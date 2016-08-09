@@ -28,89 +28,78 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Sc
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 /**
- * Builder delegation class to generate a XSD schema that describes a
- * {@link ConfigurationModel}
+ * Builder delegation class to generate a XSD schema that describes a {@link ConfigurationModel}
  *
  * @since 4.0.0
  */
-final class ConfigurationSchemaDelegate
-{
+final class ConfigurationSchemaDelegate {
 
-    private final ObjectFactory objectFactory = new ObjectFactory();
-    private final SchemaBuilder builder;
-    private Schema schema;
+  private final ObjectFactory objectFactory = new ObjectFactory();
+  private final SchemaBuilder builder;
+  private Schema schema;
 
-    public ConfigurationSchemaDelegate(SchemaBuilder builder)
-    {
-        this.builder = builder;
+  public ConfigurationSchemaDelegate(SchemaBuilder builder) {
+    this.builder = builder;
+  }
+
+  public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel) {
+    this.schema = schema;
+
+    ExtensionType config = registerExtension(configurationModel.getName());
+    config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
+
+    final ExplicitGroup choice = new ExplicitGroup();
+    choice.setMinOccurs(ZERO);
+    choice.setMaxOccurs(UNBOUNDED);
+
+    addConnectionProviderElement(choice, configurationModel);
+    addDynamicConfigPolicyElement(choice, configurationModel);
+    builder.registerParameters(config, choice, configurationModel.getParameterModels());
+    config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
+  }
+
+  private ExtensionType registerExtension(String name) {
+    LocalComplexType complexType = new LocalComplexType();
+
+    Element extension = new TopLevelElement();
+    extension.setName(name);
+    extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
+    extension.setComplexType(complexType);
+
+    ComplexContent complexContent = new ComplexContent();
+    complexType.setComplexContent(complexContent);
+    ExtensionType complexContentExtension = new ExtensionType();
+    complexContentExtension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
+    complexContent.setExtension(complexContentExtension);
+
+    schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
+
+
+    return complexContentExtension;
+  }
+
+  private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel) {
+    ExtensionModel extensionModel = configurationModel.getExtensionModel();
+    if (!extensionModel.getConnectionProviders().isEmpty() || !configurationModel.getConnectionProviders().isEmpty()) {
+      TopLevelElement objectElement = new TopLevelElement();
+
+      objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null ? ZERO : ONE);
+
+      objectElement.setMaxOccurs("1");
+      objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
+
+      all.getParticle().add(objectFactory.createElement(objectElement));
     }
+  }
 
-    public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel)
-    {
-        this.schema = schema;
+  private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel) {
+    if (!getDynamicParameters(configurationModel).isEmpty()) {
+      TopLevelElement objectElement = new TopLevelElement();
+      objectElement.setMinOccurs(ZERO);
+      objectElement.setMaxOccurs("1");
+      objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
 
-        ExtensionType config = registerExtension(configurationModel.getName());
-        config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
-
-        final ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(ZERO);
-        choice.setMaxOccurs(UNBOUNDED);
-
-        addConnectionProviderElement(choice, configurationModel);
-        addDynamicConfigPolicyElement(choice, configurationModel);
-        builder.registerParameters(config, choice, configurationModel.getParameterModels());
-        config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
+      all.getParticle().add(objectFactory.createElement(objectElement));
     }
-
-    private ExtensionType registerExtension(String name)
-    {
-        LocalComplexType complexType = new LocalComplexType();
-
-        Element extension = new TopLevelElement();
-        extension.setName(name);
-        extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
-        extension.setComplexType(complexType);
-
-        ComplexContent complexContent = new ComplexContent();
-        complexType.setComplexContent(complexContent);
-        ExtensionType complexContentExtension = new ExtensionType();
-        complexContentExtension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
-        complexContent.setExtension(complexContentExtension);
-
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
-
-
-        return complexContentExtension;
-    }
-
-    private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel)
-    {
-        ExtensionModel extensionModel = configurationModel.getExtensionModel();
-        if (!extensionModel.getConnectionProviders().isEmpty() || !configurationModel.getConnectionProviders().isEmpty())
-        {
-            TopLevelElement objectElement = new TopLevelElement();
-
-            objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null
-                                       ? ZERO
-                                       : ONE);
-
-            objectElement.setMaxOccurs("1");
-            objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
-
-            all.getParticle().add(objectFactory.createElement(objectElement));
-        }
-    }
-
-    private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel)
-    {
-        if (!getDynamicParameters(configurationModel).isEmpty())
-        {
-            TopLevelElement objectElement = new TopLevelElement();
-            objectElement.setMinOccurs(ZERO);
-            objectElement.setMaxOccurs("1");
-            objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
-
-            all.getParticle().add(objectFactory.createElement(objectElement));
-        }
-    }
+  }
 }

@@ -12,26 +12,20 @@ import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
-public abstract class AbstractDynamicDatabaseConfigTestCase extends AbstractDatabaseConfigTestCase
-{
+public abstract class AbstractDynamicDatabaseConfigTestCase extends AbstractDatabaseConfigTestCase {
 
-    public AbstractDynamicDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public AbstractDynamicDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Override
+  protected DbConfig resolveConfig(DbConfigResolver dbConfigResolver) {
+    try {
+      MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
+
+      return dbConfigResolver.resolve(muleEvent);
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to create test event to resolve DbConfig");
     }
-
-    @Override
-    protected DbConfig resolveConfig(DbConfigResolver dbConfigResolver)
-    {
-        try
-        {
-            MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
-
-            return dbConfigResolver.resolve(muleEvent);
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Unable to create test event to resolve DbConfig");
-        }
-    }
+  }
 }

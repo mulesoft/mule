@@ -6,23 +6,19 @@
  */
 package org.mule.runtime.core.util.concurrent;
 
-public class DaemonThreadFactory extends NamedThreadFactory
-{
+public class DaemonThreadFactory extends NamedThreadFactory {
 
-    public DaemonThreadFactory(String name)
-    {
-        super(name);
-    }
+  public DaemonThreadFactory(String name) {
+    super(name);
+  }
 
-    public DaemonThreadFactory(String name, ClassLoader contextClassLoader)
-    {
-        super(name, contextClassLoader);
-    }
+  public DaemonThreadFactory(String name, ClassLoader contextClassLoader) {
+    super(name, contextClassLoader);
+  }
 
-    @Override
-    protected void doConfigureThread(Thread t)
-    {
-        t.setDaemon(true);
-    }
+  @Override
+  protected void doConfigureThread(Thread t) {
+    t.setDaemon(true);
+  }
 
 }

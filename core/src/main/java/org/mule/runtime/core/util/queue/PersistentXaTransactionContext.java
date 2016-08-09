@@ -20,128 +20,101 @@ import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Implementation of {@link org.mule.runtime.core.util.queue.XaQueueTransactionContext} for persistent queues using XA transactions
+ * Implementation of {@link org.mule.runtime.core.util.queue.XaQueueTransactionContext} for persistent queues using XA
+ * transactions
  */
-public class PersistentXaTransactionContext implements XaQueueTransactionContext
-{
-    private final XaTxQueueTransactionJournal transactionJournal;
-    private final QueueProvider queueProvider;
-    private Xid xid;
+public class PersistentXaTransactionContext implements XaQueueTransactionContext {
 
-    public PersistentXaTransactionContext(XaTxQueueTransactionJournal simpleTxQueueTransactionJournal, QueueProvider queueProvider, Xid xid)
-    {
-        this.transactionJournal = simpleTxQueueTransactionJournal;
-        this.queueProvider = queueProvider;
-        this.xid = xid;
+  private final XaTxQueueTransactionJournal transactionJournal;
+  private final QueueProvider queueProvider;
+  private Xid xid;
+
+  public PersistentXaTransactionContext(XaTxQueueTransactionJournal simpleTxQueueTransactionJournal, QueueProvider queueProvider,
+                                        Xid xid) {
+    this.transactionJournal = simpleTxQueueTransactionJournal;
+    this.queueProvider = queueProvider;
+    this.xid = xid;
+  }
+
+  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
+    this.transactionJournal.logAdd(xid, queue, item);
+    return true;
+  }
+
+  public void untake(QueueStore queue, Serializable item) throws InterruptedException {
+    this.transactionJournal.logAddFirst(xid, queue, item);
+  }
+
+  public void clear(QueueStore queue) throws InterruptedException {
+    synchronized (queue) {
+      while (poll(queue, 100) != null);
     }
+  }
 
-    public boolean offer(QueueStore queue, Serializable item, long offerTimeout)
-        throws InterruptedException
-    {
-        this.transactionJournal.logAdd(xid, queue, item);
-        return true;
+  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
+    synchronized (queue) {
+      Serializable value = queue.peek();
+      if (value == null) {
+        return null;
+      }
+      this.transactionJournal.logRemove(xid, queue, value);
+      return queue.poll(pollTimeout);
     }
+  }
 
-    public void untake(QueueStore queue, Serializable item) throws InterruptedException
-    {
-        this.transactionJournal.logAddFirst(xid, queue, item);
-    }
+  public Serializable peek(QueueStore queue) throws InterruptedException {
+    return queue.peek();
+  }
 
-    public void clear(QueueStore queue) throws InterruptedException
-    {
-        synchronized (queue)
-        {
-            while (poll(queue, 100) != null);
+  public int size(QueueStore queue) {
+    final AtomicInteger addSize = new AtomicInteger(0);
+    CollectionUtils.forAllDo(this.transactionJournal.getLogEntriesForTx(xid), new Closure() {
+
+      @Override
+      public void execute(Object value) {
+        if (((XaQueueTxJournalEntry) value).isAdd() || ((XaQueueTxJournalEntry) value).isAddFirst()) {
+          addSize.incrementAndGet();
         }
-    }
+      }
+    });
+    return queue.getSize() + addSize.get();
+  }
 
-    public Serializable poll(QueueStore queue, long pollTimeout)
-        throws InterruptedException
-    {
-        synchronized (queue)
-        {
-            Serializable value = queue.peek();
-            if (value == null)
-            {
-                return null;
-            }
-            this.transactionJournal.logRemove(xid, queue, value);
-            return queue.poll(pollTimeout);
+  @Override
+  public void doCommit() throws ResourceManagerException {
+    try {
+      Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
+      for (XaQueueTxJournalEntry entry : logEntries) {
+        if (entry.isAdd()) {
+          queueProvider.getQueue(entry.getQueueName()).putNow(entry.getValue());
+        } else if (entry.isAddFirst()) {
+          queueProvider.getQueue(entry.getQueueName()).untake(entry.getValue());
         }
+      }
+      this.transactionJournal.logCommit(xid);
+    } catch (Exception e) {
+      throw new ResourceManagerException(e);
     }
+  }
 
-    public Serializable peek(QueueStore queue) throws InterruptedException
-    {
-        return queue.peek();
-    }
-
-    public int size(QueueStore queue)
-    {
-        final AtomicInteger addSize = new AtomicInteger(0);
-        CollectionUtils.forAllDo(this.transactionJournal.getLogEntriesForTx(xid), new Closure()
-        {
-            @Override
-            public void execute(Object value)
-            {
-                if (((XaQueueTxJournalEntry)value).isAdd() ||  ((XaQueueTxJournalEntry)value).isAddFirst())
-                {
-                    addSize.incrementAndGet();
-                }
-            }
-        });
-        return queue.getSize() + addSize.get();
-    }
-
-    @Override
-    public void doCommit() throws ResourceManagerException
-    {
-        try
-        {
-            Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
-            for (XaQueueTxJournalEntry entry : logEntries)
-            {
-                if (entry.isAdd())
-                {
-                    queueProvider.getQueue(entry.getQueueName()).putNow(entry.getValue());
-                }
-                else if (entry.isAddFirst())
-                {
-                    queueProvider.getQueue(entry.getQueueName()).untake(entry.getValue());
-                }
-            }
-            this.transactionJournal.logCommit(xid);
+  @Override
+  public void doRollback() throws ResourceManagerException {
+    Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
+    for (XaQueueTxJournalEntry entry : logEntries) {
+      if (entry.isRemove()) {
+        try {
+          queueProvider.getQueue(entry.getQueueName()).putNow(entry.getValue());
+        } catch (InterruptedException e) {
+          throw new ResourceManagerException(e);
         }
-        catch (Exception e)
-        {
-            throw new ResourceManagerException(e);
-        }
+      }
     }
+    this.transactionJournal.logRollback(xid);
+  }
 
-    @Override
-    public void doRollback() throws ResourceManagerException
-    {
-        Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
-        for (XaQueueTxJournalEntry entry : logEntries)
-        {
-            if (entry.isRemove())
-            {
-                try
-                {
-                    queueProvider.getQueue(entry.getQueueName()).putNow(entry.getValue());
-                }
-                catch (InterruptedException e)
-                {
-                    throw new ResourceManagerException(e);
-                }
-            }
-        }
-        this.transactionJournal.logRollback(xid);
-    }
-
-    @Override
-    public void doPrepare() throws ResourceManagerException
-    {
-        this.transactionJournal.logPrepare(xid);
-    }
+  @Override
+  public void doPrepare() throws ResourceManagerException {
+    this.transactionJournal.logPrepare(xid);
+  }
 
 }

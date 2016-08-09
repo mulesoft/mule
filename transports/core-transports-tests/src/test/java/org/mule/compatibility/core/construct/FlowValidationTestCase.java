@@ -28,53 +28,48 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FlowValidationTestCase extends AbstractMuleTestCase
-{
+public class FlowValidationTestCase extends AbstractMuleTestCase {
 
-    public static final String FLOW_NAME = "flowName";
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    public MuleContext mockMuleContext;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    public InboundEndpoint inboundEndpoint;
-    @Mock
-    public RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy;
-    @Mock
-    public AbstractRedeliveryPolicy mockRedeliveryPolicy;
-    private Flow flow;
+  public static final String FLOW_NAME = "flowName";
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  public MuleContext mockMuleContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  public InboundEndpoint inboundEndpoint;
+  @Mock
+  public RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy;
+  @Mock
+  public AbstractRedeliveryPolicy mockRedeliveryPolicy;
+  private Flow flow;
 
-    @Before
-    public void setUp()
-    {
-        when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
-        this.flow = new Flow(FLOW_NAME, mockMuleContext);
-    }
+  @Before
+  public void setUp() {
+    when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
+    this.flow = new Flow(FLOW_NAME, mockMuleContext);
+  }
 
-    @Test(expected = FlowConstructInvalidException.class)
-    public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception
-    {
-        configureFlowForRedelivery();
-        flow.setProcessingStrategy(new AsynchronousProcessingStrategy());
-        flow.validateConstruct();
-    }
+  @Test(expected = FlowConstructInvalidException.class)
+  public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
+    configureFlowForRedelivery();
+    flow.setProcessingStrategy(new AsynchronousProcessingStrategy());
+    flow.validateConstruct();
+  }
 
-    @Test
-    public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception
-    {
-        configureFlowForRedelivery();
-        flow.validateConstruct();
-        assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
-    }
+  @Test
+  public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
+    configureFlowForRedelivery();
+    flow.validateConstruct();
+    assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
+  }
 
-    private void configureFlowForRedelivery()
-    {
-        when(inboundEndpoint.getTransactionConfig().isConfigured()).thenReturn(false);
-        when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
-        flow.setExceptionListener(rollbackMessagingExceptionStrategy);
-        when(rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts()).thenReturn(true);
-        when(rollbackMessagingExceptionStrategy.acceptsAll()).thenReturn(true);
-        when(inboundEndpoint.getRedeliveryPolicy()).thenReturn(mockRedeliveryPolicy);
-        flow.setMessageSource(inboundEndpoint);
-        // flow.setMessageSource(Mockito.mock(MessageSource.class));
-    }
+  private void configureFlowForRedelivery() {
+    when(inboundEndpoint.getTransactionConfig().isConfigured()).thenReturn(false);
+    when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
+    flow.setExceptionListener(rollbackMessagingExceptionStrategy);
+    when(rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts()).thenReturn(true);
+    when(rollbackMessagingExceptionStrategy.acceptsAll()).thenReturn(true);
+    when(inboundEndpoint.getRedeliveryPolicy()).thenReturn(mockRedeliveryPolicy);
+    flow.setMessageSource(inboundEndpoint);
+    // flow.setMessageSource(Mockito.mock(MessageSource.class));
+  }
 
 }

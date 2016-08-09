@@ -14,23 +14,19 @@ import org.mule.runtime.core.metadata.TypedValue;
 /**
  * Propagates data type for flow vars used for enrichment target
  */
-public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherDataTypePropagator
-{
+public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherDataTypePropagator {
 
-    public FlowVarEnricherDataTypePropagator()
-    {
-        super(FLOW_VARS);
-    }
+  public FlowVarEnricherDataTypePropagator() {
+    super(FLOW_VARS);
+  }
 
-    @Override
-    protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName)
-    {
-        event.setFlowVariable(propertyName, typedValue.getValue(), typedValue.getDataType());
-    }
+  @Override
+  protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName) {
+    event.setFlowVariable(propertyName, typedValue.getValue(), typedValue.getDataType());
+  }
 
-    @Override
-    protected boolean containsVariable(MuleEvent event, String propertyName)
-    {
-        return event.getFlowVariableNames().contains(propertyName);
-    }
+  @Override
+  protected boolean containsVariable(MuleEvent event, String propertyName) {
+    return event.getFlowVariableNames().contains(propertyName);
+  }
 }

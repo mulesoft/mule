@@ -70,409 +70,358 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
-{
+public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
+  private MuleEvent event;
+  private ServerNotificationManager notificationManager;
+  private TestPipeline pipeline;
+  private final String pipelineName = "testPipeline";
+
+  @Before
+  public void createMocks() throws Exception {
+
+    when(muleContext.getStatistics()).thenReturn(new AllStatistics());
+    when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
+    when(muleContext.getRegistry()).thenReturn(new MuleRegistryHelper(new DefaultRegistryBroker(muleContext), muleContext));
+    when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());
+    notificationManager = mock(ServerNotificationManager.class);
+    when(muleContext.getNotificationManager()).thenReturn(notificationManager);
+    pipeline = new TestPipeline(pipelineName, muleContext);
+    when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
+  }
+
+  @Test
+  public void requestResponse() throws MuleException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.initialise();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+
+    source.trigger(event);
+
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
+    verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+  }
+
+  @Test
+  public void requestResponseNonBlocking() throws Exception {
+    assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor());
+  }
+
+  @Test
+  public void requestResponseNonBlockingWithBlockingMessageProcessor() throws Exception {
+    assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""));
+  }
+
+  private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor) throws Exception {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    pipeline.setMessageProcessors(Collections.singletonList(messageProcessor));
+    pipeline.initialise();
+
+    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+    event =
+        new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+
+    source.trigger(event);
+
+    new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
+      verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+      return true;
+    }));
+  }
+
+  @Test
+  public void oneWay() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.initialise();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+
+    source.trigger(event);
+
+    new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
+      verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+      return true;
+    }));
+  }
+
+  @Test
+  public void requestResponseRequestException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(new ExceptionThrowingMessageProcessor());
+    pipeline.setMessageProcessors(processors);
+    pipeline.initialise();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+
+    try {
+      source.trigger(event);
+    } catch (Exception e) {
+    }
+
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
+    verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
+  }
+
+  @Test
+  public void requestResponseNonBlockingRequestException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(new ExceptionThrowingMessageProcessor());
+    processors.add(new SensingNullMessageProcessor());
+    pipeline.setMessageProcessors(processors);
+    pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    pipeline.initialise();
+
+    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+    event =
+        new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+
+    try {
+      source.trigger(event);
+    } catch (Exception e) {
+    }
+
+    new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+      verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
+      return true;
+    }));
+  }
+
+  @Test
+  public void requestResponseNonBlockingResponseException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
+    processors.add(new SensingNullMessageProcessor());
+    pipeline.setMessageProcessors(processors);
+    pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    pipeline.initialise();
+
+    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+    event =
+        new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+
+    try {
+      source.trigger(event);
+    } catch (Exception e) {
+    }
+
+    new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+      verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+      return true;
+    }));
+  }
+
+  @Test
+  public void requestResponseResponseException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
+    pipeline.setMessageProcessors(processors);
+    pipeline.initialise();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+
+    try {
+      source.trigger(event);
+    } catch (Exception e) {
+    }
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
+    verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+  }
+
+  @Test
+  public void oneWayRequestException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(new ExceptionThrowingMessageProcessor());
+    pipeline.setMessageProcessors(processors);
+    pipeline.initialise();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+
+    try {
+      source.trigger(event);
+    } catch (Exception e) {
+    }
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationManager, times(1))
+        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+    verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
+  }
+
+  @Test
+  public void oneWayAsyncRequestException() throws MuleException, InterruptedException {
+    TriggerableMessageSource source = new TriggerableMessageSource();
+    Flow pipeline = new Flow("test", muleContext);
+    pipeline.setProcessingStrategy(new AsynchronousProcessingStrategy());
+    final CountDownLatch latch = new CountDownLatch(1);
+    pipeline.setMessageSource(source);
+    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
+    List<MessageProcessor> processors = new ArrayList<>();
+    processors.add(event -> {
+      latch.countDown();
+      throw new RuntimeException("error");
+    });
+    pipeline.setMessageProcessors(processors);
+    pipeline.initialise();
+    pipeline.start();
+
+    event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+
+    source.trigger(event);
+    latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+    new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
+      // Event is not same, because it's copied
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_START,
+                                                                                    false, null)));
+      verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_END,
+                                                                                    false, null)));
+      verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
+      return true;
+    }));
+
+    pipeline.stop();
+    pipeline.dispose();
+  }
+
+
+  private class TestPipeline extends AbstractPipeline {
+
+    CountDownLatch latch = new CountDownLatch(2);
+
+    public TestPipeline(String name, MuleContext muleContext) {
+      super(name, muleContext);
+    }
+
+    @Override
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+      builder.chain((MessageProcessor) event -> {
+        latch.countDown();
+        return event;
+      });
+      super.configureMessageProcessors(builder);
+    }
+
+    @Override
+    protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+      super.configurePostProcessors(builder);
+      builder.chain((MessageProcessor) event -> {
+        latch.countDown();
+        return event;
+      });
+    }
+
+    @Override
+    public String getConstructType() {
+      return "test";
+    }
+  }
+
+  private class PipelineMessageNotificiationArgumentMatcher extends ArgumentMatcher<PipelineMessageNotification> {
+
+    private int expectedAction;
+    private boolean exceptionExpected;
     private MuleEvent event;
-    private ServerNotificationManager notificationManager;
-    private TestPipeline pipeline;
-    private final String pipelineName = "testPipeline";
 
-    @Before
-    public void createMocks() throws Exception
-    {
-
-        when(muleContext.getStatistics()).thenReturn(new AllStatistics());
-        when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-        when(muleContext.getRegistry()).thenReturn(
-                new MuleRegistryHelper(new DefaultRegistryBroker(muleContext), muleContext));
-        when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());
-        notificationManager = mock(ServerNotificationManager.class);
-        when(muleContext.getNotificationManager()).thenReturn(notificationManager);
-        pipeline = new TestPipeline(pipelineName, muleContext);
-        when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
+    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, MuleEvent event) {
+      this.expectedAction = expectedAction;
+      this.exceptionExpected = exceptionExpected;
+      this.event = event;
     }
 
-    @Test
-    public void requestResponse() throws MuleException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.initialise();
+    @Override
+    public boolean matches(Object argument) {
+      ServerNotification notification = (ServerNotification) argument;
+      if (exceptionExpected) {
+        MessagingException exception = null;
+        if (notification instanceof PipelineMessageNotification) {
+          exception = ((PipelineMessageNotification) notification).getException();
+        } else if (notification instanceof AsyncMessageNotification) {
+          exception = ((AsyncMessageNotification) notification).getException();
 
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+        }
+        return expectedAction == notification.getAction() && exception != null && notification.getSource() != null
+            && (this.event == null || this.event == notification.getSource());
+      } else {
+        return expectedAction == notification.getAction() && notification.getSource() != null
+            && (this.event == null || this.event == notification.getSource());
+      }
 
-        source.trigger(event);
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
-        verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
+  }
 
-    @Test
-    public void requestResponseNonBlocking() throws Exception
-    {
-        assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor());
+  public static class ExceptionThrowingMessageProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      throw new IllegalStateException();
     }
-
-    @Test
-    public void requestResponseNonBlockingWithBlockingMessageProcessor() throws Exception
-    {
-        assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""));
-    }
-
-    private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor) throws Exception
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        pipeline.setMessageProcessors(Collections.singletonList(messageProcessor));
-        pipeline.initialise();
-
-        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(),
-                REQUEST_RESPONSE, nullReplyToHandler, pipeline);
-
-        source.trigger(event);
-
-        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() ->
-        {
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
-            verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
-            return true;
-        }));
-    }
-
-    @Test
-    public void oneWay() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.initialise();
-
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
-
-        source.trigger(event);
-
-        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() ->
-        {
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
-            verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
-            return true;
-        }));
-    }
-
-    @Test
-    public void requestResponseRequestException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(new ExceptionThrowingMessageProcessor());
-        pipeline.setMessageProcessors(processors);
-        pipeline.initialise();
-
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
-
-        try
-        {
-            source.trigger(event);
-        }
-        catch (Exception e)
-        {
-        }
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
-        verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
-    }
-
-    @Test
-    public void requestResponseNonBlockingRequestException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(new ExceptionThrowingMessageProcessor());
-        processors.add(new SensingNullMessageProcessor());
-        pipeline.setMessageProcessors(processors);
-        pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        pipeline.initialise();
-
-        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
-
-        try
-        {
-            source.trigger(event);
-        }
-        catch (Exception e)
-        {
-        }
-
-        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() ->
-        {
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
-            verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
-            return true;
-        }));
-    }
-
-    @Test
-    public void requestResponseNonBlockingResponseException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
-        processors.add(new SensingNullMessageProcessor());
-        pipeline.setMessageProcessors(processors);
-        pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        pipeline.initialise();
-
-        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
-
-        try
-        {
-            source.trigger(event);
-        }
-        catch (Exception e)
-        {
-        }
-
-        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() ->
-        {
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
-            verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
-            return true;
-        }));
-    }
-
-    @Test
-    public void requestResponseResponseException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
-        pipeline.setMessageProcessors(processors);
-        pipeline.initialise();
-
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
-
-        try
-        {
-            source.trigger(event);
-        }
-        catch (Exception e)
-        {
-        }
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
-        verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
-    }
-
-    @Test
-    public void oneWayRequestException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(new ExceptionThrowingMessageProcessor());
-        pipeline.setMessageProcessors(processors);
-        pipeline.initialise();
-
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
-
-        try
-        {
-            source.trigger(event);
-        }
-        catch (Exception e)
-        {
-        }
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-            argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
-        verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
-    }
-
-    @Test
-    public void oneWayAsyncRequestException() throws MuleException, InterruptedException
-    {
-        TriggerableMessageSource source = new TriggerableMessageSource();
-        Flow pipeline = new Flow("test", muleContext);
-        pipeline.setProcessingStrategy(new AsynchronousProcessingStrategy());
-        final CountDownLatch latch = new CountDownLatch(1);
-        pipeline.setMessageSource(source);
-        pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<>();
-        processors.add(event ->
-        {
-            latch.countDown();
-            throw new RuntimeException("error");
-        });
-        pipeline.setMessageProcessors(processors);
-        pipeline.initialise();
-        pipeline.start();
-
-        event = new DefaultMuleEvent(MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
-
-        source.trigger(event);
-        latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        new PollingProber(2000, 50).check(new JUnitLambdaProbe(() ->
-        {
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
-            // Event is not same, because it's copied
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_START, false, null)));
-            verify(notificationManager, times(1)).fireNotification(
-                    argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_END, false, null)));
-            verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
-            return true;
-        }));
-
-        pipeline.stop();
-        pipeline.dispose();
-    }
-
-
-    private class TestPipeline extends AbstractPipeline
-    {
-
-        CountDownLatch latch = new CountDownLatch(2);
-
-        public TestPipeline(String name, MuleContext muleContext)
-        {
-            super(name, muleContext);
-        }
-
-        @Override
-        protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
-        {
-            builder.chain((MessageProcessor) event ->
-            {
-                latch.countDown();
-                return event;
-            });
-            super.configureMessageProcessors(builder);
-        }
-
-        @Override
-        protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException
-        {
-            super.configurePostProcessors(builder);
-            builder.chain((MessageProcessor) event ->
-            {
-                latch.countDown();
-                return event;
-            });
-        }
-
-        @Override
-        public String getConstructType()
-        {
-            return "test";
-        }
-    }
-
-    private class PipelineMessageNotificiationArgumentMatcher extends
-        ArgumentMatcher<PipelineMessageNotification>
-    {
-        private int expectedAction;
-        private boolean exceptionExpected;
-        private MuleEvent event;
-
-        public PipelineMessageNotificiationArgumentMatcher(int expectedAction,
-                                                           boolean exceptionExpected,
-                                                           MuleEvent event)
-        {
-            this.expectedAction = expectedAction;
-            this.exceptionExpected = exceptionExpected;
-            this.event = event;
-        }
-
-        @Override
-        public boolean matches(Object argument)
-        {
-            ServerNotification notification = (ServerNotification) argument;
-            if (exceptionExpected)
-            {
-                MessagingException exception = null;
-                if (notification instanceof PipelineMessageNotification)
-                {
-                    exception = ((PipelineMessageNotification) notification).getException();
-                }
-                else if (notification instanceof AsyncMessageNotification)
-                {
-                    exception = ((AsyncMessageNotification) notification).getException();
-
-                }
-                return expectedAction == notification.getAction() && exception != null
-                       && notification.getSource() != null
-                       && (this.event == null || this.event == notification.getSource());
-            }
-            else
-            {
-                return expectedAction == notification.getAction() && notification.getSource() != null
-                       && (this.event == null || this.event == notification.getSource());
-            }
-
-        }
-    }
-
-    public static class ExceptionThrowingMessageProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new IllegalStateException();
-        }
-    }
+  }
 
 }

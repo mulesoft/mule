@@ -37,154 +37,136 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
-{
+public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
-    public static final String CLASS_NAME = "java.lang.Object";
-    public static final String RESOURCE_NAME = "dummy.txt";
+  public static final String CLASS_NAME = "java.lang.Object";
+  public static final String RESOURCE_NAME = "dummy.txt";
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    public boolean verboseClassloadingLog;
-    @Rule
-    public SystemProperty verboseClassloading;
+  public boolean verboseClassloadingLog;
+  @Rule
+  public SystemProperty verboseClassloading;
 
-    protected FilteringArtifactClassLoader filteringArtifactClassLoader;
-    protected final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-    protected final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+  protected FilteringArtifactClassLoader filteringArtifactClassLoader;
+  protected final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
+  protected final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
 
-    @Parameters(name = "verbose: {0}")
-    public static Collection<Object[]> params()
-    {
-        return asList(new Object[][] {
-                                      {true},
-                                      {false}
-        });
+  @Parameters(name = "verbose: {0}")
+  public static Collection<Object[]> params() {
+    return asList(new Object[][] {{true}, {false}});
+  }
+
+  public FilteringArtifactClassLoaderTestCase(boolean verboseClassloadingLog) {
+    this.verboseClassloadingLog = verboseClassloadingLog;
+    verboseClassloading = new SystemProperty(MULE_LOG_VERBOSE_CLASSLOADING, Boolean.toString(verboseClassloadingLog));
+  }
+
+  @Before
+  public void before() {
+    when(artifactClassLoader.getArtifactName()).thenReturn("mockArtifact");
+  }
+
+  @Test
+  public void throwClassNotFoundErrorWhenClassIsNotExported() throws ClassNotFoundException {
+    expected.expect(NotExportedClassException.class);
+    if (verboseClassloadingLog) {
+      expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'."
+          + lineSeparator() + filter.toString()));
+    } else {
+      expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'."));
     }
 
-    public FilteringArtifactClassLoaderTestCase(boolean verboseClassloadingLog)
-    {
-        this.verboseClassloadingLog = verboseClassloadingLog;
-        verboseClassloading = new SystemProperty(MULE_LOG_VERBOSE_CLASSLOADING, Boolean.toString(verboseClassloadingLog));
-    }
+    when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-    @Before
-    public void before()
-    {
-        when(artifactClassLoader.getArtifactName()).thenReturn("mockArtifact");
-    }
+    filteringArtifactClassLoader.loadClass(CLASS_NAME);
+  }
 
-    @Test
-    public void throwClassNotFoundErrorWhenClassIsNotExported() throws ClassNotFoundException
-    {
-        expected.expect(NotExportedClassException.class);
-        if (verboseClassloadingLog)
-        {
-            expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'." + lineSeparator() + filter.toString()));
-        }
-        else
-        {
-            expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'."));
-        }
+  protected FilteringArtifactClassLoader doCreateClassLoader() {
+    return new FilteringArtifactClassLoader(artifactClassLoader, filter);
+  }
 
-        when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
-        filteringArtifactClassLoader = doCreateClassLoader();
+  @Test
+  public void loadsExportedClass() throws ClassNotFoundException {
+    TestClassLoader classLoader = new TestClassLoader();
+    Class expectedClass = this.getClass();
+    classLoader.addClass(CLASS_NAME, expectedClass);
 
-        filteringArtifactClassLoader.loadClass(CLASS_NAME);
-    }
+    when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-    protected FilteringArtifactClassLoader doCreateClassLoader()
-    {
-        return new FilteringArtifactClassLoader(artifactClassLoader, filter);
-    }
+    filteringArtifactClassLoader = doCreateClassLoader();
+    Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
+    assertThat(aClass, equalTo(expectedClass));
+  }
 
-    @Test
-    public void loadsExportedClass() throws ClassNotFoundException
-    {
-        TestClassLoader classLoader = new TestClassLoader();
-        Class expectedClass = this.getClass();
-        classLoader.addClass(CLASS_NAME, expectedClass);
+  @Test
+  public void filtersResourceWhenNotExported() throws ClassNotFoundException {
+    when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-        when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
-        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+    URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
+    assertThat(resource, equalTo(null));
+  }
 
-        filteringArtifactClassLoader = doCreateClassLoader();
-        Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
-        assertThat(aClass, equalTo(expectedClass));
-    }
+  @Test
+  public void loadsExportedResource() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
 
-    @Test
-    public void filtersResourceWhenNotExported() throws ClassNotFoundException
-    {
-        when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
-        filteringArtifactClassLoader = doCreateClassLoader();
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+    when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
 
-        URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
-        assertThat(resource, equalTo(null));
-    }
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-    @Test
-    public void loadsExportedResource() throws ClassNotFoundException, IOException
-    {
-        URL expectedResource = new URL("file:///app.txt");
+    URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
+    assertThat(resource, equalTo(expectedResource));
+  }
 
-        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-        when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
+  @Test
+  public void filtersResources() throws Exception {
+    TestClassLoader classLoader = new TestClassLoader();
+    URL blockedResource = new URL("file:///app.txt");
+    classLoader.addResource(RESOURCE_NAME, blockedResource);
 
-        filteringArtifactClassLoader = doCreateClassLoader();
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-        URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
-        assertThat(resource, equalTo(expectedResource));
-    }
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-    @Test
-    public void filtersResources() throws Exception
-    {
-        TestClassLoader classLoader = new TestClassLoader();
-        URL blockedResource = new URL("file:///app.txt");
-        classLoader.addResource(RESOURCE_NAME, blockedResource);
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
+    assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
+  }
 
-        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
-        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+  @Test
+  public void getsExportedResources() throws Exception {
+    URL resource = new URL("file:/app.txt");
 
-        filteringArtifactClassLoader = doCreateClassLoader();
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+    when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
 
-        Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-        assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
-    }
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-    @Test
-    public void getsExportedResources() throws Exception
-    {
-        URL resource = new URL("file:/app.txt");
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
+    assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
+  }
 
-        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-        when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
+  @Test
+  public void returnsCorrectClassLoader() throws Exception {
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-        filteringArtifactClassLoader = doCreateClassLoader();
+    final ClassLoader classLoader = filteringArtifactClassLoader.getClassLoader();
 
-        Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-        assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
-    }
+    assertThat(classLoader, is(filteringArtifactClassLoader));
+  }
 
-    @Test
-    public void returnsCorrectClassLoader() throws Exception
-    {
-        filteringArtifactClassLoader = doCreateClassLoader();
+  @Test
+  public void doesNotDisposesFilteredClassLoader() throws Exception {
+    filteringArtifactClassLoader = doCreateClassLoader();
 
-        final ClassLoader classLoader = filteringArtifactClassLoader.getClassLoader();
+    filteringArtifactClassLoader.dispose();
 
-        assertThat(classLoader, is(filteringArtifactClassLoader));
-    }
-
-    @Test
-    public void doesNotDisposesFilteredClassLoader() throws Exception
-    {
-        filteringArtifactClassLoader = doCreateClassLoader();
-
-        filteringArtifactClassLoader.dispose();
-
-        verify(artifactClassLoader, never()).dispose();
-    }
+    verify(artifactClassLoader, never()).dispose();
+  }
 }

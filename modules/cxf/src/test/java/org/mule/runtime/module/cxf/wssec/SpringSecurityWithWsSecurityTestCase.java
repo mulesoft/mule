@@ -14,28 +14,23 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.junit.Ignore;
 
 @Ignore("MULE-6926: flaky test")
-public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
-{
+public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase {
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                             "org/mule/runtime/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml",
-                             "org/mule/runtime/module/cxf/wssec/spring-security-ws-security-conf.xml"
-        };
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"org/mule/runtime/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml",
+        "org/mule/runtime/module/cxf/wssec/spring-security-ws-security-conf.xml"};
+  }
 
-    @Override
-    @Ignore("MULE-6926: flaky test")
-    public void testUsernameToken() throws Exception
-    {
-        super.testUsernameToken();
-        GreeterWithLatch greeter = getGreeter();
-        SecurityContext sc = greeter.getSecurityContext();
-        assertNotNull(sc);
-        assertNotNull(sc.getAuthentication());
-        assertEquals(null, sc.getAuthentication().getCredentials());
-        assertNotNull(sc.getAuthentication().getPrincipal());
-    }
+  @Override
+  @Ignore("MULE-6926: flaky test")
+  public void testUsernameToken() throws Exception {
+    super.testUsernameToken();
+    GreeterWithLatch greeter = getGreeter();
+    SecurityContext sc = greeter.getSecurityContext();
+    assertNotNull(sc);
+    assertNotNull(sc.getAuthentication());
+    assertEquals(null, sc.getAuthentication().getCredentials());
+    assertNotNull(sc.getAuthentication().getPrincipal());
+  }
 }

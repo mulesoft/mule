@@ -14,32 +14,26 @@ import org.mule.test.vegan.extension.VeganCookBook;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestOperationsWithSubTypeMapping
-{
+public class TestOperationsWithSubTypeMapping {
 
-    public ParentShape shapeRetriever(ParentShape shape)
-    {
-        return shape;
-    }
+  public ParentShape shapeRetriever(ParentShape shape) {
+    return shape;
+  }
 
-    public Door doorRetriever(Door door)
-    {
-        return door;
-    }
+  public Door doorRetriever(Door door) {
+    return door;
+  }
 
-    public SubTypesMappingConnector configRetriever(@UseConfig SubTypesMappingConnector config)
-    {
-        return config;
-    }
+  public SubTypesMappingConnector configRetriever(@UseConfig SubTypesMappingConnector config) {
+    return config;
+  }
 
-    public SubTypesConnectorConnection connectionRetriever(@Connection SubTypesConnectorConnection connection)
-    {
-        return connection;
-    }
+  public SubTypesConnectorConnection connectionRetriever(@Connection SubTypesConnectorConnection connection) {
+    return connection;
+  }
 
-    public List<Object> subtypedAndConcreteParameters(ParentShape baseShape, Door door, FinalPojo finalPojo,
-                                                      VeganCookBook cookBook, ParentShape squareShape, ParentShape triangle)
-    {
-        return Arrays.asList(baseShape, door, finalPojo, cookBook, squareShape, triangle);
-    }
+  public List<Object> subtypedAndConcreteParameters(ParentShape baseShape, Door door, FinalPojo finalPojo, VeganCookBook cookBook,
+                                                    ParentShape squareShape, ParentShape triangle) {
+    return Arrays.asList(baseShape, door, finalPojo, cookBook, squareShape, triangle);
+  }
 }

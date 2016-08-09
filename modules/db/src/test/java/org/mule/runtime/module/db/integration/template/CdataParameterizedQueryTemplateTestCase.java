@@ -14,19 +14,16 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class CdataParameterizedQueryTemplateTestCase extends FunctionalTestCase
-{
+public class CdataParameterizedQueryTemplateTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/template/cdata-parameterized-query-template-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/template/cdata-parameterized-query-template-config.xml";
+  }
 
-    @Test
-    public void parsesParameterizedQuery() throws Exception
-    {
-        QueryTemplate queryTemplate = muleContext.getRegistry().lookupObject("parameterizedQuery");
-        assertThat(queryTemplate.getSqlText(), equalTo("select * from PLANET"));
-    }
+  @Test
+  public void parsesParameterizedQuery() throws Exception {
+    QueryTemplate queryTemplate = muleContext.getRegistry().lookupObject("parameterizedQuery");
+    assertThat(queryTemplate.getSqlText(), equalTo("select * from PLANET"));
+  }
 }

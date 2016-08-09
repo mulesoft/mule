@@ -37,97 +37,89 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
-{
+public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {
 
-    private final String CUSTOM_RESPONSE_PARAMETER1_VALUE = "token-resp-value1";
-    private final String CUSTOM_RESPONSE_PARAMETER2_VALUE = "token-resp-value2";
-    private static final String RESOURCE_PATH = "/resource";
-    private static final String NEW_ACCESS_TOKEN = "abcdefghjkl";
-    @Rule
-    public SystemProperty tokenUrl = new SystemProperty("token.url", String.format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
-    @Rule
-    public SystemProperty customTokenResponseParameter1Name = new SystemProperty("custom.param.extractor1", "token-resp-param1");
-    @Rule
-    public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
+  private final String CUSTOM_RESPONSE_PARAMETER1_VALUE = "token-resp-value1";
+  private final String CUSTOM_RESPONSE_PARAMETER2_VALUE = "token-resp-value2";
+  private static final String RESOURCE_PATH = "/resource";
+  private static final String NEW_ACCESS_TOKEN = "abcdefghjkl";
+  @Rule
+  public SystemProperty tokenUrl =
+      new SystemProperty("token.url",
+                         String.format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
+  @Rule
+  public SystemProperty customTokenResponseParameter1Name = new SystemProperty("custom.param.extractor1", "token-resp-param1");
+  @Rule
+  public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
 
-    private String configFile;
+  private String configFile;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return configFile;
-    }
+  @Override
+  protected String getConfigFile() {
+    return configFile;
+  }
 
-    public ClientCredentialsFullConfigTestCase(String configFile)
-    {
-        this.configFile = configFile;
-    }
+  public ClientCredentialsFullConfigTestCase(String configFile) {
+    this.configFile = configFile;
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
-                             new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
+                         new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
+  }
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        final ImmutableMap customTokenResponseParameters = new ImmutableMap.Builder()
-                .put(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE)
-                .put(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE).build();
-        configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(customTokenResponseParameters);
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    final ImmutableMap customTokenResponseParameters =
+        new ImmutableMap.Builder().put(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE)
+            .put(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE).build();
+    configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(customTokenResponseParameters);
+  }
 
-    @Test
-    public void authenticationIsDoneOnStartupUsingScope() throws Exception
-    {
-        verifyRequestDoneToTokenUrlForClientCredentials(scopes.getValue());
+  @Test
+  public void authenticationIsDoneOnStartupUsingScope() throws Exception {
+    verifyRequestDoneToTokenUrlForClientCredentials(scopes.getValue());
 
-        SimpleMemoryObjectStore objectStore = muleContext.getRegistry().get("customObjectStore");
-        assertThat(objectStore.allKeys().isEmpty(), is(false));
-        ResourceOwnerOAuthContext resourceOwnerOAuthContext = (ResourceOwnerOAuthContext) objectStore.retrieve(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-        assertThat(resourceOwnerOAuthContext.getAccessToken(), Is.<Serializable>is(ACCESS_TOKEN));
-    }
+    SimpleMemoryObjectStore objectStore = muleContext.getRegistry().get("customObjectStore");
+    assertThat(objectStore.allKeys().isEmpty(), is(false));
+    ResourceOwnerOAuthContext resourceOwnerOAuthContext =
+        (ResourceOwnerOAuthContext) objectStore.retrieve(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    assertThat(resourceOwnerOAuthContext.getAccessToken(), Is.<Serializable>is(ACCESS_TOKEN));
+  }
 
-    @Test
-    public void customTokenResponseParametersAreCaptured() throws Exception
-    {
-        final OAuthContextFunctionAsserter oauthContextAsserter = OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig");
-        oauthContextAsserter.assertAccessTokenIs(ACCESS_TOKEN);
-        oauthContextAsserter.assertExpiresInIs(EXPIRES_IN);
-        oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE);
-        oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
-    }
+  @Test
+  public void customTokenResponseParametersAreCaptured() throws Exception {
+    final OAuthContextFunctionAsserter oauthContextAsserter =
+        OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig");
+    oauthContextAsserter.assertAccessTokenIs(ACCESS_TOKEN);
+    oauthContextAsserter.assertExpiresInIs(EXPIRES_IN);
+    oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(),
+                                                                CUSTOM_RESPONSE_PARAMETER1_VALUE);
+    oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(),
+                                                                CUSTOM_RESPONSE_PARAMETER2_VALUE);
+  }
 
-    @Test
-    public void authenticationFailedTriggersRefreshAccessToken() throws Exception
-    {
-        configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
+  @Test
+  public void authenticationFailedTriggersRefreshAccessToken() throws Exception {
+    configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
 
-        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withStatus(500).withHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
+        .willReturn(aResponse().withStatus(500).withHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
 
-        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withBody(TEST_MESSAGE)
-                                                         .withStatus(200)));
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
+        .willReturn(aResponse().withBody(TEST_MESSAGE).withStatus(200)));
 
-        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
+    flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 
-        verifyRequestDoneToTokenUrlForClientCredentials();
+    verifyRequestDoneToTokenUrlForClientCredentials();
 
-        wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-                                    .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
-    }
+    wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
+        .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+  }
 
-    @Override
-    protected String getProtocol()
-    {
-        return HTTPS.getScheme();
-    }
+  @Override
+  protected String getProtocol() {
+    return HTTPS.getScheme();
+  }
 }

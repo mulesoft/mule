@@ -14,108 +14,93 @@ import java.util.concurrent.locks.Lock;
 /**
  * OAuth state for a particular resource owner which typically represents an user.
  */
-public class ResourceOwnerOAuthContext implements Serializable
-{
+public class ResourceOwnerOAuthContext implements Serializable {
 
-    public static final String DEFAULT_RESOURCE_OWNER_ID = "default";
+  public static final String DEFAULT_RESOURCE_OWNER_ID = "default";
 
-    private final String resourceOwnerId;
-    private transient Lock refreshUserOAuthContextLock;
-    private String accessToken;
-    private String refreshToken;
-    private String state;
-    private String expiresIn;
-    private Map<String, Object> tokenResponseParameters = new HashMap<String, Object>();
+  private final String resourceOwnerId;
+  private transient Lock refreshUserOAuthContextLock;
+  private String accessToken;
+  private String refreshToken;
+  private String state;
+  private String expiresIn;
+  private Map<String, Object> tokenResponseParameters = new HashMap<String, Object>();
 
-    public ResourceOwnerOAuthContext(final Lock refreshUserOAuthContextLock, final String resourceOwnerId)
-    {
-        this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
-        this.resourceOwnerId = resourceOwnerId;
-    }
+  public ResourceOwnerOAuthContext(final Lock refreshUserOAuthContextLock, final String resourceOwnerId) {
+    this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
+    this.resourceOwnerId = resourceOwnerId;
+  }
 
-    /**
-     * @return access token of the oauth context retrieved by the token request
-     */
-    public String getAccessToken()
-    {
-        return accessToken;
-    }
+  /**
+   * @return access token of the oauth context retrieved by the token request
+   */
+  public String getAccessToken() {
+    return accessToken;
+  }
 
-    /**
-     * @return refresh token of the oauth context retrieved by the token request
-     */
-    public String getRefreshToken()
-    {
-        return refreshToken;
-    }
+  /**
+   * @return refresh token of the oauth context retrieved by the token request
+   */
+  public String getRefreshToken() {
+    return refreshToken;
+  }
 
-    /**
-     * @return state of the oauth context send in the authorization request
-     */
-    public String getState()
-    {
-        return state;
-    }
+  /**
+   * @return state of the oauth context send in the authorization request
+   */
+  public String getState() {
+    return state;
+  }
 
-    public void setAccessToken(final String accessToken)
-    {
-        this.accessToken = accessToken;
-    }
+  public void setAccessToken(final String accessToken) {
+    this.accessToken = accessToken;
+  }
 
-    public void setRefreshToken(final String refreshToken)
-    {
-        this.refreshToken = refreshToken;
-    }
+  public void setRefreshToken(final String refreshToken) {
+    this.refreshToken = refreshToken;
+  }
 
-    public void setExpiresIn(final String expiresIn)
-    {
-        this.expiresIn = expiresIn;
-    }
+  public void setExpiresIn(final String expiresIn) {
+    this.expiresIn = expiresIn;
+  }
 
-    /**
-     * @return expires in value retrieved by the token request.
-     */
-    public String getExpiresIn()
-    {
-        return expiresIn;
-    }
+  /**
+   * @return expires in value retrieved by the token request.
+   */
+  public String getExpiresIn() {
+    return expiresIn;
+  }
 
-    public void setState(final String state)
-    {
-        this.state = state;
-    }
+  public void setState(final String state) {
+    this.state = state;
+  }
 
-    /**
-     * @return custom token request response parameters configured for extraction.
-     */
-    public Map<String, Object> getTokenResponseParameters()
-    {
-        return tokenResponseParameters;
-    }
+  /**
+   * @return custom token request response parameters configured for extraction.
+   */
+  public Map<String, Object> getTokenResponseParameters() {
+    return tokenResponseParameters;
+  }
 
-    public void setTokenResponseParameters(final Map<String, Object> tokenResponseParameters)
-    {
-        this.tokenResponseParameters = tokenResponseParameters;
-    }
+  public void setTokenResponseParameters(final Map<String, Object> tokenResponseParameters) {
+    this.tokenResponseParameters = tokenResponseParameters;
+  }
 
-    /**
-     * @return a lock that can be used to avoid concurrency problems trying to update oauth context.
-     */
-    public Lock getRefreshUserOAuthContextLock()
-    {
-        return refreshUserOAuthContextLock;
-    }
+  /**
+   * @return a lock that can be used to avoid concurrency problems trying to update oauth context.
+   */
+  public Lock getRefreshUserOAuthContextLock() {
+    return refreshUserOAuthContextLock;
+  }
 
-    /**
-     * @return id for the oauth state.
-     */
-    public String getResourceOwnerId()
-    {
-        return resourceOwnerId;
-    }
+  /**
+   * @return id for the oauth state.
+   */
+  public String getResourceOwnerId() {
+    return resourceOwnerId;
+  }
 
-    public void setRefreshUserOAuthContextLock(Lock refreshUserOAuthContextLock)
-    {
-        this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
-    }
+  public void setRefreshUserOAuthContextLock(Lock refreshUserOAuthContextLock) {
+    this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
+  }
 }

@@ -20,69 +20,54 @@ import java.util.zip.ZipOutputStream;
 /**
  * Provides utility methods to work with ZIP files
  */
-public class ZipUtils
-{
+public class ZipUtils {
 
-    private ZipUtils()
-    {
+  private ZipUtils() {}
+
+  /**
+   * Describes a resource that can be compressed in a ZIP file
+   */
+  public static class ZipResource {
+
+    private final String file;
+    private final String alias;
+
+    public ZipResource(String file, String alias) {
+      this.file = file;
+      this.alias = alias;
     }
+  }
 
-    /**
-     * Describes a resource that can be compressed in a ZIP file
-     */
-    public static class ZipResource
-    {
-
-        private final String file;
-        private final String alias;
-
-        public ZipResource(String file, String alias)
-        {
-            this.file = file;
-            this.alias = alias;
+  /**
+   * Compress a set of resource files into a ZIP file
+   *
+   * @param targetFile file that will contain the zipped files
+   * @param resources resources to compress
+   * @throws IOException in case of any error processing the files
+   */
+  public static void compress(File targetFile, ZipResource[] resources) throws IOException {
+    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(targetFile))) {
+      for (ZipResource zipResource : resources) {
+        URL resourceUrl = ClassUtils.getResource(zipResource.file, ZipUtils.class);
+        if (resourceUrl == null) {
+          resourceUrl = new File(zipResource.file).toURI().toURL();
         }
+
+        try (FileInputStream in = new FileInputStream(resourceUrl.getFile())) {
+          out.putNextEntry(new ZipEntry(zipResource.alias == null ? zipResource.file : zipResource.alias));
+
+          byte[] buffer = new byte[1024];
+
+          int count;
+          while ((count = in.read(buffer)) > 0) {
+            out.write(buffer, 0, count);
+          }
+        }
+      }
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException("Error compressing file " + targetFile.getName(), e);
     }
-
-    /**
-     * Compress a set of resource files into a ZIP file
-     *
-     * @param targetFile file that will contain the zipped files
-     * @param resources  resources to compress
-     * @throws IOException in case of any error processing the files
-     */
-    public static void compress(File targetFile, ZipResource[] resources) throws IOException
-    {
-        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(targetFile)))
-        {
-            for (ZipResource zipResource : resources)
-            {
-                URL resourceUrl = ClassUtils.getResource(zipResource.file, ZipUtils.class);
-                if (resourceUrl == null)
-                {
-                    resourceUrl = new File(zipResource.file).toURI().toURL();
-                }
-
-                try (FileInputStream in = new FileInputStream(resourceUrl.getFile()))
-                {
-                    out.putNextEntry(new ZipEntry(zipResource.alias == null ? zipResource.file : zipResource.alias));
-
-                    byte[] buffer = new byte[1024];
-
-                    int count;
-                    while ((count = in.read(buffer)) > 0)
-                    {
-                        out.write(buffer, 0, count);
-                    }
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new IOException("Error compressing file " + targetFile.getName(), e);
-        }
-    }
+  }
 }

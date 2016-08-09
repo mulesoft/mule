@@ -16,19 +16,14 @@ import org.mule.mvel2.ast.ASTNode;
 /**
  * Resolves data type for expressions representing message's payload
  */
-public class PayloadExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver
-{
+public class PayloadExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver {
 
-    @Override
-    protected DataType getDataType(MuleEvent event, ASTNode node)
-    {
-        if (node.isIdentifier() && (PAYLOAD.equals(node.getName()) || MESSAGE_PAYLOAD.equals(node.getName())))
-        {
-            return event.getMessage().getDataType();
-        }
-        else
-        {
-            return null;
-        }
+  @Override
+  protected DataType getDataType(MuleEvent event, ASTNode node) {
+    if (node.isIdentifier() && (PAYLOAD.equals(node.getName()) || MESSAGE_PAYLOAD.equals(node.getName()))) {
+      return event.getMessage().getDataType();
+    } else {
+      return null;
     }
+  }
 }

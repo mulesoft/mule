@@ -18,46 +18,40 @@ import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import org.junit.Test;
 
-public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCase
-{
+public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-threading-profile.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-threading-profile.xml";
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnector.class};
+  }
 
-    @Test
-    public void customThreadingProfile() throws Exception
-    {
-        PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", getTestEvent(""));
-        assertThreadingProfile(connector.getThreadingProfile());
-    }
+  @Test
+  public void customThreadingProfile() throws Exception {
+    PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", getTestEvent(""));
+    assertThreadingProfile(connector.getThreadingProfile());
+  }
 
-    @Test
-    public void noThreadingProfile() throws Exception
-    {
-        PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", getTestEvent(""));
-        assertThat(connector.getThreadingProfile(), is(nullValue()));
-    }
+  @Test
+  public void noThreadingProfile() throws Exception {
+    PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", getTestEvent(""));
+    assertThat(connector.getThreadingProfile(), is(nullValue()));
+  }
 
-    @Test
-    public void threadingProfileOnConnection() throws Exception
-    {
-        PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
-        assertThreadingProfile(client.getThreadingProfile());
-    }
+  @Test
+  public void threadingProfileOnConnection() throws Exception {
+    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
+    assertThreadingProfile(client.getThreadingProfile());
+  }
 
-    private void assertThreadingProfile(ThreadingProfile threadingProfile){
-        assertThat(threadingProfile, is(notNullValue()));
-        assertThat(threadingProfile.getMaxThreadsActive(), is(20));
-        assertThat(threadingProfile.isDoThreading(), is(false));
-    }
+  private void assertThreadingProfile(ThreadingProfile threadingProfile) {
+    assertThat(threadingProfile, is(notNullValue()));
+    assertThat(threadingProfile.getMaxThreadsActive(), is(20));
+    assertThat(threadingProfile.isDoThreading(), is(false));
+  }
 
 }

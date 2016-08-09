@@ -18,25 +18,20 @@ import org.mule.mvel2.util.ASTLinkedList;
 /**
  * Base class for extracting data type from {@link CompiledExpression}
  */
-public abstract class AbstractExpressionDataTypeResolver implements ExpressionDataTypeResolver
-{
+public abstract class AbstractExpressionDataTypeResolver implements ExpressionDataTypeResolver {
 
-    @Override
-    public DataType resolve(MuleEvent event, CompiledExpression compiledExpression)
-    {
-        ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
+  @Override
+  public DataType resolve(MuleEvent event, CompiledExpression compiledExpression) {
+    ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
 
-        if (!iterator.hasMoreNodes())
-        {
-            return null;
-        }
-        else
-        {
-            ASTNode node = iterator.nextNode();
+    if (!iterator.hasMoreNodes()) {
+      return null;
+    } else {
+      ASTNode node = iterator.nextNode();
 
-            return getDataType(event, node);
-        }
+      return getDataType(event, node);
     }
+  }
 
-    protected abstract DataType getDataType(MuleEvent event, ASTNode node);
+  protected abstract DataType getDataType(MuleEvent event, ASTNode node);
 }

@@ -12,74 +12,50 @@ import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-public class ApplicationStartedDeploymentListener implements DeploymentListener
-{
+public class ApplicationStartedDeploymentListener implements DeploymentListener {
 
-    public static final int APPLICATION_STARTED_TIMEOUT_IN_SECONDS = 20;
+  public static final int APPLICATION_STARTED_TIMEOUT_IN_SECONDS = 20;
 
-    private Latch applicationStartedLatch = new Latch();
+  private Latch applicationStartedLatch = new Latch();
 
-    public void waitUntilApplicationDeployed()
-    {
-        try
-        {
-            if (!applicationStartedLatch.await(APPLICATION_STARTED_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS))
-            {
-                throw new RuntimeException("Application didn't start within " + APPLICATION_STARTED_TIMEOUT_IN_SECONDS + " seconds");
-            }
-        }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+  public void waitUntilApplicationDeployed() {
+    try {
+      if (!applicationStartedLatch.await(APPLICATION_STARTED_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)) {
+        throw new RuntimeException("Application didn't start within " + APPLICATION_STARTED_TIMEOUT_IN_SECONDS + " seconds");
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void onDeploymentStart(String artifactName)
-    {
-    }
+  @Override
+  public void onDeploymentStart(String artifactName) {}
 
-    @Override
-    public void onDeploymentSuccess(String artifactName)
-    {
-        if (artifactName.equals(MuleContextProcessApplication.TEST_APPLICATION_NAME))
-        {
-            applicationStartedLatch.release();
-        }
+  @Override
+  public void onDeploymentSuccess(String artifactName) {
+    if (artifactName.equals(MuleContextProcessApplication.TEST_APPLICATION_NAME)) {
+      applicationStartedLatch.release();
     }
+  }
 
-    @Override
-    public void onDeploymentFailure(String artifactName, Throwable cause)
-    {
-    }
+  @Override
+  public void onDeploymentFailure(String artifactName, Throwable cause) {}
 
-    @Override
-    public void onUndeploymentStart(String artifactName)
-    {
-    }
+  @Override
+  public void onUndeploymentStart(String artifactName) {}
 
-    @Override
-    public void onUndeploymentSuccess(String artifactName)
-    {
-    }
+  @Override
+  public void onUndeploymentSuccess(String artifactName) {}
 
-    @Override
-    public void onUndeploymentFailure(String artifactName, Throwable cause)
-    {
-    }
+  @Override
+  public void onUndeploymentFailure(String artifactName, Throwable cause) {}
 
-    @Override
-    public void onMuleContextCreated(String artifactName, MuleContext context)
-    {
-    }
+  @Override
+  public void onMuleContextCreated(String artifactName, MuleContext context) {}
 
-    @Override
-    public void onMuleContextInitialised(String artifactName, MuleContext context)
-    {
-    }
+  @Override
+  public void onMuleContextInitialised(String artifactName, MuleContext context) {}
 
-    @Override
-    public void onMuleContextConfigured(String artifactName, MuleContext context)
-    {
-    }
+  @Override
+  public void onMuleContextConfigured(String artifactName, MuleContext context) {}
 }

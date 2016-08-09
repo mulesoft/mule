@@ -14,13 +14,12 @@ import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-public class EndpointMuleUniversalConduitFactory implements MuleUniversalConduitFactory
-{
+public class EndpointMuleUniversalConduitFactory implements MuleUniversalConduitFactory {
 
-    @Override
-    public MuleUniversalConduit create(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei, EndpointReferenceType t)
-    {
-        return new EndpointMuleUniversalConduit(transport, configuration, ei, t);
-    }
+  @Override
+  public MuleUniversalConduit create(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
+                                     EndpointReferenceType t) {
+    return new EndpointMuleUniversalConduit(transport, configuration, ei, t);
+  }
 
 }

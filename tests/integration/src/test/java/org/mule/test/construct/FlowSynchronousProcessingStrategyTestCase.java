@@ -11,19 +11,17 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleMessage;
 
-public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/construct/flow-synchronous-processing-strategy-config.xml";
-    }
+public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase {
 
-    @Override
-    public void oneWay() throws Exception
-    {
-        flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-        MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/construct/flow-synchronous-processing-strategy-config.xml";
+  }
+
+  @Override
+  public void oneWay() throws Exception {
+    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
+  }
 }

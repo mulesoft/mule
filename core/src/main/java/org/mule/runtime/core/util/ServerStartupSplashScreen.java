@@ -17,85 +17,68 @@ import java.util.Collection;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-public class ServerStartupSplashScreen extends SplashScreen
-{
-    @Override
-    protected void doHeader(MuleContext context)
-    {
-        String notset = CoreMessages.notSet().getMessage();
+public class ServerStartupSplashScreen extends SplashScreen {
 
-        // Mule Version, Timestamp, and Server ID
-        Manifest mf = MuleManifest.getManifest();
-        Attributes att = mf.getMainAttributes();
-        if (att.values().size() > 0)
-        {
-            header.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
-            header.add(CoreMessages.version().getMessage() + " Build: "
-                    + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
+  @Override
+  protected void doHeader(MuleContext context) {
+    String notset = CoreMessages.notSet().getMessage();
 
-            header.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
-            header.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
-        }
-        else
-        {
-            header.add(CoreMessages.versionNotSet().getMessage());
-        }
-        header.add(" ");
-        if (context.getStartDate() > 0)
-        {
-            header.add(CoreMessages.serverStartedAt(context.getStartDate()).getMessage());
-        }
-        header.add("Server ID: " + context.getConfiguration().getId());
+    // Mule Version, Timestamp, and Server ID
+    Manifest mf = MuleManifest.getManifest();
+    Attributes att = mf.getMainAttributes();
+    if (att.values().size() > 0) {
+      header.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+      header.add(CoreMessages.version().getMessage() + " Build: "
+          + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
 
-        // JDK, Encoding, OS, and Host
-        header.add("JDK: " + System.getProperty("java.version") + " ("
-            + System.getProperty("java.vm.info") + ")");
-        header.add("OS encoding: " + System.getProperty("file.encoding")
-                + ", Mule encoding: " + context.getConfiguration().getDefaultEncoding());
-        String patch = System.getProperty("sun.os.patch.level", null);
-        header.add("OS: " + System.getProperty("os.name")
-                + (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " ("
-                + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
-        try
-        {
-            InetAddress host = NetworkUtils.getLocalHost();
-            header.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
-        }
-        catch (UnknownHostException e)
-        {
-            // ignore
-        }
+      header.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
+      header.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
+    } else {
+      header.add(CoreMessages.versionNotSet().getMessage());
+    }
+    header.add(" ");
+    if (context.getStartDate() > 0) {
+      header.add(CoreMessages.serverStartedAt(context.getStartDate()).getMessage());
+    }
+    header.add("Server ID: " + context.getConfiguration().getId());
 
-        // Dev/Production mode
-        // TODO for now now used, potentially a 'production' mode can disable direcotry (non-api) hot-deployment for tight app control
-        //final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
-        //header.add("Mode: " + (productionMode ? "Production" : "Development"));
-
-        header.add(" ");
+    // JDK, Encoding, OS, and Host
+    header.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
+    header.add("OS encoding: " + System.getProperty("file.encoding") + ", Mule encoding: "
+        + context.getConfiguration().getDefaultEncoding());
+    String patch = System.getProperty("sun.os.patch.level", null);
+    header.add("OS: " + System.getProperty("os.name") + (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "")
+        + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+    try {
+      InetAddress host = NetworkUtils.getLocalHost();
+      header.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
+    } catch (UnknownHostException e) {
+      // ignore
     }
 
-    @Override
-    protected void doFooter(MuleContext context)
-    {
-        // Mule Agents
-        if (!body.isEmpty())
-        {
-            footer.add(" ");
-        }
-        //List agents
-        Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
-        if (agents.size() == 0)
-        {
-            footer.add(CoreMessages.agentsRunning().getMessage() + " "
-                    + CoreMessages.none().getMessage());
-        }
-        else
-        {
-            footer.add(CoreMessages.agentsRunning().getMessage());
-            for (Agent agent : agents)
-            {
-                footer.add("  " + agent.getDescription());
-            }
-        }
+    // Dev/Production mode
+    // TODO for now now used, potentially a 'production' mode can disable direcotry (non-api) hot-deployment for tight app control
+    // final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
+    // header.add("Mode: " + (productionMode ? "Production" : "Development"));
+
+    header.add(" ");
+  }
+
+  @Override
+  protected void doFooter(MuleContext context) {
+    // Mule Agents
+    if (!body.isEmpty()) {
+      footer.add(" ");
     }
+    // List agents
+    Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
+    if (agents.size() == 0) {
+      footer.add(CoreMessages.agentsRunning().getMessage() + " " + CoreMessages.none().getMessage());
+    } else {
+      footer.add(CoreMessages.agentsRunning().getMessage());
+      for (Agent agent : agents) {
+        footer.add("  " + agent.getDescription());
+      }
+    }
+  }
 }

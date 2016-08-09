@@ -11,29 +11,24 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.LinkedList;
 
-public class SimpleMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
-{
+public class SimpleMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
-    public SimpleMessageProcessorChainBuilder()
-    {
-        // empty
-    }
+  public SimpleMessageProcessorChainBuilder() {
+    // empty
+  }
 
-    public SimpleMessageProcessorChainBuilder(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
+  public SimpleMessageProcessorChainBuilder(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 
-    @Override
-    protected DefaultMessageProcessorChain createInnerChain(LinkedList<MessageProcessor> tempList)
-    {
-        return new SimpleMessageProcessorChain(tempList);
-    }
+  @Override
+  protected DefaultMessageProcessorChain createInnerChain(LinkedList<MessageProcessor> tempList) {
+    return new SimpleMessageProcessorChain(tempList);
+  }
 
-    @Override
-    protected DefaultMessageProcessorChain createOuterChain(LinkedList<MessageProcessor> tempList)
-    {
-        return new SimpleMessageProcessorChain(tempList);
-    }
+  @Override
+  protected DefaultMessageProcessorChain createOuterChain(LinkedList<MessageProcessor> tempList) {
+    return new SimpleMessageProcessorChain(tempList);
+  }
 
 }

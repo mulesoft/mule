@@ -15,28 +15,25 @@ import org.junit.Test;
 /**
  * Tests that envelope body unwrapping works fine when multiple namespaces are used
  */
-public class MultipleNamespacesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class MultipleNamespacesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    private static final String EXPECTED_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                                    "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">\n" +
-                                                    "            <text xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"false\">Hello</text>\n" +
-                                                    "</ns2:echoResponse>";
+  private static final String EXPECTED_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+      + "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">\n"
+      + "            <text xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"false\">Hello</text>\n"
+      + "</ns2:echoResponse>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-namespaces-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiple-namespaces-config.xml";
+  }
 
 
-    @Test
-    public void validRequestReturnsExpectedAnswer() throws Exception
-    {
-        MuleMessage response = flowRunner("client").withPayload(ECHO_REQUEST).run().getMessage();
+  @Test
+  public void validRequestReturnsExpectedAnswer() throws Exception {
+    MuleMessage response = flowRunner("client").withPayload(ECHO_REQUEST).run().getMessage();
 
-        XMLUnit.setIgnoreWhitespace(true);
-        assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(response));
-    }
+    XMLUnit.setIgnoreWhitespace(true);
+    assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(response));
+  }
 
 }

@@ -9,12 +9,12 @@ package org.mule.runtime.core.api.lifecycle;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * This callback is used to execute lifecycle behaviour for an object being managed by a {@link LifecycleManager}
- * The callback is used so that transitions can be managed consistently outside of an object
+ * This callback is used to execute lifecycle behaviour for an object being managed by a {@link LifecycleManager} The callback is
+ * used so that transitions can be managed consistently outside of an object
  *
  * @since 3.0
  */
-public interface LifecycleCallback<O>
-{
-    void onTransition(String phaseName, O object) throws MuleException;
+public interface LifecycleCallback<O> {
+
+  void onTransition(String phaseName, O object) throws MuleException;
 }

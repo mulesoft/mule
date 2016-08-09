@@ -21,66 +21,59 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("See MULE-9200")
-public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
-{
-    @Rule
-    public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "100");
+public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "shutdown-timeout-request-response-config.xml";
-    }
+  @Rule
+  public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "100");
 
-    @Test
-    public void testStaticComponent() throws Exception
-    {
-        doShutDownTest("http://localhost:" + httpPort.getNumber() + "/staticComponent");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "shutdown-timeout-request-response-config.xml";
+  }
 
-    @Test
-    public void testScriptComponent() throws Exception
-    {
-        doShutDownTest("http://localhost:" + httpPort.getNumber() + "/scriptComponent");
-    }
+  @Test
+  public void testStaticComponent() throws Exception {
+    doShutDownTest("http://localhost:" + httpPort.getNumber() + "/staticComponent");
+  }
 
-    @Test
-    public void testExpressionTransformer() throws Exception
-    {
-        doShutDownTest("http://localhost:" + httpPort.getNumber() + "/expressionTransformer");
-    }
+  @Test
+  public void testScriptComponent() throws Exception {
+    doShutDownTest("http://localhost:" + httpPort.getNumber() + "/scriptComponent");
+  }
 
-    private void doShutDownTest(final String url) throws MuleException, InterruptedException
-    {
-        final MuleClient client = muleContext.getClient();
-        final boolean[] results = new boolean[] {false};
+  @Test
+  public void testExpressionTransformer() throws Exception {
+    doShutDownTest("http://localhost:" + httpPort.getNumber() + "/expressionTransformer");
+  }
 
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-                    MuleMessage result = client.send(url, muleMessage, HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build());
-                    results[0] = result.getExceptionPayload().getException() instanceof DispatchException;
-                }
-                catch (Exception e)
-                {
-                    // Ignore
-                }
-            }
-        };
-        t.start();
+  private void doShutDownTest(final String url) throws MuleException, InterruptedException {
+    final MuleClient client = muleContext.getClient();
+    final boolean[] results = new boolean[] {false};
 
-        // Make sure to give the request enough time to get to the waiting portion of the feed.
-        waitLatch.await();
+    Thread t = new Thread() {
 
-        muleContext.stop();
+      @Override
+      public void run() {
+        try {
+          MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
+          MuleMessage result =
+              client.send(url, muleMessage,
+                          HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build());
+          results[0] = result.getExceptionPayload().getException() instanceof DispatchException;
+        } catch (Exception e) {
+          // Ignore
+        }
+      }
+    };
+    t.start();
 
-        t.join();
+    // Make sure to give the request enough time to get to the waiting portion of the feed.
+    waitLatch.await();
 
-        assertTrue("Was able to process message ", results[0]);
-    }
+    muleContext.stop();
+
+    t.join();
+
+    assertTrue("Was able to process message ", results[0]);
+  }
 }

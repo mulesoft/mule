@@ -14,35 +14,27 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 
-public class StartElementEventX extends StartElementEvent
-{
+public class StartElementEventX extends StartElementEvent {
 
-    private final List attributes2;
-    private final List namespaces2;
+  private final List attributes2;
+  private final List namespaces2;
 
-    public StartElementEventX(QName name,
-                              List attributes,
-                              List namespaces,
-                              NamespaceContext namespaceCtx,
-                              Location location,
-                              QName schemaType)
-    {
-        super(name, attributes.iterator(), namespaces.iterator(), namespaceCtx, location, schemaType);
-        attributes2 = attributes;
-        namespaces2 = namespaces;
-    }
+  public StartElementEventX(QName name, List attributes, List namespaces, NamespaceContext namespaceCtx, Location location,
+                            QName schemaType) {
+    super(name, attributes.iterator(), namespaces.iterator(), namespaceCtx, location, schemaType);
+    attributes2 = attributes;
+    namespaces2 = namespaces;
+  }
 
-    public List getAttributeList()
-    {
-        return attributes2;
-    }
+  public List getAttributeList() {
+    return attributes2;
+  }
 
-    public List getNamespaceList()
-    {
-        return namespaces2;
-    }
-    
-    
+  public List getNamespaceList() {
+    return namespaces2;
+  }
+
+
 }
 
 

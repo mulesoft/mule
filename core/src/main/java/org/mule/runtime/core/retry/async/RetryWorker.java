@@ -17,76 +17,59 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link javax.resource.spi.work.Work} implementation used when executing a {@link RetryPolicyTemplate} in a separate
- * thread.
+ * A {@link javax.resource.spi.work.Work} implementation used when executing a {@link RetryPolicyTemplate} in a separate thread.
  */
-public class RetryWorker implements Work
-{
-    protected transient final Logger logger = LoggerFactory.getLogger(RetryWorker.class);
+public class RetryWorker implements Work {
 
-    private final RetryCallback callback;
-    private final WorkManager workManager;
-    private Exception exception = null;
-    private final FutureRetryContext context = new FutureRetryContext();
-    private final RetryPolicyTemplate delegate;
-    private Latch startLatch;
+  protected transient final Logger logger = LoggerFactory.getLogger(RetryWorker.class);
 
-    public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, WorkManager workManager)
-    {
-        this(delegate, callback, workManager, null);
+  private final RetryCallback callback;
+  private final WorkManager workManager;
+  private Exception exception = null;
+  private final FutureRetryContext context = new FutureRetryContext();
+  private final RetryPolicyTemplate delegate;
+  private Latch startLatch;
+
+  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, WorkManager workManager) {
+    this(delegate, callback, workManager, null);
+  }
+
+  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, WorkManager workManager, Latch startLatch) {
+    this.callback = callback;
+    this.workManager = workManager;
+    this.delegate = delegate;
+    this.startLatch = startLatch;
+    if (this.startLatch == null) {
+      this.startLatch = new Latch();
+      this.startLatch.countDown();
     }
+  }
 
-    public RetryWorker(RetryPolicyTemplate delegate,
-                       RetryCallback callback,
-                       WorkManager workManager,
-                       Latch startLatch)
-    {
-        this.callback = callback;
-        this.workManager = workManager;
-        this.delegate = delegate;
-        this.startLatch = startLatch;
-        if (this.startLatch == null)
-        {
-            this.startLatch = new Latch();
-            this.startLatch.countDown();
-        }
+  public void release() {
+
+  }
+
+  public void run() {
+    try {
+      startLatch.await();
+    } catch (InterruptedException e) {
+      logger.warn("Retry thread interrupted for callback: " + callback.getWorkDescription());
+      return;
     }
-
-    public void release()
-    {
+    try {
+      context.setDelegateContext(delegate.execute(callback, workManager));
+    } catch (Exception e) {
+      this.exception = e;
+      logger.error("Error retrying work", e);
 
     }
+  }
 
-    public void run()
-    {
-        try
-        {
-            startLatch.await();
-        }
-        catch (InterruptedException e)
-        {
-            logger.warn("Retry thread interrupted for callback: " + callback.getWorkDescription());
-            return;
-        }
-        try
-        {
-            context.setDelegateContext(delegate.execute(callback, workManager));
-        }
-        catch (Exception e)
-        {
-            this.exception = e;
-            logger.error("Error retrying work", e);
+  public Exception getException() {
+    return exception;
+  }
 
-        }
-    }
-
-    public Exception getException()
-    {
-        return exception;
-    }
-
-    public FutureRetryContext getRetryContext()
-    {
-        return context;
-    }
+  public FutureRetryContext getRetryContext() {
+    return context;
+  }
 }

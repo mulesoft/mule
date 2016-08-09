@@ -30,53 +30,45 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
  *
  * @since 4.0
  */
-public class DefaultRepositoryService implements RepositoryService
-{
+public class DefaultRepositoryService implements RepositoryService {
 
-    private final RepositorySystem repositorySystem;
-    private final DefaultRepositorySystemSession repositorySystemSession;
-    private final List<RemoteRepository> remoteRepositories;
+  private final RepositorySystem repositorySystem;
+  private final DefaultRepositorySystemSession repositorySystemSession;
+  private final List<RemoteRepository> remoteRepositories;
 
-    DefaultRepositoryService(RepositorySystem repositorySystem, DefaultRepositorySystemSession repositorySystemSession, List<RemoteRepository> remoteRepositories)
-    {
-        this.repositorySystem = repositorySystem;
-        this.repositorySystemSession = repositorySystemSession;
-        this.remoteRepositories = remoteRepositories;
+  DefaultRepositoryService(RepositorySystem repositorySystem, DefaultRepositorySystemSession repositorySystemSession,
+                           List<RemoteRepository> remoteRepositories) {
+    this.repositorySystem = repositorySystem;
+    this.repositorySystemSession = repositorySystemSession;
+    this.remoteRepositories = remoteRepositories;
+  }
+
+  @Override
+  public File lookupBundle(BundleDescriptor bundleDescriptor) {
+    try {
+      if (remoteRepositories.isEmpty()) {
+        throw new RepositoryServiceDisabledException("Repository service has not been configured so it's disabled. "
+            + "To enable it you must configure the set of repositories to use using the system property: "
+            + MULE_REMOTE_REPOSITORIES_PROPERTY);
+      }
+      DefaultArtifact artifact = toArtifact(bundleDescriptor);
+      ArtifactRequest getArtifactRequest = new ArtifactRequest();
+      getArtifactRequest.setRepositories(remoteRepositories);
+      getArtifactRequest.setArtifact(artifact);
+      ArtifactResult artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, getArtifactRequest);
+      return artifactResult.getArtifact().getFile();
+    } catch (ArtifactResolutionException e) {
+      if (e.getCause() instanceof ArtifactNotFoundException) {
+        throw new BundleNotFoundException("Couldn't find bundle " + bundleDescriptor.toString(), e);
+      } else {
+        throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
+
+      }
     }
+  }
 
-    @Override
-    public File lookupBundle(BundleDescriptor bundleDescriptor)
-    {
-        try
-        {
-            if (remoteRepositories.isEmpty())
-            {
-                throw new RepositoryServiceDisabledException("Repository service has not been configured so it's disabled. " +
-                                                             "To enable it you must configure the set of repositories to use using the system property: " + MULE_REMOTE_REPOSITORIES_PROPERTY);
-            }
-            DefaultArtifact artifact = toArtifact(bundleDescriptor);
-            ArtifactRequest getArtifactRequest = new ArtifactRequest();
-            getArtifactRequest.setRepositories(remoteRepositories);
-            getArtifactRequest.setArtifact(artifact);
-            ArtifactResult artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, getArtifactRequest);
-            return artifactResult.getArtifact().getFile();
-        }
-        catch (ArtifactResolutionException e)
-        {
-            if (e.getCause() instanceof ArtifactNotFoundException)
-            {
-                throw new BundleNotFoundException("Couldn't find bundle " + bundleDescriptor.toString(), e);
-            }
-            else
-            {
-                throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
-
-            }
-        }
-    }
-
-    private DefaultArtifact toArtifact(BundleDescriptor bundleDescriptor)
-    {
-        return new DefaultArtifact(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), bundleDescriptor.getType(), bundleDescriptor.getVersion());
-    }
+  private DefaultArtifact toArtifact(BundleDescriptor bundleDescriptor) {
+    return new DefaultArtifact(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), bundleDescriptor.getType(),
+                               bundleDescriptor.getVersion());
+  }
 }

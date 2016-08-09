@@ -12,58 +12,57 @@ import org.mule.runtime.core.api.MuleMessage;
 import java.util.Map;
 
 /**
- * The RetryContext is used to store any data which carries over from 
- * attempt to attempt such as response messages.
+ * The RetryContext is used to store any data which carries over from attempt to attempt such as response messages.
  */
-public interface RetryContext
-{
-    String FAILED_RECEIVER = "failedReceiver";
-    String FAILED_DISPATCHER = "failedDispatcher";
-    String FAILED_REQUESTER = "failedRequester";
+public interface RetryContext {
 
-    /**
-     * @return a read-only meta-info map or an empty map, never null.
-     */
-    Map<Object, Object> getMetaInfo();
+  String FAILED_RECEIVER = "failedReceiver";
+  String FAILED_DISPATCHER = "failedDispatcher";
+  String FAILED_REQUESTER = "failedRequester";
 
-    MuleMessage[] getReturnMessages();
+  /**
+   * @return a read-only meta-info map or an empty map, never null.
+   */
+  Map<Object, Object> getMetaInfo();
 
-    MuleMessage getFirstReturnMessage();
+  MuleMessage[] getReturnMessages();
 
-    void setReturnMessages(MuleMessage[] returnMessages);
+  MuleMessage getFirstReturnMessage();
 
-    void addReturnMessage(MuleMessage result);
+  void setReturnMessages(MuleMessage[] returnMessages);
 
-    String getDescription();
+  void addReturnMessage(MuleMessage result);
 
-    MuleContext getMuleContext();
+  String getDescription();
 
-    /**
-     * The most recent failure which prevented the context from validating the connection. Note that the method may
-     * return null. Instead, the {@link #isOk()} should be consulted first.
-     *
-     * @return last failure or null
-     */
-    Throwable getLastFailure();
+  MuleContext getMuleContext();
 
-    /**
-     * Typically called by validation logic to mark no problems with the current connection. Additionally,
-     * clears any previous failure set.
-     */
-    void setOk();
+  /**
+   * The most recent failure which prevented the context from validating the connection. Note that the method may return null.
+   * Instead, the {@link #isOk()} should be consulted first.
+   *
+   * @return last failure or null
+   */
+  Throwable getLastFailure();
 
-    /**
-     * Typically called by validation logic to mark a problem and an optional root cause.
-     *
-     * @param lastFailure the most recent failure, can be null
-     */
-    void setFailed(Throwable lastFailure);
+  /**
+   * Typically called by validation logic to mark no problems with the current connection. Additionally, clears any previous
+   * failure set.
+   */
+  void setOk();
 
-    /**
-     * Note that it's possible for an implementation to return false and have no failure specified, thus
-     * the subsequent {@link #getLastFailure()} may return null.
-     *
-     * @return true if no problems detected before
-     */
-    boolean isOk();
+  /**
+   * Typically called by validation logic to mark a problem and an optional root cause.
+   *
+   * @param lastFailure the most recent failure, can be null
+   */
+  void setFailed(Throwable lastFailure);
+
+  /**
+   * Note that it's possible for an implementation to return false and have no failure specified, thus the subsequent
+   * {@link #getLastFailure()} may return null.
+   *
+   * @return true if no problems detected before
+   */
+  boolean isOk();
 }

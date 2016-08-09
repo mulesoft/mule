@@ -19,74 +19,68 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase
-{
+public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase {
 
-    private TestNonBlockingProcessor testNonBlockingProcessor;
+  private TestNonBlockingProcessor testNonBlockingProcessor;
 
-    @Before
-    public void before() throws InitialisationException
-    {
-        testNonBlockingProcessor = new TestNonBlockingProcessor();
-        testNonBlockingProcessor.initialise();
-    }
+  @Before
+  public void before() throws InitialisationException {
+    testNonBlockingProcessor = new TestNonBlockingProcessor();
+    testNonBlockingProcessor.initialise();
+  }
 
-    @After
-    public void after()
-    {
-        testNonBlockingProcessor.dispose();
-    }
+  @After
+  public void after() {
+    testNonBlockingProcessor.dispose();
+  }
 
-    @Override
-    protected ResponseAssertionMessageProcessor createAssertionMessageProcessor()
-    {
-        ResponseAssertionMessageProcessor mp = new ResponseAssertionMessageProcessor();
-        mp.setListener(new SensingNullMessageProcessor());
-        return mp;
-    }
+  @Override
+  protected ResponseAssertionMessageProcessor createAssertionMessageProcessor() {
+    ResponseAssertionMessageProcessor mp = new ResponseAssertionMessageProcessor();
+    mp.setListener(new SensingNullMessageProcessor());
+    return mp;
+  }
 
-    @Test
-    public void responseProcess() throws Exception
-    {
-        when(mockEvent.isAllowNonBlocking()).thenReturn(false);
-        when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+  @Test
+  public void responseProcess() throws Exception {
+    when(mockEvent.isAllowNonBlocking()).thenReturn(false);
+    when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
-        ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(testNonBlockingProcessor);
-        asp.setFlowConstruct(flowConstruct);
-        asp.setExpression(TRUE_EXPRESSION);
-        asp.setResponseExpression(TRUE_EXPRESSION);
-        asp.setCount(1);
-        asp.setResponseCount(1);
-        asp.setResponseSameThread(false);
-        asp.start();
-        asp.process(mockEvent);
-        assertFalse(asp.expressionFailed());
-        assertFalse(asp.responseExpressionFailed());
-        assertFalse(asp.countFailOrNullEvent());
-        assertFalse(asp.responseCountFailOrNullEvent());
-    }
+    ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
+    asp.setListener(testNonBlockingProcessor);
+    asp.setFlowConstruct(flowConstruct);
+    asp.setExpression(TRUE_EXPRESSION);
+    asp.setResponseExpression(TRUE_EXPRESSION);
+    asp.setCount(1);
+    asp.setResponseCount(1);
+    asp.setResponseSameThread(false);
+    asp.start();
+    asp.process(mockEvent);
+    assertFalse(asp.expressionFailed());
+    assertFalse(asp.responseExpressionFailed());
+    assertFalse(asp.countFailOrNullEvent());
+    assertFalse(asp.responseCountFailOrNullEvent());
+  }
 
-    @Test
-    public void responseProcessNonBlocking() throws Exception
-    {
-        when(mockEvent.isAllowNonBlocking()).thenReturn(true);
-        when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+  @Test
+  public void responseProcessNonBlocking() throws Exception {
+    when(mockEvent.isAllowNonBlocking()).thenReturn(true);
+    when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
-        ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(testNonBlockingProcessor);
-        asp.setFlowConstruct(flowConstruct);
-        asp.setExpression(TRUE_EXPRESSION);
-        asp.setResponseExpression(TRUE_EXPRESSION);
-        asp.setCount(1);
-        asp.setResponseCount(1);
-        asp.setResponseSameThread(false);
-        asp.start();
-        asp.process(mockEvent);
-        assertFalse(asp.expressionFailed());
-        assertFalse(asp.responseExpressionFailed());
-        assertFalse(asp.countFailOrNullEvent());
-        assertFalse(asp.responseCountFailOrNullEvent());
-    }
+    ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
+    asp.setListener(testNonBlockingProcessor);
+    asp.setFlowConstruct(flowConstruct);
+    asp.setExpression(TRUE_EXPRESSION);
+    asp.setResponseExpression(TRUE_EXPRESSION);
+    asp.setCount(1);
+    asp.setResponseCount(1);
+    asp.setResponseSameThread(false);
+    asp.start();
+    asp.process(mockEvent);
+    assertFalse(asp.expressionFailed());
+    assertFalse(asp.responseExpressionFailed());
+    assertFalse(asp.countFailOrNullEvent());
+    assertFalse(asp.responseCountFailOrNullEvent());
+  }
 
 }

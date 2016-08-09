@@ -11,26 +11,23 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.transport.tcp.protocols.XmlMessageEOFProtocol;
 
-public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase
-{
+public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase {
 
-    @Override
-    public void doSetUp()
-    {
-        setProtocol(new XmlMessageEOFProtocol());
-    }
+  @Override
+  public void doSetUp() {
+    setProtocol(new XmlMessageEOFProtocol());
+  }
 
-    @Override
-    public void testSlowStream() throws Exception
-    {
-        String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
+  @Override
+  public void testSlowStream() throws Exception {
+    String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
 
-        SlowInputStream bais = new SlowInputStream(msgData.getBytes());
+    SlowInputStream bais = new SlowInputStream(msgData.getBytes());
 
-        byte[] result = read(bais);
-        assertNotNull(result);
-        // hurray!  get everything
-        assertEquals(msgData, new String(result));
-    }
+    byte[] result = read(bais);
+    assertNotNull(result);
+    // hurray! get everything
+    assertEquals(msgData, new String(result));
+  }
 
 }

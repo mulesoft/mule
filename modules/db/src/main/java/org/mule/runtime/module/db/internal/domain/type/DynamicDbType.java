@@ -14,43 +14,36 @@ import java.sql.SQLException;
 /**
  * Defines a type that is dynamically resolved
  */
-public class DynamicDbType implements DbType
-{
+public class DynamicDbType implements DbType {
 
-    private String name;
+  private String name;
 
-    public DynamicDbType(String name)
-    {
-        this.name = name;
-    }
+  public DynamicDbType(String name) {
+    this.name = name;
+  }
 
-    @Override
-    public int getId()
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public int getId() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Object getParameterValue(CallableStatement statement, int index) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void registerOutParameter(CallableStatement statement, int index) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void registerOutParameter(CallableStatement statement, int index) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 }

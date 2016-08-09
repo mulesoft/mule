@@ -38,94 +38,86 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpConnectionManagerTestCase extends AbstractMuleTestCase
-{
+public class HttpConnectionManagerTestCase extends AbstractMuleTestCase {
 
-    public static final String DEFAULT_ENDPOINT_URI = "http://localhost:1234/";
-    public static final String NESTED_ENDPOINT_URI_1 = "http://localhost:1234/service";
-    public static final String NESTED_ENDPOINT_URI_2 = "http://localhost:1234/service/order";
-    public static final String ANOTHER_ENDPOINT_URI = "http://localhost:1235/service";
-    public static final String ANOTHER_NESTED_ENDPOINT_URI = "http://localhost:1235/service/order";
+  public static final String DEFAULT_ENDPOINT_URI = "http://localhost:1234/";
+  public static final String NESTED_ENDPOINT_URI_1 = "http://localhost:1234/service";
+  public static final String NESTED_ENDPOINT_URI_2 = "http://localhost:1234/service/order";
+  public static final String ANOTHER_ENDPOINT_URI = "http://localhost:1235/service";
+  public static final String ANOTHER_NESTED_ENDPOINT_URI = "http://localhost:1235/service/order";
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private WorkManager mockWorkManager;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpConnector mockHttpConnector;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleContext mockMuleContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private WorkManager mockWorkManager;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpConnector mockHttpConnector;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleContext mockMuleContext;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorWithNullWorkManager()
-    {
-        new HttpConnectionManager(mockHttpConnector, null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void constructorWithNullWorkManager() {
+    new HttpConnectionManager(mockHttpConnector, null);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorWithNullConnector()
-    {
-        new HttpConnectionManager(null, mockWorkManager);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void constructorWithNullConnector() {
+    new HttpConnectionManager(null, mockWorkManager);
+  }
 
-    @Test(expected = MuleRuntimeException.class)
-    public void workSchedulingFails() throws Exception
-    {
-        when(mockHttpConnector.getServerSocket(any(URI.class))).thenThrow(IOException.class);
-        createConnectionManagerAndAddDefaultEndpointUri();
-    }
+  @Test(expected = MuleRuntimeException.class)
+  public void workSchedulingFails() throws Exception {
+    when(mockHttpConnector.getServerSocket(any(URI.class))).thenThrow(IOException.class);
+    createConnectionManagerAndAddDefaultEndpointUri();
+  }
 
-    @Test
-    public void removeConnectionWithoutDispatcherDoesntFail() throws Exception
-    {
-        HttpConnectionManager connectionManager = new HttpConnectionManager(mockHttpConnector, mockWorkManager);
-        connectionManager.removeConnection(new MuleEndpointURI("http://localhost:1234/service/path", mockMuleContext));
-    }
+  @Test
+  public void removeConnectionWithoutDispatcherDoesntFail() throws Exception {
+    HttpConnectionManager connectionManager = new HttpConnectionManager(mockHttpConnector, mockWorkManager);
+    connectionManager.removeConnection(new MuleEndpointURI("http://localhost:1234/service/path", mockMuleContext));
+  }
 
-    @Test
-    public void addConnectionStartsSocketDispatcher() throws Exception
-    {
-        createConnectionManagerAndAddDefaultEndpointUri();
-        verify(mockWorkManager, times(1)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
-    }
+  @Test
+  public void addConnectionStartsSocketDispatcher() throws Exception {
+    createConnectionManagerAndAddDefaultEndpointUri();
+    verify(mockWorkManager, times(1)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class),
+                                                   any(WorkListener.class));
+  }
 
-    @Test
-    public void add3EndpointUrisToSameHostPortOnlyExecutesOneDispatcher() throws Exception
-    {
-        HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
-        connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_1));
-        connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_2));
-        verify(mockWorkManager, times(1)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
-    }
+  @Test
+  public void add3EndpointUrisToSameHostPortOnlyExecutesOneDispatcher() throws Exception {
+    HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
+    connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_1));
+    connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_2));
+    verify(mockWorkManager, times(1)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class),
+                                                   any(WorkListener.class));
+  }
 
-    @Test
-    public void addEndpointsToDifferentHostPortOpensSeveralConnections() throws Exception
-    {
-        HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
-        connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_1));
-        connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_2));
-        connectionManager.addConnection(createEndpointUri(ANOTHER_ENDPOINT_URI));
-        connectionManager.addConnection(createEndpointUri(ANOTHER_NESTED_ENDPOINT_URI));
-        verify(mockWorkManager, times(2)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
-    }
+  @Test
+  public void addEndpointsToDifferentHostPortOpensSeveralConnections() throws Exception {
+    HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
+    connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_1));
+    connectionManager.addConnection(createEndpointUri(NESTED_ENDPOINT_URI_2));
+    connectionManager.addConnection(createEndpointUri(ANOTHER_ENDPOINT_URI));
+    connectionManager.addConnection(createEndpointUri(ANOTHER_NESTED_ENDPOINT_URI));
+    verify(mockWorkManager, times(2)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class),
+                                                   any(WorkListener.class));
+  }
 
-    @Test
-    public void disposeShutdownsEverything() throws Exception
-    {
-        HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
-        connectionManager.dispose();
-        verify(mockWorkManager, times(1)).dispose();
-    }
+  @Test
+  public void disposeShutdownsEverything() throws Exception {
+    HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
+    connectionManager.dispose();
+    verify(mockWorkManager, times(1)).dispose();
+  }
 
-    private HttpConnectionManager createConnectionManagerAndAddDefaultEndpointUri() throws ConnectException, EndpointException
-    {
-        HttpConnectionManager connectionManager = new HttpConnectionManager(mockHttpConnector, mockWorkManager);
-        connectionManager.addConnection(createEndpointUri(DEFAULT_ENDPOINT_URI));
-        return connectionManager;
-    }
+  private HttpConnectionManager createConnectionManagerAndAddDefaultEndpointUri() throws ConnectException, EndpointException {
+    HttpConnectionManager connectionManager = new HttpConnectionManager(mockHttpConnector, mockWorkManager);
+    connectionManager.addConnection(createEndpointUri(DEFAULT_ENDPOINT_URI));
+    return connectionManager;
+  }
 
-    private MuleEndpointURI createEndpointUri(String uri) throws EndpointException
-    {
-        return new MuleEndpointURI(uri, mockMuleContext);
-    }
+  private MuleEndpointURI createEndpointUri(String uri) throws EndpointException {
+    return new MuleEndpointURI(uri, mockMuleContext);
+  }
 
 
 }

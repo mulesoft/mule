@@ -20,33 +20,31 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class PollingEtagTestCase extends FunctionalTestCase
-{
-    private static final int WAIT_TIME = 2500;
+public class PollingEtagTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static final int WAIT_TIME = 2500;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "polling-etag-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    @Ignore("MULE-6926: flaky test")
-    public void testPollingReceiversRestart() throws Exception
-    {
-        Object ftc = getComponent("Test");
-        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+  @Override
+  protected String getConfigFile() {
+    return "polling-etag-test-flow.xml";
+  }
 
-        AtomicInteger pollCounter = new AtomicInteger(0);
-        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
+  @Test
+  @Ignore("MULE-6926: flaky test")
+  public void testPollingReceiversRestart() throws Exception {
+    Object ftc = getComponent("Test");
+    assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
-        // should be enough to poll for multiple messages
-        Thread.sleep(WAIT_TIME);
+    AtomicInteger pollCounter = new AtomicInteger(0);
+    ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
-        assertEquals(1, pollCounter.get());
-    }
+    // should be enough to poll for multiple messages
+    Thread.sleep(WAIT_TIME);
+
+    assertEquals(1, pollCounter.get());
+  }
 }
 

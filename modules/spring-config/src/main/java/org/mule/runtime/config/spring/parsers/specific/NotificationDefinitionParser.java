@@ -46,105 +46,96 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
-{
+public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser {
 
-    private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS = "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
-    private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS = "org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
-    public static final Map EVENT_MAP;
-    public static final Map INTERFACE_MAP;
-    public static final String INTERFACE = "interface";
-    public static final String INTERFACE_CLASS = "interface-class";
-    public static final String EVENT = "event";
-    public static final String EVENT_CLASS = "event-class";
-    public static final String[][] INTERFACE_ATTRIBUTES =
-            new String[][]{new String[]{INTERFACE}, new String[]{INTERFACE_CLASS}};
-    public static final String[][] EVENT_ATTRIBUTES =
-            new String[][]{new String[]{EVENT}, new String[]{EVENT_CLASS}};
-    public static final String[][] ALL_ATTRIBUTES =
-            new String[][]{
-                    new String[]{EVENT}, new String[]{EVENT_CLASS},
-                    new String[]{INTERFACE}, new String[]{INTERFACE_CLASS}};
+  private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS =
+      "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
+  private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS =
+      "org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
+  public static final Map EVENT_MAP;
+  public static final Map INTERFACE_MAP;
+  public static final String INTERFACE = "interface";
+  public static final String INTERFACE_CLASS = "interface-class";
+  public static final String EVENT = "event";
+  public static final String EVENT_CLASS = "event-class";
+  public static final String[][] INTERFACE_ATTRIBUTES = new String[][] {new String[] {INTERFACE}, new String[] {INTERFACE_CLASS}};
+  public static final String[][] EVENT_ATTRIBUTES = new String[][] {new String[] {EVENT}, new String[] {EVENT_CLASS}};
+  public static final String[][] ALL_ATTRIBUTES =
+      new String[][] {new String[] {EVENT}, new String[] {EVENT_CLASS}, new String[] {INTERFACE}, new String[] {INTERFACE_CLASS}};
 
-    static
-    {
-        EVENT_MAP = new HashMap();
-        EVENT_MAP.put("CONTEXT", MuleContextNotification.class.getName());
-        EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
-        EVENT_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
-        EVENT_MAP.put("CONNECTOR-MESSAGE", ConnectorMessageNotification.class.getName());
-        EVENT_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotification.class.getName());
-        EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
-        EVENT_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotification.class.getName());
-        EVENT_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotification.class.getName());
-        EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());
-        EVENT_MAP.put("REGISTRY", RegistryNotification.class.getName());
-        EVENT_MAP.put("CUSTOM", CustomNotification.class.getName());
-        EVENT_MAP.put("EXCEPTION", ExceptionNotification.class.getName());
-        EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
-        EVENT_MAP.put("ROUTING", RoutingNotification.class.getName());
-        EVENT_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
-        EVENT_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
-        // EVENT_MAP.put("MESSAGE", ConnectorMessageNotification.class.getName());
+  static {
+    EVENT_MAP = new HashMap();
+    EVENT_MAP.put("CONTEXT", MuleContextNotification.class.getName());
+    EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
+    EVENT_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
+    EVENT_MAP.put("CONNECTOR-MESSAGE", ConnectorMessageNotification.class.getName());
+    EVENT_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotification.class.getName());
+    EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
+    EVENT_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotification.class.getName());
+    EVENT_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotification.class.getName());
+    EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());
+    EVENT_MAP.put("REGISTRY", RegistryNotification.class.getName());
+    EVENT_MAP.put("CUSTOM", CustomNotification.class.getName());
+    EVENT_MAP.put("EXCEPTION", ExceptionNotification.class.getName());
+    EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
+    EVENT_MAP.put("ROUTING", RoutingNotification.class.getName());
+    EVENT_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
+    EVENT_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
+    // EVENT_MAP.put("MESSAGE", ConnectorMessageNotification.class.getName());
 
-        INTERFACE_MAP = new HashMap();
-        INTERFACE_MAP.put("CONTEXT", MuleContextNotificationListener.class.getName());
-        INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
-        INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
-        INTERFACE_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotificationListener.class.getName());
-        INTERFACE_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotificationListener.class.getName());
-        INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
-        INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
-        INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());
-        INTERFACE_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS);
-        INTERFACE_MAP.put("CONNECTOR-MESSAGE", ConnectorMessageNotificationListener.class.getName());
-        INTERFACE_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotificationListener.class.getName());
-        INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());
-        INTERFACE_MAP.put("TRANSACTION", TransactionNotificationListener.class.getName());
-        INTERFACE_MAP.put("ROUTING", RoutingNotificationListener.class.getName());
-        INTERFACE_MAP.put("CLUSTER-NODE", ClusterNodeNotificationListener.class.getName());
-        INTERFACE_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
-        INTERFACE_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
+    INTERFACE_MAP = new HashMap();
+    INTERFACE_MAP.put("CONTEXT", MuleContextNotificationListener.class.getName());
+    INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
+    INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
+    INTERFACE_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotificationListener.class.getName());
+    INTERFACE_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotificationListener.class.getName());
+    INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
+    INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
+    INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());
+    INTERFACE_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS);
+    INTERFACE_MAP.put("CONNECTOR-MESSAGE", ConnectorMessageNotificationListener.class.getName());
+    INTERFACE_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotificationListener.class.getName());
+    INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());
+    INTERFACE_MAP.put("TRANSACTION", TransactionNotificationListener.class.getName());
+    INTERFACE_MAP.put("ROUTING", RoutingNotificationListener.class.getName());
+    INTERFACE_MAP.put("CLUSTER-NODE", ClusterNodeNotificationListener.class.getName());
+    INTERFACE_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
+    INTERFACE_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
 
-        // Deprecated
-        EVENT_MAP.put("MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
+    // Deprecated
+    EVENT_MAP.put("MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
+  }
+
+  public NotificationDefinitionParser() {
+    super("interfaceToType", INTERFACE_CLASS, EVENT_CLASS);
+    addMapping(EVENT, EVENT_MAP);
+    addAlias(EVENT, VALUE);
+    addMapping(INTERFACE, INTERFACE_MAP);
+    addAlias(INTERFACE, KEY);
+    registerPreProcessor(new CheckExclusiveAttributes(INTERFACE_ATTRIBUTES));
+    registerPreProcessor(new CheckExclusiveAttributes(EVENT_ATTRIBUTES));
+    registerPreProcessor(new CheckRequiredAttributes(INTERFACE_ATTRIBUTES));
+    registerPreProcessor(new CheckRequiredAttributes(EVENT_ATTRIBUTES));
+    registerPreProcessor(new SetDefaults());
+  }
+
+  /**
+   * If only one of event or interface is set, use it as default for the other
+   */
+  private class SetDefaults implements PreProcessor {
+
+    @Override
+    public void preProcess(PropertyConfiguration config, Element element) {
+      copy(element, INTERFACE, EVENT, EVENT_CLASS);
+      copy(element, EVENT, INTERFACE, INTERFACE_CLASS);
     }
 
-    public NotificationDefinitionParser()
-    {
-        super("interfaceToType", INTERFACE_CLASS, EVENT_CLASS);
-        addMapping(EVENT, EVENT_MAP);
-        addAlias(EVENT, VALUE);
-        addMapping(INTERFACE, INTERFACE_MAP);
-        addAlias(INTERFACE, KEY);
-        registerPreProcessor(new CheckExclusiveAttributes(INTERFACE_ATTRIBUTES));
-        registerPreProcessor(new CheckExclusiveAttributes(EVENT_ATTRIBUTES));
-        registerPreProcessor(new CheckRequiredAttributes(INTERFACE_ATTRIBUTES));
-        registerPreProcessor(new CheckRequiredAttributes(EVENT_ATTRIBUTES));
-        registerPreProcessor(new SetDefaults());
+    private void copy(Element element, String from, String to, String blocker) {
+      if (element.hasAttribute(from) && !element.hasAttribute(to) && !element.hasAttribute(blocker)) {
+        element.setAttribute(to, element.getAttribute(from));
+      }
     }
 
-    /**
-     * If only one of event or interface is set, use it as default for the other
-     */
-    private class SetDefaults implements PreProcessor
-    {
-
-        @Override
-        public void preProcess(PropertyConfiguration config, Element element)
-        {
-            copy(element, INTERFACE, EVENT, EVENT_CLASS);
-            copy(element, EVENT, INTERFACE, INTERFACE_CLASS);
-        }
-
-        private void copy(Element element, String from, String to, String blocker)
-        {
-            if (element.hasAttribute(from) && !element.hasAttribute(to) && !element.hasAttribute(blocker))
-            {
-                element.setAttribute(to, element.getAttribute(from));
-            }
-        }
-
-    }
+  }
 
 }

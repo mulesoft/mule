@@ -11,13 +11,12 @@ import org.mule.extension.http.api.request.client.HttpClient;
 /**
  * Factory object for {@link HttpClient} mule-to-httpLibrary adapters.
  */
-public interface HttpClientFactory
-{
+public interface HttpClientFactory {
 
-    /**
-     * @param configuration the configuration to use for the underlying http library.
-     * @return a newly built {@link HttpClient}
-     */
-    HttpClient create(HttpClientConfiguration configuration);
+  /**
+   * @param configuration the configuration to use for the underlying http library.
+   * @return a newly built {@link HttpClient}
+   */
+  HttpClient create(HttpClientConfiguration configuration);
 
 }

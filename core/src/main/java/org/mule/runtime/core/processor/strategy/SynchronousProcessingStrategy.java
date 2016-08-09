@@ -17,30 +17,21 @@ import java.util.List;
 /**
  * This strategy processes all message processors in the calling thread.
  */
-public class SynchronousProcessingStrategy implements ProcessingStrategy
-{
-    @Override
-    public void configureProcessors(List<MessageProcessor> processors,
-                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
-                                    MessageProcessorChainBuilder chainBuilder,
-                                    MuleContext muleContext)
-    {
-        for (Object processor : processors)
-        {
-            if (processor instanceof MessageProcessor)
-            {
-                chainBuilder.chain((MessageProcessor) processor);
-            }
-            else if (processor instanceof MessageProcessorBuilder)
-            {
-                chainBuilder.chain((MessageProcessorBuilder) processor);
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-            }
-        }
+public class SynchronousProcessingStrategy implements ProcessingStrategy {
+
+  @Override
+  public void configureProcessors(List<MessageProcessor> processors,
+                                  org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                  MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+    for (Object processor : processors) {
+      if (processor instanceof MessageProcessor) {
+        chainBuilder.chain((MessageProcessor) processor);
+      } else if (processor instanceof MessageProcessorBuilder) {
+        chainBuilder.chain((MessageProcessorBuilder) processor);
+      } else {
+        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+      }
     }
+  }
 
 }

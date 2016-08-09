@@ -11,28 +11,28 @@ package org.mule.runtime.core.api.lifecycle;
  *
  * @since 3.0
  */
-public interface LifecycleState
-{
-    boolean isInitialised();
+public interface LifecycleState {
 
-    boolean isInitialising();
+  boolean isInitialised();
 
-    boolean isStarted();
+  boolean isInitialising();
 
-    boolean isStarting();
+  boolean isStarted();
 
-    boolean isStopped();
+  boolean isStarting();
 
-    boolean isStopping();
+  boolean isStopped();
 
-    boolean isDisposed();
+  boolean isStopping();
 
-    boolean isDisposing();
+  boolean isDisposed();
 
-    boolean isPhaseComplete(String phase);
-    
-    boolean isPhaseExecuting(String phase);
+  boolean isDisposing();
 
-    boolean isValidTransition(String phase);
+  boolean isPhaseComplete(String phase);
+
+  boolean isPhaseExecuting(String phase);
+
+  boolean isValidTransition(String phase);
 
 }

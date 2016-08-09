@@ -14,25 +14,21 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.aop.MethodBeforeAdvice;
 
-public class FunctionalTestAdvice implements MethodBeforeAdvice
-{
+public class FunctionalTestAdvice implements MethodBeforeAdvice {
 
-    private Latch latch = new Latch();
-    private String message;
+  private Latch latch = new Latch();
+  private String message;
 
-    public void before(Method method, Object[] args, Object target) throws Throwable
-    {
-        if (null != args && args.length == 1 && args[0] instanceof MuleEventContext)
-        {
-            message = ((MuleEventContext) args[0]).getMessageAsString();
-        }
-        latch.countDown();
+  public void before(Method method, Object[] args, Object target) throws Throwable {
+    if (null != args && args.length == 1 && args[0] instanceof MuleEventContext) {
+      message = ((MuleEventContext) args[0]).getMessageAsString();
     }
+    latch.countDown();
+  }
 
-    public String getMessage(long ms) throws InterruptedException
-    {
-        latch.await(ms, TimeUnit.MILLISECONDS);
-        return message;
-    }
+  public String getMessage(long ms) throws InterruptedException {
+    latch.await(ms, TimeUnit.MILLISECONDS);
+    return message;
+  }
 
 }

@@ -16,16 +16,15 @@ import java.util.List;
 /**
  * Resolves resolves all the {@link Service} provided by the available {@link ServiceProvider}.
  */
-public interface ServiceResolver
-{
+public interface ServiceResolver {
 
-    /**
-     * Resolves the services instances provided by the given service providers.
-     *
-     * @param serviceProviders service providers to be resolved. Non null.
-     * @return the list of resolved services, sorted by the dependency relationship, i.e., all the services
-     * required by a given service must be located in the list before the dependant service.
-     * @throws ServiceResolutionError
-     */
-    List<Service> resolveServices(List<ServiceProvider> serviceProviders) throws ServiceResolutionError;
+  /**
+   * Resolves the services instances provided by the given service providers.
+   *
+   * @param serviceProviders service providers to be resolved. Non null.
+   * @return the list of resolved services, sorted by the dependency relationship, i.e., all the services required by a given
+   *         service must be located in the list before the dependant service.
+   * @throws ServiceResolutionError
+   */
+  List<Service> resolveServices(List<ServiceProvider> serviceProviders) throws ServiceResolutionError;
 }

@@ -11,12 +11,12 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import java.util.List;
 
 /**
- * Marks a collection of transactions, e.g. a set of single-resource TXs managed as
- * a single unit of work, but without resorting to XA.
+ * Marks a collection of transactions, e.g. a set of single-resource TXs managed as a single unit of work, but without resorting
+ * to XA.
  */
-public interface TransactionCollection
-{
-    void aggregate(AbstractSingleResourceTransaction tx);
+public interface TransactionCollection {
 
-    List<Transaction> getTxCollection();
+  void aggregate(AbstractSingleResourceTransaction tx);
+
+  List<Transaction> getTxCollection();
 }

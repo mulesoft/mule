@@ -48,155 +48,138 @@ import java.util.Objects;
 import org.junit.Test;
 
 @SmallTest
-public class IntrospectionUtilsTestCase extends AbstractMuleTestCase
-{
+public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
-    private List<FruitBasket> baskets;
+  private List<FruitBasket> baskets;
 
-    @Test
-    public void getMethodReturnType() throws Exception
-    {
-        MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod("foo"), TYPE_LOADER);
-        assertDictionary(metadataType, String.class, Apple.class);
-    }
+  @Test
+  public void getMethodReturnType() throws Exception {
+    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod("foo"), TYPE_LOADER);
+    assertDictionary(metadataType, String.class, Apple.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getNullMethodReturnType() throws Exception
-    {
-        IntrospectionUtils.getMethodReturnType(null, TYPE_LOADER);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void getNullMethodReturnType() throws Exception {
+    IntrospectionUtils.getMethodReturnType(null, TYPE_LOADER);
+  }
 
-    @Test
-    public void getArgumentlessMethodArgumentTypes() throws Exception
-    {
-        MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod("foo"), TYPE_LOADER);
-        assertNotNull(types);
-        assertEquals(0, types.length);
-    }
+  @Test
+  public void getArgumentlessMethodArgumentTypes() throws Exception {
+    MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod("foo"), TYPE_LOADER);
+    assertNotNull(types);
+    assertEquals(0, types.length);
+  }
 
-    @Test
-    public void getMethodArgumentTypes() throws Exception
-    {
-        MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod("bar", String.class, Long.class, Apple.class, Map.class), TYPE_LOADER);
-        assertNotNull(types);
-        assertEquals(4, types.length);
+  @Test
+  public void getMethodArgumentTypes() throws Exception {
+    MetadataType[] types = IntrospectionUtils
+        .getMethodArgumentTypes(getMethod("bar", String.class, Long.class, Apple.class, Map.class), TYPE_LOADER);
+    assertNotNull(types);
+    assertEquals(4, types.length);
 
-        assertType(types[0], String.class);
-        assertType(types[1], Long.class);
-        assertType(types[2], Apple.class);
-        assertDictionary(types[3], Banana.class, Kiwi.class);
-    }
+    assertType(types[0], String.class);
+    assertType(types[1], Long.class);
+    assertType(types[2], Apple.class);
+    assertDictionary(types[3], Banana.class, Kiwi.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getNullMethodArgumentTypes() throws Exception
-    {
-        IntrospectionUtils.getMethodArgumentTypes(null, TYPE_LOADER);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void getNullMethodArgumentTypes() throws Exception {
+    IntrospectionUtils.getMethodArgumentTypes(null, TYPE_LOADER);
+  }
 
-    @Test
-    public void getFieldDataType() throws Exception
-    {
-        MetadataType type = IntrospectionUtils.getFieldMetadataType(getClass().getDeclaredField("baskets"), TYPE_LOADER);
-        assertList(type, FruitBasket.class);
-    }
+  @Test
+  public void getFieldDataType() throws Exception {
+    MetadataType type = IntrospectionUtils.getFieldMetadataType(getClass().getDeclaredField("baskets"), TYPE_LOADER);
+    assertList(type, FruitBasket.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getNullFieldDataType() throws Exception
-    {
-        IntrospectionUtils.getFieldMetadataType(null, TYPE_LOADER);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void getNullFieldDataType() throws Exception {
+    IntrospectionUtils.getFieldMetadataType(null, TYPE_LOADER);
+  }
 
-    @Test
-    public void getNoAnnotatedExposedPojoFields()
-    {
-        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(LifetimeInfo.class);
-        assertThat(exposedFields, is(not(empty())));
-        assertThat(exposedFields.size(), is(3));
-        assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
-        assertField("dateOfDeath", TYPE_LOADER.load(Calendar.class), exposedFields);
-        assertField("dateOfConception", TYPE_LOADER.load(LocalDateTime.class), exposedFields);
-    }
+  @Test
+  public void getNoAnnotatedExposedPojoFields() {
+    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(LifetimeInfo.class);
+    assertThat(exposedFields, is(not(empty())));
+    assertThat(exposedFields.size(), is(3));
+    assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
+    assertField("dateOfDeath", TYPE_LOADER.load(Calendar.class), exposedFields);
+    assertField("dateOfConception", TYPE_LOADER.load(LocalDateTime.class), exposedFields);
+  }
 
-    @Test
-    public void getEmptyExposedPojoFields()
-    {
-        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBasket.class);
-        assertThat(exposedFields, is(empty()));
-    }
+  @Test
+  public void getEmptyExposedPojoFields() {
+    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBasket.class);
+    assertThat(exposedFields, is(empty()));
+  }
 
-    @Test
-    public void getWildCardFieldsDataTypes()
-    {
+  @Test
+  public void getWildCardFieldsDataTypes() {
 
-        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBox.class);
-        assertNotNull(exposedFields);
-        assertEquals(6, exposedFields.size());
-        assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
-        assertField("wildCardList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
-        assertField("rawList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
-        assertField("wildCardMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)), exposedFields);
-        assertField("rawMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)), exposedFields);
-        assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Fruit.class)), exposedFields);
-    }
+    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBox.class);
+    assertNotNull(exposedFields);
+    assertEquals(6, exposedFields.size());
+    assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
+    assertField("wildCardList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
+    assertField("rawList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
+    assertField("wildCardMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)),
+                exposedFields);
+    assertField("rawMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)),
+                exposedFields);
+    assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Fruit.class)),
+                exposedFields);
+  }
 
-    private void assertField(String name, MetadataType metadataType, Collection<Field> fields)
-    {
-        Field field = findField(name, fields);
-        assertThat(field, is(notNullValue()));
-        assertThat(field.getName(), equalTo(name));
-        assertThat(field.getType(), equalTo(JavaTypeUtils.getType(metadataType)));
-    }
+  private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
+    Field field = findField(name, fields);
+    assertThat(field, is(notNullValue()));
+    assertThat(field.getName(), equalTo(name));
+    assertThat(field.getType(), equalTo(JavaTypeUtils.getType(metadataType)));
+  }
 
-    private Field findField(String name, Collection<Field> fields)
-    {
-        return (Field) CollectionUtils.find(fields, f -> name.equals(((Field) f).getName()));
-    }
+  private Field findField(String name, Collection<Field> fields) {
+    return (Field) CollectionUtils.find(fields, f -> name.equals(((Field) f).getName()));
+  }
 
-    private void assertType(MetadataType type, Class<?> rawType)
-    {
-        assertThat(rawType.isAssignableFrom(JavaTypeUtils.getType(type)), is(true));
-    }
+  private void assertType(MetadataType type, Class<?> rawType) {
+    assertThat(rawType.isAssignableFrom(JavaTypeUtils.getType(type)), is(true));
+  }
 
-    private Method getMethod(String methodName, Class<?>... parameterTypes) throws Exception
-    {
-        return getClass().getMethod(methodName, parameterTypes);
-    }
+  private Method getMethod(String methodName, Class<?>... parameterTypes) throws Exception {
+    return getClass().getMethod(methodName, parameterTypes);
+  }
 
-    private void assertDictionary(MetadataType metadataType, Class<?> keyType, Class<?> valueType)
-    {
-        assertThat(metadataType, is(instanceOf(DictionaryType.class)));
-        DictionaryType dictionaryType = (DictionaryType) metadataType;
-        assertType(dictionaryType, Map.class);
+  private void assertDictionary(MetadataType metadataType, Class<?> keyType, Class<?> valueType) {
+    assertThat(metadataType, is(instanceOf(DictionaryType.class)));
+    DictionaryType dictionaryType = (DictionaryType) metadataType;
+    assertType(dictionaryType, Map.class);
 
-        assertType(dictionaryType.getKeyType(), keyType);
-        assertType(dictionaryType.getValueType(), valueType);
-    }
+    assertType(dictionaryType.getKeyType(), keyType);
+    assertType(dictionaryType.getValueType(), valueType);
+  }
 
-    private void assertList(MetadataType metadataType, Class<?> listItemType)
-    {
-        assertThat(metadataType, is(instanceOf(ArrayType.class)));
-        assertType(metadataType, List.class);
-        MetadataType itemMetadataType = ((ArrayType) metadataType).getType();
-        assertType(itemMetadataType, listItemType);
-    }
+  private void assertList(MetadataType metadataType, Class<?> listItemType) {
+    assertThat(metadataType, is(instanceOf(ArrayType.class)));
+    assertType(metadataType, List.class);
+    MetadataType itemMetadataType = ((ArrayType) metadataType).getType();
+    assertType(itemMetadataType, listItemType);
+  }
 
-    public Map<String, Apple> foo()
-    {
-        return new HashMap<>();
-    }
+  public Map<String, Apple> foo() {
+    return new HashMap<>();
+  }
 
-    public int bar(String s, Long l, Apple apple, Map<Banana, Kiwi> fruits)
-    {
-        return Objects.hash(s, l, apple, fruits);
-    }
+  public int bar(String s, Long l, Apple apple, Map<Banana, Kiwi> fruits) {
+    return Objects.hash(s, l, apple, fruits);
+  }
 
-    public List<FruitBasket> getBaskets()
-    {
-        return baskets;
-    }
+  public List<FruitBasket> getBaskets() {
+    return baskets;
+  }
 
-    public void setBaskets(List<FruitBasket> baskets)
-    {
-        this.baskets = baskets;
-    }
+  public void setBaskets(List<FruitBasket> baskets) {
+    this.baskets = baskets;
+  }
 }

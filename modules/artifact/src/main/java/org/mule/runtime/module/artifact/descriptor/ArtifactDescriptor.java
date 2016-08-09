@@ -9,34 +9,28 @@ package org.mule.runtime.module.artifact.descriptor;
 
 import java.io.File;
 
-public class ArtifactDescriptor
-{
+public class ArtifactDescriptor {
 
-    private String name;
-    private File rootFolder;
+  private String name;
+  private File rootFolder;
 
-    public String getName()
-    {
-        return name;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public File getRootFolder() {
+    return rootFolder;
+  }
+
+  public void setRootFolder(File rootFolder) {
+    if (rootFolder == null) {
+      throw new IllegalArgumentException("Root folder cannot be null");
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public File getRootFolder()
-    {
-        return rootFolder;
-    }
-
-    public void setRootFolder(File rootFolder)
-    {
-        if (rootFolder == null)
-        {
-            throw new IllegalArgumentException("Root folder cannot be null");
-        }
-
-        this.rootFolder = rootFolder;
-    }
+    this.rootFolder = rootFolder;
+  }
 }

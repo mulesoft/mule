@@ -10,20 +10,19 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.List;
 
-public interface ServerPluginClassLoaderManager
-{
+public interface ServerPluginClassLoaderManager {
 
-    /**
-     * Adds a new classloader
-     *
-     * @param classLoader plugin classloader to add. Non null
-     */
-    void addPluginClassLoader(ArtifactClassLoader classLoader);
+  /**
+   * Adds a new classloader
+   *
+   * @param classLoader plugin classloader to add. Non null
+   */
+  void addPluginClassLoader(ArtifactClassLoader classLoader);
 
-    /**
-     * Immutable list of current plugin classloaders
-     *
-     * @return list of classloaders. Non null
-     */
-    List<ArtifactClassLoader> getPluginClassLoaders();
+  /**
+   * Immutable list of current plugin classloaders
+   *
+   * @return list of classloaders. Non null
+   */
+  List<ArtifactClassLoader> getPluginClassLoaders();
 }

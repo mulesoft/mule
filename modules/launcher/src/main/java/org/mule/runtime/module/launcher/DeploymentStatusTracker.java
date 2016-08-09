@@ -9,19 +9,16 @@ package org.mule.runtime.module.launcher;
 /**
  * Keeps track of the deployment status of all artifact in the Mule instance.
  */
-public class DeploymentStatusTracker extends AbstractDeploymentListener
-{
+public class DeploymentStatusTracker extends AbstractDeploymentListener {
 
-    private ArtifactDeploymentStatusTracker applicationDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
-    private ArtifactDeploymentStatusTracker domainDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
+  private ArtifactDeploymentStatusTracker applicationDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
+  private ArtifactDeploymentStatusTracker domainDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
 
-    public ArtifactDeploymentStatusTracker getApplicationDeploymentStatusTracker()
-    {
-        return applicationDeploymentStatusTracker;
-    }
+  public ArtifactDeploymentStatusTracker getApplicationDeploymentStatusTracker() {
+    return applicationDeploymentStatusTracker;
+  }
 
-    public ArtifactDeploymentStatusTracker getDomainDeploymentStatusTracker()
-    {
-        return domainDeploymentStatusTracker;
-    }
+  public ArtifactDeploymentStatusTracker getDomainDeploymentStatusTracker() {
+    return domainDeploymentStatusTracker;
+  }
 }

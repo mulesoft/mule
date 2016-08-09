@@ -21,67 +21,60 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MessageSourceTestCase extends ExtensionFunctionalTestCase
-{
+public class MessageSourceTestCase extends ExtensionFunctionalTestCase {
 
-    public static final int TIMEOUT_MILLIS = 5000;
-    public static final int POLL_DELAY_MILLIS = 100;
+  public static final int TIMEOUT_MILLIS = 5000;
+  public static final int POLL_DELAY_MILLIS = 100;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {HeisenbergExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-source-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "heisenberg-source-config.xml";
+  }
 
-    @Test
-    public void source() throws Exception
-    {
-        startFlow("source");
-        HeisenbergExtension heisenberg = locateConfig();
+  @Test
+  public void source() throws Exception {
+    startFlow("source");
+    HeisenbergExtension heisenberg = locateConfig();
 
-        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
-    }
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
+  }
 
-    @Test
-    public void onException() throws Exception
-    {
-        startFlow("sourceFailed");
-        HeisenbergExtension heisenberg = locateConfig();
+  @Test
+  public void onException() throws Exception {
+    startFlow("sourceFailed");
+    HeisenbergExtension heisenberg = locateConfig();
 
-        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> heisenberg.getMoney().longValue() == -1));
-    }
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> heisenberg.getMoney().longValue() == -1));
+  }
 
 
-    @Test
-    public void enrichExceptionOnStart() throws Exception
-    {
-        expectedException.expectMessage(ENRICHED_MESSAGE + CORE_POOL_SIZE_ERROR_MESSAGE);
-        startFlow("sourceFailedOnStart");
-    }
+  @Test
+  public void enrichExceptionOnStart() throws Exception {
+    expectedException.expectMessage(ENRICHED_MESSAGE + CORE_POOL_SIZE_ERROR_MESSAGE);
+    startFlow("sourceFailedOnStart");
+  }
 
-    @Test
-    public void reconnectWithEnrichedException() throws Exception
-    {
-        startFlow("sourceFailedOnRuntime");
-        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> sourceTimesStarted > 2));
-    }
+  @Test
+  public void reconnectWithEnrichedException() throws Exception {
+    startFlow("sourceFailedOnRuntime");
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> sourceTimesStarted > 2));
+  }
 
-    private HeisenbergExtension locateConfig() throws Exception
-    {
-        return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", getTestEvent("")).getValue();
-    }
+  private HeisenbergExtension locateConfig() throws Exception {
+    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", getTestEvent("")).getValue();
+  }
 
-    private void startFlow(String flowName) throws Exception
-    {
-        ((Flow) getFlowConstruct(flowName)).start();
-    }
+  private void startFlow(String flowName) throws Exception {
+    ((Flow) getFlowConstruct(flowName)).start();
+  }
 }

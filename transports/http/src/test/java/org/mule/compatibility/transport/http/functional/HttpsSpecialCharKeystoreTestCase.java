@@ -12,18 +12,16 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-public class HttpsSpecialCharKeystoreTestCase extends HttpsFunctionalTestCase
-{
+public class HttpsSpecialCharKeystoreTestCase extends HttpsFunctionalTestCase {
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        File serverKeystore = new File(IOUtils.getResourceAsUrl(SERVER_KEYSTORE, getClass()).getPath());
-        File serverKeystoreCopy = new File(workingDirectory.getRoot().getPath() + "/dir$/serverKeystore");
-        FileUtils.copyFile(serverKeystore, serverKeystoreCopy);
-        //this is a SystemProperty rule defined in the superclass
-        System.setProperty(SERVER_KEYSTORE_PATH, serverKeystoreCopy.getPath());
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    File serverKeystore = new File(IOUtils.getResourceAsUrl(SERVER_KEYSTORE, getClass()).getPath());
+    File serverKeystoreCopy = new File(workingDirectory.getRoot().getPath() + "/dir$/serverKeystore");
+    FileUtils.copyFile(serverKeystore, serverKeystoreCopy);
+    // this is a SystemProperty rule defined in the superclass
+    System.setProperty(SERVER_KEYSTORE_PATH, serverKeystoreCopy.getPath());
+  }
 
 }

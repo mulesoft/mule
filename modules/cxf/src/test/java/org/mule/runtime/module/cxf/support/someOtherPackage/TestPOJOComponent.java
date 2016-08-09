@@ -8,9 +8,9 @@ package org.mule.runtime.module.cxf.support.someOtherPackage;
 
 public class TestPOJOComponent {
 
-    public String sayHello(String name) {
+  public String sayHello(String name) {
 
-        return "Hello, " + name;
-    }
+    return "Hello, " + name;
+  }
 
 }

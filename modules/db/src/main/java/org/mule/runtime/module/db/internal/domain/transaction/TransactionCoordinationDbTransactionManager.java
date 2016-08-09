@@ -13,12 +13,10 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 /**
  * Implements {@link DbTransactionManager} using {@link TransactionCoordination}
  */
-public class TransactionCoordinationDbTransactionManager implements DbTransactionManager
-{
+public class TransactionCoordinationDbTransactionManager implements DbTransactionManager {
 
-    @Override
-    public Transaction getTransaction()
-    {
-        return TransactionCoordination.getInstance().getTransaction();
-    }
+  @Override
+  public Transaction getTransaction() {
+    return TransactionCoordination.getInstance().getTransaction();
+  }
 }

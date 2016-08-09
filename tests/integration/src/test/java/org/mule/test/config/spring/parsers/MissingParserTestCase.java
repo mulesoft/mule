@@ -8,19 +8,16 @@ package org.mule.test.config.spring.parsers;
 
 import org.junit.Test;
 
-public class MissingParserTestCase extends AbstractBadConfigTestCase
-{
+public class MissingParserTestCase extends AbstractBadConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/missing-parser-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/missing-parser-test.xml";
+  }
 
-    @Test
-    public void testHelpfulErrorMessage() throws Exception
-    {
-        assertErrorContains("Is the module or extension");
-    }
+  @Test
+  public void testHelpfulErrorMessage() throws Exception {
+    assertErrorContains("Is the module or extension");
+  }
 
 }

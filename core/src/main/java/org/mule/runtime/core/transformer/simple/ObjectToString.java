@@ -22,105 +22,76 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ObjectToString</code> transformer is useful for debugging. It will return
- * human-readable output for various kinds of objects. Right now, it is just coded to
- * handle Map and Collection objects. Others will be added.
+ * <code>ObjectToString</code> transformer is useful for debugging. It will return human-readable output for various kinds of
+ * objects. Right now, it is just coded to handle Map and Collection objects. Others will be added.
  */
-public class ObjectToString extends AbstractTransformer implements DiscoverableTransformer
-{
-    protected static final int DEFAULT_BUFFER_SIZE = 80;
+public class ObjectToString extends AbstractTransformer implements DiscoverableTransformer {
 
-    /** Give core transformers a slighty higher priority */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  protected static final int DEFAULT_BUFFER_SIZE = 80;
 
-    public ObjectToString()
-    {
-        registerSourceType(DataType.OBJECT);
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.fromType(OutputHandler.class));
-        setReturnDataType(DataType.STRING);
+  /** Give core transformers a slighty higher priority */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+
+  public ObjectToString() {
+    registerSourceType(DataType.OBJECT);
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.fromType(OutputHandler.class));
+    setReturnDataType(DataType.STRING);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    String output = "";
+
+    if (src instanceof InputStream) {
+      output = createStringFromInputStream((InputStream) src, outputEncoding);
+    } else if (src instanceof OutputHandler) {
+      output = createStringFromOutputHandler((OutputHandler) src, outputEncoding);
+    } else if (src instanceof byte[]) {
+      output = createStringFromByteArray((byte[]) src, outputEncoding);
+    } else {
+      output = StringMessageUtils.toString(src);
     }
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        String output = "";
+    return output;
+  }
 
-        if (src instanceof InputStream)
-        {
-            output = createStringFromInputStream((InputStream) src, outputEncoding);
-        }
-        else if (src instanceof OutputHandler)
-        {
-            output = createStringFromOutputHandler((OutputHandler) src, outputEncoding);
-        }
-        else if (src instanceof byte[])
-        {
-            output = createStringFromByteArray((byte[]) src, outputEncoding);
-        }
-        else
-        {
-            output = StringMessageUtils.toString(src);
-        }
-
-        return output;
+  protected String createStringFromInputStream(InputStream input, Charset outputEncoding) throws TransformerException {
+    try {
+      return IOUtils.toString(input, outputEncoding);
+    } catch (IOException e) {
+      throw new TransformerException(CoreMessages.errorReadingStream(), e);
+    } finally {
+      try {
+        input.close();
+      } catch (IOException e) {
+        logger.warn("Could not close stream", e);
+      }
     }
+  }
 
-    protected String createStringFromInputStream(InputStream input, Charset outputEncoding)
-        throws TransformerException
-    {
-        try
-        {
-            return IOUtils.toString(input, outputEncoding);
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(CoreMessages.errorReadingStream(), e);
-        }
-        finally
-        {
-            try
-            {
-                input.close();
-            }
-            catch (IOException e)
-            {
-                logger.warn("Could not close stream", e);
-            }
-        }
+  protected String createStringFromOutputHandler(OutputHandler handler, Charset outputEncoding) throws TransformerException {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    try {
+      handler.write(RequestContext.getEvent(), bytes);
+      return bytes.toString(outputEncoding.name());
+    } catch (IOException e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    protected String createStringFromOutputHandler(OutputHandler handler, Charset outputEncoding)
-        throws TransformerException
-    {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try
-        {
-            handler.write(RequestContext.getEvent(), bytes);
-            return bytes.toString(outputEncoding.name());
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+  protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding) throws TransformerException {
+    return new String(bytes, outputEncoding);
+  }
 
-    protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding)
-        throws TransformerException
-    {
-        return new String(bytes, outputEncoding);
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

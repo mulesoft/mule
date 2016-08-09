@@ -13,94 +13,75 @@ import org.slf4j.LoggerFactory;
 /**
  * A thread that detects and processes events.
  */
-public abstract class EventProcessingThread extends Thread
-{
-    protected final Logger logger = LoggerFactory.getLogger(EventProcessingThread.class);
+public abstract class EventProcessingThread extends Thread {
 
-    protected volatile boolean stopRequested;
-    protected long delayTime;
-    protected Object lock = new Object();
+  protected final Logger logger = LoggerFactory.getLogger(EventProcessingThread.class);
 
-    public EventProcessingThread(String name, long delayTime)
-    {
-        setName(name);
-        this.delayTime = delayTime;
+  protected volatile boolean stopRequested;
+  protected long delayTime;
+  protected Object lock = new Object();
+
+  public EventProcessingThread(String name, long delayTime) {
+    setName(name);
+    this.delayTime = delayTime;
+  }
+
+  public void processNow() {
+    synchronized (lock) {
+      lock.notifyAll();
+    }
+  }
+
+  /**
+   * Stops the monitoring of the expired groups.
+   */
+  public void stopProcessing() {
+    logger.debug("Stopping " + getName());
+    stopRequested = true;
+    processNow();
+
+    try {
+      this.join();
+    } catch (InterruptedException e) {
+      // Ignoring
+    }
+  }
+
+  protected boolean delay(long timeToDelay) {
+    try {
+      synchronized (lock) {
+        lock.wait(timeToDelay);
+      }
+    } catch (InterruptedException e) {
+      return true;
+    }
+    return false;
+  }
+
+  public final void run() {
+    while (true) {
+      if (stopRequested) {
+        logger.debug("Received request to stop processing events");
+        break;
+      }
+
+      try {
+        doRun();
+      } catch (RuntimeException e) {
+        logger.warn(String.format("Caught exception on event processing thread '%s'", getName()), e);
+      }
+
+      if (delay(delayTime)) {
+        break;
+      }
     }
 
-    public void processNow()
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-        }
-    }
-    
-    /**
-     * Stops the monitoring of the expired groups.
-     */
-    public void stopProcessing()
-    {
-        logger.debug("Stopping " + getName());
-        stopRequested = true;
-        processNow();
-        
-        try
-        {
-            this.join();
-        }
-        catch (InterruptedException e)
-        {
-            // Ignoring
-        }
-    }
+    logger.debug(getName() + " fully stopped");
+  }
 
-    protected boolean delay(long timeToDelay)
-    {
-        try
-        {
-            synchronized (lock)
-            {
-                lock.wait(timeToDelay);
-            }
-        }
-        catch (InterruptedException e)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public final void run()
-    {
-        while (true)
-        {
-            if (stopRequested)
-            {
-                logger.debug("Received request to stop processing events");
-                break;
-            }
-
-            try
-            {
-                doRun();
-            }
-            catch (RuntimeException e)
-            {
-                logger.warn(String.format("Caught exception on event processing thread '%s'", getName()), e);
-            }
-
-            if (delay(delayTime))
-            {
-                break;
-            }
-        }
-
-        logger.debug(getName() + " fully stopped");
-    }
-
-    /**
-     * Detect and process events
-     */
-    protected abstract void doRun();
+  /**
+   * Detect and process events
+   */
+  protected abstract void doRun();
 
 }

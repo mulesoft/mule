@@ -17,26 +17,22 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ChildListDefinitionParser extends ChildDefinitionParser
-{
+public class ChildListDefinitionParser extends ChildDefinitionParser {
 
-    public ChildListDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, ArrayList.class);
-        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
-    }
+  public ChildListDefinitionParser(String setterMethod) {
+    super(setterMethod, ArrayList.class);
+    addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
+  }
 
-    protected Class getBeanClass(Element element)
-    {
-        return ListFactoryBean.class;
-    }
+  protected Class getBeanClass(Element element) {
+    return ListFactoryBean.class;
+  }
 
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        super.parseChild(element, parserContext, builder);
-        List parsedList = parserContext.getDelegate().parseListElement(element, builder.getRawBeanDefinition());
-        builder.addPropertyValue("sourceList", parsedList);
-        builder.addPropertyValue("targetListClass", super.getBeanClass(element));
-    }
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    super.parseChild(element, parserContext, builder);
+    List parsedList = parserContext.getDelegate().parseListElement(element, builder.getRawBeanDefinition());
+    builder.addPropertyValue("sourceList", parsedList);
+    builder.addPropertyValue("targetListClass", super.getBeanClass(element));
+  }
 
 }

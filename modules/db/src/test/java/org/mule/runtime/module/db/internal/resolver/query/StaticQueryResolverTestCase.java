@@ -15,18 +15,16 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class StaticQueryResolverTestCase extends AbstractQueryResolverTestCase
-{
+public class StaticQueryResolverTestCase extends AbstractQueryResolverTestCase {
 
-    @Test
-    public void resolvesStaticQuery() throws Exception
-    {
-        Query query = createQuery(createQueryTemplate(STATIC_SQL_TEXT));
+  @Test
+  public void resolvesStaticQuery() throws Exception {
+    Query query = createQuery(createQueryTemplate(STATIC_SQL_TEXT));
 
-        StaticQueryResolver queryResolver = new StaticQueryResolver(query);
+    StaticQueryResolver queryResolver = new StaticQueryResolver(query);
 
-        Query resolvedQuery = queryResolver.resolve(null, muleEvent);
+    Query resolvedQuery = queryResolver.resolve(null, muleEvent);
 
-        assertThat(query, equalTo(resolvedQuery));
-    }
+    assertThat(query, equalTo(resolvedQuery));
+  }
 }

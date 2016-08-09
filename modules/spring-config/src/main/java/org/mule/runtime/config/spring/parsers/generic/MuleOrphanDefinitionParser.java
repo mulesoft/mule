@@ -15,35 +15,29 @@ import org.w3c.dom.Element;
 /**
  * A parser for direct children of the <mule> element.
  */
-public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
-{
-    /**
-     * This constructor assumes that the class name will be explicitly specified as
-     * an attribute on the element.
-     */
-    public MuleOrphanDefinitionParser(boolean singleton)
-    {
-        super(singleton);
-    }
+public class MuleOrphanDefinitionParser extends OrphanDefinitionParser {
 
-    public MuleOrphanDefinitionParser(Class<?> beanClass, boolean singleton)
-    {
-        super(beanClass, singleton);
-    }
+  /**
+   * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
+   */
+  public MuleOrphanDefinitionParser(boolean singleton) {
+    super(singleton);
+  }
 
-    @Override
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        assertMuleParent(element);
-        return super.parseInternal(element, parserContext);
-    }
+  public MuleOrphanDefinitionParser(Class<?> beanClass, boolean singleton) {
+    super(beanClass, singleton);
+  }
 
-    protected void assertMuleParent(Element element)
-    {
-        if (!isTopLevel(element))
-        {
-            throw new IllegalStateException("This element should be embedded inside the Mule <"
-                    + ROOT_ELEMENT + "> element: " + SpringXMLUtils.elementToString(element));
-        }
+  @Override
+  protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+    assertMuleParent(element);
+    return super.parseInternal(element, parserContext);
+  }
+
+  protected void assertMuleParent(Element element) {
+    if (!isTopLevel(element)) {
+      throw new IllegalStateException("This element should be embedded inside the Mule <" + ROOT_ELEMENT + "> element: "
+          + SpringXMLUtils.elementToString(element));
     }
+  }
 }

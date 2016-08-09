@@ -19,93 +19,76 @@ import java.util.List;
 
 /**
  *
- * Routing strategy that routes the message through a list of {@link MessageProcessor} until
- * one is successfully executed.
+ * Routing strategy that routes the message through a list of {@link MessageProcessor} until one is successfully executed.
  *
- * The message will be route to the first route, if the route execution is successful then
- * execution ends, if not the message will be route to the next route. This continues until a
- * successful route is found.
+ * The message will be route to the first route, if the route execution is successful then execution ends, if not the message will
+ * be route to the next route. This continues until a successful route is found.
  */
-public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
-{
-    protected ExpressionFilter failureExpressionFilter;
-    private RouteProcessor processor;
+public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
-    /**
-     * @param muleContext
-     * @param failureExpression Mule expression that validates if a {@link MessageProcessor} execution was successful or not.
-     */
-    public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression, RouteProcessor processor)
-    {
-        super(muleContext);
-        if (failureExpression != null)
-        {
-            failureExpressionFilter = new ExpressionFilter(failureExpression);
+  protected ExpressionFilter failureExpressionFilter;
+  private RouteProcessor processor;
+
+  /**
+   * @param muleContext
+   * @param failureExpression Mule expression that validates if a {@link MessageProcessor} execution was successful or not.
+   */
+  public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression, RouteProcessor processor) {
+    super(muleContext);
+    if (failureExpression != null) {
+      failureExpressionFilter = new ExpressionFilter(failureExpression);
+    } else {
+      failureExpressionFilter = new ExpressionFilter("exception != null");
+    }
+    failureExpressionFilter.setMuleContext(muleContext);
+    this.processor = processor;
+  }
+
+  @Override
+  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException {
+    MuleEvent returnEvent = null;
+
+    boolean failed = true;
+    Exception failExceptionCause = null;
+    for (MessageProcessor mp : messageProcessors) {
+      try {
+        MuleEvent toProcess = cloneEventForRoutinng(event, mp);
+        returnEvent = processor.processRoute(mp, toProcess);
+
+        if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
+          failed = false;
+        } else {
+          failed = returnEvent == null || failureExpressionFilter.accept(returnEvent);
         }
-        else
-        {
-            failureExpressionFilter = new ExpressionFilter("exception != null");
-        }
-        failureExpressionFilter.setMuleContext(muleContext);
-        this.processor = processor;
+      } catch (Exception ex) {
+        failed = true;
+        failExceptionCause = ex;
+      }
+      if (!failed) {
+        break;
+      }
     }
 
-    @Override
-    public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException
-    {
-        MuleEvent returnEvent = null;
-
-        boolean failed = true;
-        Exception failExceptionCause = null;
-        for (MessageProcessor mp : messageProcessors)
-        {
-            try
-            {
-                MuleEvent toProcess = cloneEventForRoutinng(event, mp);
-                returnEvent = processor.processRoute(mp, toProcess);
-
-                if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
-                {
-                    failed = false;
-                }
-                else
-                {
-                    failed = returnEvent == null || failureExpressionFilter.accept(returnEvent);
-                }
-            }
-            catch (Exception ex)
-            {
-                failed = true;
-                failExceptionCause = ex;
-            }
-            if (!failed)
-            {
-                break;
-            }
-        }
-
-        if (failed)
-        {
-            if (failExceptionCause != null)
-            {
-                throw new RoutingFailedMessagingException(CoreMessages.createStaticMessage("all message processor failed during first successful routing strategy") ,event, failExceptionCause);
-            }
-            else
-            {
-                throw new RoutingFailedMessagingException(CoreMessages.createStaticMessage("all message processor failed during first successful routing strategy") ,event);
-            }
-        }
-
-        return returnEvent;
+    if (failed) {
+      if (failExceptionCause != null) {
+        throw new RoutingFailedMessagingException(CoreMessages
+            .createStaticMessage("all message processor failed during first successful routing strategy"), event,
+                                                  failExceptionCause);
+      } else {
+        throw new RoutingFailedMessagingException(CoreMessages
+            .createStaticMessage("all message processor failed during first successful routing strategy"), event);
+      }
     }
 
-    private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp) throws MessagingException
-    {
-        return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
-    }
+    return returnEvent;
+  }
 
-    interface RouteProcessor
-    {
-        MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException;
-    }
+  private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp) throws MessagingException {
+    return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
+  }
+
+  interface RouteProcessor {
+
+    MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException;
+  }
 }

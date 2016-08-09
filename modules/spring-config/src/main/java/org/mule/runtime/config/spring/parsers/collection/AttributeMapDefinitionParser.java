@@ -21,41 +21,34 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * Creates a single, stand-alone map object and processes all attributes to this map
  */
-public class AttributeMapDefinitionParser extends ChildDefinitionParser
-{
-    public AttributeMapDefinitionParser(String setter)
-    {
-        super(setter, ManagedMap.class);
-    }
+public class AttributeMapDefinitionParser extends ChildDefinitionParser {
 
-    protected Class getBeanClass(Element element)
-    {
-        return MapFactoryBean.class;
-    }
+  public AttributeMapDefinitionParser(String setter) {
+    super(setter, ManagedMap.class);
+  }
 
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        ManagedMap values = new ManagedMap();
-        NamedNodeMap attributes = element.getAttributes();
-        for (int x = 0; x < attributes.getLength(); x++)
-        {
-            Attr attribute = (Attr) attributes.item(x);
-            String oldName = SpringXMLUtils.attributeName(attribute);
-            //TODO How can I use bestGuessName
-            String name = beanPropertyConfiguration.translateName(oldName);
-            Object value = beanPropertyConfiguration.translateValue(oldName, attribute.getNodeValue());
-            if (beanPropertyConfiguration.isReference(oldName))
-            {
-                values.put(name, new RuntimeBeanReference(attribute.getNodeValue()));
-            }
-            else
-            {
-                values.put(name, value);
-            }
-        }
-        builder.addPropertyValue("sourceMap", values);
-        builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
-        postProcess(parserContext, getBeanAssembler(element, builder), element);
+  protected Class getBeanClass(Element element) {
+    return MapFactoryBean.class;
+  }
+
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    ManagedMap values = new ManagedMap();
+    NamedNodeMap attributes = element.getAttributes();
+    for (int x = 0; x < attributes.getLength(); x++) {
+      Attr attribute = (Attr) attributes.item(x);
+      String oldName = SpringXMLUtils.attributeName(attribute);
+      // TODO How can I use bestGuessName
+      String name = beanPropertyConfiguration.translateName(oldName);
+      Object value = beanPropertyConfiguration.translateValue(oldName, attribute.getNodeValue());
+      if (beanPropertyConfiguration.isReference(oldName)) {
+        values.put(name, new RuntimeBeanReference(attribute.getNodeValue()));
+      } else {
+        values.put(name, value);
+      }
     }
+    builder.addPropertyValue("sourceMap", values);
+    builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
+    postProcess(parserContext, getBeanAssembler(element, builder), element);
+  }
 
 }

@@ -24,109 +24,86 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 
 /**
- * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can
- * be injected with the {@link FlowConstruct}.
+ * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can be injected with the {@link FlowConstruct}.
  */
-public class FlowConfiguringMessageProcessor implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer, NonBlockingSupported
-{
+public class FlowConfiguringMessageProcessor
+    implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer, NonBlockingSupported {
 
-    private MessageProcessorBuilder builder;
-    private MessageProcessor messageProcessor;
-    private MessageProcessor listener;
+  private MessageProcessorBuilder builder;
+  private MessageProcessor messageProcessor;
+  private MessageProcessor listener;
 
-    public FlowConfiguringMessageProcessor(MessageProcessorBuilder builder)
-    {
-        this.builder = builder;
+  public FlowConfiguringMessageProcessor(MessageProcessorBuilder builder) {
+    this.builder = builder;
+  }
+
+  public void setListener(MessageProcessor listener) {
+    this.listener = listener;
+  }
+
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return messageProcessor.process(event);
+  }
+
+  public void start() throws MuleException {
+    if (messageProcessor instanceof Startable) {
+      ((Startable) messageProcessor).start();
+    }
+  }
+
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    if (builder instanceof FlowConstructAware) {
+      ((FlowConstructAware) builder).setFlowConstruct(flowConstruct);
+    }
+  }
+
+  public void dispose() {
+    if (messageProcessor instanceof Disposable) {
+      ((Disposable) messageProcessor).dispose();
+    }
+  }
+
+  public void stop() throws MuleException {
+    if (messageProcessor instanceof Stoppable) {
+      ((Stoppable) messageProcessor).stop();
+    }
+  }
+
+  public void initialise() throws InitialisationException {
+    if (builder instanceof Initialisable) {
+      ((Initialisable) builder).initialise();
     }
 
-    public void setListener(MessageProcessor listener)
-    {
-        this.listener = listener;
+    try {
+      messageProcessor = builder.build();
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return messageProcessor.process(event);
+    if (messageProcessor instanceof Initialisable) {
+      ((Initialisable) messageProcessor).initialise();
     }
 
-    public void start() throws MuleException
-    {
-        if (messageProcessor instanceof Startable)
-        {
-            ((Startable) messageProcessor).start();
-        }
+    if (messageProcessor instanceof InterceptingMessageProcessor && listener != null) {
+      ((InterceptingMessageProcessor) messageProcessor).setListener(listener);
     }
+  }
 
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        if (builder instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) builder).setFlowConstruct(flowConstruct);
-        }
+  /**
+   * The MessageProcessor that this class built.
+   */
+  public MessageProcessor getWrappedMessageProcessor() {
+    return messageProcessor;
+  }
+
+  public MessageProcessorBuilder getMessageProcessorBuilder() {
+    return builder;
+  }
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    if (getWrappedMessageProcessor() instanceof MessageProcessorContainer) {
+      ((MessageProcessorContainer) getWrappedMessageProcessor()).addMessageProcessorPathElements(pathElement);
     }
-
-    public void dispose()
-    {
-        if (messageProcessor instanceof Disposable)
-        {
-            ((Disposable) messageProcessor).dispose();
-        }
-    }
-
-    public void stop() throws MuleException
-    {
-        if (messageProcessor instanceof Stoppable)
-        {
-            ((Stoppable) messageProcessor).stop();
-        }
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        if (builder instanceof Initialisable)
-        {
-            ((Initialisable) builder).initialise();
-        }
-
-        try
-        {
-            messageProcessor = builder.build();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
-        if (messageProcessor instanceof Initialisable)
-        {
-            ((Initialisable) messageProcessor).initialise();
-        }
-
-        if (messageProcessor instanceof InterceptingMessageProcessor && listener != null)
-        {
-            ((InterceptingMessageProcessor) messageProcessor).setListener(listener);
-        }
-    }
-
-    /**
-     * The MessageProcessor that this class built.
-     */
-    public MessageProcessor getWrappedMessageProcessor()
-    {
-        return messageProcessor;
-    }
-
-    public MessageProcessorBuilder getMessageProcessorBuilder()
-    {
-        return builder;
-    }
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
-    {
-        if (getWrappedMessageProcessor() instanceof MessageProcessorContainer)
-        {
-            ((MessageProcessorContainer) getWrappedMessageProcessor()).addMessageProcessorPathElements(pathElement);
-        }
-    }
+  }
 }

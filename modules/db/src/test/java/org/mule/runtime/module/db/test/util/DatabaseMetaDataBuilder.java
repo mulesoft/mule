@@ -17,32 +17,26 @@ import java.sql.SQLException;
 /**
  * Builds {@link DatabaseMetaData} mocks
  */
-public class DatabaseMetaDataBuilder
-{
+public class DatabaseMetaDataBuilder {
 
-    private final DatabaseMetaData databaseMetaData;
+  private final DatabaseMetaData databaseMetaData;
 
-    public DatabaseMetaDataBuilder()
-    {
-        databaseMetaData = mock(DatabaseMetaData.class);
+  public DatabaseMetaDataBuilder() {
+    databaseMetaData = mock(DatabaseMetaData.class);
+  }
+
+  public DatabaseMetaDataBuilder returningStoredProcedureColumns(String catalog, String storedProcedureName,
+                                                                 ResultSet procedureColumns) {
+    try {
+      when(databaseMetaData.getProcedureColumns(catalog, null, storedProcedureName, "%")).thenReturn(procedureColumns);
+    } catch (SQLException e) {
+      // Not going to happen when building the mock
     }
 
-    public DatabaseMetaDataBuilder returningStoredProcedureColumns(String catalog, String storedProcedureName, ResultSet procedureColumns)
-    {
-        try
-        {
-            when(databaseMetaData.getProcedureColumns(catalog, null, storedProcedureName, "%")).thenReturn(procedureColumns);
-        }
-        catch (SQLException e)
-        {
-            // Not going to happen when building the mock
-        }
+    return this;
+  }
 
-        return this;
-    }
-
-    public DatabaseMetaData build()
-    {
-        return databaseMetaData;
-    }
+  public DatabaseMetaData build() {
+    return databaseMetaData;
+  }
 }

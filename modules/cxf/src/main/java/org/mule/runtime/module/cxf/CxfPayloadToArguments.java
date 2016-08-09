@@ -10,82 +10,63 @@ package org.mule.runtime.module.cxf;
 import org.mule.runtime.core.api.MuleMessage;
 
 /**
- * This enum defines the strategies to convert a Payload to an array of arguments
- * that will be used to call the webservice in
+ * This enum defines the strategies to convert a Payload to an array of arguments that will be used to call the webservice in
  * {@link CxfOutboundMessageProcessor#doSendWithClient(org.mule.runtime.core.api.MuleEvent)} and in
  * {@link CxfOutboundMessageProcessor#doSendWithProxy(org.mule.runtime.core.api.MuleEvent)}.
  */
-public enum CxfPayloadToArguments
-{
-    /**
-     * In this strategy, if the payload is {code null} it will be
-     * sent as a parameter just like any other object.
-     */
-    NULL_PAYLOAD_AS_PARAMETER(CxfConstants.PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER)
-    {
+public enum CxfPayloadToArguments {
+  /**
+   * In this strategy, if the payload is {code null} it will be sent as a parameter just like any other object.
+   */
+  NULL_PAYLOAD_AS_PARAMETER(CxfConstants.PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER) {
 
-    },
-    /**
-     * In this strategy, if the payload is {@code null} it will not be
-     * send as a parameter. The array of arguments in this case will be empty. For
-     * the rest of the objects it behaves just like
-     * {@link #NULL_PAYLOAD_AS_PARAMETER} (it will delegate to
-     * {@link CxfPayloadToArguments#payloadToArrayOfArguments(Object)}).
-     */
-    NULL_PAYLOAD_AS_VOID(CxfConstants.PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_VOID)
-    {
-        @Override
-        public Object[] payloadToArrayOfArguments(Object payload)
-        {
-            if (payload == null)
-            {
-                return new Object[]{};
-            }
-            else
-            {
-                return super.payloadToArrayOfArguments(payload);
-            }
-        }
-    };
+  },
+  /**
+   * In this strategy, if the payload is {@code null} it will not be send as a parameter. The array of arguments in this case will
+   * be empty. For the rest of the objects it behaves just like {@link #NULL_PAYLOAD_AS_PARAMETER} (it will delegate to
+   * {@link CxfPayloadToArguments#payloadToArrayOfArguments(Object)}).
+   */
+  NULL_PAYLOAD_AS_VOID(CxfConstants.PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_VOID) {
 
-    /**
-     * This is the value that is needed to be configured in the endpoint under
-     * property {@link CxfConstants#PAYLOAD_TO_ARGUMENTS} so this
-     * {@link CxfPayloadToArguments} is selected on method
-     * {@link #getPayloadToArgumentsForEndpoint(OutboundEndpoint)}.
-     */
-    private final String payloadToArgumentsParameterValue;
-
-    private CxfPayloadToArguments(String payloadToArgumentsParameterValue)
-    {
-        this.payloadToArgumentsParameterValue = payloadToArgumentsParameterValue;
+    @Override
+    public Object[] payloadToArrayOfArguments(Object payload) {
+      if (payload == null) {
+        return new Object[] {};
+      } else {
+        return super.payloadToArrayOfArguments(payload);
+      }
     }
+  };
 
-    /**
-     * This method is the one that converts the payload in an array of arguments. In
-     * this default implementation if the payload is already an array of
-     * {@link Object objects} that array will be returned. Otherwise, an array with
-     * one element, the payload, will be returned.
-     * 
-     * @param payload the payload to convert to array of arguments.
-     * @return the array of arguments
-     */
-    public Object[] payloadToArrayOfArguments(Object payload)
-    {
-        Object[] args;
-        if (payload instanceof Object[])
-        {
-            args = (Object[]) payload;
-        }
-        else
-        {
-            args = new Object[]{payload};
-        }
-        return args;
-    }
+  /**
+   * This is the value that is needed to be configured in the endpoint under property {@link CxfConstants#PAYLOAD_TO_ARGUMENTS} so
+   * this {@link CxfPayloadToArguments} is selected on method {@link #getPayloadToArgumentsForEndpoint(OutboundEndpoint)}.
+   */
+  private final String payloadToArgumentsParameterValue;
 
-    public String getPayloadToArgumentsParameterValue()
-    {
-        return payloadToArgumentsParameterValue;
+  private CxfPayloadToArguments(String payloadToArgumentsParameterValue) {
+    this.payloadToArgumentsParameterValue = payloadToArgumentsParameterValue;
+  }
+
+  /**
+   * This method is the one that converts the payload in an array of arguments. In this default implementation if the payload is
+   * already an array of {@link Object objects} that array will be returned. Otherwise, an array with one element, the payload,
+   * will be returned.
+   * 
+   * @param payload the payload to convert to array of arguments.
+   * @return the array of arguments
+   */
+  public Object[] payloadToArrayOfArguments(Object payload) {
+    Object[] args;
+    if (payload instanceof Object[]) {
+      args = (Object[]) payload;
+    } else {
+      args = new Object[] {payload};
     }
+    return args;
+  }
+
+  public String getPayloadToArgumentsParameterValue() {
+    return payloadToArgumentsParameterValue;
+  }
 }

@@ -21,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for typeDerivationControl.
+ * <p>
+ * Java class for typeDerivationControl.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;simpleType name="typeDerivationControl">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}derivationControl">
@@ -38,39 +41,31 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "typeDerivationControl")
 @XmlEnum(DerivationControl.class)
-public enum TypeDerivationControl
-{
+public enum TypeDerivationControl {
 
-    @XmlEnumValue("extension")
-    EXTENSION(DerivationControl.EXTENSION),
-    @XmlEnumValue("restriction")
-    RESTRICTION(DerivationControl.RESTRICTION),
-    @XmlEnumValue("list")
-    LIST(DerivationControl.LIST),
-    @XmlEnumValue("union")
-    UNION(DerivationControl.UNION);
-    private final DerivationControl value;
+  @XmlEnumValue("extension")
+  EXTENSION(DerivationControl.EXTENSION), @XmlEnumValue("restriction")
+  RESTRICTION(DerivationControl.RESTRICTION), @XmlEnumValue("list")
+  LIST(DerivationControl.LIST), @XmlEnumValue("union")
+  UNION(DerivationControl.UNION);
 
-    TypeDerivationControl(DerivationControl v)
-    {
-        value = v;
+  private final DerivationControl value;
+
+  TypeDerivationControl(DerivationControl v) {
+    value = v;
+  }
+
+  public DerivationControl value() {
+    return value;
+  }
+
+  public static TypeDerivationControl fromValue(DerivationControl v) {
+    for (TypeDerivationControl c : TypeDerivationControl.values()) {
+      if (c.value.equals(v)) {
+        return c;
+      }
     }
-
-    public DerivationControl value()
-    {
-        return value;
-    }
-
-    public static TypeDerivationControl fromValue(DerivationControl v)
-    {
-        for (TypeDerivationControl c : TypeDerivationControl.values())
-        {
-            if (c.value.equals(v))
-            {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(v.toString());
-    }
+    throw new IllegalArgumentException(v.toString());
+  }
 
 }

@@ -21,58 +21,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This {@link SocketClient} implementation allows the reading and writing
- * to and from a specific connected TCP {@link Socket}.
+ * This {@link SocketClient} implementation allows the reading and writing to and from a specific connected TCP {@link Socket}.
  */
-public final class TcpClient implements SocketClient
-{
+public final class TcpClient implements SocketClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcpClient.class);
-    private final Socket socket;
-    private final TcpProtocol protocol;
+  private static final Logger LOGGER = LoggerFactory.getLogger(TcpClient.class);
+  private final Socket socket;
+  private final TcpProtocol protocol;
 
-    public TcpClient(Socket socket, TcpProtocol protocol)
-    {
-        this.socket = socket;
-        this.protocol = protocol;
-    }
+  public TcpClient(Socket socket, TcpProtocol protocol) {
+    this.socket = socket;
+    this.protocol = protocol;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void write(Object data, String outputEncoding) throws IOException
-    {
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-        protocol.write(bufferedOutputStream, data, outputEncoding);
-        bufferedOutputStream.flush();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void write(Object data, String outputEncoding) throws IOException {
+    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
+    protocol.write(bufferedOutputStream, data, outputEncoding);
+    bufferedOutputStream.flush();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public InputStream read() throws IOException
-    {
-        InputStream inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        return protocol.read(inputStream);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public InputStream read() throws IOException {
+    InputStream inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+    return protocol.read(inputStream);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void close() throws IOException
-    {
-        socket.close();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close() throws IOException {
+    socket.close();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SocketAttributes getAttributes()
-    {
-        return new ImmutableSocketAttributes(socket);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SocketAttributes getAttributes() {
+    return new ImmutableSocketAttributes(socket);
+  }
 }

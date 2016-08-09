@@ -25,60 +25,57 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
-{
+public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase {
 
-    public static final String TEST_TRANSACTION_FACTORY_CLASS = "javax.jms.Connection";
+  public static final String TEST_TRANSACTION_FACTORY_CLASS = "javax.jms.Connection";
 
-    @Test(expected=ClassNotFoundException.class)
-    public void registeringOptionalTransaction() throws Exception
-    {
-        createTestRegistryBootstrap(APP);
-        muleContext.getTransactionFactoryManager().getTransactionFactoryFor(ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
-    }
+  @Test(expected = ClassNotFoundException.class)
+  public void registeringOptionalTransaction() throws Exception {
+    createTestRegistryBootstrap(APP);
+    muleContext.getTransactionFactoryManager().getTransactionFactoryFor(ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
+  }
 
-    @Test
-    public void existingNotOptionalTransaction() throws Exception
-    {
-        createTestRegistryBootstrap(APP);
-        TransactionFactory transactionFactoryFor = muleContext.getTransactionFactoryManager().getTransactionFactoryFor(FakeTransactionResource.class);
-        Assert.assertNotNull(transactionFactoryFor);
-    }
+  @Test
+  public void existingNotOptionalTransaction() throws Exception {
+    createTestRegistryBootstrap(APP);
+    TransactionFactory transactionFactoryFor =
+        muleContext.getTransactionFactoryManager().getTransactionFactoryFor(FakeTransactionResource.class);
+    Assert.assertNotNull(transactionFactoryFor);
+  }
 
-    @Test
-    public void registerOnlyAppPropertiesType() throws Exception
-    {
-        createTestRegistryBootstrap(APP);
-        assertThat(muleContext.getRegistry().lookupObject(String.class), notNullValue());
-        assertThat(muleContext.getRegistry().lookupObject(Properties.class), nullValue());
-        assertThat(muleContext.getRegistry().lookupObject(ArrayList.class), notNullValue());
-    }
+  @Test
+  public void registerOnlyAppPropertiesType() throws Exception {
+    createTestRegistryBootstrap(APP);
+    assertThat(muleContext.getRegistry().lookupObject(String.class), notNullValue());
+    assertThat(muleContext.getRegistry().lookupObject(Properties.class), nullValue());
+    assertThat(muleContext.getRegistry().lookupObject(ArrayList.class), notNullValue());
+  }
 
-    @Test
-    public void registerOnlyDomainPropertiesType() throws Exception
-    {
-        createTestRegistryBootstrap(DOMAIN);
-        assertThat(muleContext.getRegistry().lookupObject(String.class), nullValue());
-        assertThat(muleContext.getRegistry().lookupObject(Properties.class), notNullValue());
-        assertThat(muleContext.getRegistry().lookupObject(ArrayList.class), notNullValue());
-    }
+  @Test
+  public void registerOnlyDomainPropertiesType() throws Exception {
+    createTestRegistryBootstrap(DOMAIN);
+    assertThat(muleContext.getRegistry().lookupObject(String.class), nullValue());
+    assertThat(muleContext.getRegistry().lookupObject(Properties.class), notNullValue());
+    assertThat(muleContext.getRegistry().lookupObject(ArrayList.class), notNullValue());
+  }
 
-    private SimpleRegistryBootstrap createTestRegistryBootstrap(ArtifactType artifactType) throws InitialisationException
-    {
-        final Properties properties = new Properties();
-        properties.put("1", String.format("java.lang.String,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
-        properties.put("2", String.format("java.util.Properties,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, DOMAIN.getAsString()));
-        properties.put("3", String.format("java.util.ArrayList,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.ALL.getAsString()));
-        properties.put("jms.singletx.transaction.resource1", String.format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
-        properties.put("test.singletx.transaction.factory1", FakeTransactionFactory.class.getName());
-        properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());
+  private SimpleRegistryBootstrap createTestRegistryBootstrap(ArtifactType artifactType) throws InitialisationException {
+    final Properties properties = new Properties();
+    properties.put("1", String.format("java.lang.String,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
+    properties.put("2", String.format("java.util.Properties,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, DOMAIN.getAsString()));
+    properties
+        .put("3",
+             String.format("java.util.ArrayList,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.ALL.getAsString()));
+    properties.put("jms.singletx.transaction.resource1", String.format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
+    properties.put("test.singletx.transaction.factory1", FakeTransactionFactory.class.getName());
+    properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());
 
-        final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
-        ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
+    final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
+    ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
 
-        SimpleRegistryBootstrap simpleRegistryBootstrap = new SimpleRegistryBootstrap(artifactType, muleContext);
-        simpleRegistryBootstrap.initialise();
-        return simpleRegistryBootstrap;
-    }
+    SimpleRegistryBootstrap simpleRegistryBootstrap = new SimpleRegistryBootstrap(artifactType, muleContext);
+    simpleRegistryBootstrap.initialise();
+    return simpleRegistryBootstrap;
+  }
 
 }

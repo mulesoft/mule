@@ -11,13 +11,12 @@ import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.transport.file.FileMessageDispatcherFactory;
 import org.mule.runtime.core.api.MuleException;
 
-public class SleepyFileMessageDispatcherFactory extends FileMessageDispatcherFactory
-{    
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new SleepyFileMessageDispatcher(endpoint);
-    }
+public class SleepyFileMessageDispatcherFactory extends FileMessageDispatcherFactory {
+
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new SleepyFileMessageDispatcher(endpoint);
+  }
 
 }
 

@@ -26,123 +26,107 @@ import java.util.Collections;
 import org.junit.Test;
 
 /**
- * This tests verifies that the {@link org.mule.runtime.module.launcher.application.DefaultMuleApplication}
- * status is set correctly depending on its {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
+ * This tests verifies that the {@link org.mule.runtime.module.launcher.application.DefaultMuleApplication} status is set
+ * correctly depending on its {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
  */
-public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase
-{
+public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase {
 
-    private static final int PROBER_TIMEOUT = 1000;
-    private static final int PROBER_INTERVAL = 100;
+  private static final int PROBER_TIMEOUT = 1000;
+  private static final int PROBER_INTERVAL = 100;
 
-    private DefaultMuleApplication application;
+  private DefaultMuleApplication application;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
-        application = new DefaultMuleApplication(null, parentArtifactClassLoader, Collections.emptyList(), null, mock(ServiceRepository.class));
-        application.setMuleContext(muleContext);
+  @Override
+  protected void doSetUp() throws Exception {
+    MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+    application =
+        new DefaultMuleApplication(null, parentArtifactClassLoader, Collections.emptyList(), null, mock(ServiceRepository.class));
+    application.setMuleContext(muleContext);
+  }
+
+  @Test
+  public void initialState() {
+    assertStatus(ApplicationStatus.CREATED);
+  }
+
+  @Test
+  public void initialised() {
+    // the context was initialised before we gave it to the application, so we need
+    // to fire the notification again since the listener wasn't there
+    muleContext.fireNotification(new MuleContextNotification(muleContext, MuleContextNotification.CONTEXT_INITIALISED));
+    assertStatus(ApplicationStatus.INITIALISED);
+  }
+
+  @Test
+  public void started() throws Exception {
+    muleContext.start();
+    assertStatus(ApplicationStatus.STARTED);
+  }
+
+  @Test
+  public void stopped() throws Exception {
+    muleContext.start();
+    muleContext.stop();
+    assertStatus(ApplicationStatus.STOPPED);
+  }
+
+  @Test
+  public void destroyed() {
+    muleContext.dispose();
+    assertStatus(ApplicationStatus.DESTROYED);
+  }
+
+  @Test
+  public void nullDeploymentClassLoaderAfterDispose() {
+    ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+    when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
+
+    DefaultMuleApplication application =
+        new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), Collections.emptyList(), null, null);
+    application.install();
+    assertThat(application.deploymentClassLoader, is(notNullValue()));
+    application.dispose();
+    assertThat(application.deploymentClassLoader, is(nullValue()));
+  }
+
+  @Test
+  public void deploymentFailedOnInit() {
+    try {
+      application.init();
+      fail("Was expecting init to fail");
+    } catch (Exception e) {
+      assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
     }
+  }
 
-    @Test
-    public void initialState()
-    {
-        assertStatus(ApplicationStatus.CREATED);
+  @Test
+  public void deploymentFailedOnStart() throws Exception {
+    try {
+      application.start();
+      fail("Was expecting start to fail");
+    } catch (Exception e) {
+      muleContext.stop();
+      muleContext.dispose();
+      assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
     }
+  }
 
-    @Test
-    public void initialised()
-    {
-        // the context was initialised before we gave it to the application, so we need
-        // to fire the notification again since the listener wasn't there
-        muleContext.fireNotification(new MuleContextNotification(muleContext, MuleContextNotification.CONTEXT_INITIALISED));
-        assertStatus(ApplicationStatus.INITIALISED);
-    }
+  private void assertStatus(final ApplicationStatus status) {
+    PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_INTERVAL);
+    prober.check(new JUnitProbe() {
 
-    @Test
-    public void started() throws Exception
-    {
-        muleContext.start();
-        assertStatus(ApplicationStatus.STARTED);
-    }
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(application.getStatus(), is(status));
+        return true;
+      }
 
-    @Test
-    public void stopped() throws Exception
-    {
-        muleContext.start();
-        muleContext.stop();
-        assertStatus(ApplicationStatus.STOPPED);
-    }
+      @Override
+      public String describeFailure() {
+        return String.format("Application remained at status %s instead of moving to %s", application.getStatus().name(),
+                             status.name());
+      }
+    });
 
-    @Test
-    public void destroyed()
-    {
-        muleContext.dispose();
-        assertStatus(ApplicationStatus.DESTROYED);
-    }
-
-    @Test
-    public void nullDeploymentClassLoaderAfterDispose()
-    {
-        ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-        when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
-
-        DefaultMuleApplication application = new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), Collections.emptyList(), null, null);
-        application.install();
-        assertThat(application.deploymentClassLoader, is(notNullValue()));
-        application.dispose();
-        assertThat(application.deploymentClassLoader, is(nullValue()));
-    }
-
-    @Test
-    public void deploymentFailedOnInit()
-    {
-        try
-        {
-            application.init();
-            fail("Was expecting init to fail");
-        }
-        catch (Exception e)
-        {
-            assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
-        }
-    }
-
-    @Test
-    public void deploymentFailedOnStart() throws Exception
-    {
-        try
-        {
-            application.start();
-            fail("Was expecting start to fail");
-        }
-        catch (Exception e)
-        {
-            muleContext.stop();
-            muleContext.dispose();
-            assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
-        }
-    }
-
-    private void assertStatus(final ApplicationStatus status)
-    {
-        PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_INTERVAL);
-        prober.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                assertThat(application.getStatus(), is(status));
-                return true;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return String.format("Application remained at status %s instead of moving to %s", application.getStatus().name(), status.name());
-            }
-        });
-
-    }
+  }
 }

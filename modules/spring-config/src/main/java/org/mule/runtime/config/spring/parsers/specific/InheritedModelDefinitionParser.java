@@ -12,17 +12,14 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Allows the <i>Inherited</i> model type to be used. This parser simply looks up the real Model bean and
- * passes that back.
+ * Allows the <i>Inherited</i> model type to be used. This parser simply looks up the real Model bean and passes that back.
  */
-public class InheritedModelDefinitionParser extends AbstractBeanDefinitionParser
-{
+public class InheritedModelDefinitionParser extends AbstractBeanDefinitionParser {
 
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        String parent = element.getAttribute("name");
-        element.setAttribute("id", parent);
-        return (AbstractBeanDefinition)parserContext.getRegistry().getBeanDefinition(parent);
-    }
+  protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+    String parent = element.getAttribute("name");
+    element.setAttribute("id", parent);
+    return (AbstractBeanDefinition) parserContext.getRegistry().getBeanDefinition(parent);
+  }
 
 }

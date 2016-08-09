@@ -17,59 +17,52 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 @SmallTest
-public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase
-{
+public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testSelectNoRegularClassIfThereIsNoPreferred()
-    {
-        List<Object> classes = new ArrayList<Object>();
-        classes.add(new NonPreferred());
+  @Test
+  public void testSelectNoRegularClassIfThereIsNoPreferred() {
+    List<Object> classes = new ArrayList<Object>();
+    classes.add(new NonPreferred());
 
-        PreferredObjectSelector selector = new PreferredObjectSelector();
-        Object object = selector.select(classes.iterator());
-        assertNotNull("Selector selected a wrong object", object instanceof NonPreferred);
-    }
+    PreferredObjectSelector selector = new PreferredObjectSelector();
+    Object object = selector.select(classes.iterator());
+    assertNotNull("Selector selected a wrong object", object instanceof NonPreferred);
+  }
 
-    @Test
-    public void testSelectDefaultPreferredClassOverNoPreferredOne()
-    {
-        List<Object> classes = new ArrayList<Object>();
-        classes.add(new NonPreferred());
-        classes.add(new PreferredWithDefaultWeight());
+  @Test
+  public void testSelectDefaultPreferredClassOverNoPreferredOne() {
+    List<Object> classes = new ArrayList<Object>();
+    classes.add(new NonPreferred());
+    classes.add(new PreferredWithDefaultWeight());
 
-        PreferredObjectSelector selector = new PreferredObjectSelector();
-        Object object = selector.select(classes.iterator());
-        assertNotNull("Selector selected a wrong object", object instanceof PreferredWithDefaultWeight);
-    }
+    PreferredObjectSelector selector = new PreferredObjectSelector();
+    Object object = selector.select(classes.iterator());
+    assertNotNull("Selector selected a wrong object", object instanceof PreferredWithDefaultWeight);
+  }
 
-    @Test
-    public void testSelectPreferredClassWithHighestWeight()
-    {
-        List<Object> classes = new ArrayList<Object>();
-        classes.add(new NonPreferred());
-        classes.add(new PreferredWithDefaultWeight());
-        classes.add(new PreferredWithHighestWeight());
+  @Test
+  public void testSelectPreferredClassWithHighestWeight() {
+    List<Object> classes = new ArrayList<Object>();
+    classes.add(new NonPreferred());
+    classes.add(new PreferredWithDefaultWeight());
+    classes.add(new PreferredWithHighestWeight());
 
-        PreferredObjectSelector selector = new PreferredObjectSelector();
-        Object object = selector.select(classes.iterator());
-        assertNotNull("Selector selected a wrong object", object instanceof PreferredWithHighestWeight);
-    }
+    PreferredObjectSelector selector = new PreferredObjectSelector();
+    Object object = selector.select(classes.iterator());
+    assertNotNull("Selector selected a wrong object", object instanceof PreferredWithHighestWeight);
+  }
 
-    public class NonPreferred
-    {
+  public class NonPreferred {
 
-    }
+  }
 
-    @Preferred
-    public class PreferredWithDefaultWeight
-    {
+  @Preferred
+  public class PreferredWithDefaultWeight {
 
-    }
+  }
 
-    @Preferred(weight = 10)
-    public class PreferredWithHighestWeight
-    {
+  @Preferred(weight = 10)
+  public class PreferredWithHighestWeight {
 
-    }
+  }
 }

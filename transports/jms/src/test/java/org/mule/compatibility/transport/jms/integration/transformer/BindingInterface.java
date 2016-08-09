@@ -6,14 +6,14 @@
  */
 package org.mule.compatibility.transport.jms.integration.transformer;
 
-public interface BindingInterface
-{
-    String hello1(String s);
+public interface BindingInterface {
 
-    String hello2(String s);
+  String hello1(String s);
 
-    String hello3(String s);
+  String hello2(String s);
 
-    String hello4(String s);
+  String hello3(String s);
+
+  String hello4(String s);
 
 }

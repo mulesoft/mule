@@ -17,25 +17,23 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class FileMimeTypeTestCase extends AbstractFileFunctionalTestCase
-{
-    private static final int TIMEOUT = 5000;
+public class FileMimeTypeTestCase extends AbstractFileFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return  "file-mime-type.xml";
-    }
+  private static final int TIMEOUT = 5000;
 
-    @Test
-    public void setsMimeType() throws Exception
-    {
-        createDataFile(getWorkingDirectory(), TEST_MESSAGE, null);
+  @Override
+  protected String getConfigFile() {
+    return "file-mime-type.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request("vm://receive", TIMEOUT);
+  @Test
+  public void setsMimeType() throws Exception {
+    createDataFile(getWorkingDirectory(), TEST_MESSAGE, null);
 
-        assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-        assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.request("vm://receive", TIMEOUT);
+
+    assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+    assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+  }
 }

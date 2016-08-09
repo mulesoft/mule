@@ -34,51 +34,40 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Alias("smtps")
 @DisplayName("SMTPS Connection")
-public class SMTPSProvider extends AbstractSenderProvider implements Initialisable
-{
+public class SMTPSProvider extends AbstractSenderProvider implements Initialisable {
 
-    /**
-     * The port number of the mail server. '465' by default.
-     */
-    @Parameter
-    @Optional(defaultValue = SMTPS_PORT)
-    @Placement(group = CONNECTION, order = 2)
-    private String port;
+  /**
+   * The port number of the mail server. '465' by default.
+   */
+  @Parameter
+  @Optional(defaultValue = SMTPS_PORT)
+  @Placement(group = CONNECTION, order = 2)
+  private String port;
 
-    /**
-     * A factory for TLS contexts. A TLS context is configured with a key store and a trust store.
-     * Allows to create a TLS secured connections.
-     */
-    @Parameter
-    @Summary("TLS Configuration for the secure connection of the SMTPS protocol")
-    @Placement(group = CONNECTION, order = 5)
-    @DisplayName(TLS_CONFIGURATION)
-    private TlsContextFactory tlsContextFactory;
+  /**
+   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
+   * connections.
+   */
+  @Parameter
+  @Summary("TLS Configuration for the secure connection of the SMTPS protocol")
+  @Placement(group = CONNECTION, order = 5)
+  @DisplayName(TLS_CONFIGURATION)
+  private TlsContextFactory tlsContextFactory;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(tlsContextFactory);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(tlsContextFactory);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SenderConnection connect() throws ConnectionException
-    {
-        return new SenderConnection(SMTPS,
-                                    settings.getUser(),
-                                    settings.getPassword(),
-                                    settings.getHost(),
-                                    port,
-                                    getConnectionTimeout(),
-                                    getReadTimeout(),
-                                    getWriteTimeout(),
-                                    getProperties(),
-                                    tlsContextFactory);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SenderConnection connect() throws ConnectionException {
+    return new SenderConnection(SMTPS, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties(), tlsContextFactory);
+  }
 }

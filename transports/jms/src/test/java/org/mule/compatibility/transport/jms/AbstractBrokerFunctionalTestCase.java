@@ -14,32 +14,27 @@ import org.junit.Rule;
 /**
  * Base test class for tests that require an Active MQ broker that is not embedded in the Mule application.
  */
-public class AbstractBrokerFunctionalTestCase extends FunctionalTestCase
-{
+public class AbstractBrokerFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public ActiveMQBroker amqBroker = new ActiveMQBroker("port");
+  @Rule
+  public ActiveMQBroker amqBroker = new ActiveMQBroker("port");
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        amqBroker.start();
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    amqBroker.start();
+  }
 
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        amqBroker.stop();
-    }
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    amqBroker.stop();
+  }
 
-    protected int getConnectionsCount()
-    {
-        return amqBroker.getConnectionsCount();
-    }
+  protected int getConnectionsCount() {
+    return amqBroker.getConnectionsCount();
+  }
 
-    public String getConnectorUrl()
-    {
-        return amqBroker.getConnectorUrl();
-    }
+  public String getConnectorUrl() {
+    return amqBroker.getConnectorUrl();
+  }
 
 }

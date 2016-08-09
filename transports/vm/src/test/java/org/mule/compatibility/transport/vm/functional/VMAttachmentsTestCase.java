@@ -21,33 +21,29 @@ import javax.activation.FileDataSource;
 
 import org.junit.Test;
 
-public class VMAttachmentsTestCase extends FunctionalTestCase
-{
+public class VMAttachmentsTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/vm-attachments-test-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "vm/vm-attachments-test-flow.xml";
+  }
+
+  @Test
+  public void testAttachments() throws Exception {
+    FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/" + getConfigFile()).getAbsoluteFile());
+    MuleMessage msg = MuleMessage.builder().payload("Mmm... attachments!")
+        .addOutboundAttachment("test-attachment", new DataHandler(ds)).build();
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage reply = client.send("vm-in", msg);
+
+    assertNotNull(reply);
+    if (reply.getExceptionPayload() != null) {
+      fail(reply.getExceptionPayload().getException().getCause().toString());
     }
 
-    @Test
-    public void testAttachments() throws Exception
-    {
-        FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
-                                                        + getConfigFile()).getAbsoluteFile());
-        MuleMessage msg = MuleMessage.builder().payload("Mmm... attachments!").addOutboundAttachment("test-attachment", new DataHandler(ds)).build();
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage reply = client.send("vm-in", msg);
-
-        assertNotNull(reply);
-        if (reply.getExceptionPayload() != null)
-        {
-            fail(reply.getExceptionPayload().getException().getCause().toString());
-        }
-
-        assertEquals(1, reply.getInboundAttachmentNames().size());
-        assertNotNull(reply.getInboundAttachment("mule"));
-        assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));
-    }
+    assertEquals(1, reply.getInboundAttachmentNames().size());
+    assertNotNull(reply.getInboundAttachment("mule"));
+    assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));
+  }
 }

@@ -10,12 +10,10 @@ package org.mule.test.vegan.extension;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.tck.testmodels.fruit.Apple;
 
-public class EatAppleOperation
-{
+public class EatAppleOperation {
 
-    public Apple eatApple(@Connection Apple apple)
-    {
-        apple.bite();
-        return apple;
-    }
+  public Apple eatApple(@Connection Apple apple) {
+    apple.bite();
+    return apple;
+  }
 }

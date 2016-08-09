@@ -9,14 +9,14 @@ package org.mule.mvel;
 
 public class Bar {
 
-    private BarDetails stuff;
+  private BarDetails stuff;
 
-    public BarDetails getStuff() {
-        return stuff;
-    }
+  public BarDetails getStuff() {
+    return stuff;
+  }
 
-    public void setStuff(BarDetails stuff) {
-        this.stuff = stuff;
-    }
+  public void setStuff(BarDetails stuff) {
+    this.stuff = stuff;
+  }
 }
 

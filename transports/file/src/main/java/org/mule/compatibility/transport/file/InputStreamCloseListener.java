@@ -11,13 +11,12 @@ import java.io.File;
 /**
  * Listener to be called once a file gets closed
  */
-public interface InputStreamCloseListener
-{
+public interface InputStreamCloseListener {
 
-    /**
-     * Call when a file input stream gets closed
-     *
-     * @param file the file on which close was call
-     */
-    void fileClose(File file);
+  /**
+   * Call when a file input stream gets closed
+   *
+   * @param file the file on which close was call
+   */
+  void fileClose(File file);
 }

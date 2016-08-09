@@ -23,41 +23,38 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
 /**
- * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor}
- * instances through a {@link OperationMessageProcessorObjectFactory}
+ * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
+ * {@link OperationMessageProcessorObjectFactory}
  *
  * @since 4.0
  */
-public class OperationDefinitionParser extends ExtensionDefinitionParser
-{
+public class OperationDefinitionParser extends ExtensionDefinitionParser {
 
-    private final RuntimeExtensionModel extensionModel;
-    private final RuntimeOperationModel operationModel;
-    private final MuleContext muleContext;
-    private final DslElementSyntax operationDsl;
+  private final RuntimeExtensionModel extensionModel;
+  private final RuntimeOperationModel operationModel;
+  private final MuleContext muleContext;
+  private final DslElementSyntax operationDsl;
 
-    public OperationDefinitionParser(Builder definition, RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
-                                     DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext, ExtensionParsingContext parsingContext)
-    {
-        super(definition, dslSyntaxResolver, parsingContext);
-        this.extensionModel = extensionModel;
-        this.operationModel = operationModel;
-        this.muleContext = muleContext;
-        this.operationDsl = dslSyntaxResolver.resolve(operationModel);
-    }
+  public OperationDefinitionParser(Builder definition, RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+                                   DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
+                                   ExtensionParsingContext parsingContext) {
+    super(definition, dslSyntaxResolver, parsingContext);
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
+    this.muleContext = muleContext;
+    this.operationDsl = dslSyntaxResolver.resolve(operationModel);
+  }
 
-    @Override
-    protected void doParse(Builder definitionBuilder) throws ConfigurationException
-    {
-        definitionBuilder.withIdentifier(operationDsl.getElementName())
-                .withTypeDefinition(fromType(OperationMessageProcessor.class))
-                .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
-                .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-                .withConstructorParameterDefinition(fromFixedValue(operationModel).build())
-                .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
-                .withSetterParameterDefinition(TARGET_ATTRIBUTE, fromSimpleParameter(TARGET_ATTRIBUTE).build())
-                .withSetterParameterDefinition("configurationProviderName", fromSimpleParameter(CONFIG_ATTRIBUTE).build());
+  @Override
+  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
+    definitionBuilder.withIdentifier(operationDsl.getElementName()).withTypeDefinition(fromType(OperationMessageProcessor.class))
+        .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
+        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+        .withConstructorParameterDefinition(fromFixedValue(operationModel).build())
+        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withSetterParameterDefinition(TARGET_ATTRIBUTE, fromSimpleParameter(TARGET_ATTRIBUTE).build())
+        .withSetterParameterDefinition("configurationProviderName", fromSimpleParameter(CONFIG_ATTRIBUTE).build());
 
-        parseParameters(operationModel.getParameterModels());
-    }
+    parseParameters(operationModel.getParameterModels());
+  }
 }

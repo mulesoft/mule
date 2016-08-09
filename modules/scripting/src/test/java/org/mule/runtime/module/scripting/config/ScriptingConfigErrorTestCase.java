@@ -13,15 +13,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class ScriptingConfigErrorTestCase extends AbstractMuleTestCase
-{
+public class ScriptingConfigErrorTestCase extends AbstractMuleTestCase {
 
-    @Test(expected = InitialisationException.class)
-    public void testMissingEngine() throws InitialisationException, ConfigurationException
-    {
-        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-        new DefaultMuleContextFactory().createMuleContext("config-error.xml");
-    }
+  @Test(expected = InitialisationException.class)
+  public void testMissingEngine() throws InitialisationException, ConfigurationException {
+    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    new DefaultMuleContextFactory().createMuleContext("config-error.xml");
+  }
 }
 
 

@@ -14,16 +14,15 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
 @Extension(name = "Basic", description = "Basic Test connector")
 @Operations(VoidOperations.class)
-public class GlobalInnerPojoConnector
-{
+public class GlobalInnerPojoConnector {
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private Account requiredPojoExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private Account requiredPojoExpressionRequired;
 
-    /**
-     * This should generate a Global element for the inner Owner, but no child element inside the account POJO
-     */
-    @Parameter
-    private Account requiredPojoDefault;
+  /**
+   * This should generate a Global element for the inner Owner, but no child element inside the account POJO
+   */
+  @Parameter
+  private Account requiredPojoDefault;
 }

@@ -22,44 +22,39 @@ import java.net.DatagramSocket;
 
 
 /**
- * A {@link ConnectionProvider} which provides instances of
- * {@link UdpListenerConnection} to be used by {@link SocketListener}
+ * A {@link ConnectionProvider} which provides instances of {@link UdpListenerConnection} to be used by {@link SocketListener}
  *
  * @since 4.0
  */
 @Alias("udp-listener")
-public class UdpListenerProvider implements ConnectionProvider<UdpListenerConnection>
-{
+public class UdpListenerProvider implements ConnectionProvider<UdpListenerConnection> {
 
-    /**
-     * This configuration parameter refers to the address where the UDP socket should listen for incoming packets.
-     */
-    @ParameterGroup
-    private ConnectionSettings connectionSettings;
+  /**
+   * This configuration parameter refers to the address where the UDP socket should listen for incoming packets.
+   */
+  @ParameterGroup
+  private ConnectionSettings connectionSettings;
 
-    /**
-     * {@link DatagramSocket} configuration properties
-     */
-    @ParameterGroup
-    private UdpSocketProperties udpSocketProperties;
+  /**
+   * {@link DatagramSocket} configuration properties
+   */
+  @ParameterGroup
+  private UdpSocketProperties udpSocketProperties;
 
-    @Override
-    public UdpListenerConnection connect() throws ConnectionException, UnresolvableHostException
-    {
-        UdpListenerConnection connection = new UdpListenerConnection(connectionSettings, udpSocketProperties);
-        connection.connect();
-        return connection;
-    }
+  @Override
+  public UdpListenerConnection connect() throws ConnectionException, UnresolvableHostException {
+    UdpListenerConnection connection = new UdpListenerConnection(connectionSettings, udpSocketProperties);
+    connection.connect();
+    return connection;
+  }
 
-    @Override
-    public void disconnect(UdpListenerConnection connection)
-    {
-        connection.disconnect();
-    }
+  @Override
+  public void disconnect(UdpListenerConnection connection) {
+    connection.disconnect();
+  }
 
-    @Override
-    public ConnectionValidationResult validate(UdpListenerConnection connection)
-    {
-        return SocketUtils.validate(connection);
-    }
+  @Override
+  public ConnectionValidationResult validate(UdpListenerConnection connection) {
+    return SocketUtils.validate(connection);
+  }
 }

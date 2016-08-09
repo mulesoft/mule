@@ -13,39 +13,33 @@ import java.sql.SQLException;
 /**
  * Base class for {@link DbType}
  */
-public abstract class AbstractDbType implements DbType
-{
+public abstract class AbstractDbType implements DbType {
 
-    protected final int id;
-    protected final String name;
+  protected final int id;
+  protected final String name;
 
-    public AbstractDbType(int id, String name)
-    {
-        this.id = id;
-        this.name = name;
-    }
+  public AbstractDbType(int id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
-    @Override
-    public int getId()
-    {
-        return id;
-    }
+  @Override
+  public int getId() {
+    return id;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public void registerOutParameter(CallableStatement statement, int index) throws SQLException
-    {
-        statement.registerOutParameter(index, id, name);
-    }
+  @Override
+  public void registerOutParameter(CallableStatement statement, int index) throws SQLException {
+    statement.registerOutParameter(index, id, name);
+  }
 
-    @Override
-    public String toString()
-    {
-        return name;
-    }
+  @Override
+  public String toString() {
+    return name;
+  }
 }

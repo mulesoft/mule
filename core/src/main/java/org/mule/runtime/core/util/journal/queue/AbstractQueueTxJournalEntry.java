@@ -21,172 +21,145 @@ import java.io.Serializable;
  *
  * @param <T> type of the entry identifier
  */
-public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T>
-{
+public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> {
 
-    enum Operation
-    {
-        COMMIT((byte) 1), ROLLBACK((byte) 2), PREPARE((byte) 3), REMOVE((byte) 4), ADD((byte) 5), ADD_FIRST((byte) 6);
+  enum Operation {
+    COMMIT((byte) 1), ROLLBACK((byte) 2), PREPARE((byte) 3), REMOVE((byte) 4), ADD((byte) 5), ADD_FIRST((byte) 6);
 
-        private final byte byteRepresentation;
+    private final byte byteRepresentation;
 
-        Operation(byte operation)
-        {
-            this.byteRepresentation = operation;
+    Operation(byte operation) {
+      this.byteRepresentation = operation;
+    }
+
+    public byte getByteRepresentation() {
+      return byteRepresentation;
+    }
+
+    public static Operation createFromByteRepresentation(byte byteRepresentation) {
+      for (Operation operation : values()) {
+        if (operation.byteRepresentation == byteRepresentation) {
+          return operation;
         }
+      }
+      throw new MuleRuntimeException(CoreMessages
+          .createStaticMessage("Unexpected byte representation value: " + byteRepresentation));
+    }
+  }
 
-        public byte getByteRepresentation()
-        {
-            return byteRepresentation;
-        }
+  private T txId;
+  private String queueName;
+  private byte operation;
+  private Serializable value;
 
-        public static Operation createFromByteRepresentation(byte byteRepresentation)
-        {
-            for (Operation operation : values())
-            {
-                if (operation.byteRepresentation == byteRepresentation)
-                {
-                    return operation;
-                }
-            }
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Unexpected byte representation value: " + byteRepresentation));
-        }
+  public AbstractQueueTxJournalEntry(T txId, byte operation, String queueName, Serializable value) {
+    this.txId = txId;
+    this.queueName = queueName;
+    this.operation = operation;
+    this.value = value;
+  }
+
+  public AbstractQueueTxJournalEntry(T txId, byte operation) {
+    this.txId = txId;
+    this.operation = operation;
+  }
+
+  public AbstractQueueTxJournalEntry(DataInputStream inputStream, MuleContext muleContext) throws IOException {
+    txId = deserializeTxId(inputStream);
+    operation = inputStream.readByte();
+    if (isCheckpointOperation(operation)) {
+      return;
     }
 
-    private T txId;
-    private String queueName;
-    private byte operation;
-    private Serializable value;
+    int queueNameSize = toUnsignedInt(inputStream.readByte());
+    byte[] queueNameAsBytes = new byte[queueNameSize];
+    inputStream.read(queueNameAsBytes, 0, queueNameSize);
+    int valueSize = inputStream.readInt();
+    byte[] valueAsBytes = new byte[valueSize];
+    inputStream.read(valueAsBytes, 0, valueSize);
+    queueName = new String(queueNameAsBytes);
+    value = muleContext.getObjectSerializer().deserialize(valueAsBytes);
+  }
 
-    public AbstractQueueTxJournalEntry(T txId, byte operation, String queueName, Serializable value)
-    {
-        this.txId = txId;
-        this.queueName = queueName;
-        this.operation = operation;
-        this.value = value;
+  public void write(DataOutputStream outputStream, MuleContext muleContext) {
+    try {
+      serializeTxId(outputStream);
+      outputStream.write(operation);
+      if (isCheckpointOperation(operation)) {
+        outputStream.flush();
+        return;
+      }
+      outputStream.write(queueName.length());
+      outputStream.write(queueName.getBytes());
+      byte[] serializedValue = muleContext.getObjectSerializer().serialize(value);
+      outputStream.writeInt(serializedValue.length);
+      outputStream.write(serializedValue);
+      outputStream.flush();
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    public AbstractQueueTxJournalEntry(T txId, byte operation)
-    {
-        this.txId = txId;
-        this.operation = operation;
-    }
+  public static boolean isCheckpointOperation(byte operationAsByte) {
+    Operation operation = Operation.createFromByteRepresentation(operationAsByte);
+    return operation.equals(Operation.COMMIT) || operation.equals(Operation.ROLLBACK) || operation.equals(Operation.PREPARE);
+  }
 
-    public AbstractQueueTxJournalEntry(DataInputStream inputStream, MuleContext muleContext) throws IOException
-    {
-        txId = deserializeTxId(inputStream);
-        operation = inputStream.readByte();
-        if (isCheckpointOperation(operation))
-        {
-            return;
-        }
+  public Serializable getValue() {
+    return value;
+  }
 
-        int queueNameSize = toUnsignedInt(inputStream.readByte());
-        byte[] queueNameAsBytes = new byte[queueNameSize];
-        inputStream.read(queueNameAsBytes, 0, queueNameSize);
-        int valueSize = inputStream.readInt();
-        byte[] valueAsBytes = new byte[valueSize];
-        inputStream.read(valueAsBytes, 0, valueSize);
-        queueName = new String(queueNameAsBytes);
-        value = muleContext.getObjectSerializer().deserialize(valueAsBytes);
-    }
+  public String getQueueName() {
+    return queueName;
+  }
 
-    public void write(DataOutputStream outputStream, MuleContext muleContext)
-    {
-        try
-        {
-            serializeTxId(outputStream);
-            outputStream.write(operation);
-            if (isCheckpointOperation(operation))
-            {
-                outputStream.flush();
-                return;
-            }
-            outputStream.write(queueName.length());
-            outputStream.write(queueName.getBytes());
-            byte[] serializedValue = muleContext.getObjectSerializer().serialize(value);
-            outputStream.writeInt(serializedValue.length);
-            outputStream.write(serializedValue);
-            outputStream.flush();
-        }
-        catch (IOException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
+  public T getTxId() {
+    return txId;
+  }
 
-    public static boolean isCheckpointOperation(byte operationAsByte)
-    {
-        Operation operation = Operation.createFromByteRepresentation(operationAsByte);
-        return operation.equals(Operation.COMMIT) || operation.equals(Operation.ROLLBACK) || operation.equals(Operation.PREPARE);
-    }
+  public byte getOperation() {
+    return operation;
+  }
 
-    public Serializable getValue()
-    {
-        return value;
-    }
+  public boolean isCommit() {
+    return operation == Operation.COMMIT.getByteRepresentation();
+  }
 
-    public String getQueueName()
-    {
-        return queueName;
-    }
+  public boolean isRollback() {
+    return operation == Operation.ROLLBACK.getByteRepresentation();
+  }
 
-    public T getTxId()
-    {
-        return txId;
-    }
+  public boolean isRemove() {
+    return operation == Operation.REMOVE.getByteRepresentation();
+  }
 
-    public byte getOperation()
-    {
-        return operation;
-    }
+  public boolean isAdd() {
+    return operation == Operation.ADD.getByteRepresentation();
+  }
 
-    public boolean isCommit()
-    {
-        return operation == Operation.COMMIT.getByteRepresentation();
-    }
+  public boolean isAddFirst() {
+    return operation == Operation.ADD_FIRST.getByteRepresentation();
+  }
 
-    public boolean isRollback()
-    {
-        return operation == Operation.ROLLBACK.getByteRepresentation();
-    }
+  public boolean isPrepare() {
+    return Operation.PREPARE.getByteRepresentation() == getOperation();
+  }
 
-    public boolean isRemove()
-    {
-        return operation == Operation.REMOVE.getByteRepresentation();
-    }
+  private int toUnsignedInt(byte b) {
+    return b & 0xFF;
+  }
 
-    public boolean isAdd()
-    {
-        return operation == Operation.ADD.getByteRepresentation();
-    }
+  /**
+   * @param inputStream stream in from which the transaction id must be deserialized
+   * @return the deserialized transaction identifier
+   * @throws IOException in case the deserialization fails
+   */
+  protected abstract T deserializeTxId(DataInputStream inputStream) throws IOException;
 
-    public boolean isAddFirst()
-    {
-        return operation == Operation.ADD_FIRST.getByteRepresentation();
-    }
-
-    public boolean isPrepare()
-    {
-        return Operation.PREPARE.getByteRepresentation() == getOperation();
-    }
-
-    private int toUnsignedInt(byte b)
-    {
-        return b & 0xFF;
-    }
-
-    /**
-     * @param inputStream stream in from which the transaction id must be deserialized
-     * @return the deserialized transaction identifier
-     * @throws IOException in case the deserialization fails
-     */
-    protected abstract T deserializeTxId(DataInputStream inputStream) throws IOException;
-
-    /**
-     * @param outputStream stream used to serialize the transaction identifier
-     * @throws IOException in case the serialization fails
-     */
-    protected abstract void serializeTxId(DataOutputStream outputStream) throws IOException;
+  /**
+   * @param outputStream stream used to serialize the transaction identifier
+   * @throws IOException in case the serialization fails
+   */
+  protected abstract void serializeTxId(DataOutputStream outputStream) throws IOException;
 }
 

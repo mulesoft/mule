@@ -9,35 +9,30 @@ package org.mule.runtime.module.oauth2.internal;
 /**
  * Configuration of a custom parameter to extract from the token response.
  */
-public class ParameterExtractor
-{
+public class ParameterExtractor {
 
-    private String paramName;
-    private String value;
+  private String paramName;
+  private String value;
 
-    public void setParamName(final String paramName)
-    {
-        this.paramName = paramName;
-    }
+  public void setParamName(final String paramName) {
+    this.paramName = paramName;
+  }
 
-    public void setValue(final String value)
-    {
-        this.value = value;
-    }
+  public void setValue(final String value) {
+    this.value = value;
+  }
 
-    /**
-     * @return name of the parameter used to store it in the oauth context.
-     */
-    public String getParamName()
-    {
-        return paramName;
-    }
+  /**
+   * @return name of the parameter used to store it in the oauth context.
+   */
+  public String getParamName() {
+    return paramName;
+  }
 
-    /**
-     * @return value extracted from the token response.
-     */
-    public String getValue()
-    {
-        return value;
-    }
+  /**
+   * @return value extracted from the token response.
+   */
+  public String getValue() {
+    return value;
+  }
 }

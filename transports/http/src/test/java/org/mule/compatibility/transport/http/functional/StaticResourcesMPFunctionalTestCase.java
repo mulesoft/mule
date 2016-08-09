@@ -21,163 +21,145 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
-{
-    @ClassRule
-    public static SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase {
 
-    @ClassRule
-    public static DynamicPort port1 = new DynamicPort("port1");
+  @ClassRule
+  public static SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
 
-    @ClassRule
-    public static DynamicPort port2 = new DynamicPort("port2");
+  @ClassRule
+  public static DynamicPort port1 = new DynamicPort("port1");
 
-    @ClassRule
-    public static DynamicPort port3 = new DynamicPort("port3");
+  @ClassRule
+  public static DynamicPort port2 = new DynamicPort("port2");
 
-    private HttpMethod method;
-    private int responseCode;
-    private String payload;
+  @ClassRule
+  public static DynamicPort port3 = new DynamicPort("port3");
 
-    public StaticResourcesMPFunctionalTestCase()
-    {
-        System.setProperty("test.root",
-            ClassUtils.getClassPathRoot(StaticResourcesMPFunctionalTestCase.class).getPath());
-        setDisposeContextPerClass(true);
-    }
+  private HttpMethod method;
+  private int responseCode;
+  private String payload;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-static-resource-test.xml";
-    }
+  public StaticResourcesMPFunctionalTestCase() {
+    System.setProperty("test.root", ClassUtils.getClassPathRoot(StaticResourcesMPFunctionalTestCase.class).getPath());
+    setDisposeContextPerClass(true);
+  }
 
-    @Test
-    public void httpUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(payload, "Test index.html");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-static-resource-test.xml";
+  }
 
-    @Test
-    public void httpUrlRequestingExplicitResourceShouldReturnResource() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static/main.html", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(payload, "Test main.html");
-    }
+  @Test
+  public void httpUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception {
+    String url = String.format("http://localhost:%d/static", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(payload, "Test index.html");
+  }
 
-    @Test
-    public void httpUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static/foo.html", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_NOT_FOUND, responseCode);
-    }
+  @Test
+  public void httpUrlRequestingExplicitResourceShouldReturnResource() throws Exception {
+    String url = String.format("http://localhost:%d/static/main.html", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(payload, "Test main.html");
+  }
 
-    @Test
-    public void contentTypeForDefaultResourceShouldBeTextHtml() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertResponseContentType("text/html");
-    }
+  @Test
+  public void httpUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception {
+    String url = String.format("http://localhost:%d/static/foo.html", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_NOT_FOUND, responseCode);
+  }
 
-    @Test
-    public void contentTypeShouldBeDetermintedFromResource() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static/image.gif", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertResponseContentType("image/gif");
-    }
+  @Test
+  public void contentTypeForDefaultResourceShouldBeTextHtml() throws Exception {
+    String url = String.format("http://localhost:%d/static", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertResponseContentType("text/html");
+  }
 
-    @Test
-    public void explicitMimeTypeConfigurationShouldOverrideDefaults() throws Exception
-    {
-        String url = String.format("http://localhost:%d/static/image.png", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertResponseContentType("image/png");
-    }
+  @Test
+  public void contentTypeShouldBeDetermintedFromResource() throws Exception {
+    String url = String.format("http://localhost:%d/static/image.gif", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertResponseContentType("image/gif");
+  }
 
-    @Test
-    public void httpsUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception
-    {
-        String url = String.format("https://localhost:%d/static", port2.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(payload, "Test index.html");
-    }
+  @Test
+  public void explicitMimeTypeConfigurationShouldOverrideDefaults() throws Exception {
+    String url = String.format("http://localhost:%d/static/image.png", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertResponseContentType("image/png");
+  }
 
-    @Test
-    public void httpsUrlRequestingExplicitResourceShouldReturnResource() throws Exception
-    {
-        String url = String.format("https://localhost:%d/static/main.html", port2.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(payload, "Test main.html");
-    }
+  @Test
+  public void httpsUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception {
+    String url = String.format("https://localhost:%d/static", port2.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(payload, "Test index.html");
+  }
 
-    @Test
-    public void httpsUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception
-    {
-        String url = String.format("https://localhost:%d/static/foo.html", port2.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_NOT_FOUND, responseCode);
-    }
+  @Test
+  public void httpsUrlRequestingExplicitResourceShouldReturnResource() throws Exception {
+    String url = String.format("https://localhost:%d/static/main.html", port2.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(payload, "Test main.html");
+  }
 
-    private void request(String url, boolean followRedirects) throws Exception
-    {
-        method = new GetMethod(url);
-        method.setFollowRedirects(followRedirects);
-        responseCode = new HttpClient().executeMethod(method);
-        payload = method.getResponseBodyAsString();
-    }
+  @Test
+  public void httpsUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception {
+    String url = String.format("https://localhost:%d/static/foo.html", port2.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_NOT_FOUND, responseCode);
+  }
 
-    private void assertResponseContentType(String contentType)
-    {
-        assertEquals(contentType, method.getResponseHeader("Content-Type").getValue());
-    }
+  private void request(String url, boolean followRedirects) throws Exception {
+    method = new GetMethod(url);
+    method.setFollowRedirects(followRedirects);
+    responseCode = new HttpClient().executeMethod(method);
+    payload = method.getResponseBodyAsString();
+  }
 
-    /**
-     * Test that endpoints bound to the same http port but different path work with
-     * the static resource MP
-     */
-    @Test
-    public void testFlowBindingOnSamePort() throws Exception
-    {
-        String url = String.format("http://localhost:%d/echo", port1.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(method.getResponseBodyAsString(), "/echo");
+  private void assertResponseContentType(String contentType) {
+    assertEquals(contentType, method.getResponseHeader("Content-Type").getValue());
+  }
 
-        url = String.format("https://localhost:%d/echo", port2.getNumber());
-        request(url, true);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(method.getResponseBodyAsString(), "/echo");
-    }
+  /**
+   * Test that endpoints bound to the same http port but different path work with the static resource MP
+   */
+  @Test
+  public void testFlowBindingOnSamePort() throws Exception {
+    String url = String.format("http://localhost:%d/echo", port1.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(method.getResponseBodyAsString(), "/echo");
 
-    @Test
-    public void httpUrlWithRootAddressShouldReturnDefaultDocument() throws Exception
-    {
-        String url = String.format("http://localhost:%d/", port3.getNumber());
-        request(url, false);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(method.getResponseBodyAsString(), "Test index.html");
-    }
+    url = String.format("https://localhost:%d/echo", port2.getNumber());
+    request(url, true);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(method.getResponseBodyAsString(), "/echo");
+  }
 
-    @Test
-    public void httpUrlExplicitResourceInRootPathShouldReturnResource() throws Exception
-    {
-        String url = String.format("http://localhost:%d/index.html", port3.getNumber());
-        request(url, false);
-        assertEquals(HttpConstants.SC_OK, responseCode);
-        assertEquals(payload, "Test index.html");
-    }
+  @Test
+  public void httpUrlWithRootAddressShouldReturnDefaultDocument() throws Exception {
+    String url = String.format("http://localhost:%d/", port3.getNumber());
+    request(url, false);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(method.getResponseBodyAsString(), "Test index.html");
+  }
+
+  @Test
+  public void httpUrlExplicitResourceInRootPathShouldReturnResource() throws Exception {
+    String url = String.format("http://localhost:%d/index.html", port3.getNumber());
+    request(url, false);
+    assertEquals(HttpConstants.SC_OK, responseCode);
+    assertEquals(payload, "Test index.html");
+  }
 
 }

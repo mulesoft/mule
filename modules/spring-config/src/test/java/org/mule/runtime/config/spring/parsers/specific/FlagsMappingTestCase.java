@@ -18,39 +18,34 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 @SmallTest
-public class FlagsMappingTestCase extends AbstractMuleTestCase
-{
-    private FlagsMapping flagsMapping;
+public class FlagsMappingTestCase extends AbstractMuleTestCase {
 
-    @Before
-    public void setUp() throws Exception
-    {
-        flagsMapping = new FlagsMapping();
-    }
+  private FlagsMapping flagsMapping;
 
-    @Test
-    public void testSetSingleFlagString()
-    {
-        int result = rewrite("DOTALL");
-        assertEquals(Pattern.DOTALL, result);
-    }
+  @Before
+  public void setUp() throws Exception {
+    flagsMapping = new FlagsMapping();
+  }
 
-    @Test
-    public void testMultipleFlagsString()
-    {
-        int result = rewrite("DOTALL,MULTILINE");
-        assertEquals(Pattern.DOTALL | Pattern.MULTILINE, result);
-    }
+  @Test
+  public void testSetSingleFlagString() {
+    int result = rewrite("DOTALL");
+    assertEquals(Pattern.DOTALL, result);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidFlagsString()
-    {
-        flagsMapping.rewrite("WRONG_FLAG");
-    }
+  @Test
+  public void testMultipleFlagsString() {
+    int result = rewrite("DOTALL,MULTILINE");
+    assertEquals(Pattern.DOTALL | Pattern.MULTILINE, result);
+  }
 
-    private int rewrite(String input)
-    {
-        Integer result = (Integer) flagsMapping.rewrite(input);
-        return result.intValue();
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidFlagsString() {
+    flagsMapping.rewrite("WRONG_FLAG");
+  }
+
+  private int rewrite(String input) {
+    Integer result = (Integer) flagsMapping.rewrite(input);
+    return result.intValue();
+  }
 }

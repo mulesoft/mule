@@ -14,7 +14,6 @@ import java.io.Serializable;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface LegacyImmutableEndpoint extends Serializable, NamedObject
-{
+public interface LegacyImmutableEndpoint extends Serializable, NamedObject {
 
 }

@@ -9,21 +9,18 @@ package org.mule.runtime.core.api.processor;
 /**
  * @since 3.5.0
  */
-public class NamedStageNameSource implements StageNameSource
-{
+public class NamedStageNameSource implements StageNameSource {
 
-    private final String ownerName;
-    private final String stageName;
+  private final String ownerName;
+  private final String stageName;
 
-    public NamedStageNameSource(String ownerName, String stageName)
-    {
-        this.ownerName = ownerName;
-        this.stageName = stageName;
-    }
+  public NamedStageNameSource(String ownerName, String stageName) {
+    this.ownerName = ownerName;
+    this.stageName = stageName;
+  }
 
-    @Override
-    public String getName()
-    {
-        return String.format("%s.%s", this.ownerName, this.stageName);
-    }
+  @Override
+  public String getName() {
+    return String.format("%s.%s", this.ownerName, this.stageName);
+  }
 }

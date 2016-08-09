@@ -34,156 +34,135 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly
- * into a {@link Registry}, generates {@link BeanDefinition}s into a {@link BeanDefinitionRegistry} so
- * that the Spring framework can create those objects when initialising an {@link ApplicationContext}}
+ * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly into a {@link Registry},
+ * generates {@link BeanDefinition}s into a {@link BeanDefinitionRegistry} so that the Spring framework can create those objects
+ * when initialising an {@link ApplicationContext}}
  *
  * @since 3.7.0
  */
-public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements Initialisable
-{
+public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements Initialisable {
 
-    private OptionalObjectsController optionalObjectsController;
-    private BeanDefinitionRegistry beanDefinitionRegistry;
+  private OptionalObjectsController optionalObjectsController;
+  private BeanDefinitionRegistry beanDefinitionRegistry;
 
-    /**
-     * @param artifactType              type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not associated to the related artifact it will be ignored.
-     * @param muleContext               the {@code MuleContext} of the artifact.
-     * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's not able to create it, then it gets ignored.
-     * @param beanDefinitionRegistry    the spring bean definition registry where the bean definitions gets stored
-     */
-    public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext, OptionalObjectsController optionalObjectsController, BeanDefinitionRegistry beanDefinitionRegistry)
-    {
-        super(artifactType, muleContext);
-        this.optionalObjectsController = optionalObjectsController;
-        this.beanDefinitionRegistry = beanDefinitionRegistry;
+  /**
+   * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
+   *        associated to the related artifact it will be ignored.
+   * @param muleContext the {@code MuleContext} of the artifact.
+   * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's
+   *        not able to create it, then it gets ignored.
+   * @param beanDefinitionRegistry the spring bean definition registry where the bean definitions gets stored
+   */
+  public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
+                                 OptionalObjectsController optionalObjectsController,
+                                 BeanDefinitionRegistry beanDefinitionRegistry) {
+    super(artifactType, muleContext);
+    this.optionalObjectsController = optionalObjectsController;
+    this.beanDefinitionRegistry = beanDefinitionRegistry;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    try {
+      absorbAndDiscardOtherRegistries();
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+  @Override
+  protected void registerTransformers() throws MuleException {
+    // no-op .. will happen on post processors
+  }
+
+  @Override
+  protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass,
+                                       Class<? extends Transformer> transformerClass)
+      throws Exception {
+    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(transformerClass);
+
+    DataType returnType = null;
+
+    if (returnClass != null) {
+      DataTypeParamsBuilder dataTypeBuilder = DataType.builder().type(returnClass);
+      if (isNotEmpty(bootstrapProperty.getMimeType())) {
+        dataTypeBuilder = dataTypeBuilder.mediaType(bootstrapProperty.getMimeType());
+      }
+      builder.addPropertyValue("returnDataType", dataTypeBuilder.build());
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        try
-        {
-            absorbAndDiscardOtherRegistries();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
+    String name = bootstrapProperty.getName();
+    if (name == null) {
+      // Prefixes the generated default name to ensure there is less chance of conflict if the user registers
+      // the transformer with the same name
+      name = "_" + TransformerUtils.generateTransformerName(transformerClass, returnType);
     }
 
-    @Override
-    protected void registerTransformers() throws MuleException
-    {
-        //no-op .. will happen on post processors
+    builder.addPropertyValue("name", name);
+
+    notifyIfOptional(name, bootstrapProperty.getOptional());
+    doRegisterObject(name, builder);
+  }
+
+  /**
+   * We want the SpringRegistry to be the only default one. This method looks for other registries and absorbs its objects into
+   * the created {@code beanDefinitionRegistry}. Then, the absorbed registry is unregistered from the context
+   */
+  private void absorbAndDiscardOtherRegistries() {
+    if (!(muleContext.getRegistry() instanceof RegistryProvider)) {
+      return;
     }
 
-    @Override
-    protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass, Class<? extends Transformer> transformerClass) throws Exception
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(transformerClass);
+    for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries()) {
+      if (registry instanceof SpringRegistry) {
+        continue;
+      }
 
-        DataType returnType = null;
+      for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet()) {
+        registerInstance(entry.getKey(), entry.getValue());
+      }
 
-        if (returnClass != null)
-        {
-            DataTypeParamsBuilder dataTypeBuilder = DataType.builder().type(returnClass);
-            if (isNotEmpty(bootstrapProperty.getMimeType()))
-            {
-                dataTypeBuilder = dataTypeBuilder.mediaType(bootstrapProperty.getMimeType());
-            }
-            builder.addPropertyValue("returnDataType", dataTypeBuilder.build());
-        }
+      muleContext.removeRegistry(registry);
+    }
+  }
 
-        String name = bootstrapProperty.getName();
-        if (name == null)
-        {
-            // Prefixes the generated default name to ensure there is less chance of conflict if the user registers
-            // the transformer with the same name
-            name = "_" + TransformerUtils.generateTransformerName(transformerClass, returnType);
-        }
+  @Override
+  protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
+    notifyIfOptional(bootstrapProperty.getKey(), bootstrapProperty.getOptional());
 
-        builder.addPropertyValue("name", name);
+    Class<?> clazz = bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
+    BeanDefinitionBuilder builder;
 
-        notifyIfOptional(name, bootstrapProperty.getOptional());
-        doRegisterObject(name, builder);
+    if (BootstrapObjectFactory.class.isAssignableFrom(clazz)) {
+      final Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
+      builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
+      builder.addConstructorArgValue(value);
+    } else {
+      builder = BeanDefinitionBuilder.rootBeanDefinition(clazz);
     }
 
-    /**
-     * We want the SpringRegistry to be the only default one. This method
-     * looks for other registries and absorbs its objects into the created
-     * {@code beanDefinitionRegistry}. Then, the absorbed registry is unregistered
-     * from the context
-     */
-    private void absorbAndDiscardOtherRegistries()
-    {
-        if (!(muleContext.getRegistry() instanceof RegistryProvider))
-        {
-            return;
-        }
+    doRegisterObject(bootstrapProperty.getKey(), builder);
+  }
 
-        for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries())
-        {
-            if (registry instanceof SpringRegistry)
-            {
-                continue;
-            }
-
-            for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet())
-            {
-                registerInstance(entry.getKey(), entry.getValue());
-            }
-
-            muleContext.removeRegistry(registry);
-        }
+  private void notifyIfOptional(String key, boolean optional) {
+    if (optional && optionalObjectsController != null) {
+      optionalObjectsController.registerOptionalKey(key);
     }
+  }
 
-    @Override
-    protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception
-    {
-        notifyIfOptional(bootstrapProperty.getKey(), bootstrapProperty.getOptional());
+  private void doRegisterObject(String key, BeanDefinitionBuilder builder) {
+    beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
+  }
 
-        Class<?> clazz = bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
-        BeanDefinitionBuilder builder;
+  private void registerInstance(String key, Object value) {
+    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
+    builder.addConstructorArgValue(value);
+    doRegisterObject(key, builder);
+  }
 
-        if (BootstrapObjectFactory.class.isAssignableFrom(clazz))
-        {
-            final Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
-            builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
-            builder.addConstructorArgValue(value);
-        }
-        else
-        {
-            builder = BeanDefinitionBuilder.rootBeanDefinition(clazz);
-        }
-
-        doRegisterObject(bootstrapProperty.getKey(), builder);
-    }
-
-    private void notifyIfOptional(String key, boolean optional)
-    {
-        if (optional && optionalObjectsController != null)
-        {
-            optionalObjectsController.registerOptionalKey(key);
-        }
-    }
-
-    private void doRegisterObject(String key, BeanDefinitionBuilder builder)
-    {
-        beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
-    }
-
-    private void registerInstance(String key, Object value)
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
-        builder.addConstructorArgValue(value);
-        doRegisterObject(key, builder);
-    }
-
-    protected OptionalObjectsController getOptionalObjectsController()
-    {
-        return optionalObjectsController;
-    }
+  protected OptionalObjectsController getOptionalObjectsController() {
+    return optionalObjectsController;
+  }
 
 }

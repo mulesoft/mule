@@ -16,49 +16,40 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SmallTest
-public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
-{
+public class NamedThreadFactoryTestCase extends AbstractMuleTestCase {
 
-    protected Latch latch = new Latch();
-    protected String testThreadName = "myThread";
-    protected ClassLoader testClassLoader = new ClassLoader()
-    {
-    };
-    protected Runnable nullRunnable = new Runnable()
-    {
-        public void run()
-        {
-        }
-    };
+  protected Latch latch = new Latch();
+  protected String testThreadName = "myThread";
+  protected ClassLoader testClassLoader = new ClassLoader() {};
+  protected Runnable nullRunnable = new Runnable() {
 
-    @Test
-    public void testNameContextClassloader() throws InterruptedException
-    {
-        NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName, testClassLoader);
-        Thread t = threadFactory.newThread(new Runnable()
-        {
+    public void run() {}
+  };
 
-            public void run()
-            {
-                assertEquals(testThreadName + ".01", Thread.currentThread().getName());
-                assertEquals(testClassLoader, Thread.currentThread().getContextClassLoader());
-                latch.countDown();
-            }
-        });
-        t.start();
-        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
-    }
+  @Test
+  public void testNameContextClassloader() throws InterruptedException {
+    NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName, testClassLoader);
+    Thread t = threadFactory.newThread(new Runnable() {
 
-    @Test
-    public void testNameIncrement() throws InterruptedException
-    {
-        NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName);
-        Thread t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".01", t.getName());
-        t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".02", t.getName());
-        t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".03", t.getName());
-    }
+      public void run() {
+        assertEquals(testThreadName + ".01", Thread.currentThread().getName());
+        assertEquals(testClassLoader, Thread.currentThread().getContextClassLoader());
+        latch.countDown();
+      }
+    });
+    t.start();
+    assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void testNameIncrement() throws InterruptedException {
+    NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName);
+    Thread t = threadFactory.newThread(nullRunnable);
+    assertEquals(testThreadName + ".01", t.getName());
+    t = threadFactory.newThread(nullRunnable);
+    assertEquals(testThreadName + ".02", t.getName());
+    t = threadFactory.newThread(nullRunnable);
+    assertEquals(testThreadName + ".03", t.getName());
+  }
 
 }

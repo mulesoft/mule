@@ -30,79 +30,69 @@ import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.w3c.dom.Document;
 
-public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTestCase
-{
-    private Document srcData; // Parsed XML doc
-    private String resultData; // String as US-ASCII
+public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        org.dom4j.Document dom4jDoc = DocumentHelper.parseText(IOUtils.toString(IOUtils.getResourceAsStream(
-            "cdcatalog-utf-8.xml", getClass()), "UTF-8"));
-        srcData = new DOMWriter().write(dom4jDoc);
-        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-us-ascii.xml", getClass()),
-            "US-ASCII");
+  private Document srcData; // Parsed XML doc
+  private String resultData; // String as US-ASCII
+
+  @Override
+  protected void doSetUp() throws Exception {
+    org.dom4j.Document dom4jDoc =
+        DocumentHelper.parseText(IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8"));
+    srcData = new DOMWriter().write(dom4jDoc);
+    resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-us-ascii.xml", getClass()), "US-ASCII");
+  }
+
+  @Override
+  public Transformer getTransformer() throws Exception {
+    EndpointAwareTransformer trans =
+        new DefaultEndpointAwareTransformer(createObject(DomDocumentToXml.class), SystemUtils.getDefaultEncoding(muleContext));
+    trans.setReturnDataType(DataType.STRING);
+
+    EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
+    builder.setEncoding(US_ASCII);
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(builder);
+
+    trans.setEndpoint(endpoint);
+    return trans;
+  }
+
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
+    trans.setReturnDataType(DataType.fromType(org.w3c.dom.Document.class));
+    return trans;
+  }
+
+  @Override
+  public Object getTestData() {
+    return srcData;
+  }
+
+  @Override
+  public Object getResultData() {
+    return resultData;
+  }
+
+  @Override
+  public boolean compareResults(Object expected, Object result) {
+    // This is only used during roundtrip test, so it will always be Document
+    // instances
+    if (expected instanceof Document) {
+      expected = new DOMReader().read((Document) expected).asXML();
+      result = new DOMReader().read((Document) result).asXML();
     }
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        EndpointAwareTransformer trans = new DefaultEndpointAwareTransformer(createObject(DomDocumentToXml.class), SystemUtils.getDefaultEncoding(muleContext));
-        trans.setReturnDataType(DataType.STRING);
+    return super.compareResults(expected, result);
+  }
 
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding(US_ASCII);
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
-            builder);
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 
-        trans.setEndpoint(endpoint);
-        return trans;
-    }
-
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
-        trans.setReturnDataType(DataType.fromType(org.w3c.dom.Document.class));
-        return trans;
-    }
-
-    @Override
-    public Object getTestData()
-    {
-        return srcData;
-    }
-
-    @Override
-    public Object getResultData()
-    {
-        return resultData;
-    }
-
-    @Override
-    public boolean compareResults(Object expected, Object result)
-    {
-        // This is only used during roundtrip test, so it will always be Document
-        // instances
-        if (expected instanceof Document)
-        {
-            expected = new DOMReader().read((Document)expected).asXML();
-            result = new DOMReader().read((Document)result).asXML();
-        }
-
-        return super.compareResults(expected, result);
-    }
-
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
-
-    @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        return new TransportsConfigurationBuilder();
-    }
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    return new TransportsConfigurationBuilder();
+  }
 
 }

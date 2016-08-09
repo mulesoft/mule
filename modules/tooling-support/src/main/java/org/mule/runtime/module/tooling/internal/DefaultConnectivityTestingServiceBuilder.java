@@ -30,84 +30,77 @@ import java.util.List;
  *
  * @since 4.0
  */
-class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder
-{
+class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
-    private static final String EXTENSION_BUNDLE_TYPE = "zip";
-    protected static final String NO_CONNECTIVITY_TESTING_STRATEGY_FOUND = format("No %s instances where found", ConnectivityTestingStrategy.class);
-    private final RepositoryService repositoryService;
-    private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
-    private ServiceRegistry serviceRegistry;
-    private List<BundleDescriptor> bundleDescriptors = new ArrayList<>();
-    private ArtifactConfiguration artifactConfiguration;
-    private TemporaryArtifact temporaryArtifact;
+  private static final String EXTENSION_BUNDLE_TYPE = "zip";
+  protected static final String NO_CONNECTIVITY_TESTING_STRATEGY_FOUND =
+      format("No %s instances where found", ConnectivityTestingStrategy.class);
+  private final RepositoryService repositoryService;
+  private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
+  private ServiceRegistry serviceRegistry;
+  private List<BundleDescriptor> bundleDescriptors = new ArrayList<>();
+  private ArtifactConfiguration artifactConfiguration;
+  private TemporaryArtifact temporaryArtifact;
 
-    DefaultConnectivityTestingServiceBuilder(RepositoryService repositoryService, TemporaryArtifactBuilderFactory artifactBuilderFactory, ServiceRegistry serviceRegistry)
-    {
-        this.artifactBuilderFactory = artifactBuilderFactory;
-        this.repositoryService = repositoryService;
-        this.serviceRegistry = serviceRegistry;
+  DefaultConnectivityTestingServiceBuilder(RepositoryService repositoryService,
+                                           TemporaryArtifactBuilderFactory artifactBuilderFactory,
+                                           ServiceRegistry serviceRegistry) {
+    this.artifactBuilderFactory = artifactBuilderFactory;
+    this.repositoryService = repositoryService;
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
+    this.bundleDescriptors.add(new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId)
+        .setType(EXTENSION_BUNDLE_TYPE).setVersion(artifactVersion).build());
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public ConnectivityTestingServiceBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
+    this.artifactConfiguration = artifactConfiguration;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectivityTestingService build() {
+    checkState(artifactConfiguration != null, "artifact configuration cannot be null");
+    checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
+    TemporaryArtifact temporaryArtifact = buildArtifact();
+    return new DefaultConnectivityTestingService(temporaryArtifact);
+  }
+
+  private TemporaryArtifact buildArtifact() {
+    if (temporaryArtifact != null) {
+      return temporaryArtifact;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion)
-    {
-        this.bundleDescriptors.add(new BundleDescriptor.Builder()
-            .setGroupId(groupId)
-            .setArtifactId(artifactId)
-            .setType(EXTENSION_BUNDLE_TYPE)
-            .setVersion(artifactVersion).build());
-        return this;
+    Collection<ConnectivityTestingStrategy> connectivityTestingStrategies =
+        serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class);
+
+    if (connectivityTestingStrategies.isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage(NO_CONNECTIVITY_TESTING_STRATEGY_FOUND));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public ConnectivityTestingServiceBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration)
-    {
-        this.artifactConfiguration = artifactConfiguration;
-        return this;
-    }
+    TemporaryArtifactBuilder temporaryArtifactBuilder =
+        artifactBuilderFactory.newBuilder().setArtifactConfiguration(artifactConfiguration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectivityTestingService build()
-    {
-        checkState(artifactConfiguration != null, "artifact configuration cannot be null");
-        checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
-        TemporaryArtifact temporaryArtifact = buildArtifact();
-        return new DefaultConnectivityTestingService(temporaryArtifact);
-    }
+    connectivityTestingStrategies.stream().forEach(connectivityTestingStrategy -> temporaryArtifactBuilder
+        .addConnectivityTestingStrategyType(connectivityTestingStrategy.getClass()));
 
-    private TemporaryArtifact buildArtifact()
-    {
-        if (temporaryArtifact != null)
-        {
-            return temporaryArtifact;
-        }
-
-        Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class);
-
-        if (connectivityTestingStrategies.isEmpty())
-        {
-            throw new MuleRuntimeException(createStaticMessage(NO_CONNECTIVITY_TESTING_STRATEGY_FOUND));
-        }
-
-        TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
-                .setArtifactConfiguration(artifactConfiguration);
-
-        connectivityTestingStrategies.stream()
-                .forEach(connectivityTestingStrategy -> temporaryArtifactBuilder.addConnectivityTestingStrategyType(connectivityTestingStrategy.getClass()));
-
-        bundleDescriptors.stream()
-                .forEach(bundleDescriptor -> temporaryArtifactBuilder.addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
-        temporaryArtifact = temporaryArtifactBuilder.build();
-        return temporaryArtifact;
-    }
+    bundleDescriptors.stream().forEach(bundleDescriptor -> temporaryArtifactBuilder
+        .addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
+    temporaryArtifact = temporaryArtifactBuilder.build();
+    return temporaryArtifact;
+  }
 
 }

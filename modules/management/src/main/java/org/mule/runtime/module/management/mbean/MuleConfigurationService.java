@@ -11,80 +11,67 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.StringUtils;
 
 /**
- * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
- * a management service.
+ * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as a management service.
  * 
  */
-public class MuleConfigurationService implements MuleConfigurationServiceMBean
-{
-    private  MuleConfiguration muleConfiguration;
+public class MuleConfigurationService implements MuleConfigurationServiceMBean {
 
-    public MuleConfigurationService(MuleConfiguration muleConfiguration)
-    {
-        this.muleConfiguration = muleConfiguration;
-    }
+  private MuleConfiguration muleConfiguration;
 
-    public int getSynchronousEventTimeout()
-    {
-        return muleConfiguration.getDefaultResponseTimeout();
-    }
+  public MuleConfigurationService(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
+  }
 
-    public String getWorkingDirectory()
-    {
-        return muleConfiguration.getWorkingDirectory();
-    }
+  public int getSynchronousEventTimeout() {
+    return muleConfiguration.getDefaultResponseTimeout();
+  }
 
-    public int getTransactionTimeout()
-    {
-        return muleConfiguration.getDefaultTransactionTimeout();
-    }
+  public String getWorkingDirectory() {
+    return muleConfiguration.getWorkingDirectory();
+  }
 
-    public int getShutdownTimeout()
-    {
-        return muleConfiguration.getShutdownTimeout();
-    }
+  public int getTransactionTimeout() {
+    return muleConfiguration.getDefaultTransactionTimeout();
+  }
 
-    public boolean isClientMode()
-    {
-        return muleConfiguration.isClientMode();
-    }
+  public int getShutdownTimeout() {
+    return muleConfiguration.getShutdownTimeout();
+  }
+
+  public boolean isClientMode() {
+    return muleConfiguration.isClientMode();
+  }
 
 
-    public String getEncoding()
-    {
-        return muleConfiguration.getDefaultEncoding();
-    }
+  public String getEncoding() {
+    return muleConfiguration.getDefaultEncoding();
+  }
 
-    public boolean isContainerMode()
-    {
-        return muleConfiguration.isContainerMode();
-    }
+  public boolean isContainerMode() {
+    return muleConfiguration.isContainerMode();
+  }
 
-    public boolean isFullStackTraces()
-    {
-        /*
-            Sacrifice the code quality for the sake of keeping things simple -
-            the alternative would be to pass MuleContext into every exception constructor.
-         */
-        return DefaultMuleConfiguration.fullStackTraces;
-    }
+  public boolean isFullStackTraces() {
+    /*
+     * Sacrifice the code quality for the sake of keeping things simple - the alternative would be to pass MuleContext into every
+     * exception constructor.
+     */
+    return DefaultMuleConfiguration.fullStackTraces;
+  }
 
-    public void setFullStackTraces(boolean flag)
-    {
-        /*
-           Sacrifice the code quality for the sake of keeping things simple -
-           the alternative would be to pass MuleContext into every exception constructor.
-        */
-        DefaultMuleConfiguration.fullStackTraces = flag;
-    }
+  public void setFullStackTraces(boolean flag) {
+    /*
+     * Sacrifice the code quality for the sake of keeping things simple - the alternative would be to pass MuleContext into every
+     * exception constructor.
+     */
+    DefaultMuleConfiguration.fullStackTraces = flag;
+  }
 
-    public String getStackTraceFilter()
-    {
-        return StringUtils.join(DefaultMuleConfiguration.stackTraceFilter, ',');
-    }
+  public String getStackTraceFilter() {
+    return StringUtils.join(DefaultMuleConfiguration.stackTraceFilter, ',');
+  }
 
-    public void setStackTraceFilter(String filterAsString)
-    {
-        DefaultMuleConfiguration.stackTraceFilter = filterAsString.split(",");
-    }
+  public void setStackTraceFilter(String filterAsString) {
+    DefaultMuleConfiguration.stackTraceFilter = filterAsString.split(",");
+  }
 }

@@ -15,16 +15,15 @@ import javax.xml.namespace.QName;
 /**
  * Creates {@link DbConfig} instances
  */
-public interface DbConfigFactory
-{
+public interface DbConfigFactory {
 
-    /**
-     * Creates a {@link DbConfig} to access a given {@link DataSource}
-     *
-     * @param name name of the config
-     * @param annotations 
-     * @param dataSource dataSource to access from the created DbConfig
-     * @return a non null DbConfig
-     */
-    DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource);
+  /**
+   * Creates a {@link DbConfig} to access a given {@link DataSource}
+   *
+   * @param name name of the config
+   * @param annotations
+   * @param dataSource dataSource to access from the created DbConfig
+   * @return a non null DbConfig
+   */
+  DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource);
 }

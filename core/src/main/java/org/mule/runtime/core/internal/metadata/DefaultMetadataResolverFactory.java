@@ -19,79 +19,71 @@ import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFac
 
 
 /**
- * Default implementation of the {@link MetadataResolverFactory}, it provides initialized instances of {@link MetadataKeysResolver},
- * {@link MetadataKeysResolver} and {@link MetadataOutputResolver} of the classes passed in the constructor.
+ * Default implementation of the {@link MetadataResolverFactory}, it provides initialized instances of
+ * {@link MetadataKeysResolver}, {@link MetadataKeysResolver} and {@link MetadataOutputResolver} of the classes passed in the
+ * constructor.
  *
  * @since 4.0
  */
-public final class DefaultMetadataResolverFactory implements MetadataResolverFactory
-{
+public final class DefaultMetadataResolverFactory implements MetadataResolverFactory {
 
-    private final MetadataOutputResolver metadataOutputResolver;
-    private final MetadataAttributesResolver metadataAttributesResolver;
-    private final MetadataContentResolver metadataContentResolver;
-    private final MetadataKeysResolver metadataKeysResolver;
+  private final MetadataOutputResolver metadataOutputResolver;
+  private final MetadataAttributesResolver metadataAttributesResolver;
+  private final MetadataContentResolver metadataContentResolver;
+  private final MetadataKeysResolver metadataKeysResolver;
 
-    public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
-                                          Class<? extends MetadataContentResolver> contentResolver,
-                                          Class<? extends MetadataOutputResolver> outputResolver,
-                                          Class<? extends MetadataAttributesResolver> attributesResolver)
-    {
-        checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
-        checkArgument(contentResolver != null, "MetadataContentResolver type cannot be null");
-        checkArgument(outputResolver != null, "MetadataOutputResolver type cannot be null");
+  public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
+                                        Class<? extends MetadataContentResolver> contentResolver,
+                                        Class<? extends MetadataOutputResolver> outputResolver,
+                                        Class<? extends MetadataAttributesResolver> attributesResolver) {
+    checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
+    checkArgument(contentResolver != null, "MetadataContentResolver type cannot be null");
+    checkArgument(outputResolver != null, "MetadataOutputResolver type cannot be null");
 
-        metadataKeysResolver = instanciateResolver(keyResolver);
-        metadataContentResolver = instanciateResolver(contentResolver);
-        metadataOutputResolver = instanciateResolver(outputResolver);
-        metadataAttributesResolver = instanciateResolver(attributesResolver);
+    metadataKeysResolver = instanciateResolver(keyResolver);
+    metadataContentResolver = instanciateResolver(contentResolver);
+    metadataOutputResolver = instanciateResolver(outputResolver);
+    metadataAttributesResolver = instanciateResolver(attributesResolver);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataKeysResolver getKeyResolver() {
+    return metadataKeysResolver;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> MetadataContentResolver<T> getContentResolver() {
+    return metadataContentResolver;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> MetadataOutputResolver<T> getOutputResolver() {
+    return metadataOutputResolver;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
+    return metadataAttributesResolver;
+  }
+
+  private <T> T instanciateResolver(Class<?> factoryType) {
+    try {
+      return (T) ClassUtils.instanciateClass(factoryType);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create MetadataResolver of type "
+          + getClassName(factoryType)), e);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataKeysResolver getKeyResolver()
-    {
-        return metadataKeysResolver;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> MetadataContentResolver<T> getContentResolver()
-    {
-        return metadataContentResolver;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> MetadataOutputResolver<T> getOutputResolver()
-    {
-        return metadataOutputResolver;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> MetadataAttributesResolver<T> getOutputAttributesResolver()
-    {
-        return metadataAttributesResolver;
-    }
-
-    private <T> T instanciateResolver(Class<?> factoryType)
-    {
-        try
-        {
-            return (T) ClassUtils.instanciateClass(factoryType);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not create MetadataResolver of type " + getClassName(factoryType)), e);
-        }
-    }
+  }
 }

@@ -26,158 +26,140 @@ import java.nio.charset.Charset;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TransformerChainingTestCase extends AbstractMuleContextTestCase
-{
+public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
-    private TransformationService transformationService;
+  private TransformationService transformationService;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        transformationService = new TransformationService(muleContext);
+  @Before
+  public void setUp() throws Exception {
+    transformationService = new TransformationService(muleContext);
+  }
+
+  @Test
+  public void testSingleChainedTransformer() throws Exception {
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(validTransformer);
+    message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+
+    Object transformedMessage = message.getPayload();
+    assertNotNull(transformedMessage);
+    assertEquals(new Integer(1), transformedMessage);
+  }
+
+  @Test
+  public void testTwoChainedTransformers() throws Exception {
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
+    message = transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
+
+    Object transformedMessage = message.getPayload();
+    assertNotNull(transformedMessage);
+    assertEquals(new Integer(2), transformedMessage);
+  }
+
+  @Test
+  public void testThreeChainedTransformers() throws Exception {
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
+    message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+
+    Object transformedMessage = message.getPayload();
+    assertNotNull(transformedMessage);
+    assertEquals(new Integer(3), transformedMessage);
+  }
+
+  @Test(expected = TransformerMessagingException.class)
+  public void testIgnoreBadInputBreaksWithTransformationOrderInvalidValidWhenEnforcedOn() throws Exception {
+    AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+    assertNotNull(invalidTransformer);
+    invalidTransformer.setIgnoreBadInput(true);
+
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
+    transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+  }
+
+  @Test
+  public void testIgnoreBadInputBreaksChainWithTransformationOrderInvalidValid() throws Exception {
+    AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+    assertNotNull(invalidTransformer);
+    invalidTransformer.setIgnoreBadInput(false);
+
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
+
+    try {
+      transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+      fail("Transformer chain is expected to fail because of invalid transformer within chain.");
+    } catch (MuleException tfe) {
+      // ignore
     }
+  }
 
-    @Test
-    public void testSingleChainedTransformer() throws Exception
-    {
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-        
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(validTransformer);
-        message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+  @Test
+  public void testIgnoreBadInputBreaksChainWithTransformationOrderValidInvalid() throws Exception {
+    AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+    assertNotNull(invalidTransformer);
+    invalidTransformer.setIgnoreBadInput(false);
 
-        Object transformedMessage = message.getPayload();
-        assertNotNull(transformedMessage);
-        assertEquals(new Integer(1), transformedMessage);
+    AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+    assertNotNull(validTransformer);
+
+    MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
+    Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
+
+    try {
+      transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+      fail("Transformer chain is expected to fail because of invalid transformer within chain.");
+    } catch (MuleException tfe) {
+      assertNotNull(tfe);
     }
+  }
 
-    @Test
-    public void testTwoChainedTransformers() throws Exception
-    {
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-        
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-        message = transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
+  private Transformer getInvalidTransformer() throws Exception {
+    AbstractTransformer transformer = new AbstractTransformer() {
 
-        Object transformedMessage = message.getPayload();
-        assertNotNull(transformedMessage);
-        assertEquals(new Integer(2), transformedMessage);
-    }
+      @Override
+      protected Object doTransform(final Object src, final Charset encoding) throws TransformerException {
+        throw new RuntimeException("This transformer must not perform any transformations.");
+      }
+    };
 
-    @Test
-    public void testThreeChainedTransformers() throws Exception
-    {
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-        
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
-        message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+    // Use this class as a bogus source type to enforce a simple invalid transformer
+    transformer.registerSourceType(DataType.fromType(this.getClass()));
 
-        Object transformedMessage = message.getPayload();
-        assertNotNull(transformedMessage);
-        assertEquals(new Integer(3), transformedMessage);
-    }
+    return transformer;
+  }
 
-    @Test(expected = TransformerMessagingException.class)
-    public void testIgnoreBadInputBreaksWithTransformationOrderInvalidValidWhenEnforcedOn() throws Exception
-    {
-        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
-        assertNotNull(invalidTransformer);
-        invalidTransformer.setIgnoreBadInput(true);
+  private Transformer getIncreaseByOneTransformer() throws Exception {
+    AbstractTransformer transformer = new AbstractTransformer() {
 
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
+      @Override
+      protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+        return new Integer(((Integer) src).intValue() + 1);
+      }
+    };
 
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
-        transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
-    }
+    DataType integerDataType = DataType.fromType(Integer.class);
+    transformer.registerSourceType(integerDataType);
+    transformer.setReturnDataType(DataType.builder(integerDataType).charset(getDefaultEncoding(muleContext)).build());
 
-    @Test
-    public void testIgnoreBadInputBreaksChainWithTransformationOrderInvalidValid() throws Exception
-    {
-        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
-        assertNotNull(invalidTransformer);
-        invalidTransformer.setIgnoreBadInput(false);
-        
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-        
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
-        
-        try
-        {
-            transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
-            fail("Transformer chain is expected to fail because of invalid transformer within chain.");
-        }
-        catch (MuleException tfe)
-        {
-            // ignore
-        }
-    }
+    return transformer;
+  }
 
-    @Test
-    public void testIgnoreBadInputBreaksChainWithTransformationOrderValidInvalid() throws Exception
-    {
-        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
-        assertNotNull(invalidTransformer);
-        invalidTransformer.setIgnoreBadInput(false);
-
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-
-        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
-        Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
-
-        try
-        {
-            transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
-            fail("Transformer chain is expected to fail because of invalid transformer within chain.");
-        }
-        catch (MuleException tfe)
-        {
-            assertNotNull(tfe);
-        }
-    }
-
-    private Transformer getInvalidTransformer() throws Exception
-    {
-        AbstractTransformer transformer = new AbstractTransformer()
-        {
-            @Override
-            protected Object doTransform(final Object src, final Charset encoding) throws TransformerException
-            {
-                throw new RuntimeException("This transformer must not perform any transformations.");
-            }
-        };
-
-        // Use this class as a bogus source type to enforce a simple invalid transformer
-        transformer.registerSourceType(DataType.fromType(this.getClass()));
-        
-        return transformer;
-    }
-    
-    private Transformer getIncreaseByOneTransformer() throws Exception
-    {
-        AbstractTransformer transformer = new AbstractTransformer()
-        {
-            @Override
-            protected Object doTransform(Object src, Charset encoding) throws TransformerException
-            {
-                return new Integer(((Integer) src).intValue() + 1);
-            }
-        };
-        
-        DataType integerDataType = DataType.fromType(Integer.class);
-        transformer.registerSourceType(integerDataType);
-        transformer.setReturnDataType(DataType.builder(integerDataType).charset(getDefaultEncoding(muleContext)).build());
-
-        return transformer;
-    }
-    
 }

@@ -14,34 +14,29 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.compatibility.transport.tcp.protocols.LengthProtocol;
 
-public class LengthProtocolTestCase extends DefaultProtocolTestCase
-{
+public class LengthProtocolTestCase extends DefaultProtocolTestCase {
 
-    public LengthProtocolTestCase()
-    {
-        super(new LengthProtocol(), 1);
-    }
+  public LengthProtocolTestCase() {
+    super(new LengthProtocol(), 1);
+  }
 
-    @Test
-    public void testFinalValue() throws Exception
-    {
-        byte[] result = (byte[]) getProtocol().read(new SlowInputStream());
-        assertEquals((byte) SlowInputStream.PAYLOAD, result[0]);
-    }
+  @Test
+  public void testFinalValue() throws Exception {
+    byte[] result = (byte[]) getProtocol().read(new SlowInputStream());
+    assertEquals((byte) SlowInputStream.PAYLOAD, result[0]);
+  }
 
-    // try also with a "generous" input stream (ie one that will return all data
-    // without delay) to make sure reset logic is ok
-    @Test
-    public void testGenerous() throws Exception
-    {
-        byte[] bytes = new byte[SlowInputStream.FULL_LENGTH];
-        for (int i = 0; i < SlowInputStream.FULL_LENGTH; ++i)
-        {
-            bytes[i] = (byte) SlowInputStream.CONTENTS[i];
-        }
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        byte[] result = (byte[]) getProtocol().read(bis);
-        assertEquals((byte) SlowInputStream.PAYLOAD, result[0]);
+  // try also with a "generous" input stream (ie one that will return all data
+  // without delay) to make sure reset logic is ok
+  @Test
+  public void testGenerous() throws Exception {
+    byte[] bytes = new byte[SlowInputStream.FULL_LENGTH];
+    for (int i = 0; i < SlowInputStream.FULL_LENGTH; ++i) {
+      bytes[i] = (byte) SlowInputStream.CONTENTS[i];
     }
+    ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+    byte[] result = (byte[]) getProtocol().read(bis);
+    assertEquals((byte) SlowInputStream.PAYLOAD, result[0]);
+  }
 
 }

@@ -15,16 +15,14 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  * 
  * @author estebanroblesluna
  */
-public class PreAuthenticatedAuthenticationProvider implements SpringAuthenticationProvider
-{
-    /**
-     * {@inheritDoc}
-     */
-    public Authentication getAuthentication(org.mule.runtime.core.api.security.Authentication authentication)
-    {
-        return new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(),
-            authentication.getCredentials());
-    }
+public class PreAuthenticatedAuthenticationProvider implements SpringAuthenticationProvider {
+
+  /**
+   * {@inheritDoc}
+   */
+  public Authentication getAuthentication(org.mule.runtime.core.api.security.Authentication authentication) {
+    return new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials());
+  }
 }
 
 

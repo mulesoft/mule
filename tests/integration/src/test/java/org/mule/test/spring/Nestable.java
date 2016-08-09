@@ -6,12 +6,10 @@
  */
 package org.mule.test.spring;
 
-public class Nestable
-{
+public class Nestable {
 
-    public void setNestable(Nestable nestable)
-    {
-        // empty
-    }
+  public void setNestable(Nestable nestable) {
+    // empty
+  }
 
 }

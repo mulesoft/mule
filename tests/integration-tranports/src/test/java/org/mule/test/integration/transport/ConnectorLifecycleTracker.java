@@ -19,86 +19,76 @@ import java.util.List;
 /**
  * TODO
  */
-public class ConnectorLifecycleTracker extends AbstractConnector
-{
-    private final List<String> tracker = new ArrayList<String>();
+public class ConnectorLifecycleTracker extends AbstractConnector {
 
-    private String property1;
+  private final List<String> tracker = new ArrayList<String>();
 
-    boolean connected = false;
-    
-    public ConnectorLifecycleTracker(MuleContext context)
-    {
-        super(context);
-    }
-    
-    public List<String> getTracker() {
-        return tracker;
-    }
+  private String property1;
 
-    @Override
-    public String getProtocol()
-    {
-        return "test";
-    }
+  boolean connected = false;
 
-    @Override
-    public void doConnect() throws Exception
-    {
-        connected = true;
-        getTracker().add("connect");
-    }
+  public ConnectorLifecycleTracker(MuleContext context) {
+    super(context);
+  }
 
-    @Override
-    public void doDisconnect() throws Exception
-    {
-        connected = false;
-        getTracker().add("disconnect");
-    }
+  public List<String> getTracker() {
+    return tracker;
+  }
+
+  @Override
+  public String getProtocol() {
+    return "test";
+  }
+
+  @Override
+  public void doConnect() throws Exception {
+    connected = true;
+    getTracker().add("connect");
+  }
+
+  @Override
+  public void doDisconnect() throws Exception {
+    connected = false;
+    getTracker().add("disconnect");
+  }
 
 
 
-    public void setProperty(final String value) {
-        tracker.add("setProperty");
-    }
+  public void setProperty(final String value) {
+    tracker.add("setProperty");
+  }
 
-    @Override
-    public void doInitialise() throws InitialisationException
-    {
-        tracker.add("initialise");
-    }
+  @Override
+  public void doInitialise() throws InitialisationException {
+    tracker.add("initialise");
+  }
 
-    @Override
-    public void doStart() throws MuleException
-    {
-        tracker.add("start");
-    }
+  @Override
+  public void doStart() throws MuleException {
+    tracker.add("start");
+  }
 
-    @Override
-    public void doStop() throws MuleException {
-        tracker.add("stop");
-    }
+  @Override
+  public void doStop() throws MuleException {
+    tracker.add("stop");
+  }
 
-    @Override
-    public void doDispose() {
-        tracker.add("dispose");
-    }
+  @Override
+  public void doDispose() {
+    tracker.add("dispose");
+  }
 
 
-    public String getProperty1()
-    {
-        return property1;
-    }
+  public String getProperty1() {
+    return property1;
+  }
 
-    public void setProperty1(String property1)
-    {
-        tracker.add("setProperty");
-        this.property1 = property1;
-    }
+  public void setProperty1(String property1) {
+    tracker.add("setProperty");
+    this.property1 = property1;
+  }
 
-    public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
-        throws MuleException
-    {
-        return null;
-    }
+  public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
+    return null;
+  }
 }

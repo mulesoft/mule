@@ -24,65 +24,62 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link ClassLoaderFilter} that decorates a {@link ClassLoaderFilter} to
- * allow exporting classes by name that are not exported by the original {@link ClassLoaderFilter}.
- * For resources it delegates to the original {@link ClassLoaderFilter}.
+ * Implementation of {@link ClassLoaderFilter} that decorates a {@link ClassLoaderFilter} to allow exporting classes by name that
+ * are not exported by the original {@link ClassLoaderFilter}. For resources it delegates to the original
+ * {@link ClassLoaderFilter}.
  *
  * @since 4.0
  */
-public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
-{
+public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final ClassLoaderFilter classLoaderFilter;
-    private final Map<String, Object> exportedClasses;
+  private final ClassLoaderFilter classLoaderFilter;
+  private final Map<String, Object> exportedClasses;
 
-    /**
-     * Creates an extended {@link ClassLoaderFilter} to exporte classes that are not exported as packages in the original
-     * filter.
-     *
-     * @param classLoaderFilter the original filter. Not null.
-     * @param exportedClasses a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
-     */
-    public TestArtifactClassLoaderFilter(final ClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses)
-    {
-        checkNotNull(classLoaderFilter, "classLoaderFilter cannot be null");
-        checkNotNull(exportedClasses, "exportedClasses cannot be null");
+  /**
+   * Creates an extended {@link ClassLoaderFilter} to exporte classes that are not exported as packages in the original filter.
+   *
+   * @param classLoaderFilter the original filter. Not null.
+   * @param exportedClasses a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
+   */
+  public TestArtifactClassLoaderFilter(final ClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses) {
+    checkNotNull(classLoaderFilter, "classLoaderFilter cannot be null");
+    checkNotNull(exportedClasses, "exportedClasses cannot be null");
 
-        this.classLoaderFilter = classLoaderFilter;
-        this.exportedClasses = exportedClasses.stream().collect(Collectors.toMap(Class::getName, identity()));
+    this.classLoaderFilter = classLoaderFilter;
+    this.exportedClasses = exportedClasses.stream().collect(Collectors.toMap(Class::getName, identity()));
+  }
+
+  /**
+   * It delegates to the original {@link ClassLoaderFilter} if it is not exported it will check againts the list of exported
+   * classes.
+   *
+   * @param name class name to check. Non empty.
+   * @return true if the resource is exported, false otherwise
+   */
+  @Override
+  public boolean exportsClass(final String name) {
+    checkArgument(!isEmpty(name), "Class name cannot be empty");
+
+    boolean exported = classLoaderFilter.exportsClass(name);
+    if (!exported) {
+      exported = exportedClasses.get(name) != null;
+      if (exported) {
+        logger.warn(StringMessageUtils
+            .getBoilerPlate(newArrayList("WARNING:", " ",
+                                         "Class: '" + name + "' is NOT exposed by the plugin but it will be visible "
+                                             + "due to it was manually forced to be exported for testing purposes.",
+                                         " ",
+                                         "Check if this is really necessary, this class won't be visible in standalone mode."),
+                            '*', DEFAULT_MESSAGE_WIDTH));
+      }
     }
+    return exported;
+  }
 
-    /**
-     * It delegates to the original {@link ClassLoaderFilter} if it is not exported it will check againts the list
-     * of exported classes.
-     *
-     * @param name class name to check. Non empty.
-     * @return true if the resource is exported, false otherwise
-     */
-    @Override
-    public boolean exportsClass(final String name)
-    {
-        checkArgument(!isEmpty(name), "Class name cannot be empty");
-
-        boolean exported = classLoaderFilter.exportsClass(name);
-        if (!exported)
-        {
-            exported = exportedClasses.get(name) != null;
-            if (exported)
-            {
-                logger.warn(StringMessageUtils.getBoilerPlate(newArrayList("WARNING:", " ", "Class: '" + name + "' is NOT exposed by the plugin but it will be visible " +
-                                                                           "due to it was manually forced to be exported for testing purposes.", " ", "Check if this is really necessary, this class won't be visible in standalone mode."),
-                                                                           '*', DEFAULT_MESSAGE_WIDTH));
-            }
-        }
-        return  exported;
-    }
-
-    @Override
-    public boolean exportsResource(final String name)
-    {
-        return classLoaderFilter.exportsResource(name);
-    }
+  @Override
+  public boolean exportsResource(final String name) {
+    return classLoaderFilter.exportsResource(name);
+  }
 }

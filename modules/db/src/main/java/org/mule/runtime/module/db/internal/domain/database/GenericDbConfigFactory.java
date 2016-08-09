@@ -38,118 +38,103 @@ import javax.xml.namespace.QName;
 /**
  * Creates {@link DbConfig} for generic data bases
  */
-public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
-{
-    private class AnnotatedConnectionFactory extends AbstractAnnotatedObject implements ConnectionFactory, NamedObject
-    {
+public class GenericDbConfigFactory implements ConfigurableDbConfigFactory {
 
-        private String name;
-        private ConnectionFactory inner;
+  private class AnnotatedConnectionFactory extends AbstractAnnotatedObject implements ConnectionFactory, NamedObject {
 
-        public AnnotatedConnectionFactory(String name, ConnectionFactory inner, Map<QName, Object> annotations)
-        {
-            this.name = name;
-            this.inner = inner;
-            setAnnotations(annotations);
-        }
+    private String name;
+    private ConnectionFactory inner;
 
-        @Override
-        public String getName()
-        {
-            return name;
-        }
-
-        @Override
-        public Connection create(DataSource dataSource) throws ConnectionCreationException
-        {
-            return inner.create(dataSource);
-        }
-
+    public AnnotatedConnectionFactory(String name, ConnectionFactory inner, Map<QName, Object> annotations) {
+      this.name = name;
+      this.inner = inner;
+      setAnnotations(annotations);
     }
-
-    private List<DbType> customDataTypes;
-    private RetryPolicyTemplate retryPolicyTemplate;
 
     @Override
-    public DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource)
-    {
-        ConnectionFactory connectionFactory;
+    public String getName() {
+      return name;
+    }
 
-        SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory(createTypeMapping());
-        if (retryPolicyTemplate == null)
-        {
-            connectionFactory = simpleConnectionFactory;
+    @Override
+    public Connection create(DataSource dataSource) throws ConnectionCreationException {
+      return inner.create(dataSource);
+    }
+
+  }
+
+  private List<DbType> customDataTypes;
+  private RetryPolicyTemplate retryPolicyTemplate;
+
+  @Override
+  public DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource) {
+    ConnectionFactory connectionFactory;
+
+    SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory(createTypeMapping());
+    if (retryPolicyTemplate == null) {
+      connectionFactory = simpleConnectionFactory;
+    } else {
+      connectionFactory = new RetryConnectionFactory(retryPolicyTemplate,
+                                                     new AnnotatedConnectionFactory(name, simpleConnectionFactory, annotations));
+    }
+
+    DbTypeManager dbTypeManager = doCreateTypeManager();
+
+    DbConnectionFactory dbConnectionFactory =
+        new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory,
+                                             dataSource);
+
+    return doCreateDbConfig(dataSource, dbTypeManager, dbConnectionFactory, name);
+  }
+
+  private Map<String, Class<?>> createTypeMapping() {
+    final Map<String, Class<?>> typeMapping = new HashMap<>();
+
+    for (DbType dbType : customDataTypes) {
+      if (dbType instanceof MappedStructResolvedDbType) {
+        final MappedStructResolvedDbType structDbType = (MappedStructResolvedDbType) dbType;
+        if (structDbType.getMappedClass() != null) {
+          typeMapping.put(structDbType.getName(), structDbType.getMappedClass());
         }
-        else
-        {
-            connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new AnnotatedConnectionFactory(name, simpleConnectionFactory, annotations));
-        }
-
-        DbTypeManager dbTypeManager = doCreateTypeManager();
-
-        DbConnectionFactory dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
-
-        return doCreateDbConfig(dataSource, dbTypeManager, dbConnectionFactory, name);
+      }
     }
 
-    private Map<String, Class<?>> createTypeMapping()
-    {
-        final Map<String, Class<?>> typeMapping = new HashMap<>();
+    return typeMapping;
+  }
 
-        for (DbType dbType : customDataTypes)
-        {
-            if (dbType instanceof MappedStructResolvedDbType)
-            {
-                final MappedStructResolvedDbType structDbType = (MappedStructResolvedDbType) dbType;
-                if (structDbType.getMappedClass() != null)
-                {
-                    typeMapping.put(structDbType.getName(), structDbType.getMappedClass());
-                }
-            }
-        }
+  protected DbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory,
+                                      String name) {
+    return new GenericDbConfig(datasource, name, dbTypeManager, dbConnectionFactory);
+  }
 
-        return typeMapping;
+  protected DbTypeManager doCreateTypeManager() {
+    List<DbTypeManager> typeManagers = new ArrayList<>();
+
+    typeManagers.add(new MetadataDbTypeManager());
+
+    if (customDataTypes.size() > 0) {
+      typeManagers.add(new StaticDbTypeManager(customDataTypes));
     }
 
-    protected DbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory, String name)
-    {
-        return new GenericDbConfig(datasource, name, dbTypeManager, dbConnectionFactory);
+    List<DbType> vendorDataTypes = getVendorDataTypes();
+    if (vendorDataTypes.size() > 0) {
+      typeManagers.add(new StaticDbTypeManager(vendorDataTypes));
     }
 
-    protected DbTypeManager doCreateTypeManager()
-    {
-        List<DbTypeManager> typeManagers = new ArrayList<>();
+    typeManagers.add(new StaticDbTypeManager(JdbcTypes.types));
 
-        typeManagers.add(new MetadataDbTypeManager());
+    return new CompositeDbTypeManager(typeManagers);
+  }
 
-        if (customDataTypes.size() > 0)
-        {
-            typeManagers.add(new StaticDbTypeManager(customDataTypes));
-        }
+  protected List<DbType> getVendorDataTypes() {
+    return Collections.EMPTY_LIST;
+  }
 
-        List<DbType> vendorDataTypes = getVendorDataTypes();
-        if (vendorDataTypes.size() > 0)
-        {
-            typeManagers.add(new StaticDbTypeManager(vendorDataTypes));
-        }
+  public void setCustomDataTypes(List<DbType> customDataTypes) {
+    this.customDataTypes = customDataTypes;
+  }
 
-        typeManagers.add(new StaticDbTypeManager(JdbcTypes.types));
-
-        return new CompositeDbTypeManager(typeManagers);
-    }
-
-    protected List<DbType> getVendorDataTypes()
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public void setCustomDataTypes(List<DbType> customDataTypes)
-    {
-        this.customDataTypes = customDataTypes;
-    }
-
-    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
-    {
-        this.retryPolicyTemplate = retryPolicyTemplate;
-    }
+  public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
+    this.retryPolicyTemplate = retryPolicyTemplate;
+  }
 }

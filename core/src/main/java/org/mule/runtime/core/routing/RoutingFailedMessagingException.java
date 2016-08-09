@@ -14,36 +14,30 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Exception through by routing strategies when routing fails
  */
-public class RoutingFailedMessagingException extends MessagingException
-{
+public class RoutingFailedMessagingException extends MessagingException {
 
-    public RoutingFailedMessagingException(Message message, MuleEvent event)
-    {
-        super(message, event);
-    }
+  public RoutingFailedMessagingException(Message message, MuleEvent event) {
+    super(message, event);
+  }
 
-    public RoutingFailedMessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-    }
+  public RoutingFailedMessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+  }
 
-    public RoutingFailedMessagingException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  public RoutingFailedMessagingException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
 
-    public RoutingFailedMessagingException(MuleEvent event, Throwable cause)
-    {
-        super(event, cause);
-    }
+  public RoutingFailedMessagingException(MuleEvent event, Throwable cause) {
+    super(event, cause);
+  }
 
-    public RoutingFailedMessagingException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, cause, failingMessageProcessor);
-    }
+  public RoutingFailedMessagingException(Message message, MuleEvent event, Throwable cause,
+                                         MessageProcessor failingMessageProcessor) {
+    super(message, event, cause, failingMessageProcessor);
+  }
 
-    public RoutingFailedMessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(event, cause, failingMessageProcessor);
-    }
+  public RoutingFailedMessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
+    super(event, cause, failingMessageProcessor);
+  }
 }

@@ -7,11 +7,12 @@
 package org.mule.runtime.core.api;
 
 /**
- * Beans implementing <code>GlobalNameableObject</code> have globalName set during initialization
- * to the bean name defined in the configuration
+ * Beans implementing <code>GlobalNameableObject</code> have globalName set during initialization to the bean name defined in the
+ * configuration
  */
-public interface GlobalNameableObject
-{
-    String getGlobalName();
-    void setGlobalName(String name);
+public interface GlobalNameableObject {
+
+  String getGlobalName();
+
+  void setGlobalName(String name);
 }

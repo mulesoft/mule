@@ -19,50 +19,45 @@ import java.sql.ResultSet;
 import org.junit.Test;
 
 @SmallTest
-public class StatementStreamingResultSetCloserTestCase extends AbstractMuleTestCase
-{
+public class StatementStreamingResultSetCloserTestCase extends AbstractMuleTestCase {
 
-    private final StatementStreamingResultSetCloser resultSetCloser = new StatementStreamingResultSetCloser();
-    private final DbConnection connection = mock(DbConnection.class);
-    private final ResultSet resultSet1 = mock(ResultSet.class);
-    private final ResultSet resultSet2 = mock(ResultSet.class);
+  private final StatementStreamingResultSetCloser resultSetCloser = new StatementStreamingResultSetCloser();
+  private final DbConnection connection = mock(DbConnection.class);
+  private final ResultSet resultSet1 = mock(ResultSet.class);
+  private final ResultSet resultSet2 = mock(ResultSet.class);
 
-    @Test
-    public void closesRegisteredResultSet() throws Exception
-    {
-        resultSetCloser.trackResultSet(connection, resultSet1);
+  @Test
+  public void closesRegisteredResultSet() throws Exception {
+    resultSetCloser.trackResultSet(connection, resultSet1);
 
-        resultSetCloser.close(connection, resultSet1);
+    resultSetCloser.close(connection, resultSet1);
 
-        verify(resultSet1).close();
-    }
+    verify(resultSet1).close();
+  }
 
-    @Test
-    public void tracksMultipleResultSetFromConnection() throws Exception
-    {
-        resultSetCloser.trackResultSet(connection, resultSet1);
-        resultSetCloser.trackResultSet(connection, resultSet2);
+  @Test
+  public void tracksMultipleResultSetFromConnection() throws Exception {
+    resultSetCloser.trackResultSet(connection, resultSet1);
+    resultSetCloser.trackResultSet(connection, resultSet2);
 
-        resultSetCloser.close(connection, resultSet1);
-        resultSetCloser.close(connection, resultSet2);
+    resultSetCloser.close(connection, resultSet1);
+    resultSetCloser.close(connection, resultSet2);
 
-        verify(resultSet1).close();
-        verify(resultSet2).close();
-    }
+    verify(resultSet1).close();
+    verify(resultSet2).close();
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void throwsExceptionWhenClosingUnTrackedConnection() throws Exception
-    {
-        resultSetCloser.close(connection, resultSet1);
-    }
+  @Test(expected = IllegalStateException.class)
+  public void throwsExceptionWhenClosingUnTrackedConnection() throws Exception {
+    resultSetCloser.close(connection, resultSet1);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void throwsExceptionWhenClosingUnTrackedResultSet() throws Exception
-    {
-        resultSetCloser.trackResultSet(connection, resultSet1);
-        resultSetCloser.trackResultSet(connection, resultSet2);
+  @Test(expected = IllegalStateException.class)
+  public void throwsExceptionWhenClosingUnTrackedResultSet() throws Exception {
+    resultSetCloser.trackResultSet(connection, resultSet1);
+    resultSetCloser.trackResultSet(connection, resultSet2);
 
-        resultSetCloser.close(connection, resultSet1);
-        resultSetCloser.close(connection, resultSet1);
-    }
+    resultSetCloser.close(connection, resultSet1);
+    resultSetCloser.close(connection, resultSet1);
+  }
 }

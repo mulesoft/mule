@@ -17,65 +17,55 @@ import javax.management.MBeanServerFactory;
 
 import org.junit.Test;
 
-public class MuleAgentsTestCase extends AbstractMuleContextTestCase
-{
+public class MuleAgentsTestCase extends AbstractMuleContextTestCase {
 
-    protected JmxApplicationAgent jmxAgent;
+  protected JmxApplicationAgent jmxAgent;
 
-    public MuleAgentsTestCase()
-    {
-        setStartContext(false);
-    }
+  public MuleAgentsTestCase() {
+    setStartContext(false);
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+  }
 
-    @Test
-    public void testRemoveNonExistentAgent() throws Exception
-    {
-        muleContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
-        // should not throw NPE
-    }
+  @Test
+  public void testRemoveNonExistentAgent() throws Exception {
+    muleContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
+    // should not throw NPE
+  }
 
-    @Test
-    public void testAgentsRegistrationOrder() throws Exception
-    {
-        // If you specified "JmxAgent", it was the first one in the map,
-        // but for "jmxAgent" the order was not preserved.
-        // MX4JAgent depends on JmxAgent having finished initilisation
-        // before proceeding, otherwise it is not able to find any
-        // MBeanServer.
-        jmxAgent.setName("jmxAgent");
+  @Test
+  public void testAgentsRegistrationOrder() throws Exception {
+    // If you specified "JmxAgent", it was the first one in the map,
+    // but for "jmxAgent" the order was not preserved.
+    // MX4JAgent depends on JmxAgent having finished initilisation
+    // before proceeding, otherwise it is not able to find any
+    // MBeanServer.
+    jmxAgent.setName("jmxAgent");
 
-        Mx4jAgent agentSecond = new Mx4jAgent();
-        agentSecond.setName("mx4jAgent");
-        muleContext.getRegistry().registerAgent(agentSecond);
+    Mx4jAgent agentSecond = new Mx4jAgent();
+    agentSecond.setName("mx4jAgent");
+    muleContext.getRegistry().registerAgent(agentSecond);
 
-        // should not throw an exception
-        muleContext.start();
-    }
+    // should not throw an exception
+    muleContext.start();
+  }
 
-    /**
-     * Should not bark when the MBeanServer is injected and
-     * {@code locateServer} and {@code createServer} both
-     * set to false.
-     */
-    @Test
-    public void testJmxAgentInjectedMBeanServer() throws Exception
-    {
-        List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
-        MBeanServer server;
-        server = servers == null || servers.isEmpty()
-                ? MBeanServerFactory.createMBeanServer()
-                : (MBeanServer) servers.get(0);
-        jmxAgent.setCreateServer(false);
-        jmxAgent.setLocateServer(false);
-        jmxAgent.setMBeanServer(server);
+  /**
+   * Should not bark when the MBeanServer is injected and {@code locateServer} and {@code createServer} both set to false.
+   */
+  @Test
+  public void testJmxAgentInjectedMBeanServer() throws Exception {
+    List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
+    MBeanServer server;
+    server = servers == null || servers.isEmpty() ? MBeanServerFactory.createMBeanServer() : (MBeanServer) servers.get(0);
+    jmxAgent.setCreateServer(false);
+    jmxAgent.setLocateServer(false);
+    jmxAgent.setMBeanServer(server);
 
-        muleContext.start();
-    }
+    muleContext.start();
+  }
 }

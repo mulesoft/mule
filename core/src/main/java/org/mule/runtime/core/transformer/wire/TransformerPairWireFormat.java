@@ -26,122 +26,94 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A pairing of an outbound transformer and an inbound transformer that can be used to serialize and deserialize data.
- * THis is used when marshalling requests over the wire. IN Mule the MuleClient RemoteDispatcher uses wire formats to
- * communicate with the server.
+ * A pairing of an outbound transformer and an inbound transformer that can be used to serialize and deserialize data. THis is
+ * used when marshalling requests over the wire. IN Mule the MuleClient RemoteDispatcher uses wire formats to communicate with the
+ * server.
  */
-public class TransformerPairWireFormat implements WireFormat
-{
-    /**
-     * logger used by this class
-     */
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public class TransformerPairWireFormat implements WireFormat {
 
-    protected Transformer inboundTransformer;
-    protected Transformer outboundTransformer;
-    protected MuleContext muleContext;
+  /**
+   * logger used by this class
+   */
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-        inboundTransformer.setMuleContext(muleContext);
-        outboundTransformer.setMuleContext(muleContext);
+  protected Transformer inboundTransformer;
+  protected Transformer outboundTransformer;
+  protected MuleContext muleContext;
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+    inboundTransformer.setMuleContext(muleContext);
+    outboundTransformer.setMuleContext(muleContext);
+  }
+
+  @Override
+  public Object read(InputStream in) throws MuleException {
+    if (inboundTransformer == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
     }
+    if (inboundTransformer.isSourceDataTypeSupported(DataType.INPUT_STREAM)) {
+      return inboundTransformer.transform(in);
+    } else {
+      try {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(in, baos);
+        return inboundTransformer.transform(baos.toByteArray());
+      } catch (IOException e) {
+        throw new DefaultMuleException(CoreMessages.failedToReadPayload(), e);
+      }
+    }
+  }
 
-    @Override
-    public Object read(InputStream in) throws MuleException
-    {
-        if (inboundTransformer == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
+  @Override
+  public void write(OutputStream out, Object o, Charset encoding) throws MuleException {
+    if (outboundTransformer == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("outboundTransformer").getMessage());
+    }
+    try {
+      Class returnClass = outboundTransformer.getReturnDataType().getType();
+      if (returnClass.equals(Object.class)) {
+        logger.warn("No return class was set on transformer: " + outboundTransformer
+            + ". Attempting to work out how to treat the result transformation");
+
+        Object result = outboundTransformer.transform(o);
+
+        byte[] bytes;
+        if (result instanceof byte[]) {
+          bytes = (byte[]) result;
+        } else {
+          bytes = result.toString().getBytes(encoding);
         }
-        if (inboundTransformer.isSourceDataTypeSupported(DataType.INPUT_STREAM))
-        {
-            return inboundTransformer.transform(in);
-        }
-        else
-        {
-            try
-            {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy(in, baos);
-                return inboundTransformer.transform(baos.toByteArray());
-            }
-            catch (IOException e)
-            {
-                throw new DefaultMuleException(CoreMessages.failedToReadPayload(), e);
-            }
-        }
+
+        out.write(bytes);
+      } else if (returnClass.equals(byte[].class)) {
+        byte[] b = (byte[]) outboundTransformer.transform(o);
+        out.write(b);
+      } else if (returnClass.equals(String.class)) {
+        String s = (String) outboundTransformer.transform(o);
+        out.write(s.getBytes(encoding));
+      } else {
+        throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()));
+      }
+    } catch (IOException e) {
+      throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()), e);
     }
+  }
 
-    @Override
-    public void write(OutputStream out, Object o, Charset encoding) throws MuleException
-    {
-        if (outboundTransformer == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("outboundTransformer").getMessage());
-        }
-        try
-        {
-            Class returnClass = outboundTransformer.getReturnDataType().getType();
-            if (returnClass.equals(Object.class))
-            {
-                logger.warn("No return class was set on transformer: " + outboundTransformer
-                                + ". Attempting to work out how to treat the result transformation");
+  public Transformer getInboundTransformer() {
+    return inboundTransformer;
+  }
 
-                Object result = outboundTransformer.transform(o);
+  public void setInboundTransformer(Transformer inboundTransformer) {
+    this.inboundTransformer = inboundTransformer;
+  }
 
-                byte[] bytes;
-                if (result instanceof byte[])
-                {
-                    bytes = (byte[]) result;
-                }
-                else
-                {
-                    bytes = result.toString().getBytes(encoding);
-                }
+  public Transformer getOutboundTransformer() {
+    return outboundTransformer;
+  }
 
-                out.write(bytes);
-            }
-            else if (returnClass.equals(byte[].class))
-            {
-                byte[] b = (byte[]) outboundTransformer.transform(o);
-                out.write(b);
-            }
-            else if (returnClass.equals(String.class))
-            {
-                String s = (String) outboundTransformer.transform(o);
-                out.write(s.getBytes(encoding));
-            }
-            else
-            {
-                throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()));
-            }
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()), e);
-        }
-    }
-
-    public Transformer getInboundTransformer()
-    {
-        return inboundTransformer;
-    }
-
-    public void setInboundTransformer(Transformer inboundTransformer)
-    {
-        this.inboundTransformer = inboundTransformer;
-    }
-
-    public Transformer getOutboundTransformer()
-    {
-        return outboundTransformer;
-    }
-
-    public void setOutboundTransformer(Transformer outboundTransformer)
-    {
-        this.outboundTransformer = outboundTransformer;
-    }
+  public void setOutboundTransformer(Transformer outboundTransformer) {
+    this.outboundTransformer = outboundTransformer;
+  }
 }

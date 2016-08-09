@@ -13,24 +13,23 @@ import org.mule.runtime.core.construct.Flow;
 
 import java.util.List;
 
-public class DynamicFlowFactory
-{
+public class DynamicFlowFactory {
 
-    /**
-     * Creates a programmatic flow
-     *
-     * @param muleContext the context of the application
-     * @param flowName the flow name
-     * @param messageProcessors the flow message processors
-     * @return a new flow
-     * @throws MuleException if there was a failure registering the flow in mule.
-     */
-    public static Flow createDynamicFlow(final MuleContext muleContext, String flowName, List<MessageProcessor> messageProcessors) throws MuleException
-    {
-        final Flow flow = new Flow(flowName, muleContext);
-        flow.setMessageProcessors(messageProcessors);
-        muleContext.getRegistry().registerFlowConstruct(flow);
-        flow.start();
-        return flow;
-    }
+  /**
+   * Creates a programmatic flow
+   *
+   * @param muleContext the context of the application
+   * @param flowName the flow name
+   * @param messageProcessors the flow message processors
+   * @return a new flow
+   * @throws MuleException if there was a failure registering the flow in mule.
+   */
+  public static Flow createDynamicFlow(final MuleContext muleContext, String flowName, List<MessageProcessor> messageProcessors)
+      throws MuleException {
+    final Flow flow = new Flow(flowName, muleContext);
+    flow.setMessageProcessors(messageProcessors);
+    muleContext.getRegistry().registerFlowConstruct(flow);
+    flow.start();
+    return flow;
+  }
 }

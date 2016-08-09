@@ -10,11 +10,10 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
-public class Account
-{
+public class Account {
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private Owner requiredInnerPojoWithExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private Owner requiredInnerPojoWithExpressionRequired;
 
 }

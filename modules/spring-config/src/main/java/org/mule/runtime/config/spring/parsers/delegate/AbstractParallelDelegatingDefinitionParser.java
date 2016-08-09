@@ -13,33 +13,27 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This allows a definition parsers to be dynamically represented by one instance
- * selected from a set of parsers, depending on the context.  For example, a single
- * Mule model may be defined across several file - the first file used defines the
- * model and subsequent uses extend it (for this particular case, see
- * {@link InheritDefinitionParser}).
+ * This allows a definition parsers to be dynamically represented by one instance selected from a set of parsers, depending on the
+ * context. For example, a single Mule model may be defined across several file - the first file used defines the model and
+ * subsequent uses extend it (for this particular case, see {@link InheritDefinitionParser}).
  *
- * <p>Note that the sub-parsers must be consistent.  That includes matching the
- * same schema, for example.
+ * <p>
+ * Note that the sub-parsers must be consistent. That includes matching the same schema, for example.
  */
-public abstract class AbstractParallelDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
-{
+public abstract class AbstractParallelDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser {
 
-    protected AbstractParallelDelegatingDefinitionParser()
-    {
-        super();
-    }
+  protected AbstractParallelDelegatingDefinitionParser() {
+    super();
+  }
 
-    protected AbstractParallelDelegatingDefinitionParser(MuleDefinitionParser[] delegates)
-    {
-        super(delegates);
-    }
+  protected AbstractParallelDelegatingDefinitionParser(MuleDefinitionParser[] delegates) {
+    super(delegates);
+  }
 
-    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
-    {
-        return getDelegate(element, parserContext).muleParse(element, parserContext);
-    }
+  public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext) {
+    return getDelegate(element, parserContext).muleParse(element, parserContext);
+  }
 
-    protected abstract MuleDefinitionParser getDelegate(Element element, ParserContext parserContext);
+  protected abstract MuleDefinitionParser getDelegate(Element element, ParserContext parserContext);
 
 }

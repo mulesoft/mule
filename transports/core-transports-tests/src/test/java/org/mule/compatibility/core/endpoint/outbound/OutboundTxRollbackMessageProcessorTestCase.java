@@ -21,44 +21,38 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
 
-public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageProcessorTestCase
-{
+public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
 
-    @Test
-    public void testNoRollback() throws InitialisationException, EndpointException, Exception
-    {
-        InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
-        TestListener listener = new TestListener();
-        mp.setListener(listener);
+  @Test
+  public void testNoRollback() throws InitialisationException, EndpointException, Exception {
+    InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
+    TestListener listener = new TestListener();
+    mp.setListener(listener);
 
-        MuleEvent event = createTestOutboundEvent();
-        mp.process(event);
+    MuleEvent event = createTestOutboundEvent();
+    mp.process(event);
 
-        assertSame(event, listener.sensedEvent);
+    assertSame(event, listener.sensedEvent);
+  }
+
+  @Test
+  public void testRollback() throws InitialisationException, EndpointException, Exception {
+    InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
+    TestListener listener = new TestListener();
+    mp.setListener(listener);
+
+    Transaction tx = new TestTransaction(muleContext);
+    try {
+      TransactionCoordination.getInstance().bindTransaction(tx);
+      tx.setRollbackOnly();
+
+      MuleEvent event = createTestOutboundEvent();
+      MuleEvent result = mp.process(event);
+
+      assertNull(listener.sensedEvent);
+      assertSame(result, event);
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(tx);
     }
-
-    @Test
-    public void testRollback() throws InitialisationException, EndpointException, Exception
-    {
-        InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
-        TestListener listener = new TestListener();
-        mp.setListener(listener);
-
-        Transaction tx = new TestTransaction(muleContext);
-        try
-        {
-            TransactionCoordination.getInstance().bindTransaction(tx);
-            tx.setRollbackOnly();
-
-            MuleEvent event = createTestOutboundEvent();
-            MuleEvent result = mp.process(event);
-
-            assertNull(listener.sensedEvent);
-            assertSame(result, event);
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(tx);
-        }
-    }
+  }
 }

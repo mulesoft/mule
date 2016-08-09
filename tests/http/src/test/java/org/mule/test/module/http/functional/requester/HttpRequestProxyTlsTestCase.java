@@ -34,160 +34,143 @@ import org.junit.runners.Parameterized;
 
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase
-{
+public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
-    private static final String OK_RESPONSE = "OK";
-    private static final String PATH = "/test?key=value";
+  private static final String OK_RESPONSE = "OK";
+  private static final String PATH = "/test?key=value";
 
-    @Rule
-    public DynamicPort proxyPort = new DynamicPort("proxyPort");
+  @Rule
+  public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Rule
-    public SystemProperty keyStorePathProperty;
+  @Rule
+  public SystemProperty keyStorePathProperty;
 
-    @Rule
-    public SystemProperty trustStorePathProperty;
+  @Rule
+  public SystemProperty trustStorePathProperty;
 
-    private MockProxyServer proxyServer = new MockProxyServer(proxyPort.getNumber(), httpPort.getNumber());
+  private MockProxyServer proxyServer = new MockProxyServer(proxyPort.getNumber(), httpPort.getNumber());
 
-    private String requestURI;
-    private String requestPayload;
-    private String requestHost;
+  private String requestURI;
+  private String requestPayload;
+  private String requestHost;
 
-    public HttpRequestProxyTlsTestCase(String keyStorePath, String trustStorePath, String requestHost)
-    {
-        this.keyStorePathProperty = new SystemProperty("keyStorePath", keyStorePath);
-        this.trustStorePathProperty = new SystemProperty("trustStorePath", trustStorePath);
-        this.requestHost = requestHost;
+  public HttpRequestProxyTlsTestCase(String keyStorePath, String trustStorePath, String requestHost) {
+    this.keyStorePathProperty = new SystemProperty("keyStorePath", keyStorePath);
+    this.trustStorePathProperty = new SystemProperty("trustStorePath", trustStorePath);
+    this.requestHost = requestHost;
+  }
+
+  /**
+   * The test will run with two key store / trust store pairs. One has the subject alternative name set to localhost (the default
+   * for all TLS tests), and the other one has the name set to "test". We need this to validate that the hostname verification is
+   * performed using the host of the request, and not the one of the proxy.
+   */
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {
+        {"tls/ssltest-keystore-with-test-hostname.jks", "tls/ssltest-truststore-with-test-hostname.jks", "test"},
+        {"tls/ssltest-keystore.jks", "tls/ssltest-cacerts.jks", "localhost"}});
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "http-request-proxy-tls-config.xml";
+  }
+
+  @Test
+  public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception {
+    getFunctionalTestComponent("serverFlow").setEventCallback((context, component) -> {
+      requestPayload = getPayloadAsString(context.getMessage());
+      requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
+    });
+
+    proxyServer.start();
+
+    MuleEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withFlowVariable("host", requestHost)
+        .withFlowVariable("path", PATH).run();
+
+    assertThat(requestPayload, equalTo(TEST_MESSAGE));
+    assertThat(requestURI, equalTo(PATH));
+    assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+    assertThat(getPayloadAsString(event.getMessage()), equalTo(OK_RESPONSE));
+
+    proxyServer.stop();
+  }
+
+  /**
+   * Implementation of an https proxy server for testing purposes. The server will accept only one connection, which is expected
+   * to send a CONNECT request. The request is consumed, a 200 OK answer is returned, and then it acts as a tunnel between the
+   * client and the HTTPS service.
+   */
+  private static class MockProxyServer {
+
+    private static final String PROXY_RESPONSE = "HTTP/1.1 200 Connection established\r\n\r\n";
+
+    private int proxyServerPort;
+    private int serverPort;
+    private ServerSocket serverSocket;
+    private Thread serverThread;
+
+    public MockProxyServer(int proxyServerPort, int serverPort) {
+      this.proxyServerPort = proxyServerPort;
+      this.serverPort = serverPort;
     }
 
-    /**
-     * The test will run with two key store / trust store pairs. One has the subject alternative name set to localhost (the
-     * default for all TLS tests), and the other one has the name set to "test". We need this to validate that the hostname
-     * verification is performed using the host of the request, and not the one of the proxy.
-     */
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters() {
-        return Arrays.asList(new Object[][] {{"tls/ssltest-keystore-with-test-hostname.jks", "tls/ssltest-truststore-with-test-hostname.jks", "test"},
-                                             {"tls/ssltest-keystore.jks", "tls/ssltest-cacerts.jks", "localhost"}});
-    }
+    public void start() throws Exception {
+      serverSocket = new ServerSocket(proxyServerPort);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-proxy-tls-config.xml";
-    }
-
-    @Test
-    public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception
-    {
-        getFunctionalTestComponent("serverFlow").setEventCallback((context, component) -> {
-            requestPayload = getPayloadAsString(context.getMessage());
-            requestURI =((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
-        });
-
-        proxyServer.start();
-
-        MuleEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE)
-                                                  .withFlowVariable("host", requestHost)
-                                                  .withFlowVariable("path", PATH)
-                                                  .run();
-
-        assertThat(requestPayload, equalTo(TEST_MESSAGE));
-        assertThat(requestURI, equalTo(PATH));
-        assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(OK_RESPONSE));
-
-        proxyServer.stop();
-    }
-
-    /**
-     * Implementation of an https proxy server for testing purposes. The server will accept only one connection,
-     * which is expected to send a CONNECT request. The request is consumed, a 200 OK answer is returned, and then
-     * it acts as a tunnel between the client and the HTTPS service.
-     */
-    private static class MockProxyServer
-    {
-        private static final String PROXY_RESPONSE = "HTTP/1.1 200 Connection established\r\n\r\n";
-
-        private int proxyServerPort;
-        private int serverPort;
-        private ServerSocket serverSocket;
-        private Thread serverThread;
-
-        public MockProxyServer(int proxyServerPort, int serverPort)
-        {
-            this.proxyServerPort = proxyServerPort;
-            this.serverPort = serverPort;
+      serverThread = new Thread(() -> {
+        try {
+          Socket clientSocket = serverSocket.accept();
+          handleRequest(clientSocket);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
+      });
 
-        public void start() throws Exception
-        {
-            serverSocket = new ServerSocket(proxyServerPort);
-
-            serverThread = new Thread(() -> {
-                try
-                {
-                    Socket clientSocket = serverSocket.accept();
-                    handleRequest(clientSocket);
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            serverThread.start();
-        }
-
-        public void stop() throws Exception
-        {
-            serverSocket.close();
-            serverThread.join();
-        }
-
-        private void handleRequest(final Socket clientSocket) throws Exception
-        {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()), 1);
-
-            while (reader.readLine().trim().isEmpty())
-            {
-                // Consume the CONNECT request.
-            }
-
-            OutputStream os = clientSocket.getOutputStream();
-
-            os.write(PROXY_RESPONSE.getBytes());
-            os.flush();
-
-            final Socket server = new Socket("localhost", serverPort);
-
-            // Make a tunnel between both sockets (HTTPS traffic).
-
-            Thread responseThread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        IOUtils.copy(server.getInputStream(), clientSocket.getOutputStream());
-                    }
-                    catch (IOException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-            responseThread.start();
-
-            IOUtils.copy(clientSocket.getInputStream(), server.getOutputStream());
-            responseThread.join();
-        }
-
+      serverThread.start();
     }
+
+    public void stop() throws Exception {
+      serverSocket.close();
+      serverThread.join();
+    }
+
+    private void handleRequest(final Socket clientSocket) throws Exception {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()), 1);
+
+      while (reader.readLine().trim().isEmpty()) {
+        // Consume the CONNECT request.
+      }
+
+      OutputStream os = clientSocket.getOutputStream();
+
+      os.write(PROXY_RESPONSE.getBytes());
+      os.flush();
+
+      final Socket server = new Socket("localhost", serverPort);
+
+      // Make a tunnel between both sockets (HTTPS traffic).
+
+      Thread responseThread = new Thread() {
+
+        @Override
+        public void run() {
+          try {
+            IOUtils.copy(server.getInputStream(), clientSocket.getOutputStream());
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        }
+      };
+      responseThread.start();
+
+      IOUtils.copy(clientSocket.getInputStream(), server.getOutputStream());
+      responseThread.join();
+    }
+
+  }
 }

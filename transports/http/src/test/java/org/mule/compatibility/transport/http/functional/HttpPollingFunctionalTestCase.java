@@ -20,35 +20,32 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPollingFunctionalTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class HttpPollingFunctionalTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-http-polling-config-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testPollingHttpConnector() throws Exception
-    {
-        FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
-        assertNotNull(ftc);
-        ftc.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                assertEquals("The Accept header should be set on the incoming message", "application/xml",
-                    context.getMessage().<String> getInboundProperty("Accept"));
-            }
-        });
+  @Override
+  protected String getConfigFile() {
+    return "mule-http-polling-config-flow.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);
-        assertNotNull(result.getPayload());
-        assertEquals("foo", getPayloadAsString(result));
-    }
+  @Test
+  public void testPollingHttpConnector() throws Exception {
+    FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
+    assertNotNull(ftc);
+    ftc.setEventCallback(new EventCallback() {
+
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        assertEquals("The Accept header should be set on the incoming message", "application/xml",
+                     context.getMessage().<String>getInboundProperty("Accept"));
+      }
+    });
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);
+    assertNotNull(result.getPayload());
+    assertEquals("foo", getPayloadAsString(result));
+  }
 }

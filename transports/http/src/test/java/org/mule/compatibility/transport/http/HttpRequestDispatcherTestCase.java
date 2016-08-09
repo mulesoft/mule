@@ -46,207 +46,180 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
-{
+public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase {
 
-    public static final int WAIT_TIME = 5000;
+  public static final int WAIT_TIME = 5000;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpConnector mockHttpConnector;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private WorkManager mockWorkManager;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ServerSocket mockServerSocket;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private RetryPolicyTemplate mockRetryTemplate;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ConnectorLifecycleManager mockConnectorLifecycleManager;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private RetryContext mockRetryContext;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SystemExceptionHandler mockExceptionListener;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ExecutorService mockExecutor;
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpSocketDispatcherWithNullConnector()
-    {
-        new HttpRequestDispatcher(null, mockRetryTemplate, mockServerSocket, mockWorkManager);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpSocketDispatcherWithNullRetryPolicyTemplate()
-    {
-        new HttpRequestDispatcher(mockHttpConnector, null, mockServerSocket, mockWorkManager);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpSocketDispatcherWithNullServerSocket()
-    {
-        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, null, mockWorkManager);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpSocketDispatcherWithNullWorkManager()
-    {
-        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, null);
-    }
-
-    @Test
-    public void closeServerSocketWhenDisconnect() throws IOException
-    {
-        HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
-        httpRequestDispatcher.disconnect();
-        verify(mockServerSocket, times(1)).close();
-    }
-
-    @Test
-    public void whenFailureCallSystemExceptionHandler() throws Exception
-    {
-        final HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
-        final Latch acceptCalledLath = new Latch();
-        sustituteLifecycleManager();
-        when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(true);
-        when(mockRetryTemplate.execute(any(RetryCallback.class), any(WorkManager.class))).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                acceptCalledLath.release();
-                throw new Exception();
-            }
-        });
-        when(mockHttpConnector.getMuleContext().getExceptionListener()).thenReturn(mockExceptionListener);
-        Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
-        try
-        {
-            dispatcherThread.start();
-            if (!acceptCalledLath.await(WAIT_TIME, TimeUnit.MILLISECONDS))
-            {
-                fail("retry template should be executed");
-            }
-
-            Prober prober = new PollingProber(100, 1);
-            prober.check(new Probe()
-            {
-                @Override
-                public boolean isSatisfied()
-                {
-                    try
-                    {
-                        verify(mockExceptionListener, Mockito.atLeast(1)).handleException(Mockito.isA(Exception.class));
-                        return true;
-                    }
-                    catch (AssertionError e)
-                    {
-                        return false;
-                    }
-                }
-
-                @Override
-                public String describeFailure()
-                {
-                    return "Exception listener was not invoked";
-                }
-            });
-        }
-        finally
-        {
-            httpRequestDispatcher.disconnect();
-        }
-    }
-
-    @Test
-    public void whenConnectorIsNotStartedDoNotAcceptSockets() throws Exception
-    {
-        HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
-        sustituteLifecycleManager();
-        when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(false);
-        when(mockHttpConnector.isStarted()).thenReturn(false);
-        Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
-        try
-        {
-            dispatcherThread.start();
-            verify(mockRetryTemplate, times(0)).execute(any(RetryCallback.class),any(WorkManager.class));
-        }
-        finally
-        {
-            httpRequestDispatcher.disconnect();
-        }
-    }
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpConnector mockHttpConnector;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private WorkManager mockWorkManager;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ServerSocket mockServerSocket;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private RetryPolicyTemplate mockRetryTemplate;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ConnectorLifecycleManager mockConnectorLifecycleManager;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private RetryContext mockRetryContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SystemExceptionHandler mockExceptionListener;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ExecutorService mockExecutor;
 
 
-    @Test
-    public void whenSocketAcceptedExecuteWork() throws Exception
-    {
-        final HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
-        httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
-        final Latch acceptCalledLath = new Latch();
-        sustituteLifecycleManager();
-        when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(true);
-        when(mockRetryTemplate.execute(any(RetryCallback.class), any(WorkManager.class))).thenAnswer(new Answer<RetryContext>()
-        {
-            @Override
-            public RetryContext answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                ((RetryCallback) invocationOnMock.getArguments()[0]).doWork(mockRetryContext);
-                return null;
-            }
-        });
-        Mockito.doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                acceptCalledLath.release();
-                return null;
-            }
-        }).when(mockExecutor).execute(any(HttpRequestDispatcherWork.class));
-        Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
-        dispatcherThread.start();
-        try
-        {
-            if (!acceptCalledLath.await(500, TimeUnit.MILLISECONDS))
-            {
-                fail("Work should have been scheduled");
-            }
-        }
-        finally
-        {
-            httpRequestDispatcher.disconnect();
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpSocketDispatcherWithNullConnector() {
+    new HttpRequestDispatcher(null, mockRetryTemplate, mockServerSocket, mockWorkManager);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpSocketDispatcherWithNullRetryPolicyTemplate() {
+    new HttpRequestDispatcher(mockHttpConnector, null, mockServerSocket, mockWorkManager);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpSocketDispatcherWithNullServerSocket() {
+    new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, null, mockWorkManager);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpSocketDispatcherWithNullWorkManager() {
+    new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, null);
+  }
+
+  @Test
+  public void closeServerSocketWhenDisconnect() throws IOException {
+    HttpRequestDispatcher httpRequestDispatcher =
+        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+    httpRequestDispatcher.disconnect();
+    verify(mockServerSocket, times(1)).close();
+  }
+
+  @Test
+  public void whenFailureCallSystemExceptionHandler() throws Exception {
+    final HttpRequestDispatcher httpRequestDispatcher =
+        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+    final Latch acceptCalledLath = new Latch();
+    sustituteLifecycleManager();
+    when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(true);
+    when(mockRetryTemplate.execute(any(RetryCallback.class), any(WorkManager.class))).thenAnswer(new Answer<Object>() {
+
+      @Override
+      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+        acceptCalledLath.release();
+        throw new Exception();
+      }
+    });
+    when(mockHttpConnector.getMuleContext().getExceptionListener()).thenReturn(mockExceptionListener);
+    Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
+    try {
+      dispatcherThread.start();
+      if (!acceptCalledLath.await(WAIT_TIME, TimeUnit.MILLISECONDS)) {
+        fail("retry template should be executed");
+      }
+
+      Prober prober = new PollingProber(100, 1);
+      prober.check(new Probe() {
+
+        @Override
+        public boolean isSatisfied() {
+          try {
+            verify(mockExceptionListener, Mockito.atLeast(1)).handleException(Mockito.isA(Exception.class));
+            return true;
+          } catch (AssertionError e) {
+            return false;
+          }
         }
 
+        @Override
+        public String describeFailure() {
+          return "Exception listener was not invoked";
+        }
+      });
+    } finally {
+      httpRequestDispatcher.disconnect();
+    }
+  }
+
+  @Test
+  public void whenConnectorIsNotStartedDoNotAcceptSockets() throws Exception {
+    HttpRequestDispatcher httpRequestDispatcher =
+        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+    sustituteLifecycleManager();
+    when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(false);
+    when(mockHttpConnector.isStarted()).thenReturn(false);
+    Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
+    try {
+      dispatcherThread.start();
+      verify(mockRetryTemplate, times(0)).execute(any(RetryCallback.class), any(WorkManager.class));
+    } finally {
+      httpRequestDispatcher.disconnect();
+    }
+  }
+
+
+  @Test
+  public void whenSocketAcceptedExecuteWork() throws Exception {
+    final HttpRequestDispatcher httpRequestDispatcher =
+        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+    httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
+    final Latch acceptCalledLath = new Latch();
+    sustituteLifecycleManager();
+    when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(true);
+    when(mockRetryTemplate.execute(any(RetryCallback.class), any(WorkManager.class))).thenAnswer(new Answer<RetryContext>() {
+
+      @Override
+      public RetryContext answer(InvocationOnMock invocationOnMock) throws Throwable {
+        ((RetryCallback) invocationOnMock.getArguments()[0]).doWork(mockRetryContext);
+        return null;
+      }
+    });
+    Mockito.doAnswer(new Answer<Object>() {
+
+      @Override
+      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+        acceptCalledLath.release();
+        return null;
+      }
+    }).when(mockExecutor).execute(any(HttpRequestDispatcherWork.class));
+    Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
+    dispatcherThread.start();
+    try {
+      if (!acceptCalledLath.await(500, TimeUnit.MILLISECONDS)) {
+        fail("Work should have been scheduled");
+      }
+    } finally {
+      httpRequestDispatcher.disconnect();
     }
 
-    @Test
-    public void shutsDownRequestHandOffExecutorWhenDisconnected()
-    {
-        HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
-        httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
+  }
 
-        httpRequestDispatcher.disconnect();
-        verify(mockExecutor).shutdown();
-    }
+  @Test
+  public void shutsDownRequestHandOffExecutorWhenDisconnected() {
+    HttpRequestDispatcher httpRequestDispatcher =
+        new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+    httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
 
-    private void sustituteLifecycleManager() throws NoSuchFieldException, IllegalAccessException
-    {
-        Field filed = AbstractConnector.class.getDeclaredField("lifecycleManager");
-        filed.setAccessible(true);
-        filed.set(mockHttpConnector, mockConnectorLifecycleManager);
-    }
+    httpRequestDispatcher.disconnect();
+    verify(mockExecutor).shutdown();
+  }
 
-    private Thread createDispatcherThread(final HttpRequestDispatcher httpRequestDispatcher)
-    {
-        Thread requestDispatcherThread = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                httpRequestDispatcher.run();
-            }
-        };
-        requestDispatcherThread.setDaemon(true);
-        return requestDispatcherThread;
-    }
+  private void sustituteLifecycleManager() throws NoSuchFieldException, IllegalAccessException {
+    Field filed = AbstractConnector.class.getDeclaredField("lifecycleManager");
+    filed.setAccessible(true);
+    filed.set(mockHttpConnector, mockConnectorLifecycleManager);
+  }
+
+  private Thread createDispatcherThread(final HttpRequestDispatcher httpRequestDispatcher) {
+    Thread requestDispatcherThread = new Thread() {
+
+      @Override
+      public void run() {
+        httpRequestDispatcher.run();
+      }
+    };
+    requestDispatcherThread.setDaemon(true);
+    return requestDispatcherThread;
+  }
 }

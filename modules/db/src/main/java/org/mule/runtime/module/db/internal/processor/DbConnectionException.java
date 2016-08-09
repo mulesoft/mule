@@ -16,17 +16,15 @@ import java.sql.SQLException;
  * <code>DbConnectionException</code> is an exception thrown when an error connecting to a DB occurs, regardless of the message.
  *
  */
-public class DbConnectionException extends LocatedMuleException
-{
+public class DbConnectionException extends LocatedMuleException {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8687956514569428383L;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 8687956514569428383L;
 
-    public DbConnectionException(SQLException e, DbConfig dbConfig)
-    {
-        super(e, dbConfig);
-    }
+  public DbConnectionException(SQLException e, DbConfig dbConfig) {
+    super(e, dbConfig);
+  }
 
 }

@@ -9,80 +9,66 @@ package org.mule.runtime.module.db.integration.model;
 
 import static org.mule.runtime.module.db.integration.model.FieldUtils.getValueAsString;
 
-public class Field
-{
+public class Field {
 
-    private final String name;
-    private final Object value;
+  private final String name;
+  private final Object value;
 
-    public Field(String name, Object value)
-    {
-        this.name = name.toUpperCase();
-        this.value = value;
+  public Field(String name, Object value) {
+    this.name = name.toUpperCase();
+    this.value = value;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Object getValue() {
+    return value;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    public String getName()
-    {
-        return name;
+    Field field = (Field) o;
+
+    return name.equals(field.name) && !(value != null ? !checkEqualValues(field) : field.value != null);
+  }
+
+  /**
+   * Lets subclasses to determine when another field has the same value
+   *
+   * @param field field to compare against to
+   * @return true if current field has the same value than the given one, false otherwise
+   */
+  protected boolean checkEqualValues(Field field) {
+    if (value instanceof Object[] && field.value instanceof Object[]) {
+      final Object[] arrayValue = (Object[]) this.value;
+      final Object[] arrayFieldValue = (Object[]) field.value;
+      if (arrayValue.length == arrayFieldValue.length) {
+        final String s1 = getValueAsString(arrayValue);
+        final String s2 = getValueAsString(arrayFieldValue);
+        return s1.equals(s2);
+      }
+      return false;
+    } else {
+      return value.toString().equals(field.value.toString());
     }
+  }
 
-    public Object getValue()
-    {
-        return value;
-    }
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        Field field = (Field) o;
-
-        return name.equals(field.name) && !(value != null ? !checkEqualValues(field) : field.value != null);
-    }
-
-    /**
-     * Lets subclasses to determine when another field has the same value
-     *
-     * @param field field to compare against to
-     * @return true if current field has the same value than the given one, false otherwise
-     */
-    protected boolean checkEqualValues(Field field)
-    {
-        if (value instanceof Object[] && field.value instanceof Object[])
-        {
-            final Object[] arrayValue = (Object[]) this.value;
-            final Object[] arrayFieldValue = (Object[]) field.value;
-            if (arrayValue.length == arrayFieldValue.length)
-            {
-                final String s1 = getValueAsString(arrayValue);
-                final String s2 = getValueAsString(arrayFieldValue);
-                return s1.equals(s2);
-            }
-            return false;
-        }
-        else
-        {
-            return value.toString().equals(field.value.toString());
-        }
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return name.hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "{" + name + ", " + getValueAsString(value) + "}";
-    }
+  @Override
+  public String toString() {
+    return "{" + name + ", " + getValueAsString(value) + "}";
+  }
 }

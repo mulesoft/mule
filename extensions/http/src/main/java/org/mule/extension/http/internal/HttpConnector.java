@@ -33,29 +33,31 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 /**
  * HTTP connector used to handle and perform HTTP requests.
  * <p>
- * This class only serves as an extension definition. It's configurations are divided on server
- * ({@link HttpListenerConfig}) and client ({@link HttpRequesterConfig}) capabilities.
+ * This class only serves as an extension definition. It's configurations are divided on server ({@link HttpListenerConfig}) and
+ * client ({@link HttpRequesterConfig}) capabilities.
  *
  * @since 4.0
  */
 @Extension(name = "HTTP", description = "Connector to handle and perform HTTP requests")
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @Operations(HttpOperations.class)
-@SubTypeMapping(baseType = HttpAuthentication.class, subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
+@SubTypeMapping(baseType = HttpAuthentication.class,
+    subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
 @SubTypeMapping(baseType = ProxyConfig.class, subTypes = {DefaultProxyConfig.class, NtlmProxyConfig.class})
-@SubTypeMapping(baseType = ResponseValidator.class, subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
+@SubTypeMapping(baseType = ResponseValidator.class,
+    subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
 @Import(type = TcpClientSocketProperties.class, from = SocketsExtension.class)
 @Import(type = TcpServerSocketProperties.class, from = SocketsExtension.class)
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/httpn", namespace = "httpn")
-@Export(resources = {"/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"}, classes = {HttpListenerConnectionManager.class})
-public class HttpConnector
-{
+@Export(resources = {"/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"},
+    classes = {HttpListenerConnectionManager.class})
+public class HttpConnector {
 
-    public static final String URL_CONFIGURATION = "URL Configuration";
-    public static final String URL_OVERRIDE_CONFIGURATION = "URL Override Configuration";
-    public static final String API_CONFIGURATION = "API Configuration";
-    public static final String TLS_CONFIGURATION = "TLS Configuration";
-    public static final String OTHER_SETTINGS = "Other Settings";
-    public static final String AUTHENTICATION = "Authentication";
-    public static final String TLS = "TLS";
+  public static final String URL_CONFIGURATION = "URL Configuration";
+  public static final String URL_OVERRIDE_CONFIGURATION = "URL Override Configuration";
+  public static final String API_CONFIGURATION = "API Configuration";
+  public static final String TLS_CONFIGURATION = "TLS Configuration";
+  public static final String OTHER_SETTINGS = "Other Settings";
+  public static final String AUTHENTICATION = "Authentication";
+  public static final String TLS = "TLS";
 }

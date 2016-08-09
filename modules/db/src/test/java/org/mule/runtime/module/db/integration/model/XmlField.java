@@ -9,33 +9,24 @@ package org.mule.runtime.module.db.integration.model;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
-public class XmlField extends Field
-{
+public class XmlField extends Field {
 
-    public XmlField(String name, Object value)
-    {
-        super(name, value);
+  public XmlField(String name, Object value) {
+    super(name, value);
+  }
+
+  @Override
+  protected boolean checkEqualValues(Field field) {
+    if (getValue().equals(field.getValue())) {
+      return true;
+    } else {
+      try {
+        XMLUnit.setIgnoreWhitespace(true);
+
+        return XMLUnit.compareXML((String) getValue(), (String) field.getValue()).identical();
+      } catch (Exception e) {
+        return false;
+      }
     }
-
-    @Override
-    protected boolean checkEqualValues(Field field)
-    {
-        if (getValue().equals(field.getValue()))
-        {
-            return true;
-        }
-        else
-        {
-            try
-            {
-                XMLUnit.setIgnoreWhitespace(true);
-
-                return XMLUnit.compareXML((String) getValue(), (String) field.getValue()).identical();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-    }
+  }
 }

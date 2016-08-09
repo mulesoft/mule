@@ -17,41 +17,35 @@ import javax.sql.DataSource;
 /**
  * Composes multiple {@link DataSourceDecorator} instances
  */
-public class CompositeDataSourceDecorator implements DataSourceDecorator
-{
+public class CompositeDataSourceDecorator implements DataSourceDecorator {
 
-    private final LinkedList<DataSourceDecorator> decorators = new LinkedList<DataSourceDecorator>();
+  private final LinkedList<DataSourceDecorator> decorators = new LinkedList<DataSourceDecorator>();
 
-    public CompositeDataSourceDecorator()
-    {
-        decorators.add(new DefaultDataSourceDecorator());
+  public CompositeDataSourceDecorator() {
+    decorators.add(new DefaultDataSourceDecorator());
+  }
+
+  @Override
+  public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile,
+                             MuleContext muleContext) {
+    for (DataSourceDecorator decorator : decorators) {
+      if (decorator.appliesTo(dataSource, muleContext)) {
+        return decorator.decorate(dataSource, dataSourceName, dbPoolingProfile, muleContext);
+      }
     }
+    return dataSource;
+  }
 
-    @Override
-    public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile, MuleContext muleContext)
-    {
-        for (DataSourceDecorator decorator : decorators)
-        {
-            if (decorator.appliesTo(dataSource, muleContext))
-            {
-                return decorator.decorate(dataSource, dataSourceName, dbPoolingProfile, muleContext);
-            }
-        }
-        return dataSource;
-    }
+  @Override
+  public boolean appliesTo(DataSource dataSource, MuleContext muleContext) {
+    return true;
+  }
 
-    @Override
-    public boolean appliesTo(DataSource dataSource, MuleContext muleContext)
-    {
-        return true;
+  public void init(MuleContext muleContext) {
+    Collection<DataSourceDecorator> connectionFactoryDecorators =
+        muleContext.getRegistry().lookupObjects(DataSourceDecorator.class);
+    for (DataSourceDecorator connectionFactoryDecorator : connectionFactoryDecorators) {
+      decorators.addFirst(connectionFactoryDecorator);
     }
-
-    public void init(MuleContext muleContext)
-    {
-        Collection<DataSourceDecorator> connectionFactoryDecorators = muleContext.getRegistry().lookupObjects(DataSourceDecorator.class);
-        for (DataSourceDecorator connectionFactoryDecorator : connectionFactoryDecorators)
-        {
-            decorators.addFirst(connectionFactoryDecorator);
-        }
-    }
+  }
 }

@@ -22,56 +22,48 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
-{
+public class DefaultDescribingContextTestCase extends AbstractMuleTestCase {
 
-    private static final String KEY = "key";
-    private static final String VALUE = "value";
-    private ExtensionDeclarer descriptor;
+  private static final String KEY = "key";
+  private static final String VALUE = "value";
+  private ExtensionDeclarer descriptor;
 
-    private DescribingContext context;
+  private DescribingContext context;
 
-    @Before
-    public void before()
-    {
-        descriptor = new ExtensionDeclarer();
-        context = new DefaultDescribingContext(descriptor, getClass().getClassLoader());
-        context.addParameter(KEY, VALUE);
-    }
+  @Before
+  public void before() {
+    descriptor = new ExtensionDeclarer();
+    context = new DefaultDescribingContext(descriptor, getClass().getClassLoader());
+    context.addParameter(KEY, VALUE);
+  }
 
-    @Test
-    public void getDeclarationDescriptor()
-    {
-        assertThat(descriptor, is(sameInstance(context.getExtensionDeclarer())));
-    }
+  @Test
+  public void getDeclarationDescriptor() {
+    assertThat(descriptor, is(sameInstance(context.getExtensionDeclarer())));
+  }
 
-    @Test
-    public void getParameter()
-    {
-        assertThat(context.getParameter(KEY, String.class), is(sameInstance((Object) VALUE)));
-    }
+  @Test
+  public void getParameter() {
+    assertThat(context.getParameter(KEY, String.class), is(sameInstance((Object) VALUE)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void wrongParameterType()
-    {
-        context.getParameter(KEY, Long.class);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void wrongParameterType() {
+    context.getParameter(KEY, Long.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullParameterKey()
-    {
-        context.addParameter(null, VALUE);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void nullParameterKey() {
+    context.addParameter(null, VALUE);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullParameterValur()
-    {
-        context.addParameter(KEY, null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void nullParameterValur() {
+    context.addParameter(KEY, null);
+  }
 
-    @Test
-    public void getClassLoader()
-    {
-        assertThat(context.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class), is(sameInstance(getClass().getClassLoader())));
-    }
+  @Test
+  public void getClassLoader() {
+    assertThat(context.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class), is(sameInstance(getClass().getClassLoader())));
+  }
 }

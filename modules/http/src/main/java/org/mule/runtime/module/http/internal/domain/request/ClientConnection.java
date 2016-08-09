@@ -20,65 +20,54 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides information about the client connection
  */
-public class ClientConnection
-{
+public class ClientConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientConnection.class);
-    private final SSLSession sslSession;
-    private final InetSocketAddress remoteHostAddress;
+  private static final Logger logger = LoggerFactory.getLogger(ClientConnection.class);
+  private final SSLSession sslSession;
+  private final InetSocketAddress remoteHostAddress;
 
-    public ClientConnection(InetSocketAddress remoteHostAddress)
-    {
-        Preconditions.checkArgument(remoteHostAddress != null, "remoteHostAddress cannot be null.");
-        this.remoteHostAddress = remoteHostAddress;
-        this.sslSession = null;
-    }
+  public ClientConnection(InetSocketAddress remoteHostAddress) {
+    Preconditions.checkArgument(remoteHostAddress != null, "remoteHostAddress cannot be null.");
+    this.remoteHostAddress = remoteHostAddress;
+    this.sslSession = null;
+  }
 
-    /**
-     * @param sslSession        the SSL session
-     * @param remoteHostAddress
-     */
-    public ClientConnection(SSLSession sslSession, InetSocketAddress remoteHostAddress)
-    {
-        Preconditions.checkArgument(sslSession != null, "sslSession cannot be null.");
-        Preconditions.checkArgument(remoteHostAddress != null, "remoteHostAddress cannot be null.");
-        this.sslSession = sslSession;
-        this.remoteHostAddress = remoteHostAddress;
-    }
+  /**
+   * @param sslSession the SSL session
+   * @param remoteHostAddress
+   */
+  public ClientConnection(SSLSession sslSession, InetSocketAddress remoteHostAddress) {
+    Preconditions.checkArgument(sslSession != null, "sslSession cannot be null.");
+    Preconditions.checkArgument(remoteHostAddress != null, "remoteHostAddress cannot be null.");
+    this.sslSession = sslSession;
+    this.remoteHostAddress = remoteHostAddress;
+  }
 
-    /**
-     * @return the host address from the client
-     */
-    public InetSocketAddress getRemoteHostAddress()
-    {
-        return remoteHostAddress;
-    }
+  /**
+   * @return the host address from the client
+   */
+  public InetSocketAddress getRemoteHostAddress() {
+    return remoteHostAddress;
+  }
 
-    /**
-     * @return the client certificate provided during the TLS client authentication, returns null if the TLS connection
-     * didn't require client authentication or if the connection is not using TLS.
-     */
-    public Certificate getClientCertificate()
-    {
-        try
-        {
-            if (sslSession != null)
-            {
-                Certificate[] peerCertificates = sslSession.getPeerCertificates();
-                if (peerCertificates.length > 0)
-                {
-                    return peerCertificates[0];
-                }
-            }
+  /**
+   * @return the client certificate provided during the TLS client authentication, returns null if the TLS connection didn't
+   *         require client authentication or if the connection is not using TLS.
+   */
+  public Certificate getClientCertificate() {
+    try {
+      if (sslSession != null) {
+        Certificate[] peerCertificates = sslSession.getPeerCertificates();
+        if (peerCertificates.length > 0) {
+          return peerCertificates[0];
         }
-        catch (SSLPeerUnverifiedException e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Failure getting peer certificates", e);
-            }
-        }
-        return null;
+      }
+    } catch (SSLPeerUnverifiedException e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Failure getting peer certificates", e);
+      }
     }
+    return null;
+  }
 
 }

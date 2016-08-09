@@ -30,69 +30,61 @@ import org.junit.Test;
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
-public class StreamingTestCase extends FunctionalTestCase
-{
+public class StreamingTestCase extends FunctionalTestCase {
 
-    public static final int TIMEOUT = 300000;
-    public static final String TEST_MESSAGE = "Test TCP Request";
-    public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
+  public static final int TIMEOUT = 300000;
+  public static final String TEST_MESSAGE = "Test TCP Request";
+  public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-streaming-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-streaming-test-flow.xml";
+  }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference<String> message = new AtomicReference<String>();
-        final AtomicInteger loopCount = new AtomicInteger(0);
+  @Test
+  public void testSend() throws Exception {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<String> message = new AtomicReference<String>();
+    final AtomicInteger loopCount = new AtomicInteger(0);
 
-        EventCallback callback = new EventCallback()
-        {
-            @Override
-            public synchronized void eventReceived(MuleEventContext context, Object component)
-            {
-                try
-                {
-                    logger.info("called " + loopCount.incrementAndGet() + " times");
-                    FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
-                    // without this we may have problems with the many repeats
-                    if (1 == latch.getCount())
-                    {
-                        message.set(ftc.getSummary());
-                        assertEquals(RESULT, message.get());
-                        latch.countDown();
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        };
+    EventCallback callback = new EventCallback() {
 
-        MuleClient client = muleContext.getClient();
+      @Override
+      public synchronized void eventReceived(MuleEventContext context, Object component) {
+        try {
+          logger.info("called " + loopCount.incrementAndGet() + " times");
+          FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
+          // without this we may have problems with the many repeats
+          if (1 == latch.getCount()) {
+            message.set(ftc.getSummary());
+            assertEquals(RESULT, message.get());
+            latch.countDown();
+          }
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
+      }
+    };
 
-        // this works only if singleton set in descriptor
-        Object ftc = getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
-        assertNotNull(ftc);
+    MuleClient client = muleContext.getClient();
 
-        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
+    // this works only if singleton set in descriptor
+    Object ftc = getComponent("testComponent");
+    assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
+    assertNotNull(ftc);
 
-        client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource()).getAddress(),
-            TEST_MESSAGE, new HashMap());
+    ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
-        latch.await(10, TimeUnit.SECONDS);
-        assertEquals(RESULT, message.get());
-    }
+    client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource())
+        .getAddress(), TEST_MESSAGE, new HashMap());
+
+    latch.await(10, TimeUnit.SECONDS);
+    assertEquals(RESULT, message.get());
+  }
 }

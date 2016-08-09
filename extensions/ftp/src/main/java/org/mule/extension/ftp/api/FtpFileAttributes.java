@@ -15,11 +15,10 @@ import java.time.LocalDateTime;
  *
  * @since 4.0
  */
-public interface FtpFileAttributes extends FileAttributes
-{
+public interface FtpFileAttributes extends FileAttributes {
 
-    /**
-     * @return The last time the file was modified
-     */
-    LocalDateTime getTimestamp();
+  /**
+   * @return The last time the file was modified
+   */
+  LocalDateTime getTimestamp();
 }

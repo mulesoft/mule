@@ -11,21 +11,20 @@ import org.mule.runtime.core.util.xa.ResourceManagerException;
 /**
  * Specialization of {@link QueueTransactionContext} for local queue transactions
  */
-public interface LocalQueueTransactionContext extends QueueTransactionContext
-{
+public interface LocalQueueTransactionContext extends QueueTransactionContext {
 
-    /**
-     * Commits the current transaction context operations
-     *
-     * @throws ResourceManagerException
-     */
-    public void doCommit() throws ResourceManagerException;
+  /**
+   * Commits the current transaction context operations
+   *
+   * @throws ResourceManagerException
+   */
+  public void doCommit() throws ResourceManagerException;
 
-    /**
-     * Rollbacks the current transaction context operations
-     *
-     * @throws ResourceManagerException
-     */
-    public void doRollback() throws ResourceManagerException;
+  /**
+   * Rollbacks the current transaction context operations
+   *
+   * @throws ResourceManagerException
+   */
+  public void doRollback() throws ResourceManagerException;
 
 }

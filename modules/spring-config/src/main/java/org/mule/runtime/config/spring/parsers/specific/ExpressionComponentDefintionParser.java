@@ -12,21 +12,18 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ExpressionComponentDefintionParser extends ChildDefinitionParser
-{
-    public ExpressionComponentDefintionParser(String setterMethod, Class<?> clazz)
-    {
-        super(setterMethod, clazz);
-        addAlias("file", "expressionFile");
-    }
+public class ExpressionComponentDefintionParser extends ChildDefinitionParser {
 
-    @Override
-    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-    {
-        super.postProcess(context, assembler, element);
-        if (element.getTextContent() != null && !element.getTextContent().isEmpty())
-        {
-            assembler.getBean().addPropertyValue("expression", element.getTextContent());
-        }
+  public ExpressionComponentDefintionParser(String setterMethod, Class<?> clazz) {
+    super(setterMethod, clazz);
+    addAlias("file", "expressionFile");
+  }
+
+  @Override
+  protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    super.postProcess(context, assembler, element);
+    if (element.getTextContent() != null && !element.getTextContent().isEmpty()) {
+      assembler.getBean().addPropertyValue("expression", element.getTextContent());
     }
+  }
 }

@@ -28,147 +28,121 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * This is a very hurried demonstration.  It needs improving!
+ * This is a very hurried demonstration. It needs improving!
  */
-public class AllAttributeChildDefinitionParser
-        extends AbstractBeanDefinitionParser implements MuleDefinitionParser
-{
+public class AllAttributeChildDefinitionParser extends AbstractBeanDefinitionParser implements MuleDefinitionParser {
 
-    private DynamicAttributeDefinitionParser delegate;
-    private PropertyConfiguration configuration = new SimplePropertyConfiguration();
+  private DynamicAttributeDefinitionParser delegate;
+  private PropertyConfiguration configuration = new SimplePropertyConfiguration();
 
-    public AllAttributeChildDefinitionParser(DynamicAttributeDefinitionParser delegate)
-    {
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        this.delegate = delegate;
+  public AllAttributeChildDefinitionParser(DynamicAttributeDefinitionParser delegate) {
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    this.delegate = delegate;
+  }
+
+  protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+    NamedNodeMap attributes = element.getAttributes();
+    for (int i = 0; i < attributes.getLength(); ++i) {
+      String name = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+      if (!isIgnored(name)) {
+        delegate.setAttributeName(name);
+        delegate.muleParse(element, parserContext);
+      }
     }
-
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        NamedNodeMap attributes = element.getAttributes();
-        for (int i = 0; i < attributes.getLength(); ++i)
-        {
-            String name = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-            if (!isIgnored(name))
-            {
-                delegate.setAttributeName(name);
-                delegate.muleParse(element, parserContext);
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
 
-    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
-    {
-        return parseInternal(element, parserContext);
-    }
+  public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext) {
+    return parseInternal(element, parserContext);
+  }
 
-    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
-    {
-        delegate.registerPreProcessor(preProcessor);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor) {
+    delegate.registerPreProcessor(preProcessor);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
-    {
-        delegate.registerPostProcessor(postProcessor);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor) {
+    delegate.registerPostProcessor(postProcessor);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addReference(String propertyName)
-    {
-        configuration.addReference(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addReference(String propertyName) {
+    configuration.addReference(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
-    {
-        configuration.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings) {
+    configuration.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
-    {
-        configuration.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings) {
+    configuration.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
-    {
-        configuration.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings) {
+    configuration.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
-    {
-        configuration.addAlias(alias, propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName) {
+    configuration.addAlias(alias, propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addCollection(String propertyName)
-    {
-        configuration.addCollection(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addCollection(String propertyName) {
+    configuration.addCollection(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addIgnored(String propertyName)
-    {
-        configuration.addIgnored(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addIgnored(String propertyName) {
+    configuration.addIgnored(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
-    {
-        configuration.removeIgnored(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration removeIgnored(String propertyName) {
+    configuration.removeIgnored(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
-    {
-        configuration.setIgnoredDefault(ignoreAll);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll) {
+    configuration.setIgnoredDefault(ignoreAll);
+    return this;
+  }
 
-    public String getAttributeMapping(String alias)
-    {
-        return configuration.getAttributeMapping(alias);
-    }
+  public String getAttributeMapping(String alias) {
+    return configuration.getAttributeMapping(alias);
+  }
 
-    public boolean isCollection(String propertyName)
-    {
-        return configuration.isCollection(propertyName);
-    }
+  public boolean isCollection(String propertyName) {
+    return configuration.isCollection(propertyName);
+  }
 
-    public boolean isIgnored(String propertyName)
-    {
-        return configuration.isIgnored(propertyName);
-    }
+  public boolean isIgnored(String propertyName) {
+    return configuration.isIgnored(propertyName);
+  }
 
-    public boolean isBeanReference(String attributeName)
-    {
-        return configuration.isReference(attributeName);
-    }
+  public boolean isBeanReference(String attributeName) {
+    return configuration.isReference(attributeName);
+  }
 
-    public String translateName(String oldName)
-    {
-        return configuration.translateName(oldName);
-    }
+  public String translateName(String oldName) {
+    return configuration.translateName(oldName);
+  }
 
-    public Object translateValue(String name, String value)
-    {
-        return configuration.translateValue(name, value);
-    }
+  public Object translateValue(String name, String value) {
+    return configuration.translateValue(name, value);
+  }
 
-    public String getBeanName(Element element)
-    {
-        return AutoIdUtils.getUniqueName(element, "all-attribute");
-    }
+  public String getBeanName(Element element) {
+    return AutoIdUtils.getUniqueName(element, "all-attribute");
+  }
 
-    public MuleDefinitionParserConfiguration addBeanFlag(String flag)
-    {
-        delegate.addBeanFlag(flag);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addBeanFlag(String flag) {
+    delegate.addBeanFlag(flag);
+    return this;
+  }
 }

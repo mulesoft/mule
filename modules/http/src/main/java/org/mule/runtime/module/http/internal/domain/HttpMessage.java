@@ -11,41 +11,42 @@ import java.util.Collection;
 /**
  * Represents common parts of an http message
  */
-public interface HttpMessage
-{
+public interface HttpMessage {
 
-    /**
-     * @return all headers name
-     */
-    Collection<String> getHeaderNames();
+  /**
+   * @return all headers name
+   */
+  Collection<String> getHeaderNames();
 
-    /**
-     * @param headerName name of the header
-     * @return first value of the header
-     */
-    String getHeaderValue(String headerName);
+  /**
+   * @param headerName name of the header
+   * @return first value of the header
+   */
+  String getHeaderValue(String headerName);
 
-    /**
-     * @param headerName name of the header
-     * @return first value of the header, regardless of the case
-     */
-    String getHeaderValueIgnoreCase(String headerName);
+  /**
+   * @param headerName name of the header
+   * @return first value of the header, regardless of the case
+   */
+  String getHeaderValueIgnoreCase(String headerName);
 
-    /**
-     * @param headerName name of the header
-     * @return all the values of that headers. If not such headers exists return null, otherwise the collection of header values
-     */
-    Collection<String> getHeaderValues(String headerName);
+  /**
+   * @param headerName name of the header
+   * @return all the values of that headers. If not such headers exists return null, otherwise the collection of header values
+   */
+  Collection<String> getHeaderValues(String headerName);
 
-    /**
-     * @param headerName name of the header
-     * @return all the values of that headers, regardless of the case. If not such headers exists return null, otherwise the collection of header values
-     */
-    Collection<String> getHeaderValuesIgnoreCase(String headerName);
+  /**
+   * @param headerName name of the header
+   * @return all the values of that headers, regardless of the case. If not such headers exists return null, otherwise the
+   *         collection of header values
+   */
+  Collection<String> getHeaderValuesIgnoreCase(String headerName);
 
-    /**
-     * @return the entity of the message. If there's no entity an {@link org.mule.runtime.module.http.internal.domain.EmptyHttpEntity} is returned
-     */
-    HttpEntity getEntity();
+  /**
+   * @return the entity of the message. If there's no entity an
+   *         {@link org.mule.runtime.module.http.internal.domain.EmptyHttpEntity} is returned
+   */
+  HttpEntity getEntity();
 
 }

@@ -11,25 +11,18 @@ import org.mule.runtime.module.xml.stax.StaxSource;
 
 import javax.xml.stream.XMLStreamReader;
 
-public class XMLStreamCloser implements StreamCloser
-{
+public class XMLStreamCloser implements StreamCloser {
 
-    public boolean canClose(Class streamType)
-    {
-        return StaxSource.class.isAssignableFrom(streamType)
-               || XMLStreamReader.class.isAssignableFrom(streamType);
-    }
+  public boolean canClose(Class streamType) {
+    return StaxSource.class.isAssignableFrom(streamType) || XMLStreamReader.class.isAssignableFrom(streamType);
+  }
 
-    public void close(Object stream) throws Exception
-    {
-        if (stream instanceof XMLStreamReader)
-        {
-            ((XMLStreamReader) stream).close();
-        }
-        else if (stream instanceof StaxSource)
-        {
-            ((StaxSource) stream).getXMLStreamReader().close();
-        }
+  public void close(Object stream) throws Exception {
+    if (stream instanceof XMLStreamReader) {
+      ((XMLStreamReader) stream).close();
+    } else if (stream instanceof StaxSource) {
+      ((StaxSource) stream).getXMLStreamReader().close();
     }
+  }
 
 }

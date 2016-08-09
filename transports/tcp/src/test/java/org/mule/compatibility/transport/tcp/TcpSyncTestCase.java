@@ -23,83 +23,75 @@ import java.util.Arrays;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpSyncTestCase extends FunctionalTestCase
-{
+public class TcpSyncTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-sync-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "tcp-sync-flow.xml";
+  }
+
+  protected MuleMessage send(Object payload) throws Exception {
+    MuleClient client = muleContext.getClient();
+    return client
+        .send(((InboundEndpoint) (((Flow) muleContext.getRegistry().lookupObject("service"))).getMessageSource()).getAddress(),
+              payload, null);
+  }
+
+  @Test
+  public void testSendString() throws Exception {
+    MuleMessage message = send("data");
+    assertNotNull(message);
+    String response = getPayloadAsString(message);
+    assertEquals("data", response);
+  }
+
+  @Test
+  public void testSyncResponseOfBufferSize() throws Exception {
+    int size = 1024 * 16;
+    TcpConnector tcp = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
+    tcp.setSendBufferSize(size);
+    tcp.setReceiveBufferSize(size);
+    byte[] data = fillBuffer(new byte[size]);
+    MuleMessage message = send(data);
+    assertNotNull(message);
+    byte[] response = getPayloadAsBytes(message);
+    assertEquals(data.length, response.length);
+    assertTrue(Arrays.equals(data, response));
+  }
+
+  @Test
+  public void testManySyncResponseOfBufferSize() throws Exception {
+    int size = 1024 * 16;
+    TcpConnector tcp = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
+    tcp.setSendBufferSize(size);
+    tcp.setReceiveBufferSize(size);
+    byte[] data = fillBuffer(new byte[size]);
+    for (int i = 0; i < 20; ++i) {
+      MuleMessage message = send(data);
+      assertNotNull(message);
+      byte[] response = getPayloadAsBytes(message);
+      assertEquals(data.length, response.length);
+      assertTrue(Arrays.equals(data, response));
     }
+  }
 
-    protected MuleMessage send(Object payload) throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        return client.send(((InboundEndpoint) (((Flow) muleContext.getRegistry().lookupObject("service"))).getMessageSource()).getAddress(), payload, null);
-    }
+  @Test
+  public void testSyncResponseVeryBig() throws Exception {
+    byte[] data = fillBuffer(new byte[1024 * 1024]);
+    MuleMessage message = send(data);
+    assertNotNull(message);
+    byte[] response = getPayloadAsBytes(message);
+    assertEquals(data.length, response.length);
+    assertTrue(Arrays.equals(data, response));
+  }
 
-    @Test
-    public void testSendString() throws Exception
-    {
-        MuleMessage message = send("data");
-        assertNotNull(message);
-        String response = getPayloadAsString(message);
-        assertEquals("data", response);
+  protected byte[] fillBuffer(byte[] buffer) {
+    for (int i = 0; i < buffer.length; ++i) {
+      buffer[i] = (byte) (i % 255);
     }
-
-    @Test
-    public void testSyncResponseOfBufferSize() throws Exception
-    {
-        int size = 1024 * 16;
-        TcpConnector tcp = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
-        tcp.setSendBufferSize(size);
-        tcp.setReceiveBufferSize(size);
-        byte[] data = fillBuffer(new byte[size]);
-        MuleMessage message = send(data);
-        assertNotNull(message);
-        byte[] response = getPayloadAsBytes(message);
-        assertEquals(data.length, response.length);
-        assertTrue(Arrays.equals(data, response));
-    }
-
-    @Test
-    public void testManySyncResponseOfBufferSize() throws Exception
-    {
-        int size = 1024 * 16;
-        TcpConnector tcp = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
-        tcp.setSendBufferSize(size);
-        tcp.setReceiveBufferSize(size);
-        byte[] data = fillBuffer(new byte[size]);
-        for (int i = 0; i < 20; ++i)
-        {
-            MuleMessage message = send(data);
-            assertNotNull(message);
-            byte[] response = getPayloadAsBytes(message);
-            assertEquals(data.length, response.length);
-            assertTrue(Arrays.equals(data, response));
-        }
-    }
-
-    @Test
-    public void testSyncResponseVeryBig() throws Exception
-    {
-        byte[] data = fillBuffer(new byte[1024 * 1024]);
-        MuleMessage message = send(data);
-        assertNotNull(message);
-        byte[] response = getPayloadAsBytes(message);
-        assertEquals(data.length, response.length);
-        assertTrue(Arrays.equals(data, response));
-    }
-
-    protected byte[] fillBuffer(byte[] buffer)
-    {
-        for (int i = 0; i < buffer.length; ++i)
-        {
-            buffer[i] = (byte) (i % 255);
-        }
-        return buffer;
-    }
+    return buffer;
+  }
 }

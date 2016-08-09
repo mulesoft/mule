@@ -11,14 +11,14 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 /**
- * Specific case of a {@link MessageProcessorContainer} when its inner processors are dynamic (for instance, with a dynamically referenced subflow).
+ * Specific case of a {@link MessageProcessorContainer} when its inner processors are dynamic (for instance, with a dynamically
+ * referenced subflow).
  */
-public interface DynamicMessageProcessorContainer extends MessageProcessorContainer, MessageProcessor
-{
+public interface DynamicMessageProcessorContainer extends MessageProcessorContainer, MessageProcessor {
 
-    /**
-     * Builds the flowMap for the inner processors relative to the calling flow.
-     */
-    FlowMap buildInnerPaths();
+  /**
+   * Builds the flowMap for the inner processors relative to the calling flow.
+   */
+  FlowMap buildInnerPaths();
 
 }

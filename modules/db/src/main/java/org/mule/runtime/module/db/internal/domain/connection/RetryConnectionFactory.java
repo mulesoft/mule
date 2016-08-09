@@ -17,54 +17,45 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.sql.DataSource;
 
 /**
- * Defines a {@link ConnectionFactory} that is configured to retry connection
- * creation in case of errors using a {@link RetryPolicyTemplate}
+ * Defines a {@link ConnectionFactory} that is configured to retry connection creation in case of errors using a
+ * {@link RetryPolicyTemplate}
  */
-public class RetryConnectionFactory extends AbstractConnectionFactory
-{
+public class RetryConnectionFactory extends AbstractConnectionFactory {
 
-    private final RetryPolicyTemplate retryPolicyTemplate;
-    private final ConnectionFactory delegate;
+  private final RetryPolicyTemplate retryPolicyTemplate;
+  private final ConnectionFactory delegate;
 
-    public RetryConnectionFactory(RetryPolicyTemplate retryPolicyTemplate, ConnectionFactory delegate)
-    {
-        this.retryPolicyTemplate = retryPolicyTemplate;
-        this.delegate = delegate;
-    }
+  public RetryConnectionFactory(RetryPolicyTemplate retryPolicyTemplate, ConnectionFactory delegate) {
+    this.retryPolicyTemplate = retryPolicyTemplate;
+    this.delegate = delegate;
+  }
 
-    @Override
-    protected Connection doCreateConnection(final DataSource dataSource)
-    {
-        final AtomicReference<Connection> connectionRef = new AtomicReference<Connection>();
+  @Override
+  protected Connection doCreateConnection(final DataSource dataSource) {
+    final AtomicReference<Connection> connectionRef = new AtomicReference<Connection>();
 
-        try
-        {
-            retryPolicyTemplate.execute(new RetryCallback()
-            {
-                public void doWork(RetryContext context) throws Exception
-                {
-                    Connection connection = delegate.create(dataSource);
+    try {
+      retryPolicyTemplate.execute(new RetryCallback() {
 
-                    connectionRef.set(connection);
-                }
+        public void doWork(RetryContext context) throws Exception {
+          Connection connection = delegate.create(dataSource);
 
-                public String getWorkDescription()
-                {
-                    return "Connection factory";
-                }
-
-                @Override
-                public Object getWorkOwner()
-                {
-                    return delegate;
-                }
-            }, null);
-        }
-        catch (Exception e)
-        {
-            throw new ConnectionCreationException(e);
+          connectionRef.set(connection);
         }
 
-        return connectionRef.get();
+        public String getWorkDescription() {
+          return "Connection factory";
+        }
+
+        @Override
+        public Object getWorkOwner() {
+          return delegate;
+        }
+      }, null);
+    } catch (Exception e) {
+      throw new ConnectionCreationException(e);
     }
+
+    return connectionRef.get();
+  }
 }

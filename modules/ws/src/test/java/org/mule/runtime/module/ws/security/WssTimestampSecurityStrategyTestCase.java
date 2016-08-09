@@ -20,36 +20,34 @@ import java.util.Map;
 import org.junit.Test;
 
 @SmallTest
-public class WssTimestampSecurityStrategyTestCase extends AbstractMuleTestCase
-{
-    private static final long EXPIRES = 30;
+public class WssTimestampSecurityStrategyTestCase extends AbstractMuleTestCase {
 
-    private WssTimestampSecurityStrategy strategy = new WssTimestampSecurityStrategy();
+  private static final long EXPIRES = 30;
 
-    @Test
-    public void actionAndTtlTimestampFieldsAreSetOnEmptyMap()
-    {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        strategy.setExpires(EXPIRES);
-        strategy.apply(properties, null);
+  private WssTimestampSecurityStrategy strategy = new WssTimestampSecurityStrategy();
 
-        assertEquals(TIMESTAMP, properties.get(ACTION));
-        assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
-    }
+  @Test
+  public void actionAndTtlTimestampFieldsAreSetOnEmptyMap() {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    strategy.setExpires(EXPIRES);
+    strategy.apply(properties, null);
 
-    @Test
-    public void actionIsAppendedAfterExistingAction()
-    {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(ACTION, USERNAME_TOKEN);
+    assertEquals(TIMESTAMP, properties.get(ACTION));
+    assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
+  }
 
-        strategy.setExpires(EXPIRES);
-        strategy.apply(properties, null);
+  @Test
+  public void actionIsAppendedAfterExistingAction() {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put(ACTION, USERNAME_TOKEN);
 
-        String expectedAction = USERNAME_TOKEN + " " + TIMESTAMP;
-        assertEquals(expectedAction, properties.get(ACTION));
-        assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
-    }
+    strategy.setExpires(EXPIRES);
+    strategy.apply(properties, null);
+
+    String expectedAction = USERNAME_TOKEN + " " + TIMESTAMP;
+    assertEquals(expectedAction, properties.get(ACTION));
+    assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
+  }
 
 
 }

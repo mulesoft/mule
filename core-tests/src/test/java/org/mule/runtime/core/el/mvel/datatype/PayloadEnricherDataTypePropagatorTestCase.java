@@ -27,36 +27,33 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase
-{
+public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase {
 
-    public static final Charset CUSTOM_ENCODING = UTF_16;
+  public static final Charset CUSTOM_ENCODING = UTF_16;
 
-    private final PayloadEnricherDataTypePropagator dataTypePropagator = new PayloadEnricherDataTypePropagator();
+  private final PayloadEnricherDataTypePropagator dataTypePropagator = new PayloadEnricherDataTypePropagator();
 
-    @Test
-    public void propagatesPayloadDataType() throws Exception
-    {
-       doPayloadDataTypeTest(PAYLOAD + " = 'unused'");
-    }
+  @Test
+  public void propagatesPayloadDataType() throws Exception {
+    doPayloadDataTypeTest(PAYLOAD + " = 'unused'");
+  }
 
-    @Test
-    public void propagatesMessagePayloadDataType() throws Exception
-    {
-       doPayloadDataTypeTest(MESSAGE_PAYLOAD + " = 'unused'");
-    }
+  @Test
+  public void propagatesMessagePayloadDataType() throws Exception {
+    doPayloadDataTypeTest(MESSAGE_PAYLOAD + " = 'unused'");
+  }
 
-    private void doPayloadDataTypeTest(String expression) throws Exception
-    {
-        final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
+  private void doPayloadDataTypeTest(String expression) throws Exception {
+    final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-        MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
-        final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
+    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    final CompiledExpression compiledExpression =
+        (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-        MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-        dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-        assertThat(testEvent.getMessage().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
-    }
+    assertThat(testEvent.getMessage().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+  }
 }

@@ -21,51 +21,48 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTestCase
-{
-    private CombineCollectionsTransformer merger;
+public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        
-        merger = new CombineCollectionsTransformer();
-    }
+  private CombineCollectionsTransformer merger;
 
-    @Test
-    public void testMuleMessageCollectionMerge() throws Exception
-    {   
-        MuleEvent event = getTestEvent("hello");
-        
-        List list = new ArrayList<>();
-        list.add(MuleMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
-        list.add(MuleMessage.builder().payload("4").build());
-        list.add(MuleMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
-        MuleMessage collection = MuleMessage.builder().collectionPayload(list, MuleMessage.class).build();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        event = new DefaultMuleEvent(collection, event);
-        
-        MuleEvent response = merger.process(event);
-        
-        assertTrue(response.getMessage().getPayload() instanceof List);
-        assertEquals(7, ((List)response.getMessage().getPayload()).size());
-    }
-    
-    @Test
-    public void testMuleMessageMerge() throws Exception
-    {
-        MuleEvent event = getTestEvent("hello");
-        
-        List<Object> payload = new ArrayList<>();
-        payload.add(Arrays.asList("1", "2", "3"));
-        payload.add("4");
-        payload.add(Arrays.asList("5", "6", "7"));
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
+    merger = new CombineCollectionsTransformer();
+  }
 
-        MuleEvent response = merger.process(event);
-        
-        assertTrue(response.getMessage().getPayload() instanceof List);
-        assertEquals(7, ((List)response.getMessage().getPayload()).size());
-    }
+  @Test
+  public void testMuleMessageCollectionMerge() throws Exception {
+    MuleEvent event = getTestEvent("hello");
+
+    List list = new ArrayList<>();
+    list.add(MuleMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
+    list.add(MuleMessage.builder().payload("4").build());
+    list.add(MuleMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
+    MuleMessage collection = MuleMessage.builder().collectionPayload(list, MuleMessage.class).build();
+
+    event = new DefaultMuleEvent(collection, event);
+
+    MuleEvent response = merger.process(event);
+
+    assertTrue(response.getMessage().getPayload() instanceof List);
+    assertEquals(7, ((List) response.getMessage().getPayload()).size());
+  }
+
+  @Test
+  public void testMuleMessageMerge() throws Exception {
+    MuleEvent event = getTestEvent("hello");
+
+    List<Object> payload = new ArrayList<>();
+    payload.add(Arrays.asList("1", "2", "3"));
+    payload.add("4");
+    payload.add(Arrays.asList("5", "6", "7"));
+    event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
+
+    MuleEvent response = merger.process(event);
+
+    assertTrue(response.getMessage().getPayload() instanceof List);
+    assertEquals(7, ((List) response.getMessage().getPayload()).size());
+  }
 }

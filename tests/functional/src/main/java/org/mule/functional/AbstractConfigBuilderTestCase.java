@@ -23,88 +23,77 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import org.junit.Test;
 
-public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
-{
+public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase {
 
-    public AbstractConfigBuilderTestCase(boolean legacy)
-    {
-        super(legacy);
-    }
+  public AbstractConfigBuilderTestCase(boolean legacy) {
+    super(legacy);
+  }
 
-    @Override
-    protected boolean isGracefulShutdown()
-    {
-        return true;
-    }
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
 
-    @Override
-    public void testManagerConfig() throws Exception
-    {
-        super.testManagerConfig();
+  @Override
+  public void testManagerConfig() throws Exception {
+    super.testManagerConfig();
 
-        assertNotNull(muleContext.getTransactionManager());
-    }
+    assertNotNull(muleContext.getTransactionManager());
+  }
 
-    @Test
-    public void testExceptionStrategy2()
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
-        assertNotNull(flow.getExceptionListener());
-        assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
-    }
+  @Test
+  public void testExceptionStrategy2() {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
+    assertNotNull(flow.getExceptionListener());
+    assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
+  }
 
-    @Override
-    public void testTransformerConfig()
-    {
-        super.testTransformerConfig();
+  @Override
+  public void testTransformerConfig() {
+    super.testTransformerConfig();
 
-        Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
-        assertNotNull(t);
-        assertTrue(t instanceof TestCompressionTransformer);
-        assertEquals(t.getReturnDataType(), DataType.STRING);
-        assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
-    }
+    Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+    assertNotNull(t);
+    assertTrue(t instanceof TestCompressionTransformer);
+    assertEquals(t.getReturnDataType(), DataType.STRING);
+    assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
+  }
 
-    @Test
-    public void testPoolingConfig()
-    {
-        // test per-descriptor overrides
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        PoolingProfile pp = ((PooledJavaComponent) flow.getMessageProcessors().get(0)).getPoolingProfile();
+  @Test
+  public void testPoolingConfig() {
+    // test per-descriptor overrides
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
+    PoolingProfile pp = ((PooledJavaComponent) flow.getMessageProcessors().get(0)).getPoolingProfile();
 
-        assertEquals(9, pp.getMaxActive());
-        assertEquals(6, pp.getMaxIdle());
-        assertEquals(4002, pp.getMaxWait());
-        assertEquals(PoolingProfile.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
-        assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
-    }
+    assertEquals(9, pp.getMaxActive());
+    assertEquals(6, pp.getMaxIdle());
+    assertEquals(4002, pp.getMaxWait());
+    assertEquals(PoolingProfile.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
+    assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
+  }
 
-    @Test
-    public void testEnvironmentProperties()
-    {
-        assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
-        assertEquals("this was set from the manager properties!", muleContext.getRegistry().lookupObject("beanProperty1"));
-        assertNotNull(muleContext.getRegistry().lookupObject("OS_Version"));
-    }
+  @Test
+  public void testEnvironmentProperties() {
+    assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
+    assertEquals("this was set from the manager properties!", muleContext.getRegistry().lookupObject("beanProperty1"));
+    assertNotNull(muleContext.getRegistry().lookupObject("OS_Version"));
+  }
 
-    @Test
-    public void testMuleConfiguration()
-    {
-        assertEquals(10, muleContext.getConfiguration().getDefaultResponseTimeout());
-        assertEquals(20, muleContext.getConfiguration().getDefaultTransactionTimeout());
-        assertEquals(30, muleContext.getConfiguration().getShutdownTimeout());
-    }
+  @Test
+  public void testMuleConfiguration() {
+    assertEquals(10, muleContext.getConfiguration().getDefaultResponseTimeout());
+    assertEquals(20, muleContext.getConfiguration().getDefaultTransactionTimeout());
+    assertEquals(30, muleContext.getConfiguration().getShutdownTimeout());
+  }
 
-    @Test
-    public void testGlobalInterceptorStack()
-    {
-        InterceptorStack interceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject(
-                "testInterceptorStack");
-        assertNotNull(interceptorStack);
-        assertEquals(3, interceptorStack.getInterceptors().size());
-        assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(0).getClass());
-        assertEquals(TimerInterceptor.class, interceptorStack.getInterceptors().get(1).getClass());
-        assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
-    }
+  @Test
+  public void testGlobalInterceptorStack() {
+    InterceptorStack interceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject("testInterceptorStack");
+    assertNotNull(interceptorStack);
+    assertEquals(3, interceptorStack.getInterceptors().size());
+    assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(0).getClass());
+    assertEquals(TimerInterceptor.class, interceptorStack.getInterceptors().get(1).getClass());
+    assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
+  }
 
 }

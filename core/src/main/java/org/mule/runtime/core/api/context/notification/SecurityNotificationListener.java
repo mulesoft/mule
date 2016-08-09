@@ -10,10 +10,10 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 
 
 /**
- * <code>MuleContextNotificationListener</code> is an observer interface that objects
- * can implement to receive notifications about secure access requests.
+ * <code>MuleContextNotificationListener</code> is an observer interface that objects can implement to receive notifications about
+ * secure access requests.
  */
-public interface SecurityNotificationListener<T extends SecurityNotification> extends ServerNotificationListener<SecurityNotification>
-{
-    // no methods
+public interface SecurityNotificationListener<T extends SecurityNotification>
+    extends ServerNotificationListener<SecurityNotification> {
+  // no methods
 }

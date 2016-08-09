@@ -13,35 +13,31 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class GroovyRegistryLookupTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "groovy-registry-lookup-config.xml";
-    }
+public class GroovyRegistryLookupTestCase extends FunctionalTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected String getConfigFile() {
+    return "groovy-registry-lookup-config.xml";
+  }
 
-        muleContext.getRegistry().registerObject("hello", new Hello());
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-    @Test
-    public void testBindingCallout() throws Exception
-    {
-        MuleMessage response = flowRunner("sayHello").withPayload("").run().getMessage();
-        assertNotNull(response);
-        assertEquals("hello", getPayloadAsString(response));
-    }
+    muleContext.getRegistry().registerObject("hello", new Hello());
+  }
 
-    public static class Hello
-    {
-        public String sayHello()
-        {
-            return "hello";
-        }
+  @Test
+  public void testBindingCallout() throws Exception {
+    MuleMessage response = flowRunner("sayHello").withPayload("").run().getMessage();
+    assertNotNull(response);
+    assertEquals("hello", getPayloadAsString(response));
+  }
+
+  public static class Hello {
+
+    public String sayHello() {
+      return "hello";
     }
+  }
 }

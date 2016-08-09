@@ -19,87 +19,72 @@ import org.slf4j.LoggerFactory;
 /**
  * Generic {@link org.mule.execution.MessageProcessContext} implementations for transports.
  */
-public class TransportMessageProcessContext implements MessageProcessContext
-{
+public class TransportMessageProcessContext implements MessageProcessContext {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final MessageReceiver messageReceiver;
-    private WorkManager flowExecutionWorkManager;
+  private final MessageReceiver messageReceiver;
+  private WorkManager flowExecutionWorkManager;
 
-    /**
-     * Creates an instance that executes the flow in the current thread.
-     * Calling #supportsAsynchronousProcessing method will always return false since
-     * there's not work manager specified for the flow execution.
-     *
-     * @param messageReceiver receiver of the message
-     */
-    public TransportMessageProcessContext(MessageReceiver messageReceiver)
-    {
-        this.messageReceiver = messageReceiver;
+  /**
+   * Creates an instance that executes the flow in the current thread. Calling #supportsAsynchronousProcessing method will always
+   * return false since there's not work manager specified for the flow execution.
+   *
+   * @param messageReceiver receiver of the message
+   */
+  public TransportMessageProcessContext(MessageReceiver messageReceiver) {
+    this.messageReceiver = messageReceiver;
+  }
+
+  /**
+   * Creates an instance that executes the flow using the supplied WorkManager. Calling #supportsAsynchronousProcessing method
+   * will always return true since there's a WorkManager available to execute the flow.
+   *
+   * @param messageReceiver receiver of the message
+   * @param flowExecutionWorkManager the work manager to use for the flow execution
+   */
+  public TransportMessageProcessContext(MessageReceiver messageReceiver, WorkManager flowExecutionWorkManager) {
+    this.messageReceiver = messageReceiver;
+    this.flowExecutionWorkManager = flowExecutionWorkManager;
+  }
+
+  @Override
+  public MessageSource getMessageSource() {
+    return this.messageReceiver.getEndpoint();
+  }
+
+  protected MessageSource getMessageReceiver() {
+    return this.messageReceiver;
+  }
+
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    return this.messageReceiver.getFlowConstruct();
+  }
+
+  @Override
+  public boolean supportsAsynchronousProcessing() {
+    if (flowExecutionWorkManager != null) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    /**
-     * Creates an instance that executes the flow using the supplied WorkManager.
-     * Calling #supportsAsynchronousProcessing method will always return true since
-     * there's a WorkManager available to execute the flow.
-     *
-     * @param messageReceiver receiver of the message
-     * @param flowExecutionWorkManager the work manager to use for the flow execution
-     */
-    public TransportMessageProcessContext(MessageReceiver messageReceiver, WorkManager flowExecutionWorkManager)
-    {
-        this.messageReceiver = messageReceiver;
-        this.flowExecutionWorkManager = flowExecutionWorkManager;
-    }
+  @Override
+  public WorkManager getFlowExecutionWorkManager() {
+    return flowExecutionWorkManager;
+  }
 
-    @Override
-    public MessageSource getMessageSource()
-    {
-        return this.messageReceiver.getEndpoint();
-    }
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return messageReceiver.getEndpoint().getTransactionConfig();
+  }
 
-    protected MessageSource getMessageReceiver()
-    {
-        return this.messageReceiver;
-    }
-
-    @Override
-    public FlowConstruct getFlowConstruct()
-    {
-        return this.messageReceiver.getFlowConstruct();
-    }
-
-    @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        if (flowExecutionWorkManager != null)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    @Override
-    public WorkManager getFlowExecutionWorkManager()
-    {
-        return flowExecutionWorkManager;
-    }
-
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return messageReceiver.getEndpoint().getTransactionConfig();
-    }
-
-    @Override
-    public ClassLoader getExecutionClassLoader()
-    {
-        return messageReceiver.getEndpoint().getMuleContext().getExecutionClassLoader();
-    }
+  @Override
+  public ClassLoader getExecutionClassLoader() {
+    return messageReceiver.getEndpoint().getMuleContext().getExecutionClassLoader();
+  }
 
 }
 

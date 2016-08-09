@@ -28,32 +28,29 @@ import javax.mail.Message;
 
 import org.junit.Test;
 
-public class EmailContentProcessorTestCase extends AbstractMuleTestCase
-{
-    @Test
-    public void emailTextBodyFromMultipart() throws Exception
-    {
-        Message message = getMultipartTestMessage();
-        String messageBody = process(message).getBody();
-        assertThat(messageBody, is(EMAIL_CONTENT));
-    }
+public class EmailContentProcessorTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void emailTextBodyFromSinglePart() throws Exception
-    {
-        Message message = getSinglePartTestMessage();
-        String messageBody = process(message).getBody();
-        assertThat(messageBody, is(EMAIL_CONTENT));
-    }
+  @Test
+  public void emailTextBodyFromMultipart() throws Exception {
+    Message message = getMultipartTestMessage();
+    String messageBody = process(message).getBody();
+    assertThat(messageBody, is(EMAIL_CONTENT));
+  }
 
-    @Test
-    public void emailAttachmentsFromMultipart() throws Exception
-    {
-        Message message = getMultipartTestMessage();
-        List<MuleMessage> attachments = process(message).getAttachments();
-        assertThat(attachments, hasSize(2));
-        assertAttachmentContent(attachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
-        assertAttachmentContent(attachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
-    }
+  @Test
+  public void emailTextBodyFromSinglePart() throws Exception {
+    Message message = getSinglePartTestMessage();
+    String messageBody = process(message).getBody();
+    assertThat(messageBody, is(EMAIL_CONTENT));
+  }
+
+  @Test
+  public void emailAttachmentsFromMultipart() throws Exception {
+    Message message = getMultipartTestMessage();
+    List<MuleMessage> attachments = process(message).getAttachments();
+    assertThat(attachments, hasSize(2));
+    assertAttachmentContent(attachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
+    assertAttachmentContent(attachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
+  }
 
 }

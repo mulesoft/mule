@@ -12,16 +12,13 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 /**
- * This allows a message processor to be defined globally, or embedded within an
- * endpoint.
+ * This allows a message processor to be defined globally, or embedded within an endpoint.
  */
-public class MessageProcessorChainDefinitionParser extends ParentContextDefinitionParser
-{
-    public MessageProcessorChainDefinitionParser()
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(
-            MessageProcessorChainFactoryBean.class, false));
-        otherwise(new ChildDefinitionParser("messageProcessor", MessageProcessorChainFactoryBean.class));
-    }
+public class MessageProcessorChainDefinitionParser extends ParentContextDefinitionParser {
+
+  public MessageProcessorChainDefinitionParser() {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(MessageProcessorChainFactoryBean.class, false));
+    otherwise(new ChildDefinitionParser("messageProcessor", MessageProcessorChainFactoryBean.class));
+  }
 
 }

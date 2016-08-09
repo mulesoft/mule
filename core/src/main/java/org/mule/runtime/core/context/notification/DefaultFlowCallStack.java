@@ -15,84 +15,73 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting
- * information for an application developer.
+ * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
+ * for an application developer.
  */
-public class DefaultFlowCallStack implements FlowCallStack
-{
-    private static final long serialVersionUID = -8683711977929802819L;
+public class DefaultFlowCallStack implements FlowCallStack {
 
-    private Stack<FlowStackElement> innerStack = new Stack<>();
+  private static final long serialVersionUID = -8683711977929802819L;
 
-    /**
-     * Adds an element to the top of this stack
-     * 
-     * @param flowStackElement the element to add
-     */
-    public void push(FlowStackElement flowStackElement)
-    {
-        innerStack.push(flowStackElement);
+  private Stack<FlowStackElement> innerStack = new Stack<>();
+
+  /**
+   * Adds an element to the top of this stack
+   * 
+   * @param flowStackElement the element to add
+   */
+  public void push(FlowStackElement flowStackElement) {
+    innerStack.push(flowStackElement);
+  }
+
+  /**
+   * Adds a message processor path to the list of processors that were invoked as part of the processing of this stack's event.
+   * 
+   * @param processorPath the path to mark as invoked.
+   * @throws EmptyStackException if this stack is empty.
+   */
+  public void setCurrentProcessorPath(String processorPath) {
+    FlowStackElement topElement = innerStack.pop();
+    innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
+  }
+
+  /**
+   * Removes the top-most element from this stack.
+   * 
+   * @return the top-most element of this stack.
+   * @throws EmptyStackException if this stack is empty.
+   */
+  public FlowStackElement pop() {
+    return innerStack.pop();
+  }
+
+  @Override
+  public List<FlowStackElement> getElements() {
+    List<FlowStackElement> elementsCloned = new ArrayList<>();
+    for (int i = innerStack.size() - 1; i >= 0; --i) {
+      elementsCloned.add(innerStack.get(i));
+    }
+    return elementsCloned;
+  }
+
+  @Override
+  public DefaultFlowCallStack clone() {
+    DefaultFlowCallStack cloned = new DefaultFlowCallStack();
+    for (int i = 0; i < innerStack.size(); ++i) {
+      cloned.innerStack.push(innerStack.get(i));
     }
 
-    /**
-     * Adds a message processor path to the list of processors that were invoked as part of the processing of this
-     * stack's event.
-     * 
-     * @param processorPath the path to mark as invoked.
-     * @throws EmptyStackException if this stack is empty.
-     */
-    public void setCurrentProcessorPath(String processorPath)
-    {
-        FlowStackElement topElement = innerStack.pop();
-        innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
-    }
+    return cloned;
+  }
 
-    /**
-     * Removes the top-most element from this stack.
-     * 
-     * @return the top-most element of this stack.
-     * @throws EmptyStackException if this stack is empty.
-     */
-    public FlowStackElement pop()
-    {
-        return innerStack.pop();
+  @Override
+  public String toString() {
+    StringBuilder stackString = new StringBuilder();
+    for (int i = innerStack.size() - 1; i >= 0; --i) {
+      stackString.append("at ").append(innerStack.get(i).toString());
+      if (i != 0) {
+        stackString.append(System.lineSeparator());
+      }
     }
-
-    @Override
-    public List<FlowStackElement> getElements()
-    {
-        List<FlowStackElement> elementsCloned = new ArrayList<>();
-        for (int i = innerStack.size() - 1; i >= 0; --i)
-        {
-            elementsCloned.add(innerStack.get(i));
-        }
-        return elementsCloned;
-    }
-
-    @Override
-    public DefaultFlowCallStack clone()
-    {
-        DefaultFlowCallStack cloned = new DefaultFlowCallStack();
-        for (int i = 0; i < innerStack.size(); ++i)
-        {
-            cloned.innerStack.push(innerStack.get(i));
-        }
-
-        return cloned;
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder stackString = new StringBuilder();
-        for (int i = innerStack.size() - 1; i >= 0; --i)
-        {
-            stackString.append("at ").append(innerStack.get(i).toString());
-            if (i != 0)
-            {
-                stackString.append(System.lineSeparator());
-            }
-        }
-        return stackString.toString();
-    }
+    return stackString.toString();
+  }
 }

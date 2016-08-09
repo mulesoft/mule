@@ -26,57 +26,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components
- * provided by the mule spring security module.
+ * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components provided by the mule
+ * spring security module.
  *
  * @since 4.0
  */
-public class MuleSecurityComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
-{
+public class MuleSecurityComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-    @Override
-    public void init(MuleContext muleContext)
-    {
-    }
+  @Override
+  public void init(MuleContext muleContext) {}
 
-    @Override
-    public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
-    {
-        List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-        ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(MULE_SS_NAMESPACE);
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
+    ComponentBuildingDefinition.Builder baseDefinition =
+        new ComponentBuildingDefinition.Builder().withNamespace(MULE_SS_NAMESPACE);
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("security-manager")
-                                                 .withTypeDefinition(fromType(SecurityManager.class))
-                                                 .withObjectFactoryType(MuleSecurityManagerConfigurator.class)
-                                                 .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                                                 .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                                                 .withSetterParameterDefinition("providers", fromChildCollectionConfiguration(SecurityProvider.class).build())
-                                                 .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("security-manager")
+        .withTypeDefinition(fromType(SecurityManager.class)).withObjectFactoryType(MuleSecurityManagerConfigurator.class)
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("providers", fromChildCollectionConfiguration(SecurityProvider.class).build()).build());
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("delegate-security-provider")
-                                                 .withTypeDefinition(fromType(SpringProviderAdapter.class))
-                                                 .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                                                 .withSetterParameterDefinition("securityProperties", fromChildCollectionConfiguration(SecurityProperty.class).build())
-                                                 .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("delegate-ref").build())
-                                                 .withSetterParameterDefinition("authenticationProvider", fromSimpleReferenceParameter("authenticationProvider-ref").build())
-                                                 .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("delegate-security-provider")
+        .withTypeDefinition(fromType(SpringProviderAdapter.class))
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("securityProperties", fromChildCollectionConfiguration(SecurityProperty.class).build())
+        .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("delegate-ref").build())
+        .withSetterParameterDefinition("authenticationProvider",
+                                       fromSimpleReferenceParameter("authenticationProvider-ref").build())
+        .build());
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("security-property")
-                                                 .withTypeDefinition(fromType(SecurityProperty.class))
-                                                 .withConstructorParameterDefinition(fromSimpleParameter("name").build())
-                                                 .withConstructorParameterDefinition(fromSimpleParameter("value").build())
-                                                 .build());
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier("security-property").withTypeDefinition(fromType(SecurityProperty.class))
+            .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+            .withConstructorParameterDefinition(fromSimpleParameter("value").build()).build());
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("authorization-filter")
-                                                 .withTypeDefinition(fromType(AuthorizationFilter.class))
-                                                 .withSetterParameterDefinition("requiredAuthorities", fromSimpleParameter("requiredAuthorities", (value) -> asList(((String) value).split(","))
-                                                         .stream()
-                                                         .map(String::trim).collect(toList())).build())
-                                                 .build());
-        return componentBuildingDefinitions;
-    }
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("authorization-filter")
+        .withTypeDefinition(fromType(AuthorizationFilter.class))
+        .withSetterParameterDefinition("requiredAuthorities",
+                                       fromSimpleParameter("requiredAuthorities", (value) -> asList(((String) value).split(","))
+                                           .stream().map(String::trim).collect(toList())).build())
+        .build());
+    return componentBuildingDefinitions;
+  }
 }

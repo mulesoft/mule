@@ -25,60 +25,49 @@ import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class BasicTypeMetadataVisitorTestCase extends AbstractMuleTestCase
-{
+public class BasicTypeMetadataVisitorTestCase extends AbstractMuleTestCase {
 
-    private static final BaseTypeBuilder<?> BUILDER = BaseTypeBuilder.create(JAVA);
+  private static final BaseTypeBuilder<?> BUILDER = BaseTypeBuilder.create(JAVA);
 
-    @Parameters(name = "isSimpleType({0})")
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {BUILDER.stringType().build(), true},
-                {BUILDER.numberType().build(), true},
-                {BUILDER.booleanType().build(), true},
-                {BUILDER.objectType().build(), false},
-                {BUILDER.arrayType().of(BUILDER.stringType()).build(), false},
-                {BUILDER.dateTimeType().build(), false}
-        });
+  @Parameters(name = "isSimpleType({0})")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{BUILDER.stringType().build(), true}, {BUILDER.numberType().build(), true},
+        {BUILDER.booleanType().build(), true}, {BUILDER.objectType().build(), false},
+        {BUILDER.arrayType().of(BUILDER.stringType()).build(), false}, {BUILDER.dateTimeType().build(), false}});
+  }
+
+  @Parameterized.Parameter(0)
+  public MetadataType metadataType;
+
+  @Parameterized.Parameter(1)
+  public boolean expectedSimple;
+
+  private BasicTypeMetadataVisitor visitor = new BasicTypeMetadataVisitor() {
+
+    @Override
+    protected void visitBasicType(MetadataType metadataType) {
+      simpleType = true;
     }
 
-    @Parameterized.Parameter(0)
-    public MetadataType metadataType;
-
-    @Parameterized.Parameter(1)
-    public boolean expectedSimple;
-
-    private BasicTypeMetadataVisitor visitor = new BasicTypeMetadataVisitor()
-    {
-        @Override
-        protected void visitBasicType(MetadataType metadataType)
-        {
-            simpleType = true;
-        }
-
-        @Override
-        protected void defaultVisit(MetadataType metadataType)
-        {
-            complexType = true;
-        }
-    };
-
-    private boolean simpleType;
-    private boolean complexType;
-
-    @Before
-    public void before()
-    {
-        simpleType = false;
-        complexType = false;
+    @Override
+    protected void defaultVisit(MetadataType metadataType) {
+      complexType = true;
     }
+  };
 
-    @Test
-    public void assertSimpleOrNot()
-    {
-        metadataType.accept(visitor);
-        assertThat(simpleType, is(expectedSimple));
-        assertThat(complexType, is(!expectedSimple));
-    }
+  private boolean simpleType;
+  private boolean complexType;
+
+  @Before
+  public void before() {
+    simpleType = false;
+    complexType = false;
+  }
+
+  @Test
+  public void assertSimpleOrNot() {
+    metadataType.accept(visitor);
+    assertThat(simpleType, is(expectedSimple));
+    assertThat(complexType, is(!expectedSimple));
+  }
 }

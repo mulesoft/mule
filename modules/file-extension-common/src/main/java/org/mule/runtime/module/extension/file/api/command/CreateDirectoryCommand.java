@@ -14,14 +14,13 @@ import org.mule.runtime.module.extension.file.api.FileSystem;
  *
  * @since 4.0
  */
-public interface CreateDirectoryCommand
-{
+public interface CreateDirectoryCommand {
 
-    /**
-     * Creates a directory under the considerations of {@link FileSystem#createDirectory(FileConnectorConfig, String)}
-     *
-     * @param config        the config that is parameterizing this operation
-     * @param directoryName the new directory's new name
-     */
-    void createDirectory(FileConnectorConfig config, String directoryName);
+  /**
+   * Creates a directory under the considerations of {@link FileSystem#createDirectory(FileConnectorConfig, String)}
+   *
+   * @param config the config that is parameterizing this operation
+   * @param directoryName the new directory's new name
+   */
+  void createDirectory(FileConnectorConfig config, String directoryName);
 }

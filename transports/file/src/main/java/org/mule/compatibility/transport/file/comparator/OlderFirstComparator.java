@@ -14,37 +14,31 @@ import java.text.MessageFormat;
 import java.util.Comparator;
 
 /**
- * <p><code>OlderComparatorComparator</code> is a {@link Comparator} of File
- * which is capable of comparing files for equality based on their modification dates.</p>
+ * <p>
+ * <code>OlderComparatorComparator</code> is a {@link Comparator} of File which is capable of comparing files for equality based
+ * on their modification dates.
+ * </p>
  */
-public class OlderFirstComparator implements Comparator
-{
-    @Override
-    public int compare(Object o1, Object o2)
-    {
-        if (o1 instanceof File && o2 instanceof File)
-        {
-            File f = (File) o1;
-            File f1 = (File) o2;
-            boolean fileNewer = FileUtils.isFileNewer(f, f1);
-            boolean fileOlder = FileUtils.isFileOlder(f, f1);
-            if (!fileNewer && !fileOlder)
-            {
-                return 0;
-            }
-            else if (fileNewer)
-            {
-                return 1;
-            }
-            else
-            {
-                return -1;
-            }
+public class OlderFirstComparator implements Comparator {
 
-        }
-        throw new IllegalArgumentException(MessageFormat.format(
-                "Expected java.io.File instance, but was {0} and {1}",
-                ClassUtils.getShortClassName(o1, "<null>"),
-                ClassUtils.getShortClassName(o2, "<null")));
+  @Override
+  public int compare(Object o1, Object o2) {
+    if (o1 instanceof File && o2 instanceof File) {
+      File f = (File) o1;
+      File f1 = (File) o2;
+      boolean fileNewer = FileUtils.isFileNewer(f, f1);
+      boolean fileOlder = FileUtils.isFileOlder(f, f1);
+      if (!fileNewer && !fileOlder) {
+        return 0;
+      } else if (fileNewer) {
+        return 1;
+      } else {
+        return -1;
+      }
+
     }
+    throw new IllegalArgumentException(MessageFormat.format("Expected java.io.File instance, but was {0} and {1}",
+                                                            ClassUtils.getShortClassName(o1, "<null>"),
+                                                            ClassUtils.getShortClassName(o2, "<null")));
+  }
 }

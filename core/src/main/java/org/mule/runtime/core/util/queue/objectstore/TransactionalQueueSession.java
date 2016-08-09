@@ -25,234 +25,170 @@ import org.slf4j.LoggerFactory;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-class TransactionalQueueSession extends DefaultXASession implements QueueSession
-{
-    private Logger logger = LoggerFactory.getLogger(org.mule.runtime.core.util.queue.TransactionalQueueSession.class);
+class TransactionalQueueSession extends DefaultXASession implements QueueSession {
 
-    protected TransactionalQueueManager queueManager;
+  private Logger logger = LoggerFactory.getLogger(org.mule.runtime.core.util.queue.TransactionalQueueSession.class);
 
-    public TransactionalQueueSession(AbstractXAResourceManager resourceManager,
-                                     TransactionalQueueManager queueManager)
-    {
-        super(resourceManager);
-        this.queueManager = queueManager;
+  protected TransactionalQueueManager queueManager;
+
+  public TransactionalQueueSession(AbstractXAResourceManager resourceManager, TransactionalQueueManager queueManager) {
+    super(resourceManager);
+    this.queueManager = queueManager;
+  }
+
+  @Override
+  public Queue getQueue(String name) {
+    QueueInfo queue = queueManager.getQueue(name);
+    return new QueueImpl(queue);
+  }
+
+  protected class QueueImpl implements Queue {
+
+    protected QueueInfo queue;
+
+    public QueueImpl(QueueInfo queue) {
+      this.queue = queue;
     }
 
     @Override
-    public Queue getQueue(String name)
-    {
-        QueueInfo queue = queueManager.getQueue(name);
-        return new QueueImpl(queue);
+    public void put(Serializable item) throws InterruptedException, ObjectStoreException {
+      offer(item, Long.MAX_VALUE);
     }
 
-    protected class QueueImpl implements Queue
-    {
-        protected QueueInfo queue;
-
-        public QueueImpl(QueueInfo queue)
-        {
-            this.queue = queue;
+    @Override
+    public void clear() throws InterruptedException {
+      if (localContext != null && !queue.isQueueTransactional()) {
+        ((QueueTransactionContext) localContext).clear(queue);
+      } else {
+        try {
+          queueManager.doClear(queue);
+        } catch (ObjectStoreException e) {
+          throw new RuntimeException(e);
         }
-
-        @Override
-        public void put(Serializable item) throws InterruptedException, ObjectStoreException
-        {
-            offer(item, Long.MAX_VALUE);
-        }
-
-        @Override
-        public void clear() throws InterruptedException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                ((QueueTransactionContext) localContext).clear(queue);
-            }
-            else
-            {
-                try
-                {
-                    queueManager.doClear(queue);
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        @Override
-        public boolean offer(Serializable item, long timeout)
-            throws InterruptedException, ObjectStoreException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
-            }
-            else
-            {
-                try
-                {
-                    Serializable id = queueManager.doStore(queue, item);
-                    try
-                    {
-                        if (!queue.offer(id, 0, timeout))
-                        {
-                            queueManager.doRemove(queue, id);
-                            return false;
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
-                    catch (InterruptedException e)
-                    {
-                        queueManager.doRemove(queue, id);
-                        throw e;
-                    }
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        @Override
-        public Serializable take() throws InterruptedException
-        {
-            return poll(Long.MAX_VALUE);
-        }
-
-        @Override
-        public void untake(Serializable item) throws InterruptedException, ObjectStoreException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                ((QueueTransactionContext) localContext).untake(queue, item);
-            }
-            else
-            {
-                Serializable id = queueManager.doStore(queue, item);
-                queue.untake(id);
-            }
-        }
-
-        @Override
-        public Serializable poll(long timeout) throws InterruptedException
-        {
-            try
-            {
-                if (localContext != null && !queue.isQueueTransactional())
-                {
-                    Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
-                    return postProcessIfNeeded(item);
-                }
-                else if (queue.canTakeFromStore())
-                {
-                    Serializable item = queue.takeNextItemFromStore(timeout);
-                    return postProcessIfNeeded(item);
-                }
-                else
-                {
-                    Serializable id = queue.poll(timeout);
-                    if (id != null)
-                    {
-                        Serializable item = queueManager.doLoad(queue, id);
-                        if (item != null)
-                        {
-                            queueManager.doRemove(queue, id);
-                        }
-                        return postProcessIfNeeded(item);
-                    }
-                    return null;
-                }
-            }
-            catch (InterruptedException iex)
-            {
-                if (!queueManager.getMuleContext().isStopping())
-                {
-                    throw iex;
-                }
-                // if stopping, ignore
-                return null;
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public Serializable peek() throws InterruptedException
-        {
-            try
-            {
-                if (localContext != null && !queue.isQueueTransactional())
-                {
-                    Serializable item = ((QueueTransactionContext) localContext).peek(queue);
-                    return postProcessIfNeeded(item);
-                }
-                else
-                {
-                    Serializable id = queue.peek();
-                    if (id != null)
-                    {
-                        Serializable item = queueManager.doLoad(queue, id);
-                        return postProcessIfNeeded(item);
-                    }
-                    return null;
-                }
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        
-        @Override
-        public void dispose() throws MuleException, InterruptedException
-        {
-            queueManager.disposeQueue(this);
-        }
-
-        @Override
-        public int size()
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                return ((QueueTransactionContext) localContext).size(queue);
-            }
-            else
-            {
-                return queue.getSize();
-            }
-        }
-
-        @Override
-        public String getName()
-        {
-            return queue.getName();
-        }
-
-        /**
-         * Note -- this must handle null items
-         */
-        private Serializable postProcessIfNeeded(Serializable item)
-        {
-            try
-            {
-                if (item instanceof DeserializationPostInitialisable)
-                {
-                    DeserializationPostInitialisable.Implementation.init(item, queueManager.getMuleContext());
-                }
-                return item;
-            }
-            catch (Exception e)
-            {
-                logger.warn("Unable to deserialize message", e);
-                return null;
-            }
-        }
+      }
     }
+
+    @Override
+    public boolean offer(Serializable item, long timeout) throws InterruptedException, ObjectStoreException {
+      if (localContext != null && !queue.isQueueTransactional()) {
+        return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
+      } else {
+        try {
+          Serializable id = queueManager.doStore(queue, item);
+          try {
+            if (!queue.offer(id, 0, timeout)) {
+              queueManager.doRemove(queue, id);
+              return false;
+            } else {
+              return true;
+            }
+          } catch (InterruptedException e) {
+            queueManager.doRemove(queue, id);
+            throw e;
+          }
+        } catch (ObjectStoreException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+
+    @Override
+    public Serializable take() throws InterruptedException {
+      return poll(Long.MAX_VALUE);
+    }
+
+    @Override
+    public void untake(Serializable item) throws InterruptedException, ObjectStoreException {
+      if (localContext != null && !queue.isQueueTransactional()) {
+        ((QueueTransactionContext) localContext).untake(queue, item);
+      } else {
+        Serializable id = queueManager.doStore(queue, item);
+        queue.untake(id);
+      }
+    }
+
+    @Override
+    public Serializable poll(long timeout) throws InterruptedException {
+      try {
+        if (localContext != null && !queue.isQueueTransactional()) {
+          Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
+          return postProcessIfNeeded(item);
+        } else if (queue.canTakeFromStore()) {
+          Serializable item = queue.takeNextItemFromStore(timeout);
+          return postProcessIfNeeded(item);
+        } else {
+          Serializable id = queue.poll(timeout);
+          if (id != null) {
+            Serializable item = queueManager.doLoad(queue, id);
+            if (item != null) {
+              queueManager.doRemove(queue, id);
+            }
+            return postProcessIfNeeded(item);
+          }
+          return null;
+        }
+      } catch (InterruptedException iex) {
+        if (!queueManager.getMuleContext().isStopping()) {
+          throw iex;
+        }
+        // if stopping, ignore
+        return null;
+      } catch (ObjectStoreException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    @Override
+    public Serializable peek() throws InterruptedException {
+      try {
+        if (localContext != null && !queue.isQueueTransactional()) {
+          Serializable item = ((QueueTransactionContext) localContext).peek(queue);
+          return postProcessIfNeeded(item);
+        } else {
+          Serializable id = queue.peek();
+          if (id != null) {
+            Serializable item = queueManager.doLoad(queue, id);
+            return postProcessIfNeeded(item);
+          }
+          return null;
+        }
+      } catch (ObjectStoreException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    @Override
+    public void dispose() throws MuleException, InterruptedException {
+      queueManager.disposeQueue(this);
+    }
+
+    @Override
+    public int size() {
+      if (localContext != null && !queue.isQueueTransactional()) {
+        return ((QueueTransactionContext) localContext).size(queue);
+      } else {
+        return queue.getSize();
+      }
+    }
+
+    @Override
+    public String getName() {
+      return queue.getName();
+    }
+
+    /**
+     * Note -- this must handle null items
+     */
+    private Serializable postProcessIfNeeded(Serializable item) {
+      try {
+        if (item instanceof DeserializationPostInitialisable) {
+          DeserializationPostInitialisable.Implementation.init(item, queueManager.getMuleContext());
+        }
+        return item;
+      } catch (Exception e) {
+        logger.warn("Unable to deserialize message", e);
+        return null;
+      }
+    }
+  }
 }

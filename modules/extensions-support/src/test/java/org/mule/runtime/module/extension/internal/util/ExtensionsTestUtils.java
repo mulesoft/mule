@@ -45,144 +45,121 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 
-public abstract class ExtensionsTestUtils
-{
+public abstract class ExtensionsTestUtils {
 
-    public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    public static final BaseTypeBuilder<?> TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  public static final BaseTypeBuilder<?> TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
 
-    public static final String HELLO_WORLD = "Hello World!";
+  public static final String HELLO_WORLD = "Hello World!";
 
-    public static MetadataType toMetadataType(Class<?> type)
-    {
-        return TYPE_LOADER.load(type);
+  public static MetadataType toMetadataType(Class<?> type) {
+    return TYPE_LOADER.load(type);
+  }
+
+  public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
+    ArrayTypeBuilder<?> arrayTypeBuilder = TYPE_BUILDER.arrayType();
+    arrayTypeBuilder.id(clazz.getName());
+    arrayTypeBuilder.of(itemType);
+
+    return arrayTypeBuilder.build();
+  }
+
+  public static DictionaryType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> keyTypeBuilder,
+                                            TypeBuilder<?> valueTypeBuilder) {
+    return TYPE_BUILDER.dictionaryType().id(clazz.getName()).ofKey(keyTypeBuilder).ofValue(valueTypeBuilder).build();
+  }
+
+  public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz) {
+    BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+    final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager();
+    typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
+
+    return typeBuilder;
+  }
+
+  public static ValueResolver getResolver(Object value) throws Exception {
+    return getResolver(value, null, true);
+  }
+
+  public static ValueResolver getResolver(Object value, MuleEvent event, boolean dynamic, Class<?>... extraInterfaces)
+      throws Exception {
+    ValueResolver resolver;
+    if (ArrayUtils.isEmpty(extraInterfaces)) {
+      resolver = mock(ValueResolver.class);
+    } else {
+      resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
     }
 
-    public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType)
-    {
-        ArrayTypeBuilder<?> arrayTypeBuilder = TYPE_BUILDER.arrayType();
-        arrayTypeBuilder.id(clazz.getName());
-        arrayTypeBuilder.of(itemType);
+    when(resolver.resolve(event != null ? same(event) : any(MuleEvent.class))).thenReturn(value);
+    when(resolver.isDynamic()).thenReturn(dynamic);
 
-        return arrayTypeBuilder.build();
-    }
+    return resolver;
+  }
 
-    public static DictionaryType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> keyTypeBuilder, TypeBuilder<?> valueTypeBuilder)
-    {
-        return TYPE_BUILDER.dictionaryType().id(clazz.getName())
-                .ofKey(keyTypeBuilder)
-                .ofValue(valueTypeBuilder)
-                .build();
-    }
+  public static ParameterModel getParameter(String name, Class<?> type) {
+    ParameterModel parameterModel = mock(ParameterModel.class);
+    when(parameterModel.getName()).thenReturn(name);
+    when(parameterModel.getType()).thenReturn(toMetadataType(type));
+    when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
 
-    public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz)
-    {
-        BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-        final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager();
-        typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
+    return parameterModel;
+  }
 
-        return typeBuilder;
-    }
-
-    public static ValueResolver getResolver(Object value) throws Exception
-    {
-        return getResolver(value, null, true);
-    }
-
-    public static ValueResolver getResolver(Object value, MuleEvent event, boolean dynamic, Class<?>... extraInterfaces) throws Exception
-    {
-        ValueResolver resolver;
-        if (ArrayUtils.isEmpty(extraInterfaces))
-        {
-            resolver = mock(ValueResolver.class);
+  public static void stubRegistryKeys(MuleContext muleContext, final String... keys) {
+    when(muleContext.getRegistry().get(anyString())).thenAnswer(invocation -> {
+      String name = (String) invocation.getArguments()[0];
+      if (name != null) {
+        for (String key : keys) {
+          if (name.contains(key)) {
+            return null;
+          }
         }
-        else
-        {
-            resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
-        }
+      }
 
-        when(resolver.resolve(event != null ? same(event) : any(MuleEvent.class))).thenReturn(value);
-        when(resolver.isDynamic()).thenReturn(dynamic);
+      return RETURNS_DEEP_STUBS.get().answer(invocation);
+    });
+  }
 
-        return resolver;
+  public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception {
+    return (C) getConfigurationInstanceFromRegistry(key, muleEvent).getValue();
+  }
+
+  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception {
+    ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
+    return extensionManager.getConfiguration(key, muleEvent);
+  }
+
+  /**
+   * Receives to {@link String} representation of two XML files and verify that they are semantically equivalent
+   *
+   * @param expected the reference content
+   * @param actual the actual content
+   * @throws Exception if comparison fails
+   */
+  public static void compareXML(String expected, String actual) throws Exception {
+    XMLUnit.setNormalizeWhitespace(true);
+    XMLUnit.setIgnoreWhitespace(true);
+    XMLUnit.setIgnoreComments(true);
+    XMLUnit.setIgnoreAttributeOrder(false);
+
+    Diff diff = XMLUnit.compareXML(expected, actual);
+    if (!(diff.similar() && diff.identical())) {
+      System.out.println(actual);
+      DetailedDiff detDiff = new DetailedDiff(diff);
+      @SuppressWarnings("rawtypes")
+      List differences = detDiff.getAllDifferences();
+      StringBuilder diffLines = new StringBuilder();
+      for (Object object : differences) {
+        Difference difference = (Difference) object;
+        diffLines.append(difference.toString() + '\n');
+      }
+
+      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
     }
+  }
 
-    public static ParameterModel getParameter(String name, Class<?> type)
-    {
-        ParameterModel parameterModel = mock(ParameterModel.class);
-        when(parameterModel.getName()).thenReturn(name);
-        when(parameterModel.getType()).thenReturn(toMetadataType(type));
-        when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
-
-        return parameterModel;
-    }
-
-    public static void stubRegistryKeys(MuleContext muleContext, final String... keys)
-    {
-        when(muleContext.getRegistry().get(anyString())).thenAnswer(invocation -> {
-            String name = (String) invocation.getArguments()[0];
-            if (name != null)
-            {
-                for (String key : keys)
-                {
-                    if (name.contains(key))
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            return RETURNS_DEEP_STUBS.get().answer(invocation);
-        });
-    }
-
-    public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
-    {
-        return (C) getConfigurationInstanceFromRegistry(key, muleEvent).getValue();
-    }
-
-    public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception
-    {
-        ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
-        return extensionManager.getConfiguration(key, muleEvent);
-    }
-
-    /**
-     * Receives to {@link String} representation of two XML
-     * files and verify that they are semantically equivalent
-     *
-     * @param expected the reference content
-     * @param actual   the actual content
-     * @throws Exception if comparison fails
-     */
-    public static void compareXML(String expected, String actual) throws Exception
-    {
-        XMLUnit.setNormalizeWhitespace(true);
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreComments(true);
-        XMLUnit.setIgnoreAttributeOrder(false);
-
-        Diff diff = XMLUnit.compareXML(expected, actual);
-        if (!(diff.similar() && diff.identical()))
-        {
-            System.out.println(actual);
-            DetailedDiff detDiff = new DetailedDiff(diff);
-            @SuppressWarnings("rawtypes")
-            List differences = detDiff.getAllDifferences();
-            StringBuilder diffLines = new StringBuilder();
-            for (Object object : differences)
-            {
-                Difference difference = (Difference) object;
-                diffLines.append(difference.toString() + '\n');
-            }
-
-            throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
-        }
-    }
-
-    public static void mockClassLoaderModelProperty(ExtensionModel extensionModel, ClassLoader classLoader)
-    {
-        when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(
-                new ClassLoaderModelProperty(classLoader)));
-    }
+  public static void mockClassLoaderModelProperty(ExtensionModel extensionModel, ClassLoader classLoader) {
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class))
+        .thenReturn(Optional.of(new ClassLoaderModelProperty(classLoader)));
+  }
 }

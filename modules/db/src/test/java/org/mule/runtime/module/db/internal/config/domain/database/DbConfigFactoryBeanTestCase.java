@@ -19,27 +19,24 @@ import java.util.Collections;
 import org.junit.Test;
 
 @SmallTest
-public class DbConfigFactoryBeanTestCase extends AbstractMuleTestCase
-{
+public class DbConfigFactoryBeanTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void disposesDataSourceFactory() throws Exception
-    {
-        final DataSourceFactory dataSourceFactory = mock(DataSourceFactory.class);
+  @Test
+  public void disposesDataSourceFactory() throws Exception {
+    final DataSourceFactory dataSourceFactory = mock(DataSourceFactory.class);
 
-        DbConfigResolverFactoryBean dbConfigFactoryBean = new DbConfigResolverFactoryBean()
-        {
-            @Override
-            protected DataSourceFactory createDataSourceFactory()
-            {
-                return dataSourceFactory;
-            }
-        };
-        dbConfigFactoryBean.setCustomDataTypes(Collections.<DbType>emptyList());
-        dbConfigFactoryBean.createInstance();
+    DbConfigResolverFactoryBean dbConfigFactoryBean = new DbConfigResolverFactoryBean() {
 
-        dbConfigFactoryBean.dispose();
+      @Override
+      protected DataSourceFactory createDataSourceFactory() {
+        return dataSourceFactory;
+      }
+    };
+    dbConfigFactoryBean.setCustomDataTypes(Collections.<DbType>emptyList());
+    dbConfigFactoryBean.createInstance();
 
-        verify(dataSourceFactory).dispose();
-    }
+    dbConfigFactoryBean.dispose();
+
+    verify(dataSourceFactory).dispose();
+  }
 }

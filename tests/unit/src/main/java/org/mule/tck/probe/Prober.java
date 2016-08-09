@@ -9,8 +9,7 @@ package org.mule.tck.probe;
 /**
  * Checks wheter a given {@link Probe} is satisfied or not.
  */
-public interface Prober
-{
+public interface Prober {
 
-    void check(Probe probe);
+  void check(Probe probe);
 }

@@ -20,105 +20,82 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * SecretKey based encryption using JCE. Users must specify a key as an array of
- * bytes. This can be set directly on the strategy or a keyFactory can be specified.
- * A keyFactory is an implementation of {@link SecretKeyFactory} and must return a
- * byte array. The default algorthm used by this strategy is Blowfish, but users can
- * specify any valid algorithm supported by JCE.
+ * SecretKey based encryption using JCE. Users must specify a key as an array of bytes. This can be set directly on the strategy
+ * or a keyFactory can be specified. A keyFactory is an implementation of {@link SecretKeyFactory} and must return a byte array.
+ * The default algorthm used by this strategy is Blowfish, but users can specify any valid algorithm supported by JCE.
  * 
  * @see SecretKeyFactory
- * @deprecated This class is deprecated and will be removed in Mule 4.0. Use
- * {@link PasswordBasedEncryptionStrategy} instead, which follows the correct
- * way of transforming a string password into a cryptographic key
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link PasswordBasedEncryptionStrategy} instead,
+ *             which follows the correct way of transforming a string password into a cryptographic key
  */
 @Deprecated
-public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
-{
+public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy {
 
-    public static final String DEFAULT_ALGORITHM = "Blowfish";
+  public static final String DEFAULT_ALGORITHM = "Blowfish";
 
-    private byte[] key;
-    private SecretKeyFactory keyFactory;
+  private byte[] key;
+  private SecretKeyFactory keyFactory;
 
-    public SecretKeyEncryptionStrategy()
-    {
-        algorithm = DEFAULT_ALGORITHM;
-    }
+  public SecretKeyEncryptionStrategy() {
+    algorithm = DEFAULT_ALGORITHM;
+  }
 
-    public void initialise() throws InitialisationException
-    {
-        if (key == null)
-        {
-            if (keyFactory == null)
-            {
-                throw new InitialisationException(CoreMessages.objectIsNull("Key / KeyFactory"), this);
-            }
-            else
-            {
-                try
-                {
-                    key = keyFactory.getKey();
-                }
-                catch (Exception e)
-                {
-                    throw new InitialisationException(e, this);
-                }
-            }
+  public void initialise() throws InitialisationException {
+    if (key == null) {
+      if (keyFactory == null) {
+        throw new InitialisationException(CoreMessages.objectIsNull("Key / KeyFactory"), this);
+      } else {
+        try {
+          key = keyFactory.getKey();
+        } catch (Exception e) {
+          throw new InitialisationException(e, this);
         }
-        super.initialise();
+      }
     }
+    super.initialise();
+  }
 
-    @Override
-    protected void createAndInitCiphers() throws GeneralSecurityException
-    {
-        encryptCipher = Cipher.getInstance(getAlgorithm());
-        decryptCipher = Cipher.getInstance(getAlgorithm());
+  @Override
+  protected void createAndInitCiphers() throws GeneralSecurityException {
+    encryptCipher = Cipher.getInstance(getAlgorithm());
+    decryptCipher = Cipher.getInstance(getAlgorithm());
 
-        AlgorithmParameterSpec paramSpec = createAlgorithmParameterSpec();
-        if (paramSpec != null)
-        {
-            encryptCipher.init(Cipher.ENCRYPT_MODE, (SecretKeySpec) keySpec, paramSpec);
-            decryptCipher.init(Cipher.DECRYPT_MODE, (SecretKeySpec) keySpec, paramSpec);
-        }
-        else
-        {
-            encryptCipher.init(Cipher.ENCRYPT_MODE, (SecretKeySpec) keySpec);
-            decryptCipher.init(Cipher.DECRYPT_MODE, (SecretKeySpec) keySpec);
-        }
+    AlgorithmParameterSpec paramSpec = createAlgorithmParameterSpec();
+    if (paramSpec != null) {
+      encryptCipher.init(Cipher.ENCRYPT_MODE, (SecretKeySpec) keySpec, paramSpec);
+      decryptCipher.init(Cipher.DECRYPT_MODE, (SecretKeySpec) keySpec, paramSpec);
+    } else {
+      encryptCipher.init(Cipher.ENCRYPT_MODE, (SecretKeySpec) keySpec);
+      decryptCipher.init(Cipher.DECRYPT_MODE, (SecretKeySpec) keySpec);
     }
-    protected KeySpec createKeySpec()
-    {
-        return new SecretKeySpec(key, algorithm);
-    }
+  }
 
-    protected AlgorithmParameterSpec createAlgorithmParameterSpec()
-    {
-        return null;
-    }
+  protected KeySpec createKeySpec() {
+    return new SecretKeySpec(key, algorithm);
+  }
 
-    public void setKey(byte[] rawKey)
-    {
-        this.key = rawKey;
-    }
+  protected AlgorithmParameterSpec createAlgorithmParameterSpec() {
+    return null;
+  }
 
-    public void setKey(String rawKey)
-    {
-        this.key = StringMessageUtils.getBytes(rawKey);
-    }
+  public void setKey(byte[] rawKey) {
+    this.key = rawKey;
+  }
 
-    public SecretKeyFactory getKeyFactory()
-    {
-        return keyFactory;
-    }
+  public void setKey(String rawKey) {
+    this.key = StringMessageUtils.getBytes(rawKey);
+  }
 
-    public void setKeyFactory(SecretKeyFactory keyFactory)
-    {
-        this.keyFactory = keyFactory;
-    }
+  public SecretKeyFactory getKeyFactory() {
+    return keyFactory;
+  }
 
-    protected SecretKey getSecretKey() throws GeneralSecurityException
-    {
-        return KeyGenerator.getInstance(algorithm).generateKey();
-    }
+  public void setKeyFactory(SecretKeyFactory keyFactory) {
+    this.keyFactory = keyFactory;
+  }
+
+  protected SecretKey getSecretKey() throws GeneralSecurityException {
+    return KeyGenerator.getInstance(algorithm).generateKey();
+  }
 
 }

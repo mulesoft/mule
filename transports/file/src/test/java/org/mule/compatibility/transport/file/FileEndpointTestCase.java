@@ -15,83 +15,75 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class FileEndpointTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class FileEndpointTestCase extends AbstractMuleContextEndpointTestCase {
 
-    private EndpointURI newMuleEndpointURI(String text) throws Exception
-    {
-        MuleEndpointURI uri = new MuleEndpointURI(text, muleContext);
-        uri.initialise();
-        return uri;
-    }
+  private EndpointURI newMuleEndpointURI(String text) throws Exception {
+    MuleEndpointURI uri = new MuleEndpointURI(text, muleContext);
+    uri.initialise();
+    return uri;
+  }
 
-    @Test
-    public void testFileUrl() throws Exception
-    {
-        EndpointURI url = newMuleEndpointURI("file:///C:/temp?endpointName=fileEndpoint");
-        assertEquals("file", url.getScheme());
-        assertEquals("/C:/temp", url.getAddress());
-        assertNotNull(url.getEndpointName());
-        assertEquals("fileEndpoint", url.getEndpointName());
-        assertEquals(-1, url.getPort());
-        assertEquals("file:///C:/temp?endpointName=fileEndpoint", url.toString());
-        assertEquals("endpointName=fileEndpoint", url.getQuery());
-        assertEquals(1, url.getParams().size());
-    }
+  @Test
+  public void testFileUrl() throws Exception {
+    EndpointURI url = newMuleEndpointURI("file:///C:/temp?endpointName=fileEndpoint");
+    assertEquals("file", url.getScheme());
+    assertEquals("/C:/temp", url.getAddress());
+    assertNotNull(url.getEndpointName());
+    assertEquals("fileEndpoint", url.getEndpointName());
+    assertEquals(-1, url.getPort());
+    assertEquals("file:///C:/temp?endpointName=fileEndpoint", url.toString());
+    assertEquals("endpointName=fileEndpoint", url.getQuery());
+    assertEquals(1, url.getParams().size());
+  }
 
-    @Test
-    public void testFileUrlWithoutDrive() throws Exception
-    {
-        EndpointURI url = newMuleEndpointURI("file://temp?endpointName=fileEndpoint");
-        assertEquals("file", url.getScheme());
-        assertEquals("temp", url.getAddress());
-        assertNotNull(url.getEndpointName());
-        assertEquals("fileEndpoint", url.getEndpointName());
-        assertEquals(-1, url.getPort());
-        assertEquals("file://temp?endpointName=fileEndpoint", url.toString());
-        assertEquals("endpointName=fileEndpoint", url.getQuery());
-        assertEquals(1, url.getParams().size());
-    }
+  @Test
+  public void testFileUrlWithoutDrive() throws Exception {
+    EndpointURI url = newMuleEndpointURI("file://temp?endpointName=fileEndpoint");
+    assertEquals("file", url.getScheme());
+    assertEquals("temp", url.getAddress());
+    assertNotNull(url.getEndpointName());
+    assertEquals("fileEndpoint", url.getEndpointName());
+    assertEquals(-1, url.getPort());
+    assertEquals("file://temp?endpointName=fileEndpoint", url.toString());
+    assertEquals("endpointName=fileEndpoint", url.getQuery());
+    assertEquals(1, url.getParams().size());
+  }
 
-    @Test
-    public void testRelativeFileUriParentDir() throws Exception
-    {
-        String muleURI = "file://../test-data/in";
-        EndpointURI url = newMuleEndpointURI(muleURI);
+  @Test
+  public void testRelativeFileUriParentDir() throws Exception {
+    String muleURI = "file://../test-data/in";
+    EndpointURI url = newMuleEndpointURI(muleURI);
 
-        assertEquals("../test-data/in", url.getAddress());
-    }
+    assertEquals("../test-data/in", url.getAddress());
+  }
 
-    @Test
-    public void testRelativeFileUriCurrentDir() throws Exception
-    {
-        String muleURI = "file://./test-data/in";
-        EndpointURI url = newMuleEndpointURI(muleURI);
+  @Test
+  public void testRelativeFileUriCurrentDir() throws Exception {
+    String muleURI = "file://./test-data/in";
+    EndpointURI url = newMuleEndpointURI(muleURI);
 
-        assertEquals("./test-data/in", url.getAddress());
-    }
+    assertEquals("./test-data/in", url.getAddress());
+  }
 
-    @Test
-    public void testWinNetworkUri() throws Exception
-    {
-        String muleURI = "file:////192.168.0.1/test/";
-        EndpointURI url = newMuleEndpointURI(muleURI);
+  @Test
+  public void testWinNetworkUri() throws Exception {
+    String muleURI = "file:////192.168.0.1/test/";
+    EndpointURI url = newMuleEndpointURI(muleURI);
 
-        assertEquals("//192.168.0.1/test/", url.getAddress());
-    }
+    assertEquals("//192.168.0.1/test/", url.getAddress());
+  }
 
-    @Test
-    public void testRelativeFileUriAsParameter() throws Exception
-    {
-        EndpointURI url = newMuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");
-        assertEquals("file", url.getScheme());
-        assertEquals("./temp", url.getAddress());
-        assertNotNull(url.getEndpointName());
-        assertEquals("fileEndpoint", url.getEndpointName());
-        assertEquals(-1, url.getPort());
-        assertEquals("file://?address=./temp&endpointName=fileEndpoint", url.toString());
-        assertEquals("address=./temp&endpointName=fileEndpoint", url.getQuery());
-        assertEquals(2, url.getParams().size());
-    }
+  @Test
+  public void testRelativeFileUriAsParameter() throws Exception {
+    EndpointURI url = newMuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");
+    assertEquals("file", url.getScheme());
+    assertEquals("./temp", url.getAddress());
+    assertNotNull(url.getEndpointName());
+    assertEquals("fileEndpoint", url.getEndpointName());
+    assertEquals(-1, url.getPort());
+    assertEquals("file://?address=./temp&endpointName=fileEndpoint", url.toString());
+    assertEquals("address=./temp&endpointName=fileEndpoint", url.getQuery());
+    assertEquals(2, url.getParams().size());
+  }
 
 }

@@ -20,46 +20,36 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * This interceptor is responsible from compressing a message when
- * the Content-Encoding is set to gzip or x-gzip.
- * It won't set the outbound property since it requires that it's
- * previously set. This makes sense since we are proxying.
+ * This interceptor is responsible from compressing a message when the Content-Encoding is set to gzip or x-gzip. It won't set the
+ * outbound property since it requires that it's previously set. This makes sense since we are proxying.
  */
-public class ProxyGZIPOutInterceptor extends AbstractProxyGZIPInterceptor
-{
-    public ProxyGZIPOutInterceptor()
-    {
-        super(Phase.PREPARE_SEND);
-        addAfter(MessageSenderInterceptor.class.getName());
+public class ProxyGZIPOutInterceptor extends AbstractProxyGZIPInterceptor {
+
+  public ProxyGZIPOutInterceptor() {
+    super(Phase.PREPARE_SEND);
+    addAfter(MessageSenderInterceptor.class.getName());
+  }
+
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+    if (event == null || event.getMessage() == null) {
+      return;
     }
 
-    @Override
-    public void handleMessage(Message message) throws Fault
-    {
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    if (isEncoded(event.getMessage())) {
+      OutputStream os = message.getContent(OutputStream.class);
+      if (os == null) {
+        return;
+      }
 
-        if (event == null || event.getMessage() == null)
-        {
-            return;
-        }
-
-        if(isEncoded(event.getMessage()))
-        {
-            OutputStream os = message.getContent(OutputStream.class);
-            if (os == null)
-            {
-                return;
-            }
-
-            try
-            {
-                message.setContent(OutputStream.class, new GZIPOutputStream(os));
-            }
-            catch(IOException io)
-            {
-                throw new Fault(io);
-            }
-        }
+      try {
+        message.setContent(OutputStream.class, new GZIPOutputStream(os));
+      } catch (IOException io) {
+        throw new Fault(io);
+      }
     }
+  }
 
 }

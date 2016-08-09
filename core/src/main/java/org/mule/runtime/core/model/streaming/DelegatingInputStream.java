@@ -9,59 +9,48 @@ package org.mule.runtime.core.model.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DelegatingInputStream extends InputStream
-{
+public class DelegatingInputStream extends InputStream {
 
-    private InputStream delegate;
-    
-    public DelegatingInputStream(InputStream delegate)
-    {
-        this.delegate = delegate;
-    }
+  private InputStream delegate;
 
-    public int available() throws IOException
-    {
-        return delegate.available();
-    }
+  public DelegatingInputStream(InputStream delegate) {
+    this.delegate = delegate;
+  }
 
-    public synchronized void mark(int readlimit)
-    {
-        delegate.mark(readlimit);
-    }
+  public int available() throws IOException {
+    return delegate.available();
+  }
 
-    public boolean markSupported()
-    {
-        return delegate.markSupported();
-    }
+  public synchronized void mark(int readlimit) {
+    delegate.mark(readlimit);
+  }
 
-    public synchronized void reset() throws IOException
-    {
-        delegate.reset();
-    }
+  public boolean markSupported() {
+    return delegate.markSupported();
+  }
 
-    public long skip(long n) throws IOException
-    {
-        return delegate.skip(n);
-    }
+  public synchronized void reset() throws IOException {
+    delegate.reset();
+  }
 
-    public int read() throws IOException
-    {
-        return delegate.read();
-    }
+  public long skip(long n) throws IOException {
+    return delegate.skip(n);
+  }
 
-    public int read(byte b[]) throws IOException
-    {
-        return delegate.read(b);
-    }
+  public int read() throws IOException {
+    return delegate.read();
+  }
 
-    public int read(byte b[], int off, int len) throws IOException
-    {
-        return delegate.read(b, off, len);
-    }
+  public int read(byte b[]) throws IOException {
+    return delegate.read(b);
+  }
 
-    public void close() throws IOException
-    {
-        delegate.close();
-    }
+  public int read(byte b[], int off, int len) throws IOException {
+    return delegate.read(b, off, len);
+  }
+
+  public void close() throws IOException {
+    delegate.close();
+  }
 
 }

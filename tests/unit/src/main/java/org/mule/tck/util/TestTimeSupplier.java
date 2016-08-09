@@ -12,54 +12,47 @@ import org.mule.runtime.core.time.TimeSupplier;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A test {@link TimeSupplier} for externalizing the system time. It is initialised at a given
- * initial {@link #timeInMillis} using the {@link #TestTimeSupplier(long)} constructor. The value can be
- * retrieved through the {@link #get()} method.
+ * A test {@link TimeSupplier} for externalizing the system time. It is initialised at a given initial {@link #timeInMillis} using
+ * the {@link #TestTimeSupplier(long)} constructor. The value can be retrieved through the {@link #get()} method.
  * <p/>
- * The usefulness of ths class comes from the behavior provided by the {@link #move(long, TimeUnit)}
- * method which allows changing that value per the tests needs. After invoking this method, you can retrieved
- * the modified value through the {@link #get()} method, although there's no way to retrieve the original one after
- * {@link #move(long, TimeUnit)} has been invoked.
+ * The usefulness of ths class comes from the behavior provided by the {@link #move(long, TimeUnit)} method which allows changing
+ * that value per the tests needs. After invoking this method, you can retrieved the modified value through the {@link #get()}
+ * method, although there's no way to retrieve the original one after {@link #move(long, TimeUnit)} has been invoked.
  *
  * @since 4.0
  */
-public class TestTimeSupplier extends TimeSupplier
-{
+public class TestTimeSupplier extends TimeSupplier {
 
-    private long timeInMillis;
+  private long timeInMillis;
 
-    /**
-     * Creates a new instance
-     *
-     * @param timeInMillis time in milliseconds to be supplied until its modified by {@link #move(long, TimeUnit)}
-     */
-    public TestTimeSupplier(long timeInMillis)
-    {
-        this.timeInMillis = timeInMillis;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param timeInMillis time in milliseconds to be supplied until its modified by {@link #move(long, TimeUnit)}
+   */
+  public TestTimeSupplier(long timeInMillis) {
+    this.timeInMillis = timeInMillis;
+  }
 
-    /**
-     * Returns the current virtualized time in milliseconds
-     */
-    @Override
-    public Long get()
-    {
-        return timeInMillis;
-    }
+  /**
+   * Returns the current virtualized time in milliseconds
+   */
+  @Override
+  public Long get() {
+    return timeInMillis;
+  }
 
-    /**
-     * Moves the current {@link #timeInMillis} by the given {@code time} which is expressed
-     * in the given {@code unit}.
-     * <p/>
-     *
-     * @param timeOffset the offset to be applied on {@link #timeInMillis}
-     * @param unit       a {@link TimeUnit} which qualifies the {@code timeOffset}
-     * @return the updated {@link #timeInMillis}
-     * @throws IllegalArgumentException if {@code timeOffset} is negative
-     */
-    public long move(long timeOffset, TimeUnit unit)
-    {
-        checkArgument(timeOffset >= 0, "I told you not to go into the past McFly...");
-        return this.timeInMillis += unit.toMillis(timeOffset);
-    }
+  /**
+   * Moves the current {@link #timeInMillis} by the given {@code time} which is expressed in the given {@code unit}.
+   * <p/>
+   *
+   * @param timeOffset the offset to be applied on {@link #timeInMillis}
+   * @param unit a {@link TimeUnit} which qualifies the {@code timeOffset}
+   * @return the updated {@link #timeInMillis}
+   * @throws IllegalArgumentException if {@code timeOffset} is negative
+   */
+  public long move(long timeOffset, TimeUnit unit) {
+    checkArgument(timeOffset >= 0, "I told you not to go into the past McFly...");
+    return this.timeInMillis += unit.toMillis(timeOffset);
+  }
 }

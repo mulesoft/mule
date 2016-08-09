@@ -17,57 +17,49 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  *
- * Routes a message through a set of routes that will be obtained
- * dynamically (per message) using a {@link DynamicRouteResolver}.
+ * Routes a message through a set of routes that will be obtained dynamically (per message) using a {@link DynamicRouteResolver}.
  *
- * The message will be route to the first route, if the route execution is successful then
- * execution ends, if not the message will be route to the next route. This continues until a
- * successful route is found.
+ * The message will be route to the first route, if the route execution is successful then execution ends, if not the message will
+ * be route to the next route. This continues until a successful route is found.
  *
  */
-public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, MuleContextAware
-{
-    private FirstSuccessfulRoutingStrategy routingStrategy;
-    private MuleContext muleContext;
-    private String failureExpression;
-    private DynamicRouteResolver dynamicRouteResolver;
+public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, MuleContextAware {
+
+  private FirstSuccessfulRoutingStrategy routingStrategy;
+  private MuleContext muleContext;
+  private String failureExpression;
+  private DynamicRouteResolver dynamicRouteResolver;
 
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return routingStrategy.route(event, dynamicRouteResolver.resolveRoutes(event));
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return routingStrategy.route(event, dynamicRouteResolver.resolveRoutes(event));
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, (route, event) -> route.process(event));
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, (route, event) -> route.process(event));
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
-    /**
-     * Specifies an expression that when evaluated as determines if the processing of
-     * one a route was a failure or not.
-     *
-     * @param failureExpression
-     * @see org.mule.runtime.core.routing.filters.ExpressionFilter
-     */
-    public void setFailureExpression(String failureExpression)
-    {
-        this.failureExpression = failureExpression;
-    }
+  /**
+   * Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
+   *
+   * @param failureExpression
+   * @see org.mule.runtime.core.routing.filters.ExpressionFilter
+   */
+  public void setFailureExpression(String failureExpression) {
+    this.failureExpression = failureExpression;
+  }
 
-    /**
-     * @param dynamicRouteResolver custom route resolver to use
-     */
-    public void setDynamicRouteResolver(DynamicRouteResolver dynamicRouteResolver)
-    {
-        this.dynamicRouteResolver = dynamicRouteResolver;
-    }
+  /**
+   * @param dynamicRouteResolver custom route resolver to use
+   */
+  public void setDynamicRouteResolver(DynamicRouteResolver dynamicRouteResolver) {
+    this.dynamicRouteResolver = dynamicRouteResolver;
+  }
 }

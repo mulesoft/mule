@@ -18,36 +18,29 @@ import org.glassfish.grizzly.WriteResult;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 
-public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandler<WriteResult>
-{
+public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandler<WriteResult> {
 
-    protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
-    {
-        final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
-                .status(httpResponse.getStatusCode())
-                .reasonPhrase(httpResponse.getReasonPhrase());
+  protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse) {
+    final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
+        .status(httpResponse.getStatusCode()).reasonPhrase(httpResponse.getReasonPhrase());
 
-        final Collection<String> allHeaders = httpResponse.getHeaderNames();
-        for (String headerName : allHeaders)
-        {
-            final Collection<String> values = httpResponse.getHeaderValues(headerName);
-            for (String value : values)
-            {
-                responsePacketBuilder.header(headerName, value);
-            }
-        }
-        HttpResponsePacket httpResponsePacket = responsePacketBuilder.build();
-        httpResponsePacket.setProtocol(sourceRequest.getProtocol());
-        if (httpResponse.getHeaderValueIgnoreCase(TRANSFER_ENCODING) != null)
-        {
-            httpResponsePacket.setChunked(true);
-        }
-
-        if (CLOSE.equalsIgnoreCase(httpResponsePacket.getHeader(CONNECTION)))
-        {
-            httpResponsePacket.getProcessingState().setKeepAlive(false);
-        }
-        return httpResponsePacket;
+    final Collection<String> allHeaders = httpResponse.getHeaderNames();
+    for (String headerName : allHeaders) {
+      final Collection<String> values = httpResponse.getHeaderValues(headerName);
+      for (String value : values) {
+        responsePacketBuilder.header(headerName, value);
+      }
     }
+    HttpResponsePacket httpResponsePacket = responsePacketBuilder.build();
+    httpResponsePacket.setProtocol(sourceRequest.getProtocol());
+    if (httpResponse.getHeaderValueIgnoreCase(TRANSFER_ENCODING) != null) {
+      httpResponsePacket.setChunked(true);
+    }
+
+    if (CLOSE.equalsIgnoreCase(httpResponsePacket.getHeader(CONNECTION))) {
+      httpResponsePacket.getProcessingState().setKeepAlive(false);
+    }
+    return httpResponsePacket;
+  }
 
 }

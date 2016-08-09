@@ -20,23 +20,21 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class XaTransactionFactoryTestCase extends AbstractMuleTestCase
-{
+public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void setsTransactionTimeout() throws Exception
-    {
-        final int timeout = 1000;
-        final XaTransactionFactory transactionFactory = new XaTransactionFactory();
-        transactionFactory.setTimeout(timeout);
+  @Test
+  public void setsTransactionTimeout() throws Exception {
+    final int timeout = 1000;
+    final XaTransactionFactory transactionFactory = new XaTransactionFactory();
+    transactionFactory.setTimeout(timeout);
 
-        final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
-        final TransactionManager transactionManager = mock(TransactionManager.class);
-        when(muleContext.getTransactionManager()).thenReturn(transactionManager);
+    final TransactionManager transactionManager = mock(TransactionManager.class);
+    when(muleContext.getTransactionManager()).thenReturn(transactionManager);
 
-        final Transaction transaction = transactionFactory.beginTransaction(muleContext);
+    final Transaction transaction = transactionFactory.beginTransaction(muleContext);
 
-        assertThat(transaction.getTimeout(), equalTo(timeout));
-    }
+    assertThat(transaction.getTimeout(), equalTo(timeout));
+  }
 }

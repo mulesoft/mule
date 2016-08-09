@@ -19,22 +19,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class BatchConstraintTestCase extends AbstractMuleTestCase
-{
-    @Test
-    public void testConstraintFilter() throws Exception
-    {
-        MuleEvent testEvent = Mockito.mock(MuleEvent.class);
-        BatchConstraint filter = new BatchConstraint();
-        filter.setBatchSize(3);
-        assertEquals(3, filter.getBatchSize());
-        assertTrue(!filter.accept(testEvent));
+public class BatchConstraintTestCase extends AbstractMuleTestCase {
 
-        ConstraintFilter clone = (ConstraintFilter)filter.clone();
-        assertNotNull(clone);
-        assertNotSame(filter, clone);
+  @Test
+  public void testConstraintFilter() throws Exception {
+    MuleEvent testEvent = Mockito.mock(MuleEvent.class);
+    BatchConstraint filter = new BatchConstraint();
+    filter.setBatchSize(3);
+    assertEquals(3, filter.getBatchSize());
+    assertTrue(!filter.accept(testEvent));
 
-        assertTrue(!filter.accept(testEvent));
-        assertTrue(filter.accept(testEvent));
-    }
+    ConstraintFilter clone = (ConstraintFilter) filter.clone();
+    assertNotNull(clone);
+    assertNotSame(filter, clone);
+
+    assertTrue(!filter.accept(testEvent));
+    assertTrue(filter.accept(testEvent));
+  }
 }

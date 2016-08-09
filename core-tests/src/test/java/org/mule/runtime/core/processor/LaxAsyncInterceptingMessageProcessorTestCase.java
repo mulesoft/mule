@@ -14,63 +14,51 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
 
-public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncInterceptingMessageProcessorTestCase
-{
+public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncInterceptingMessageProcessorTestCase {
 
-    @Override
-    @Test
-    public void testProcessRequestResponse() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+  @Override
+  @Test
+  public void testProcessRequestResponse() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
 
-        assertSync(messageProcessor, event);
+    assertSync(messageProcessor, event);
+  }
+
+  @Override
+  @Test
+  public void testProcessOneWayWithTx() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Transaction transaction = new TestTransaction(muleContext);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+
+    try {
+      assertSync(messageProcessor, event);
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
+  }
 
-    @Override
-    @Test
-    public void testProcessOneWayWithTx() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        Transaction transaction = new TestTransaction(muleContext);
-        TransactionCoordination.getInstance().bindTransaction(transaction);
+  @Override
+  @Test
+  public void testProcessRequestResponseWithTx() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Transaction transaction = new TestTransaction(muleContext);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
 
-        try
-        {
-            assertSync(messageProcessor, event);
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
+    try {
+      assertSync(messageProcessor, event);
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
+  }
 
-    @Override
-    @Test
-    public void testProcessRequestResponseWithTx() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        Transaction transaction = new TestTransaction(muleContext);
-        TransactionCoordination.getInstance().bindTransaction(transaction);
-
-        try
-        {
-            assertSync(messageProcessor, event);
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
-    }
-
-    @Override
-    protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
-        throws Exception
-    {
-        LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource());
-        mp.setMuleContext(muleContext);
-        mp.setListener(listener);
-        return mp;
-    }
+  @Override
+  protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
+      throws Exception {
+    LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor(new TestWorkManagerSource());
+    mp.setMuleContext(muleContext);
+    mp.setListener(listener);
+    return mp;
+  }
 
 }

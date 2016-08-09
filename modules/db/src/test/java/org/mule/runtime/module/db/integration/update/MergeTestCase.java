@@ -26,47 +26,40 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class MergeTestCase extends AbstractDbIntegrationTestCase
-{
+public class MergeTestCase extends AbstractDbIntegrationTestCase {
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    public MergeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public MergeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/merge-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/merge-config.xml"};
+  }
 
-    @Test
-    public void mergesTables() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("merge").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void mergesTables() throws Exception {
+    final MuleEvent responseEvent = flowRunner("merge").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMergeResult(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMergeResult(response);
+  }
 
-    private void assertMergeResult(MuleMessage response) throws SQLException
-    {
-        assertThat((Integer) response.getPayload(), equalTo(3));
-        
-        List<Map<String, String>> result = selectData("select * from PLANET order by ID", getDefaultDataSource());
-        assertRecords(result, createRecord(2), createRecord(3), createRecord(4));
-    }
+  private void assertMergeResult(MuleMessage response) throws SQLException {
+    assertThat((Integer) response.getPayload(), equalTo(3));
 
-    private Record createRecord(int pos)
-    {
-        return new Record(new Field("NAME", "merged"), new Field("POSITION", pos));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET order by ID", getDefaultDataSource());
+    assertRecords(result, createRecord(2), createRecord(3), createRecord(4));
+  }
+
+  private Record createRecord(int pos) {
+    return new Record(new Field("NAME", "merged"), new Field("POSITION", pos));
+  }
 }
 
 

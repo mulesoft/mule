@@ -19,32 +19,28 @@ import java.util.List;
  *
  * @since 4.0
  */
-final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement
-{
+final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
 
-    private final Class<T> aClass;
+  private final Class<T> aClass;
 
-    SourceTypeWrapper(Class<T> aClass)
-    {
-        super(aClass);
-        this.aClass = aClass;
-    }
+  SourceTypeWrapper(Class<T> aClass) {
+    super(aClass);
+    this.aClass = aClass;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<? extends Source> getDeclaredClass()
-    {
-        return aClass;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<? extends Source> getDeclaredClass() {
+    return aClass;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Type> getSuperClassGenerics()
-    {
-        return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Type> getSuperClassGenerics() {
+    return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class);
+  }
 }

@@ -26,10 +26,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -50,31 +53,28 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "selector")
-public class Selector
-        extends Annotated {
+public class Selector extends Annotated {
 
-    @XmlAttribute(name = "xpath", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String xpath;
+  @XmlAttribute(name = "xpath", required = true)
+  @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+  protected String xpath;
 
-    /**
-     * Gets the value of the xpath property.
-     *
-     * @return possible object is
-     *         {@link String }
-     */
-    public String getXpath() {
-        return xpath;
-    }
+  /**
+   * Gets the value of the xpath property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getXpath() {
+    return xpath;
+  }
 
-    /**
-     * Sets the value of the xpath property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setXpath(String value) {
-        this.xpath = value;
-    }
+  /**
+   * Sets the value of the xpath property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setXpath(String value) {
+    this.xpath = value;
+  }
 
 }

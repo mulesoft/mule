@@ -14,31 +14,27 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import org.junit.Test;
 
-public class SourceWithoutConnectedOperationTestCase extends ExtensionFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "vegan-config.xml";
-    }
+public class SourceWithoutConnectedOperationTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {VeganExtension.class};
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vegan-config.xml";
+  }
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        HarvestPeachesSource.isConnected = false;
-        super.doSetUpBeforeMuleContextCreation();
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {VeganExtension.class};
+  }
 
-    @Test
-    public void testSourceIsConnected() throws Exception
-    {
-        new PollingProber(1000, 1000).check(new JUnitLambdaProbe(() -> HarvestPeachesSource.isConnected));
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    HarvestPeachesSource.isConnected = false;
+    super.doSetUpBeforeMuleContextCreation();
+  }
+
+  @Test
+  public void testSourceIsConnected() throws Exception {
+    new PollingProber(1000, 1000).check(new JUnitLambdaProbe(() -> HarvestPeachesSource.isConnected));
+  }
 
 }

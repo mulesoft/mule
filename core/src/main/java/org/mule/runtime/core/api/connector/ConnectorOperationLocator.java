@@ -14,18 +14,18 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 /**
  * Locator for a MessageProcessor which is an operation from a Mule connector that fulfills the operation required.
  */
-public interface ConnectorOperationLocator
-{
+public interface ConnectorOperationLocator {
 
-    /**
-     * Lookup for an operation from a connector
-     *
-     * @param url the URL that identifies the operation
-     * @param operationOptions the options to use to execute the operation
-     * @param exchangePattern the exchange pattern to use for the operation
-     * @return the operation configured for the url and options
-     * @throws MuleException
-     */
-    MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException;
+  /**
+   * Lookup for an operation from a connector
+   *
+   * @param url the URL that identifies the operation
+   * @param operationOptions the options to use to execute the operation
+   * @param exchangePattern the exchange pattern to use for the operation
+   * @return the operation configured for the url and options
+   * @throws MuleException
+   */
+  MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
+      throws MuleException;
 
 }

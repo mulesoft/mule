@@ -14,71 +14,60 @@ import java.util.Collection;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
 
-public class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse
-{
+public class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
-    private final HttpEntity body;
-    private ResponseStatus responseStatus = new ResponseStatus();
-    private MultiMap headers = new MultiValueMap();
+  private final HttpEntity body;
+  private ResponseStatus responseStatus = new ResponseStatus();
+  private MultiMap headers = new MultiValueMap();
 
-    public DefaultHttpResponse(ResponseStatus responseStatus, MultiMap headers, HttpEntity body)
-    {
-        this.responseStatus = responseStatus;
-        this.headers = headers;
-        this.body = body;
+  public DefaultHttpResponse(ResponseStatus responseStatus, MultiMap headers, HttpEntity body) {
+    this.responseStatus = responseStatus;
+    this.headers = headers;
+    this.body = body;
+  }
+
+  @Override
+  public HttpEntity getEntity() {
+    return body;
+  }
+
+  @Override
+  public Collection<String> getHeaderNames() {
+    return headers.keySet();
+  }
+
+  @Override
+  public String getHeaderValue(String headerName) {
+    final Object value = headers.get(headerName);
+    if (value == null) {
+      return null;
     }
+    return (String) ((Collection) value).iterator().next();
+  }
 
-    @Override
-    public HttpEntity getEntity()
-    {
-        return body;
-    }
+  @Override
+  public Collection<String> getHeaderValues(String headerName) {
+    return (Collection<String>) headers.get(headerName);
+  }
 
-    @Override
-    public Collection<String> getHeaderNames()
-    {
-        return headers.keySet();
-    }
+  @Override
+  public int getStatusCode() {
+    return this.responseStatus.getStatusCode();
+  }
 
-    @Override
-    public String getHeaderValue(String headerName)
-    {
-        final Object value = headers.get(headerName);
-        if (value == null)
-        {
-            return null;
-        }
-        return (String) ((Collection)value).iterator().next();
-    }
+  @Override
+  public void setStatusCode(int statusCode) {
+    this.responseStatus.setStatusCode(statusCode);
+  }
 
-    @Override
-    public Collection<String> getHeaderValues(String headerName)
-    {
-        return (Collection<String>) headers.get(headerName);
-    }
+  @Override
+  public String getReasonPhrase() {
+    return this.responseStatus.getReasonPhrase();
+  }
 
-    @Override
-    public int getStatusCode()
-    {
-        return this.responseStatus.getStatusCode();
-    }
-
-    @Override
-    public void setStatusCode(int statusCode)
-    {
-        this.responseStatus.setStatusCode(statusCode);
-    }
-
-    @Override
-    public String getReasonPhrase()
-    {
-        return this.responseStatus.getReasonPhrase();
-    }
-
-    @Override
-    public void setReasonPhrase(String reasonPhrase)
-    {
-        this.responseStatus.setReasonPhrase(reasonPhrase);
-    }
+  @Override
+  public void setReasonPhrase(String reasonPhrase) {
+    this.responseStatus.setReasonPhrase(reasonPhrase);
+  }
 
 }

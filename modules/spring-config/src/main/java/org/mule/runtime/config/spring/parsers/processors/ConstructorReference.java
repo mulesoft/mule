@@ -12,19 +12,16 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
 
-public class ConstructorReference implements PostProcessor
-{
+public class ConstructorReference implements PostProcessor {
 
-    public String reference;
+  public String reference;
 
-    public ConstructorReference(String reference)
-    {
-        this.reference = reference;
-    }
+  public ConstructorReference(String reference) {
+    this.reference = reference;
+  }
 
-    public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
-    {
-        assembler.getBean().addConstructorArgReference(reference);
-    }
+  public void postProcess(ParserContext unused, BeanAssembler assembler, Element element) {
+    assembler.getBean().addConstructorArgReference(reference);
+  }
 
 }

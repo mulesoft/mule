@@ -27,118 +27,96 @@ import org.slf4j.LoggerFactory;
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
  * <p>
- * The incoming message is is sent to both the primary and wiretap outputs. The flow
- * of the primary output will be unmodified and a copy of the message used for the
- * wiretap output.
+ * The incoming message is is sent to both the primary and wiretap outputs. The flow of the primary output will be unmodified and
+ * a copy of the message used for the wiretap output.
  * <p>
- * An optional filter can be used to filter which message are sent to the wiretap
- * output, this filter does not affect the flow to the primary output. If there is an
- * error sending to the wiretap output no exception will be thrown but rather an
- * error logged.
+ * An optional filter can be used to filter which message are sent to the wiretap output, this filter does not affect the flow to
+ * the primary output. If there is an error sending to the wiretap output no exception will be thrown but rather an error logged.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
-public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported
-{
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-    protected volatile MessageProcessor tap;
-    protected volatile Filter filter;
+public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported {
 
-    protected MessageProcessor filteredTap = new WireTapFilter();
+  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected volatile MessageProcessor tap;
+  protected volatile Filter filter;
 
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (tap == null)
-        {
-            return event;
-        }
+  protected MessageProcessor filteredTap = new WireTapFilter();
 
-        try
-        {
-            MuleEvent tapEvent = DefaultMuleEvent.copy(event);
-            // Tap should not respond to reply to handler
-            // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
-            tapEvent = new DefaultMuleEvent(tapEvent, (ReplyToHandler) null);
-            OptimizedRequestContext.unsafeSetEvent(tapEvent);
-            filteredTap.process(tapEvent);
-            OptimizedRequestContext.unsafeSetEvent(event);
-        }
-        catch (MuleException e)
-        {
-            logger.error("Exception sending to wiretap output " + tap, e);
-        }
-
-        return event;
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (tap == null) {
+      return event;
     }
 
-    public MessageProcessor getTap()
-    {
-        return tap;
+    try {
+      MuleEvent tapEvent = DefaultMuleEvent.copy(event);
+      // Tap should not respond to reply to handler
+      // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
+      tapEvent = new DefaultMuleEvent(tapEvent, (ReplyToHandler) null);
+      OptimizedRequestContext.unsafeSetEvent(tapEvent);
+      filteredTap.process(tapEvent);
+      OptimizedRequestContext.unsafeSetEvent(event);
+    } catch (MuleException e) {
+      logger.error("Exception sending to wiretap output " + tap, e);
     }
 
-    public void setTap(MessageProcessor tap)
-    {
-        this.tap = tap;
-    }
+    return event;
+  }
 
-    @Deprecated
-    public void setMessageProcessor(MessageProcessor tap)
-    {
-        setTap(tap);
-    }
-    
-    public Filter getFilter()
-    {
-        return filter;
-    }
+  public MessageProcessor getTap() {
+    return tap;
+  }
 
-    public void setFilter(Filter filter)
-    {
-        this.filter = filter;
-    }
+  public void setTap(MessageProcessor tap) {
+    this.tap = tap;
+  }
 
-    private class WireTapFilter extends AbstractFilteringMessageProcessor
-    {
-        @Override
-        protected boolean accept(MuleEvent event)
-        {
-            if (filter == null)
-            {
-                return true;
-            }
-            else
-            {
-                return filter.accept(event);
-            }
-        }
+  @Deprecated
+  public void setMessageProcessor(MessageProcessor tap) {
+    setTap(tap);
+  }
 
-        @Override
-        protected MuleEvent processNext(MuleEvent event) throws MuleException
-        {
-            if (tap != null)
-            {
-                tap.process(event);
-            }
-            return null;
-        }
+  public Filter getFilter() {
+    return filter;
+  }
 
-        @Override
-        public String toString()
-        {
-            return ObjectUtils.toString(this);
-        }
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+  }
+
+  private class WireTapFilter extends AbstractFilteringMessageProcessor {
+
+    @Override
+    protected boolean accept(MuleEvent event) {
+      if (filter == null) {
+        return true;
+      } else {
+        return filter.accept(event);
+      }
     }
 
     @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
+    protected MuleEvent processNext(MuleEvent event) throws MuleException {
+      if (tap != null) {
+        tap.process(event);
+      }
+      return null;
     }
 
-        @Override
-    protected List<MessageProcessor> getOwnedMessageProcessors()
-    {
-        return Collections.singletonList(tap);
+    @Override
+    public String toString() {
+      return ObjectUtils.toString(this);
     }
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
+
+  @Override
+  protected List<MessageProcessor> getOwnedMessageProcessors() {
+    return Collections.singletonList(tap);
+  }
 
 }

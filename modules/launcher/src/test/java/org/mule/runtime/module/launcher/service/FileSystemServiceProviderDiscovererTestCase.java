@@ -36,100 +36,93 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTestCase
-{
+public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTestCase {
 
-    private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
-    @Rule
-    public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
-    private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
+  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
+  @Rule
+  public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
+  private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
 
-    @Before
-    public void setUp() throws Exception
-    {
-        final File servicesFolder = getServicesFolder();
-        assertThat(servicesFolder.mkdir(), is(true));
+  @Before
+  public void setUp() throws Exception {
+    final File servicesFolder = getServicesFolder();
+    assertThat(servicesFolder.mkdir(), is(true));
+  }
+
+  @Test
+  public void discoversNoServices() throws Exception {
+    final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
+
+    final List<ServiceProvider> discover = serviceProviderDiscoverer.discover();
+
+    assertThat(discover, is(empty()));
+  }
+
+  @Test
+  public void discoversServices() throws Exception {
+    installService("fooService", FooServiceProvider.class);
+    installService("barService", BarServiceProvider.class);
+
+    ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
+    when(serviceClassLoaderFactory.create(argThat(any(ArtifactClassLoader.class)), argThat(any(ServiceDescriptor.class))))
+        .thenReturn(serviceClassLoader);
+    final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
+
+    final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
+
+    assertThat(serviceProviders.size(), equalTo(2));
+    assertThat(serviceProviders, hasItem(instanceOf(FooServiceProvider.class)));
+    assertThat(serviceProviders, hasItem(instanceOf(BarServiceProvider.class)));
+  }
+
+  @Test(expected = ServiceResolutionError.class)
+  public void detectsCorruptServiceFile() throws Exception {
+    installCorruptedService("fooService", FooServiceProvider.class);
+
+    ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
+    when(serviceClassLoaderFactory.create(argThat(any(ArtifactClassLoader.class)), argThat(any(ServiceDescriptor.class))))
+        .thenReturn(serviceClassLoader);
+    final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
+
+    serviceProviderDiscoverer.discover();
+  }
+
+  private void installService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception {
+    installService(serviceName, providerClass, false);
+  }
+
+  private void installCorruptedService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception {
+    installService(serviceName, providerClass, true);
+  }
+
+  private void installService(String serviceName, Class<? extends ServiceProvider> providerClass, boolean corrupted)
+      throws Exception {
+    final ServiceFileBuilder fooService =
+        new ServiceFileBuilder(serviceName).configuredWith(SERVICE_PROVIDER_CLASS_NAME, providerClass.getName());
+    if (corrupted) {
+      fooService.corrupted();
     }
 
-    @Test
-    public void discoversNoServices() throws Exception
-    {
-        final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer = new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
+    File installedService = new File(getServicesFolder(), fooService.getArtifactFile().getName());
+    moveFile(fooService.getArtifactFile(), installedService);
+  }
 
-        final List<ServiceProvider> discover = serviceProviderDiscoverer.discover();
+  public static class FooServiceProvider implements ServiceProvider {
 
-        assertThat(discover, is(empty()));
+    @Override
+    public List<ServiceDefinition> providedServices() {
+      return emptyList();
     }
+  }
 
-    @Test
-    public void discoversServices() throws Exception
-    {
-        installService("fooService", FooServiceProvider.class);
-        installService("barService", BarServiceProvider.class);
+  public static class BarServiceProvider implements ServiceProvider {
 
-        ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
-        when(serviceClassLoaderFactory.create(argThat(any(ArtifactClassLoader.class)), argThat(any(ServiceDescriptor.class)))).thenReturn(serviceClassLoader);
-        final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer = new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
-
-        final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
-
-        assertThat(serviceProviders.size(), equalTo(2));
-        assertThat(serviceProviders, hasItem(instanceOf(FooServiceProvider.class)));
-        assertThat(serviceProviders, hasItem(instanceOf(BarServiceProvider.class)));
+    @Override
+    public List<ServiceDefinition> providedServices() {
+      return emptyList();
     }
-
-    @Test(expected = ServiceResolutionError.class)
-    public void detectsCorruptServiceFile() throws Exception
-    {
-        installCorruptedService("fooService", FooServiceProvider.class);
-
-        ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
-        when(serviceClassLoaderFactory.create(argThat(any(ArtifactClassLoader.class)), argThat(any(ServiceDescriptor.class)))).thenReturn(serviceClassLoader);
-        final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer = new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
-
-        serviceProviderDiscoverer.discover();
-    }
-
-    private void installService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception
-    {
-        installService(serviceName, providerClass, false);
-    }
-
-    private void installCorruptedService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception
-    {
-        installService(serviceName, providerClass, true);
-    }
-
-    private void installService(String serviceName, Class<? extends ServiceProvider> providerClass, boolean corrupted) throws Exception
-    {
-        final ServiceFileBuilder fooService = new ServiceFileBuilder(serviceName)
-                .configuredWith(SERVICE_PROVIDER_CLASS_NAME, providerClass.getName());
-        if (corrupted)
-        {
-            fooService.corrupted();
-        }
-
-        File installedService = new File(getServicesFolder(), fooService.getArtifactFile().getName());
-        moveFile(fooService.getArtifactFile(), installedService);
-    }
-
-    public static class FooServiceProvider implements ServiceProvider
-    {
-
-        @Override
-        public List<ServiceDefinition> providedServices()
-        {
-            return emptyList();
-        }
-    }
-
-    public static class BarServiceProvider implements ServiceProvider
-    {
-
-        @Override
-        public List<ServiceDefinition> providedServices()
-        {
-            return emptyList();
-        }
-    }
+  }
 }

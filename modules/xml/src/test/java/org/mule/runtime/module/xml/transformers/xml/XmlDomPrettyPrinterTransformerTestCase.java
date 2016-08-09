@@ -16,44 +16,36 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.junit.Assert.fail;
 
-public class XmlDomPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase
-{
-    private static final String rawData ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";
+public class XmlDomPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase {
 
-    // Do not normalize any Strings for this test since we need to test formatting
-    protected String normalizeString(String rawString)
-    {
-        return rawData;
+  private static final String rawData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";
+
+  // Do not normalize any Strings for this test since we need to test formatting
+  protected String normalizeString(String rawString) {
+    return rawData;
+  }
+
+  public Object getResultData() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + "<just>\n" + "  <a>\n" + "    <test>test</test>\n" + "  </a>\n"
+        + "</just>\n";
+  }
+
+  public Transformer getRoundTripTransformer() throws Exception {
+    // there is no XmlUnprettyPrinter :)
+    return null;
+  }
+
+  public Object getTestData() {
+    try {
+      return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(rawData.getBytes()));
+    } catch (Exception e) {
+      fail(e.getMessage());
+      return null;
     }
 
-    public Object getResultData()
-    {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + "<just>\n" + "  <a>\n"
-               + "    <test>test</test>\n" + "  </a>\n" + "</just>\n";
-    }
+  }
 
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        // there is no XmlUnprettyPrinter :)
-        return null;
-    }
-
-    public Object getTestData()
-    {
-        try
-        {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(rawData.getBytes()));
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
-
-    }
-
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(XmlPrettyPrinter.class);
-    }
+  public Transformer getTransformer() throws Exception {
+    return createObject(XmlPrettyPrinter.class);
+  }
 }

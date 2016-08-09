@@ -15,19 +15,16 @@ import org.junit.Test;
 /*
  * This test has been added due to MULE-610
  */
-public class GlobalTransformerTestCase extends AbstractIntegrationTestCase
-{
+public class GlobalTransformerTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/config/global-transformer-mule-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/config/global-transformer-mule-config-flow.xml";
+  }
 
-    @Test
-    public void testNormal() throws Exception
-    {
-        MuleMessage msg= flowRunner("Test").withPayload(getTestMuleMessage("HELLO!")).run().getMessage();
-        assertTrue(msg.getPayload() instanceof byte[]);
-    }
+  @Test
+  public void testNormal() throws Exception {
+    MuleMessage msg = flowRunner("Test").withPayload(getTestMuleMessage("HELLO!")).run().getMessage();
+    assertTrue(msg.getPayload() instanceof byte[]);
+  }
 }

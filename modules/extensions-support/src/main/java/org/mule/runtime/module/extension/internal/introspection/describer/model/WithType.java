@@ -15,21 +15,18 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
  *
  * @since 4.0
  */
-interface WithType
-{
+interface WithType {
 
-    /**
-     * @return The {@link TypeWrapper} of the represented component
-     */
-    Type getType();
+  /**
+   * @return The {@link TypeWrapper} of the represented component
+   */
+  Type getType();
 
-    /**
-     * @param typeLoader {@link ClassTypeLoader} that will load the {@link Class} and represent it as a
-     *                   {@link MetadataType}
-     * @return The {@link MetadataType} representation of the component type
-     */
-    default MetadataType getMetadataType(ClassTypeLoader typeLoader)
-    {
-        return typeLoader.load(getType().getDeclaredClass());
-    }
+  /**
+   * @param typeLoader {@link ClassTypeLoader} that will load the {@link Class} and represent it as a {@link MetadataType}
+   * @return The {@link MetadataType} representation of the component type
+   */
+  default MetadataType getMetadataType(ClassTypeLoader typeLoader) {
+    return typeLoader.load(getType().getDeclaredClass());
+  }
 }

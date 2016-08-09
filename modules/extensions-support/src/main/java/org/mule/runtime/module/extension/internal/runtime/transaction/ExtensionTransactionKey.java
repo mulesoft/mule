@@ -11,33 +11,27 @@ import org.mule.runtime.core.api.util.Reference;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 /**
- * The key used to bind a {@link ExtensionTransactionalResource}
- * into a {@link Transaction}. Although logically speaking
- * it is the extension's {@link ConfigurationInstance} which should
- * act as key, this class allows to decouple from its concrete
- * type and while not depending on its equals and hashCode implementations
+ * The key used to bind a {@link ExtensionTransactionalResource} into a {@link Transaction}. Although logically speaking it is the
+ * extension's {@link ConfigurationInstance} which should act as key, this class allows to decouple from its concrete type and
+ * while not depending on its equals and hashCode implementations
  *
  * @since 4.0
  */
-public class ExtensionTransactionKey
-{
+public class ExtensionTransactionKey {
 
-    private final Reference<ConfigurationInstance> configReference;
+  private final Reference<ConfigurationInstance> configReference;
 
-    public ExtensionTransactionKey(ConfigurationInstance config)
-    {
-        configReference = new Reference<>(config);
-    }
+  public ExtensionTransactionKey(ConfigurationInstance config) {
+    configReference = new Reference<>(config);
+  }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        return obj instanceof ExtensionTransactionKey && configReference.equals(((ExtensionTransactionKey) obj).configReference);
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof ExtensionTransactionKey && configReference.equals(((ExtensionTransactionKey) obj).configReference);
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return configReference.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return configReference.hashCode();
+  }
 }

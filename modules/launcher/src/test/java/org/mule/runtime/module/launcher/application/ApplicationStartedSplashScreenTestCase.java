@@ -25,66 +25,59 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<ApplicationStartedSplashScreen>
-{
+public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<ApplicationStartedSplashScreen> {
 
-    private static final String APP_NAME = "simpleApp";
-    private static final String PLUGIN_NAME = "simplePlugin";
-    private static final String APP_LIB_PATH = String.format("apps/%s/lib", APP_NAME);
-    private static final String MY_JAR = "myLib.jar";
-    private static final String MY_ZIP = "myZip.zip";
+  private static final String APP_NAME = "simpleApp";
+  private static final String PLUGIN_NAME = "simplePlugin";
+  private static final String APP_LIB_PATH = String.format("apps/%s/lib", APP_NAME);
+  private static final String MY_JAR = "myLib.jar";
+  private static final String MY_ZIP = "myZip.zip";
 
-    private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    private ArtifactPluginDescriptor pluginDescriptor = mock(ArtifactPluginDescriptor.class);
-    private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
+  private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+  private ArtifactPluginDescriptor pluginDescriptor = mock(ArtifactPluginDescriptor.class);
+  private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
 
-    @BeforeClass
-    public static void setUpLibrary() throws IOException
-    {
-        File libFile = newFile(workingDirectory.getRoot(), APP_LIB_PATH);
-        libFile.mkdirs();
-        newFile(workingDirectory.getRoot(), getAppPathFor(MY_JAR)).mkdir();
-        newFile(workingDirectory.getRoot(), getAppPathFor(MY_ZIP)).mkdir();
-    }
+  @BeforeClass
+  public static void setUpLibrary() throws IOException {
+    File libFile = newFile(workingDirectory.getRoot(), APP_LIB_PATH);
+    libFile.mkdirs();
+    newFile(workingDirectory.getRoot(), getAppPathFor(MY_JAR)).mkdir();
+    newFile(workingDirectory.getRoot(), getAppPathFor(MY_ZIP)).mkdir();
+  }
 
-    @Before
-    public void setUp()
-    {
-        splashScreen = new ApplicationStartedSplashScreen();
-        when(descriptor.getName()).thenReturn(APP_NAME);
-        when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
-        when(descriptor.getPlugins()).thenReturn(plugins);
-        when(pluginDescriptor.getName()).thenReturn(PLUGIN_NAME);
-    }
+  @Before
+  public void setUp() {
+    splashScreen = new ApplicationStartedSplashScreen();
+    when(descriptor.getName()).thenReturn(APP_NAME);
+    when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
+    when(descriptor.getPlugins()).thenReturn(plugins);
+    when(pluginDescriptor.getName()).thenReturn(PLUGIN_NAME);
+  }
 
-    @Override
-    protected void setUpSplashScreen()
-    {
-        splashScreen.createMessage(descriptor);
-    }
+  @Override
+  protected void setUpSplashScreen() {
+    splashScreen.createMessage(descriptor);
+  }
 
-    @Override
-    protected Matcher<String> getSimpleLogMatcher()
-    {
-        return is("\n**********************************************************************\n" +
-                    "* Started app '" + APP_NAME + "'                                            *\n" +
-                    "**********************************************************************");
-    }
+  @Override
+  protected Matcher<String> getSimpleLogMatcher() {
+    return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
+        + "'                                            *\n"
+        + "**********************************************************************");
+  }
 
-    @Override
-    protected Matcher<String> getComplexLogMatcher()
-    {
-        return is("\n**********************************************************************\n" +
-                    "* Started app '" + APP_NAME + "'                                            *\n" +
-                    "* Application plugins:                                               *\n" +
-                    "*  - " + PLUGIN_NAME + "                                                    *\n" +
-                    "* Application libraries:                                             *\n" +
-                    "*  - " + MY_JAR + "                                                       *\n" +
-                    "**********************************************************************");
-    }
+  @Override
+  protected Matcher<String> getComplexLogMatcher() {
+    return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
+        + "'                                            *\n"
+        + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME
+        + "                                                    *\n"
+        + "* Application libraries:                                             *\n" + "*  - " + MY_JAR
+        + "                                                       *\n"
+        + "**********************************************************************");
+  }
 
-    private static String getAppPathFor(String fileName)
-    {
-        return String.format(APP_LIB_PATH + "/%s", fileName);
-    }
+  private static String getAppPathFor(String fileName) {
+    return String.format(APP_LIB_PATH + "/%s", fileName);
+  }
 }

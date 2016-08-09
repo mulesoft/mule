@@ -19,54 +19,44 @@ import java.net.URLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebServiceOnlineCheck
-{
-    public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
-    private static final Logger logger = LoggerFactory.getLogger(WebServiceOnlineCheck.class);
+public class WebServiceOnlineCheck {
 
-    public static boolean isWebServiceOnline()
-    {
-        logger.debug("Verifying that the web service is on-line...");
-        
-        BufferedReader input = null;
-        try 
-        {
-            URLConnection conn = new URL(TEST_URL).openConnection();
-            // setting these timeouts ensures the client does not deadlock indefinitely
-            // when the server has problems.
-            conn.setConnectTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
-            conn.setReadTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
-            InputStream in = conn.getInputStream();
+  public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
+  private static final Logger logger = LoggerFactory.getLogger(WebServiceOnlineCheck.class);
 
-            input = new BufferedReader(new InputStreamReader(in));            
+  public static boolean isWebServiceOnline() {
+    logger.debug("Verifying that the web service is on-line...");
 
-            String response = "";
-            String line;
-            while ((line = input.readLine()) != null) 
-            {
-                response += line;
-            }
+    BufferedReader input = null;
+    try {
+      URLConnection conn = new URL(TEST_URL).openConnection();
+      // setting these timeouts ensures the client does not deadlock indefinitely
+      // when the server has problems.
+      conn.setConnectTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
+      conn.setReadTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
+      InputStream in = conn.getInputStream();
 
-            if (StringUtils.containsIgnoreCase(response, "Cisco"))
-            {
-                return true;
-            }
-            else
-            {
-                logger.warn("Unexpected response, web service does not seem to be on-line: \n" + response);
-                return false;
-            }
-        } 
-        catch (Exception e) 
-        {
-            logger.warn("Exception occurred, web service does not seem to be on-line: " + e);
-            return false;
-        } 
-        finally
-        {
-            IOUtils.closeQuietly(input);
-        }
+      input = new BufferedReader(new InputStreamReader(in));
+
+      String response = "";
+      String line;
+      while ((line = input.readLine()) != null) {
+        response += line;
+      }
+
+      if (StringUtils.containsIgnoreCase(response, "Cisco")) {
+        return true;
+      } else {
+        logger.warn("Unexpected response, web service does not seem to be on-line: \n" + response);
+        return false;
+      }
+    } catch (Exception e) {
+      logger.warn("Exception occurred, web service does not seem to be on-line: " + e);
+      return false;
+    } finally {
+      IOUtils.closeQuietly(input);
     }
+  }
 }
 
 

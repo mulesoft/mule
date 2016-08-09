@@ -20,37 +20,36 @@ import org.joda.time.DateTimeZone;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractDateHeaderTestCase extends AbstractMuleTestCase
-{
-    @Rule
-    public final CustomTimeZone timeZone = new CustomTimeZone("EST");
+public abstract class AbstractDateHeaderTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testDateHeaderFormat() throws Exception
-    {
-        initialise();
-        HttpResponse response = new HttpResponse();
+  @Rule
+  public final CustomTimeZone timeZone = new CustomTimeZone("EST");
 
-        DateTime dateTime = new DateTime(2005, 9, 5, 16, 30, 0, 0, DateTimeZone.forID("EST"));
+  @Test
+  public void testDateHeaderFormat() throws Exception {
+    initialise();
+    HttpResponse response = new HttpResponse();
 
-        setDateHeader(response, dateTime.getMillis());
+    DateTime dateTime = new DateTime(2005, 9, 5, 16, 30, 0, 0, DateTimeZone.forID("EST"));
 
-        boolean headerFound = false;
-        for (Header header : response.getHeaders())
-        {
-            if (HttpConstants.HEADER_DATE.equals(header.getName()))
-            {
-                headerFound = true;
-                assertThat(header.getValue(), equalTo(getExpectedHeaderValue()));
-            }
-        }
-        assertThat("Date header missing.", headerFound, equalTo(true));
+    setDateHeader(response, dateTime.getMillis());
+
+    boolean headerFound = false;
+    for (Header header : response.getHeaders()) {
+      if (HttpConstants.HEADER_DATE.equals(header.getName())) {
+        headerFound = true;
+        assertThat(header.getValue(), equalTo(getExpectedHeaderValue()));
+      }
     }
+    assertThat("Date header missing.", headerFound, equalTo(true));
+  }
 
-    //Set up the object to be tested
-    protected abstract void initialise() throws Exception;
-    //Perform the specific date header setting
-    protected abstract void setDateHeader(HttpResponse response, long millis);
-    //Set up the expected header outcome
-    protected abstract String getExpectedHeaderValue();
+  // Set up the object to be tested
+  protected abstract void initialise() throws Exception;
+
+  // Perform the specific date header setting
+  protected abstract void setDateHeader(HttpResponse response, long millis);
+
+  // Set up the expected header outcome
+  protected abstract String getExpectedHeaderValue();
 }

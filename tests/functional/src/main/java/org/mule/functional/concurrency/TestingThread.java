@@ -11,8 +11,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class is very useful for test cases which need to make assertions 
- * concurrently in different threads.  Usage is as follows:
+ * This class is very useful for test cases which need to make assertions concurrently in different threads. Usage is as follows:
  * <code>
  *   public void testConcurrency() 
  *   {                
@@ -40,55 +39,45 @@ import java.util.concurrent.TimeUnit;
  *           fail(thread.getException().getMessage());
  *       }
  *   }
- * </code>
- *   Both the TestingThread and the main thread will run in parallel, 
- *   therefore assertions can be made on "somethingElse" while the call 
- *   to runSomething() is blocking the main thread of the TestCase.
+ * </code> Both the TestingThread and the main thread will run in parallel, therefore assertions can be made on "somethingElse"
+ * while the call to runSomething() is blocking the main thread of the TestCase.
  */
-public abstract class TestingThread extends Thread implements Runnable
-{
-    public static final long AWAIT_TIMEOUT = 10000;
-    private static final long awaitTimeout = Long.getLong("mule.test.timeoutSecs", AWAIT_TIMEOUT/1000L) * 1000L;
-    private final Latch done = new Latch();
-    private volatile Throwable exception = null;        
+public abstract class TestingThread extends Thread implements Runnable {
 
-    /**
-     * Executes the doRun() method and stores any exception which occurred to be 
-     * returned at a later time.
-     */
-    @Override
-    public final void run() 
-    {
-        try
-        {
-            doRun();
-        }
-        catch (Throwable e)
-        {
-            exception = e;
-        }
-        finally
-        {
-            done.countDown();
-        }
-    }
-    
-    abstract protected void doRun() throws Throwable;
+  public static final long AWAIT_TIMEOUT = 10000;
+  private static final long awaitTimeout = Long.getLong("mule.test.timeoutSecs", AWAIT_TIMEOUT / 1000L) * 1000L;
+  private final Latch done = new Latch();
+  private volatile Throwable exception = null;
 
-    /**
-     * Block until the thread completes its doRun() method.
-     * @throws InterruptedException
-     */
-    public void await() throws InterruptedException
-    {
-        done.await(awaitTimeout, TimeUnit.MILLISECONDS);
+  /**
+   * Executes the doRun() method and stores any exception which occurred to be returned at a later time.
+   */
+  @Override
+  public final void run() {
+    try {
+      doRun();
+    } catch (Throwable e) {
+      exception = e;
+    } finally {
+      done.countDown();
     }
+  }
 
-    /**
-     * @return any exception thrown by the doRun() method, including failed assertions
-     */
-    public Throwable getException()
-    {
-        return exception;
-    }
+  abstract protected void doRun() throws Throwable;
+
+  /**
+   * Block until the thread completes its doRun() method.
+   * 
+   * @throws InterruptedException
+   */
+  public void await() throws InterruptedException {
+    done.await(awaitTimeout, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * @return any exception thrown by the doRun() method, including failed assertions
+   */
+  public Throwable getException() {
+    return exception;
+  }
 }

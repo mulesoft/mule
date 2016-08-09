@@ -17,56 +17,51 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Test;
 
-public class DynamicConfigExpirationTestCase extends ExtensionFunctionalTestCase
-{
+public class DynamicConfigExpirationTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "dynamic-config-expiration.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "dynamic-config-expiration.xml";
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {HeisenbergExtension.class};
+  }
 
-    @Test
-    public void expireDynamicConfig() throws Exception
-    {
-        final String myName = "Walt";
-        FlowRunner runner = flowRunner("dynamic").withPayload(myName);
+  @Test
+  public void expireDynamicConfig() throws Exception {
+    final String myName = "Walt";
+    FlowRunner runner = flowRunner("dynamic").withPayload(myName);
 
-        final MuleEvent event = runner.buildEvent();
-        String returnedName = getPayloadAsString(runner.run().getMessage());
+    final MuleEvent event = runner.buildEvent();
+    String returnedName = getPayloadAsString(runner.run().getMessage());
 
-        HeisenbergExtension config = (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", event).getValue();
+    HeisenbergExtension config =
+        (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", event).getValue();
 
-        // validate we actually hit the correct dynamic config
-        assertThat(returnedName, is(myName));
-        assertThat(config.getPersonalInfo().getName(), is(myName));
+    // validate we actually hit the correct dynamic config
+    assertThat(returnedName, is(myName));
+    assertThat(config.getPersonalInfo().getName(), is(myName));
 
-        PollingProber prober = new PollingProber(5000, 1000);
-        prober.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                assertThat(config.getStop(), is(1));
-                assertThat(config.getDispose(), is(1));
+    PollingProber prober = new PollingProber(5000, 1000);
+    prober.check(new JUnitProbe() {
 
-                return true;
-            }
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(config.getStop(), is(1));
+        assertThat(config.getDispose(), is(1));
 
-            @Override
-            public String describeFailure()
-            {
-                return "config was not stopped or disposed";
-            }
-        });
+        return true;
+      }
 
-        assertThat(config.getInitialise(), is(1));
-        assertThat(config.getStart(), is(1));
-    }
+      @Override
+      public String describeFailure() {
+        return "config was not stopped or disposed";
+      }
+    });
+
+    assertThat(config.getInitialise(), is(1));
+    assertThat(config.getStart(), is(1));
+  }
 }

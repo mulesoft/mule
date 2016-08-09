@@ -19,49 +19,40 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.junit.Test;
 
-public class XmlToXMLStreamReaderTestCase extends AbstractXmlTransformerTestCase
-{
+public class XmlToXMLStreamReaderTestCase extends AbstractXmlTransformerTestCase {
 
-    private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>TEST_MESSAGE</test>";
+  private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>TEST_MESSAGE</test>";
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(XmlToXMLStreamReader.class);
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return createObject(XmlToXMLStreamReader.class);
+  }
+
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    Transformer t = createObject(XmlToDomDocument.class);
+    t.setReturnDataType(DataType.STRING);
+    return t;
+  }
+
+  @Override
+  public Object getTestData() {
+    return TEST_XML;
+  }
+
+  @Override
+  public Object getResultData() {
+    try {
+      return XMLUtils.toXMLStreamReader(XMLInputFactory.newFactory(), TEST_XML);
+    } catch (XMLStreamException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        Transformer t = createObject(XmlToDomDocument.class);
-        t.setReturnDataType(DataType.STRING);
-        return t;
-    }
-
-    @Override
-    public Object getTestData()
-    {
-        return TEST_XML;
-    }
-
-    @Override
-    public Object getResultData()
-    {
-        try
-        {
-            return XMLUtils.toXMLStreamReader(XMLInputFactory.newFactory(), TEST_XML);
-        }
-        catch (XMLStreamException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    public void supportsOutputHandlerAsSourceType() throws Exception
-    {
-        OutputHandler outputHandler = (event, out) -> out.write(TEST_XML.getBytes());
-        XMLStreamReader result = (XMLStreamReader) getTransformer().transform(outputHandler);
-        compareResults(getResultData(), result);
-    }
+  @Test
+  public void supportsOutputHandlerAsSourceType() throws Exception {
+    OutputHandler outputHandler = (event, out) -> out.write(TEST_XML.getBytes());
+    XMLStreamReader result = (XMLStreamReader) getTransformer().transform(outputHandler);
+    compareResults(getResultData(), result);
+  }
 }

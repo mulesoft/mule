@@ -12,13 +12,13 @@ import org.mule.runtime.core.api.MuleContext;
 import java.net.URI;
 
 /**
- * <code>EndpointBuilder</code> determines how a uri is translated to a MuleEndpointURI Connectors can override the
- * default behaviour to suit their needs
+ * <code>EndpointBuilder</code> determines how a uri is translated to a MuleEndpointURI Connectors can override the default
+ * behaviour to suit their needs
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface EndpointURIBuilder
-{
-    EndpointURI build(URI uri, MuleContext muleContext) throws MalformedEndpointException;
+public interface EndpointURIBuilder {
+
+  EndpointURI build(URI uri, MuleContext muleContext) throws MalformedEndpointException;
 }

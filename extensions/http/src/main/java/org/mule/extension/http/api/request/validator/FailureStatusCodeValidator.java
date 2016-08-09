@@ -11,23 +11,20 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * Response validator that allows specifying which status codes should be treated as failures.
- * Responses with such status codes will cause the component to throw an exception.
+ * Response validator that allows specifying which status codes should be treated as failures. Responses with such status codes
+ * will cause the component to throw an exception.
  *
  * @since 4.0
  */
-public class FailureStatusCodeValidator extends RangeStatusCodeValidator
-{
+public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
-    @Override
-    public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException
-    {
-        int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
+  @Override
+  public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException {
+    int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
 
-        if (belongs(status))
-        {
-            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage, context);
-        }
+    if (belongs(status)) {
+      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage, context);
     }
+  }
 
 }

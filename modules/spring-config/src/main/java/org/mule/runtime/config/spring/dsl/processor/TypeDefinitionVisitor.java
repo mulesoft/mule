@@ -9,34 +9,32 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.config.spring.dsl.api.TypeDefinition;
 
 /**
- * Visitor that will be invoked based on a {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition#getTypeDefinition()} configuration.
+ * Visitor that will be invoked based on a
+ * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition#getTypeDefinition()} configuration.
  *
  * @since 4.0
  */
-public interface TypeDefinitionVisitor
-{
+public interface TypeDefinitionVisitor {
 
-    /**
-     * Invoked when the {@link TypeDefinition} it's defined
-     * from a {@code Class} hardcoded value
-     *
-     * @param type the hardcoded type
-     */
-    void onType(Class<?> type);
+  /**
+   * Invoked when the {@link TypeDefinition} it's defined from a {@code Class} hardcoded value
+   *
+   * @param type the hardcoded type
+   */
+  void onType(Class<?> type);
 
-    /**
-     * Invoked when the {@link TypeDefinition} it's defined
-     * from a configuration attribute of the component
-     *
-     * @param attributeName the name of the configuration attribute holding the type definition. Most likely a fully qualified java class name.
-     */
-    void onConfigurationAttribute(String attributeName);
+  /**
+   * Invoked when the {@link TypeDefinition} it's defined from a configuration attribute of the component
+   *
+   * @param attributeName the name of the configuration attribute holding the type definition. Most likely a fully qualified java
+   *        class name.
+   */
+  void onConfigurationAttribute(String attributeName);
 
-    /**
-     * Invoked when the {@link TypeDefinition} it's defined to be a map
-     * entry.
-     *
-     * @param mapEntryType the holder for the key type and value type
-     */
-    void onMapType(TypeDefinition.MapEntryType mapEntryType);
+  /**
+   * Invoked when the {@link TypeDefinition} it's defined to be a map entry.
+   *
+   * @param mapEntryType the holder for the key type and value type
+   */
+  void onMapType(TypeDefinition.MapEntryType mapEntryType);
 }

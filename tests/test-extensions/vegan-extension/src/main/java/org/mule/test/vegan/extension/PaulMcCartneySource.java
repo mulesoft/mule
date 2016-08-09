@@ -10,18 +10,15 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Fruit;
 
-public class PaulMcCartneySource extends Source<Fruit, Attributes>
-{
+public class PaulMcCartneySource extends Source<Fruit, Attributes> {
 
-    @Override
-    public void start() throws Exception
-    {
+  @Override
+  public void start() throws Exception {
 
-    }
+  }
 
-    @Override
-    public void stop() throws Exception
-    {
+  @Override
+  public void stop() throws Exception {
 
-    }
+  }
 }

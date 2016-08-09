@@ -11,17 +11,15 @@ import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryWrapper;
 
 /**
- * We want to set the connection factory as a pojo factory and then add attributes (username and
- * password) on the parent
+ * We want to set the connection factory as a pojo factory and then add attributes (username and password) on the parent
  */
-public class ConnectionFactoryDefinitionParser extends AbstractFirstResultSerialDefinitionParser
-{
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+public class ConnectionFactoryDefinitionParser extends AbstractFirstResultSerialDefinitionParser {
 
-    public ConnectionFactoryDefinitionParser()
-    {
-        addDelegate(new ObjectFactoryWrapper("connectionFactory")).addIgnored(USERNAME).addIgnored(PASSWORD);
-        addDelegate(new ParentDefinitionParser()).setIgnoredDefault(true).removeIgnored(USERNAME).removeIgnored(PASSWORD);
-    }
+  public static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
+
+  public ConnectionFactoryDefinitionParser() {
+    addDelegate(new ObjectFactoryWrapper("connectionFactory")).addIgnored(USERNAME).addIgnored(PASSWORD);
+    addDelegate(new ParentDefinitionParser()).setIgnoredDefault(true).removeIgnored(USERNAME).removeIgnored(PASSWORD);
+  }
 }

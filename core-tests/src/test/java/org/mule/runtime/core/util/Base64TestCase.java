@@ -19,19 +19,17 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
 @SmallTest
-public class Base64TestCase extends AbstractMuleTestCase
-{
+public class Base64TestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void decodeWithoutUnzipping() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphabetic(1024);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload.getBytes());
-        GZIPCompressorInputStream gzipCompressorInputStream = new GZIPCompressorInputStream(byteArrayInputStream);
+  @Test
+  public void decodeWithoutUnzipping() throws Exception {
+    final String payload = RandomStringUtils.randomAlphabetic(1024);
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload.getBytes());
+    GZIPCompressorInputStream gzipCompressorInputStream = new GZIPCompressorInputStream(byteArrayInputStream);
 
-        String encoded = Base64.encodeBytes(IOUtils.toByteArray(gzipCompressorInputStream), Base64.DONT_BREAK_LINES);
-        GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(Base64.decodeWithoutUnzipping(encoded)));
+    String encoded = Base64.encodeBytes(IOUtils.toByteArray(gzipCompressorInputStream), Base64.DONT_BREAK_LINES);
+    GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(Base64.decodeWithoutUnzipping(encoded)));
 
-        assertThat(IOUtils.toString(gzipInputStream), is(payload));
-    }
+    assertThat(IOUtils.toString(gzipInputStream), is(payload));
+  }
 }

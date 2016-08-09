@@ -13,15 +13,13 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.junit.Test;
 
-public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTransformersTestCase
-{
+public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTransformersTestCase {
 
-    // extra test for MULE-1274: transforming Mule Messages with regular payload
-    @Test
-    public void testPayloadWrappedInMuleMessage() throws TransformerException
-    {
-        Object wrappedPayload = MuleMessage.builder().payload(this.getResultData()).build();
-        assertEquals(this.getTestData(), this.getRoundTripTransformer().transform(wrappedPayload));
-    }
+  // extra test for MULE-1274: transforming Mule Messages with regular payload
+  @Test
+  public void testPayloadWrappedInMuleMessage() throws TransformerException {
+    Object wrappedPayload = MuleMessage.builder().payload(this.getResultData()).build();
+    assertEquals(this.getTestData(), this.getRoundTripTransformer().transform(wrappedPayload));
+  }
 
 }

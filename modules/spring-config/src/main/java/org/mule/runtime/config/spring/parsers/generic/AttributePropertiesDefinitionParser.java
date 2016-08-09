@@ -8,18 +8,15 @@ package org.mule.runtime.config.spring.parsers.generic;
 
 import org.mule.runtime.config.spring.parsers.assembly.AttributeMapBeanAssemblerFactory;
 
-public class AttributePropertiesDefinitionParser extends ChildDefinitionParser
-{
+public class AttributePropertiesDefinitionParser extends ChildDefinitionParser {
 
-    public AttributePropertiesDefinitionParser(String setterMethod)
-    {
-        this(setterMethod, java.lang.Object.class);
-    }
+  public AttributePropertiesDefinitionParser(String setterMethod) {
+    this(setterMethod, java.lang.Object.class);
+  }
 
-    public AttributePropertiesDefinitionParser(String setterMethod, Class clazz)
-    {
-        super(setterMethod, clazz);
-        setBeanAssemblerFactory(new AttributeMapBeanAssemblerFactory());
-    }
+  public AttributePropertiesDefinitionParser(String setterMethod, Class clazz) {
+    super(setterMethod, clazz);
+    setBeanAssemblerFactory(new AttributeMapBeanAssemblerFactory());
+  }
 
 }

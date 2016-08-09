@@ -17,49 +17,39 @@ import java.util.function.Function;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Represents a function that accepts a {@link MuleEvent}
- * and evaluates a MEL expression that produces a
- * result of the specified type using a {@link TypeSafeExpressionValueResolver}.
+ * Represents a function that accepts a {@link MuleEvent} and evaluates a MEL expression that produces a result of the specified
+ * type using a {@link TypeSafeExpressionValueResolver}.
  *
  * @since 4.0
  */
-final class ExpressionFunction<T> implements Function<MuleEvent, T>
-{
+final class ExpressionFunction<T> implements Function<MuleEvent, T> {
 
-    private final String expression;
-    private final MetadataType type;
+  private final String expression;
+  private final MetadataType type;
 
-    ExpressionFunction(String expression, MetadataType type)
-    {
-        this.expression = expression;
-        this.type = type;
+  ExpressionFunction(String expression, MetadataType type) {
+    this.expression = expression;
+    this.type = type;
+  }
+
+  @Override
+  public T apply(MuleEvent event) {
+    try {
+      return new TypeSafeExpressionValueResolver<T>(expression, getType(type)).resolve(event);
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    @Override
-    public T apply(MuleEvent event)
-    {
-        try
-        {
-            return new TypeSafeExpressionValueResolver<T>(expression, getType(type)).resolve(event);
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        return obj instanceof ExpressionFunction
-               && ((ExpressionFunction) obj).expression.equals(expression)
-               && ((ExpressionFunction) obj).type.equals(type);
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof ExpressionFunction && ((ExpressionFunction) obj).expression.equals(expression)
+        && ((ExpressionFunction) obj).type.equals(type);
+  }
 
 }

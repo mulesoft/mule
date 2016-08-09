@@ -15,22 +15,20 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class ReplyToChainIntegration4TestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-4.xml";
-    }
+public class ReplyToChainIntegration4TestCase extends FunctionalTestCase {
 
-    @Test
-    public void testReplyToChain() throws Exception
-    {
-        String message = "test";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-4.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://pojo1", message, null);
-        assertNotNull(result);
-        assertEquals("Received: " + message, result.getPayload());
-    }
+  @Test
+  public void testReplyToChain() throws Exception {
+    String message = "test";
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("vm://pojo1", message, null);
+    assertNotNull(result);
+    assertEquals("Received: " + message, result.getPayload());
+  }
 }

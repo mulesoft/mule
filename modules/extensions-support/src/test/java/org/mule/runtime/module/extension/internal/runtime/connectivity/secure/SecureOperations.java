@@ -9,11 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.secure;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
-public class SecureOperations
-{
+public class SecureOperations {
 
-    public String dummyOperation(@Password String secureParam, @Text String longText)
-    {
-        return secureParam;
-    }
+  public String dummyOperation(@Password String secureParam, @Text String longText) {
+    return secureParam;
+  }
 }

@@ -13,30 +13,25 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class GreedyTestCase extends FunctionalTestCase
-{
+public class GreedyTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "greedy-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "greedy-config.xml";
+  }
 
-    @Test
-    public void testDollars() throws Exception
-    {
-        runTest(2.33, "USD", "[9 quarters, 0 dimes, 1 nickels, 3 pennies]");
-    }
+  @Test
+  public void testDollars() throws Exception {
+    runTest(2.33, "USD", "[9 quarters, 0 dimes, 1 nickels, 3 pennies]");
+  }
 
-    @Test
-    public void testPounds() throws Exception
-    {
-        runTest(1.28, "GBP", "[1 pounds, 1 twenty_pence, 1 five_pence, 1 two_pence, 1 pennies]");
-    }
-    
-    private void runTest(double amount, String currency, String expectedResult) throws Exception
-    {
-        MuleEvent response = flowRunner("greedy").withPayload(amount * 100).withFlowVariable("currency", currency).run();
-        assertThat(getPayloadAsString(response.getMessage()), equalTo(expectedResult));
-    }
+  @Test
+  public void testPounds() throws Exception {
+    runTest(1.28, "GBP", "[1 pounds, 1 twenty_pence, 1 five_pence, 1 two_pence, 1 pennies]");
+  }
+
+  private void runTest(double amount, String currency, String expectedResult) throws Exception {
+    MuleEvent response = flowRunner("greedy").withPayload(amount * 100).withFlowVariable("currency", currency).run();
+    assertThat(getPayloadAsString(response.getMessage()), equalTo(expectedResult));
+  }
 }

@@ -12,39 +12,33 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 
 /**
- * Tests a model for which synchonous=true for environment (was "and connector", but
- * that is no longer possible). Not the same as issue MULE-1687. This will happily
- * send 1GB while running in significantly less memory, but it takes some time. Since
- * I'd like this to run in CI I will set at 100MB and test memory delta. But since
- * memory usage could be around that anyway, this is may be a little unreliable. And
- * there's no way to measure memory use directly in 1.4. We'll see... IMPORTANT - DO
- * NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO SEE DIAGNOSTICS.
- * OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA TRANSFERRED, CAUSING
- * CONFUSNG AND PROBABLY FATAL MEMORY USE.
+ * Tests a model for which synchonous=true for environment (was "and connector", but that is no longer possible). Not the same as
+ * issue MULE-1687. This will happily send 1GB while running in significantly less memory, but it takes some time. Since I'd like
+ * this to run in CI I will set at 100MB and test memory delta. But since memory usage could be around that anyway, this is may be
+ * a little unreliable. And there's no way to measure memory use directly in 1.4. We'll see... IMPORTANT - DO NOT RUN THIS TEST IN
+ * AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
+ * TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTestCase
-{
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTestCase {
 
-    @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-streaming2-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort port2 = new DynamicPort("port2");
 
-    public StreamingSynchCapacityTestCase()
-    {
-        super(100 * ONE_MB);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-streaming2-test-flow.xml";
+  }
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4713
-        return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
-    }
+  public StreamingSynchCapacityTestCase() {
+    super(100 * ONE_MB);
+  }
+
+  @Override
+  protected boolean isDisabledInThisEnvironment() {
+    // MULE-4713
+    return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
+  }
 }

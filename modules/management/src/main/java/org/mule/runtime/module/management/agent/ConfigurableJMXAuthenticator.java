@@ -10,9 +10,9 @@ import java.util.Map;
 
 import javax.management.remote.JMXAuthenticator;
 
-public interface ConfigurableJMXAuthenticator extends JMXAuthenticator
-{
-    void configure(Map credentials);
+public interface ConfigurableJMXAuthenticator extends JMXAuthenticator {
+
+  void configure(Map credentials);
 }
 
 

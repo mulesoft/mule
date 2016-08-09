@@ -10,25 +10,21 @@ package org.mule.runtime.module.db.test.util;
 /**
  * Defines a type for testing purposes
  */
-public class TypeMetadata
-{
+public class TypeMetadata {
 
-    private final String name;
-    private final int id;
+  private final String name;
+  private final int id;
 
-    public TypeMetadata(String name, int id)
-    {
-        this.name = name;
-        this.id = id;
-    }
+  public TypeMetadata(String name, int id) {
+    this.name = name;
+    this.id = id;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getId()
-    {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 }

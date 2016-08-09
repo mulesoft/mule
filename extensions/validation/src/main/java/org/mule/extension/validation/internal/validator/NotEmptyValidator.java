@@ -20,84 +20,61 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Validates that {@link #value} is not empty. The definition of empty depends on
- * the type of {@link #value}. If it's a {@link String} it will check that it is not blank.
- * If it's a {@link Collection}, array or {@link Map} it will check that it's not empty. No other types
- * are supported, an {@link IllegalArgumentException} will be thrown if any other type is supplied
+ * Validates that {@link #value} is not empty. The definition of empty depends on the type of {@link #value}. If it's a
+ * {@link String} it will check that it is not blank. If it's a {@link Collection}, array or {@link Map} it will check that it's
+ * not empty. No other types are supported, an {@link IllegalArgumentException} will be thrown if any other type is supplied
  *
  * @since 3.7.0
  */
-public class NotEmptyValidator extends AbstractValidator
-{
+public class NotEmptyValidator extends AbstractValidator {
 
-    private final Object value;
-    private Message errorMessage;
+  private final Object value;
+  private Message errorMessage;
 
-    public NotEmptyValidator(Object value, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
+  public NotEmptyValidator(Object value, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    if (value == null) {
+      errorMessage = getMessages().valueIsNull();
+      return fail();
+    } else if (value instanceof String) {
+      if (StringUtils.isBlank((String) value)) {
+        errorMessage = getMessages().stringIsBlank();
+        return fail();
+      }
+    } else if (value instanceof Collection) {
+      if (((Collection<?>) value).isEmpty()) {
+        errorMessage = getMessages().collectionIsEmpty();
+        return fail();
+      }
+    } else if (value instanceof Map) {
+      if (((Map<?, ?>) value).isEmpty()) {
+        errorMessage = getMessages().mapIsEmpty();
+        return fail();
+      }
+    } else if (value.getClass().isArray()) {
+      if (ArrayUtils.getLength(value) == 0) {
+        errorMessage = getMessages().arrayIsEmpty();
+        return fail();
+      }
+    } else if (value instanceof BlankLiteral) {
+      errorMessage = getMessages().valueIsBlankLiteral();
+      return fail();
+    } else {
+      throw new IllegalArgumentException(String.format(
+                                                       "Only instances of Map, Collection, Array and String can be checked for emptyness. Instance of %s was found instead",
+                                                       value.getClass().getName()));
     }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        if (value == null)
-        {
-            errorMessage = getMessages().valueIsNull();
-            return fail();
-        }
-        else if (value instanceof String)
-        {
-            if (StringUtils.isBlank((String) value))
-            {
-                errorMessage = getMessages().stringIsBlank();
-                return fail();
-            }
-        }
-        else if (value instanceof Collection)
-        {
-            if (((Collection<?>) value).isEmpty())
-            {
-                errorMessage = getMessages().collectionIsEmpty();
-                return fail();
-            }
-        }
-        else if (value instanceof Map)
-        {
-            if (((Map<?, ?>) value).isEmpty())
-            {
-                errorMessage = getMessages().mapIsEmpty();
-                return fail();
-            }
-        }
-        else if (value.getClass().isArray())
-        {
-            if (ArrayUtils.getLength(value) == 0)
-            {
-                errorMessage = getMessages().arrayIsEmpty();
-                return fail();
-            }
-        }
-        else if (value instanceof BlankLiteral)
-        {
-            errorMessage = getMessages().valueIsBlankLiteral();
-            return fail();
-        }
-        else
-        {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Only instances of Map, Collection, Array and String can be checked for emptyness. Instance of %s was found instead",
-                            value.getClass().getName()));
-        }
+    return ok();
+  }
 
-        return ok();
-    }
-
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return errorMessage;
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return errorMessage;
+  }
 }

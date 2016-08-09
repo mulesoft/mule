@@ -21,39 +21,33 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InsertParameterizedQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class InsertParameterizedQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public InsertParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-parameterized-query-config.xml"};
+  }
 
-    @Test
-    public void usesParameterizedQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("insertParameterizedQuery").withPayload("Pluto").run();
+  @Test
+  public void usesParameterizedQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("insertParameterizedQuery").withPayload("Pluto").run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertInsert(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertInsert(response);
+  }
 
-    private void assertInsert(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getPayload(), equalTo(1));
+  private void assertInsert(MuleMessage response) throws SQLException {
+    assertThat(response.getPayload(), equalTo(1));
 
-        assertPlanetRecordsFromQuery("Pluto");
-    }
+    assertPlanetRecordsFromQuery("Pluto");
+  }
 }

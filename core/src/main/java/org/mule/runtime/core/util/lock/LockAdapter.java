@@ -11,53 +11,46 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Implementation of {@link Lock} that delegates the locking mechanism to
- * a {@link LockGroup} but looks like a regular lock from the client's perspective
+ * Implementation of {@link Lock} that delegates the locking mechanism to a {@link LockGroup} but looks like a regular lock from
+ * the client's perspective
  */
-public class LockAdapter implements Lock
-{
-    private LockGroup lockGroup;
-    private String lockId;
+public class LockAdapter implements Lock {
 
-    public LockAdapter(String lockId, LockGroup lockGroup)
-    {
-        this.lockGroup = lockGroup;
-        this.lockId = lockId;
-    }
+  private LockGroup lockGroup;
+  private String lockId;
 
-    @Override
-    public void lock()
-    {
-        lockGroup.lock(lockId);
-    }
+  public LockAdapter(String lockId, LockGroup lockGroup) {
+    this.lockGroup = lockGroup;
+    this.lockId = lockId;
+  }
 
-    @Override
-    public void lockInterruptibly() throws InterruptedException
-    {
-        lockGroup.lockInterruptibly(lockId);
-    }
+  @Override
+  public void lock() {
+    lockGroup.lock(lockId);
+  }
 
-    @Override
-    public boolean tryLock()
-    {
-        return lockGroup.tryLock(lockId);
-    }
+  @Override
+  public void lockInterruptibly() throws InterruptedException {
+    lockGroup.lockInterruptibly(lockId);
+  }
 
-    @Override
-    public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException
-    {
-        return lockGroup.tryLock(lockId, timeout, timeUnit);
-    }
+  @Override
+  public boolean tryLock() {
+    return lockGroup.tryLock(lockId);
+  }
 
-    @Override
-    public void unlock()
-    {
-        lockGroup.unlock(lockId);
-    }
+  @Override
+  public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    return lockGroup.tryLock(lockId, timeout, timeUnit);
+  }
 
-    @Override
-    public Condition newCondition()
-    {
-        throw new UnsupportedOperationException("Operation not supported by mule locks");
-    }
+  @Override
+  public void unlock() {
+    lockGroup.unlock(lockId);
+  }
+
+  @Override
+  public Condition newCondition() {
+    throw new UnsupportedOperationException("Operation not supported by mule locks");
+  }
 }

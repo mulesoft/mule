@@ -32,60 +32,55 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
-{
-    private static final String TEST_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/test";
+public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase {
 
-    private SpringXmlConfigurationMuleArtifactFactory factory;
-    private MuleArtifact artifact;
+  private static final String TEST_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/test";
 
-    @Before
-    public void before()
-    {
-        factory = new SpringXmlConfigurationMuleArtifactFactory();
+  private SpringXmlConfigurationMuleArtifactFactory factory;
+  private MuleArtifact artifact;
+
+  @Before
+  public void before() {
+    factory = new SpringXmlConfigurationMuleArtifactFactory();
+  }
+
+  @After
+  public void after() {
+    if (factory != null) {
+      factory.returnArtifact(artifact);
+    }
+  }
+
+  @Test
+  public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException {
+    XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
+    HashMap<String, String> map = new HashMap<>();
+    map.put("test", "test1");
+    when(callback.getEnvironmentProperties()).thenReturn(map);
+    when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
+    when(callback.getSchemaLocation(TEST_SCHEMA_URL))
+        .thenReturn("http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd");
+    Element element = createElement("component", TEST_SCHEMA_URL, "test");
+    element.setAttribute("throwException", "true");
+
+    artifact = factory.getArtifactForMessageProcessor(element, callback);
+
+    assertThat(artifact.hasCapability(Testable.class), is(false));
+  }
+
+  private Element createElement(String name, String namespace, String prefix) throws DocumentException {
+    org.dom4j.Element dom4jElement = DocumentHelper.createElement(new QName(name, new Namespace(prefix, namespace)));
+    org.dom4j.Document dom4jDocument = dom4jElement.getDocument();
+    if (dom4jDocument == null) {
+      dom4jDocument = DocumentHelper.createDocument();
+      dom4jDocument.setRootElement(dom4jElement);
     }
 
-    @After
-    public void after()
-    {
-        if (factory != null)
-        {
-            factory.returnArtifact(artifact);
-        }
-    }
-
-    @Test
-    public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException
-    {
-        XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
-        HashMap<String, String> map = new HashMap<>();
-        map.put("test", "test1");
-        when(callback.getEnvironmentProperties()).thenReturn(map);
-        when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
-        when(callback.getSchemaLocation(TEST_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd");
-        Element element = createElement("component", TEST_SCHEMA_URL, "test");
-        element.setAttribute("throwException", "true");
-
-        artifact = factory.getArtifactForMessageProcessor(element, callback);
-
-        assertThat(artifact.hasCapability(Testable.class), is(false));
-    }
-
-    private Element createElement(String name, String namespace, String prefix) throws DocumentException
-    {
-        org.dom4j.Element dom4jElement = DocumentHelper.createElement(new QName(name, new Namespace(prefix, namespace)));
-        org.dom4j.Document dom4jDocument = dom4jElement.getDocument();
-        if (dom4jDocument == null)
-        {
-            dom4jDocument = DocumentHelper.createDocument();
-            dom4jDocument.setRootElement(dom4jElement);
-        }
-
-        final DOMWriter writer = new DOMWriter();
-        Document w3cDocument = writer.write(dom4jDocument);
-        Element w3cElement = w3cDocument.getDocumentElement();
+    final DOMWriter writer = new DOMWriter();
+    Document w3cDocument = writer.write(dom4jDocument);
+    Element w3cElement = w3cDocument.getDocumentElement();
 
 
-        return w3cElement;
-    }
+    return w3cElement;
+  }
 }

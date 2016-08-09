@@ -12,41 +12,35 @@ import org.mule.runtime.core.api.config.MuleProperties;
 /**
  * Global connector configuration.
  */
-public class ConnectorConfiguration
-{
-    // This still says http for backwards compatibility
-    public static final String USE_HTTP_TRANSPORT_FOR_URIS = MuleProperties.SYSTEM_PROPERTY_PREFIX + "http.useTransportForUris";
-    private boolean useTransportForUris;
+public class ConnectorConfiguration {
 
-    public void setUseTransportForUris(boolean useTransportForUris)
-    {
-        this.useTransportForUris = useTransportForUris;
-    }
+  // This still says http for backwards compatibility
+  public static final String USE_HTTP_TRANSPORT_FOR_URIS = MuleProperties.SYSTEM_PROPERTY_PREFIX + "http.useTransportForUris";
+  private boolean useTransportForUris;
 
-    /**
-     * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this
-     * determines if the old HTTP transport should be used by default. If false, the new HTTP connector will be used.
-     * This applies, for example, when specifying an HTTP URI in MuleClient.
-     */
-    private boolean useTransportForUris()
-    {
-        return useTransportForUris;
-    }
+  public void setUseTransportForUris(boolean useTransportForUris) {
+    this.useTransportForUris = useTransportForUris;
+  }
 
-    /**
-     * @param muleContext mule context for the app.
-     * @return true if the http transport must be use to process URIs, false if the new module must be used.
-     */
-    public static boolean useTransportForUris(final MuleContext muleContext)
-    {
-        final ConnectorConfiguration httpConfig = muleContext.getConfiguration().getExtension(ConnectorConfiguration.class);
-        if (httpConfig != null)
-        {
-            return httpConfig.useTransportForUris();
-        }
-        else
-        {
-            return Boolean.getBoolean(USE_HTTP_TRANSPORT_FOR_URIS);
-        }
+  /**
+   * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this determines if the
+   * old HTTP transport should be used by default. If false, the new HTTP connector will be used. This applies, for example, when
+   * specifying an HTTP URI in MuleClient.
+   */
+  private boolean useTransportForUris() {
+    return useTransportForUris;
+  }
+
+  /**
+   * @param muleContext mule context for the app.
+   * @return true if the http transport must be use to process URIs, false if the new module must be used.
+   */
+  public static boolean useTransportForUris(final MuleContext muleContext) {
+    final ConnectorConfiguration httpConfig = muleContext.getConfiguration().getExtension(ConnectorConfiguration.class);
+    if (httpConfig != null) {
+      return httpConfig.useTransportForUris();
+    } else {
+      return Boolean.getBoolean(USE_HTTP_TRANSPORT_FOR_URIS);
     }
+  }
 }

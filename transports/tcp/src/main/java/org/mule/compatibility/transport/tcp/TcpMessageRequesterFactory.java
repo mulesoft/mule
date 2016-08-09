@@ -11,13 +11,11 @@ import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
 import org.mule.runtime.core.api.MuleException;
 
-public class TcpMessageRequesterFactory extends AbstractMessageRequesterFactory
-{
+public class TcpMessageRequesterFactory extends AbstractMessageRequesterFactory {
 
-    @Override
-    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
-    {
-        return new TcpMessageRequester(endpoint);
-    }
+  @Override
+  public MessageRequester create(InboundEndpoint endpoint) throws MuleException {
+    return new TcpMessageRequester(endpoint);
+  }
 
 }

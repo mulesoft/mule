@@ -25,113 +25,92 @@ import java.util.List;
 
 /**
  * A abstract {@link org.mule.runtime.core.api.processor.ProcessingStrategy} implementation that provides a
- * {@link org.mule.runtime.core.api.config.ThreadingProfile} for you in extensions configured via setters for each of the threading
- * profile attributes.
+ * {@link org.mule.runtime.core.api.config.ThreadingProfile} for you in extensions configured via setters for each of the
+ * threading profile attributes.
  */
-public abstract class AbstractThreadingProfileProcessingStrategy implements ProcessingStrategy
-{
+public abstract class AbstractThreadingProfileProcessingStrategy implements ProcessingStrategy {
 
-    protected Integer maxThreads;
-    protected Integer minThreads;
-    protected Integer maxBufferSize;
-    protected Long threadTTL;
-    protected Long threadWaitTimeout;
-    protected Integer poolExhaustedAction;
+  protected Integer maxThreads;
+  protected Integer minThreads;
+  protected Integer maxBufferSize;
+  protected Long threadTTL;
+  protected Long threadWaitTimeout;
+  protected Integer poolExhaustedAction;
 
-    protected ThreadingProfile createThreadingProfile(MuleContext muleContext)
-    {
-        ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
-        if (maxThreads != null)
-        {
-            threadingProfile.setMaxThreadsActive(maxThreads);
-        }
-        if (minThreads != null)
-        {
-            threadingProfile.setMaxThreadsIdle(minThreads);
-        }
-        if (maxBufferSize != null)
-        {
-            threadingProfile.setMaxBufferSize(maxBufferSize);
-        }
-        if (threadTTL != null)
-        {
-            threadingProfile.setThreadTTL(threadTTL);
-        }
-        if (threadWaitTimeout != null)
-        {
-            threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
-        }
-        if (poolExhaustedAction != null)
-        {
-            threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
-        }
-        threadingProfile.setMuleContext(muleContext);
-        return threadingProfile;
+  protected ThreadingProfile createThreadingProfile(MuleContext muleContext) {
+    ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
+    if (maxThreads != null) {
+      threadingProfile.setMaxThreadsActive(maxThreads);
     }
-
-    protected String getThreadPoolName(String stageName, MuleContext muleContext)
-    {
-        return ThreadNameHelper.flow(muleContext, stageName);
+    if (minThreads != null) {
+      threadingProfile.setMaxThreadsIdle(minThreads);
     }
-
-    public Integer getMaxThreads()
-    {
-        return maxThreads;
+    if (maxBufferSize != null) {
+      threadingProfile.setMaxBufferSize(maxBufferSize);
     }
-
-    public void setMaxThreads(Integer maxThreads)
-    {
-        this.maxThreads = maxThreads;
+    if (threadTTL != null) {
+      threadingProfile.setThreadTTL(threadTTL);
     }
-
-    public Integer getMinThreads()
-    {
-        return minThreads;
+    if (threadWaitTimeout != null) {
+      threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
     }
-
-    public void setMinThreads(Integer minThreads)
-    {
-        this.minThreads = minThreads;
+    if (poolExhaustedAction != null) {
+      threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
     }
+    threadingProfile.setMuleContext(muleContext);
+    return threadingProfile;
+  }
 
-    public void setMaxBufferSize(Integer maxBufferSize)
-    {
-        this.maxBufferSize = maxBufferSize;
-    }
+  protected String getThreadPoolName(String stageName, MuleContext muleContext) {
+    return ThreadNameHelper.flow(muleContext, stageName);
+  }
 
-    public void setThreadTTL(Long threadTTL)
-    {
-        this.threadTTL = threadTTL;
-    }
+  public Integer getMaxThreads() {
+    return maxThreads;
+  }
 
-    public void setThreadWaitTimeout(Long threadWaitTimeout)
-    {
-        this.threadWaitTimeout = threadWaitTimeout;
-    }
+  public void setMaxThreads(Integer maxThreads) {
+    this.maxThreads = maxThreads;
+  }
 
-    public void setPoolExhaustedAction(Integer poolExhaustedAction)
-    {
-        this.poolExhaustedAction = poolExhaustedAction;
-    }
+  public Integer getMinThreads() {
+    return minThreads;
+  }
 
-    public Integer getMaxBufferSize()
-    {
-        return maxBufferSize;
-    }
+  public void setMinThreads(Integer minThreads) {
+    this.minThreads = minThreads;
+  }
 
-    public Long getThreadTTL()
-    {
-        return threadTTL;
-    }
+  public void setMaxBufferSize(Integer maxBufferSize) {
+    this.maxBufferSize = maxBufferSize;
+  }
 
-    public Long getThreadWaitTimeout()
-    {
-        return threadWaitTimeout;
-    }
+  public void setThreadTTL(Long threadTTL) {
+    this.threadTTL = threadTTL;
+  }
 
-    public Integer getPoolExhaustedAction()
-    {
-        return poolExhaustedAction;
-    }
+  public void setThreadWaitTimeout(Long threadWaitTimeout) {
+    this.threadWaitTimeout = threadWaitTimeout;
+  }
+
+  public void setPoolExhaustedAction(Integer poolExhaustedAction) {
+    this.poolExhaustedAction = poolExhaustedAction;
+  }
+
+  public Integer getMaxBufferSize() {
+    return maxBufferSize;
+  }
+
+  public Long getThreadTTL() {
+    return threadTTL;
+  }
+
+  public Long getThreadWaitTimeout() {
+    return threadWaitTimeout;
+  }
+
+  public Integer getPoolExhaustedAction() {
+    return poolExhaustedAction;
+  }
 
 }

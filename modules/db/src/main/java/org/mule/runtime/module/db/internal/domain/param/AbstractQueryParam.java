@@ -10,38 +10,32 @@ package org.mule.runtime.module.db.internal.domain.param;
 import org.mule.runtime.module.db.internal.domain.type.DbType;
 
 /**
- * Defines a base class for implementing different kind of { @link QueryParam}
- * classes.
+ * Defines a base class for implementing different kind of { @link QueryParam} classes.
  */
-public class AbstractQueryParam implements QueryParam
-{
+public class AbstractQueryParam implements QueryParam {
 
-    private final int index;
-    private final DbType type;
-    private final String name;
+  private final int index;
+  private final DbType type;
+  private final String name;
 
-    public AbstractQueryParam(int index, DbType type, String name)
-    {
-        this.index = index;
-        this.type = type;
-        this.name = name;
-    }
+  public AbstractQueryParam(int index, DbType type, String name) {
+    this.index = index;
+    this.type = type;
+    this.name = name;
+  }
 
-    @Override
-    public int getIndex()
-    {
-        return index;
-    }
+  @Override
+  public int getIndex() {
+    return index;
+  }
 
-    @Override
-    public DbType getType()
-    {
-        return type;
-    }
+  @Override
+  public DbType getType() {
+    return type;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 }

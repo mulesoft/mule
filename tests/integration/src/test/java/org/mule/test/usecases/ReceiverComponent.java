@@ -9,10 +9,9 @@ package org.mule.test.usecases;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
-public class ReceiverComponent implements Callable
-{
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        return "Received: " + eventContext.getMessageAsString();
-    }
+public class ReceiverComponent implements Callable {
+
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    return "Received: " + eventContext.getMessageAsString();
+  }
 }

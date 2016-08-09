@@ -14,113 +14,95 @@ import java.util.Arrays;
 /**
  * Includes basic configuration for the HTTP Cache-Control Header
  */
-public class CacheControlHeader
-{
-    private static final String[] DIRECTIVE = {"public", "private"};
+public class CacheControlHeader {
 
-    private String directive;
-    private String noCache;
-    private String noStore;
-    private String mustRevalidate;
-    private String maxAge;
+  private static final String[] DIRECTIVE = {"public", "private"};
+
+  private String directive;
+  private String noCache;
+  private String noStore;
+  private String mustRevalidate;
+  private String maxAge;
 
 
-    public CacheControlHeader()
-    {
-        noCache = "false";
-        noStore = "false";
-        mustRevalidate = "false";
+  public CacheControlHeader() {
+    noCache = "false";
+    noStore = "false";
+    mustRevalidate = "false";
+  }
+
+  /**
+   * Evaluates all the properties in case there are expressions
+   *
+   * @param event MuleEvent
+   * @param expressionManager
+   */
+  public void parse(MuleEvent event, ExpressionManager expressionManager) {
+    directive = parse(directive, event, expressionManager);
+    checkDirective(directive);
+    noCache = parse(noCache, event, expressionManager);
+    noStore = parse(noStore, event, expressionManager);
+    mustRevalidate = parse(mustRevalidate, event, expressionManager);
+    maxAge = parse(maxAge, event, expressionManager);
+  }
+
+  private void checkDirective(String directive) {
+    if (directive != null && !Arrays.asList(DIRECTIVE).contains(directive)) {
+      throw new IllegalArgumentException("Invalid Cache-Control directive: " + directive);
+    }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder cacheControl = new StringBuilder("");
+    if (directive != null) {
+      cacheControl.append(directive).append(",");
+    }
+    if (Boolean.valueOf(noCache)) {
+      cacheControl.append("no-cache").append(",");
+    }
+    if (Boolean.valueOf(noStore)) {
+      cacheControl.append("no-store").append(",");
+    }
+    if (Boolean.valueOf(mustRevalidate)) {
+      cacheControl.append("must-revalidate").append(",");
+    }
+    if (maxAge != null) {
+      cacheControl.append("max-age=").append(maxAge).append(",");
     }
 
-    /**
-     * Evaluates all the properties in case there are expressions
-     *
-     * @param event MuleEvent
-     * @param expressionManager
-     */
-    public void parse(MuleEvent event, ExpressionManager expressionManager)
-    {
-        directive = parse(directive, event, expressionManager);
-        checkDirective(directive);
-        noCache = parse(noCache, event, expressionManager);
-        noStore = parse(noStore, event, expressionManager);
-        mustRevalidate = parse(mustRevalidate, event, expressionManager);
-        maxAge = parse(maxAge, event, expressionManager);
+    String value = cacheControl.toString();
+    if (value.endsWith(",")) {
+      return value.substring(0, value.length() - 1);
     }
+    return value;
+  }
 
-    private void checkDirective(String directive)
-    {
-        if(directive != null && !Arrays.asList(DIRECTIVE).contains(directive))
-        {
-            throw new IllegalArgumentException("Invalid Cache-Control directive: " + directive);
-        }
+  private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
+    if (value != null) {
+      return expressionManager.parse(value, event);
     }
+    return value;
+  }
 
-    @Override
-    public String toString()
-    {
-        StringBuilder cacheControl = new StringBuilder("");
-        if(directive != null)
-        {
-            cacheControl.append(directive).append(",");
-        }
-        if(Boolean.valueOf(noCache))
-        {
-            cacheControl.append("no-cache").append(",");
-        }
-        if(Boolean.valueOf(noStore))
-        {
-            cacheControl.append("no-store").append(",");
-        }
-        if(Boolean.valueOf(mustRevalidate))
-        {
-            cacheControl.append("must-revalidate").append(",");
-        }
-        if(maxAge != null)
-        {
-            cacheControl.append("max-age=").append(maxAge).append(",");
-        }
+  public void setDirective(String directive) {
+    this.directive = directive;
+  }
 
-        String value = cacheControl.toString();
-        if(value.endsWith(","))
-        {
-            return value.substring(0, value.length() - 1);
-        }
-        return value;
-    }
+  public void setNoCache(String noCache) {
+    this.noCache = noCache;
+  }
 
-    private String parse(String value, MuleEvent event, ExpressionManager expressionManager)
-    {
-        if(value != null)
-        {
-            return expressionManager.parse(value, event);
-        }
-        return value;
-    }
+  public void setNoStore(String noStore) {
+    this.noStore = noStore;
+  }
 
-    public void setDirective(String directive)
-    {
-        this.directive = directive;
-    }
+  public void setMustRevalidate(String mustRevalidate) {
+    this.mustRevalidate = mustRevalidate;
+  }
 
-    public void setNoCache(String noCache)
-    {
-        this.noCache = noCache;
-    }
-
-    public void setNoStore(String noStore)
-    {
-        this.noStore = noStore;
-    }
-
-    public void setMustRevalidate(String mustRevalidate)
-    {
-        this.mustRevalidate = mustRevalidate;
-    }
-
-    public void setMaxAge(String maxAge)
-    {
-        this.maxAge = maxAge;
-    }
+  public void setMaxAge(String maxAge) {
+    this.maxAge = maxAge;
+  }
 
 }

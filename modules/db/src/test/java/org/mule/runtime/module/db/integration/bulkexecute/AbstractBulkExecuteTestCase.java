@@ -20,23 +20,20 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBulkExecuteTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractBulkExecuteTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractBulkExecuteTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractBulkExecuteTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    protected void assertBulkModeResult(Object payload) throws SQLException
-    {
-        assertTrue(payload instanceof int[]);
-        int[] counters = (int[]) payload;
-        assertEquals(2, counters.length);
-        assertEquals(0, counters[0]);
-        assertEquals(1, counters[1]);
+  protected void assertBulkModeResult(Object payload) throws SQLException {
+    assertTrue(payload instanceof int[]);
+    int[] counters = (int[]) payload;
+    assertEquals(2, counters.length);
+    assertEquals(0, counters[0]);
+    assertEquals(1, counters[1]);
 
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=0 or POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=0 or POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 }

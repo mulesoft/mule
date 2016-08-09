@@ -20,159 +20,144 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TimerTestCase extends AbstractMuleTestCase implements TimeEventListener
-{
-    private volatile boolean fired;
+public class TimerTestCase extends AbstractMuleTestCase implements TimeEventListener {
 
-    private Timer timer;
+  private volatile boolean fired;
 
-    @Before
-    public void before()
-    {
-        timer = new Timer();
-    }
+  private Timer timer;
 
-    @After
-    public void after()
-    {
-        timer.cancel();
-    }
+  @Before
+  public void before() {
+    timer = new Timer();
+  }
 
-    @Test
-    public void testTimer() throws Exception
-    {
+  @After
+  public void after() {
+    timer.cancel();
+  }
 
-        EventTimerTask task = new EventTimerTask(this);
+  @Test
+  public void testTimer() throws Exception {
 
-        timer.schedule(task, 0, 1000);
-        task.start();
+    EventTimerTask task = new EventTimerTask(this);
 
-        new PollingProber(1500, 50).check(new JUnitLambdaProbe(() ->
-        {
-            assertTrue(fired);
-            return true;
-        }));
-    }
+    timer.schedule(task, 0, 1000);
+    task.start();
 
-    @Test
-    public void testStopTimer() throws Exception
-    {
-        fired = false;
+    new PollingProber(1500, 50).check(new JUnitLambdaProbe(() -> {
+      assertTrue(fired);
+      return true;
+    }));
+  }
 
-        EventTimerTask task = new EventTimerTask(this);
+  @Test
+  public void testStopTimer() throws Exception {
+    fired = false;
 
-        timer.schedule(task, 0, 1000);
-        task.start();
-        new PollingProber(1500, 50).check(new JUnitLambdaProbe(() ->
-        {
-            assertTrue(fired);
-            return true;
-        }));
-        fired = false;
-        task.stop();
-        Thread.sleep(1500);
-        assertFalse(fired);
-    }
+    EventTimerTask task = new EventTimerTask(this);
 
-    @Test
-    public void testMultipleListeners() throws Exception
-    {
-        fired = false;
-        AnotherListener listener = new AnotherListener();
+    timer.schedule(task, 0, 1000);
+    task.start();
+    new PollingProber(1500, 50).check(new JUnitLambdaProbe(() -> {
+      assertTrue(fired);
+      return true;
+    }));
+    fired = false;
+    task.stop();
+    Thread.sleep(1500);
+    assertFalse(fired);
+  }
 
-        EventTimerTask task = new EventTimerTask(this);
-        task.addListener(listener);
+  @Test
+  public void testMultipleListeners() throws Exception {
+    fired = false;
+    AnotherListener listener = new AnotherListener();
 
-        timer.schedule(task, 0, 1000);
+    EventTimerTask task = new EventTimerTask(this);
+    task.addListener(listener);
 
-        task.start();
-        new PollingProber(1500, 50).check(new JUnitLambdaProbe(() ->
-        {
-            assertTrue(fired);
-            assertTrue(listener.wasFired());
-            return true;
-        }));
-        listener.setWasFired(false);
+    timer.schedule(task, 0, 1000);
 
-        fired = false;
-        task.stop();
-        Thread.sleep(1500);
-        assertTrue(!fired);
-        assertTrue(!listener.wasFired());
-    }
+    task.start();
+    new PollingProber(1500, 50).check(new JUnitLambdaProbe(() -> {
+      assertTrue(fired);
+      assertTrue(listener.wasFired());
+      return true;
+    }));
+    listener.setWasFired(false);
 
-    @Test
-    public void testRemoveListeners() throws Exception
-    {
-        fired = false;
-        AnotherListener listener = new AnotherListener();
+    fired = false;
+    task.stop();
+    Thread.sleep(1500);
+    assertTrue(!fired);
+    assertTrue(!listener.wasFired());
+  }
 
-        EventTimerTask task = new EventTimerTask(this);
-        task.addListener(listener);
+  @Test
+  public void testRemoveListeners() throws Exception {
+    fired = false;
+    AnotherListener listener = new AnotherListener();
 
-        timer.schedule(task, 0, 1000);
+    EventTimerTask task = new EventTimerTask(this);
+    task.addListener(listener);
 
-        task.start();
-        new PollingProber(1500, 50).check(new JUnitLambdaProbe(() ->
-        {
-            assertTrue(fired);
-            assertTrue(listener.wasFired());
-            return true;
-        }));
-        listener.setWasFired(false);
+    timer.schedule(task, 0, 1000);
 
-        fired = false;
-        task.stop();
-        task.removeListener(this);
-        task.start();
-        Thread.sleep(1500);
-        assertTrue(!fired);
-        assertTrue(listener.wasFired());
-        listener.setWasFired(false);
-        task.stop();
-        task.removeAllListeners();
-        task.start();
-        Thread.sleep(1500);
-        assertTrue(!fired);
-        assertTrue(!listener.wasFired());
-    }
+    task.start();
+    new PollingProber(1500, 50).check(new JUnitLambdaProbe(() -> {
+      assertTrue(fired);
+      assertTrue(listener.wasFired());
+      return true;
+    }));
+    listener.setWasFired(false);
+
+    fired = false;
+    task.stop();
+    task.removeListener(this);
+    task.start();
+    Thread.sleep(1500);
+    assertTrue(!fired);
+    assertTrue(listener.wasFired());
+    listener.setWasFired(false);
+    task.stop();
+    task.removeAllListeners();
+    task.start();
+    Thread.sleep(1500);
+    assertTrue(!fired);
+    assertTrue(!listener.wasFired());
+  }
+
+  @Override
+  public void timeExpired(TimeEvent e) {
+    assertTrue(e.getTimeExpired() > 0);
+    assertNotNull(e.getName());
+    fired = true;
+
+  }
+
+  private class AnotherListener implements TimeEventListener {
+
+    private boolean wasFired;
 
     @Override
-    public void timeExpired(TimeEvent e)
-    {
-        assertTrue(e.getTimeExpired() > 0);
-        assertNotNull(e.getName());
-        fired = true;
-
+    public void timeExpired(TimeEvent e) {
+      wasFired = true;
     }
 
-    private class AnotherListener implements TimeEventListener
-    {
-
-        private boolean wasFired;
-
-        @Override
-        public void timeExpired(TimeEvent e)
-        {
-            wasFired = true;
-        }
-
-        /**
-         * @return Returns the wasFired.
-         */
-        public boolean wasFired()
-        {
-            return wasFired;
-        }
-
-        /**
-         * @param wasFired The wasFired to set.
-         */
-        public void setWasFired(boolean wasFired)
-        {
-            this.wasFired = wasFired;
-        }
-
+    /**
+     * @return Returns the wasFired.
+     */
+    public boolean wasFired() {
+      return wasFired;
     }
+
+    /**
+     * @param wasFired The wasFired to set.
+     */
+    public void setWasFired(boolean wasFired) {
+      this.wasFired = wasFired;
+    }
+
+  }
 
 }

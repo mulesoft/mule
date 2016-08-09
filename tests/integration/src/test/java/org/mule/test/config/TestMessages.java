@@ -9,16 +9,15 @@ package org.mule.test.config;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class TestMessages extends MessageFactory
-{
-    private static final TestMessages factory = new TestMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath("test");
-    
-    public static Message testMessage(String arg1, String arg2, String arg3)
-    {
-        return factory.createMessage(BUNDLE_PATH, 1, arg1, arg2, arg3);
-    }
+public class TestMessages extends MessageFactory {
+
+  private static final TestMessages factory = new TestMessages();
+
+  private static final String BUNDLE_PATH = getBundlePath("test");
+
+  public static Message testMessage(String arg1, String arg2, String arg3) {
+    return factory.createMessage(BUNDLE_PATH, 1, arg1, arg2, arg3);
+  }
 }
 
 

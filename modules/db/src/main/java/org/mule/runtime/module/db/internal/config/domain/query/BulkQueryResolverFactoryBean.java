@@ -17,45 +17,36 @@ import org.mule.runtime.module.db.internal.resolver.query.DynamicBulkQueryResolv
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class BulkQueryResolverFactoryBean implements FactoryBean<BulkQueryResolver>, MuleContextAware
-{
+public class BulkQueryResolverFactoryBean implements FactoryBean<BulkQueryResolver>, MuleContextAware {
 
-    private final String bulkQuery;
-    private MuleContext context;
+  private final String bulkQuery;
+  private MuleContext context;
 
-    public BulkQueryResolverFactoryBean(String bulkQuery)
-    {
-        this.bulkQuery = bulkQuery;
+  public BulkQueryResolverFactoryBean(String bulkQuery) {
+    this.bulkQuery = bulkQuery;
+  }
+
+  @Override
+  public BulkQueryResolver getObject() throws Exception {
+    if (context.getExpressionManager().isExpression(bulkQuery)) {
+      return new DynamicBulkQueryResolver(bulkQuery, new SimpleQueryTemplateParser(), context.getExpressionManager());
+    } else {
+      return new StaticBulkQueryResolver(bulkQuery, new SimpleQueryTemplateParser());
     }
+  }
 
-    @Override
-    public BulkQueryResolver getObject() throws Exception
-    {
-        if (context.getExpressionManager().isExpression(bulkQuery))
-        {
-            return new DynamicBulkQueryResolver(bulkQuery, new SimpleQueryTemplateParser(), context.getExpressionManager());
-        }
-        else
-        {
-            return new StaticBulkQueryResolver(bulkQuery, new SimpleQueryTemplateParser());
-        }
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return ParamValueResolver.class;
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ParamValueResolver.class;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.context = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.context = context;
+  }
 }

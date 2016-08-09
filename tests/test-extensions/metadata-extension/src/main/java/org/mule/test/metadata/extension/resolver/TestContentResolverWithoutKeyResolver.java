@@ -12,12 +12,11 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 
-public class TestContentResolverWithoutKeyResolver implements MetadataContentResolver<String>
-{
+public class TestContentResolverWithoutKeyResolver implements MetadataContentResolver<String> {
 
-    @Override
-    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        return TestMetadataResolverUtils.getMetadata(key);
-    }
+  @Override
+  public MetadataType getContentMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return TestMetadataResolverUtils.getMetadata(key);
+  }
 }

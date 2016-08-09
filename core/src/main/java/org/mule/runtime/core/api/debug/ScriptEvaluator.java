@@ -12,15 +12,14 @@ package org.mule.runtime.core.api.debug;
  *
  * @since 3.8.0
  */
-public interface ScriptEvaluator
-{
+public interface ScriptEvaluator {
 
-    /**
-     * Evaluates the script and returns the information of the result
-     *
-     * @param script The script to be evaluated
-     * @return The result of the script
-     */
-    FieldDebugInfo<?> eval(String script);
+  /**
+   * Evaluates the script and returns the information of the result
+   *
+   * @param script The script to be evaluated
+   * @return The result of the script
+   */
+  FieldDebugInfo<?> eval(String script);
 
 }

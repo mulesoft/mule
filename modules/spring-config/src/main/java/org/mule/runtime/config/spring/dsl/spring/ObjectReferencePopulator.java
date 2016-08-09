@@ -24,29 +24,25 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-class ObjectReferencePopulator
-{
+class ObjectReferencePopulator {
 
-    //TODO MULE-9682: Load this list dynamically and define the whole set of objects that can be injected.
-    private static ImmutableMap<Class<?>, String> OBJECT_REFERENCES = new ImmutableMap.Builder()
-            .put(MuleContext.class, OBJECT_MULE_CONTEXT)
-            .put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
-            .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER)
-            .build();
+  // TODO MULE-9682: Load this list dynamically and define the whole set of objects that can be injected.
+  private static ImmutableMap<Class<?>, String> OBJECT_REFERENCES =
+      new ImmutableMap.Builder().put(MuleContext.class, OBJECT_MULE_CONTEXT).put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
+          .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER).build();
 
 
-    /**
-     * @param type the type of the object to be popoulated with
-     * @param typeIdConsumer a {@code Consumer} that will be provided with the identifier of the object to populate
-     */
-    public void populate(Class<?> type, Consumer<String> typeIdConsumer)
-    {
-        String referenceName = OBJECT_REFERENCES.get(type);
-        if (referenceName == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not determine reference object of type: " + type.getName()));
-        }
-        typeIdConsumer.accept(referenceName);
+  /**
+   * @param type the type of the object to be popoulated with
+   * @param typeIdConsumer a {@code Consumer} that will be provided with the identifier of the object to populate
+   */
+  public void populate(Class<?> type, Consumer<String> typeIdConsumer) {
+    String referenceName = OBJECT_REFERENCES.get(type);
+    if (referenceName == null) {
+      throw new MuleRuntimeException(CoreMessages
+          .createStaticMessage("Could not determine reference object of type: " + type.getName()));
     }
+    typeIdConsumer.accept(referenceName);
+  }
 
 }

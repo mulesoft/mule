@@ -16,49 +16,36 @@ import java.util.Properties;
 /**
  * TODO
  */
-public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
-{
-    @Override
-    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
-    {
-        super.setEndpoint(uri, props);
+public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder {
 
-		String oldUri = uri.toString();
+  @Override
+  protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException {
+    super.setEndpoint(uri, props);
 
-        String newUri = null;
-        if (uri.getScheme().equals("topic"))
-        {
-            props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
-            newUri = uri.toString().replace("topic://", "jms://");
-        }
-        else if (uri.getScheme().equals("queue"))
-        {
-            newUri = uri.toString().replace("queue://", "jms://");
-        }//Added by Eugene - dynamic endpoints were resolved to jms://queue:// etc
-		else if (oldUri.startsWith("jms://queue://"))
-		{
-			newUri = uri.toString().replace("jms://queue://", "jms://queue:");
-		}
-		else if (oldUri.startsWith("jms://temp-queue://"))
-		{
-			newUri = uri.toString().replace("jms://temp-queue://", "jms://temp-queue:");
-		}
-		else if (oldUri.startsWith("jms://topic://"))
-		{
-			props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
-			newUri = uri.toString().replace("jms://topic://", "jms://topic:");
-		}
+    String oldUri = uri.toString();
 
-        try
-        {
-            if (newUri != null)
-            {
-                rewriteURI(new URI(newUri));
-            }
-        }
-        catch (URISyntaxException e)
-        {
-            throw new MalformedEndpointException(e);
-        }
+    String newUri = null;
+    if (uri.getScheme().equals("topic")) {
+      props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
+      newUri = uri.toString().replace("topic://", "jms://");
+    } else if (uri.getScheme().equals("queue")) {
+      newUri = uri.toString().replace("queue://", "jms://");
+    } // Added by Eugene - dynamic endpoints were resolved to jms://queue:// etc
+    else if (oldUri.startsWith("jms://queue://")) {
+      newUri = uri.toString().replace("jms://queue://", "jms://queue:");
+    } else if (oldUri.startsWith("jms://temp-queue://")) {
+      newUri = uri.toString().replace("jms://temp-queue://", "jms://temp-queue:");
+    } else if (oldUri.startsWith("jms://topic://")) {
+      props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
+      newUri = uri.toString().replace("jms://topic://", "jms://topic:");
     }
+
+    try {
+      if (newUri != null) {
+        rewriteURI(new URI(newUri));
+      }
+    } catch (URISyntaxException e) {
+      throw new MalformedEndpointException(e);
+    }
+  }
 }

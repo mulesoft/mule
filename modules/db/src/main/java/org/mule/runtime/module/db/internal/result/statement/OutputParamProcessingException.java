@@ -10,11 +10,9 @@ package org.mule.runtime.module.db.internal.result.statement;
 /**
  * Thrown to indicate an error during the processing of a output parameter
  */
-public class OutputParamProcessingException extends RuntimeException
-{
+public class OutputParamProcessingException extends RuntimeException {
 
-    public OutputParamProcessingException(Throwable cause)
-    {
-        super(cause);
-    }
+  public OutputParamProcessingException(Throwable cause) {
+    super(cause);
+  }
 }

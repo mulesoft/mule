@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-public enum HttpAuthenticationType
-{
-    BASIC, DIGEST, NTLM;
+public enum HttpAuthenticationType {
+  BASIC, DIGEST, NTLM;
 }

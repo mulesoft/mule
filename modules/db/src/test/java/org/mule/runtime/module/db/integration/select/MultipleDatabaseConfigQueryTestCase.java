@@ -10,17 +10,14 @@ package org.mule.runtime.module.db.integration.select;
 import org.mule.runtime.module.db.integration.config.AbstractMultipleDatabaseConfigErrorTestCase;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class MultipleDatabaseConfigQueryTestCase extends AbstractMultipleDatabaseConfigErrorTestCase
-{
+public class MultipleDatabaseConfigQueryTestCase extends AbstractMultipleDatabaseConfigErrorTestCase {
 
-    public MultipleDatabaseConfigQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public MultipleDatabaseConfigQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/multiple-database-config-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/multiple-database-config-query-config.xml"};
+  }
 }

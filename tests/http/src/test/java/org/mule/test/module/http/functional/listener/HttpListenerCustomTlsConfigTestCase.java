@@ -16,34 +16,30 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
-    @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
-    @Rule
-    public DynamicPort port3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort port3 = new DynamicPort("port3");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-custom-tls-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-custom-tls-config.xml";
+  }
 
-    @Test
-    public void customTlsGlobalContext() throws Exception
-    {
-        final MuleEvent res = flowRunner("testFlowGlobalContextClient").withPayload("data").run();
-        assertThat(getPayloadAsString(res.getMessage()), is("ok"));
-    }
+  @Test
+  public void customTlsGlobalContext() throws Exception {
+    final MuleEvent res = flowRunner("testFlowGlobalContextClient").withPayload("data").run();
+    assertThat(getPayloadAsString(res.getMessage()), is("ok"));
+  }
 
-    @Test
-    public void customTlsNestedContext() throws Exception
-    {
-        final MuleEvent res = flowRunner("testFlowNestedContextClient").withPayload("data").run();
-        assertThat(getPayloadAsString(res.getMessage()), is("all right"));
-    }
+  @Test
+  public void customTlsNestedContext() throws Exception {
+    final MuleEvent res = flowRunner("testFlowNestedContextClient").withPayload("data").run();
+    assertThat(getPayloadAsString(res.getMessage()), is("all right"));
+  }
 
 }

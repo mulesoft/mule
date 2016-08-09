@@ -40,340 +40,252 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Mule input/output utilities.
  */
-public class IOUtils extends org.apache.commons.io.IOUtils
-{
+public class IOUtils extends org.apache.commons.io.IOUtils {
 
-    private static final Log logger = LogFactory.getLog(IOUtils.class);
+  private static final Log logger = LogFactory.getLog(IOUtils.class);
 
-    protected static int bufferSize = NumberUtils.toInt(
-            System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
+  protected static int bufferSize = NumberUtils.toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
-    /**
-     * Attempts to load a resource from the file system, from a URL, or from the
-     * classpath, in that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @return the requested resource as a string
-     * @throws java.io.IOException IO error
-     */
-    public static String getResourceAsString(final String resourceName, final Class callingClass)
-            throws IOException
-    {
-        try (InputStream is = getResourceAsStream(resourceName, callingClass))
-        {
-            if (is != null)
-            {
-                return toString(is);
-            }
-            else
-            {
-                throw new IOException("Unable to load resource " + resourceName);
-            }
+  /**
+   * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @param callingClass The Class object of the calling object
+   * @return the requested resource as a string
+   * @throws java.io.IOException IO error
+   */
+  public static String getResourceAsString(final String resourceName, final Class callingClass) throws IOException {
+    try (InputStream is = getResourceAsStream(resourceName, callingClass)) {
+      if (is != null) {
+        return toString(is);
+      } else {
+        throw new IOException("Unable to load resource " + resourceName);
+      }
+    }
+  }
+
+  /**
+   * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @param callingClass The Class object of the calling object
+   * @return an InputStream to the resource or null if resource not found
+   * @throws java.io.IOException IO error
+   */
+  public static InputStream getResourceAsStream(final String resourceName, final Class callingClass) throws IOException {
+    return getResourceAsStream(resourceName, callingClass, true, true);
+  }
+
+  /**
+   * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @param callingClass The Class object of the calling object
+   * @param tryAsFile - try to load the resource from the local file system
+   * @param tryAsUrl - try to load the resource as a URL
+   * @return an InputStream to the resource or null if resource not found
+   * @throws java.io.IOException IO error
+   */
+  public static InputStream getResourceAsStream(final String resourceName, final Class callingClass, boolean tryAsFile,
+                                                boolean tryAsUrl)
+      throws IOException {
+
+    URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile, tryAsUrl);
+
+    if (url == null) {
+      return null;
+    } else {
+      return url.openStream();
+    }
+  }
+
+  /**
+   * Attempts to load a resource from the file system or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @param callingClass The Class object of the calling object
+   * @return an URL to the resource or null if resource not found
+   */
+  public static URL getResourceAsUrl(final String resourceName, final Class callingClass) {
+    return getResourceAsUrl(resourceName, callingClass, true, true);
+  }
+
+  /**
+   * Attempts to load a resource from the file system or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @param callingClass The Class object of the calling object
+   * @param tryAsFile - try to load the resource from the local file system
+   * @param tryAsUrl - try to load the resource as a Url string
+   * @return an URL to the resource or null if resource not found
+   */
+  public static URL getResourceAsUrl(final String resourceName, final Class callingClass, boolean tryAsFile, boolean tryAsUrl) {
+    if (resourceName == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("Resource name").getMessage());
+    }
+    URL url = null;
+
+    // Try to load the resource from the file system.
+    if (tryAsFile) {
+      try {
+        File file = FileUtils.newFile(resourceName);
+        if (file.exists()) {
+          url = file.getAbsoluteFile().toURL();
+        } else {
+          logger.debug("Unable to load resource from the file system: " + file.getAbsolutePath());
         }
+      } catch (Exception e) {
+        logger.debug("Unable to load resource from the file system: " + e.getMessage());
+      }
     }
 
-    /**
-     * Attempts to load a resource from the file system, from a URL, or from the
-     * classpath, in that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @return an InputStream to the resource or null if resource not found
-     * @throws java.io.IOException IO error
-     */
-    public static InputStream getResourceAsStream(final String resourceName,
-                                                  final Class callingClass) throws IOException
-    {
-        return getResourceAsStream(resourceName, callingClass, true, true);
+    // Try to load the resource from the classpath.
+    if (url == null) {
+      try {
+        url = (URL) AccessController.doPrivileged((PrivilegedAction) () -> ClassUtils.getResource(resourceName, callingClass));
+        if (url == null) {
+          logger.debug("Unable to load resource " + resourceName + " from the classpath");
+        }
+      } catch (Exception e) {
+        logger.debug("Unable to load resource " + resourceName + " from the classpath: " + e.getMessage());
+      }
     }
 
-    /**
-     * Attempts to load a resource from the file system, from a URL, or from the
-     * classpath, in that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @param tryAsFile    - try to load the resource from the local file system
-     * @param tryAsUrl     - try to load the resource as a URL
-     * @return an InputStream to the resource or null if resource not found
-     * @throws java.io.IOException IO error
-     */
-    public static InputStream getResourceAsStream(final String resourceName,
-                                                  final Class callingClass,
-                                                  boolean tryAsFile,
-                                                  boolean tryAsUrl) throws IOException
-    {
+    if (url == null) {
+      try {
+        url = new URL(resourceName);
+      } catch (MalformedURLException e) {
+        // ignore
+      }
+    }
+    return url;
+  }
 
-        URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile, tryAsUrl);
+  /**
+   * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code> method but catches any
+   * {@link IOException} and wraps it into a {@link RuntimeException}.
+   */
+  public static String toString(InputStream input) {
+    try {
+      return org.apache.commons.io.IOUtils.toString(input);
+    } catch (IOException iox) {
+      throw new RuntimeException(iox);
+    }
+  }
 
-        if (url == null)
-        {
-            return null;
-        }
-        else
-        {
-            return url.openStream();
-        }
+  /**
+   * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code> method but catches any
+   * {@link IOException} and wraps it into a {@link RuntimeException}.
+   */
+  public static byte[] toByteArray(InputStream input) {
+    try {
+      return org.apache.commons.io.IOUtils.toByteArray(input);
+    } catch (IOException iox) {
+      throw new RuntimeException(iox);
+    }
+  }
+
+  /**
+   * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because there is no
+   * polymorphism for static methods, but rather just direct use of these two methods.
+   */
+  public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+    byte[] buffer = new byte[bufferSize];
+    long count = 0;
+    int n = 0;
+    while (-1 != (n = input.read(buffer))) {
+      output.write(buffer, 0, n);
+      count += n;
+    }
+    return count;
+  }
+
+  /**
+   * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because there is no
+   * polymorphism for static methods, but rather just direct use of these two methods.
+   */
+  public static long copyLarge(Reader input, Writer output) throws IOException {
+    char[] buffer = new char[bufferSize];
+    long count = 0;
+    int n = 0;
+    while (-1 != (n = input.read(buffer))) {
+      output.write(buffer, 0, n);
+      count += n;
+    }
+    return count;
+  }
+
+  /**
+   * Transforms an Object into a DataHandler of its corresponding type.
+   *
+   * @param name the name of the attachment being handled
+   * @param object the attachment to be handled
+   * @param contentType the Content-Type of the attachment that is being handled
+   * @return a {@link DataHandler} of the corresponding attachment
+   * @throws IOException if the transformation fails.
+   */
+  public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws IOException {
+    DataHandler dh;
+    if (object instanceof File) {
+      if (contentType != null) {
+        dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
+      } else {
+        dh = new DataHandler(new FileDataSource((File) object));
+      }
+    } else if (object instanceof URL) {
+      if (contentType != null) {
+        dh = new DataHandler(((URL) object).openStream(), contentType.toString());
+      } else {
+        dh = new DataHandler((URL) object);
+      }
+    } else if (object instanceof String) {
+      if (contentType != null) {
+        dh = new DataHandler(new StringDataSource((String) object, name, contentType));
+      } else {
+        dh = new DataHandler(new StringDataSource((String) object, name));
+      }
+    } else if (object instanceof byte[] && contentType != null) {
+      dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+    } else if (object instanceof InputStream && contentType != null) {
+      dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
+    } else {
+      dh = new DataHandler(object, contentType.toString());
+    }
+    return dh;
+  }
+
+  /**
+   * Transforms an Object into a {@link MuleMessage} to be used in a {@link MultiPartPayload}.
+   *
+   * @param name the name of the attachment being handled
+   * @param object the attachment to be handled
+   * @param contentType the Content-Type of the attachment that is being handled
+   * @return a {@link MuleMessage} of the corresponding attachment
+   * @throws IOException if the transformation fails.
+   */
+  public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
+    final Builder builder;
+
+    if (object instanceof File) {
+      builder = MuleMessage.builder().payload(new FileInputStream((File) object));
+    } else if (object instanceof URL) {
+      builder = MuleMessage.builder().payload(((URL) object).openStream());
+    } else if (object instanceof String) {
+      builder = MuleMessage.builder().payload(object);
+      if (contentType == null || MediaType.ANY.matches(contentType)) {
+        builder.mediaType(MediaType.TEXT);
+      }
+    } else {
+      builder = MuleMessage.builder().payload(object);
     }
 
-    /**
-     * Attempts to load a resource from the file system or from the classpath, in
-     * that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @return an URL to the resource or null if resource not found
-     */
-    public static URL getResourceAsUrl(final String resourceName, final Class callingClass)
-    {
-        return getResourceAsUrl(resourceName, callingClass, true, true);
+    if (contentType != null && !MediaType.ANY.matches(contentType)) {
+      builder.mediaType(contentType);
+    } else {
+      final DataHandler dataHandler = toDataHandler(name, object, contentType);
+      builder.mediaType(MediaType.parse(dataHandler.getContentType()));
     }
 
-    /**
-     * Attempts to load a resource from the file system or from the classpath, in
-     * that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @param tryAsFile    - try to load the resource from the local file system
-     * @param tryAsUrl     - try to load the resource as a Url string
-     * @return an URL to the resource or null if resource not found
-     */
-    public static URL getResourceAsUrl(final String resourceName,
-                                       final Class callingClass,
-                                       boolean tryAsFile, boolean tryAsUrl)
-    {
-        if (resourceName == null)
-        {
-            throw new IllegalArgumentException(
-                    CoreMessages.objectIsNull("Resource name").getMessage());
-        }
-        URL url = null;
-
-        // Try to load the resource from the file system.
-        if (tryAsFile)
-        {
-            try
-            {
-                File file = FileUtils.newFile(resourceName);
-                if (file.exists())
-                {
-                    url = file.getAbsoluteFile().toURL();
-                }
-                else
-                {
-                    logger.debug("Unable to load resource from the file system: "
-                                 + file.getAbsolutePath());
-                }
-            }
-            catch (Exception e)
-            {
-                logger.debug("Unable to load resource from the file system: " + e.getMessage());
-            }
-        }
-
-        // Try to load the resource from the classpath.
-        if (url == null)
-        {
-            try
-            {
-                url = (URL) AccessController.doPrivileged((PrivilegedAction) () -> ClassUtils.getResource(resourceName, callingClass));
-                if (url == null)
-                {
-                    logger.debug("Unable to load resource " + resourceName + " from the classpath");
-                }
-            }
-            catch (Exception e)
-            {
-                logger.debug("Unable to load resource " + resourceName + " from the classpath: " + e.getMessage());
-            }
-        }
-
-        if (url == null)
-        {
-            try
-            {
-                url = new URL(resourceName);
-            }
-            catch (MalformedURLException e)
-            {
-                //ignore
-            }
-        }
-        return url;
-    }
-
-    /**
-     * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code>
-     * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
-     */
-    public static String toString(InputStream input)
-    {
-        try
-        {
-            return org.apache.commons.io.IOUtils.toString(input);
-        }
-        catch (IOException iox)
-        {
-            throw new RuntimeException(iox);
-        }
-    }
-
-    /**
-     * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code>
-     * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
-     */
-    public static byte[] toByteArray(InputStream input)
-    {
-        try
-        {
-            return org.apache.commons.io.IOUtils.toByteArray(input);
-        }
-        catch (IOException iox)
-        {
-            throw new RuntimeException(iox);
-        }
-    }
-
-    /**
-     * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because
-     * there is no polymorphism for static methods, but rather just direct use of these two methods.
-     */
-    public static long copyLarge(InputStream input, OutputStream output) throws IOException
-    {
-        byte[] buffer = new byte[bufferSize];
-        long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer)))
-        {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
-
-    /**
-     * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because
-     * there is no polymorphism for static methods, but rather just direct use of these two methods.
-     */
-    public static long copyLarge(Reader input, Writer output) throws IOException
-    {
-        char[] buffer = new char[bufferSize];
-        long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer)))
-        {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
-
-    /**
-     * Transforms an Object into a DataHandler of its corresponding type.
-     *
-     * @param name the name of the attachment being handled
-     * @param object the attachment to be handled
-     * @param contentType the Content-Type of the attachment that is being handled
-     * @return a {@link DataHandler} of the corresponding attachment
-     * @throws IOException if the transformation fails.
-     */
-    public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws IOException
-    {
-        DataHandler dh;
-        if (object instanceof File)
-        {
-            if (contentType != null)
-            {
-                dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
-            }
-            else
-            {
-                dh = new DataHandler(new FileDataSource((File) object));
-            }
-        }
-        else if (object instanceof URL)
-        {
-            if (contentType != null)
-            {
-                dh = new DataHandler(((URL) object).openStream(), contentType.toString());
-            }
-            else
-            {
-                dh = new DataHandler((URL) object);
-            }
-        }
-        else if (object instanceof String)
-        {
-            if (contentType != null)
-            {
-                dh = new DataHandler(new StringDataSource((String) object, name, contentType));
-            }
-            else
-            {
-                dh = new DataHandler(new StringDataSource((String) object, name));
-            }
-        }
-        else if (object instanceof byte[] && contentType != null)
-        {
-            dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
-        }
-        else if (object instanceof InputStream && contentType != null)
-        {
-            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
-        }
-        else
-        {
-            dh = new DataHandler(object, contentType.toString());
-        }
-        return dh;
-    }
-
-    /**
-     * Transforms an Object into a {@link MuleMessage} to be used in a {@link MultiPartPayload}.
-     *
-     * @param name the name of the attachment being handled
-     * @param object the attachment to be handled
-     * @param contentType the Content-Type of the attachment that is being handled
-     * @return a {@link MuleMessage} of the corresponding attachment
-     * @throws IOException if the transformation fails.
-     */
-    public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException
-    {
-        final Builder builder;
-
-        if (object instanceof File)
-        {
-            builder = MuleMessage.builder().payload(new FileInputStream((File) object));
-        }
-        else if (object instanceof URL)
-        {
-            builder = MuleMessage.builder().payload(((URL) object).openStream());
-        }
-        else if (object instanceof String)
-        {
-            builder = MuleMessage.builder().payload(object);
-            if (contentType == null || MediaType.ANY.matches(contentType))
-            {
-                builder.mediaType(MediaType.TEXT);
-            }
-        }
-        else
-        {
-            builder = MuleMessage.builder().payload(object);
-        }
-
-        if (contentType != null && !MediaType.ANY.matches(contentType))
-        {
-            builder.mediaType(contentType);
-        }
-        else
-        {
-            final DataHandler dataHandler = toDataHandler(name, object, contentType);
-            builder.mediaType(MediaType.parse(dataHandler.getContentType()));
-        }
-
-        return builder.attributes(new PartAttributes(name)).build();
-    }
+    return builder.attributes(new PartAttributes(name)).build();
+  }
 }

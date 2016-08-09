@@ -13,42 +13,37 @@ import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 
 /**
- * A {@link ObjectParsingDelegate} which only parses {@link ObjectType}
- * which represent one specific java type.
+ * A {@link ObjectParsingDelegate} which only parses {@link ObjectType} which represent one specific java type.
  *
  * @since 4.0
  */
-public class FixedTypeParsingDelegate implements ObjectParsingDelegate
-{
+public class FixedTypeParsingDelegate implements ObjectParsingDelegate {
 
-    private final Class<?> type;
+  private final Class<?> type;
 
-    /**
-     * Creates a new instance
-     *
-     * @param type the type that {@code this} delegate accepts
-     */
-    public FixedTypeParsingDelegate(Class<?> type)
-    {
-        this.type = type;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param type the type that {@code this} delegate accepts
+   */
+  public FixedTypeParsingDelegate(Class<?> type) {
+    this.type = type;
+  }
 
-    /**
-     * @param objectType an {@link ObjectType}
-     * @return {@code true} if the {@code objectType} represents the {@link #type}
-     */
-    @Override
-    public boolean accepts(ObjectType objectType)
-    {
-        return type.equals(getType(objectType));
-    }
+  /**
+   * @param objectType an {@link ObjectType}
+   * @return {@code true} if the {@code objectType} represents the {@link #type}
+   */
+  @Override
+  public boolean accepts(ObjectType objectType) {
+    return type.equals(getType(objectType));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl)
-    {
-        return fromChildConfiguration(type);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl) {
+    return fromChildConfiguration(type);
+  }
 }

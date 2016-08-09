@@ -18,26 +18,23 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase
-{
+public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-filename-filter-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-filename-filter-config.xml";
+  }
 
-    @Test
-    public void filtersFile() throws Exception
-    {
-        File folder = createFolder(getWorkingDirectory().getAbsolutePath());
-        createDataFile(folder, TEST_MESSAGE);
+  @Test
+  public void filtersFile() throws Exception {
+    File folder = createFolder(getWorkingDirectory().getAbsolutePath());
+    createDataFile(folder, TEST_MESSAGE);
 
-        MuleClient client = muleContext.getClient();
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
 
-        assertNotNull("Did not processed the file", response);
-        assertEquals(TEST_MESSAGE, response.getPayload());
-    }
+    assertNotNull("Did not processed the file", response);
+    assertEquals(TEST_MESSAGE, response.getPayload());
+  }
 }

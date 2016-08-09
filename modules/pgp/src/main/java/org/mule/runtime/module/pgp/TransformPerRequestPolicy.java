@@ -10,64 +10,56 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.Semaphore;
 
 /**
- * A {@link TransformPolicy} that copies only the requested transformed bytes
- * into the {@link PipedOutputStream}.
+ * A {@link TransformPolicy} that copies only the requested transformed bytes into the {@link PipedOutputStream}.
  */
-public class TransformPerRequestPolicy extends AbstractTransformPolicy
-{
+public class TransformPerRequestPolicy extends AbstractTransformPolicy {
 
-    private Semaphore writeSemaphore;
+  private Semaphore writeSemaphore;
 
-    public TransformPerRequestPolicy()
-    {
-        this.writeSemaphore = new Semaphore(1);
-    }
+  public TransformPerRequestPolicy() {
+    this.writeSemaphore = new Semaphore(1);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void readRequest(long length) {
+    super.readRequest(length);
+    this.writeSemaphore.release();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void release() {
+    this.writeSemaphore.release();
+    super.release();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Thread getCopyingThread() {
+    return new PerRequestWork();
+  }
+
+  private class PerRequestWork extends TransformerWork {
+
     @Override
-    public void readRequest(long length)
-    {
-        super.readRequest(length);
-        this.writeSemaphore.release();
+    protected void execute() throws Exception {
+      getTransformer().initialize(getInputStream().getOut());
+
+      boolean finishWriting = false;
+      while (!finishWriting && !isClosed) {
+        writeSemaphore.acquire();
+        finishWriting = getTransformer().write(getInputStream().getOut(), getBytesRequested());
+      }
     }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void release()
-    {
-        this.writeSemaphore.release();
-        super.release();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Thread getCopyingThread()
-    {
-        return new PerRequestWork();
-    }
-
-    private class PerRequestWork extends TransformerWork
-    {
-        @Override
-        protected void execute() throws Exception
-        {
-            getTransformer().initialize(getInputStream().getOut());
-
-            boolean finishWriting = false;
-            while (!finishWriting && !isClosed)
-            {
-                writeSemaphore.acquire();
-                finishWriting = getTransformer().write(getInputStream().getOut(), getBytesRequested());
-            }
-        }
-    }
+  }
 }
 
 

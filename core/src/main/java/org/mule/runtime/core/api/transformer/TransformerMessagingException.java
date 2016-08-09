@@ -13,30 +13,26 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * An exception that occurred while transforming a message.
  */
-public class TransformerMessagingException extends MessagingException
-{
-    private transient Transformer transformer;
+public class TransformerMessagingException extends MessagingException {
 
-    public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer)
-    {
-        super(message, event, transformer);
-        this.transformer = transformer;
-    }
+  private transient Transformer transformer;
 
-    public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer, Throwable cause)
-    {
-        super(message, event, cause, transformer);
-        this.transformer = transformer;
-    }
+  public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer) {
+    super(message, event, transformer);
+    this.transformer = transformer;
+  }
 
-    public TransformerMessagingException(MuleEvent event, Transformer transformer, Throwable cause)
-    {
-        super(event, cause, transformer);
-        this.transformer = transformer;
-    }
+  public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer, Throwable cause) {
+    super(message, event, cause, transformer);
+    this.transformer = transformer;
+  }
 
-    public Transformer getTransformer()
-    {
-        return transformer;
-    }
+  public TransformerMessagingException(MuleEvent event, Transformer transformer, Throwable cause) {
+    super(event, cause, transformer);
+    this.transformer = transformer;
+  }
+
+  public Transformer getTransformer() {
+    return transformer;
+  }
 }

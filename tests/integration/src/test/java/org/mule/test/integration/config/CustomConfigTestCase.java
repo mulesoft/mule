@@ -15,22 +15,20 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import org.junit.Test;
 
-public class CustomConfigTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/config/custom-config.xml";
-    }
+public class CustomConfigTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testCustomTransformerConfig() throws Exception
-    {
-        Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
-        assertNotNull("testTransformer should not be null", trans);
-        assertTrue("Transformer should be an instance of TestCompressionTransformer", trans instanceof TestCompressionTransformer);
-        assertEquals(((TestCompressionTransformer)trans).getBeanProperty1(), "soo");
-        assertEquals(((TestCompressionTransformer)trans).getBeanProperty2(), 12345);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/config/custom-config.xml";
+  }
+
+  @Test
+  public void testCustomTransformerConfig() throws Exception {
+    Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
+    assertNotNull("testTransformer should not be null", trans);
+    assertTrue("Transformer should be an instance of TestCompressionTransformer", trans instanceof TestCompressionTransformer);
+    assertEquals(((TestCompressionTransformer) trans).getBeanProperty1(), "soo");
+    assertEquals(((TestCompressionTransformer) trans).getBeanProperty2(), 12345);
+  }
 
 }

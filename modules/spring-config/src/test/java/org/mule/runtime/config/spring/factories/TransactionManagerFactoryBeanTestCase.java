@@ -23,47 +23,43 @@ import javax.transaction.TransactionManager;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
-public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase
-{
+public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void registerTransactionManager() throws Exception
-    {
-        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+  @Test
+  public void registerTransactionManager() throws Exception {
+    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
 
-        TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
-        txMgrFB.setMuleContext(context);
-        txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
-        TransactionManager transactionManager = txMgrFB.getObject();
-        assertThat(transactionManager, not(is(IsNull.nullValue())));
-    }
+    TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
+    txMgrFB.setMuleContext(context);
+    txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
+    TransactionManager transactionManager = txMgrFB.getObject();
+    assertThat(transactionManager, not(is(IsNull.nullValue())));
+  }
 
-    @Test
-    public void registerCustomTransactionManager() throws Exception
-    {
-        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+  @Test
+  public void registerCustomTransactionManager() throws Exception {
+    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
 
-        TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
-        txMgrFB.setMuleContext(context);
-        TransactionManager txMgr = mock(TransactionManager.class);
-        txMgrFB.setCustomTxManager(txMgr);
-        TransactionManager transactionManager = txMgrFB.getObject();
-        assertThat(transactionManager, sameInstance(txMgr));
-    }
+    TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
+    txMgrFB.setMuleContext(context);
+    TransactionManager txMgr = mock(TransactionManager.class);
+    txMgrFB.setCustomTxManager(txMgr);
+    TransactionManager transactionManager = txMgrFB.getObject();
+    assertThat(transactionManager, sameInstance(txMgr));
+  }
 
-    @Test
-    public void ignoreCustomTransactionManager() throws Exception
-    {
-        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+  @Test
+  public void ignoreCustomTransactionManager() throws Exception {
+    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
 
-        TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
-        txMgrFB.setMuleContext(context);
-        txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
-        TransactionManager txMgr = mock(TransactionManager.class);
-        txMgrFB.setCustomTxManager(txMgr);
-        TransactionManager transactionManager = txMgrFB.getObject();
-        assertThat(transactionManager, not(nullValue()));
-        assertThat(transactionManager, not(sameInstance(txMgr)));
-    }
+    TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
+    txMgrFB.setMuleContext(context);
+    txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
+    TransactionManager txMgr = mock(TransactionManager.class);
+    txMgrFB.setCustomTxManager(txMgr);
+    TransactionManager transactionManager = txMgrFB.getObject();
+    assertThat(transactionManager, not(nullValue()));
+    assertThat(transactionManager, not(sameInstance(txMgr)));
+  }
 
 }

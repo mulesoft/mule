@@ -10,13 +10,12 @@ package org.mule.runtime.module.db.internal.domain.connection;
 /**
  * Notifies that a connection can be released
  */
-public interface DbConnectionReleaser
-{
+public interface DbConnectionReleaser {
 
-    /**
-     * Releases a given connection
-     *
-     * @param connection connection to release
-     */
-    void release(DbConnection connection);
+  /**
+   * Releases a given connection
+   *
+   * @param connection connection to release
+   */
+  void release(DbConnection connection);
 }

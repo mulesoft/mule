@@ -28,89 +28,79 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations. */
-public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase {
 
-    private Session session = null;
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-transformers.xml";
+  private Session session = null;
+
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-transformers.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+
+    session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    RequestContext.setEvent(null);
+    if (session != null) {
+      session.close();
+      session = null;
+    }
+  }
+
+  @Test
+  public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception {
+    RequestContext.setEvent(getTestEvent("test"));
+
+    MuleMessage message = getTestMuleMessage("This is a test TextMessage");
+
+    SetTestRecipientsTransformer trans = new SetTestRecipientsTransformer();
+    trans.setMuleContext(muleContext);
+    MuleMessage result1 = (MuleMessage) trans.transform(message);
+
+    // Check that transformer 1 set message property ok.
+    assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
+                 result1.getOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY));
+
+    AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
+    trans2.setMuleContext(muleContext);
+    Message result2 = (Message) trans2.transform(result1);
+
+    // Test to see that ObjectToJMSMessage transformer transformed to JMS message
+    // correctly
+    assertThat(result2, instanceOf(TextMessage.class));
+    assertEquals("This is a test TextMessage", ((TextMessage) result2).getText());
+
+    // Check to see if after the ObjectToJMSMessage transformer these properties
+    // are on JMS message
+    assertEquals("vm://recipient1, vm://recipient1, vm://recipient3", result2.getStringProperty("recipients"));
+
+  }
+
+  /** Test <i>AbstractMessageTransformer</i> which sets Message properties */
+  private class SetTestRecipientsTransformer extends AbstractMessageTransformer {
+
+    public SetTestRecipientsTransformer() {
+      registerSourceType(DataType.MULE_MESSAGE);
     }
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+      String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
+      logger.debug("Setting recipients to '" + recipients + "'");
 
-        session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
+      event.setMessage(MuleMessage.builder(event.getMessage())
+          .addOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients).build());
+      return event.getMessage();
     }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        RequestContext.setEvent(null);
-        if (session != null)
-        {
-            session.close();
-            session = null;
-        }
-    }
-
-    @Test
-    public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception
-    {
-        RequestContext.setEvent(getTestEvent("test"));
-
-        MuleMessage message = getTestMuleMessage("This is a test TextMessage");
-
-        SetTestRecipientsTransformer trans = new SetTestRecipientsTransformer();
-        trans.setMuleContext(muleContext);
-        MuleMessage result1 = (MuleMessage) trans.transform(message);
-
-        // Check that transformer 1 set message property ok.
-        assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
-                     result1.getOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY));
-
-        AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
-        trans2.setMuleContext(muleContext);
-        Message result2 = (Message) trans2.transform(result1);
-
-        // Test to see that ObjectToJMSMessage transformer transformed to JMS message
-        // correctly
-        assertThat(result2, instanceOf(TextMessage.class));
-        assertEquals("This is a test TextMessage", ((TextMessage) result2).getText());
-
-        // Check to see if after the ObjectToJMSMessage transformer these properties
-        // are on JMS message
-        assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
-            result2.getStringProperty("recipients"));
-
-    }
-
-    /** Test <i>AbstractMessageTransformer</i> which sets Message properties */
-    private class SetTestRecipientsTransformer extends AbstractMessageTransformer
-    {
-
-        public SetTestRecipientsTransformer()
-        {
-            registerSourceType(DataType.MULE_MESSAGE);
-        }
-
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding)
-        {
-            String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
-            logger.debug("Setting recipients to '" + recipients + "'");
-
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                                     .addOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients)
-                                     .build());
-            return event.getMessage();
-        }
-
-    }
+  }
 
 }

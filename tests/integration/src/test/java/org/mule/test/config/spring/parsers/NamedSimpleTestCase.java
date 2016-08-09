@@ -11,29 +11,26 @@ import org.mule.test.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
-public class NamedSimpleTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/named-simple-test.xml";
-    }
+public class NamedSimpleTestCase extends AbstractNamespaceTestCase {
 
-    @Test
-    public void testNamed1()
-    {
-        OrphanBean orphan1 = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
-        assertBeanPopulated(orphan1, "orphan1");
-        ChildBean child1 = (ChildBean) assertContentExists(orphan1.getChild(), ChildBean.class);
-        assertBeanPopulated(child1, "child1");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/named-simple-test.xml";
+  }
 
-    @Test
-    public void testNamed2()
-    {
-        OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-        assertBeanPopulated(orphan2, "orphan2");
-        ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
-        assertBeanPopulated(child2, "child2");
-    }
+  @Test
+  public void testNamed1() {
+    OrphanBean orphan1 = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
+    assertBeanPopulated(orphan1, "orphan1");
+    ChildBean child1 = (ChildBean) assertContentExists(orphan1.getChild(), ChildBean.class);
+    assertBeanPopulated(child1, "child1");
+  }
+
+  @Test
+  public void testNamed2() {
+    OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+    assertBeanPopulated(orphan2, "orphan2");
+    ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
+    assertBeanPopulated(child2, "child2");
+  }
 }

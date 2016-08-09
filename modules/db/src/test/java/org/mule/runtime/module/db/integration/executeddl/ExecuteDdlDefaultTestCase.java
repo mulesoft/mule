@@ -19,43 +19,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase
-{
+public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase {
 
-    public ExecuteDdlDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public ExecuteDdlDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/executeddl/execute-ddl-default-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/executeddl/execute-ddl-default-config.xml"};
+  }
 
-    @Test
-    public void updatesDataRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("executeDdl").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void updatesDataRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("executeDdl").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertTableCreation(response.getPayload());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertTableCreation(response.getPayload());
+  }
 
-    @Test
-    public void updatesDataOneWay() throws Exception
-    {
-        flowRunner("executeDdlOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
+  @Test
+  public void updatesDataOneWay() throws Exception {
+    flowRunner("executeDdlOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertTableCreation(response.getPayload());
-    }
+    assertTableCreation(response.getPayload());
+  }
 }

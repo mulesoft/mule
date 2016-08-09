@@ -25,60 +25,58 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Rule;
 
 /**
- * Uses a WSDL definition file that imports the types from another WSDL file, which includes the schema from yet another
- * XSD file but via HTTP.
+ * Uses a WSDL definition file that imports the types from another WSDL file, which includes the schema from yet another XSD file
+ * but via HTTP.
  */
-public class IncludedExternalXsdTypesFunctionalTestCase extends IncludedXsdTypesFunctionalTestCase
-{
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
-    @Rule
-    public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestExternalIncludedTypes.wsdl");
+public class IncludedExternalXsdTypesFunctionalTestCase extends IncludedXsdTypesFunctionalTestCase {
 
-    private Server server;
-    File wsdl;
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestExternalIncludedTypes.wsdl");
+
+  private Server server;
+  File wsdl;
+
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    createWsdlFile();
+    startServer();
+  }
+
+  private void createWsdlFile() throws IOException {
+    // the WSDL must reference a dynamic HTTP port so we have to create it
+    String modifiedWsdl =
+        String.format(IOUtils.getResourceAsString("TestIncludedExternalTypeDefinitionsFormat.wsdl", this.getClass()),
+                      httpPort.getValue());
+    String testRoot = getClassPathRoot(IncludedExternalXsdTypesFunctionalTestCase.class).getPath();
+    wsdl = new File(testRoot + "TestIncludedExternalTypeDefinitions.wsdl");
+    FileUtils.writeStringToFile(wsdl, modifiedWsdl);
+  }
+
+  private void startServer() throws Exception {
+    server = new Server(httpPort.getNumber());
+    server.setHandler(new SchemaProviderHandler());
+    server.start();
+  }
+
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    server.stop();
+    FileUtils.deleteQuietly(wsdl);
+    super.doTearDownAfterMuleContextDispose();
+  }
+
+  private class SchemaProviderHandler extends AbstractHandler {
 
     @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        createWsdlFile();
-        startServer();
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException {
+      response.setContentType("application/xml");
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.getWriter().print(IOUtils.getResourceAsString("TestSchema.xsd", this.getClass()));
+      baseRequest.setHandled(true);
     }
-
-    private void createWsdlFile() throws IOException
-    {
-        //the WSDL must reference a dynamic HTTP port so we have to create it
-        String modifiedWsdl = String.format(IOUtils.getResourceAsString("TestIncludedExternalTypeDefinitionsFormat.wsdl", this.getClass()), httpPort.getValue());
-        String testRoot = getClassPathRoot(IncludedExternalXsdTypesFunctionalTestCase.class).getPath();
-        wsdl = new File(testRoot + "TestIncludedExternalTypeDefinitions.wsdl");
-        FileUtils.writeStringToFile(wsdl, modifiedWsdl);
-    }
-
-    private void startServer() throws Exception
-    {
-        server = new Server(httpPort.getNumber());
-        server.setHandler(new SchemaProviderHandler());
-        server.start();
-    }
-
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        server.stop();
-        FileUtils.deleteQuietly(wsdl);
-        super.doTearDownAfterMuleContextDispose();
-    }
-
-    private class SchemaProviderHandler extends AbstractHandler
-    {
-        @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-        {
-            response.setContentType("application/xml");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().print(IOUtils.getResourceAsString("TestSchema.xsd", this.getClass()));
-            baseRequest.setHandled(true);
-        }
-    }
+  }
 }

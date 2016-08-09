@@ -17,12 +17,10 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  * 
  * @since 4.0
  */
-public abstract class BaseAttributes implements Attributes
-{
+public abstract class BaseAttributes implements Attributes {
 
-    @Override
-    public String toString()
-    {
-        return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
-    }
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
+  }
 }

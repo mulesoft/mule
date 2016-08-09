@@ -7,38 +7,35 @@
 
 package org.mule.runtime.module.db.integration.model;
 
-public class Contact
-{
-    public static final Contact CONTACT1 = new Contact("Contact1", new ContactDetails[] {new ContactDetails("home", "1-111-111", "1@1111.com")});
-    public static final Contact CONTACT2 = new Contact("Contact2", new ContactDetails[] {new ContactDetails("work", "2-222-222", "2@2222.com")});
+public class Contact {
 
-    private final String name;
-    private final ContactDetails[] details;
+  public static final Contact CONTACT1 =
+      new Contact("Contact1", new ContactDetails[] {new ContactDetails("home", "1-111-111", "1@1111.com")});
+  public static final Contact CONTACT2 =
+      new Contact("Contact2", new ContactDetails[] {new ContactDetails("work", "2-222-222", "2@2222.com")});
 
-    public Contact(String name, ContactDetails[] details)
-    {
-        this.name = name;
-        this.details = details;
+  private final String name;
+  private final ContactDetails[] details;
+
+  public Contact(String name, ContactDetails[] details) {
+    this.name = name;
+    this.details = details;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public ContactDetails[] getDetails() {
+    return details;
+  }
+
+  public Object[] getDetailsAsObjectArray() {
+    final Object[] result = new Object[details.length];
+    for (int i = 0; i < details.length; i++) {
+      result[i] = details[i].asObjectArray();
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
-    public ContactDetails[] getDetails()
-    {
-        return details;
-    }
-
-    public Object[] getDetailsAsObjectArray()
-    {
-        final Object[] result = new Object[details.length];
-        for (int i = 0; i < details.length; i++)
-        {
-            result[i] = details[i].asObjectArray();
-        }
-
-        return result;
-    }
+    return result;
+  }
 }

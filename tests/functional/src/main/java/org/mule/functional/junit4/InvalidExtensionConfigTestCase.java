@@ -15,40 +15,33 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * An {@link ExtensionFunctionalTestCase} which is expected to point to a
- * somewhat invalid config. The test fails if the config is parsed correctly.
+ * An {@link ExtensionFunctionalTestCase} which is expected to point to a somewhat invalid config. The test fails if the config is
+ * parsed correctly.
  * <p>
- * This class does not require to implement any method annotation with
- * {@link Test}
+ * This class does not require to implement any method annotation with {@link Test}
  *
  * @since 4.0
  */
-public abstract class InvalidExtensionConfigTestCase extends ExtensionFunctionalTestCase
-{
+public abstract class InvalidExtensionConfigTestCase extends ExtensionFunctionalTestCase {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        configureExceptionAssertions();
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    configureExceptionAssertions();
+  }
 
-    private void configureExceptionAssertions()
-    {
-        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-        expectedException.expect(InitialisationException.class);
-        additionalExceptionAssertions(expectedException);
-    }
+  private void configureExceptionAssertions() {
+    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    expectedException.expect(InitialisationException.class);
+    additionalExceptionAssertions(expectedException);
+  }
 
-    protected void additionalExceptionAssertions(ExpectedException expectedException)
-    {
-    }
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {}
 
-    @Test
-    public void fail()
-    {
-        Assert.fail("Config should have failed to parse");
-    }
+  @Test
+  public void fail() {
+    Assert.fail("Config should have failed to parse");
+  }
 }

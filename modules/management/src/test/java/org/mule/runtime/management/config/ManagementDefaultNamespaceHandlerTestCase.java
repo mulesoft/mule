@@ -17,40 +17,38 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "management-default-namespace-config.xml";
-    }
+public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testDefaultJmxAgentConfig() throws Exception
-    {
-        Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
-        assertNotNull(agent);
-        assertEquals(JmxApplicationAgent.class, agent.getClass());
-        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
-        
-        assertEquals(false, jmxAgent.isCreateServer());
-        assertEquals(true, jmxAgent.isLocateServer());
-        assertEquals(true, jmxAgent.isEnableStatistics());
-        assertEquals(SimplePasswordJmxAuthenticator.class, jmxAgent.getJmxAuthenticator().getClass());
+  @Override
+  protected String getConfigFile() {
+    return "management-default-namespace-config.xml";
+  }
 
-        agent = muleContext.getRegistry().lookupAgent(JmxServerNotificationAgent.DEFAULT_AGENT_NAME);
-        assertNotNull(agent);
-        assertEquals(JmxServerNotificationAgent.class, agent.getClass());
+  @Test
+  public void testDefaultJmxAgentConfig() throws Exception {
+    Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
+    assertNotNull(agent);
+    assertEquals(JmxApplicationAgent.class, agent.getClass());
+    JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
+
+    assertEquals(false, jmxAgent.isCreateServer());
+    assertEquals(true, jmxAgent.isLocateServer());
+    assertEquals(true, jmxAgent.isEnableStatistics());
+    assertEquals(SimplePasswordJmxAuthenticator.class, jmxAgent.getJmxAuthenticator().getClass());
+
+    agent = muleContext.getRegistry().lookupAgent(JmxServerNotificationAgent.DEFAULT_AGENT_NAME);
+    assertNotNull(agent);
+    assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
-        assertNotNull(agent);
-        assertEquals(Mx4jAgent.class, agent.getClass());
+    agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
+    assertNotNull(agent);
+    assertEquals(Mx4jAgent.class, agent.getClass());
 
-        
-        agent = muleContext.getRegistry().lookupAgent("jmx-default-config");
-        // see TODO in agent
-//        assertNull(agent);
-    }
+
+    agent = muleContext.getRegistry().lookupAgent("jmx-default-config");
+    // see TODO in agent
+    // assertNull(agent);
+  }
 
 }

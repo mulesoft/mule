@@ -13,24 +13,20 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Test;
 
-public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
-{
+public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-default-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "heisenberg-default-config.xml";
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {HeisenbergExtension.class};
+  }
 
-    @Test
-    public void usesDefaultConfig() throws Exception
-    {
-        assertThat(getPayloadAsString(runFlow("sayMyName").getMessage()), is("Heisenberg"));
-    }
+  @Test
+  public void usesDefaultConfig() throws Exception {
+    assertThat(getPayloadAsString(runFlow("sayMyName").getMessage()), is("Heisenberg"));
+  }
 }

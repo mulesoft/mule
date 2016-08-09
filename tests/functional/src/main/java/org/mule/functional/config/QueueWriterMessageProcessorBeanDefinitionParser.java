@@ -16,22 +16,17 @@ import org.w3c.dom.Element;
 /**
  * Parses bean definitions for {@link QueueWriterMessageProcessor}
  */
-public class QueueWriterMessageProcessorBeanDefinitionParser extends ChildDefinitionParser
-{
+public class QueueWriterMessageProcessorBeanDefinitionParser extends ChildDefinitionParser {
 
-    public QueueWriterMessageProcessorBeanDefinitionParser()
-    {
-        super("messageProcessor", QueueWriterMessageProcessor.class);
-    }
+  public QueueWriterMessageProcessorBeanDefinitionParser() {
+    super("messageProcessor", QueueWriterMessageProcessor.class);
+  }
 
-    @Override
-    public String getBeanName(Element element)
-    {
-        return AutoIdUtils.uniqueValue("test.queue." + element.getAttribute("name"));
-    }
+  @Override
+  public String getBeanName(Element element) {
+    return AutoIdUtils.uniqueValue("test.queue." + element.getAttribute("name"));
+  }
 
-    @Override
-    protected void checkElementNameUnique(Element element)
-    {
-    }
+  @Override
+  protected void checkElementNameUnique(Element element) {}
 }

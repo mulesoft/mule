@@ -15,26 +15,25 @@ import org.mule.runtime.core.api.MuleException;
  *
  * @since 4.0
  */
-public interface HttpAuthentication
-{
+public interface HttpAuthentication {
 
-    /**
-     * Adds authentication information to the request. This method will be executed before creating and sending the
-     * request. Implementations will usually add some authentication header, but there is no restriction on this.
-     *
-     * @param muleEvent The event that is being processed.
-     * @param builder The builder that is being used to create the HTTP request.
-     */
-    void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException;
+  /**
+   * Adds authentication information to the request. This method will be executed before creating and sending the request.
+   * Implementations will usually add some authentication header, but there is no restriction on this.
+   *
+   * @param muleEvent The event that is being processed.
+   * @param builder The builder that is being used to create the HTTP request.
+   */
+  void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException;
 
-    /**
-     * Detects if there was an authentication failure in the response. After sending an HTTP request and creating an
-     * event with the response, this method will be executed. If it returns false, the flow continues executing. If
-     * it returns true, the requester will try to send the request again.
-     *
-     * @param firstAttemptResponseEvent The event with the response of the request.
-     * @return True if the request should be sent again, false otherwise.
-     */
-    boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException;
+  /**
+   * Detects if there was an authentication failure in the response. After sending an HTTP request and creating an event with the
+   * response, this method will be executed. If it returns false, the flow continues executing. If it returns true, the requester
+   * will try to send the request again.
+   *
+   * @param firstAttemptResponseEvent The event with the response of the request.
+   * @return True if the request should be sent again, false otherwise.
+   */
+  boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException;
 
 }

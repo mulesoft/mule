@@ -15,85 +15,72 @@ import java.io.Serializable;
 import org.apache.commons.collections.Factory;
 
 /**
- * Will wrap a provided object store or a newly created one with the provided factory, with the provided having
- * precedence if present.
+ * Will wrap a provided object store or a newly created one with the provided factory, with the provided having precedence if
+ * present.
  * <p/>
- * In the case the factory is used and a fresh object store is created, its lifecycle management will be delegated by
- * this wrapper.
+ * In the case the factory is used and a fresh object store is created, its lifecycle management will be delegated by this
+ * wrapper.
  */
-public class ProvidedObjectStoreWrapper<T extends Serializable> implements ObjectStore<T>, Disposable
-{
-    private ObjectStore<T> wrapped;
-    private final boolean provided;
+public class ProvidedObjectStoreWrapper<T extends Serializable> implements ObjectStore<T>, Disposable {
 
-    /**
-     * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreFactory} to create one.
-     * 
-     * @param providedObjectStore the objectStroe provided through config to use. May be null.
-     * @param objectStoreFactory the factory to use to build an object store if {@code providedObjectStore} is null.
-     */
-    public ProvidedObjectStoreWrapper(ObjectStore<T> providedObjectStore, Factory objectStoreFactory)
-    {
-        if (providedObjectStore == null)
-        {
-            provided = false;
-            wrapped = (ObjectStore<T>) objectStoreFactory.create();
-        }
-        else
-        {
-            provided = true;
-            wrapped = providedObjectStore;
-        }
-    }
+  private ObjectStore<T> wrapped;
+  private final boolean provided;
 
-    @Override
-    public boolean contains(Serializable key) throws ObjectStoreException
-    {
-        return getWrapped().contains(key);
+  /**
+   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreFactory} to create one.
+   * 
+   * @param providedObjectStore the objectStroe provided through config to use. May be null.
+   * @param objectStoreFactory the factory to use to build an object store if {@code providedObjectStore} is null.
+   */
+  public ProvidedObjectStoreWrapper(ObjectStore<T> providedObjectStore, Factory objectStoreFactory) {
+    if (providedObjectStore == null) {
+      provided = false;
+      wrapped = (ObjectStore<T>) objectStoreFactory.create();
+    } else {
+      provided = true;
+      wrapped = providedObjectStore;
     }
+  }
 
-    @Override
-    public void store(Serializable key, T value) throws ObjectStoreException
-    {
-        getWrapped().store(key, value);
-    }
+  @Override
+  public boolean contains(Serializable key) throws ObjectStoreException {
+    return getWrapped().contains(key);
+  }
 
-    @Override
-    public T retrieve(Serializable key) throws ObjectStoreException
-    {
-        return getWrapped().retrieve(key);
-    }
+  @Override
+  public void store(Serializable key, T value) throws ObjectStoreException {
+    getWrapped().store(key, value);
+  }
 
-    @Override
-    public T remove(Serializable key) throws ObjectStoreException
-    {
-        return getWrapped().remove(key);
-    }
+  @Override
+  public T retrieve(Serializable key) throws ObjectStoreException {
+    return getWrapped().retrieve(key);
+  }
 
-    @Override
-    public boolean isPersistent()
-    {
-        return getWrapped().isPersistent();
-    }
+  @Override
+  public T remove(Serializable key) throws ObjectStoreException {
+    return getWrapped().remove(key);
+  }
 
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        getWrapped().clear();
-    }
+  @Override
+  public boolean isPersistent() {
+    return getWrapped().isPersistent();
+  }
 
-    @Override
-    public void dispose()
-    {
-        if (!provided && wrapped != null && wrapped instanceof Disposable)
-        {
-            ((Disposable) wrapped).dispose();
-        }
-        wrapped = null;
+  @Override
+  public void clear() throws ObjectStoreException {
+    getWrapped().clear();
+  }
+
+  @Override
+  public void dispose() {
+    if (!provided && wrapped != null && wrapped instanceof Disposable) {
+      ((Disposable) wrapped).dispose();
     }
-    
-    protected ObjectStore<T> getWrapped()
-    {
-        return wrapped;
-    }
+    wrapped = null;
+  }
+
+  protected ObjectStore<T> getWrapped() {
+    return wrapped;
+  }
 }

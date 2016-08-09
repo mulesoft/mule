@@ -14,23 +14,22 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface WithParameters
-{
+public interface WithParameters {
 
-    /**
-     * @return A list of {@link ExtensionParameter} that represents the parameters of the component
-     */
-    List<ExtensionParameter> getParameters();
+  /**
+   * @return A list of {@link ExtensionParameter} that represents the parameters of the component
+   */
+  List<ExtensionParameter> getParameters();
 
-    /**
-     * @return A list of {@link ExtensionParameter} that represents the parameters of the component that are considered
-     * as parameter groups
-     */
-    List<ExtensionParameter> getParameterGroups();
+  /**
+   * @return A list of {@link ExtensionParameter} that represents the parameters of the component that are considered as parameter
+   *         groups
+   */
+  List<ExtensionParameter> getParameterGroups();
 
-    /**
-     * @param annotationClass {@link Annotation} to look for parameters annotated with this class
-     * @return A list of {@link ExtensionParameter} that are annotated with the given Annotation Class
-     */
-    List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass);
+  /**
+   * @param annotationClass {@link Annotation} to look for parameters annotated with this class
+   * @return A list of {@link ExtensionParameter} that are annotated with the given Annotation Class
+   */
+  List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass);
 }

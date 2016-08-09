@@ -19,32 +19,30 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase
-{
+public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase {
 
-    public static final String OUTPUT_QUEUE_NAME = "flowOut";
+  public static final String OUTPUT_QUEUE_NAME = "flowOut";
 
-    @Override
-    protected String getConfigFile()
-    {
-        setStartContext(false);
-        return "vm/persistent-vmqueue-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    setStartContext(false);
+    return "vm/persistent-vmqueue-test.xml";
+  }
 
-    @Test
-    public void testUnhealthyMessageIgnored() throws Exception
-    {
-        File firstQueueFile = DualRandomAccessFileQueueStoreDelegate.getFirstQueueFileForTesting(OUTPUT_QUEUE_NAME, getWorkingDirectory().getAbsolutePath());
-        FileUtils.createFile(firstQueueFile.getAbsolutePath());
+  @Test
+  public void testUnhealthyMessageIgnored() throws Exception {
+    File firstQueueFile = DualRandomAccessFileQueueStoreDelegate
+        .getFirstQueueFileForTesting(OUTPUT_QUEUE_NAME, getWorkingDirectory().getAbsolutePath());
+    FileUtils.createFile(firstQueueFile.getAbsolutePath());
 
-        muleContext.start();
+    muleContext.start();
 
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://flowIn", "echo", null);
-        MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals("echo", result.getPayload());
-    }
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://flowIn", "echo", null);
+    MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertEquals("echo", result.getPayload());
+  }
 }
 
 

@@ -15,12 +15,10 @@ import java.util.List;
 /**
  * Resolves a query parameters to a static value without using the current event
  */
-public class StaticParamValueResolver implements ParamValueResolver
-{
+public class StaticParamValueResolver implements ParamValueResolver {
 
-    @Override
-    public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams)
-    {
-        return templateParams;
-    }
+  @Override
+  public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams) {
+    return templateParams;
+  }
 }

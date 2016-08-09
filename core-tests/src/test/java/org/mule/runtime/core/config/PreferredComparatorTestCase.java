@@ -17,50 +17,45 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class PreferredComparatorTestCase extends AbstractMuleTestCase
-{
+public class PreferredComparatorTestCase extends AbstractMuleTestCase {
 
-    private PreferredComparator comparator;
+  private PreferredComparator comparator;
 
-    @Before
-    public void setUpComparator()
-    {
-        comparator = new PreferredComparator();
-    }
+  @Before
+  public void setUpComparator() {
+    comparator = new PreferredComparator();
+  }
 
-    @Test
-    public void testCompareEqualInstances()
-    {
-        Preferred preferred1 = mock(Preferred.class);
-        when(preferred1.weight()).thenReturn(1);
+  @Test
+  public void testCompareEqualInstances() {
+    Preferred preferred1 = mock(Preferred.class);
+    when(preferred1.weight()).thenReturn(1);
 
-        Preferred preferred2 = mock(Preferred.class);
-        when(preferred2.weight()).thenReturn(1);
+    Preferred preferred2 = mock(Preferred.class);
+    when(preferred2.weight()).thenReturn(1);
 
-        assertEquals(0, comparator.compare(preferred1, preferred2));
-    }
+    assertEquals(0, comparator.compare(preferred1, preferred2));
+  }
 
-    @Test
-    public void testCompareMinorThanInstance()
-    {
-        Preferred preferred1 = mock(Preferred.class);
-        when(preferred1.weight()).thenReturn(1);
+  @Test
+  public void testCompareMinorThanInstance() {
+    Preferred preferred1 = mock(Preferred.class);
+    when(preferred1.weight()).thenReturn(1);
 
-        Preferred preferred2 = mock(Preferred.class);
-        when(preferred2.weight()).thenReturn(2);
+    Preferred preferred2 = mock(Preferred.class);
+    when(preferred2.weight()).thenReturn(2);
 
-        assertEquals(-1, comparator.compare(preferred1, preferred2));
-    }
+    assertEquals(-1, comparator.compare(preferred1, preferred2));
+  }
 
-    @Test
-    public void testCompareGreaterThanInstance()
-    {
-        Preferred preferred1 = mock(Preferred.class);
-        when(preferred1.weight()).thenReturn(2);
+  @Test
+  public void testCompareGreaterThanInstance() {
+    Preferred preferred1 = mock(Preferred.class);
+    when(preferred1.weight()).thenReturn(2);
 
-        Preferred preferred2 = mock(Preferred.class);
-        when(preferred2.weight()).thenReturn(1);
+    Preferred preferred2 = mock(Preferred.class);
+    when(preferred2.weight()).thenReturn(1);
 
-        assertEquals(1, comparator.compare(preferred1, preferred2));
-    }
+    assertEquals(1, comparator.compare(preferred1, preferred2));
+  }
 }

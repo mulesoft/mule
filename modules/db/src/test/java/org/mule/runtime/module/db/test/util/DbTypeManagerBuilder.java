@@ -20,49 +20,43 @@ import java.util.List;
 /**
  * Builds {@link DbTypeManager} mocks
  */
-public class DbTypeManagerBuilder
-{
+public class DbTypeManagerBuilder {
 
-    private DbConnection connection;
-    private List<DbType> types = new ArrayList<DbType>();
-    private List<DbType> unknownTypes = new ArrayList<DbType>();
+  private DbConnection connection;
+  private List<DbType> types = new ArrayList<DbType>();
+  private List<DbType> unknownTypes = new ArrayList<DbType>();
 
-    public DbTypeManagerBuilder on(DbConnection connection)
-    {
+  public DbTypeManagerBuilder on(DbConnection connection) {
 
-        this.connection = connection;
-        return this;
+    this.connection = connection;
+    return this;
+  }
+
+  public DbTypeManagerBuilder managing(DbType type) {
+    types.add(type);
+
+    return this;
+  }
+
+  public DbTypeManagerBuilder unknowing(DbType type) {
+    unknownTypes.add(type);
+
+    return this;
+  }
+
+  public DbTypeManager build() {
+    DbTypeManager dbTypeManager = mock(DbTypeManager.class);
+
+    for (DbType type : types) {
+      when(dbTypeManager.lookup(connection, type.getId(), type.getName())).thenReturn(type);
     }
 
-    public DbTypeManagerBuilder managing(DbType type)
-    {
-        types.add(type);
-
-        return this;
+    for (DbType type : unknownTypes) {
+      when(dbTypeManager.lookup(connection, type.getId(), type.getName()))
+          .thenThrow(new UnknownDbTypeException(type.getId(), type.getName()));
     }
 
-    public DbTypeManagerBuilder unknowing(DbType type)
-    {
-        unknownTypes.add(type);
-
-        return this;
-    }
-
-    public DbTypeManager build()
-    {
-        DbTypeManager dbTypeManager = mock(DbTypeManager.class);
-
-        for (DbType type : types)
-        {
-            when(dbTypeManager.lookup(connection, type.getId(), type.getName())).thenReturn(type);
-        }
-
-        for (DbType type : unknownTypes)
-        {
-            when(dbTypeManager.lookup(connection, type.getId(), type.getName())).thenThrow(new UnknownDbTypeException(type.getId(), type.getName()));
-        }
-
-        return dbTypeManager;
-    }
+    return dbTypeManager;
+  }
 
 }

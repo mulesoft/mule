@@ -9,14 +9,13 @@ package org.mule.runtime.core.util.xa;
 /**
  * Base transaction context for XA transactions
  */
-public abstract class AbstractXaTransactionContext extends AbstractTransactionContext
-{
+public abstract class AbstractXaTransactionContext extends AbstractTransactionContext {
 
-    /**
-     * Two phase commit prepare phase
-     *
-     * @throws ResourceManagerException
-     */
-    public abstract void doPrepare() throws ResourceManagerException;
+  /**
+   * Two phase commit prepare phase
+   *
+   * @throws ResourceManagerException
+   */
+  public abstract void doPrepare() throws ResourceManagerException;
 
 }

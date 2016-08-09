@@ -19,25 +19,24 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class FtpMoveCommand extends ClassicFtpCommand implements MoveCommand
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(FtpMoveCommand.class);
+public final class FtpMoveCommand extends ClassicFtpCommand implements MoveCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FtpMoveCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
-    {
-        super(fileSystem, client);
-    }
+  private static final Logger LOGGER = LoggerFactory.getLogger(FtpMoveCommand.class);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
-    {
-        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
-        LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FtpMoveCommand(ClassicFtpFileSystem fileSystem, FTPClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
+                   boolean createParentDirectories) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
+    LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
+  }
 }

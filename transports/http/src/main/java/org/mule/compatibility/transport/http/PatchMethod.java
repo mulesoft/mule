@@ -8,21 +8,18 @@ package org.mule.compatibility.transport.http;
 
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 
-public class PatchMethod extends EntityEnclosingMethod
-{
-    public PatchMethod()
-    {
-        super();
-    }
+public class PatchMethod extends EntityEnclosingMethod {
 
-    public PatchMethod(String uri) throws IllegalArgumentException, IllegalStateException
-    {
-        super(uri);
-    }
+  public PatchMethod() {
+    super();
+  }
 
-    @Override
-    public String getName()
-    {
-        return HttpConstants.METHOD_PATCH;
-    }
+  public PatchMethod(String uri) throws IllegalArgumentException, IllegalStateException {
+    super(uri);
+  }
+
+  @Override
+  public String getName() {
+    return HttpConstants.METHOD_PATCH;
+  }
 }

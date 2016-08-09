@@ -21,121 +21,103 @@ import java.util.concurrent.TimeUnit;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
-{
+public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase {
 
-    @ClassRule
-    public static DynamicPort dynamicPort = new DynamicPort("port1");
+  @ClassRule
+  public static DynamicPort dynamicPort = new DynamicPort("port1");
 
-    private Latch testLatch = new Latch();
-    private String httpMethod;
-    private String body;
+  private Latch testLatch = new Latch();
+  private String httpMethod;
+  private String body;
 
-    public HttpOutboundTestCase()
-    {
-        setDisposeContextPerClass(true);
+  public HttpOutboundTestCase() {
+    setDisposeContextPerClass(true);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "http-outbound-config-flow.xml";
+  }
+
+  @Override
+  protected MockHttpServer getHttpServer() {
+    return new SimpleHttpServer(dynamicPort.getNumber());
+  }
+
+  @Test
+  public void testOutboundDelete() throws Exception {
+    sendHttpRequest("vm://doDelete", HttpConstants.METHOD_DELETE);
+    assertEmptyRequestBody();
+  }
+
+  @Test
+  public void testOutboundGet() throws Exception {
+    sendHttpRequest("vm://doGet", HttpConstants.METHOD_GET);
+    assertEmptyRequestBody();
+  }
+
+  @Test
+  public void testOutboundHead() throws Exception {
+    sendHttpRequest("vm://doHead", HttpConstants.METHOD_HEAD);
+    assertEmptyRequestBody();
+  }
+
+  @Test
+  public void testOutboundOptions() throws Exception {
+    sendHttpRequest("vm://doOptions", HttpConstants.METHOD_OPTIONS);
+    assertEmptyRequestBody();
+  }
+
+  @Test
+  public void testOutboundPost() throws Exception {
+    sendHttpRequest("vm://doPost", HttpConstants.METHOD_POST);
+    assertPayloadInRequestBody();
+  }
+
+  @Test
+  public void testOutboundPut() throws Exception {
+    sendHttpRequest("vm://doPut", HttpConstants.METHOD_PUT);
+    assertPayloadInRequestBody();
+  }
+
+  @Test
+  public void testOutboundTrace() throws Exception {
+    sendHttpRequest("vm://doTrace", HttpConstants.METHOD_TRACE);
+    assertEmptyRequestBody();
+  }
+
+  @Test
+  public void testOutboundPatch() throws Exception {
+    sendHttpRequest("vm://doPatch", HttpConstants.METHOD_PATCH);
+    assertPayloadInRequestBody();
+  }
+
+  private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception {
+    muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
+
+    assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    assertEquals(expectedHttpMethod, httpMethod);
+  }
+
+  private void assertPayloadInRequestBody() {
+    assertEquals(TEST_MESSAGE, body);
+  }
+
+  private void assertEmptyRequestBody() {
+    assertNull(body);
+  }
+
+  private class SimpleHttpServer extends SingleRequestMockHttpServer {
+
+    public SimpleHttpServer(int listenPort) {
+      super(listenPort, getDefaultEncoding(muleContext));
     }
 
     @Override
-    protected String getConfigFile()
-    {
-        return "http-outbound-config-flow.xml";
+    protected void processSingleRequest(HttpRequest httpRequest) throws Exception {
+      httpMethod = httpRequest.getRequestLine().getMethod();
+      body = httpRequest.getBodyString();
+      testLatch.countDown();
     }
-
-    @Override
-    protected MockHttpServer getHttpServer()
-    {
-        return new SimpleHttpServer(dynamicPort.getNumber());
-    }
-
-    @Test
-    public void testOutboundDelete() throws Exception
-    {
-        sendHttpRequest("vm://doDelete", HttpConstants.METHOD_DELETE);
-        assertEmptyRequestBody();
-    }
-
-    @Test
-    public void testOutboundGet() throws Exception
-    {
-        sendHttpRequest("vm://doGet", HttpConstants.METHOD_GET);
-        assertEmptyRequestBody();
-    }
-
-    @Test
-    public void testOutboundHead() throws Exception
-    {
-        sendHttpRequest("vm://doHead", HttpConstants.METHOD_HEAD);
-        assertEmptyRequestBody();
-    }
-
-    @Test
-    public void testOutboundOptions() throws Exception
-    {
-        sendHttpRequest("vm://doOptions", HttpConstants.METHOD_OPTIONS);
-        assertEmptyRequestBody();
-    }
-
-    @Test
-    public void testOutboundPost() throws Exception
-    {
-        sendHttpRequest("vm://doPost", HttpConstants.METHOD_POST);
-        assertPayloadInRequestBody();
-    }
-
-    @Test
-    public void testOutboundPut() throws Exception
-    {
-        sendHttpRequest("vm://doPut", HttpConstants.METHOD_PUT);
-        assertPayloadInRequestBody();
-    }
-
-    @Test
-    public void testOutboundTrace() throws Exception
-    {
-        sendHttpRequest("vm://doTrace", HttpConstants.METHOD_TRACE);
-        assertEmptyRequestBody();
-    }
-
-    @Test
-    public void testOutboundPatch() throws Exception
-    {
-        sendHttpRequest("vm://doPatch", HttpConstants.METHOD_PATCH);
-        assertPayloadInRequestBody();
-    }
-
-    private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception
-    {
-        muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
-
-        assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(expectedHttpMethod, httpMethod);
-    }
-
-    private void assertPayloadInRequestBody()
-    {
-        assertEquals(TEST_MESSAGE, body);
-    }
-
-    private void assertEmptyRequestBody()
-    {
-        assertNull(body);
-    }
-
-    private class SimpleHttpServer extends SingleRequestMockHttpServer
-    {
-
-        public SimpleHttpServer(int listenPort)
-        {
-            super(listenPort, getDefaultEncoding(muleContext));
-        }
-
-        @Override
-        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
-        {
-            httpMethod = httpRequest.getRequestLine().getMethod();
-            body = httpRequest.getBodyString();
-            testLatch.countDown();
-        }
-    }
+  }
 }

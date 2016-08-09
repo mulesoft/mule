@@ -17,44 +17,37 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
-{
+public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml";
+  }
+
+  @Before
+  public void before() {
+    ExpressionFilenameParser.resetCount();
+  }
+
+  @Test
+  public void testExceptionInTransformer() throws Exception {
+    File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
+    f.createNewFile();
+
+    // try a couple of times with backoff strategy, then fail
+    File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
+    boolean testSucceded = false;
+    int timesTried = 0;
+    while (timesTried <= 3) {
+      Thread.sleep(500 * ++timesTried);
+      if (errorFile.exists()) {
+        testSucceded = true;
+        break;
+      }
     }
 
-    @Before
-    public void before()
-    {
-        ExpressionFilenameParser.resetCount();
+    if (!testSucceded) {
+      fail("Exception strategy hasn't moved the file to the error folder.");
     }
-
-    @Test
-    public void testExceptionInTransformer() throws Exception
-    {
-        File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
-        f.createNewFile();
-
-        // try a couple of times with backoff strategy, then fail
-        File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
-        boolean testSucceded = false;
-        int timesTried = 0;
-        while (timesTried <= 3)
-        {
-            Thread.sleep(500 * ++timesTried);
-            if (errorFile.exists())
-            {
-                testSucceded = true;
-                break;
-            }
-        }
-
-        if (!testSucceded)
-        {
-            fail("Exception strategy hasn't moved the file to the error folder.");
-        }
-    }
+  }
 }

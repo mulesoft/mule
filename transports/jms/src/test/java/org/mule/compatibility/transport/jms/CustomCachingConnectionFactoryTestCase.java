@@ -31,131 +31,122 @@ import org.junit.Test;
 
 
 @SmallTest
-public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase
-{
+public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase {
 
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+  public static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
 
-    private ConnectionFactory delegate = mock(ConnectionFactory.class);
-    private Connection connection = mock(Connection.class);
+  private ConnectionFactory delegate = mock(ConnectionFactory.class);
+  private Connection connection = mock(Connection.class);
 
-    @Test
-    public void createsConnection() throws Exception
-    {
-        when(delegate.createConnection()).thenReturn(connection);
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, null, null);
+  @Test
+  public void createsConnection() throws Exception {
+    when(delegate.createConnection()).thenReturn(connection);
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, null, null);
 
-        Connection actualConnection = cachingConnectionFactory.createConnection();
+    Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
-        verify(delegate.createConnection());
-    }
+    assertThat(actualConnection, is(instanceOf(Proxy.class)));
+    verify(delegate.createConnection());
+  }
 
-    @Test
-    public void createsConnectionWithUsername() throws Exception
-    {
-        when(delegate.createConnection(USERNAME, null)).thenReturn(connection);
+  @Test
+  public void createsConnectionWithUsername() throws Exception {
+    when(delegate.createConnection(USERNAME, null)).thenReturn(connection);
 
 
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, null);
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, null);
 
-        Connection actualConnection = cachingConnectionFactory.createConnection();
+    Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
-        verify(delegate.createConnection(USERNAME, null));
-    }
+    assertThat(actualConnection, is(instanceOf(Proxy.class)));
+    verify(delegate.createConnection(USERNAME, null));
+  }
 
-    @Test
-    public void createsConnectionWithPassword() throws Exception
-    {
-        when(delegate.createConnection(null, PASSWORD)).thenReturn(connection);
-
-
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, null, PASSWORD);
-
-        Connection actualConnection = cachingConnectionFactory.createConnection();
-
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
-        verify(delegate.createConnection(null, PASSWORD));
-    }
-
-    @Test
-    public void createsConnectionWithUsernameAndPassword() throws Exception
-    {
-        when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection);
+  @Test
+  public void createsConnectionWithPassword() throws Exception {
+    when(delegate.createConnection(null, PASSWORD)).thenReturn(connection);
 
 
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, null, PASSWORD);
 
-        Connection actualConnection = cachingConnectionFactory.createConnection();
+    Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
-        verify(delegate.createConnection(USERNAME, PASSWORD));
-    }
+    assertThat(actualConnection, is(instanceOf(Proxy.class)));
+    verify(delegate.createConnection(null, PASSWORD));
+  }
 
-    @Test(expected = javax.jms.IllegalStateException.class)
-    public void throwsErrorCreatingConnectionWithCustomUsernameAndPassword() throws Exception
-    {
-
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
-        cachingConnectionFactory.createConnection(null, null);
-    }
-
-    @Test
-    public void createsSingleConnection() throws Exception
-    {
-        when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
+  @Test
+  public void createsConnectionWithUsernameAndPassword() throws Exception {
+    when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection);
 
 
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
-        Connection connection1 = cachingConnectionFactory.createConnection();
-        connection1.close();
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
 
-        Connection connection2 = cachingConnectionFactory.createConnection();
-        assertThat(connection2, equalTo(connection1));
-    }
+    Connection actualConnection = cachingConnectionFactory.createConnection();
 
-    @Test
-    public void cachesSession() throws Exception
-    {
-        when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
-        Session session = mock(Session.class);
-        when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session).thenReturn(null);
+    assertThat(actualConnection, is(instanceOf(Proxy.class)));
+    verify(delegate.createConnection(USERNAME, PASSWORD));
+  }
 
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
-        Connection connection1 = cachingConnectionFactory.createConnection();
-        Session session1 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+  @Test(expected = javax.jms.IllegalStateException.class)
+  public void throwsErrorCreatingConnectionWithCustomUsernameAndPassword() throws Exception {
 
-        session1.close();
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+    cachingConnectionFactory.createConnection(null, null);
+  }
 
-        Session session2 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+  @Test
+  public void createsSingleConnection() throws Exception {
+    when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
 
-        assertThat(session1, equalTo(session2));
-    }
 
-    @Test
-    public void cachesProducer() throws Exception
-    {
-        Destination destination = mock(Destination.class);
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+    Connection connection1 = cachingConnectionFactory.createConnection();
+    connection1.close();
 
-        when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
-        Session session = mock(Session.class);
-        when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session).thenReturn(null);
-        MessageProducer producer = mock(MessageProducer.class);
-        when(session.createProducer(destination)).thenReturn(producer).thenReturn(null);
+    Connection connection2 = cachingConnectionFactory.createConnection();
+    assertThat(connection2, equalTo(connection1));
+  }
 
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+  @Test
+  public void cachesSession() throws Exception {
+    when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
+    Session session = mock(Session.class);
+    when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session).thenReturn(null);
 
-        Connection connection1 = cachingConnectionFactory.createConnection();
-        Session session1 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        final MessageProducer producer1 = session1.createProducer(destination);
-        producer1.close();
-        session1.close();
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+    Connection connection1 = cachingConnectionFactory.createConnection();
+    Session session1 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Session session2 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        final MessageProducer producer2 = session2.createProducer(destination);
+    session1.close();
 
-        assertThat(producer1.toString(), equalTo(producer2.toString()));
-    }
+    Session session2 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+    assertThat(session1, equalTo(session2));
+  }
+
+  @Test
+  public void cachesProducer() throws Exception {
+    Destination destination = mock(Destination.class);
+
+    when(delegate.createConnection(USERNAME, PASSWORD)).thenReturn(connection).thenReturn(null);
+    Session session = mock(Session.class);
+    when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session).thenReturn(null);
+    MessageProducer producer = mock(MessageProducer.class);
+    when(session.createProducer(destination)).thenReturn(producer).thenReturn(null);
+
+    CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(delegate, USERNAME, PASSWORD);
+
+    Connection connection1 = cachingConnectionFactory.createConnection();
+    Session session1 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    final MessageProducer producer1 = session1.createProducer(destination);
+    producer1.close();
+    session1.close();
+
+    Session session2 = connection1.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    final MessageProducer producer2 = session2.createProducer(destination);
+
+    assertThat(producer1.toString(), equalTo(producer2.toString()));
+  }
 }

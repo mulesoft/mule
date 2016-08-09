@@ -23,163 +23,141 @@ import javax.jms.Topic;
 
 import org.junit.Test;
 
-public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
-{
-    private JmsConnector connector;
-    private DefaultJmsTopicResolver resolver;
+public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-topic-resolver.xml";
-    }
+  private JmsConnector connector;
+  private DefaultJmsTopicResolver resolver;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-        resolver = (DefaultJmsTopicResolver) connector.getTopicResolver();
-    }
+  @Override
+  protected String getConfigFile() {
+    return "jms-topic-resolver.xml";
+  }
 
-    @Test
-    public void testSameConnector()
-    {
-        assertSame(connector, resolver.getConnector());
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+    resolver = (DefaultJmsTopicResolver) connector.getTopicResolver();
+  }
 
-    @Test
-    public void testEndpointNotTopicWithFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
-        assertFalse(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testSameConnector() {
+    assertSame(connector, resolver.getConnector());
+  }
 
-    @Test
-    public void testEndpointNotTopicWithFallback2() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
-        assertFalse(resolver.isTopic(endpoint, true));
-    }
+  @Test
+  public void testEndpointNotTopicWithFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
+    assertFalse(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointNotTopicNoFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
-        assertFalse(resolver.isTopic(endpoint, false));
-    }
+  @Test
+  public void testEndpointNotTopicWithFallback2() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
+    assertFalse(resolver.isTopic(endpoint, true));
+  }
 
-    @Test
-    public void testEndpointTopicPropertyWithFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointNotTopicNoFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
+    assertFalse(resolver.isTopic(endpoint, false));
+  }
 
-    @Test
-    public void testEndpointTopicPropertyWithFallback2() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
-        assertTrue(resolver.isTopic(endpoint, true));
-    }
+  @Test
+  public void testEndpointTopicPropertyWithFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointTopicPropertyNoFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
-        assertFalse(resolver.isTopic(endpoint, false));
-    }
+  @Test
+  public void testEndpointTopicPropertyWithFallback2() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
+    assertTrue(resolver.isTopic(endpoint, true));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixWithFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicPropertyNoFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
+    assertFalse(resolver.isTopic(endpoint, false));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixWithFallback2() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
-        assertTrue(resolver.isTopic(endpoint, true));
-    }
+  @Test
+  public void testEndpointTopicPrefixWithFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixNoFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
-        assertTrue(resolver.isTopic(endpoint, false));
-    }
+  @Test
+  public void testEndpointTopicPrefixWithFallback2() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
+    assertTrue(resolver.isTopic(endpoint, true));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixAndPropertyWithFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicPrefixNoFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep3");
+    assertTrue(resolver.isTopic(endpoint, false));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixAndPropertyWithFallback2() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
-        assertTrue(resolver.isTopic(endpoint, true));
-    }
+  @Test
+  public void testEndpointTopicPrefixAndPropertyWithFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointTopicPrefixAndPropertyNoFallback() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
-        assertTrue(resolver.isTopic(endpoint, false));
-    }
+  @Test
+  public void testEndpointTopicPrefixAndPropertyWithFallback2() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
+    assertTrue(resolver.isTopic(endpoint, true));
+  }
 
-    @Test
-    public void testEndpointTopicUsesEndpointProperties() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep5");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicPrefixAndPropertyNoFallback() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep4");
+    assertTrue(resolver.isTopic(endpoint, false));
+  }
 
-    @Test
-    public void testEndpointTopicWithLeadingSlash() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep6");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicUsesEndpointProperties() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep5");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointTopicWithSlashes() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep7");
-        assertTrue(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicWithLeadingSlash() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep6");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testEndpointQueueWithSlashes() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep8");
-        assertFalse(resolver.isTopic(endpoint));
-    }
+  @Test
+  public void testEndpointTopicWithSlashes() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep7");
+    assertTrue(resolver.isTopic(endpoint));
+  }
 
-    @Test
-    public void testDestinationNotTopic() throws Exception
-    {
-        // prepare the mock
-        Queue queue = mock(Queue.class);
+  @Test
+  public void testEndpointQueueWithSlashes() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep8");
+    assertFalse(resolver.isTopic(endpoint));
+  }
 
-        assertFalse(resolver.isTopic(queue));
-    }
+  @Test
+  public void testDestinationNotTopic() throws Exception {
+    // prepare the mock
+    Queue queue = mock(Queue.class);
 
-    @Test
-    public void testDestinationTopic() throws Exception
-    {
-        // prepare the mock
-        Topic topic = mock(Topic.class);
+    assertFalse(resolver.isTopic(queue));
+  }
 
-        assertTrue(resolver.isTopic(topic));
-    }
+  @Test
+  public void testDestinationTopic() throws Exception {
+    // prepare the mock
+    Topic topic = mock(Topic.class);
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+    assertTrue(resolver.isTopic(topic));
+  }
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

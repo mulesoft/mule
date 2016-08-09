@@ -32,83 +32,71 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
-{
+public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
-    private static final String TYPE_PARAMETER_NAME = "type";
+  private static final String TYPE_PARAMETER_NAME = "type";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return METADATA_TEST;
-    }
+  @Override
+  protected String getConfigFile() {
+    return METADATA_TEST;
+  }
 
-    @Before
-    public void setUp()
-    {
-        componentId = new SourceId(SOURCE_METADATA);
-    }
+  @Before
+  public void setUp() {
+    componentId = new SourceId(SOURCE_METADATA);
+  }
 
-    @Test
-    public void getSourceMetadataKeys()
-    {
-        final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
-        assertThat(metadataKeysResult.isSuccess(), is(true));
-        final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
-        assertThat(metadataKeys.size(), is(3));
-        assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
-    }
+  @Test
+  public void getSourceMetadataKeys() {
+    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    assertThat(metadataKeysResult.isSuccess(), is(true));
+    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    assertThat(metadataKeys.size(), is(3));
+    assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
+  }
 
-    @Test
-    public void injectComposedMetadataKeyIdInstanceInSource() throws Exception
-    {
-        ((Flow) getFlowConstruct(SOURCE_METADATA_WITH_MULTILEVEL)).start();
-    }
+  @Test
+  public void injectComposedMetadataKeyIdInstanceInSource() throws Exception {
+    ((Flow) getFlowConstruct(SOURCE_METADATA_WITH_MULTILEVEL)).start();
+  }
 
-    @Test
-    public void injectSimpleMetadataKeyIdInstanceInSource() throws Exception
-    {
-        ((Flow) getFlowConstruct(SOURCE_METADATA)).start();
-    }
+  @Test
+  public void injectSimpleMetadataKeyIdInstanceInSource() throws Exception {
+    ((Flow) getFlowConstruct(SOURCE_METADATA)).start();
+  }
 
-    @Test
-    public void getSourceDynamicOutputMetadata() throws Exception
-    {
-        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
-        assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, personType);
-    }
+  @Test
+  public void getSourceDynamicOutputMetadata() throws Exception {
+    final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
+    assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, personType);
+  }
 
-    @Test
-    public void sourceDoesNotSupportDynamicContentMetadata() throws Exception
-    {
-        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
-        assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
-    }
+  @Test
+  public void sourceDoesNotSupportDynamicContentMetadata() throws Exception {
+    final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
+    assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
+  }
 
-    @Test
-    public void getSourceStaticOutputMetadata() throws IOException
-    {
-        final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-        assertExpectedOutput(componentMetadata.getOutputMetadata(), new TypeToken<Map<String, Object>>()
-        {
-        }.getType(), StringAttributes.class);
-    }
+  @Test
+  public void getSourceStaticOutputMetadata() throws IOException {
+    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
+    assertExpectedOutput(componentMetadata.getOutputMetadata(), new TypeToken<Map<String, Object>>() {}.getType(),
+                         StringAttributes.class);
+  }
 
-    @Test
-    public void getSourceParametersStaticMetadata() throws IOException
-    {
-        final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-        final List<MetadataResult<ParameterMetadataDescriptor>> parametersMetadata = componentMetadata.getParametersMetadata();
+  @Test
+  public void getSourceParametersStaticMetadata() throws IOException {
+    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
+    final List<MetadataResult<ParameterMetadataDescriptor>> parametersMetadata = componentMetadata.getParametersMetadata();
 
-        assertThat(parametersMetadata.size(), is(1));
-        final MetadataResult<ParameterMetadataDescriptor> typeMetadataDescriptor = parametersMetadata.get(0);
-        assertExpectedType(typeMetadataDescriptor, TYPE_PARAMETER_NAME, String.class);
-    }
+    assertThat(parametersMetadata.size(), is(1));
+    final MetadataResult<ParameterMetadataDescriptor> typeMetadataDescriptor = parametersMetadata.get(0);
+    assertExpectedType(typeMetadataDescriptor, TYPE_PARAMETER_NAME, String.class);
+  }
 
-    @Test
-    public void sourceDoesNotSupportStaticContentMetadata()
-    {
-        final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-        assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
-    }
+  @Test
+  public void sourceDoesNotSupportStaticContentMetadata() {
+    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
+    assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
+  }
 }

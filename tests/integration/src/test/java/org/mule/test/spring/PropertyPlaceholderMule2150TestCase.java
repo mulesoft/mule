@@ -12,38 +12,33 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class PropertyPlaceholderMule2150TestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        System.getProperties().put("systemProperty", "org");
-        return "org/mule/test/spring/property-placeholder-mule-2150-test.xml";
-    }
+public class PropertyPlaceholderMule2150TestCase extends AbstractIntegrationTestCase {
 
-    protected String getProperty(String propertyName)
-    {
-        MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
-        String value = (String) holder.getMap().get(propertyName);
-        assertNotNull(propertyName, value);
-        return value;
-    }
+  @Override
+  protected String getConfigFile() {
+    System.getProperties().put("systemProperty", "org");
+    return "org/mule/test/spring/property-placeholder-mule-2150-test.xml";
+  }
 
-    @Test
-    public void testMuleEnvironment()
-    {
-        assertEquals("value1", getProperty("prop1"));
-    }
+  protected String getProperty(String propertyName) {
+    MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
+    String value = (String) holder.getMap().get(propertyName);
+    assertNotNull(propertyName, value);
+    return value;
+  }
 
-    @Test
-    public void testSpringPropertyPlaceholder()
-    {
-        assertEquals("value2", getProperty("prop2"));
-    }
+  @Test
+  public void testMuleEnvironment() {
+    assertEquals("value1", getProperty("prop1"));
+  }
 
-    @Test
-    public void testJavaEnvironment()
-    {
-        assertEquals(System.getProperty("java.version"), getProperty("prop3"));
-    }
+  @Test
+  public void testSpringPropertyPlaceholder() {
+    assertEquals("value2", getProperty("prop2"));
+  }
+
+  @Test
+  public void testJavaEnvironment() {
+    assertEquals(System.getProperty("java.version"), getProperty("prop3"));
+  }
 }

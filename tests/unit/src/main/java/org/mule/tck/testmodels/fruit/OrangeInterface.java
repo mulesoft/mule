@@ -13,37 +13,37 @@ import java.util.Map;
  * TODO
  */
 
-public interface OrangeInterface extends Fruit
-{
-    String getBrand();
+public interface OrangeInterface extends Fruit {
 
-    Integer getSegments();
+  String getBrand();
 
-    Double getRadius();
+  Integer getSegments();
 
-    void setBrand(String string);
+  Double getRadius();
 
-    void setSegments(Integer integer);
+  void setBrand(String string);
 
-    void setRadius(Double double1);
+  void setSegments(Integer integer);
 
-    List getListProperties();
+  void setRadius(Double double1);
 
-    void setListProperties(List listProperties);
+  List getListProperties();
 
-    Map getMapProperties();
+  void setListProperties(List listProperties);
 
-    void setMapProperties(Map mapProperties);
+  Map getMapProperties();
 
-    List getArrayProperties();
+  void setMapProperties(Map mapProperties);
 
-    void setArrayProperties(List arrayProperties);
+  List getArrayProperties();
 
-    FruitCleaner getCleaner();
+  void setArrayProperties(List arrayProperties);
 
-    void setCleaner(FruitCleaner cleaner);
+  FruitCleaner getCleaner();
 
-    void wash();
+  void setCleaner(FruitCleaner cleaner);
 
-    void polish();
+  void wash();
+
+  void polish();
 }

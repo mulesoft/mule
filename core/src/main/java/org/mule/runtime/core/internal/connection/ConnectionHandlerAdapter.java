@@ -11,25 +11,21 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 
 /**
- * Adapter interface which extends the {@link ConnectionHandler} contract
- * with non-API functionality
+ * Adapter interface which extends the {@link ConnectionHandler} contract with non-API functionality
  *
  * @param <T> the generic type of the wrapped connection
  * @since 4.0
  */
-public interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable
-{
+public interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable {
 
-    /**
-     * Indicates that all resources allocated by the wrapped connection
-     * must be closed and released. This is different from {@link #release()}
-     * in the sense that the latter doesn't specify if the connection's resources
-     * are actually freed or not. This on the other hand is pretty explicit about
-     * that and implies that {@code this} instance is no longer usable after
-     * invoking this method
-     *
-     * @throws MuleException if an exception occurs closing the resource
-     */
-    @Override
-    void close() throws MuleException;
+  /**
+   * Indicates that all resources allocated by the wrapped connection must be closed and released. This is different from
+   * {@link #release()} in the sense that the latter doesn't specify if the connection's resources are actually freed or not. This
+   * on the other hand is pretty explicit about that and implies that {@code this} instance is no longer usable after invoking
+   * this method
+   *
+   * @throws MuleException if an exception occurs closing the resource
+   */
+  @Override
+  void close() throws MuleException;
 }

@@ -10,32 +10,26 @@ package org.mule.runtime.module.http.internal.request;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.http.api.HttpConstants;
 
-public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
-{
+public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
 
-    /**
-     * An status code validator that allows any status code.
-     */
-    public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
+  /**
+   * An status code validator that allows any status code.
+   */
+  public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
 
-    public SuccessStatusCodeValidator()
-    {
+  public SuccessStatusCodeValidator() {}
+
+  public SuccessStatusCodeValidator(String values) {
+    setValues(values);
+  }
+
+  @Override
+  public void validate(MuleEvent responseEvent) throws ResponseValidatorException {
+    int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+
+    if (!belongs(status)) {
+      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseEvent);
     }
-
-    public SuccessStatusCodeValidator(String values)
-    {
-        setValues(values);
-    }
-
-    @Override
-    public void validate(MuleEvent responseEvent) throws ResponseValidatorException
-    {
-        int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
-
-        if (!belongs(status))
-        {
-            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseEvent);
-        }
-    }
+  }
 
 }

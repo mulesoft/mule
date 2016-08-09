@@ -12,12 +12,11 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * Weblogic-specific JMS connector.
  */
-public class WeblogicJmsConnector extends JmsConnector
-{
-    /** Constructs a new WeblogicJmsConnector. */
-    public WeblogicJmsConnector(MuleContext context)
-    {
-        super(context);
-        setTopicResolver(new WeblogicJmsTopicResolver(this));
-    }
+public class WeblogicJmsConnector extends JmsConnector {
+
+  /** Constructs a new WeblogicJmsConnector. */
+  public WeblogicJmsConnector(MuleContext context) {
+    super(context);
+    setTopicResolver(new WeblogicJmsTopicResolver(this));
+  }
 }

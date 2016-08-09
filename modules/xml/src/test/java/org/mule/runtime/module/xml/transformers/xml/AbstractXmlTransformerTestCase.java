@@ -18,64 +18,47 @@ import org.w3c.dom.Document;
 /**
  * Use this superclass if you intend to compare Xml contents.
  */
-public abstract class AbstractXmlTransformerTestCase extends AbstractTransformerTestCase
-{
+public abstract class AbstractXmlTransformerTestCase extends AbstractTransformerTestCase {
 
-    protected AbstractXmlTransformerTestCase()
-    {
-        super();
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setXSLTVersion("2.0");
-        try
-        {
-            XMLUnit.getTransformerFactory();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
-        }
+  protected AbstractXmlTransformerTestCase() {
+    super();
+    XMLUnit.setIgnoreWhitespace(true);
+    XMLUnit.setXSLTVersion("2.0");
+    try {
+      XMLUnit.getTransformerFactory();
+    } catch (TransformerFactoryConfigurationError e) {
+      XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+    }
+  }
+
+  @Override
+  public boolean compareResults(Object expected, Object result) {
+    if (expected instanceof Document && result instanceof Document) {
+      return XMLUnit.compareXML((Document) expected, (Document) result).similar();
+    } else if (expected instanceof String && result instanceof String) {
+      try {
+        String expectedString = this.normalizeString((String) expected);
+        String resultString = this.normalizeString((String) result);
+        return XMLUnit.compareXML(expectedString, resultString).similar();
+      } catch (Exception ex) {
+        return false;
+      }
+    } else if (expected instanceof XMLStreamReader && result instanceof XMLStreamReader) {
+      XMLStreamReader expectedStream = (XMLStreamReader) expected;
+      XMLStreamReader resultStream = (XMLStreamReader) result;
+
+      try {
+        Document expectedDocument = XMLUtils.toW3cDocument(expectedStream);
+        Document resultDocument = XMLUtils.toW3cDocument(resultStream);
+
+        return XMLUnit.compareXML(expectedDocument, resultDocument).similar();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
 
-    @Override
-    public boolean compareResults(Object expected, Object result)
-    {
-        if (expected instanceof Document && result instanceof Document)
-        {
-            return XMLUnit.compareXML((Document)expected, (Document)result).similar();
-        }
-        else if (expected instanceof String && result instanceof String)
-        {
-            try
-            {
-                String expectedString = this.normalizeString((String)expected);
-                String resultString = this.normalizeString((String)result);
-                return XMLUnit.compareXML(expectedString, resultString).similar();
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-        else if (expected instanceof XMLStreamReader && result instanceof XMLStreamReader)
-        {
-            XMLStreamReader expectedStream = (XMLStreamReader) expected;
-            XMLStreamReader resultStream = (XMLStreamReader) result;
-
-            try
-            {
-                Document expectedDocument = XMLUtils.toW3cDocument(expectedStream);
-                Document resultDocument = XMLUtils.toW3cDocument(resultStream);
-
-                return XMLUnit.compareXML(expectedDocument, resultDocument).similar();
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // all other comparisons are passed up
-        return super.compareResults(expected, result);
-    }
+    // all other comparisons are passed up
+    return super.compareResults(expected, result);
+  }
 
 }

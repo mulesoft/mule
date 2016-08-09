@@ -20,431 +20,348 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This code is based on code coming from the <a
- * href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
+ * This code is based on code coming from the <a href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
  * project.
  *
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public abstract class AbstractResourceManager
-{
-    /**
-     * Shutdown mode: Wait for all transactions to complete
-     */
-    public static final int SHUTDOWN_MODE_NORMAL = 0;
+public abstract class AbstractResourceManager {
 
-    /**
-     * Shutdown mode: Try to roll back all active transactions
-     */
-    public static final int SHUTDOWN_MODE_ROLLBACK = 1;
+  /**
+   * Shutdown mode: Wait for all transactions to complete
+   */
+  public static final int SHUTDOWN_MODE_NORMAL = 0;
 
-    /**
-     * Shutdown mode: Try to stop active transaction <em>NOW</em>, do no rollbacks
-     */
-    public static final int SHUTDOWN_MODE_KILL = 2;
+  /**
+   * Shutdown mode: Try to roll back all active transactions
+   */
+  public static final int SHUTDOWN_MODE_ROLLBACK = 1;
 
-    protected static final int OPERATION_MODE_STOPPED = 0;
-    protected static final int OPERATION_MODE_STOPPING = 1;
-    protected static final int OPERATION_MODE_STARTED = 2;
-    protected static final int OPERATION_MODE_STARTING = 3;
-    protected static final int OPERATION_MODE_RECOVERING = 4;
+  /**
+   * Shutdown mode: Try to stop active transaction <em>NOW</em>, do no rollbacks
+   */
+  public static final int SHUTDOWN_MODE_KILL = 2;
 
-    protected static final int DEFAULT_TIMEOUT_MSECS = 5000;
-    protected static final int DEFAULT_COMMIT_TIMEOUT_FACTOR = 2;
+  protected static final int OPERATION_MODE_STOPPED = 0;
+  protected static final int OPERATION_MODE_STOPPING = 1;
+  protected static final int OPERATION_MODE_STARTED = 2;
+  protected static final int OPERATION_MODE_STARTING = 3;
+  protected static final int OPERATION_MODE_RECOVERING = 4;
 
-    protected Collection<AbstractTransactionContext> globalTransactions = Collections.synchronizedCollection(new ArrayList<AbstractTransactionContext>());
-    protected int operationMode = OPERATION_MODE_STOPPED;
-    protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
+  protected static final int DEFAULT_TIMEOUT_MSECS = 5000;
+  protected static final int DEFAULT_COMMIT_TIMEOUT_FACTOR = 2;
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+  protected Collection<AbstractTransactionContext> globalTransactions =
+      Collections.synchronizedCollection(new ArrayList<AbstractTransactionContext>());
+  protected int operationMode = OPERATION_MODE_STOPPED;
+  protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
 
-    protected boolean dirty = false;
+  protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    public synchronized void start() throws ResourceManagerSystemException
-    {
-        logger.info("Starting ResourceManager");
-        operationMode = OPERATION_MODE_STARTING;
-        // TODO: recover and sync
-        doStart();
-        recover();
-        // sync();
-        operationMode = OPERATION_MODE_STARTED;
-        if (dirty)
-        {
-            logger
-                .warn("Started ResourceManager, but in dirty mode only (Recovery of pending transactions failed)");
+  protected boolean dirty = false;
+
+  public synchronized void start() throws ResourceManagerSystemException {
+    logger.info("Starting ResourceManager");
+    operationMode = OPERATION_MODE_STARTING;
+    // TODO: recover and sync
+    doStart();
+    recover();
+    // sync();
+    operationMode = OPERATION_MODE_STARTED;
+    if (dirty) {
+      logger.warn("Started ResourceManager, but in dirty mode only (Recovery of pending transactions failed)");
+    } else {
+      logger.info("Started ResourceManager");
+    }
+  }
+
+  protected void doStart() throws ResourceManagerSystemException {
+    // template method
+  }
+
+  protected void recover() throws ResourceManagerSystemException {
+    // nothing to do (yet?)
+  }
+
+  public synchronized void stop() throws ResourceManagerSystemException {
+    stop(SHUTDOWN_MODE_NORMAL);
+  }
+
+  public synchronized boolean stop(int mode) throws ResourceManagerSystemException {
+    return stop(mode, getDefaultTransactionTimeout() * DEFAULT_COMMIT_TIMEOUT_FACTOR);
+  }
+
+  public synchronized boolean stop(int mode, long timeOut) throws ResourceManagerSystemException {
+    logger.info("Stopping ResourceManager");
+    operationMode = OPERATION_MODE_STOPPING;
+    // TODO: sync
+    // sync();
+    boolean success = shutdown(mode, timeOut);
+    // TODO: release
+    // releaseGlobalOpenResources();
+    if (success) {
+      operationMode = OPERATION_MODE_STOPPED;
+      logger.info("Stopped ResourceManager");
+    } else {
+      logger.warn("Failed to stop ResourceManager");
+    }
+
+    return success;
+  }
+
+  protected boolean shutdown(int mode, long timeoutMSecs) {
+    switch (mode) {
+      case SHUTDOWN_MODE_NORMAL:
+        return waitForAllTxToStop(timeoutMSecs);
+      case SHUTDOWN_MODE_ROLLBACK:
+        throw new UnsupportedOperationException();
+        // return rollBackOrForward();
+      case SHUTDOWN_MODE_KILL:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Gets the default transaction timeout in <em>milliseconds</em>.
+   */
+  public long getDefaultTransactionTimeout() {
+    return defaultTimeout;
+  }
+
+  /**
+   * Sets the default transaction timeout.
+   *
+   * @param timeout timeout in <em>milliseconds</em>
+   */
+  public void setDefaultTransactionTimeout(long timeout) {
+    defaultTimeout = timeout;
+  }
+
+  /**
+   * Starts a new transaction and associates it with the current thread. All subsequent changes in the same thread made to the map
+   * are invisible from other threads until {@link #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)}
+   * is called. Use {@link #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)} to discard your
+   * changes. After calling either method there will be no transaction associated to the current thread any longer. <br>
+   * <br>
+   * <em>Caution:</em> Be careful to finally call one of those methods, as otherwise the transaction will lurk around for ever.
+   *
+   * @see #prepareTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
+   * @see #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
+   * @see #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
+   */
+  public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException {
+    return createTransactionContext(session);
+  }
+
+  public void beginTransaction(AbstractTransactionContext context) throws ResourceManagerException {
+    // can only start a new transaction when not already stopping
+    assureStarted();
+
+    synchronized (context) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Beginning transaction " + context);
+      }
+      doBegin(context);
+      context.status = Status.STATUS_ACTIVE;
+      if (logger.isDebugEnabled()) {
+        logger.debug("Began transaction " + context);
+      }
+    }
+    globalTransactions.add(context);
+  }
+
+  public int prepareTransaction(AbstractTransactionContext context) throws ResourceManagerException {
+    assureReady();
+    synchronized (context) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Preparing transaction " + context);
+      }
+      context.status = Status.STATUS_PREPARING;
+      int status = doPrepare(context);
+      context.status = Status.STATUS_PREPARED;
+      if (logger.isDebugEnabled()) {
+        logger.debug("Prepared transaction " + context);
+      }
+      return status;
+    }
+  }
+
+  public void rollbackTransaction(AbstractTransactionContext context) throws ResourceManagerException {
+    assureReady();
+    synchronized (context) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Rolling back transaction " + context);
+      }
+      try {
+        context.status = Status.STATUS_ROLLING_BACK;
+        doRollback(context);
+        context.status = Status.STATUS_ROLLEDBACK;
+      } catch (Error e) {
+        setDirty(context, e);
+        throw e;
+      } catch (RuntimeException e) {
+        setDirty(context, e);
+        throw e;
+      } catch (ResourceManagerSystemException e) {
+        setDirty(context, e);
+        throw e;
+      } finally {
+        globalTransactions.remove(context);
+        context.finalCleanUp();
+        // tell shutdown thread this tx is finished
+        context.notifyFinish();
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug("Rolled back transaction " + context);
+      }
+    }
+  }
+
+  public void setTransactionRollbackOnly(AbstractTransactionContext context) throws ResourceManagerException {
+    context.status = Status.STATUS_MARKED_ROLLBACK;
+  }
+
+  public void commitTransaction(AbstractTransactionContext context) throws ResourceManagerException {
+    assureReady();
+    if (context.status == Status.STATUS_MARKED_ROLLBACK) {
+      throw new ResourceManagerException(CoreMessages.transactionMarkedForRollback());
+    }
+    synchronized (context) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Committing transaction " + context);
+      }
+      try {
+        context.status = Status.STATUS_COMMITTING;
+        doCommit(context);
+        context.status = Status.STATUS_COMMITTED;
+      } catch (Error e) {
+        setDirty(context, e);
+        throw e;
+      } catch (RuntimeException e) {
+        setDirty(context, e);
+        throw e;
+      } catch (ResourceManagerSystemException e) {
+        setDirty(context, e);
+        throw e;
+      } catch (ResourceManagerException e) {
+        logger.warn("Could not commit tx " + context + ", rolling back instead", e);
+        doRollback(context);
+      } finally {
+        globalTransactions.remove(context);
+        context.finalCleanUp();
+        // tell shutdown thread this tx is finished
+        context.notifyFinish();
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug("Committed transaction " + context);
+      }
+    }
+  }
+
+  protected abstract AbstractTransactionContext createTransactionContext(Object session);
+
+  protected abstract void doBegin(AbstractTransactionContext context);
+
+  protected abstract int doPrepare(AbstractTransactionContext context) throws ResourceManagerException;
+
+  protected abstract void doCommit(AbstractTransactionContext context) throws ResourceManagerException;
+
+  protected abstract void doRollback(AbstractTransactionContext context) throws ResourceManagerException;
+
+  // TODO
+  // protected boolean rollBackOrForward() {
+  // }
+
+  protected boolean waitForAllTxToStop(long timeoutMSecs) {
+    long startTime = System.currentTimeMillis();
+
+    // be sure not to lock globalTransactions for too long, as we need to
+    // give
+    // txs the chance to complete (otherwise deadlocks are very likely to
+    // occur)
+    // instead iterate over a copy as we can be sure no new txs will be
+    // registered
+    // after operation level has been set to stopping
+
+    Collection<AbstractTransactionContext> transactionsToStop;
+    synchronized (globalTransactions) {
+      transactionsToStop = new ArrayList<AbstractTransactionContext>(globalTransactions);
+    }
+    for (AbstractTransactionContext context : transactionsToStop) {
+      long remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
+
+      if (remainingTimeout <= 0) {
+        return false;
+      }
+
+      synchronized (context) {
+        if (!context.finished) {
+          logger.info("Waiting for tx " + context + " to finish for " + remainingTimeout + " milli seconds");
         }
-        else
-        {
-            logger.info("Started ResourceManager");
+        while (!context.finished && remainingTimeout > 0) {
+          try {
+            context.wait(remainingTimeout);
+          } catch (InterruptedException e) {
+            return false;
+          }
+          remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
         }
-    }
-
-    protected void doStart() throws ResourceManagerSystemException
-    {
-        // template method
-    }
-
-    protected void recover() throws ResourceManagerSystemException
-    {
-        // nothing to do (yet?)
-    }
-
-    public synchronized void stop() throws ResourceManagerSystemException
-    {
-        stop(SHUTDOWN_MODE_NORMAL);
-    }
-
-    public synchronized boolean stop(int mode) throws ResourceManagerSystemException
-    {
-        return stop(mode, getDefaultTransactionTimeout() * DEFAULT_COMMIT_TIMEOUT_FACTOR);
-    }
-
-    public synchronized boolean stop(int mode, long timeOut) throws ResourceManagerSystemException
-    {
-        logger.info("Stopping ResourceManager");
-        operationMode = OPERATION_MODE_STOPPING;
-        // TODO: sync
-        // sync();
-        boolean success = shutdown(mode, timeOut);
-        // TODO: release
-        // releaseGlobalOpenResources();
-        if (success)
-        {
-            operationMode = OPERATION_MODE_STOPPED;
-            logger.info("Stopped ResourceManager");
+        if (context.finished) {
+          logger.info("Tx " + context + " finished");
+        } else {
+          logger.warn("Tx " + context + " failed to finish in given time");
         }
-        else
-        {
-            logger.warn("Failed to stop ResourceManager");
-        }
-
-        return success;
+      }
     }
 
-    protected boolean shutdown(int mode, long timeoutMSecs)
-    {
-        switch (mode)
-        {
-            case SHUTDOWN_MODE_NORMAL :
-                return waitForAllTxToStop(timeoutMSecs);
-            case SHUTDOWN_MODE_ROLLBACK :
-                throw new UnsupportedOperationException();
-                // return rollBackOrForward();
-            case SHUTDOWN_MODE_KILL :
-                return true;
-            default :
-                return false;
-        }
+    return (globalTransactions.size() == 0);
+  }
+
+  /**
+   * Flag this resource manager as dirty. No more operations will be allowed until a recovery has been successfully performed.
+   *
+   * @param context
+   * @param t
+   */
+  protected void setDirty(AbstractTransactionContext context, Throwable t) {
+    logger.error("Fatal error during critical commit/rollback of transaction " + context + ", setting resource manager to dirty.",
+                 t);
+    dirty = true;
+  }
+
+  /**
+   * Check that the FileManager is started.
+   *
+   * @throws FileManagerSystemException if the FileManager is not started.
+   */
+  protected void assureStarted() throws ResourceManagerSystemException {
+    if (operationMode != OPERATION_MODE_STARTED) {
+      throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotStarted());
     }
-
-    /**
-     * Gets the default transaction timeout in <em>milliseconds</em>.
-     */
-    public long getDefaultTransactionTimeout()
-    {
-        return defaultTimeout;
+    // do not allow any further writing or commit or rollback when db is
+    // corrupt
+    if (dirty) {
+      throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
     }
+  }
 
-    /**
-     * Sets the default transaction timeout.
-     *
-     * @param timeout timeout in <em>milliseconds</em>
-     */
-    public void setDefaultTransactionTimeout(long timeout)
-    {
-        defaultTimeout = timeout;
+  /**
+   * Check that the FileManager is ready.
+   *
+   * @throws FileManagerSystemException if the FileManager is neither started not stopping.
+   */
+  protected void assureReady() throws ResourceManagerSystemException {
+    if (operationMode != OPERATION_MODE_STARTED && operationMode != OPERATION_MODE_STOPPING) {
+      throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotReady());
     }
-
-    /**
-     * Starts a new transaction and associates it with the current thread. All
-     * subsequent changes in the same thread made to the map are invisible from other
-     * threads until {@link #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)} is called. Use
-     * {@link #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)} to discard your changes. After
-     * calling either method there will be no transaction associated to the current thread any
-     * longer. <br>
-     * <br>
-     * <em>Caution:</em> Be careful to finally call one of those methods, as
-     * otherwise the transaction will lurk around for ever.
-     *
-     * @see #prepareTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
-     * @see #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
-     * @see #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
-     */
-    public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
-    {
-        return createTransactionContext(session);
+    // do not allow any further writing or commit or rollback when db is
+    // corrupt
+    if (dirty) {
+      throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
     }
-
-    public void beginTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        // can only start a new transaction when not already stopping
-        assureStarted();
-
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Beginning transaction " + context);
-            }
-            doBegin(context);
-            context.status = Status.STATUS_ACTIVE;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Began transaction " + context);
-            }
-        }
-        globalTransactions.add(context);
-    }
-
-    public int prepareTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        assureReady();
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Preparing transaction " + context);
-            }
-            context.status = Status.STATUS_PREPARING;
-            int status = doPrepare(context);
-            context.status = Status.STATUS_PREPARED;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Prepared transaction " + context);
-            }
-            return status;
-        }
-    }
-
-    public void rollbackTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        assureReady();
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Rolling back transaction " + context);
-            }
-            try
-            {
-                context.status = Status.STATUS_ROLLING_BACK;
-                doRollback(context);
-                context.status = Status.STATUS_ROLLEDBACK;
-            }
-            catch (Error e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            catch (RuntimeException e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            catch (ResourceManagerSystemException e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            finally
-            {
-                globalTransactions.remove(context);
-                context.finalCleanUp();
-                // tell shutdown thread this tx is finished
-                context.notifyFinish();
-            }
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Rolled back transaction " + context);
-            }
-        }
-    }
-
-    public void setTransactionRollbackOnly(AbstractTransactionContext context)
-        throws ResourceManagerException
-    {
-        context.status = Status.STATUS_MARKED_ROLLBACK;
-    }
-
-    public void commitTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        assureReady();
-        if (context.status == Status.STATUS_MARKED_ROLLBACK)
-        {
-            throw new ResourceManagerException(CoreMessages.transactionMarkedForRollback());
-        }
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Committing transaction " + context);
-            }
-            try
-            {
-                context.status = Status.STATUS_COMMITTING;
-                doCommit(context);
-                context.status = Status.STATUS_COMMITTED;
-            }
-            catch (Error e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            catch (RuntimeException e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            catch (ResourceManagerSystemException e)
-            {
-                setDirty(context, e);
-                throw e;
-            }
-            catch (ResourceManagerException e)
-            {
-                logger.warn("Could not commit tx " + context + ", rolling back instead", e);
-                doRollback(context);
-            }
-            finally
-            {
-                globalTransactions.remove(context);
-                context.finalCleanUp();
-                // tell shutdown thread this tx is finished
-                context.notifyFinish();
-            }
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Committed transaction " + context);
-            }
-        }
-    }
-
-    protected abstract AbstractTransactionContext createTransactionContext(Object session);
-
-    protected abstract void doBegin(AbstractTransactionContext context);
-
-    protected abstract int doPrepare(AbstractTransactionContext context) throws ResourceManagerException;
-
-    protected abstract void doCommit(AbstractTransactionContext context) throws ResourceManagerException;
-
-    protected abstract void doRollback(AbstractTransactionContext context) throws ResourceManagerException;
-
-    // TODO
-    // protected boolean rollBackOrForward() {
-    // }
-
-    protected boolean waitForAllTxToStop(long timeoutMSecs)
-    {
-        long startTime = System.currentTimeMillis();
-
-        // be sure not to lock globalTransactions for too long, as we need to
-        // give
-        // txs the chance to complete (otherwise deadlocks are very likely to
-        // occur)
-        // instead iterate over a copy as we can be sure no new txs will be
-        // registered
-        // after operation level has been set to stopping
-
-        Collection<AbstractTransactionContext> transactionsToStop;
-        synchronized (globalTransactions)
-        {
-            transactionsToStop = new ArrayList<AbstractTransactionContext>(globalTransactions);
-        }
-        for (AbstractTransactionContext context : transactionsToStop)
-        {
-            long remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
-
-            if (remainingTimeout <= 0)
-            {
-                return false;
-            }
-
-            synchronized (context)
-            {
-                if (!context.finished)
-                {
-                    logger.info("Waiting for tx " + context + " to finish for " + remainingTimeout
-                                    + " milli seconds");
-                }
-                while (!context.finished && remainingTimeout > 0)
-                {
-                    try
-                    {
-                        context.wait(remainingTimeout);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        return false;
-                    }
-                    remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
-                }
-                if (context.finished)
-                {
-                    logger.info("Tx " + context + " finished");
-                }
-                else
-                {
-                    logger.warn("Tx " + context + " failed to finish in given time");
-                }
-            }
-        }
-
-        return (globalTransactions.size() == 0);
-    }
-
-    /**
-     * Flag this resource manager as dirty. No more operations will be allowed until
-     * a recovery has been successfully performed.
-     *
-     * @param context
-     * @param t
-     */
-    protected void setDirty(AbstractTransactionContext context, Throwable t)
-    {
-        logger.error("Fatal error during critical commit/rollback of transaction " + context
-                        + ", setting resource manager to dirty.", t);
-        dirty = true;
-    }
-
-    /**
-     * Check that the FileManager is started.
-     *
-     * @throws FileManagerSystemException if the FileManager is not started.
-     */
-    protected void assureStarted() throws ResourceManagerSystemException
-    {
-        if (operationMode != OPERATION_MODE_STARTED)
-        {
-            throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotStarted());
-        }
-        // do not allow any further writing or commit or rollback when db is
-        // corrupt
-        if (dirty)
-        {
-            throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
-        }
-    }
-
-    /**
-     * Check that the FileManager is ready.
-     *
-     * @throws FileManagerSystemException if the FileManager is neither started not
-     *             stopping.
-     */
-    protected void assureReady() throws ResourceManagerSystemException
-    {
-        if (operationMode != OPERATION_MODE_STARTED && operationMode != OPERATION_MODE_STOPPING)
-        {
-            throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotReady());
-        }
-        // do not allow any further writing or commit or rollback when db is
-        // corrupt
-        if (dirty)
-        {
-            throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
-        }
-    }
+  }
 
 }

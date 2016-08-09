@@ -25,49 +25,48 @@ import org.xml.sax.SAXException;
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link JsonSchemaValidator} instead
  */
 @Deprecated
-public interface JsonSchemaFilter extends Filter, Initialisable, MuleContextAware
-{
+public interface JsonSchemaFilter extends Filter, Initialisable, MuleContextAware {
 
-    Validator createValidator() throws SAXException;
+  Validator createValidator() throws SAXException;
 
-    public String getSchemaLanguage();
+  public String getSchemaLanguage();
 
-    void setSchemaLocations(String schemaLocations);
+  void setSchemaLocations(String schemaLocations);
 
-    String getSchemaLocations();
+  String getSchemaLocations();
 
-    public void setSchemaLanguage(String schemaLanguage);
+  public void setSchemaLanguage(String schemaLanguage);
 
-    public Schema getSchemaObject();
+  public Schema getSchemaObject();
 
-    public void setSchemaObject(Schema schemaObject);
+  public void setSchemaObject(Schema schemaObject);
 
-    public ErrorHandler getErrorHandler();
+  public ErrorHandler getErrorHandler();
 
-    public void setErrorHandler(ErrorHandler errorHandler);
+  public void setErrorHandler(ErrorHandler errorHandler);
 
-    public LSResourceResolver getResourceResolver();
+  public LSResourceResolver getResourceResolver();
 
-    public void setResourceResolver(LSResourceResolver resourceResolver);
+  public void setResourceResolver(LSResourceResolver resourceResolver);
 
-    public Map<String, Boolean> getValidatorFeatures();
+  public Map<String, Boolean> getValidatorFeatures();
 
-    public void setValidatorFeatures(Map<String, Boolean> validatorFeatures);
+  public void setValidatorFeatures(Map<String, Boolean> validatorFeatures);
 
-    public Map<String, Object> getValidatorProperties();
+  public Map<String, Object> getValidatorProperties();
 
-    public void setValidatorProperties(Map<String, Object> validatorProperties);
+  public void setValidatorProperties(Map<String, Object> validatorProperties);
 
-    public XMLInputFactory getXMLInputFactory();
+  public XMLInputFactory getXMLInputFactory();
 
-    public void setXMLInputFactory(XMLInputFactory xmlInputFactory);
+  public void setXMLInputFactory(XMLInputFactory xmlInputFactory);
 
-    public boolean isUseStaxSource();
+  public boolean isUseStaxSource();
 
-    public void setUseStaxSource(boolean useStaxSource);
+  public void setUseStaxSource(boolean useStaxSource);
 
-    public boolean isReturnResult();
+  public boolean isReturnResult();
 
-    public void setReturnResult(boolean returnResult);
+  public void setReturnResult(boolean returnResult);
 
 }

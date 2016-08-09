@@ -20,66 +20,57 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class XmlHintsFunctionalTestCase extends ExtensionFunctionalTestCase
-{
+public class XmlHintsFunctionalTestCase extends ExtensionFunctionalTestCase {
 
-    private static final String MEAT = "Nice, juicy and tasty meat";
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  private static final String MEAT = "Nice, juicy and tasty meat";
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {VeganExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {VeganExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vegan-xml-hints-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vegan-xml-hints-config.xml";
+  }
 
-    @Test
-    public void fruitOnExpression() throws Exception
-    {
-        MuleEvent event = eatFromExpression(new Apple());
-        assertThat(getPayloadAsString(event.getMessage()), equalTo("tasty " + Apple.class.getSimpleName()));
-    }
+  @Test
+  public void fruitOnExpression() throws Exception {
+    MuleEvent event = eatFromExpression(new Apple());
+    assertThat(getPayloadAsString(event.getMessage()), equalTo("tasty " + Apple.class.getSimpleName()));
+  }
 
-    @Test
-    public void stringOnExpression() throws Exception
-    {
-        expectMeatRejection();
-        eatFromExpression(MEAT);
-    }
+  @Test
+  public void stringOnExpression() throws Exception {
+    expectMeatRejection();
+    eatFromExpression(MEAT);
+  }
 
-    @Test
-    public void fixedStringValue() throws Exception
-    {
-        expectMeatRejection();
-        flowRunner("eatFixedMeat").run();
-    }
+  @Test
+  public void fixedStringValue() throws Exception {
+    expectMeatRejection();
+    flowRunner("eatFixedMeat").run();
+  }
 
-    @Test
-    public void eatBlank() throws Exception
-    {
-        expectedException.expectMessage(containsString("I SHALL NEVER EAT "));
-        flowRunner("eatBlank").run();
-    }
+  @Test
+  public void eatBlank() throws Exception {
+    expectedException.expectMessage(containsString("I SHALL NEVER EAT "));
+    flowRunner("eatBlank").run();
+  }
 
-    @Test
-    public void eatPealed() throws Exception {
-        Banana banana = flowRunner("eatPealedBanana").run().getMessage().getPayload();
-        assertThat(banana.isBitten(), is(true));
-    }
+  @Test
+  public void eatPealed() throws Exception {
+    Banana banana = flowRunner("eatPealedBanana").run().getMessage().getPayload();
+    assertThat(banana.isBitten(), is(true));
+  }
 
-    private void expectMeatRejection()
-    {
-        expectedException.expectMessage(containsString("I SHALL NEVER EAT " + MEAT));
-    }
+  private void expectMeatRejection() {
+    expectedException.expectMessage(containsString("I SHALL NEVER EAT " + MEAT));
+  }
 
-    private MuleEvent eatFromExpression(Object value) throws Exception
-    {
-        return flowRunner("eatFromExpression").withPayload(value).run();
-    }
+  private MuleEvent eatFromExpression(Object value) throws Exception {
+    return flowRunner("eatFromExpression").withPayload(value).run();
+  }
 }

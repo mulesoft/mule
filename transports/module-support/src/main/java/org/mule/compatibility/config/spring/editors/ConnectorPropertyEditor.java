@@ -19,26 +19,23 @@ import java.beans.PropertyEditorSupport;
  *
  * TODO - Why isn't this simply a reference?
  */
-public class ConnectorPropertyEditor extends PropertyEditorSupport implements MuleContextAware
-{
-    private MuleContext muleContext;
+public class ConnectorPropertyEditor extends PropertyEditorSupport implements MuleContextAware {
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
+  private MuleContext muleContext;
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void setAsText(String text) {
+
+    Connector connector = muleContext.getRegistry().lookupObject(text);
+
+    if (connector == null) {
+      throw new IllegalArgumentException(CoreMessages.objectNotRegistered("Connector", text).getMessage());
     }
-
-    @Override
-    public void setAsText(String text)
-    {
-
-        Connector connector = muleContext.getRegistry().lookupObject(text);
-
-        if (connector == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectNotRegistered("Connector", text).getMessage());
-        }
-        setValue(connector);
-    }
+    setValue(connector);
+  }
 }

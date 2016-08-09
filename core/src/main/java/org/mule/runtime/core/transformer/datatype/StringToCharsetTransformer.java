@@ -19,40 +19,32 @@ import java.nio.charset.Charset;
 /**
  * Converts strings to {@link Charset} instances. See {@link DataTypeBuilder#charset(String)}
  */
-public class StringToCharsetTransformer extends AbstractTransformer implements DiscoverableTransformer
-{
+public class StringToCharsetTransformer extends AbstractTransformer implements DiscoverableTransformer {
 
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-    public StringToCharsetTransformer()
-    {
-        this.registerSourceType(DataType.STRING);
-        this.setReturnDataType(DataType.builder().type(Charset.class).build());
+  public StringToCharsetTransformer() {
+    this.registerSourceType(DataType.STRING);
+    this.setReturnDataType(DataType.builder().type(Charset.class).build());
+  }
+
+  @Override
+  protected Object doTransform(Object src, Charset enc) throws TransformerException {
+    try {
+      return DataType.builder().charset((String) src).build().getMediaType().getCharset().get();
+    } catch (Exception e) {
+      throw new TransformerException(createStaticMessage("Exception transforming to Charset."), e);
     }
+  }
 
-    @Override
-    protected Object doTransform(Object src, Charset enc) throws TransformerException
-    {
-        try
-        {
-            return DataType.builder().charset((String) src).build().getMediaType().getCharset().get();
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(createStaticMessage("Exception transforming to Charset."), e);
-        }
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 
 }

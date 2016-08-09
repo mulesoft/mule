@@ -16,38 +16,34 @@ import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.ftplet.FtpletResult;
 
 /**
- * {@link Ftplet} implementation that calls methods on its callback. Although this seems a bit 
- * like jumping through hoops, it frees the individual test classes from having to deal with
- * creating custom Ftplets.
+ * {@link Ftplet} implementation that calls methods on its callback. Although this seems a bit like jumping through hoops, it
+ * frees the individual test classes from having to deal with creating custom Ftplets.
  */
-public class MuleFtplet extends DefaultFtplet
-{
-    public interface Callback
-    {
-        void fileUploadCompleted();
-        
-        void fileMoveCompleted();
-    }
+public class MuleFtplet extends DefaultFtplet {
 
-    private Callback callback;
-    
-    public MuleFtplet(Callback callback)
-    {
-        super();
-        this.callback = callback;
-    }
-    
-    @Override
-    public FtpletResult onUploadEnd(FtpSession session, FtpRequest request) throws FtpException, IOException
-    {
-        callback.fileUploadCompleted();
-        return null;
-    }
+  public interface Callback {
 
-    @Override
-    public FtpletResult onRenameEnd(FtpSession session, FtpRequest request) throws FtpException, IOException
-    {
-        callback.fileMoveCompleted();
-        return null;
-    }
+    void fileUploadCompleted();
+
+    void fileMoveCompleted();
+  }
+
+  private Callback callback;
+
+  public MuleFtplet(Callback callback) {
+    super();
+    this.callback = callback;
+  }
+
+  @Override
+  public FtpletResult onUploadEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
+    callback.fileUploadCompleted();
+    return null;
+  }
+
+  @Override
+  public FtpletResult onRenameEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
+    callback.fileMoveCompleted();
+    return null;
+  }
 }

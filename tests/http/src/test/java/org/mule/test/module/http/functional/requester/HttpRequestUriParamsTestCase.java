@@ -20,52 +20,45 @@ import org.junit.Test;
 /**
  *
  */
-public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-uri-params-config.xml";
-    }
+public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
-    @Test
-    public void sendsUriParamsFromList() throws Exception
-    {
-        flowRunner("uriParamList").withPayload(TEST_MESSAGE)
-                                  .withFlowVariable("paramName", "testParam2")
-                                  .withFlowVariable("paramValue", "testValue2")
-                                  .run();
-        assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-uri-params-config.xml";
+  }
 
-    @Test
-    public void sendsUriParamsFromMap() throws Exception
-    {
-        Map<String, String> params = new HashMap<>();
-        params.put("testParam1", "testValue1");
-        params.put("testParam2", "testValue2");
-        flowRunner("uriParamMap").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+  @Test
+  public void sendsUriParamsFromList() throws Exception {
+    flowRunner("uriParamList").withPayload(TEST_MESSAGE).withFlowVariable("paramName", "testParam2")
+        .withFlowVariable("paramValue", "testValue2").run();
+    assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
+  }
 
-        assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
-    }
+  @Test
+  public void sendsUriParamsFromMap() throws Exception {
+    Map<String, String> params = new HashMap<>();
+    params.put("testParam1", "testValue1");
+    params.put("testParam2", "testValue2");
+    flowRunner("uriParamMap").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
 
-    @Test
-    public void overridesUriParams() throws Exception
-    {
-        Map<String, String> params = new HashMap<>();
-        params.put("testParam1", "testValueNew");
-        params.put("testParam2", "testValue2");
-        flowRunner("uriParamOverride").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+    assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
+  }
 
-        assertThat(uri, equalTo("/testPath/testValueNew/testValue2"));
-    }
+  @Test
+  public void overridesUriParams() throws Exception {
+    Map<String, String> params = new HashMap<>();
+    params.put("testParam1", "testValueNew");
+    params.put("testParam2", "testValue2");
+    flowRunner("uriParamOverride").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
 
-    @Test
-    public void sendsUriParamsIfNull() throws Exception
-    {
-        MessagingException expectedException = flowRunner("uriParamNull").runExpectingException();
-        assertThat(expectedException.getCause(), instanceOf(NullPointerException.class));
-        assertThat(expectedException.getMessage(), containsString("Expression {testParam2} evaluated to null."));
-    }
+    assertThat(uri, equalTo("/testPath/testValueNew/testValue2"));
+  }
+
+  @Test
+  public void sendsUriParamsIfNull() throws Exception {
+    MessagingException expectedException = flowRunner("uriParamNull").runExpectingException();
+    assertThat(expectedException.getCause(), instanceOf(NullPointerException.class));
+    assertThat(expectedException.getMessage(), containsString("Expression {testParam2} evaluated to null."));
+  }
 
 }

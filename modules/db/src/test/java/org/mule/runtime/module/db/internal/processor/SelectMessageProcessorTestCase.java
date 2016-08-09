@@ -34,54 +34,45 @@ import org.mockito.Matchers;
 
 @Ignore("Re-add query validation")
 @SmallTest
-public class SelectMessageProcessorTestCase extends AbstractMuleTestCase
-{
+public class SelectMessageProcessorTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testAcceptsValidQuery() throws Exception
-    {
-        // Implement
-    }
+  @Test
+  public void testAcceptsValidQuery() throws Exception {
+    // Implement
+  }
 
-    @Test
-    public void testRejectsNonSupportedSql() throws Exception
-    {
-        DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
+  @Test
+  public void testRejectsNonSupportedSql() throws Exception {
+    DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
 
-        for (QueryType type : QueryType.values())
-        {
-            QueryTemplate queryTemplate = new QueryTemplate("UNUSED SQL TEXT", type, Collections.<QueryParam>emptyList());
+    for (QueryType type : QueryType.values()) {
+      QueryTemplate queryTemplate = new QueryTemplate("UNUSED SQL TEXT", type, Collections.<QueryParam>emptyList());
 
-            if (type != QueryType.SELECT && type != QueryType.STORE_PROCEDURE_CALL)
-            {
-                try
-                {
-                    Query query = new Query(queryTemplate, null);
-                    new SelectMessageProcessor(null, null, null, null, false);
-                    fail("SelectMessageProcessor should accept SELECT and DYNAMIC queries only");
-                }
-                catch (IllegalArgumentException expected)
-                {
-                }
-            }
+      if (type != QueryType.SELECT && type != QueryType.STORE_PROCEDURE_CALL) {
+        try {
+          Query query = new Query(queryTemplate, null);
+          new SelectMessageProcessor(null, null, null, null, false);
+          fail("SelectMessageProcessor should accept SELECT and DYNAMIC queries only");
+        } catch (IllegalArgumentException expected) {
         }
+      }
     }
+  }
 
-    @Test
-    public void testCommitsWorkIfNoTransactionDefined() throws Exception
-    {
-        DbConnection connection = mock(DbConnection.class);
-        DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
-        when(dbConnectionFactory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE)).thenReturn(connection);
-        SelectExecutor selectExecutor = mock(SelectExecutor.class);
+  @Test
+  public void testCommitsWorkIfNoTransactionDefined() throws Exception {
+    DbConnection connection = mock(DbConnection.class);
+    DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
+    when(dbConnectionFactory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE)).thenReturn(connection);
+    SelectExecutor selectExecutor = mock(SelectExecutor.class);
 
-        SelectMessageProcessor processor = new SelectMessageProcessor(null, null, null, null, false);
-        MuleEvent event = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
-        when(event.getMessage()).thenReturn(muleMessage);
+    SelectMessageProcessor processor = new SelectMessageProcessor(null, null, null, null, false);
+    MuleEvent event = mock(MuleEvent.class);
+    MuleMessage muleMessage = mock(MuleMessage.class);
+    when(event.getMessage()).thenReturn(muleMessage);
 
-        processor.process(event);
-        verify(selectExecutor, times(1)).execute(eq(connection), Matchers.any(Query.class));
-        verify(dbConnectionFactory, times(1)).releaseConnection(connection);
-    }
+    processor.process(event);
+    verify(selectExecutor, times(1)).execute(eq(connection), Matchers.any(Query.class));
+    verify(dbConnectionFactory, times(1)).releaseConnection(connection);
+  }
 }

@@ -12,22 +12,22 @@ import java.util.Map;
 
 
 /**
- * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, 
- * thereby resetting any state the policy may have (counters, etc.)
+ * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, thereby resetting any
+ * state the policy may have (counters, etc.)
  * 
  * A {@link RetryNotifier} may be set in order to take action upon each retry attempt.
  */
-public interface RetryPolicyTemplate
-{
-    RetryPolicy createRetryInstance();
+public interface RetryPolicyTemplate {
 
-    Map<Object, Object> getMetaInfo();
-    
-    void setMetaInfo(Map<Object, Object> metaInfo);
-    
-    RetryNotifier getNotifier();
+  RetryPolicy createRetryInstance();
 
-    void setNotifier(RetryNotifier retryNotifier);
+  Map<Object, Object> getMetaInfo();
 
-    RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
+  void setMetaInfo(Map<Object, Object> metaInfo);
+
+  RetryNotifier getNotifier();
+
+  void setNotifier(RetryNotifier retryNotifier);
+
+  RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
 }

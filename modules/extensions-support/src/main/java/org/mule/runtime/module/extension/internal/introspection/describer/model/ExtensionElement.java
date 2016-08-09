@@ -13,11 +13,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface ExtensionElement extends ParameterizableTypeElement, ComponentElement
-{
+public interface ExtensionElement extends ParameterizableTypeElement, ComponentElement {
 
-    /**
-     * {@inheritDoc}
-     */
-    List<ConfigurationElement> getConfigurations();
+  /**
+   * {@inheritDoc}
+   */
+  List<ConfigurationElement> getConfigurations();
 }

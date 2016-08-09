@@ -11,47 +11,41 @@ import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 /**
- * A custom model property to link an {@link EnrichableModel}
- * to a certain {@link #type} which restricts it somehow.
+ * A custom model property to link an {@link EnrichableModel} to a certain {@link #type} which restricts it somehow.
  *
  * @param <T> generic type of the restriction {@link #type}
  * @since 4.0
  */
-public final class TypeRestrictionModelProperty<T> implements ModelProperty
-{
+public final class TypeRestrictionModelProperty<T> implements ModelProperty {
 
-    private final Class<T> type;
+  private final Class<T> type;
 
-    public TypeRestrictionModelProperty(Class<T> type)
-    {
-        checkArgument(type != null, "cannot restrict to a null type");
-        this.type = type;
-    }
+  public TypeRestrictionModelProperty(Class<T> type) {
+    checkArgument(type != null, "cannot restrict to a null type");
+    this.type = type;
+  }
 
-    public Class<T> getType()
-    {
-        return type;
-    }
+  public Class<T> getType() {
+    return type;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code typeRestriction}
-     */
-    @Override
-    public String getName()
-    {
-        return "typeRestriction";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code typeRestriction}
+   */
+  @Override
+  public String getName() {
+    return "typeRestriction";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

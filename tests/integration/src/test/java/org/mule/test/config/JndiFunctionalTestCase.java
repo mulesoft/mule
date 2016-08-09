@@ -14,29 +14,27 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-public class JndiFunctionalTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/jndi-functional-test.xml";
-    }
+public class JndiFunctionalTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testJndi()
-    {
-        Object obj;
-        
-        obj = muleContext.getRegistry().lookupObject(new String("apple"));
-        assertNotNull(obj);
-        assertEquals(Apple.class, obj.getClass());
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/jndi-functional-test.xml";
+  }
 
-        obj = muleContext.getRegistry().lookupObject(new String("orange"));
-        assertNotNull(obj);
-        assertEquals(Orange.class, obj.getClass());
-        assertEquals(new Integer(8), ((Orange) obj).getSegments());
-        assertEquals("Florida Sunny", ((Orange) obj).getBrand());
-    }
+  @Test
+  public void testJndi() {
+    Object obj;
+
+    obj = muleContext.getRegistry().lookupObject(new String("apple"));
+    assertNotNull(obj);
+    assertEquals(Apple.class, obj.getClass());
+
+    obj = muleContext.getRegistry().lookupObject(new String("orange"));
+    assertNotNull(obj);
+    assertEquals(Orange.class, obj.getClass());
+    assertEquals(new Integer(8), ((Orange) obj).getSegments());
+    assertEquals("Florida Sunny", ((Orange) obj).getBrand());
+  }
 }
 
 

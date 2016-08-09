@@ -17,23 +17,20 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  * @since 4.0
  */
-public final class FtpCreateDirectoryCommand extends ClassicFtpCommand implements CreateDirectoryCommand
-{
+public final class FtpCreateDirectoryCommand extends ClassicFtpCommand implements CreateDirectoryCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FtpCreateDirectoryCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
-    {
-        super(fileSystem, client);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FtpCreateDirectoryCommand(ClassicFtpFileSystem fileSystem, FTPClient client) {
+    super(fileSystem, client);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createDirectory(FileConnectorConfig config, String directoryPath)
-    {
-        super.createDirectory(config, directoryPath);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createDirectory(FileConnectorConfig config, String directoryPath) {
+    super.createDirectory(config, directoryPath);
+  }
 }

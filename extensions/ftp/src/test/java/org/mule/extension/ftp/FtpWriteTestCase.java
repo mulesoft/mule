@@ -27,181 +27,156 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class FtpWriteTestCase extends FtpConnectorTestCase
-{
+public class FtpWriteTestCase extends FtpConnectorTestCase {
 
-    private static final String TEMP_DIRECTORY = "files";
+  private static final String TEMP_DIRECTORY = "files";
 
-    public FtpWriteTestCase(String name, FtpTestHarness testHarness)
-    {
-        super(name, testHarness);
-    }
+  public FtpWriteTestCase(String name, FtpTestHarness testHarness) {
+    super(name, testHarness);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ftp-write-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ftp-write-config.xml";
+  }
 
-    @Test
-    public void appendOnNotExistingFile() throws Exception
-    {
-        doWriteOnNotExistingFile(APPEND);
-    }
+  @Test
+  public void appendOnNotExistingFile() throws Exception {
+    doWriteOnNotExistingFile(APPEND);
+  }
 
-    @Test
-    public void overwriteOnNotExistingFile() throws Exception
-    {
-        doWriteOnNotExistingFile(OVERWRITE);
-    }
+  @Test
+  public void overwriteOnNotExistingFile() throws Exception {
+    doWriteOnNotExistingFile(OVERWRITE);
+  }
 
-    @Test
-    public void createNewOnNotExistingFile() throws Exception
-    {
+  @Test
+  public void createNewOnNotExistingFile() throws Exception {
 
-        doWriteOnNotExistingFile(CREATE_NEW);
-    }
+    doWriteOnNotExistingFile(CREATE_NEW);
+  }
 
-    @Test
-    public void appendOnExistingFile() throws Exception
-    {
-        String content = doWriteOnExistingFile(APPEND);
-        assertThat(content, is(HELLO_WORLD + HELLO_WORLD));
-    }
+  @Test
+  public void appendOnExistingFile() throws Exception {
+    String content = doWriteOnExistingFile(APPEND);
+    assertThat(content, is(HELLO_WORLD + HELLO_WORLD));
+  }
 
-    @Test
-    public void overwriteOnExistingFile() throws Exception
-    {
-        String content = doWriteOnExistingFile(OVERWRITE);
-        assertThat(content, is(HELLO_WORLD));
-    }
+  @Test
+  public void overwriteOnExistingFile() throws Exception {
+    String content = doWriteOnExistingFile(OVERWRITE);
+    assertThat(content, is(HELLO_WORLD));
+  }
 
-    @Test
-    public void createNewOnExistingFile() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        doWriteOnExistingFile(CREATE_NEW);
-    }
+  @Test
+  public void createNewOnExistingFile() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    doWriteOnExistingFile(CREATE_NEW);
+  }
 
-    @Test
-    public void appendOnNotExistingParentWithoutCreateFolder() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
-    }
+  @Test
+  public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
+  }
 
-    @Test
-    public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
-    }
+  @Test
+  public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
+  }
 
-    @Test
-    public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
-    }
+  @Test
+  public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
+  }
 
-    @Test
-    public void appendNotExistingFileWithCreatedParent() throws Exception
-    {
-        doWriteNotExistingFileWithCreatedParent(APPEND);
-    }
+  @Test
+  public void appendNotExistingFileWithCreatedParent() throws Exception {
+    doWriteNotExistingFileWithCreatedParent(APPEND);
+  }
 
-    @Test
-    public void overwriteNotExistingFileWithCreatedParent() throws Exception
-    {
-        doWriteNotExistingFileWithCreatedParent(OVERWRITE);
-    }
+  @Test
+  public void overwriteNotExistingFileWithCreatedParent() throws Exception {
+    doWriteNotExistingFileWithCreatedParent(OVERWRITE);
+  }
 
-    @Test
-    public void createNewNotExistingFileWithCreatedParent() throws Exception
-    {
-        doWriteNotExistingFileWithCreatedParent(CREATE_NEW);
-    }
+  @Test
+  public void createNewNotExistingFileWithCreatedParent() throws Exception {
+    doWriteNotExistingFileWithCreatedParent(CREATE_NEW);
+  }
 
-    @Test
-    public void writeOnReadFile() throws Exception
-    {
-        final String filePath = "file";
+  @Test
+  public void writeOnReadFile() throws Exception {
+    final String filePath = "file";
 
-        testHarness.write(filePath, "overwrite me!");
+    testHarness.write(filePath, "overwrite me!");
 
-        MuleEvent event = flowRunner("readAndWrite")
-                .withFlowVariable("path", filePath)
-                .run();
+    MuleEvent event = flowRunner("readAndWrite").withFlowVariable("path", filePath).run();
 
-        assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
-    }
+    assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
+  }
 
-    @Test
-    public void writeStaticContent() throws Exception
-    {
-        testHarness.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
-        doWrite("writeStaticContent", path, "", CREATE_NEW, false);
+  @Test
+  public void writeStaticContent() throws Exception {
+    testHarness.makeDir(TEMP_DIRECTORY);
+    String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
+    doWrite("writeStaticContent", path, "", CREATE_NEW, false);
 
-        String content = getPayloadAsString(readPath(path));
-        assertThat(content, is(HELLO_WORLD));
-    }
+    String content = getPayloadAsString(readPath(path));
+    assertThat(content, is(HELLO_WORLD));
+  }
 
-    @Test
-    public void writeWithCustomEncoding() throws Exception
-    {
-        final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
-        assertThat(defaultEncoding, is(notNullValue()));
+  @Test
+  public void writeWithCustomEncoding() throws Exception {
+    final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
+    assertThat(defaultEncoding, is(notNullValue()));
 
-        final String customEncoding = availableCharsets().keySet().stream()
-                .filter(encoding -> !encoding.equals(defaultEncoding))
-                .findFirst()
-                .orElse(null);
+    final String customEncoding =
+        availableCharsets().keySet().stream().filter(encoding -> !encoding.equals(defaultEncoding)).findFirst().orElse(null);
 
-        assertThat(customEncoding, is(notNullValue()));
-        final String filename = "encoding.txt";
+    assertThat(customEncoding, is(notNullValue()));
+    final String filename = "encoding.txt";
 
-        doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
-        InputStream content = (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload();
+    doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
+    InputStream content =
+        (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload();
 
-        assertThat(Arrays.equals(toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
-    }
+    assertThat(Arrays.equals(toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
+  }
 
-    private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception
-    {
-        testHarness.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
+  private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception {
+    testHarness.makeDir(TEMP_DIRECTORY);
+    String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
 
-        doWrite(path, HELLO_WORLD, mode, true);
+    doWrite(path, HELLO_WORLD, mode, true);
 
-        String content = getPayloadAsString(readPath(path));
-        assertThat(content, is(HELLO_WORLD));
-    }
+    String content = getPayloadAsString(readPath(path));
+    assertThat(content, is(HELLO_WORLD));
+  }
 
 
-    private void doWriteOnNotExistingFile(FileWriteMode mode) throws Exception
-    {
-        testHarness.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
-        doWrite(path, HELLO_WORLD, mode, false);
+  private void doWriteOnNotExistingFile(FileWriteMode mode) throws Exception {
+    testHarness.makeDir(TEMP_DIRECTORY);
+    String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
+    doWrite(path, HELLO_WORLD, mode, false);
 
-        String content = getPayloadAsString(readPath(path));
-        assertThat(content, is(HELLO_WORLD));
-    }
+    String content = getPayloadAsString(readPath(path));
+    assertThat(content, is(HELLO_WORLD));
+  }
 
-    private void doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception
-    {
-        testHarness.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
-        doWrite(path, HELLO_WORLD, mode, false);
-    }
+  private void doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception {
+    testHarness.makeDir(TEMP_DIRECTORY);
+    String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
+    doWrite(path, HELLO_WORLD, mode, false);
+  }
 
-    private String doWriteOnExistingFile(FileWriteMode mode) throws Exception
-    {
-        final String filePath = "file";
-        testHarness.write(filePath, HELLO_WORLD);
+  private String doWriteOnExistingFile(FileWriteMode mode) throws Exception {
+    final String filePath = "file";
+    testHarness.write(filePath, HELLO_WORLD);
 
-        doWrite(filePath, HELLO_WORLD, mode, false);
-        return getPayloadAsString(readPath(filePath));
-    }
+    doWrite(filePath, HELLO_WORLD, mode, false);
+    return getPayloadAsString(readPath(filePath));
+  }
 }

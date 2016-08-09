@@ -24,109 +24,88 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 
 /**
- * Implement a redelivery policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
- * number of times.  If this maximum is exceeded, the message is sent to a dead letter queue,  Here, if the processing of the messages
- * fails too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow
- * the message to be considered "consumed".
+ * Implement a redelivery policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
+ * times. If this maximum is exceeded, the message is sent to a dead letter queue, Here, if the processing of the messages fails
+ * too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow the message
+ * to be considered "consumed".
  */
-public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware
-{
+public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
+    implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
 
-    protected FlowConstruct flowConstruct;
-    protected int maxRedeliveryCount;
-    protected MessageProcessor deadLetterQueue;
-    public static final int REDELIVERY_FAIL_ON_FIRST = 0;
-    private MessagingExceptionHandler messagingExceptionHandler;
+  protected FlowConstruct flowConstruct;
+  protected int maxRedeliveryCount;
+  protected MessageProcessor deadLetterQueue;
+  public static final int REDELIVERY_FAIL_ON_FIRST = 0;
+  private MessagingExceptionHandler messagingExceptionHandler;
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-        if (deadLetterQueue instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) deadLetterQueue).setFlowConstruct(flowConstruct);
-        }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+    if (deadLetterQueue instanceof FlowConstructAware) {
+      ((FlowConstructAware) deadLetterQueue).setFlowConstruct(flowConstruct);
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (maxRedeliveryCount < 0) {
+      throw new InitialisationException(CoreMessages.initialisationFailure("maxRedeliveryCount must be positive"), this);
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (maxRedeliveryCount < 0)
-        {
-            throw new InitialisationException(
-                CoreMessages.initialisationFailure(
-                    "maxRedeliveryCount must be positive"), this);
-        }
-
-        if (deadLetterQueue instanceof Initialisable)
-        {
-            ((Initialisable) deadLetterQueue).initialise();
-        }
+    if (deadLetterQueue instanceof Initialisable) {
+      ((Initialisable) deadLetterQueue).initialise();
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        if (deadLetterQueue instanceof Startable)
-        {
-            ((Startable) deadLetterQueue).start();
-        }
+  @Override
+  public void start() throws MuleException {
+    if (deadLetterQueue instanceof Startable) {
+      ((Startable) deadLetterQueue).start();
     }
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        if (deadLetterQueue instanceof Stoppable)
-        {
-            ((Stoppable) deadLetterQueue).stop();
-        }
+  @Override
+  public void stop() throws MuleException {
+    if (deadLetterQueue instanceof Stoppable) {
+      ((Stoppable) deadLetterQueue).stop();
     }
+  }
 
-    @Override
-    public void dispose()
-    {
-        if (deadLetterQueue instanceof Disposable)
-        {
-            ((Disposable) deadLetterQueue).dispose();
-        }
+  @Override
+  public void dispose() {
+    if (deadLetterQueue instanceof Disposable) {
+      ((Disposable) deadLetterQueue).dispose();
     }
+  }
 
-    public int getMaxRedeliveryCount()
-    {
-        return maxRedeliveryCount;
-    }
+  public int getMaxRedeliveryCount() {
+    return maxRedeliveryCount;
+  }
 
-    public void setMaxRedeliveryCount(int maxRedeliveryCount)
-    {
-        this.maxRedeliveryCount = maxRedeliveryCount;
-    }
+  public void setMaxRedeliveryCount(int maxRedeliveryCount) {
+    this.maxRedeliveryCount = maxRedeliveryCount;
+  }
 
-    public MessageProcessor getTheFailedMessageProcessor()
-    {
-        return deadLetterQueue;
-    }
+  public MessageProcessor getTheFailedMessageProcessor() {
+    return deadLetterQueue;
+  }
 
-    public void setDeadLetterQueue(MessageProcessorFilterPair failedMessageProcessorPair)
-    {
-        this.deadLetterQueue = failedMessageProcessorPair.getMessageProcessor();
-    }
+  public void setDeadLetterQueue(MessageProcessorFilterPair failedMessageProcessorPair) {
+    this.deadLetterQueue = failedMessageProcessorPair.getMessageProcessor();
+  }
 
-    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
-    {
-        this.messagingExceptionHandler = messagingExceptionHandler;
-        if (deadLetterQueue instanceof MessagingExceptionHandlerAware)
-        {
-            ((MessagingExceptionHandlerAware) deadLetterQueue).setMessagingExceptionHandler(messagingExceptionHandler);
-        }
+  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
+    if (deadLetterQueue instanceof MessagingExceptionHandlerAware) {
+      ((MessagingExceptionHandlerAware) deadLetterQueue).setMessagingExceptionHandler(messagingExceptionHandler);
     }
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        if (deadLetterQueue instanceof MuleContextAware)
-        {
-            ((MuleContextAware) deadLetterQueue).setMuleContext(context);
-        }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    if (deadLetterQueue instanceof MuleContextAware) {
+      ((MuleContextAware) deadLetterQueue).setMuleContext(context);
     }
+  }
 }

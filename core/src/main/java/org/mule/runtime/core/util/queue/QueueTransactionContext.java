@@ -11,21 +11,18 @@ import java.io.Serializable;
 /**
  * Contract for a transactional context for queue operations.
  */
-public interface QueueTransactionContext
-{
+public interface QueueTransactionContext {
 
-    public boolean offer(QueueStore queue, Serializable item, long offerTimeout)
-            throws InterruptedException;
+  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException;
 
-    public void untake(QueueStore queue, Serializable item) throws InterruptedException;
+  public void untake(QueueStore queue, Serializable item) throws InterruptedException;
 
-    public void clear(QueueStore queue) throws InterruptedException;
+  public void clear(QueueStore queue) throws InterruptedException;
 
-    public Serializable poll(QueueStore queue, long pollTimeout)
-            throws InterruptedException;
+  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException;
 
-    public Serializable peek(QueueStore queue) throws InterruptedException;
+  public Serializable peek(QueueStore queue) throws InterruptedException;
 
-    public int size(QueueStore queue);
+  public int size(QueueStore queue);
 
 }

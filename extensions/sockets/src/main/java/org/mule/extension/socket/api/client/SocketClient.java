@@ -20,37 +20,36 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public interface SocketClient
-{
+public interface SocketClient {
 
-    /**
-     * @param data to be written into the socket
-     * @param outputEncoding to be used when writing contents
-     * of type {@link String}. If not specified, it defaults
-     * to the encoding specified in the config {@link AbstractSocketConfig}.
-     * If no default is specified {@link AbstractSocketConfig} either, mule's default encoding is used.
-     *
-     * @throws IOException
-     */
-    void write(Object data, String outputEncoding) throws IOException;
+  /**
+   * @param data to be written into the socket
+   * @param outputEncoding to be used when writing contents of type {@link String}. If not specified, it defaults to the encoding
+   *        specified in the config {@link AbstractSocketConfig}. If no default is specified {@link AbstractSocketConfig} either,
+   *        mule's default encoding is used.
+   *
+   * @throws IOException
+   */
+  void write(Object data, String outputEncoding) throws IOException;
 
-    /**
-     * This methods blocks until new data is available or {@link SocketProperties#getClientTimeout()} is reached, in
-     * which case a {@link ReadingTimeoutException} is thrown.
-     * @return an {@link InputStream} with the information read from the socket.
-     * @throws IOException
-     */
-    InputStream read() throws IOException;
+  /**
+   * This methods blocks until new data is available or {@link SocketProperties#getClientTimeout()} is reached, in which case a
+   * {@link ReadingTimeoutException} is thrown.
+   * 
+   * @return an {@link InputStream} with the information read from the socket.
+   * @throws IOException
+   */
+  InputStream read() throws IOException;
 
-    /**
-     * Closes the connection that was held by the client, leaving it unusable.
-     *
-     * @throws IOException if an I/O error occurs when closing the socket
-     */
-    void close() throws IOException;
+  /**
+   * Closes the connection that was held by the client, leaving it unusable.
+   *
+   * @throws IOException if an I/O error occurs when closing the socket
+   */
+  void close() throws IOException;
 
-    /**
-     * @return {@link SocketAttributes} with information associated to the client's connection.
-     */
-    SocketAttributes getAttributes();
+  /**
+   * @return {@link SocketAttributes} with information associated to the client's connection.
+   */
+  SocketAttributes getAttributes();
 }

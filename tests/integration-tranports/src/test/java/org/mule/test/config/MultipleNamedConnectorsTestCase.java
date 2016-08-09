@@ -10,18 +10,15 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class MultipleNamedConnectorsTestCase extends FunctionalTestCase
-{
+public class MultipleNamedConnectorsTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-named-connectors-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiple-named-connectors-test-flow.xml";
+  }
 
-    @Test
-    public void testMultipleNamedConnectors() throws Exception
-    {
-        // no-op, the initialization must not fail.   
-    }
+  @Test
+  public void testMultipleNamedConnectors() throws Exception {
+    // no-op, the initialization must not fail.
+  }
 }

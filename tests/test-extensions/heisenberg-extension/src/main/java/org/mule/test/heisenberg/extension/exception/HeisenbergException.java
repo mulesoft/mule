@@ -6,16 +6,13 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
-public class HeisenbergException extends Exception
-{
+public class HeisenbergException extends Exception {
 
-    public HeisenbergException(String message)
-    {
-        super(message);
-    }
+  public HeisenbergException(String message) {
+    super(message);
+  }
 
-    public HeisenbergException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public HeisenbergException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

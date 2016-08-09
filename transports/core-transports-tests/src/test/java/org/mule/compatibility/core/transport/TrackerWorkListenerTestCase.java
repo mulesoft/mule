@@ -27,59 +27,53 @@ import javax.resource.spi.work.WorkListener;
 import org.junit.Test;
 
 @SmallTest
-public class TrackerWorkListenerTestCase extends AbstractMuleTestCase
-{
+public class TrackerWorkListenerTestCase extends AbstractMuleTestCase {
 
-    public static final int START_DURATION = 10;
+  public static final int START_DURATION = 10;
 
-    private final Work originalWork = mock(Work.class);
-    private final Work work = mock(Work.class);
-    private final WorkException workException = new WorkException();
-    private final WorkListener delegate = mock(WorkListener.class);
-    private final TrackerWorkListener trackerWorkListener = new TrackerWorkListener(work, delegate);
+  private final Work originalWork = mock(Work.class);
+  private final Work work = mock(Work.class);
+  private final WorkException workException = new WorkException();
+  private final WorkListener delegate = mock(WorkListener.class);
+  private final TrackerWorkListener trackerWorkListener = new TrackerWorkListener(work, delegate);
 
-    @Test
-    public void notifiesWorkAccepted()
-    {
-        WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_ACCEPTED);
+  @Test
+  public void notifiesWorkAccepted() {
+    WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_ACCEPTED);
 
-        trackerWorkListener.workAccepted(workEvent);
+    trackerWorkListener.workAccepted(workEvent);
 
-        verify(delegate).workAccepted(anAcceptedWorkEventFor(this, work, workException, START_DURATION));
-    }
+    verify(delegate).workAccepted(anAcceptedWorkEventFor(this, work, workException, START_DURATION));
+  }
 
-    @Test
-    public void notifiesWorkCompleted()
-    {
-        WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_COMPLETED);
+  @Test
+  public void notifiesWorkCompleted() {
+    WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_COMPLETED);
 
-        trackerWorkListener.workCompleted(workEvent);
+    trackerWorkListener.workCompleted(workEvent);
 
-        verify(delegate).workCompleted(aCompletedWorkEventFor(this, work, workException, START_DURATION));
-    }
+    verify(delegate).workCompleted(aCompletedWorkEventFor(this, work, workException, START_DURATION));
+  }
 
-    @Test
-    public void notifiesWorkRejected()
-    {
-        WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_REJECTED);
+  @Test
+  public void notifiesWorkRejected() {
+    WorkEvent workEvent = createWorkEvent(WorkEvent.WORK_REJECTED);
 
-        trackerWorkListener.workRejected(workEvent);
+    trackerWorkListener.workRejected(workEvent);
 
-        verify(delegate).workRejected(aRejectedWorkEventFor(this, work, workException, START_DURATION));
-    }
+    verify(delegate).workRejected(aRejectedWorkEventFor(this, work, workException, START_DURATION));
+  }
 
-    @Test
-    public void notifiesWorkStarted()
-    {
-        int workStarted = WorkEvent.WORK_STARTED;
+  @Test
+  public void notifiesWorkStarted() {
+    int workStarted = WorkEvent.WORK_STARTED;
 
-        trackerWorkListener.workStarted(createWorkEvent(workStarted));
+    trackerWorkListener.workStarted(createWorkEvent(workStarted));
 
-        verify(delegate).workStarted(aStartedWorkEventFor(this, work, workException, START_DURATION));
-    }
+    verify(delegate).workStarted(aStartedWorkEventFor(this, work, workException, START_DURATION));
+  }
 
-    private WorkEvent createWorkEvent(int type)
-    {
-        return new WorkEvent(this, type, originalWork, workException, START_DURATION);
-    }
+  private WorkEvent createWorkEvent(int type) {
+    return new WorkEvent(this, type, originalWork, workException, START_DURATION);
+  }
 }

@@ -45,184 +45,160 @@ import org.springframework.jms.connection.CachingConnectionFactory;
  *
  * @since 4.0
  */
-public class JmsTransportComponentBuildingDefinitionProvider extends TransportComponentBuildingDefinitionProvider
-{
+public class JmsTransportComponentBuildingDefinitionProvider extends TransportComponentBuildingDefinitionProvider {
 
-    private static final ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(JMS_NAMESPACE);
+  private static final ComponentBuildingDefinition.Builder baseDefinition =
+      new ComponentBuildingDefinition.Builder().withNamespace(JMS_NAMESPACE);
 
-    @Override
-    public void init(MuleContext muleContext)
-    {
-        super.init(muleContext);
-    }
-
-
-    private ComponentBuildingDefinition.Builder setJmsEndpointConfiguration(ComponentBuildingDefinition.Builder enpointBuilder)
-    {
-        return enpointBuilder
-                .withNamespace(JMS_NAMESPACE)
-                .withSetterParameterDefinition("selector", fromChildConfiguration(JmsSelectorFilter.class).build())
-                .withIgnoredConfigurationParameter("queue")
-                .withIgnoredConfigurationParameter("topic");
-    }
-
-    @Override
-    protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder()
-    {
-        return setJmsEndpointConfiguration(super.getOutboundEndpointBuildingDefinitionBuilder());
-    }
-
-    @Override
-    protected ComponentBuildingDefinition.Builder getEndpointBuildingDefinitionBuilder()
-    {
-        return setJmsEndpointConfiguration(super.getEndpointBuildingDefinitionBuilder());
-    }
-
-    @Override
-    protected ComponentBuildingDefinition.Builder getInboundEndpointBuildingDefinitionBuilder()
-    {
-        return setJmsEndpointConfiguration(super.getInboundEndpointBuildingDefinitionBuilder());
-    }
-
-    @Override
-    public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
-    {
-        List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-        ComponentBuildingDefinition.Builder baseJmsConnector = getBaseConnector()
-                .withTypeDefinition(fromType(JmsConnector.class))
-                .withSetterParameterDefinition("acknowledgementMode", fromSimpleParameter("acknowledgementMode", getAckModeConverter()).build())
-                .withSetterParameterDefinition("clientId", fromSimpleParameter("clientId").build())
-                .withSetterParameterDefinition("durable", fromSimpleParameter("durable").build())
-                .withSetterParameterDefinition("noLocal", fromSimpleParameter("noLocal").build())
-                .withSetterParameterDefinition("persistentDelivery", fromSimpleParameter("persistentDelivery").build())
-                .withSetterParameterDefinition("cacheJmsSessions", fromSimpleParameter("cacheJmsSessions").build())
-                .withSetterParameterDefinition("eagerConsumer", fromSimpleParameter("eagerConsumer").build())
-                .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
-                .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-                .withSetterParameterDefinition("jndiDestinations", fromSimpleParameter("jndiDestinations").build())
-                .withSetterParameterDefinition("jndiInitialFactory", fromSimpleParameter("jndiInitialFactory").build())
-                .withSetterParameterDefinition("jndiProviderUrl", fromSimpleParameter("jndiProviderUrl").build())
-                .withSetterParameterDefinition("connectionFactoryJndiName", fromSimpleParameter("connectionFactoryJndiName").build())
-                .withSetterParameterDefinition("jndiProviderProperties", fromSimpleReferenceParameter("jndiProviderProperties-ref").build())
-                .withSetterParameterDefinition("forceJndiDestinations", fromSimpleParameter("forceJndiDestinations").build())
-                .withSetterParameterDefinition("specification", fromSimpleParameter("specification").build())
-                .withSetterParameterDefinition("disableTemporaryReplyToDestinations", fromSimpleParameter("disableTemporaryReplyToDestinations").build())
-                .withSetterParameterDefinition("returnOriginalMessageAsReply", fromSimpleParameter("returnOriginalMessageAsReply").build())
-                .withSetterParameterDefinition("embeddedMode", fromSimpleParameter("embeddedMode").build())
-                .withSetterParameterDefinition("honorQosHeaders", fromSimpleParameter("honorQosHeaders").build())
-                .withSetterParameterDefinition("sameRMOverrideValue", fromSimpleParameter("sameRMOverrideValue").build())
-                .withSetterParameterDefinition("maxRedelivery", fromSimpleParameter("maxRedelivery").build())
-                .withSetterParameterDefinition("redeliveryHandlerFactory", fromSimpleReferenceParameter("redeliveryHandlerFactory-ref").build())
-                .withSetterParameterDefinition("connectionFactory", fromSimpleReferenceParameter("connectionFactory-ref").build())
-                .withSetterParameterDefinition("numberOfConsumers", fromSimpleParameter("numberOfConsumers").build())
-                .withSetterParameterDefinition("numberOfConcurrentTransactedReceivers", fromSimpleParameter("numberOfConcurrentTransactedReceivers").build())
-                .withSetterParameterDefinition("jndiNameResolver", fromChildConfiguration(JndiNameResolver.class).build());
-
-        componentBuildingDefinitions.add(baseJmsConnector.copy().build());
-
-        componentBuildingDefinitions.add(baseJmsConnector.copy()
-                                                 .withIdentifier("custom-connector").withTypeDefinition(fromConfigurationAttribute("class")).build());
-
-        componentBuildingDefinitions.add(baseJmsConnector.copy()
-                                                 .withIdentifier("weblogic-connector").withTypeDefinition(fromType(WeblogicJmsConnector.class))
-                                                 .build());
-
-        componentBuildingDefinitions.add(baseJmsConnector.copy()
-                                                 .withIdentifier("websphere-connector").withTypeDefinition(fromType(WebsphereJmsConnector.class))
-                                                 .build());
+  @Override
+  public void init(MuleContext muleContext) {
+    super.init(muleContext);
+  }
 
 
-        ComponentBuildingDefinition.Builder baseActiveMqConnector = baseJmsConnector.copy()
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("brokerURL", fromSimpleParameter("brokerURL").build());
+  private ComponentBuildingDefinition.Builder setJmsEndpointConfiguration(ComponentBuildingDefinition.Builder enpointBuilder) {
+    return enpointBuilder.withNamespace(JMS_NAMESPACE)
+        .withSetterParameterDefinition("selector", fromChildConfiguration(JmsSelectorFilter.class).build())
+        .withIgnoredConfigurationParameter("queue").withIgnoredConfigurationParameter("topic");
+  }
 
-        componentBuildingDefinitions.add(baseActiveMqConnector.copy()
-                                                 .withIdentifier("activemq-connector")
-                                                 .withTypeDefinition(fromType(ActiveMQJmsConnector.class))
-                                                 .build());
+  @Override
+  protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder() {
+    return setJmsEndpointConfiguration(super.getOutboundEndpointBuildingDefinitionBuilder());
+  }
 
-        componentBuildingDefinitions.add(baseActiveMqConnector.copy()
-                                                 .withIdentifier("activemq-xa-connector")
-                                                 .withTypeDefinition(fromType(ActiveMQXAJmsConnector.class))
-                                                 .build());
+  @Override
+  protected ComponentBuildingDefinition.Builder getEndpointBuildingDefinitionBuilder() {
+    return setJmsEndpointConfiguration(super.getEndpointBuildingDefinitionBuilder());
+  }
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("default-jndi-name-resolver")
-                                                 .withTypeDefinition(fromType(SimpleJndiNameResolver.class))
-                                                 .withSetterParameterDefinition("jndiInitialFactory", fromSimpleParameter("jndiInitialFactory").build())
-                                                 .withSetterParameterDefinition("jndiProviderUrl", fromSimpleParameter("jndiProviderUrl").build())
-                                                 .withSetterParameterDefinition("jndiProviderProperties", fromSimpleReferenceParameter("jndiProviderProperties-ref").build())
-                                                 .build());
+  @Override
+  protected ComponentBuildingDefinition.Builder getInboundEndpointBuildingDefinitionBuilder() {
+    return setJmsEndpointConfiguration(super.getInboundEndpointBuildingDefinitionBuilder());
+  }
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("custom-jndi-name-resolver")
-                                                 .withTypeDefinition(fromConfigurationAttribute("class"))
-                                                 .build());
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
+    ComponentBuildingDefinition.Builder baseJmsConnector = getBaseConnector().withTypeDefinition(fromType(JmsConnector.class))
+        .withSetterParameterDefinition("acknowledgementMode",
+                                       fromSimpleParameter("acknowledgementMode", getAckModeConverter()).build())
+        .withSetterParameterDefinition("clientId", fromSimpleParameter("clientId").build())
+        .withSetterParameterDefinition("durable", fromSimpleParameter("durable").build())
+        .withSetterParameterDefinition("noLocal", fromSimpleParameter("noLocal").build())
+        .withSetterParameterDefinition("persistentDelivery", fromSimpleParameter("persistentDelivery").build())
+        .withSetterParameterDefinition("cacheJmsSessions", fromSimpleParameter("cacheJmsSessions").build())
+        .withSetterParameterDefinition("eagerConsumer", fromSimpleParameter("eagerConsumer").build())
+        .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
+        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
+        .withSetterParameterDefinition("jndiDestinations", fromSimpleParameter("jndiDestinations").build())
+        .withSetterParameterDefinition("jndiInitialFactory", fromSimpleParameter("jndiInitialFactory").build())
+        .withSetterParameterDefinition("jndiProviderUrl", fromSimpleParameter("jndiProviderUrl").build())
+        .withSetterParameterDefinition("connectionFactoryJndiName", fromSimpleParameter("connectionFactoryJndiName").build())
+        .withSetterParameterDefinition("jndiProviderProperties",
+                                       fromSimpleReferenceParameter("jndiProviderProperties-ref").build())
+        .withSetterParameterDefinition("forceJndiDestinations", fromSimpleParameter("forceJndiDestinations").build())
+        .withSetterParameterDefinition("specification", fromSimpleParameter("specification").build())
+        .withSetterParameterDefinition("disableTemporaryReplyToDestinations",
+                                       fromSimpleParameter("disableTemporaryReplyToDestinations").build())
+        .withSetterParameterDefinition("returnOriginalMessageAsReply",
+                                       fromSimpleParameter("returnOriginalMessageAsReply").build())
+        .withSetterParameterDefinition("embeddedMode", fromSimpleParameter("embeddedMode").build())
+        .withSetterParameterDefinition("honorQosHeaders", fromSimpleParameter("honorQosHeaders").build())
+        .withSetterParameterDefinition("sameRMOverrideValue", fromSimpleParameter("sameRMOverrideValue").build())
+        .withSetterParameterDefinition("maxRedelivery", fromSimpleParameter("maxRedelivery").build())
+        .withSetterParameterDefinition("redeliveryHandlerFactory",
+                                       fromSimpleReferenceParameter("redeliveryHandlerFactory-ref").build())
+        .withSetterParameterDefinition("connectionFactory", fromSimpleReferenceParameter("connectionFactory-ref").build())
+        .withSetterParameterDefinition("numberOfConsumers", fromSimpleParameter("numberOfConsumers").build())
+        .withSetterParameterDefinition("numberOfConcurrentTransactedReceivers",
+                                       fromSimpleParameter("numberOfConcurrentTransactedReceivers").build())
+        .withSetterParameterDefinition("jndiNameResolver", fromChildConfiguration(JndiNameResolver.class).build());
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("selector")
-                                                 .withTypeDefinition(fromType(JmsSelectorFilter.class))
-                                                 .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build()).build());
+    componentBuildingDefinitions.add(baseJmsConnector.copy().build());
 
-        componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().copy()
-                                                 .withNamespace(JMS_NAMESPACE)
-                                                 .withSetterParameterDefinition("factory", fromFixedValue(new JmsTransactionFactory()).build())
-                                                 .build());
+    componentBuildingDefinitions.add(baseJmsConnector.copy().withIdentifier("custom-connector")
+        .withTypeDefinition(fromConfigurationAttribute("class")).build());
 
-        componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().copy()
-                                                 .withNamespace(JMS_NAMESPACE)
-                                                 .withIdentifier("client-ack-transaction")
-                                                 .withSetterParameterDefinition("factory", fromFixedValue(new JmsClientAcknowledgeTransactionFactory()).build())
-                                                 .build());
+    componentBuildingDefinitions.add(baseJmsConnector.copy().withIdentifier("weblogic-connector")
+        .withTypeDefinition(fromType(WeblogicJmsConnector.class)).build());
 
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("jmsmessage-to-object-transformer")
-                                                 .withTypeDefinition(fromType(JMSMessageToObject.class))
-                                                 .build());
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("object-to-jmsmessage-transformer")
-                                                 .withTypeDefinition(fromType(ObjectToJMSMessage.class))
-                                                 .build());
-
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("caching-connection-factory")
-                                                 .withTypeDefinition(fromType(CachingConnectionFactory.class))
-                                                 .withObjectFactoryType(CachingConnectionFactoryFactoryBean.class)
-                                                 .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                                                 .withSetterParameterDefinition("sessionCacheSize", fromSimpleParameter("sessionCacheSize").build())
-                                                 .withSetterParameterDefinition("cacheProducers", fromSimpleParameter("cacheProducers").build())
-                                                 .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
-                                                 .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-                                                 .withSetterParameterDefinition("connectionFactory", fromSimpleReferenceParameter("connectionFactory-ref").build())
-                                                 .build());
-
-        componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
-        componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().build());
-        componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
-        return componentBuildingDefinitions;
-    }
+    componentBuildingDefinitions.add(baseJmsConnector.copy().withIdentifier("websphere-connector")
+        .withTypeDefinition(fromType(WebsphereJmsConnector.class)).build());
 
 
-    private TypeConverter<String, Integer> getAckModeConverter()
-    {
-        return new TypeConverter<String, Integer>()
-        {
-            @Override
-            public Integer convert(String ackMode)
-            {
-                switch (ackMode)
-                {
-                    case "AUTO_ACKNOWLEDGE":
-                        return Session.AUTO_ACKNOWLEDGE;
-                    case "CLIENT_ACKNOWLEDGE":
-                        return Session.CLIENT_ACKNOWLEDGE;
-                    case "DUPS_OK_ACKNOWLEDGE":
-                        return Session.DUPS_OK_ACKNOWLEDGE;
-                    default:
-                        throw new MuleRuntimeException(createStaticMessage("Wrong acknowledgement mode configuration: " + ackMode));
-                }
-            }
-        };
-    }
+    ComponentBuildingDefinition.Builder baseActiveMqConnector =
+        baseJmsConnector.copy().withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+            .withSetterParameterDefinition("brokerURL", fromSimpleParameter("brokerURL").build());
+
+    componentBuildingDefinitions.add(baseActiveMqConnector.copy().withIdentifier("activemq-connector")
+        .withTypeDefinition(fromType(ActiveMQJmsConnector.class)).build());
+
+    componentBuildingDefinitions.add(baseActiveMqConnector.copy().withIdentifier("activemq-xa-connector")
+        .withTypeDefinition(fromType(ActiveMQXAJmsConnector.class)).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("default-jndi-name-resolver")
+        .withTypeDefinition(fromType(SimpleJndiNameResolver.class))
+        .withSetterParameterDefinition("jndiInitialFactory", fromSimpleParameter("jndiInitialFactory").build())
+        .withSetterParameterDefinition("jndiProviderUrl", fromSimpleParameter("jndiProviderUrl").build())
+        .withSetterParameterDefinition("jndiProviderProperties",
+                                       fromSimpleReferenceParameter("jndiProviderProperties-ref").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-jndi-name-resolver")
+        .withTypeDefinition(fromConfigurationAttribute("class")).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier("selector").withTypeDefinition(fromType(JmsSelectorFilter.class))
+            .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build()).build());
+
+    componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().copy().withNamespace(JMS_NAMESPACE)
+        .withSetterParameterDefinition("factory", fromFixedValue(new JmsTransactionFactory()).build()).build());
+
+    componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().copy().withNamespace(JMS_NAMESPACE)
+        .withIdentifier("client-ack-transaction")
+        .withSetterParameterDefinition("factory", fromFixedValue(new JmsClientAcknowledgeTransactionFactory()).build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("jmsmessage-to-object-transformer")
+        .withTypeDefinition(fromType(JMSMessageToObject.class)).build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("object-to-jmsmessage-transformer")
+        .withTypeDefinition(fromType(ObjectToJMSMessage.class)).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("caching-connection-factory")
+        .withTypeDefinition(fromType(CachingConnectionFactory.class))
+        .withObjectFactoryType(CachingConnectionFactoryFactoryBean.class)
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("sessionCacheSize", fromSimpleParameter("sessionCacheSize").build())
+        .withSetterParameterDefinition("cacheProducers", fromSimpleParameter("cacheProducers").build())
+        .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
+        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
+        .withSetterParameterDefinition("connectionFactory", fromSimpleReferenceParameter("connectionFactory-ref").build())
+        .build());
+
+    componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
+    componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().build());
+    componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
+    return componentBuildingDefinitions;
+  }
+
+
+  private TypeConverter<String, Integer> getAckModeConverter() {
+    return new TypeConverter<String, Integer>() {
+
+      @Override
+      public Integer convert(String ackMode) {
+        switch (ackMode) {
+          case "AUTO_ACKNOWLEDGE":
+            return Session.AUTO_ACKNOWLEDGE;
+          case "CLIENT_ACKNOWLEDGE":
+            return Session.CLIENT_ACKNOWLEDGE;
+          case "DUPS_OK_ACKNOWLEDGE":
+            return Session.DUPS_OK_ACKNOWLEDGE;
+          default:
+            throw new MuleRuntimeException(createStaticMessage("Wrong acknowledgement mode configuration: " + ackMode));
+        }
+      }
+    };
+  }
 
 }

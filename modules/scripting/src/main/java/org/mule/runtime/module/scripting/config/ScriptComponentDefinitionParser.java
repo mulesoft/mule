@@ -9,14 +9,13 @@ package org.mule.runtime.module.scripting.config;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.runtime.module.scripting.component.ScriptComponent;
 
-public class ScriptComponentDefinitionParser extends ComponentDefinitionParser
-{
-    public ScriptComponentDefinitionParser()
-    {
-        super(ScriptComponent.class);
-        addAlias("script", "scriptText");
-        addAlias("engine", "scriptEngineName");
-    }
+public class ScriptComponentDefinitionParser extends ComponentDefinitionParser {
+
+  public ScriptComponentDefinitionParser() {
+    super(ScriptComponent.class);
+    addAlias("script", "scriptText");
+    addAlias("engine", "scriptEngineName");
+  }
 }
 
 

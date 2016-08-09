@@ -49,190 +49,154 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-public class EndpointMuleUniversalConduit extends MuleUniversalConduit
-{
+public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
-    private Map<String, OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
+  private Map<String, OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
 
-    public EndpointMuleUniversalConduit(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei, EndpointReferenceType t)
-    {
-        super(transport, configuration, ei, t);
+  public EndpointMuleUniversalConduit(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
+                                      EndpointReferenceType t) {
+    super(transport, configuration, ei, t);
+  }
+
+  protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException {
+    if (endpoints.get(uri) != null) {
+      return endpoints.get(uri);
     }
 
-    protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
-    {
-        if (endpoints.get(uri) != null)
-        {
-            return endpoints.get(uri);
+    OutboundEndpoint endpoint = getEndpointFactory(muleContext).getOutboundEndpoint(uri);
+    endpoints.put(uri, endpoint);
+    return endpoint;
+  }
+
+  private static EndpointFactory getEndpointFactory(MuleContext muleContext) {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
+
+  /**
+   * Prepare the message for writing.
+   */
+  @Override
+  public void prepare(final Message message) throws IOException {
+    // save in a separate place in case we need to resend the request
+    final ByteArrayOutputStream cache = new ByteArrayOutputStream();
+    final DelegatingOutputStream delegating = new DelegatingOutputStream(cache);
+    message.setContent(OutputStream.class, delegating);
+    message.setContent(DelegatingOutputStream.class, delegating);
+
+    OutputHandler handler = (event, out) -> {
+      out.write(cache.toByteArray());
+
+      delegating.setOutputStream(out);
+
+      // resume writing!
+      message.getInterceptorChain().doIntercept(message);
+    };
+
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    // are we sending an out of band response for a server side request?
+    boolean decoupled = event != null && message.getExchange().getInMessage() != null;
+
+    OutboundEndpoint ep = null;
+
+    if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled) {
+      // we've got an out of band WS-RM message or a message from a standalone client
+      MuleContext muleContext = configuration.getMuleContext();
+      MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
+
+      String url = setupURL(message);
+
+      try {
+        ep = getEndpoint(muleContext, url);
+        event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
+        // event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
+      } catch (Exception e) {
+        throw new Fault(e);
+      }
+    } else {
+      event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(MediaType.XML).build());
+    }
+
+    if (!decoupled) {
+      message.getExchange().put(CxfConstants.MULE_EVENT, event);
+    }
+    message.put(CxfConstants.MULE_EVENT, event);
+
+    final MuleEvent finalEvent = event;
+    final OutboundEndpoint finalEndpoint = ep;
+    AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM) {
+
+      @Override
+      public void handleMessage(Message m) throws Fault {
+        try {
+          dispatchMuleMessage(m, finalEvent, finalEndpoint);
+        } catch (MuleException e) {
+          throw new Fault(e);
         }
+      }
+    };
+    message.getInterceptorChain().add(i);
+  }
 
-        OutboundEndpoint endpoint = getEndpointFactory(muleContext).getOutboundEndpoint(uri);
-        endpoints.put(uri, endpoint);
-        return endpoint;
-    }
+  protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
+    try {
+      reqEvent.setMessage(MuleMessage.builder(reqEvent.getMessage())
+          .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString()).build());
 
-    private static EndpointFactory getEndpointFactory(MuleContext muleContext)
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+      if (reqEvent.isAllowNonBlocking()) {
+        final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-    /**
-     * Prepare the message for writing.
-     */
-    @Override
-    public void prepare(final Message message) throws IOException
-    {
-        // save in a separate place in case we need to resend the request
-        final ByteArrayOutputStream cache = new ByteArrayOutputStream();
-        final DelegatingOutputStream delegating = new DelegatingOutputStream(cache);
-        message.setContent(OutputStream.class, delegating);
-        message.setContent(DelegatingOutputStream.class, delegating);
+        reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler() {
 
-        OutputHandler handler = (event, out) ->
-        {
-            out.write(cache.toByteArray());
-
-            delegating.setOutputStream(out);
-
-            // resume writing!
-            message.getInterceptorChain().doIntercept(message);
-        };
-
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-        // are we sending an out of band response for a server side request?
-        boolean decoupled = event != null && message.getExchange().getInMessage() != null;
-
-        OutboundEndpoint ep = null;
-
-        if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
-        {
-            // we've got an out of band WS-RM message or a message from a standalone client
-            MuleContext muleContext = configuration.getMuleContext();
-            MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
-
-            String url = setupURL(message);
-
-            try
-            {
-                ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
-                // event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
+          @Override
+          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+            try {
+              Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
+              holder.value = event;
+              sendResultBackToCxf(m, event);
+            } catch (IOException e) {
+              processExceptionReplyTo(new MessagingException(event, e), replyTo);
             }
-            catch (Exception e)
-            {
-                throw new Fault(e);
-            }
-        }
-        else
-        {
-            event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(MediaType.XML).build());
-        }
+          }
 
-        if (!decoupled)
-        {
-            message.getExchange().put(CxfConstants.MULE_EVENT, event);
-        }
-        message.put(CxfConstants.MULE_EVENT, event);
+          @Override
+          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+            originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
+          }
+        });
+      }
+      // Update RequestContext ThreadLocal for backwards compatibility
+      OptimizedRequestContext.unsafeSetEvent(reqEvent);
 
-        final MuleEvent finalEvent = event;
-        final OutboundEndpoint finalEndpoint = ep;
-        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
-        {
-            @Override
-            public void handleMessage(Message m) throws Fault
-            {
-                try
-                {
-                    dispatchMuleMessage(m, finalEvent, finalEndpoint);
-                }
-                catch (MuleException e)
-                {
-                    throw new Fault(e);
-                }
-            }
-        };
-        message.getInterceptorChain().add(i);
+      MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
+
+      if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
+        sendResultBackToCxf(m, resEvent);
+      }
+    } catch (MuleException me) {
+      throw me;
+    } catch (Exception e) {
+      throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
+    }
+  }
+
+  protected MuleEvent processNext(MuleEvent event, Exchange exchange, OutboundEndpoint endpoint) throws MuleException {
+    CxfOutboundMessageProcessor processor =
+        (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
+    MuleEvent response;
+    if (processor == null) {
+      response = endpoint.process(event);
+    } else {
+      response = processor.processNext(event);
+
+      Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+      holder.value = response;
     }
 
-    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException
-    {
-        try
-        {
-            reqEvent.setMessage(MuleMessage.builder(reqEvent.getMessage())
-                                        .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString())
-                                        .build());
-
-            if (reqEvent.isAllowNonBlocking())
-            {
-                final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
-
-                reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler()
-                {
-                    @Override
-                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
-                    {
-                        try
-                        {
-                            Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
-                            holder.value = event;
-                            sendResultBackToCxf(m, event);
-                        }
-                        catch (IOException e)
-                        {
-                            processExceptionReplyTo(new MessagingException(event, e), replyTo);
-                        }
-                    }
-
-                    @Override
-                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-                    {
-                        originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-                    }
-                });
-            }
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(reqEvent);
-
-            MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
-
-            if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
-            {
-                sendResultBackToCxf(m, resEvent);
-            }
-        }
-        catch (MuleException me)
-        {
-            throw me;
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
-        }
-    }
-
-    protected MuleEvent processNext(MuleEvent event,
-                                    Exchange exchange, OutboundEndpoint endpoint)
-            throws MuleException
-    {
-        CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
-        MuleEvent response;
-        if (processor == null)
-        {
-            response = endpoint.process(event);
-        }
-        else
-        {
-            response = processor.processNext(event);
-
-            Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
-            holder.value = response;
-        }
-
-        // response = processor.processNext(event);
-        //
-        // Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
-        // holder.value = response;
-        return response;
-    }
+    // response = processor.processNext(event);
+    //
+    // Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+    // holder.value = response;
+    return response;
+  }
 
 }

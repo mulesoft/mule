@@ -20,41 +20,36 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 4.0
  */
-public final class DefaultMetadataCache implements MetadataCache
-{
+public final class DefaultMetadataCache implements MetadataCache {
 
-    private final Map<Serializable, Serializable> cache = new ConcurrentHashMap<>();
+  private final Map<Serializable, Serializable> cache = new ConcurrentHashMap<>();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void put(Serializable key, Serializable value)
-    {
-        cache.put(key, value);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void put(Serializable key, Serializable value) {
+    cache.put(key, value);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void putAll(Map<? extends Serializable, ? extends Serializable> values)
-    {
-        cache.putAll(values);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void putAll(Map<? extends Serializable, ? extends Serializable> values) {
+    cache.putAll(values);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T extends Serializable> Optional<T> get(Serializable key)
-    {
-        return Optional.ofNullable((T)cache.get(key));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T extends Serializable> Optional<T> get(Serializable key) {
+    return Optional.ofNullable((T) cache.get(key));
+  }
 
-    public Map<Serializable, Serializable> asMap()
-    {
-        return ImmutableMap.copyOf(cache);
-    }
+  public Map<Serializable, Serializable> asMap() {
+    return ImmutableMap.copyOf(cache);
+  }
 
 }

@@ -14,24 +14,21 @@ import org.mule.runtime.api.connection.PoolingListener;
  * @param <Connection> the generic type for the pooled connection
  * @since 4.0
  */
-final class NullPoolingListener<Connection> implements PoolingListener<Connection>
-{
+final class NullPoolingListener<Connection> implements PoolingListener<Connection> {
 
-    /**
-     * Does nothing
-     */
-    @Override
-    public void onBorrow(Connection connection)
-    {
+  /**
+   * Does nothing
+   */
+  @Override
+  public void onBorrow(Connection connection) {
 
-    }
+  }
 
-    /**
-     * Does nothing
-     */
-    @Override
-    public void onReturn(Connection connection)
-    {
+  /**
+   * Does nothing
+   */
+  @Override
+  public void onReturn(Connection connection) {
 
-    }
+  }
 }

@@ -7,13 +7,13 @@
 package org.mule.runtime.core.api.exception;
 
 /**
- * This is used to provide a rollback method in order to achieve atomic message delivery without relying on JTA transactions, 
- * The exact behavior of this method will depend on the transport, e.g. it may send a negative ack, reset a semaphore, 
- * put the resource back in its original state/location, etc.
+ * This is used to provide a rollback method in order to achieve atomic message delivery without relying on JTA transactions, The
+ * exact behavior of this method will depend on the transport, e.g. it may send a negative ack, reset a semaphore, put the
+ * resource back in its original state/location, etc.
  */
-public interface RollbackSourceCallback
-{
-    public void rollback();
+public interface RollbackSourceCallback {
+
+  public void rollback();
 }
 
 

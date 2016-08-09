@@ -19,72 +19,65 @@ import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 
 import org.junit.Test;
 
-public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationTestCase
-{
-    public ClusterizableMessageSourceFlowTestCase()
-    {
-        setStartContext(false);
-    }
+public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationTestCase {
+
+  public ClusterizableMessageSourceFlowTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "clusterizable-message-source-flow-config.xml";
+  }
+
+  @Test
+  public void startsWhenPrimaryNode() throws Exception {
+    muleContext.start();
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    assertEquals("TEST", response.getPayload());
+  }
+
+  @Test
+  public void doesNotStartsWhenSecondaryNode() throws Exception {
+    TestPollingController pollingController = new TestPollingController();
+    ((DefaultMuleContext) muleContext).setPollingController(pollingController);
+    muleContext.start();
+
+    Flow test1 = (Flow) muleContext.getRegistry().get("test1");
+    ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
+    assertTrue(test1.isStarted());
+    assertTrue(messageSource.isStarted());
+  }
+
+  @Test
+  public void startsWhenNodeBecomePrimary() throws Exception {
+    TestPollingController pollingController = new TestPollingController();
+    ((DefaultMuleContext) muleContext).setPollingController(pollingController);
+
+    muleContext.start();
+
+    Flow test1 = (Flow) muleContext.getRegistry().get("test1");
+    ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
+
+    messageSource.initialise();
+
+    pollingController.isPrimary = true;
+    muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    assertEquals("TEST", response.getPayload());
+  }
+
+  private class TestPollingController implements PollingController {
+
+    boolean isPrimary;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "clusterizable-message-source-flow-config.xml";
+    public boolean isPrimaryPollingInstance() {
+      return isPrimary;
     }
-
-    @Test
-    public void startsWhenPrimaryNode() throws Exception
-    {
-        muleContext.start();
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
-        assertEquals("TEST", response.getPayload());
-    }
-
-    @Test
-    public void doesNotStartsWhenSecondaryNode() throws Exception
-    {
-        TestPollingController pollingController = new TestPollingController();
-        ((DefaultMuleContext) muleContext).setPollingController(pollingController);
-        muleContext.start();
-
-        Flow test1 = (Flow) muleContext.getRegistry().get("test1");
-        ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
-        assertTrue(test1.isStarted());
-        assertTrue(messageSource.isStarted());
-    }
-
-    @Test
-    public void startsWhenNodeBecomePrimary() throws Exception
-    {
-        TestPollingController pollingController = new TestPollingController();
-        ((DefaultMuleContext) muleContext).setPollingController(pollingController);
-
-        muleContext.start();
-
-        Flow test1 = (Flow) muleContext.getRegistry().get("test1");
-        ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
-
-        messageSource.initialise();
-
-        pollingController.isPrimary=true;
-        muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
-        assertEquals("TEST", response.getPayload());
-    }
-
-    private class TestPollingController implements PollingController
-    {
-
-        boolean isPrimary;
-
-        @Override
-        public boolean isPrimaryPollingInstance()
-        {
-            return isPrimary;
-        }
-    }
+  }
 }

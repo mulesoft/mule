@@ -10,27 +10,23 @@ package org.mule.runtime.module.db.internal.result.statement;
 /**
  * Represents an output parameter after a {@link java.sql.Statement} execution
  */
-public class OutputParamResult implements StatementResult
-{
+public class OutputParamResult implements StatementResult {
 
-    private final String name;
-    private final Object value;
+  private final String name;
+  private final Object value;
 
-    public OutputParamResult(String name, Object value)
-    {
-        this.name = name;
-        this.value = value;
-    }
+  public OutputParamResult(String name, Object value) {
+    this.name = name;
+    this.value = value;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public Object getResult()
-    {
-        return value;
-    }
+  @Override
+  public Object getResult() {
+    return value;
+  }
 }

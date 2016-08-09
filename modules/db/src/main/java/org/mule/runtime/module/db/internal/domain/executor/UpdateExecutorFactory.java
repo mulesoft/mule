@@ -12,19 +12,16 @@ import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 /**
  * Creates {@link UpdateExecutor} instances
  */
-public class UpdateExecutorFactory implements QueryExecutorFactory
-{
+public class UpdateExecutorFactory implements QueryExecutorFactory {
 
-    private final StatementFactory statementFactory;
+  private final StatementFactory statementFactory;
 
-    public UpdateExecutorFactory(StatementFactory statementFactory)
-    {
-        this.statementFactory = statementFactory;
-    }
+  public UpdateExecutorFactory(StatementFactory statementFactory) {
+    this.statementFactory = statementFactory;
+  }
 
-    @Override
-    public QueryExecutor create()
-    {
-        return new UpdateExecutor(statementFactory);
-    }
+  @Override
+  public QueryExecutor create() {
+    return new UpdateExecutor(statementFactory);
+  }
 }

@@ -10,21 +10,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 /**
- * Concrete implementation for {@link SimpleServerSocketFactory}.
- * It provides TCP {@link ServerSocket}.
+ * Concrete implementation for {@link SimpleServerSocketFactory}. It provides TCP {@link ServerSocket}.
  *
  * @since 4.0
  */
-public class TcpServerSocketFactory implements SimpleServerSocketFactory
-{
+public class TcpServerSocketFactory implements SimpleServerSocketFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ServerSocket createServerSocket() throws IOException
-    {
-        return new ServerSocket();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ServerSocket createServerSocket() throws IOException {
+    return new ServerSocket();
+  }
 
 }

@@ -14,44 +14,38 @@ import java.io.IOException;
 
 import org.junit.Before;
 
-public class HttpsSharePortTestCase extends HttpSharePortTestCase
-{
+public class HttpsSharePortTestCase extends HttpSharePortTestCase {
 
-    private DefaultTlsContextFactory tlsContextFactory;
+  private DefaultTlsContextFactory tlsContextFactory;
 
-    @Before
-    public void setup() throws IOException
-    {
-        tlsContextFactory = new DefaultTlsContextFactory();
+  @Before
+  public void setup() throws IOException {
+    tlsContextFactory = new DefaultTlsContextFactory();
 
-        // Configure trust store in the client with the certificate of the server.
-        tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-        tlsContextFactory.setTrustStorePassword("changeit");
-    }
+    // Configure trust store in the client with the certificate of the server.
+    tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+    tlsContextFactory.setTrustStorePassword("changeit");
+  }
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/http/https-shared-listener-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/http/https-shared-listener-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {
+        new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
+        new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})};
+  }
 
-    @Override
-    protected SystemProperty getEndpointSchemeSystemProperty()
-    {
-        return new SystemProperty("scheme", "https");
-    }
+  @Override
+  protected SystemProperty getEndpointSchemeSystemProperty() {
+    return new SystemProperty("scheme", "https");
+  }
 
-    @Override
-    protected HttpRequestOptionsBuilder getOptionsBuilder()
-    {
-        return super.getOptionsBuilder().tlsContextFactory(tlsContextFactory);
-    }
+  @Override
+  protected HttpRequestOptionsBuilder getOptionsBuilder() {
+    return super.getOptionsBuilder().tlsContextFactory(tlsContextFactory);
+  }
 }

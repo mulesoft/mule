@@ -6,17 +6,15 @@
  */
 package org.mule.test.metadata.extension.model.shapes;
 
-public class Circle extends Shape
-{
-    private int diameter;
+public class Circle extends Shape {
 
-    public int getDiameter()
-    {
-        return diameter;
-    }
+  private int diameter;
 
-    public void setDiameter(int diameter)
-    {
-        this.diameter = diameter;
-    }
+  public int getDiameter() {
+    return diameter;
+  }
+
+  public void setDiameter(int diameter) {
+    this.diameter = diameter;
+  }
 }

@@ -18,20 +18,18 @@ import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
 import org.junit.Test;
 
-public class DefaultRetryPolicyAsyncTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/handlers/default-retry-policy-async.xml";
-    }
+public class DefaultRetryPolicyAsyncTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testPolicyRegistration() throws Exception
-    {
-        Object obj = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
-        assertThat(obj, not(nullValue()));
-        assertThat(obj, instanceOf(AsynchronousRetryTemplate.class));
-        assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) obj).getDelegate()).getCount(), is(3));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/handlers/default-retry-policy-async.xml";
+  }
+
+  @Test
+  public void testPolicyRegistration() throws Exception {
+    Object obj = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+    assertThat(obj, not(nullValue()));
+    assertThat(obj, instanceOf(AsynchronousRetryTemplate.class));
+    assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) obj).getDelegate()).getCount(), is(3));
+  }
 }

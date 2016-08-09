@@ -20,32 +20,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DatasourceBeanConfigTestCase extends AbstractDbIntegrationTestCase
-{
+public class DatasourceBeanConfigTestCase extends AbstractDbIntegrationTestCase {
 
-    public DatasourceBeanConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DatasourceBeanConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/bean-datasource-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/bean-datasource-config.xml"};
+  }
 
-    @Test
-    public void usesDatasourceConfig() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("usesBeanDatasourceConfig").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesDatasourceConfig() throws Exception {
+    final MuleEvent responseEvent = flowRunner("usesBeanDatasourceConfig").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 }

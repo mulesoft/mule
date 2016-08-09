@@ -9,39 +9,36 @@ package org.mule.runtime.core.api.lifecycle;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>CreateException</code> is thrown when creating an object inside Mule wasn't possible due
- * to inconsistent internal state or wrong input.
+ * <code>CreateException</code> is thrown when creating an object inside Mule wasn't possible due to inconsistent internal state
+ * or wrong input.
  */
-public class CreateException extends LifecycleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = -8402348927606781921L;
+public class CreateException extends LifecycleException {
 
-    /**
-     * @param message   the exception message
-     * @param component the component that failed during a lifecycle method call
-     */
-    public CreateException(Message message, Object component)
-    {
-        super(message, component);
-    }
+  /** Serial version */
+  private static final long serialVersionUID = -8402348927606781921L;
 
-    /**
-     * @param message   the exception message
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the component that failed during a lifecycle method call
-     */
-    public CreateException(Message message, Throwable cause, Object component)
-    {
-        super(message, cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param component the component that failed during a lifecycle method call
+   */
+  public CreateException(Message message, Object component) {
+    super(message, component);
+  }
 
-    /**
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the component that failed during a lifecycle method call
-     */
-    public CreateException(Throwable cause, Object component)
-    {
-        super(cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the component that failed during a lifecycle method call
+   */
+  public CreateException(Message message, Throwable cause, Object component) {
+    super(message, cause, component);
+  }
+
+  /**
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the component that failed during a lifecycle method call
+   */
+  public CreateException(Throwable cause, Object component) {
+    super(cause, component);
+  }
 }

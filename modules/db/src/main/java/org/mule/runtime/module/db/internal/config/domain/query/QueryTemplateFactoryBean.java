@@ -19,101 +19,81 @@ import java.util.List;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class QueryTemplateFactoryBean extends AbstractFactoryBean<QueryTemplate>
-{
+public class QueryTemplateFactoryBean extends AbstractFactoryBean<QueryTemplate> {
 
-    private final QueryTemplate queryTemplate;
-    private final List<QueryParamValue> params;
+  private final QueryTemplate queryTemplate;
+  private final List<QueryParamValue> params;
 
-    public QueryTemplateFactoryBean(QueryTemplate queryTemplate, List<QueryParamValue> params)
-    {
-        this.queryTemplate = queryTemplate;
+  public QueryTemplateFactoryBean(QueryTemplate queryTemplate, List<QueryParamValue> params) {
+    this.queryTemplate = queryTemplate;
 
-        if (params != null)
-        {
-            this.params = params;
-        }
-        else
-        {
-            this.params = Collections.emptyList();
-        }
+    if (params != null) {
+      this.params = params;
+    } else {
+      this.params = Collections.emptyList();
+    }
+  }
+
+  @Override
+  public Class<?> getObjectType() {
+    return QueryTemplate.class;
+  }
+
+  @Override
+  protected QueryTemplate createInstance() throws Exception {
+    // No need to processStatement a new query definition
+    if (params.isEmpty()) {
+      return queryTemplate;
     }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return QueryTemplate.class;
+    List<QueryParam> paramDefinitions = new LinkedList<QueryParam>();
+
+    boolean usesNameParamOverride = usesNamedParamOverride();
+
+    if (usesNameParamOverride) {
+      processNameParamOverride(paramDefinitions);
     }
 
-    @Override
-    protected QueryTemplate createInstance() throws Exception
-    {
-        // No need to processStatement a new query definition
-        if (params.isEmpty())
-        {
-            return queryTemplate;
-        }
+    return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), paramDefinitions);
+  }
 
-        List<QueryParam> paramDefinitions = new LinkedList<QueryParam>();
+  private void processNameParamOverride(List<QueryParam> paramDefinitions) {
+    for (InputQueryParam param : queryTemplate.getInputParams()) {
+      Object value;
 
-        boolean usesNameParamOverride = usesNamedParamOverride();
+      QueryParamValue queryParamValue = getOverriddenParam(param.getName());
+      if (queryParamValue != null) {
+        value = queryParamValue.getValue();
+      } else {
+        value = param.getValue();
+      }
 
-        if (usesNameParamOverride)
-        {
-            processNameParamOverride(paramDefinitions);
-        }
+      DefaultInputQueryParam newParam = new DefaultInputQueryParam(param.getIndex(), param.getType(), value, param.getName());
 
-        return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), paramDefinitions);
+      paramDefinitions.add(newParam);
+    }
+  }
+
+  private QueryParamValue getOverriddenParam(String name) {
+    for (QueryParamValue param : params) {
+      if (name.equals(param.getName())) {
+        return param;
+      }
     }
 
-    private void processNameParamOverride(List<QueryParam> paramDefinitions)
-    {
-        for (InputQueryParam param : queryTemplate.getInputParams())
-        {
-            Object value;
+    return null;
+  }
 
-            QueryParamValue queryParamValue = getOverriddenParam(param.getName());
-            if (queryParamValue != null)
-            {
-                value = queryParamValue.getValue();
-            }
-            else
-            {
-                value = param.getValue();
-            }
+  private boolean usesNamedParamOverride() {
+    boolean result = false;
+    for (QueryParamValue param : params) {
 
-            DefaultInputQueryParam newParam = new DefaultInputQueryParam(param.getIndex(), param.getType(), value, param.getName());
-
-            paramDefinitions.add(newParam);
-        }
+      if (!(param.getName() == null || "".equals(param.getName()))) {
+        result = true;
+        break;
+      }
     }
 
-    private QueryParamValue getOverriddenParam(String name)
-    {
-        for (QueryParamValue param : params)
-        {
-            if (name.equals(param.getName()))
-            {
-                return param;
-            }
-        }
-
-        return null;
-    }
-
-    private boolean usesNamedParamOverride()
-    {
-        boolean result = false;
-        for (QueryParamValue param : params)
-        {
-
-            if (!(param.getName() == null || "".equals(param.getName())))
-            {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
+    return result;
+  }
 }

@@ -15,53 +15,42 @@ import org.slf4j.LoggerFactory;
 /**
  * Default exception Handler used when executing work in the work manager
  */
-public class DefaultWorkListener implements WorkListener
-{
+public class DefaultWorkListener implements WorkListener {
 
-    /**
-     * logger used by this class
-     */
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  /**
+   * logger used by this class
+   */
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void workAccepted(WorkEvent event)
-    {
-        handleWorkException(event, "workAccepted");
+  public void workAccepted(WorkEvent event) {
+    handleWorkException(event, "workAccepted");
+  }
+
+  public void workRejected(WorkEvent event) {
+    handleWorkException(event, "workRejected");
+  }
+
+  public void workStarted(WorkEvent event) {
+    handleWorkException(event, "workStarted");
+  }
+
+  public void workCompleted(WorkEvent event) {
+    handleWorkException(event, "workCompleted");
+  }
+
+  protected void handleWorkException(WorkEvent event, String type) {
+    Throwable e;
+
+    if (event != null && event.getException() != null) {
+      e = event.getException();
+    } else {
+      return;
     }
 
-    public void workRejected(WorkEvent event)
-    {
-        handleWorkException(event, "workRejected");
+    if (event.getException().getCause() != null) {
+      e = event.getException().getCause();
     }
 
-    public void workStarted(WorkEvent event)
-    {
-        handleWorkException(event, "workStarted");
-    }
-
-    public void workCompleted(WorkEvent event)
-    {
-        handleWorkException(event, "workCompleted");
-    }
-
-    protected void handleWorkException(WorkEvent event, String type)
-    {
-        Throwable e;
-
-        if (event != null && event.getException() != null)
-        {
-            e = event.getException();
-        }
-        else
-        {
-            return;
-        }
-
-        if (event.getException().getCause() != null)
-        {
-            e = event.getException().getCause();
-        }
-
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                     + event.getWork().toString(), e);
-    }
+    logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString(), e);
+  }
 }

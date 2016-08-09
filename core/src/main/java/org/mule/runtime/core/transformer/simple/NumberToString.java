@@ -15,58 +15,48 @@ import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
 /**
- * <code>NumberToString</code> converts a Number to a String.  A NumberFormat is used if one is provided.
+ * <code>NumberToString</code> converts a Number to a String. A NumberFormat is used if one is provided.
  */
-public class NumberToString extends AbstractTransformer implements DiscoverableTransformer
-{
+public class NumberToString extends AbstractTransformer implements DiscoverableTransformer {
 
-    private NumberFormat numberFormat;
+  private NumberFormat numberFormat;
 
-    /**
-     * Give core transformers a slighty higher priority
-     */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  /**
+   * Give core transformers a slighty higher priority
+   */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public NumberToString()
-    {
-        registerSourceType(DataType.NUMBER);
-        setReturnDataType(DataType.STRING);
+  public NumberToString() {
+    registerSourceType(DataType.NUMBER);
+    setReturnDataType(DataType.STRING);
+  }
+
+  public NumberToString(NumberFormat numberFormat) {
+    this();
+    this.numberFormat = numberFormat;
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    if (src == null) {
+      return "";
     }
 
-    public NumberToString(NumberFormat numberFormat)
-    {
-        this();
-        this.numberFormat = numberFormat;
+    if (numberFormat != null) {
+      return numberFormat.format(src);
+    } else {
+      return ((Number) src).toString();
     }
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        if (src == null)
-        {
-            return "";
-        }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-        if (numberFormat != null)
-        {
-            return numberFormat.format(src);
-        }
-        else
-        {
-            return ((Number) src).toString();
-        }
-    }
-
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 
 }

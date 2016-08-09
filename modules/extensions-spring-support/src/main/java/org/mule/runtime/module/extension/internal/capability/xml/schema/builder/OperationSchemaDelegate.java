@@ -26,60 +26,51 @@ import org.mule.runtime.module.extension.internal.model.property.ExtendingOperat
 import javax.xml.namespace.QName;
 
 /**
- * Builder delegation class to generate a XSD schema that describes a
- * {@link OperationModel}
+ * Builder delegation class to generate a XSD schema that describes a {@link OperationModel}
  *
  * @since 4.0.0
  */
-class OperationSchemaDelegate
-{
+class OperationSchemaDelegate {
 
-    private final SchemaBuilder builder;
+  private final SchemaBuilder builder;
 
-    public OperationSchemaDelegate(SchemaBuilder builder)
-    {
-        this.builder = builder;
+  public OperationSchemaDelegate(SchemaBuilder builder) {
+    this.builder = builder;
+  }
+
+  public void registerOperation(OperationModel operationModel) {
+    String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
+    registerProcessorElement(operationModel, typeName);
+    registerOperationType(typeName, operationModel);
+  }
+
+  private void registerProcessorElement(OperationModel operationModel, String typeName) {
+    Element element = new TopLevelElement();
+    element.setName(hyphenize(operationModel.getName()));
+    element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
+    element.setAnnotation(builder.createDocAnnotation(operationModel.getDescription()));
+    element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
+    builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
+  }
+
+  private void registerOperationType(String name, OperationModel operationModel) {
+    ExtensionType operationType = builder.registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+    addTargetParameter(operationType, operationModel);
+  }
+
+  private QName getOperationSubstitutionGroup(OperationModel operationModel) {
+    ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+    operationModel.getModelProperty(ExtendingOperationModelProperty.class)
+        .ifPresent(property -> substitutionGroup.set(builder.getSubstitutionGroup(property.getType())));
+
+    return substitutionGroup.get();
+  }
+
+  private void addTargetParameter(ExtensionType operationType, OperationModel operationModel) {
+    if (!isVoid(operationModel)) {
+      Attribute attribute = builder.createAttribute(TARGET_ATTRIBUTE, builder.load(String.class), false, NOT_SUPPORTED);
+      attribute.setAnnotation(builder.createDocAnnotation(TARGET_ATTRIBUTE_DESCRIPTION));
+      operationType.getAttributeOrAttributeGroup().add(attribute);
     }
-
-    public void registerOperation(OperationModel operationModel)
-    {
-        String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
-        registerProcessorElement(operationModel, typeName);
-        registerOperationType(typeName, operationModel);
-    }
-
-    private void registerProcessorElement(OperationModel operationModel, String typeName)
-    {
-        Element element = new TopLevelElement();
-        element.setName(hyphenize(operationModel.getName()));
-        element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
-        element.setAnnotation(builder.createDocAnnotation(operationModel.getDescription()));
-        element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
-        builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
-    }
-
-    private void registerOperationType(String name, OperationModel operationModel)
-    {
-        ExtensionType operationType = builder.registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
-        addTargetParameter(operationType, operationModel);
-    }
-
-    private QName getOperationSubstitutionGroup(OperationModel operationModel)
-    {
-        ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_MESSAGE_PROCESSOR);
-        operationModel.getModelProperty(ExtendingOperationModelProperty.class)
-                .ifPresent(property -> substitutionGroup.set(builder.getSubstitutionGroup(property.getType())));
-
-        return substitutionGroup.get();
-    }
-
-    private void addTargetParameter(ExtensionType operationType, OperationModel operationModel)
-    {
-        if (!isVoid(operationModel))
-        {
-            Attribute attribute = builder.createAttribute(TARGET_ATTRIBUTE, builder.load(String.class), false, NOT_SUPPORTED);
-            attribute.setAnnotation(builder.createDocAnnotation(TARGET_ATTRIBUTE_DESCRIPTION));
-            operationType.getAttributeOrAttributeGroup().add(attribute);
-        }
-    }
+  }
 }

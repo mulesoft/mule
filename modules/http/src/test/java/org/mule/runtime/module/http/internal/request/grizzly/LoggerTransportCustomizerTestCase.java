@@ -28,34 +28,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class LoggerTransportCustomizerTestCase extends AbstractMuleTestCase
-{
+public class LoggerTransportCustomizerTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private FilterChainBuilder mockFilterChainBuilder;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpCodecFilter mockHttpCodeFilter;
-    @Mock
-    private MuleRuntimeException mockMuleRuntimeException;
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Mock
+  private FilterChainBuilder mockFilterChainBuilder;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpCodecFilter mockHttpCodeFilter;
+  @Mock
+  private MuleRuntimeException mockMuleRuntimeException;
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    private LoggerTransportCustomizer loggerTransportCustomizer = new LoggerTransportCustomizer();
+  private LoggerTransportCustomizer loggerTransportCustomizer = new LoggerTransportCustomizer();
 
-    @Test
-    public void httpMessageLoggerIsAdded()
-    {
-        when(mockFilterChainBuilder.get(anyInt())).thenReturn(mockHttpCodeFilter);
-        loggerTransportCustomizer.customize(null, mockFilterChainBuilder);
-        verify(mockHttpCodeFilter.getMonitoringConfig()).addProbes(isA(HttpMessageLogger.class));
-    }
+  @Test
+  public void httpMessageLoggerIsAdded() {
+    when(mockFilterChainBuilder.get(anyInt())).thenReturn(mockHttpCodeFilter);
+    loggerTransportCustomizer.customize(null, mockFilterChainBuilder);
+    verify(mockHttpCodeFilter.getMonitoringConfig()).addProbes(isA(HttpMessageLogger.class));
+  }
 
-    @Test
-    public void noHttpCodeFilterFound()
-    {
-        when(mockFilterChainBuilder.get(anyInt())).thenThrow(mockMuleRuntimeException);
-        expectedException.expect(MuleRuntimeException.class);
-        loggerTransportCustomizer.customize(null, mockFilterChainBuilder);
-    }
+  @Test
+  public void noHttpCodeFilterFound() {
+    when(mockFilterChainBuilder.get(anyInt())).thenThrow(mockMuleRuntimeException);
+    expectedException.expect(MuleRuntimeException.class);
+    loggerTransportCustomizer.customize(null, mockFilterChainBuilder);
+  }
 
 }

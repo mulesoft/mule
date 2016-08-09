@@ -31,80 +31,66 @@ import org.junit.runners.Parameterized.Parameters;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
-{
+public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase {
 
-    @Parameters
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                                             {"groovy", "groovy", "Groovy Scripting Engine", "2.0"},
-                                             {"jython", "py", "jython", "2.7.0"},
-                                             {"jruby", "rb", "JSR 223 JRuby Engine", "1.7.24"},
-                                             {"rhino", "js", "Mozilla Rhino", "1.6R5"},
-                                             {"rhino", "js", "Mozilla Rhino", "1.6 release 2"}
-        });
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"groovy", "groovy", "Groovy Scripting Engine", "2.0"},
+        {"jython", "py", "jython", "2.7.0"}, {"jruby", "rb", "JSR 223 JRuby Engine", "1.7.24"},
+        {"rhino", "js", "Mozilla Rhino", "1.6R5"}, {"rhino", "js", "Mozilla Rhino", "1.6 release 2"}});
+  }
+
+  @Parameter(0)
+  public String engineName;
+
+  @Parameter(1)
+  public String extension;
+
+  @Parameter(2)
+  public String fullName;
+
+  @Parameter(3)
+  public String version;
+
+  private ScriptEngineManager scriptEngineManager;
+
+  @Before
+  public void before() {
+    scriptEngineManager = new ScriptEngineManager();
+  }
+
+  @Test
+  public void allEngines() {
+    List<ScriptEngineFactory> engineFactories = scriptEngineManager.getEngineFactories();
+    for (ScriptEngineFactory scriptEngineFactory : engineFactories) {
+      scriptEngineFactory.getScriptEngine();
     }
+    assertThat(engineFactories, hasItem(new TypeSafeMatcher<ScriptEngineFactory>() {
 
-    @Parameter(0)
-    public String engineName;
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("expected '" + fullName + " " + version + "'");
+      }
 
-    @Parameter(1)
-    public String extension;
+      @Override
+      protected void describeMismatchSafely(ScriptEngineFactory item, Description mismatchDescription) {
+        mismatchDescription.appendText("was ").appendValue("'" + item.getEngineName() + " " + item.getEngineVersion() + "'");
+      }
 
-    @Parameter(2)
-    public String fullName;
+      @Override
+      protected boolean matchesSafely(ScriptEngineFactory item) {
+        return fullName.equals(item.getEngineName()) && version.equals(item.getEngineVersion());
+      }
+    }));
+  }
 
-    @Parameter(3)
-    public String version;
+  @Test
+  public void findEngineByName() throws Exception {
+    assertThat(scriptEngineManager.getEngineByName(engineName), notNullValue());
+  }
 
-    private ScriptEngineManager scriptEngineManager;
-
-    @Before
-    public void before()
-    {
-        scriptEngineManager = new ScriptEngineManager();
-    }
-
-    @Test
-    public void allEngines()
-    {
-        List<ScriptEngineFactory> engineFactories = scriptEngineManager.getEngineFactories();
-        for (ScriptEngineFactory scriptEngineFactory : engineFactories)
-        {
-            scriptEngineFactory.getScriptEngine();
-        }
-        assertThat(engineFactories, hasItem(new TypeSafeMatcher<ScriptEngineFactory>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText("expected '" + fullName + " " + version + "'");
-            }
-
-            @Override
-            protected void describeMismatchSafely(ScriptEngineFactory item, Description mismatchDescription)
-            {
-                mismatchDescription.appendText("was ").appendValue("'" + item.getEngineName() + " " + item.getEngineVersion() + "'");
-            }
-
-            @Override
-            protected boolean matchesSafely(ScriptEngineFactory item)
-            {
-                return fullName.equals(item.getEngineName()) && version.equals(item.getEngineVersion());
-            }
-        }));
-    }
-
-    @Test
-    public void findEngineByName() throws Exception
-    {
-        assertThat(scriptEngineManager.getEngineByName(engineName), notNullValue());
-    }
-
-    @Test
-    public void findEngineByExtension() throws Exception
-    {
-        assertThat(scriptEngineManager.getEngineByExtension(extension), notNullValue());
-    }
+  @Test
+  public void findEngineByExtension() throws Exception {
+    assertThat(scriptEngineManager.getEngineByExtension(extension), notNullValue());
+  }
 }

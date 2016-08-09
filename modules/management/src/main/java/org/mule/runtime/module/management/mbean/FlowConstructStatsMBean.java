@@ -8,30 +8,29 @@ package org.mule.runtime.module.management.mbean;
 
 
 /**
- * <code>FlowConstructStatsMBean</code> defines the management interface for a mule
- * managed flow.
+ * <code>FlowConstructStatsMBean</code> defines the management interface for a mule managed flow.
  */
-public interface FlowConstructStatsMBean 
-{
-    void clearStatistics();
+public interface FlowConstructStatsMBean {
 
-    long getAsyncEventsReceived();
+  void clearStatistics();
 
-    long getSyncEventsReceived();
+  long getAsyncEventsReceived();
 
-    long getTotalEventsReceived();
+  long getSyncEventsReceived();
 
-    long getProcessedEvents();
+  long getTotalEventsReceived();
 
-    long getAverageProcessingTime();
+  long getProcessedEvents();
 
-    long getMaxProcessingTime();
+  long getAverageProcessingTime();
 
-    long getMinProcessingTime();
+  long getMaxProcessingTime();
 
-    long getTotalProcessingTime();
+  long getMinProcessingTime();
 
-    long getFatalErrors();
+  long getTotalProcessingTime();
 
-    long getExecutionErrors();
+  long getFatalErrors();
+
+  long getExecutionErrors();
 }

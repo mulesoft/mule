@@ -26,166 +26,147 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * <code>Connector</code> is the mechanism used to connect to external systems and protocols in order to send and
- * receive data.
+ * <code>Connector</code> is the mechanism used to connect to external systems and protocols in order to send and receive data.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface Connector extends LegacyConnector
-{
-    int INT_VALUE_NOT_SET = -1;
+public interface Connector extends LegacyConnector {
 
-    /**
-     * Registers a MessageProcessor listener which will listen to new message
-     * received from a specific transport channel and then processed by the endpoint.
-     * Only a single listener can be registered for a given endpoints. Attempts to
-     * register a listener when one is already registered will fail.
-     *
-     * @param endpoint defines both the transport and channel/resource uri as well
-     *            the processing (transformation/filtering) that should occur when
-     *            the endpoint processes a new message from the transport receiver.
-     * @param listener the listener that will be invoked when messages are received
-     *            on the endpoint.
-     * @param flowConstruct reference to the flow construct that the listener is part
-     *            of for use as context for logging, notifications and error
-     *            handling.
-     */
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct)
-        throws Exception;
+  int INT_VALUE_NOT_SET = -1;
 
-    /**
-     * Unregisters the listener for the given endpoints. This will mean that the
-     * listener that was registered for this endpoint will no longer receive any
-     * messages.
-     */
-    public void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception;
+  /**
+   * Registers a MessageProcessor listener which will listen to new message received from a specific transport channel and then
+   * processed by the endpoint. Only a single listener can be registered for a given endpoints. Attempts to register a listener
+   * when one is already registered will fail.
+   *
+   * @param endpoint defines both the transport and channel/resource uri as well the processing (transformation/filtering) that
+   *        should occur when the endpoint processes a new message from the transport receiver.
+   * @param listener the listener that will be invoked when messages are received on the endpoint.
+   * @param flowConstruct reference to the flow construct that the listener is part of for use as context for logging,
+   *        notifications and error handling.
+   */
+  public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception;
 
-    /**
-     * @return true if the endpoint is started
-     */
-    boolean isStarted();
+  /**
+   * Unregisters the listener for the given endpoints. This will mean that the listener that was registered for this endpoint will
+   * no longer receive any messages.
+   */
+  public void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception;
 
-    @Override
-    boolean isConnected();
+  /**
+   * @return true if the endpoint is started
+   */
+  boolean isStarted();
 
-    /**
-     * @return false if the connector is alive and well or true if the connector is
-     *         being destroyed
-     */
-    boolean isDisposed();
+  @Override
+  boolean isConnected();
 
-    /**
-     * Creates a new {@link MuleMessageFactory} using what's defined in the connector's
-     * transport service descriptor.
-     */
-    MuleMessageFactory createMuleMessageFactory() throws CreateException;
+  /**
+   * @return false if the connector is alive and well or true if the connector is being destroyed
+   */
+  boolean isDisposed();
 
-    /**
-     * @return the primary protocol name for endpoints of this connector
-     */
-    String getProtocol();
+  /**
+   * Creates a new {@link MuleMessageFactory} using what's defined in the connector's transport service descriptor.
+   */
+  MuleMessageFactory createMuleMessageFactory() throws CreateException;
 
-    /**
-     * @return true if the protocol is supported by this connector.
-     */
-    boolean supportsProtocol(String protocol);
+  /**
+   * @return the primary protocol name for endpoints of this connector
+   */
+  String getProtocol();
 
-    /**
-     * The dispatcher factory is used to create a message dispatcher of the current
-     * request
-     *
-     * @param factory the factory to use when a dispatcher request is madr
-     */
-    void setDispatcherFactory(MessageDispatcherFactory factory);
+  /**
+   * @return true if the protocol is supported by this connector.
+   */
+  boolean supportsProtocol(String protocol);
 
-    /**
-     * The dispatcher factory is used to create a message dispatcher of the current
-     * request
-     *
-     * @return the factory to use when a dispatcher request is madr
-     */
-    MessageDispatcherFactory getDispatcherFactory();
+  /**
+   * The dispatcher factory is used to create a message dispatcher of the current request
+   *
+   * @param factory the factory to use when a dispatcher request is madr
+   */
+  void setDispatcherFactory(MessageDispatcherFactory factory);
 
-    /**
-     * The requester factory is used to create a message requester of the current
-     * request
-     *
-     * @param factory the factory to use when a request is made
-     */
-    void setRequesterFactory(MessageRequesterFactory factory);
+  /**
+   * The dispatcher factory is used to create a message dispatcher of the current request
+   *
+   * @return the factory to use when a dispatcher request is madr
+   */
+  MessageDispatcherFactory getDispatcherFactory();
 
-    /**
-     * The requester factory is used to create a message requester of the current
-     * request
-     *
-     * @return the factory to use when a request is made
-     */
-    MessageRequesterFactory getRequesterFactory();
+  /**
+   * The requester factory is used to create a message requester of the current request
+   *
+   * @param factory the factory to use when a request is made
+   */
+  void setRequesterFactory(MessageRequesterFactory factory);
 
-    boolean isResponseEnabled();
+  /**
+   * The requester factory is used to create a message requester of the current request
+   *
+   * @return the factory to use when a request is made
+   */
+  MessageRequesterFactory getRequesterFactory();
 
-    /**
-     * Make a specific request to the underlying transport
-     *
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a MuleMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     */
-    MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
+  boolean isResponseEnabled();
 
-    /**
-     * Will get the output stream for this type of transport. Typically this will be
-     * called only when Streaming is being used on an outbound endpoint. If Streaming
-     * is not supported by this transport an {@link UnsupportedOperationException} is
-     * thrown. Note that the stream MUST release resources on close. For help doing
-     * so, see {@link CallbackOutputStream}.
-     *
-     * @param endpoint the endpoint that releates to this Dispatcher
-     * @param event the current event being processed
-     * @return the output stream to use for this request
-     */
-    OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
+  /**
+   * Make a specific request to the underlying transport
+   *
+   * @param endpoint the endpoint to use when connecting to the resource
+   * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
+   *        data available. If no data becomes available before the timeout elapses, null will be returned
+   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @throws Exception if the call to the underlying protocal cuases an exception
+   */
+  MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
-    RetryPolicyTemplate getRetryPolicyTemplate();
+  /**
+   * Will get the output stream for this type of transport. Typically this will be called only when Streaming is being used on an
+   * outbound endpoint. If Streaming is not supported by this transport an {@link UnsupportedOperationException} is thrown. Note
+   * that the stream MUST release resources on close. For help doing so, see {@link CallbackOutputStream}.
+   *
+   * @param endpoint the endpoint that releates to this Dispatcher
+   * @param event the current event being processed
+   * @return the output stream to use for this request
+   */
+  OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
 
-    /**
-     * @return the default {@link MessageExchangePattern} as configured in the
-     *         transport's service descriptor.
-     */
-    MessageExchangePattern getDefaultExchangePattern();
+  RetryPolicyTemplate getRetryPolicyTemplate();
 
-    /**
-     * @return List of exchange patterns that this connector supports for inbound endpoints.
-     */
-    List<MessageExchangePattern> getInboundExchangePatterns();
+  /**
+   * @return the default {@link MessageExchangePattern} as configured in the transport's service descriptor.
+   */
+  MessageExchangePattern getDefaultExchangePattern();
 
-    /**
-     * @return List of exchange patterns that this connector supports for outbound endpoints.
-     */
-    List<MessageExchangePattern> getOutboundExchangePatterns();
+  /**
+   * @return List of exchange patterns that this connector supports for inbound endpoints.
+   */
+  List<MessageExchangePattern> getInboundExchangePatterns();
 
-    /**
-     * @return The strategy used for reading and writing session information to and from the transport.
-     */
-    SessionHandler getSessionHandler();
+  /**
+   * @return List of exchange patterns that this connector supports for outbound endpoints.
+   */
+  List<MessageExchangePattern> getOutboundExchangePatterns();
 
-    /**
-     * @param maxRedelivery times to try message redelivery
-     * @return AbstractRedeliveryPolicy to use for message redelivery, null if it shouldn't be used
-     */
-    AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
+  /**
+   * @return The strategy used for reading and writing session information to and from the transport.
+   */
+  SessionHandler getSessionHandler();
 
-    /**
-     * Returns a canonical representation of the given {@link org.mule.compatibility.core.api.endpoint.EndpointURI}
-     *
-     * @param uri a not null {@link org.mule.compatibility.core.api.endpoint.EndpointURI}
-     * @return the canonical representation of the given uri as a {@link java.lang.String}
-     */
-    public String getCanonicalURI(EndpointURI uri);
+  /**
+   * @param maxRedelivery times to try message redelivery
+   * @return AbstractRedeliveryPolicy to use for message redelivery, null if it shouldn't be used
+   */
+  AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
+
+  /**
+   * Returns a canonical representation of the given {@link org.mule.compatibility.core.api.endpoint.EndpointURI}
+   *
+   * @param uri a not null {@link org.mule.compatibility.core.api.endpoint.EndpointURI}
+   * @return the canonical representation of the given uri as a {@link java.lang.String}
+   */
+  public String getCanonicalURI(EndpointURI uri);
 }

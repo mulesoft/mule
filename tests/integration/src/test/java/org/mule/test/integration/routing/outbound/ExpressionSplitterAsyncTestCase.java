@@ -15,23 +15,20 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-public class ExpressionSplitterAsyncTestCase extends AbstractIntegrationTestCase
-{
+public class ExpressionSplitterAsyncTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/expression-splitter-async-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/expression-splitter-async-test-flow.xml";
+  }
 
-    @Test
-    public void testSplitter() throws Exception
-    {
-        FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
-        fruitBowl.addFruit(new Orange());
+  @Test
+  public void testSplitter() throws Exception {
+    FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
+    fruitBowl.addFruit(new Orange());
 
-        flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
+    flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
 
-        FlowAssert.verify();
-    }
+    FlowAssert.verify();
+  }
 }

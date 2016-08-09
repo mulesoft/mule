@@ -8,47 +8,37 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.runtime.core.api.context.WorkManager;
 
-public class PollingReceiverWorkerSchedule implements Runnable
-{
+public class PollingReceiverWorkerSchedule implements Runnable {
 
-    protected final PollingReceiverWorker worker;
-    protected final WorkManager workManager;
-    protected final AbstractPollingMessageReceiver receiver;
-    private final ClassLoader classLoader;
+  protected final PollingReceiverWorker worker;
+  protected final WorkManager workManager;
+  protected final AbstractPollingMessageReceiver receiver;
+  private final ClassLoader classLoader;
 
-    protected PollingReceiverWorkerSchedule(PollingReceiverWorker work)
-    {
-        super();
-        worker = work;
-        receiver = work.getReceiver();
-        workManager = receiver.getWorkManager();
-        //use the class loader from the thread it created the work.
-        classLoader = Thread.currentThread().getContextClassLoader();
-    }
+  protected PollingReceiverWorkerSchedule(PollingReceiverWorker work) {
+    super();
+    worker = work;
+    receiver = work.getReceiver();
+    workManager = receiver.getWorkManager();
+    // use the class loader from the thread it created the work.
+    classLoader = Thread.currentThread().getContextClassLoader();
+  }
 
-    @Override
-    public void run()
-    {
-        ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            try
-            {
-                Thread.currentThread().setContextClassLoader(classLoader);
-                if (!worker.isRunning())
-                {
-                    workManager.scheduleWork(worker);
-                }
-            }
-            catch (Exception e)
-            {
-                receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
-            }
+  @Override
+  public void run() {
+    ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+    try {
+      try {
+        Thread.currentThread().setContextClassLoader(classLoader);
+        if (!worker.isRunning()) {
+          workManager.scheduleWork(worker);
         }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalCl);
-        }
+      } catch (Exception e) {
+        receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
+      }
+    } finally {
+      Thread.currentThread().setContextClassLoader(originalCl);
     }
+  }
 
 }

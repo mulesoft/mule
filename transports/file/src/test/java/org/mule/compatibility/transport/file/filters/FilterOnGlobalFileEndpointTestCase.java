@@ -19,80 +19,71 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
-{
-    private static final String TEXT_FILE = "sample.txt";
-    private static final String XML_FILE = "sample.xml";
+public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase {
 
-    private File pollDirectory;
+  private static final String TEXT_FILE = "sample.txt";
+  private static final String XML_FILE = "sample.xml";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "global-file-ep-with-filter.xml";
+  private File pollDirectory;
+
+  @Override
+  protected String getConfigFile() {
+    return "global-file-ep-with-filter.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    createPollDirectoryAndInputFiles();
+    super.doSetUp();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    // discard the test directory structure
+    assertTrue(FileUtils.deleteTree(pollDirectory.getParentFile()));
+
+    super.doTearDown();
+  }
+
+  private void createPollDirectoryAndInputFiles() throws IOException {
+    pollDirectory = createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir");
+    createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir-moveto");
+
+    createFileInPollDirectory(TEXT_FILE);
+    createFileInPollDirectory(XML_FILE);
+  }
+
+  private File createDirectory(String path) {
+    File directory = new File(path);
+    if (directory.exists() == false) {
+      if (directory.mkdirs() == false) {
+        fail("could not create poll directory");
+      }
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        createPollDirectoryAndInputFiles();
-        super.doSetUp();
-    }
+    return directory;
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        // discard the test directory structure
-        assertTrue(FileUtils.deleteTree(pollDirectory.getParentFile()));
+  private void createFileInPollDirectory(String filename) throws IOException {
+    File file = FileUtils.newFile(pollDirectory, filename);
 
-        super.doTearDown();
-    }
+    String path = file.getCanonicalPath();
 
-    private void createPollDirectoryAndInputFiles() throws IOException
-    {
-        pollDirectory = createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir");
-        createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir-moveto");
+    File newFile = FileUtils.createFile(path);
+    newFile.deleteOnExit();
+  }
 
-        createFileInPollDirectory(TEXT_FILE);
-        createFileInPollDirectory(XML_FILE);
-    }
+  @Test
+  public void testMoveFiles() throws Exception {
+    File txtFile = new File(pollDirectory, TEXT_FILE);
+    File xmlFile = new File(pollDirectory, XML_FILE);
+    assertTrue(txtFile.exists());
+    assertTrue(xmlFile.exists());
 
-    private File createDirectory(String path)
-    {
-        File directory = new File(path);
-        if (directory.exists() == false)
-        {
-            if (directory.mkdirs() == false)
-            {
-                fail("could not create poll directory");
-            }
-        }
+    MuleClient client = muleContext.getClient();
+    client.request("globalEP", 1000);
 
-        return directory;
-    }
-
-    private void createFileInPollDirectory(String filename) throws IOException
-    {
-        File file  = FileUtils.newFile(pollDirectory, filename);
-
-        String path = file.getCanonicalPath();
-
-        File newFile = FileUtils.createFile(path);
-        newFile.deleteOnExit();
-    }
-
-    @Test
-    public void testMoveFiles() throws Exception
-    {
-        File txtFile = new File(pollDirectory, TEXT_FILE);
-        File xmlFile = new File(pollDirectory, XML_FILE);
-        assertTrue(txtFile.exists());
-        assertTrue(xmlFile.exists());
-
-        MuleClient client = muleContext.getClient();
-        client.request("globalEP", 1000);
-
-        assertTrue(txtFile.exists());
-        assertFalse(xmlFile.exists());
-    }
+    assertTrue(txtFile.exists());
+    assertFalse(xmlFile.exists());
+  }
 }

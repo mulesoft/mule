@@ -6,46 +6,38 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-public class SinglePropertyWrapper implements SingleProperty
-{
+public class SinglePropertyWrapper implements SingleProperty {
 
-    private String oldName;
-    private PropertyConfiguration config;
+  private String oldName;
+  private PropertyConfiguration config;
 
-    public SinglePropertyWrapper(String oldName, PropertyConfiguration config)
-    {
-        this.oldName = oldName;
-        this.config = config;
-    }
+  public SinglePropertyWrapper(String oldName, PropertyConfiguration config) {
+    this.oldName = oldName;
+    this.config = config;
+  }
 
-    public boolean isCollection()
-    {
-        return config.isCollection(oldName);
-    }
+  public boolean isCollection() {
+    return config.isCollection(oldName);
+  }
 
-    public void setCollection()
-    {
-        config.addCollection(oldName);
-    }
+  public void setCollection() {
+    config.addCollection(oldName);
+  }
 
-    public boolean isIgnored()
-    {
-        return config.isIgnored(oldName);
-    }
+  public boolean isIgnored() {
+    return config.isIgnored(oldName);
+  }
 
-    public void setIgnored()
-    {
-        config.addIgnored(oldName);
-    }
+  public void setIgnored() {
+    config.addIgnored(oldName);
+  }
 
-    public boolean isReference()
-    {
-        return config.isReference(oldName);
-    }
+  public boolean isReference() {
+    return config.isReference(oldName);
+  }
 
-    public void setReference()
-    {
-        config.addReference(oldName);
-    }
-    
+  public void setReference() {
+    config.addReference(oldName);
+  }
+
 }

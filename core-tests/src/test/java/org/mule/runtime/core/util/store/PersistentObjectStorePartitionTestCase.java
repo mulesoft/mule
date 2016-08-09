@@ -29,61 +29,53 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
-{
+public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public TemporaryFolder objectStoreFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder objectStoreFolder = new TemporaryFolder();
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    private PersistentObjectStorePartition partition;
+  private PersistentObjectStorePartition partition;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-        addJavaSerializerToMockMuleContext(muleContext);
-        partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
-        partition.open();
+  @Before
+  public void setUp() throws Exception {
+    when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+    addJavaSerializerToMockMuleContext(muleContext);
+    partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
+    partition.open();
+  }
+
+  @Test
+  public void indicatesUnexistentKeyOnRetrieveError() throws ObjectStoreException {
+    final String nonExistentKey = "nonExistentKey";
+
+    try {
+      partition.retrieve(nonExistentKey);
+      fail("Supposed to thrown an exception as key is not valid");
+    } catch (ObjectDoesNotExistException e) {
+      assertTrue(e.getMessage().contains(nonExistentKey));
     }
+  }
 
-    @Test
-    public void indicatesUnexistentKeyOnRetrieveError() throws ObjectStoreException
-    {
-        final String nonExistentKey = "nonExistentKey";
-
-        try
-        {
-            partition.retrieve(nonExistentKey);
-            fail("Supposed to thrown an exception as key is not valid");
-        }
-        catch (ObjectDoesNotExistException e)
-        {
-            assertTrue(e.getMessage().contains(nonExistentKey));
-        }
-    }
-
-    @Test
-    public void clear() throws Exception
-    {
-        final String KEY = "key";
-        final String VALUE = "value";
+  @Test
+  public void clear() throws Exception {
+    final String KEY = "key";
+    final String VALUE = "value";
 
 
-        partition.store(KEY, VALUE);
-        assertTrue(partition.contains(KEY));
-        assertEquals(VALUE, partition.retrieve(KEY));
+    partition.store(KEY, VALUE);
+    assertTrue(partition.contains(KEY));
+    assertEquals(VALUE, partition.retrieve(KEY));
 
-        partition.clear();
-        assertFalse(partition.contains(KEY));
-    }
+    partition.clear();
+    assertFalse(partition.contains(KEY));
+  }
 
-    @Test
-    public void clearBeforeLoading() throws Exception
-    {
-        partition.clear();
-        assertEquals(0, partition.allKeys().size());
-    }
+  @Test
+  public void clearBeforeLoading() throws Exception {
+    partition.clear();
+    assertEquals(0, partition.allKeys().size());
+  }
 }

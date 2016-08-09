@@ -14,14 +14,13 @@ import java.util.List;
 /**
  * Discovers the available services.
  */
-public interface ServiceDiscoverer
-{
+public interface ServiceDiscoverer {
 
-    /**
-     * Discover services.
-     *
-     * @return a non null list of {@link Service} availables in the container.
-     * @throws ServiceResolutionError when a {@link Service} cannot be properly resolved during the discovery process.
-     */
-    List<Service> discoverServices() throws ServiceResolutionError;
+  /**
+   * Discover services.
+   *
+   * @return a non null list of {@link Service} availables in the container.
+   * @throws ServiceResolutionError when a {@link Service} cannot be properly resolved during the discovery process.
+   */
+  List<Service> discoverServices() throws ServiceResolutionError;
 }

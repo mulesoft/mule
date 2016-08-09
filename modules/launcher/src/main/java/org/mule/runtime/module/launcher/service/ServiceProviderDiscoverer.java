@@ -15,14 +15,13 @@ import java.util.List;
 /**
  * Discovers the {@link ServiceProvider} available in the container.
  */
-public interface ServiceProviderDiscoverer
-{
+public interface ServiceProviderDiscoverer {
 
-    /**
-     * Discovers available service providers.
-     *
-     * @return a non null list of  {@link ServiceProvider} foiund in the container.
-     * @throws ServiceResolutionError when a {@link ServiceProvider} cannot be properly instantiated.
-     */
-    List<ServiceProvider> discover() throws ServiceResolutionError;
+  /**
+   * Discovers available service providers.
+   *
+   * @return a non null list of {@link ServiceProvider} foiund in the container.
+   * @throws ServiceResolutionError when a {@link ServiceProvider} cannot be properly instantiated.
+   */
+  List<ServiceProvider> discover() throws ServiceResolutionError;
 }

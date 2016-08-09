@@ -16,42 +16,37 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class ScriptDefinitionParser extends OptionalChildDefinitionParser
-{
-    public ScriptDefinitionParser()
-    {
-        super("script", Scriptable.class);
-        addIgnored("name");
-        addAlias("engine", "scriptEngineName");
-        addAlias("file", "scriptFile");        
+public class ScriptDefinitionParser extends OptionalChildDefinitionParser {
 
-        // The "engine" attribute is required unless "file" is specified, in which case the 
-        // file extension will be used to determine the appropriate script engine.
-        String[][] requiredAttributeSets = new String[2][];
-        requiredAttributeSets[0] = new String[]{"engine"};
-        requiredAttributeSets[1] = new String[]{"file"};
-        registerPreProcessor(new CheckRequiredAttributes(requiredAttributeSets));
+  public ScriptDefinitionParser() {
+    super("script", Scriptable.class);
+    addIgnored("name");
+    addAlias("engine", "scriptEngineName");
+    addAlias("file", "scriptFile");
+
+    // The "engine" attribute is required unless "file" is specified, in which case the
+    // file extension will be used to determine the appropriate script engine.
+    String[][] requiredAttributeSets = new String[2][];
+    requiredAttributeSets[0] = new String[] {"engine"};
+    requiredAttributeSets[1] = new String[] {"file"};
+    registerPreProcessor(new CheckRequiredAttributes(requiredAttributeSets));
+  }
+
+  protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    Node node = element.getFirstChild();
+    if (node != null) {
+      String value = node.getNodeValue();
+      // Support CDATA for script text
+      if (node.getNextSibling() != null && node.getNextSibling().getNodeType() == Node.CDATA_SECTION_NODE) {
+        value = node.getNextSibling().getNodeValue();
+      }
+
+      if (!StringUtils.isBlank(value)) {
+        assembler.getBean().addPropertyValue("scriptText", value);
+      }
     }
-
-    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-    {
-        Node node = element.getFirstChild();
-        if (node != null)
-        {
-            String value = node.getNodeValue();
-            //Support CDATA for script text
-            if(node.getNextSibling()!=null && node.getNextSibling().getNodeType()== Node.CDATA_SECTION_NODE)
-            {
-                value = node.getNextSibling().getNodeValue();
-            }
-
-            if (!StringUtils.isBlank(value))
-            {
-                assembler.getBean().addPropertyValue("scriptText", value);
-            }
-        }
-        super.postProcess(context, assembler, element);
-    }
+    super.postProcess(context, assembler, element);
+  }
 }
 
 

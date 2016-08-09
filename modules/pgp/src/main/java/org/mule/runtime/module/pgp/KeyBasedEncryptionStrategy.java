@@ -24,117 +24,94 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
-{
-    /**
-     * logger used by this class
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(KeyBasedEncryptionStrategy.class);
+public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy {
 
-    private PGPKeyRing keyManager;
-    private CredentialsAccessor credentialsAccessor;
-    private boolean checkKeyExpirity = false;
-    private Provider provider;
+  /**
+   * logger used by this class
+   */
+  protected static final Logger logger = LoggerFactory.getLogger(KeyBasedEncryptionStrategy.class);
 
-    public void initialise() throws InitialisationException
-    {
-        if (!SecurityUtils.isFipsSecurityModel())
-        {
-            java.security.Security.addProvider(new BouncyCastleProvider());
-        }
-        provider = SecurityUtils.getDefaultSecurityProvider();
+  private PGPKeyRing keyManager;
+  private CredentialsAccessor credentialsAccessor;
+  private boolean checkKeyExpirity = false;
+  private Provider provider;
+
+  public void initialise() throws InitialisationException {
+    if (!SecurityUtils.isFipsSecurityModel()) {
+      java.security.Security.addProvider(new BouncyCastleProvider());
     }
+    provider = SecurityUtils.getDefaultSecurityProvider();
+  }
 
-    public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
-    {
-        try
-        {
-            PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
-            PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider);
-            return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
-        }
-        catch (Exception e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
+  public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException {
+    try {
+      PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
+      PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
+      StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider);
+      return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
+    } catch (Exception e) {
+      throw new CryptoFailureException(this, e);
     }
+  }
 
-    public InputStream decrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
-    {
-        try
-        {
-            PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
-            PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
-            return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
-        }
-        catch (Exception e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
+  public InputStream decrypt(InputStream data, Object cryptInfo) throws CryptoFailureException {
+    try {
+      PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
+      PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
+      StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey, this.keyManager.getSecretKey(),
+                                                                   this.keyManager.getSecretPassphrase(), provider);
+      return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
+    } catch (Exception e) {
+      throw new CryptoFailureException(this, e);
     }
+  }
 
-    private PGPCryptInfo safeGetCryptInfo(Object cryptInfo)
-    {
-        if (cryptInfo == null)
-        {
-            MuleEvent event = RequestContext.getEvent();
-            PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
-            this.checkKeyExpirity(publicKey);
-            return new PGPCryptInfo(publicKey, false);
-        }
-        else
-        {
-            PGPCryptInfo info = (PGPCryptInfo) cryptInfo;
-            this.checkKeyExpirity(info.getPublicKey());
-            return info;
-        }
+  private PGPCryptInfo safeGetCryptInfo(Object cryptInfo) {
+    if (cryptInfo == null) {
+      MuleEvent event = RequestContext.getEvent();
+      PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
+      this.checkKeyExpirity(publicKey);
+      return new PGPCryptInfo(publicKey, false);
+    } else {
+      PGPCryptInfo info = (PGPCryptInfo) cryptInfo;
+      this.checkKeyExpirity(info.getPublicKey());
+      return info;
     }
+  }
 
-    private void checkKeyExpirity(PGPPublicKey publicKey)
-    {
-        if (this.isCheckKeyExpirity() && publicKey.getValidDays() != 0)
-        {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(publicKey.getCreationTime());
-            calendar.add(Calendar.DATE, publicKey.getValidDays());
+  private void checkKeyExpirity(PGPPublicKey publicKey) {
+    if (this.isCheckKeyExpirity() && publicKey.getValidDays() != 0) {
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(publicKey.getCreationTime());
+      calendar.add(Calendar.DATE, publicKey.getValidDays());
 
-            if (!calendar.getTime().after(Calendar.getInstance().getTime()))
-            {
-                throw new InvalidPublicKeyException(PGPMessages.pgpPublicKeyExpired());
-            }
-        }
+      if (!calendar.getTime().after(Calendar.getInstance().getTime())) {
+        throw new InvalidPublicKeyException(PGPMessages.pgpPublicKeyExpired());
+      }
     }
+  }
 
-    public PGPKeyRing getKeyManager()
-    {
-        return keyManager;
-    }
+  public PGPKeyRing getKeyManager() {
+    return keyManager;
+  }
 
-    public void setKeyManager(PGPKeyRing keyManager)
-    {
-        this.keyManager = keyManager;
-    }
+  public void setKeyManager(PGPKeyRing keyManager) {
+    this.keyManager = keyManager;
+  }
 
-    public CredentialsAccessor getCredentialsAccessor()
-    {
-        return credentialsAccessor;
-    }
+  public CredentialsAccessor getCredentialsAccessor() {
+    return credentialsAccessor;
+  }
 
-    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor)
-    {
-        this.credentialsAccessor = credentialsAccessor;
-    }
+  public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
+    this.credentialsAccessor = credentialsAccessor;
+  }
 
-    public boolean isCheckKeyExpirity()
-    {
-        return checkKeyExpirity;
-    }
+  public boolean isCheckKeyExpirity() {
+    return checkKeyExpirity;
+  }
 
-    public void setCheckKeyExpirity(boolean checkKeyExpirity)
-    {
-        this.checkKeyExpirity = checkKeyExpirity;
-    }
+  public void setCheckKeyExpirity(boolean checkKeyExpirity) {
+    this.checkKeyExpirity = checkKeyExpirity;
+  }
 }

@@ -21,55 +21,49 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase
-{
-    private File dataFolder;
+public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase {
 
-    public WorkDirectoryPropertiesTestCase()
-    {
-        setStartContext(false);
+  private File dataFolder;
+
+  public WorkDirectoryPropertiesTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "work-directory-properties-config.xml";
+  }
+
+  @Before
+  public void createDataFolder() throws Exception {
+    dataFolder = new File(muleContext.getConfiguration().getWorkingDirectory(), "data");
+
+    if (!dataFolder.exists()) {
+      assertTrue("Unable to create test folder", dataFolder.mkdirs());
     }
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "work-directory-properties-config.xml";
-    }
+  @Test
+  public void testName() throws Exception {
+    File testfile = createTestFile(dataFolder, "sample.txt");
 
-    @Before
-    public void createDataFolder() throws Exception
-    {
-        dataFolder = new File(muleContext.getConfiguration().getWorkingDirectory(), "data");
+    muleContext.start();
 
-        if (!dataFolder.exists())
-        {
-            assertTrue("Unable to create test folder", dataFolder.mkdirs());
-        }
-    }
+    MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6);
 
-    @Test
-    public void testName() throws Exception
-    {
-        File testfile = createTestFile(dataFolder, "sample.txt");
+    assertTrue(response.getPayload() instanceof Map);
+    Map<String, String> payload = (Map<String, String>) response.getPayload();
+    assertEquals(dataFolder.getCanonicalPath(), payload.get(FileConnector.PROPERTY_SOURCE_DIRECTORY));
+    assertEquals(testfile.getName(), payload.get(FileConnector.PROPERTY_SOURCE_FILENAME));
+  }
 
-        muleContext.start();
+  private File createTestFile(File parentFolder, String fileName) throws IOException {
+    File result = new File(parentFolder, fileName);
 
-        MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6);
+    FileOutputStream out = new FileOutputStream(result);
+    out.write(TEST_MESSAGE.getBytes());
+    out.close();
 
-        assertTrue(response.getPayload() instanceof Map);
-        Map<String, String> payload = (Map<String, String>) response.getPayload();
-        assertEquals(dataFolder.getCanonicalPath(), payload.get(FileConnector.PROPERTY_SOURCE_DIRECTORY));
-        assertEquals(testfile.getName(), payload.get(FileConnector.PROPERTY_SOURCE_FILENAME));
-    }
-
-    private File createTestFile(File parentFolder, String fileName) throws IOException
-    {
-        File result = new File(parentFolder, fileName);
-
-        FileOutputStream out = new FileOutputStream(result);
-        out.write(TEST_MESSAGE.getBytes());
-        out.close();
-
-        return result;
-    }
+    return result;
+  }
 }

@@ -31,141 +31,126 @@ import java.time.ZoneId;
 
 import org.junit.Test;
 
-public class FileReadTestCase extends FileConnectorTestCase
-{
+public class FileReadTestCase extends FileConnectorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-read-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-read-config.xml";
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        createHelloWorldFile();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    createHelloWorldFile();
+  }
 
-    @Test
-    public void read() throws Exception
-    {
-        MuleEvent response = readHelloWorld();
+  @Test
+  public void read() throws Exception {
+    MuleEvent response = readHelloWorld();
 
-        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
-        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
+    assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+    assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-        AbstractFileInputStream payload = response.getMessage().getPayload();
-        assertThat(payload.isLocked(), is(false));
-        assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
-    }
+    AbstractFileInputStream payload = response.getMessage().getPayload();
+    assertThat(payload.isLocked(), is(false));
+    assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
+  }
 
-    @Test
-    public void readBinary() throws Exception
-    {
-        final byte[] binaryPayload = HELLO_WORLD.getBytes();
-        final String binaryFileName = "binary.bin";
-        File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
-        FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
+  @Test
+  public void readBinary() throws Exception {
+    final byte[] binaryPayload = HELLO_WORLD.getBytes();
+    final String binaryFileName = "binary.bin";
+    File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
+    FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
 
-        MuleEvent response = getPath(binaryFile.getAbsolutePath());
+    MuleEvent response = getPath(binaryFile.getAbsolutePath());
 
-        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
-        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
+    assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+    assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
-        AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
-        assertThat(payload.isLocked(), is(false));
+    AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
+    assertThat(payload.isLocked(), is(false));
 
-        byte[] readContent = new byte[new Long(binaryFile.length()).intValue()];
-        IOUtils.read(payload, readContent);
-        assertThat(new String(readContent), is(HELLO_WORLD));
-    }
+    byte[] readContent = new byte[new Long(binaryFile.length()).intValue()];
+    IOUtils.read(payload, readContent);
+    assertThat(new String(readContent), is(HELLO_WORLD));
+  }
 
-    @Test
-    public void readWithForcedMimeType() throws Exception
-    {
-        MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-        assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
-        assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
-    }
+  @Test
+  public void readWithForcedMimeType() throws Exception {
+    MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+    assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
+  }
 
-    @Test
-    public void readUnexisting() throws Exception
-    {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-        readPath("files/not-there.txt");
-    }
+  @Test
+  public void readUnexisting() throws Exception {
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    readPath("files/not-there.txt");
+  }
 
-    @Test
-    public void readWithLockAndWithoutEnoughPermissions() throws Exception
-    {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-        File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
-        forbiddenFile.createNewFile();
-        forbiddenFile.setWritable(false);
-        readWithLock(forbiddenFile.getAbsolutePath());
-    }
+  @Test
+  public void readWithLockAndWithoutEnoughPermissions() throws Exception {
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
+    forbiddenFile.createNewFile();
+    forbiddenFile.setWritable(false);
+    readWithLock(forbiddenFile.getAbsolutePath());
+  }
 
-    @Test
-    public void readDirectory() throws Exception
-    {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-        readPath("files");
-    }
+  @Test
+  public void readDirectory() throws Exception {
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    readPath("files");
+  }
 
-    @Test
-    public void readLockReleasedOnContentConsumed() throws Exception
-    {
-        final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
-        IOUtils.toString(payload);
+  @Test
+  public void readLockReleasedOnContentConsumed() throws Exception {
+    final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
+    IOUtils.toString(payload);
 
-        assertThat(payload.isLocked(), is(false));
-    }
+    assertThat(payload.isLocked(), is(false));
+  }
 
-    @Test
-    public void readLockReleasedOnEarlyClose() throws Exception
-    {
-        final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
-        payload.close();
+  @Test
+  public void readLockReleasedOnEarlyClose() throws Exception {
+    final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
+    payload.close();
 
-        assertThat(payload.isLocked(), is(false));
-    }
+    assertThat(payload.isLocked(), is(false));
+  }
 
-    @Test
-    public void getProperties() throws Exception
-    {
-        LocalFileAttributes filePayload = (LocalFileAttributes) readHelloWorld().getMessage().getAttributes();
-        Path file = Paths.get(workingDir.getValue()).resolve(HELLO_PATH);
-        assertExists(true, file.toFile());
+  @Test
+  public void getProperties() throws Exception {
+    LocalFileAttributes filePayload = (LocalFileAttributes) readHelloWorld().getMessage().getAttributes();
+    Path file = Paths.get(workingDir.getValue()).resolve(HELLO_PATH);
+    assertExists(true, file.toFile());
 
-        BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
-        assertTime(filePayload.getCreationTime(), attributes.creationTime());
-        assertThat(filePayload.getName(), equalTo(file.getFileName().toString()));
-        assertTime(filePayload.getLastAccessTime(), attributes.lastAccessTime());
-        assertTime(filePayload.getLastModifiedTime(), attributes.lastModifiedTime());
-        assertThat(filePayload.getPath(), is(file.toAbsolutePath().toString()));
-        assertThat(filePayload.getSize(), is(attributes.size()));
-        assertThat(filePayload.isDirectory(), is(false));
-        assertThat(filePayload.isSymbolicLink(), is(false));
-        assertThat(filePayload.isRegularFile(), is(true));
-    }
+    BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
+    assertTime(filePayload.getCreationTime(), attributes.creationTime());
+    assertThat(filePayload.getName(), equalTo(file.getFileName().toString()));
+    assertTime(filePayload.getLastAccessTime(), attributes.lastAccessTime());
+    assertTime(filePayload.getLastModifiedTime(), attributes.lastModifiedTime());
+    assertThat(filePayload.getPath(), is(file.toAbsolutePath().toString()));
+    assertThat(filePayload.getSize(), is(attributes.size()));
+    assertThat(filePayload.isDirectory(), is(false));
+    assertThat(filePayload.isSymbolicLink(), is(false));
+    assertThat(filePayload.isRegularFile(), is(true));
+  }
 
-    private MuleMessage readWithLock() throws Exception
-    {
-        return readWithLock(HELLO_PATH);
-    }
+  private MuleMessage readWithLock() throws Exception {
+    return readWithLock(HELLO_PATH);
+  }
 
-    private MuleMessage readWithLock(String path) throws Exception
-    {
-        MuleMessage message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
-        assertThat(((AbstractFileInputStream) message.getPayload()).isLocked(), is(true));
+  private MuleMessage readWithLock(String path) throws Exception {
+    MuleMessage message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
+    assertThat(((AbstractFileInputStream) message.getPayload()).isLocked(), is(true));
 
-        return message;
-    }
+    return message;
+  }
 
-    private void assertTime(LocalDateTime dateTime, FileTime fileTime)
-    {
-        assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(fileTime.toInstant().toEpochMilli()));
-    }
+  private void assertTime(LocalDateTime dateTime, FileTime fileTime) {
+    assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(fileTime.toInstant().toEpochMilli()));
+  }
 
 }

@@ -9,19 +9,17 @@ package org.mule.compatibility.core.transport;
 
 import java.io.Serializable;
 
-public class TestSerializableConnectable extends TestNotSerializableConnectable implements Serializable
-{
-    private static final long serialVersionUID = -5012248219580312476L;
+public class TestSerializableConnectable extends TestNotSerializableConnectable implements Serializable {
 
-    private String value;
+  private static final long serialVersionUID = -5012248219580312476L;
 
-    public String getValue()
-    {
-        return value;
-    }
+  private String value;
 
-    public void setValue(String value)
-    {
-        this.value = value;
-    }
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
 }

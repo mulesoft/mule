@@ -22,47 +22,41 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
-{
+public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    protected static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                                 "<text>Hello</text></tns:echo>";
+  protected static final String ECHO_REQUEST =
+      "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" + "<text>Hello</text></tns:echo>";
 
-    protected static final String EXPECTED_ECHO_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                                           "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                                           "<text>Hello</text></ns2:echoResponse>";
+  protected static final String EXPECTED_ECHO_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+      + "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" + "<text>Hello</text></ns2:echoResponse>";
 
-    protected void assertValidResponse(String flowName) throws Exception
-    {
-        assertValidResponse(flowName, ECHO_REQUEST, emptyMap());
-    }
+  protected void assertValidResponse(String flowName) throws Exception {
+    assertValidResponse(flowName, ECHO_REQUEST, emptyMap());
+  }
 
-    protected void assertValidResponse(String flowName, Object payload, Map<String, Serializable> properties) throws Exception
-    {
-        MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
-    }
+  protected void assertValidResponse(String flowName, Object payload, Map<String, Serializable> properties) throws Exception {
+    MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
+  }
 
-    protected void assertSoapFault(String flowName, String expectedFaultCode) throws Exception
-    {
-        assertSoapFault(flowName, ECHO_REQUEST, expectedFaultCode);
-    }
+  protected void assertSoapFault(String flowName, String expectedFaultCode) throws Exception {
+    assertSoapFault(flowName, ECHO_REQUEST, expectedFaultCode);
+  }
 
-    protected void assertSoapFault(String flowName, String message, String expectedFaultCode) throws Exception
-    {
-        assertSoapFault(flowName, message, emptyMap(), expectedFaultCode);
-    }
+  protected void assertSoapFault(String flowName, String message, String expectedFaultCode) throws Exception {
+    assertSoapFault(flowName, message, emptyMap(), expectedFaultCode);
+  }
 
-    protected void assertSoapFault(String flowName, String message, Map<String, Serializable> properties, String expectedFaultCode) throws Exception
-    {
-        expectedException.expect(SoapFaultException.class);
-        expectedException.expect(hasFaultCode(expectedFaultCode));
-        flowRunner(flowName).withPayload(message).withInboundProperties(properties).run().getMessage();
-    }
+  protected void assertSoapFault(String flowName, String message, Map<String, Serializable> properties, String expectedFaultCode)
+      throws Exception {
+    expectedException.expect(SoapFaultException.class);
+    expectedException.expect(hasFaultCode(expectedFaultCode));
+    flowRunner(flowName).withPayload(message).withInboundProperties(properties).run().getMessage();
+  }
 
 }

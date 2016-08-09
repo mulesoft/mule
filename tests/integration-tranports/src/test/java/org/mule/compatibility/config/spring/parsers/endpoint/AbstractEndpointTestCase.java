@@ -16,23 +16,20 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 
-public abstract class AbstractEndpointTestCase extends FunctionalTestCase
-{
+public abstract class AbstractEndpointTestCase extends FunctionalTestCase {
 
-    public ImmutableEndpoint doTest(String name) throws MuleException
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(name);
-        assertNotNull(endpoint);
-        EndpointURI uri = endpoint.getEndpointURI();
-        assertNotNull(uri);
-        assertEquals("foo", uri.getAddress());
-        assertEquals("test", uri.getScheme());
-        return endpoint;
-    }
+  public ImmutableEndpoint doTest(String name) throws MuleException {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(name);
+    assertNotNull(endpoint);
+    EndpointURI uri = endpoint.getEndpointURI();
+    assertNotNull(uri);
+    assertEquals("foo", uri.getAddress());
+    assertEquals("test", uri.getScheme());
+    return endpoint;
+  }
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 
 }

@@ -25,68 +25,57 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A JMX authenticator for a simple username/password scheme.
- * Passwords are neither encrypted, nor obfuscated.
+ * A JMX authenticator for a simple username/password scheme. Passwords are neither encrypted, nor obfuscated.
  */
-public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, ConfigurableJMXAuthenticator
-{
-    /**
-     * Logger used by this class.
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(JmxApplicationAgent.class);
+public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, ConfigurableJMXAuthenticator {
 
-    /**
-     * An in-memory credentials storage.
-     */
-    private Map<String, Object> credentials = new HashMap<String, Object>();
+  /**
+   * Logger used by this class.
+   */
+  protected static final Logger logger = LoggerFactory.getLogger(JmxApplicationAgent.class);
 
-    public Subject authenticate (Object authToken)
-    {
-        if (authToken == null)
-        {
-            throw new SecurityException("No authentication token available");
-        }
-        if (!(authToken instanceof String[]) || ((String[]) authToken).length != 2)
-        {
-            throw new SecurityException("Unsupported credentials format");
-        }
+  /**
+   * An in-memory credentials storage.
+   */
+  private Map<String, Object> credentials = new HashMap<String, Object>();
 
-        String[] authentication = (String[]) authToken;
-
-        String username = StringUtils.defaultString(authentication[0]);
-        String password = StringUtils.defaultString(authentication[1]);
-
-        if (!credentials.containsKey(username))
-        {
-            throw new SecurityException("Unauthenticated user: " + username);
-        }
-
-        Object pass = credentials.get(username);
-        if (!password.equals(pass == null ? "" : pass.toString()))
-        {
-            throw new SecurityException("Invalid password");
-        }
-
-        Set<Principal> principals = new HashSet<Principal>();
-        principals.add(new JMXPrincipal(username));
-        return new Subject(true, principals, Collections.EMPTY_SET, Collections.EMPTY_SET);
+  public Subject authenticate(Object authToken) {
+    if (authToken == null) {
+      throw new SecurityException("No authentication token available");
+    }
+    if (!(authToken instanceof String[]) || ((String[]) authToken).length != 2) {
+      throw new SecurityException("Unsupported credentials format");
     }
 
-    public void setCredentials (Map<String, String> newCredentials)
-    {
-        this.credentials.clear();
-        if (newCredentials == null || newCredentials.isEmpty())
-        {
-            logger.warn("Credentials cache has been purged, remote access will no longer be available");
-        }
-        else
-        {
-            this.credentials.putAll(newCredentials);
-        }
+    String[] authentication = (String[]) authToken;
+
+    String username = StringUtils.defaultString(authentication[0]);
+    String password = StringUtils.defaultString(authentication[1]);
+
+    if (!credentials.containsKey(username)) {
+      throw new SecurityException("Unauthenticated user: " + username);
     }
 
-    public void configure(Map newCredentials)
-    {
-        this.setCredentials(newCredentials);
+    Object pass = credentials.get(username);
+    if (!password.equals(pass == null ? "" : pass.toString())) {
+      throw new SecurityException("Invalid password");
     }
+
+    Set<Principal> principals = new HashSet<Principal>();
+    principals.add(new JMXPrincipal(username));
+    return new Subject(true, principals, Collections.EMPTY_SET, Collections.EMPTY_SET);
+  }
+
+  public void setCredentials(Map<String, String> newCredentials) {
+    this.credentials.clear();
+    if (newCredentials == null || newCredentials.isEmpty()) {
+      logger.warn("Credentials cache has been purged, remote access will no longer be available");
+    } else {
+      this.credentials.putAll(newCredentials);
+    }
+  }
+
+  public void configure(Map newCredentials) {
+    this.setCredentials(newCredentials);
+  }
 }

@@ -19,74 +19,66 @@ import org.apache.commons.net.ftp.FTPFile;
  *
  * @since 4.0
  */
-public class ClassicFtpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes
-{
+public class ClassicFtpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes {
 
-    private final FTPFile ftpFile;
+  private final FTPFile ftpFile;
 
-    /**
-     * Creates a new instance
-     *
-     * @param path    the file's {@link Path}
-     * @param ftpFile the {@link FTPFile} which represents the file on the FTP server
-     */
-    public ClassicFtpFileAttributes(Path path, FTPFile ftpFile)
-    {
-        super(path);
-        this.ftpFile = ftpFile;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param path the file's {@link Path}
+   * @param ftpFile the {@link FTPFile} which represents the file on the FTP server
+   */
+  public ClassicFtpFileAttributes(Path path, FTPFile ftpFile) {
+    super(path);
+    this.ftpFile = ftpFile;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LocalDateTime getTimestamp()
-    {
-        return asDateTime(ftpFile.getTimestamp().toInstant());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LocalDateTime getTimestamp() {
+    return asDateTime(ftpFile.getTimestamp().toInstant());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return ftpFile.getName();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return ftpFile.getName();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getSize()
-    {
-        return ftpFile.getSize();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getSize() {
+    return ftpFile.getSize();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isRegularFile()
-    {
-        return ftpFile.isFile();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isRegularFile() {
+    return ftpFile.isFile();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isDirectory()
-    {
-        return ftpFile.isDirectory();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isDirectory() {
+    return ftpFile.isDirectory();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSymbolicLink()
-    {
-        return ftpFile.isSymbolicLink();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isSymbolicLink() {
+    return ftpFile.isSymbolicLink();
+  }
 }

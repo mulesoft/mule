@@ -12,13 +12,11 @@ package org.mule.runtime.core.streaming;
  * 
  * @since 3.5.0
  */
-public interface ProvidesTotalHint
-{
+public interface ProvidesTotalHint {
 
-    /**
-     * returns the total amount of items available for storage/processing. In some
-     * scenarios, it might not be possible/convenient to actually retrieve this value
-     * or it might not be available at this point. -1 is returned in such a case.
-     */
-    public int size();
+  /**
+   * returns the total amount of items available for storage/processing. In some scenarios, it might not be possible/convenient to
+   * actually retrieve this value or it might not be available at this point. -1 is returned in such a case.
+   */
+  public int size();
 }

@@ -37,156 +37,140 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase
-{
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
 
-    private static final String requestFaultPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+  private static final String requestFaultPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
+      .method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "catch-exception-strategy-conf.xml";
+  }
+
+  @Test
+  public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException",
+                                       request, HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(getPayloadAsString(response).contains("Anonymous"));
+  }
+
+  @Test
+  public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request,
+                    HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertEquals(String.valueOf(HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode()),
+                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+  }
+
+  @Test
+  public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException",
+                                       request, HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(getPayloadAsString(response).contains("APPEND"));
+  }
+
+  @Test
+  public void testClientWithSOAPFaultCatchException() throws Exception {
+    MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run().getMessage();
+    assertNotNull(response);
+    assertThat(response.getExceptionPayload(), is(nullValue()));
+  }
+
+  @Test
+  public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception {
+    MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run().getMessage();
+    assertNotNull(response);
+    assertTrue(getPayloadAsString(response).contains("TEST"));
+    assertThat(response.getExceptionPayload(), is(nullValue()));
+  }
+
+  @Test
+  public void testClientWithTransformerExceptionCatchException() throws Exception {
+    MuleMessage response =
+        flowRunner("FlowWithClientAndTransformerExceptionCatchException").withPayload("hello").run().getMessage();
+    assertNotNull(response);
+    assertTrue(getPayloadAsString(response).contains(" Anonymous"));
+  }
+
+  @Test
+  public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy",
+                    getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
+    String resString = getPayloadAsString(result);
+    assertEquals(String.valueOf(OK.getStatusCode()), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(resString.contains("Anonymous"));
+  }
+
+  public static class ProxyCustomProcessor implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "catch-exception-strategy-conf.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      String payload =
+          "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\"><return>Hello Anonymous</return></ns2:sayHiResponse></soap:Body></soap:Envelope>";
+      event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
+      return event;
+    }
+  }
+
+  public static class RethrowFaultProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      throw new Fault(event.getMessage().getExceptionPayload().getException().getCause());
+    }
+  }
+
+  public static class RethrowExceptionStrategy extends TemplateMessagingExceptionStrategy {
+
+    @Override
+    protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {
+      // does nothing
     }
 
-    @Test
-    public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request, HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(getPayloadAsString(response).contains("Anonymous"));
+    @Override
+    protected MuleEvent afterRouting(Exception exception, MuleEvent event) {
+      return event;
     }
 
-    @Test
-    public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request, HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertEquals(String.valueOf(HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+    @Override
+    protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
+      return event;
+    }
+  }
+
+  public static class CxfTransformerThrowsExceptions extends AbstractTransformer {
+
+    @Override
+    protected Object doTransform(Object src, Charset enc) throws TransformerException {
+      throw new TransformerException(CoreMessages.failedToBuildMessage());
     }
 
-    @Test
-    public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request, HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(getPayloadAsString(response).contains("APPEND"));
-    }
-
-    @Test
-    public void testClientWithSOAPFaultCatchException() throws Exception
-    {
-        MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run().getMessage();
-        assertNotNull(response);
-        assertThat(response.getExceptionPayload(), is(nullValue()));
-    }
-
-    @Test
-    public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception
-    {
-        MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run().getMessage();
-        assertNotNull(response);
-        assertTrue(getPayloadAsString(response).contains("TEST"));
-        assertThat(response.getExceptionPayload(), is(nullValue()));
-    }
-
-    @Test
-    public void testClientWithTransformerExceptionCatchException() throws Exception
-    {
-        MuleMessage response = flowRunner("FlowWithClientAndTransformerExceptionCatchException").withPayload("hello").run().getMessage();
-        assertNotNull(response);
-        assertTrue(getPayloadAsString(response).contains(" Anonymous"));
-    }
-
-    @Test
-    public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
-        String resString = getPayloadAsString(result);
-        assertEquals(String.valueOf(OK.getStatusCode()), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(resString.contains("Anonymous"));
-    }
-
-    public static class ProxyCustomProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\"><return>Hello Anonymous</return></ns2:sayHiResponse></soap:Body></soap:Envelope>";
-            event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
-            return event;
-        }
-    }
-
-    public static class RethrowFaultProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new Fault(event.getMessage().getExceptionPayload().getException().getCause());
-        }
-    }
-
-    public static class RethrowExceptionStrategy extends TemplateMessagingExceptionStrategy
-    {
-        @Override
-        protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
-        {
-            // does nothing
-        }
-
-        @Override
-        protected MuleEvent afterRouting(Exception exception, MuleEvent event)
-        {
-            return event;
-        }
-
-        @Override
-        protected MuleEvent beforeRouting(Exception exception, MuleEvent event)
-        {
-            return event;
-        }
-    }
-
-    public static class CxfTransformerThrowsExceptions extends AbstractTransformer
-    {
-        @Override
-        protected Object doTransform(Object src, Charset enc) throws TransformerException
-        {
-            throw new TransformerException(CoreMessages.failedToBuildMessage());
-        }
-
-    }
+  }
 
 }

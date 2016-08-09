@@ -30,89 +30,78 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class MuleLoggerContextTestCase extends AbstractMuleTestCase
-{
+public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
-    private static final String DEFAULT_CONTEXT_NAME = "Default";
-    private static final String MESSAGE = "Do you wanna build a snowman?";
-    private static final String CATEGORY = MuleLoggerContextTestCase.class.getName();
-    private static final String TEST_APPENDER = "testAppender";
-    private static final Level LEVEL = Level.ERROR;
+  private static final String DEFAULT_CONTEXT_NAME = "Default";
+  private static final String MESSAGE = "Do you wanna build a snowman?";
+  private static final String CATEGORY = MuleLoggerContextTestCase.class.getName();
+  private static final String TEST_APPENDER = "testAppender";
+  private static final Level LEVEL = Level.ERROR;
 
-    @Mock
-    private ContextSelector contextSelector;
+  @Mock
+  private ContextSelector contextSelector;
 
-    @Mock
-    private MessageFactory messageFactory;
+  @Mock
+  private MessageFactory messageFactory;
 
-    private MuleLoggerContext context;
-    private TestAppender testAppender;
+  private MuleLoggerContext context;
+  private TestAppender testAppender;
 
-    @Before
-    public void before()
-    {
-        context = getDefaultContext();
-        testAppender = new TestAppender(TEST_APPENDER, null, null);
-        context.getConfiguration().addAppender(testAppender);
+  @Before
+  public void before() {
+    context = getDefaultContext();
+    testAppender = new TestAppender(TEST_APPENDER, null, null);
+    context.getConfiguration().addAppender(testAppender);
 
-        LoggerConfig loggerConfig = AsyncLoggerConfig.createLogger("false",
-                                                                   LEVEL.name(),
-                                                                   CATEGORY,
-                                                                   "true",
-                                                                   new AppenderRef[] {AppenderRef.createAppenderRef(TEST_APPENDER, null, null)},
-                                                                   null,
-                                                                   context.getConfiguration(),
-                                                                   null);
+    LoggerConfig loggerConfig =
+        AsyncLoggerConfig.createLogger("false", LEVEL.name(), CATEGORY, "true",
+                                       new AppenderRef[] {AppenderRef.createAppenderRef(TEST_APPENDER, null, null)}, null,
+                                       context.getConfiguration(), null);
 
-        loggerConfig.addAppender(testAppender, null, null);
-        context.getConfiguration().addLogger(CATEGORY, loggerConfig);
-        context.getConfiguration().start();
-        context.updateLoggers();
-    }
+    loggerConfig.addAppender(testAppender, null, null);
+    context.getConfiguration().addLogger(CATEGORY, loggerConfig);
+    context.getConfiguration().start();
+    context.updateLoggers();
+  }
 
-    @Test
-    public void dispatchingLogger()
-    {
-        assertThat(context.newInstance(context, "", messageFactory), instanceOf(DispatchingLogger.class));
-    }
+  @Test
+  public void dispatchingLogger() {
+    assertThat(context.newInstance(context, "", messageFactory), instanceOf(DispatchingLogger.class));
+  }
 
-    @Test
-    public void reconfigureAsyncLoggers()
-    {
-        Logger logger = context.getLogger(CATEGORY);
-        logger.error(MESSAGE);
+  @Test
+  public void reconfigureAsyncLoggers() {
+    Logger logger = context.getLogger(CATEGORY);
+    logger.error(MESSAGE);
 
-        assertLogged();
-        testAppender.clear();
+    assertLogged();
+    testAppender.clear();
 
-        context.updateLoggers(context.getConfiguration());
-        logger.error(MESSAGE);
-        assertLogged();
-    }
+    context.updateLoggers(context.getConfiguration());
+    logger.error(MESSAGE);
+    assertLogged();
+  }
 
-    private void assertLogged()
-    {
-        PollingProber pollingProber = new PollingProber(5000, 500);
-        pollingProber.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                testAppender.ensure(new TestAppender.Expectation(LEVEL.name(), CATEGORY, MESSAGE));
-                return true;
-            }
+  private void assertLogged() {
+    PollingProber pollingProber = new PollingProber(5000, 500);
+    pollingProber.check(new JUnitProbe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "message was not logged";
-            }
-        });
+      @Override
+      protected boolean test() throws Exception {
+        testAppender.ensure(new TestAppender.Expectation(LEVEL.name(), CATEGORY, MESSAGE));
+        return true;
+      }
 
-    }
+      @Override
+      public String describeFailure() {
+        return "message was not logged";
+      }
+    });
 
-    private MuleLoggerContext getDefaultContext()
-    {
-        return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector, true);
-    }
+  }
+
+  private MuleLoggerContext getDefaultContext() {
+    return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector,
+                                 true);
+  }
 }

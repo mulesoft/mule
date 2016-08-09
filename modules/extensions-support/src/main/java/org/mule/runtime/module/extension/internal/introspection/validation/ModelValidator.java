@@ -10,19 +10,17 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 
 /**
- * Validates that a constructed model is legal, meaning it's consistent and
- * doesn't violate any restriction.
+ * Validates that a constructed model is legal, meaning it's consistent and doesn't violate any restriction.
  *
  * @since 4.0
  */
-public interface ModelValidator
-{
+public interface ModelValidator {
 
-    /**
-     * Validates the given {@code model}
-     *
-     * @param model a {@link ExtensionModel}
-     * @throws IllegalModelDefinitionException if the model is illegal
-     */
-    void validate(ExtensionModel model) throws IllegalModelDefinitionException;
+  /**
+   * Validates the given {@code model}
+   *
+   * @param model a {@link ExtensionModel}
+   * @throws IllegalModelDefinitionException if the model is illegal
+   */
+  void validate(ExtensionModel model) throws IllegalModelDefinitionException;
 }

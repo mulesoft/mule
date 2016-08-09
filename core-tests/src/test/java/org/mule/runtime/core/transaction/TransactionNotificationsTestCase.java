@@ -19,89 +19,73 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase
-{
-    @Test
-    public void testTransactionNotifications() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(3);
+public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase {
 
-        // the code is simple and deceptive :) The trick is this dummy transaction is handled by
-        // a global TransactionCoordination instance, which binds it to the current thread.
-        Transaction transaction = new DummyTransaction(muleContext);
+  @Test
+  public void testTransactionNotifications() throws Exception {
+    final CountDownLatch latch = new CountDownLatch(3);
 
-        muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>()
-        {
-            public void onNotification(TransactionNotification notification)
-            {
-                if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN)
-                {
-                    assertEquals("begin", notification.getActionName());
-                    latch.countDown();
-                }
-                else
-                {
-                    if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED)
-                    {
-                        assertEquals("commit", notification.getActionName());
-                        latch.countDown();
-                    }
-                    else
-                    {
-                        if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK)
-                        {
-                            assertEquals("rollback", notification.getActionName());
-                            latch.countDown();
-                        }
-                    }
-                }
+    // the code is simple and deceptive :) The trick is this dummy transaction is handled by
+    // a global TransactionCoordination instance, which binds it to the current thread.
+    Transaction transaction = new DummyTransaction(muleContext);
+
+    muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
+
+      public void onNotification(TransactionNotification notification) {
+        if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN) {
+          assertEquals("begin", notification.getActionName());
+          latch.countDown();
+        } else {
+          if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
+            assertEquals("commit", notification.getActionName());
+            latch.countDown();
+          } else {
+            if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
+              assertEquals("rollback", notification.getActionName());
+              latch.countDown();
             }
-        }, transaction.getId());
+          }
+        }
+      }
+    }, transaction.getId());
 
 
-        transaction.begin();
-        transaction.commit();
-        transaction.rollback();
+    transaction.begin();
+    transaction.commit();
+    transaction.rollback();
 
-        // Wait for the notifcation event to be fired as they are queued
-        latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals("There are still some notifications left unfired.", 0, latch.getCount());
+    // Wait for the notifcation event to be fired as they are queued
+    latch.await(2000, TimeUnit.MILLISECONDS);
+    assertEquals("There are still some notifications left unfired.", 0, latch.getCount());
+  }
+
+  private class DummyTransaction extends AbstractSingleResourceTransaction {
+
+    private DummyTransaction(MuleContext muleContext) {
+      super(muleContext);
     }
 
-    private class DummyTransaction extends AbstractSingleResourceTransaction
-    {
-
-        private DummyTransaction(MuleContext muleContext)
-        {
-            super(muleContext);
-        }
-
-        @Override
-        protected Class getResourceType()
-        {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        protected Class getKeyType()
-        {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        protected void doBegin() throws TransactionException
-        {
-
-        }
-
-        protected void doCommit() throws TransactionException
-        {
-
-        }
-
-        protected void doRollback() throws TransactionException
-        {
-            
-        }
+    @Override
+    protected Class getResourceType() {
+      return null; // To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    protected Class getKeyType() {
+      return null; // To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    protected void doBegin() throws TransactionException {
+
+    }
+
+    protected void doCommit() throws TransactionException {
+
+    }
+
+    protected void doRollback() throws TransactionException {
+
+    }
+  }
 
 }

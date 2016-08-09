@@ -10,12 +10,10 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * Creates {@link WorkListener} to delegate notifications originated in a
- * work to another {@link WorkListener}
+ * Creates {@link WorkListener} to delegate notifications originated in a work to another {@link WorkListener}
  */
-public interface WorkListenerWrapperFactory
-{
+public interface WorkListenerWrapperFactory {
 
-    WorkListener create(Work work, WorkListener listener);
+  WorkListener create(Work work, WorkListener listener);
 
 }

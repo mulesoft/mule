@@ -24,46 +24,39 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
-{
+public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                "secure-http-polling-server-flow.xml",
-                "secure-http-polling-client-flow.xml"
-        };
-    }
 
-    @Test
-    public void testPollingHttpConnectorSentCredentials() throws Exception
-    {
-        final Latch latch = new Latch();
-        muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>()
-        {
-            @Override
-            public void onNotification(SecurityNotification notification)
-            {
-                latch.countDown();
-            }
-        });
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"secure-http-polling-server-flow.xml", "secure-http-polling-client-flow.xml"};
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://toclient", 5000);
-        assertNotNull(result);
-        assertEquals("foo", getPayloadAsString(result));
+  @Test
+  public void testPollingHttpConnectorSentCredentials() throws Exception {
+    final Latch latch = new Latch();
+    muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>() {
 
-        result = client.request("test://toclient2", 1000);
-        //This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
-        // can just add a filter
-        assertNotNull(result);
-        int status = result.getInboundProperty(HTTP_STATUS_PROPERTY, 0);
-        assertEquals(401, status);
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
-    }
+      @Override
+      public void onNotification(SecurityNotification notification) {
+        latch.countDown();
+      }
+    });
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://toclient", 5000);
+    assertNotNull(result);
+    assertEquals("foo", getPayloadAsString(result));
+
+    result = client.request("test://toclient2", 1000);
+    // This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
+    // can just add a filter
+    assertNotNull(result);
+    int status = result.getInboundProperty(HTTP_STATUS_PROPERTY, 0);
+    assertEquals(401, status);
+    assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+  }
 }

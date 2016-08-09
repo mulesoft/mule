@@ -12,37 +12,31 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class HttpResponseStatusCodeMatcher extends TypeSafeMatcher<HttpResponse>
-{
+public class HttpResponseStatusCodeMatcher extends TypeSafeMatcher<HttpResponse> {
 
-    private int statusCode;
+  private int statusCode;
 
-    public HttpResponseStatusCodeMatcher(int statusCode)
-    {
-        this.statusCode = statusCode;
-    }
+  public HttpResponseStatusCodeMatcher(int statusCode) {
+    this.statusCode = statusCode;
+  }
 
-    @Override
-    public boolean matchesSafely(HttpResponse response)
-    {
-        return response.getStatusLine().getStatusCode() == statusCode;
-    }
+  @Override
+  public boolean matchesSafely(HttpResponse response) {
+    return response.getStatusLine().getStatusCode() == statusCode;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("a response with status code ").appendValue(statusCode);
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("a response with status code ").appendValue(statusCode);
+  }
 
-    @Override
-    protected void describeMismatchSafely(HttpResponse response, Description mismatchDescription)
-    {
-        mismatchDescription.appendText("got a response with status code ").appendValue(response.getStatusLine().getStatusCode());
-    }
+  @Override
+  protected void describeMismatchSafely(HttpResponse response, Description mismatchDescription) {
+    mismatchDescription.appendText("got a response with status code ").appendValue(response.getStatusLine().getStatusCode());
+  }
 
-    @Factory
-    public static Matcher<HttpResponse> hasStatusCode(int statusCode)
-    {
-        return new HttpResponseStatusCodeMatcher(statusCode);
-    }
+  @Factory
+  public static Matcher<HttpResponse> hasStatusCode(int statusCode) {
+    return new HttpResponseStatusCodeMatcher(statusCode);
+  }
 }

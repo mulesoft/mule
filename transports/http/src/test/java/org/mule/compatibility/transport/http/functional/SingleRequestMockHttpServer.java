@@ -15,39 +15,35 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.httpclient.HttpParser;
 
-public abstract class SingleRequestMockHttpServer extends MockHttpServer
-{
+public abstract class SingleRequestMockHttpServer extends MockHttpServer {
 
-    private final Charset encoding;
-    private String statusLine;
+  private final Charset encoding;
+  private String statusLine;
 
-    public SingleRequestMockHttpServer(int listenPort, Charset encoding)
-    {
-        this(listenPort, encoding, HTTP_STATUS_LINE_OK);
-    }
+  public SingleRequestMockHttpServer(int listenPort, Charset encoding) {
+    this(listenPort, encoding, HTTP_STATUS_LINE_OK);
+  }
 
-    public SingleRequestMockHttpServer(int listenPort, Charset encoding, String statusLine)
-    {
-        super(listenPort);
-        this.encoding = encoding;
-        this.statusLine = statusLine;
-    }
+  public SingleRequestMockHttpServer(int listenPort, Charset encoding, String statusLine) {
+    super(listenPort);
+    this.encoding = encoding;
+    this.statusLine = statusLine;
+  }
 
-    protected abstract void processSingleRequest(HttpRequest httpRequest) throws Exception;
+  protected abstract void processSingleRequest(HttpRequest httpRequest) throws Exception;
 
-    @Override
-    protected void processRequests(InputStream in, OutputStream out) throws Exception
-    {
-        String line = HttpParser.readLine(in, encoding.name());
-        RequestLine requestLine = RequestLine.parseLine(line);
-        HttpRequest request = new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding.name()), in, encoding);
+  @Override
+  protected void processRequests(InputStream in, OutputStream out) throws Exception {
+    String line = HttpParser.readLine(in, encoding.name());
+    RequestLine requestLine = RequestLine.parseLine(line);
+    HttpRequest request = new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding.name()), in, encoding);
 
-        processSingleRequest(request);
+    processSingleRequest(request);
 
-        out.write(statusLine.getBytes());
-        out.write('\n');
-        out.flush();
-    }
+    out.write(statusLine.getBytes());
+    out.write('\n');
+    out.flush();
+  }
 
 }
 

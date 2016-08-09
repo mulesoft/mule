@@ -9,11 +9,9 @@ package org.mule.runtime.module.http.internal.listener;
 /**
  * Exception thrown when there is a problem processing an incoming HttpRequest to generate a MuleEvent.
  */
-public class HttpRequestParsingException extends Exception
-{
+public class HttpRequestParsingException extends Exception {
 
-    public HttpRequestParsingException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public HttpRequestParsingException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

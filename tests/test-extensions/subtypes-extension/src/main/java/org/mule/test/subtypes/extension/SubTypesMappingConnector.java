@@ -36,103 +36,90 @@ import java.util.Map;
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class})
 @Export(classes = {Revolver.class})
 @Xml(namespace = "subtypes", namespaceLocation = "http://www.mulesoft.org/schema/mule/subtypes")
-public class SubTypesMappingConnector
-{
+public class SubTypesMappingConnector {
 
-    @Parameter
-    private ParentShape abstractShape;
+  @Parameter
+  private ParentShape abstractShape;
 
-    @Parameter
-    private Door doorInterface;
+  @Parameter
+  private Door doorInterface;
 
-    @Parameter
-    private Square explicitSquare;
+  @Parameter
+  private Square explicitSquare;
 
-    @Parameter
-    private FinalPojo finalPojo;
+  @Parameter
+  private FinalPojo finalPojo;
 
-    @Parameter
-    private Ricin ricin;
+  @Parameter
+  private Ricin ricin;
 
-    @Parameter
-    private Weapon extensibleWeapon;
+  @Parameter
+  private Weapon extensibleWeapon;
 
-    @Parameter
-    private ParentShape triangle;
+  @Parameter
+  private ParentShape triangle;
 
-    @Parameter
-    private ExtensiblePojo pojoWithExtension;
+  @Parameter
+  private ExtensiblePojo pojoWithExtension;
 
-    @Parameter
-    private List<PojoForList> pojoListOne;
+  @Parameter
+  private List<PojoForList> pojoListOne;
 
-    @Parameter
-    private List<PojoForList> pojoListTwo;
+  @Parameter
+  private List<PojoForList> pojoListTwo;
 
-    @Parameter
-    private List<Weapon> weaponList;
+  @Parameter
+  private List<Weapon> weaponList;
 
-    @Parameter
-    private Map<String, Weapon> weaponMap;
+  @Parameter
+  private Map<String, Weapon> weaponMap;
 
-    public Map<String, Weapon> getWeaponMap()
-    {
-        return weaponMap;
-    }
+  public Map<String, Weapon> getWeaponMap() {
+    return weaponMap;
+  }
 
-    public List<Weapon> getWeaponList()
-    {
-        return weaponList;
-    }
+  public List<Weapon> getWeaponList() {
+    return weaponList;
+  }
 
-    public void setWeaponList(List<Weapon> weaponList)
-    {
-        this.weaponList = weaponList;
-    }
+  public void setWeaponList(List<Weapon> weaponList) {
+    this.weaponList = weaponList;
+  }
 
-    public List<PojoForList> getPojoListOne()
-    {
-        return pojoListOne;
-    }
+  public List<PojoForList> getPojoListOne() {
+    return pojoListOne;
+  }
 
-    public List<PojoForList> getPojoListTwo()
-    {
-        return pojoListTwo;
-    }
+  public List<PojoForList> getPojoListTwo() {
+    return pojoListTwo;
+  }
 
-    public ExtensiblePojo getExtensiblePojo()
-    {
-        return pojoWithExtension;
-    }
+  public ExtensiblePojo getExtensiblePojo() {
+    return pojoWithExtension;
+  }
 
-    public ParentShape getAbstractShape()
-    {
-        return abstractShape;
-    }
+  public ParentShape getAbstractShape() {
+    return abstractShape;
+  }
 
-    public Door getDoorInterface()
-    {
-        return doorInterface;
-    }
+  public Door getDoorInterface() {
+    return doorInterface;
+  }
 
-    public Square getExplicitSquare()
-    {
-        return explicitSquare;
-    }
+  public Square getExplicitSquare() {
+    return explicitSquare;
+  }
 
-    public FinalPojo getFinalPojo()
-    {
-        return finalPojo;
-    }
+  public FinalPojo getFinalPojo() {
+    return finalPojo;
+  }
 
-    public ParentShape getTriangle()
-    {
-        return triangle;
-    }
+  public ParentShape getTriangle() {
+    return triangle;
+  }
 
-    public Ricin getRicin()
-    {
-        return ricin;
-    }
+  public Ricin getRicin() {
+    return ricin;
+  }
 
 }

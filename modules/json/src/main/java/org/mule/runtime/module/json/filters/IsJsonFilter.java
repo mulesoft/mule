@@ -22,108 +22,86 @@ import org.slf4j.LoggerFactory;
 /**
  * A filter that will determine if the current message payload is a JSON encoded message.
  */
-public class IsJsonFilter implements Filter, MuleContextAware
-{
+public class IsJsonFilter implements Filter, MuleContextAware {
 
-    /**
-     * logger used by this class
-     */
-    protected transient final Logger logger = LoggerFactory.getLogger(IsJsonFilter.class);
+  /**
+   * logger used by this class
+   */
+  protected transient final Logger logger = LoggerFactory.getLogger(IsJsonFilter.class);
 
-    private boolean validateParsing = false;
+  private boolean validateParsing = false;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    public IsJsonFilter()
-    {
-        super();
+  public IsJsonFilter() {
+    super();
+  }
+
+  @Override
+  public boolean accept(MuleMessage obj) {
+    if (MediaType.APPLICATION_JSON.matches(obj.getDataType().getMediaType())) {
+      return true;
     }
+    try {
+      return accept((Object) muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
+    } catch (Exception e) {
+      logger.warn("Failed to read object payload as string for isJsonFilter", e);
+      return false;
+    }
+  }
 
-    @Override
-    public boolean accept(MuleMessage obj)
-    {
-        if (MediaType.APPLICATION_JSON.matches(obj.getDataType().getMediaType()))
-        {
-            return true;
+  public boolean accept(Object obj) {
+
+    try {
+      if (obj instanceof byte[]) {
+        obj = new String((byte[]) obj);
+      }
+
+      if (obj instanceof String) {
+        if (!mayBeJSON((String) obj)) {
+          return false;
         }
-        try
-        {
-            return accept((Object) muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
+
+        if (isValidateParsing()) {
+          new ObjectMapper().readTree((String) obj);
         }
-        catch (Exception e)
-        {
-            logger.warn("Failed to read object payload as string for isJsonFilter", e);
-            return false;
-        }
+        return true;
+      } else {
+        return false;
+      }
+
+    } catch (IOException e) {
+      logger.error("Filter result = false (message is not valid JSON): " + e.getMessage());
+      return false;
     }
+  }
 
-    public boolean accept(Object obj)
-    {
+  public boolean isValidateParsing() {
+    return validateParsing;
+  }
 
-        try
-        {
-            if (obj instanceof byte[])
-            {
-                obj = new String((byte[])obj);
-            }
+  public void setValidateParsing(boolean validateParsing) {
+    this.validateParsing = validateParsing;
+  }
 
-            if (obj instanceof String)
-            {
-                if (!mayBeJSON((String) obj))
-                {
-                    return false;
-                }
+  /**
+   * Tests if the String possibly represents a valid JSON String.
+   *
+   * @param string Valid JSON strings are:
+   *        <ul>
+   *        <li>"null"</li>
+   *        <li>starts with "[" and ends with "]"</li>
+   *        <li>starts with "{" and ends with "}"</li>
+   *        </ul>
+   * @return true if the test string starts with one of the valid json characters
+   */
+  protected boolean mayBeJSON(String string) {
+    return string != null && ("null".equals(string) || (string.startsWith("[") && string.endsWith("]"))
+        || (string.startsWith("{") && string.endsWith("}")));
+  }
 
-                if (isValidateParsing())
-                {
-                    new ObjectMapper().readTree((String) obj);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-        catch (IOException e)
-        {
-            logger.error("Filter result = false (message is not valid JSON): " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean isValidateParsing()
-    {
-        return validateParsing;
-    }
-
-    public void setValidateParsing(boolean validateParsing)
-    {
-        this.validateParsing = validateParsing;
-    }
-
-    /**
-     * Tests if the String possibly represents a valid JSON String.
-     *
-     * @param string Valid JSON strings are:
-     *               <ul>
-     *               <li>"null"</li>
-     *               <li>starts with "[" and ends with "]"</li>
-     *               <li>starts with "{" and ends with "}"</li>
-     *               </ul>
-     * @return true if the test string starts with one of the valid json characters
-     */
-    protected boolean mayBeJSON(String string)
-    {
-        return string != null
-                && ("null".equals(string)
-                || (string.startsWith("[") && string.endsWith("]")) || (string.startsWith("{") && string.endsWith("}")));
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

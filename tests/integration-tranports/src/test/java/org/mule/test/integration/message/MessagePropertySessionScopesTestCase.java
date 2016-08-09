@@ -17,31 +17,28 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class MessagePropertySessionScopesTestCase extends FunctionalTestCase
-{
+public class MessagePropertySessionScopesTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/message-property-session-scopes-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/message-property-session-scopes-config-flow.xml";
+  }
 
-    @Test
-    public void testSessionProperty() throws Exception {
+  @Test
+  public void testSessionProperty() throws Exception {
 
-        MuleMessage response = flowRunner("InService1").withPayload("Hello World").run().getMessage();
-        assertNotNull(response);
-        String payload = getPayloadAsString(response);
-        assertNotNull(payload);
-        assertEquals("java.util.Date", payload);
-    }
+    MuleMessage response = flowRunner("InService1").withPayload("Hello World").run().getMessage();
+    assertNotNull(response);
+    String payload = getPayloadAsString(response);
+    assertNotNull(payload);
+    assertEquals("java.util.Date", payload);
+  }
 
-    @Ignore
-    @Test
-    public void testInvocationProperty() throws Exception
-    {
-        MuleMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
-        // scope = "invocation" should not propagate the property on to the next service
-        assertThat(response.getPayload(), is(nullValue()));
-    }
+  @Ignore
+  @Test
+  public void testInvocationProperty() throws Exception {
+    MuleMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
+    // scope = "invocation" should not propagate the property on to the next service
+    assertThat(response.getPayload(), is(nullValue()));
+  }
 }

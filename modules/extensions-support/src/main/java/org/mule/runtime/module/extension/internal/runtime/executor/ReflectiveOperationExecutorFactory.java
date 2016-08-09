@@ -16,41 +16,35 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import java.lang.reflect.Method;
 
 /**
- * An implementation of {@link OperationExecutorFactory} which produces instances
- * of {@link ReflectiveMethodOperationExecutor}.
+ * An implementation of {@link OperationExecutorFactory} which produces instances of {@link ReflectiveMethodOperationExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0
  */
-public final class ReflectiveOperationExecutorFactory<T> implements OperationExecutorFactory
-{
+public final class ReflectiveOperationExecutorFactory<T> implements OperationExecutorFactory {
 
-    private final Class<T> implementationClass;
-    private final Method operationMethod;
+  private final Class<T> implementationClass;
+  private final Method operationMethod;
 
-    public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod)
-    {
-        checkArgument(implementationClass != null, "implementationClass cannot be null");
-        checkArgument(operationMethod != null, "operationMethod cannot be null");
+  public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
+    checkArgument(implementationClass != null, "implementationClass cannot be null");
+    checkArgument(operationMethod != null, "operationMethod cannot be null");
 
-        this.implementationClass = implementationClass;
-        this.operationMethod = operationMethod;
+    this.implementationClass = implementationClass;
+    this.operationMethod = operationMethod;
 
+  }
+
+  @Override
+  public OperationExecutor createExecutor(OperationModel operationModel) {
+    Object delegate;
+    try {
+      delegate = implementationClass.newInstance();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
+          + implementationClass.getName()), e);
     }
 
-    @Override
-    public OperationExecutor createExecutor(OperationModel operationModel)
-    {
-        Object delegate;
-        try
-        {
-            delegate = implementationClass.newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class " + implementationClass.getName()), e);
-        }
-
-        return new ReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);
-    }
+    return new ReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);
+  }
 }

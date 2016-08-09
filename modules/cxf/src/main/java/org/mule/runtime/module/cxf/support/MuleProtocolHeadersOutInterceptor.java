@@ -33,124 +33,101 @@ import org.apache.cxf.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MuleProtocolHeadersOutInterceptor
-    extends AbstractPhaseInterceptor<Message>
-{
+public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MuleProtocolHeadersOutInterceptor.class);
+  private static final Logger logger = LoggerFactory.getLogger(MuleProtocolHeadersOutInterceptor.class);
 
-    public MuleProtocolHeadersOutInterceptor()
-    {
-        super(Phase.PRE_STREAM);
-        getAfter().add(AttachmentOutInterceptor.class.getName());
+  public MuleProtocolHeadersOutInterceptor() {
+    super(Phase.PRE_STREAM);
+    getAfter().add(AttachmentOutInterceptor.class.getName());
+  }
+
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+    if (event == null || event instanceof NonBlockingVoidMuleEvent) {
+      return;
     }
 
-    @Override
-    public void handleMessage(Message message) throws Fault
-    {
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-        
-        if (event == null || event instanceof NonBlockingVoidMuleEvent)
-        {
-            return;
-        }
-
-        if (event.getMessage() == null)
-        {
-            return;
-        }
-
-        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
-
-        extractAndSetContentType(message, messageBuilder);
-        extractAndSet(message, messageBuilder, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
-
-        String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
-        final String finalMethod = method != null ? method : POST.name();
-        messageBuilder.addOutboundProperty(HTTP_METHOD_PROPERTY, finalMethod);
-
-        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(PROTOCOL_HEADERS));
-        if (reqHeaders != null)
-        {
-            for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
-            {
-                String key = e.getKey();
-                String val = format(e.getValue());
-                messageBuilder.addOutboundProperty(key, val);
-            }
-        }
-        event.setMessage(messageBuilder.build());
-
-        if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE)))
-        {
-            message.getInterceptorChain().pause();
-        }
+    if (event.getMessage() == null) {
+      return;
     }
 
-    private void extractAndSet(Message message, MuleMessage.Builder builder, String cxfHeader, String muleHeader)
-    {
-        if(message.get(cxfHeader) instanceof Serializable)
-        {
-            Serializable val = (Serializable) message.get(cxfHeader);
-            if (val != null)
-            {
-                builder.addOutboundProperty(muleHeader, val);
-            }
-        }
-        else
-        {
-            logger.warn("The header " + cxfHeader + "is not serializable and will not be propagated by Mule");
-        }
+    MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
+
+    extractAndSetContentType(message, messageBuilder);
+    extractAndSet(message, messageBuilder, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
+
+    String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
+    final String finalMethod = method != null ? method : POST.name();
+    messageBuilder.addOutboundProperty(HTTP_METHOD_PROPERTY, finalMethod);
+
+    Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(PROTOCOL_HEADERS));
+    if (reqHeaders != null) {
+      for (Map.Entry<String, List<String>> e : reqHeaders.entrySet()) {
+        String key = e.getKey();
+        String val = format(e.getValue());
+        messageBuilder.addOutboundProperty(key, val);
+      }
+    }
+    event.setMessage(messageBuilder.build());
+
+    if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE))) {
+      message.getInterceptorChain().pause();
+    }
+  }
+
+  private void extractAndSet(Message message, MuleMessage.Builder builder, String cxfHeader, String muleHeader) {
+    if (message.get(cxfHeader) instanceof Serializable) {
+      Serializable val = (Serializable) message.get(cxfHeader);
+      if (val != null) {
+        builder.addOutboundProperty(muleHeader, val);
+      }
+    } else {
+      logger.warn("The header " + cxfHeader + "is not serializable and will not be propagated by Mule");
+    }
+  }
+
+  private void extractAndSetContentType(Message message, MuleMessage.Builder builder) {
+    String ct = (String) message.get(Message.CONTENT_TYPE);
+    if (ct != null) {
+      builder.mediaType(MediaType.parse(ct).withCharset(getEncoding(message)));
+    }
+  }
+
+  private Charset getEncoding(Message message) {
+    Exchange ex = message.getExchange();
+    String encoding = (String) message.get(Message.ENCODING);
+    if (encoding == null && ex.getInMessage() != null) {
+      encoding = (String) ex.getInMessage().get(Message.ENCODING);
+      message.put(Message.ENCODING, encoding);
     }
 
-    private void extractAndSetContentType(Message message, MuleMessage.Builder builder)
-    {
-        String ct = (String) message.get(Message.CONTENT_TYPE);
-        if (ct != null)
-        {
-            builder.mediaType(MediaType.parse(ct).withCharset(getEncoding(message)));
-        }
+    if (encoding == null) {
+      message.put(Message.ENCODING, UTF_8.name());
+      return UTF_8;
+    } else {
+      return Charset.forName(encoding);
     }
+  }
 
-    private Charset getEncoding(Message message)
-    {
-        Exchange ex = message.getExchange();
-        String encoding = (String)message.get(Message.ENCODING);
-        if (encoding == null && ex.getInMessage() != null) {
-            encoding = (String) ex.getInMessage().get(Message.ENCODING);
-            message.put(Message.ENCODING, encoding);
-        }
+  private String format(List<String> value) {
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
 
-        if (encoding == null) {
-            message.put(Message.ENCODING, UTF_8.name());
-            return UTF_8;
-        }
-        else
-        {
-            return Charset.forName(encoding);
-        }
+    for (String s : value) {
+      if (!first) {
+        sb.append(", ");
+        first = false;
+      } else {
+        first = false;
+      }
+
+      sb.append(s);
     }
-
-    private String format(List<String> value)
-    {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        
-        for (String s : value) {
-            if (!first) 
-            {
-                sb.append(", ");
-                first = false;
-            }
-            else 
-            {
-                first = false;
-            }
-            
-            sb.append(s);
-        }
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 }
 
 

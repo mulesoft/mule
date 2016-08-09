@@ -14,50 +14,50 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 /**
  * Options that can be configured for making an HTTP request using {@link org.mule.runtime.core.api.client.MuleClient}
  *
- * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
+ * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may
+ * be used as key in a map
  */
-public interface HttpRequestOptions extends OperationOptions
-{
+public interface HttpRequestOptions extends OperationOptions {
 
-    /**
-     * @return HTTP method to send
-     */
-    String getMethod();
+  /**
+   * @return HTTP method to send
+   */
+  String getMethod();
 
-    /**
-     * @return the streaming mode for sending the HTTP request.
-     */
-    HttpStreamingType getRequestStreamingMode();
+  /**
+   * @return the streaming mode for sending the HTTP request.
+   */
+  HttpStreamingType getRequestStreamingMode();
 
-    /**
-     * @return true if the response from the request should not be parsed and return plain as an input stream.
-     */
-    boolean isParseResponseDisabled();
+  /**
+   * @return true if the response from the request should not be parsed and return plain as an input stream.
+   */
+  boolean isParseResponseDisabled();
 
-    /**
-     * @return the {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfig} to use for sending the request
-     */
-    HttpRequesterConfig getRequesterConfig();
+  /**
+   * @return the {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfig} to use for sending the request
+   */
+  HttpRequesterConfig getRequesterConfig();
 
-    /**
-     * @return true if should follows redirect responses
-     */
-    Boolean isFollowsRedirect();
+  /**
+   * @return true if should follows redirect responses
+   */
+  Boolean isFollowsRedirect();
 
-    /**
-     * @return maximum amount of time to wait for the response of the request
-     */
-    Long getResponseTimeout();
+  /**
+   * @return maximum amount of time to wait for the response of the request
+   */
+  Long getResponseTimeout();
 
-    /**
-     * @return true if should not validate the status code
-     */
-    boolean isStatusCodeValidationDisabled();
+  /**
+   * @return true if should not validate the status code
+   */
+  boolean isStatusCodeValidationDisabled();
 
-    /**
-     * @return the TLS configuration for making the request
-     */
-    TlsContextFactory getTlsContextFactory();
+  /**
+   * @return the TLS configuration for making the request
+   */
+  TlsContextFactory getTlsContextFactory();
 
 
 }

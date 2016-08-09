@@ -9,25 +9,22 @@ package org.mule.extension.socket.api.connection.tcp.protocol;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
- * Extend {@link XmlMessageProtocol} to continue reading
- * until either a new message or EOF is found.
+ * Extend {@link XmlMessageProtocol} to continue reading until either a new message or EOF is found.
  */
 @Alias("xml-message-eof-protocol")
-public class XmlMessageEOFProtocol extends XmlMessageProtocol
-{
+public class XmlMessageEOFProtocol extends XmlMessageProtocol {
 
-    /**
-     * Continue reading til EOF or new document found
-     *
-     * @param patternIndex The index of the xml tag (or -1 if the next message not found)
-     * @param len          The amount of data read this loop (or -1 if EOF)
-     * @param available    The amount of data available to read
-     * @return true if the read should continue
-     */
-    @Override
-    protected boolean isRepeat(int patternIndex, int len, int available)
-    {
-        return patternIndex < 0;
-    }
+  /**
+   * Continue reading til EOF or new document found
+   *
+   * @param patternIndex The index of the xml tag (or -1 if the next message not found)
+   * @param len The amount of data read this loop (or -1 if EOF)
+   * @param available The amount of data available to read
+   * @return true if the read should continue
+   */
+  @Override
+  protected boolean isRepeat(int patternIndex, int len, int available) {
+    return patternIndex < 0;
+  }
 
 }

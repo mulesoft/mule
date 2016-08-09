@@ -10,7 +10,6 @@ import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificati
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 
 public class ConnectorMessageNotificationLogger extends AbstractNotificationLogger<ConnectorMessageNotification>
-    implements ConnectorMessageNotificationListener<ConnectorMessageNotification>
-{
-    // nothing to do here
+    implements ConnectorMessageNotificationListener<ConnectorMessageNotification> {
+  // nothing to do here
 }

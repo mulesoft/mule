@@ -6,40 +6,33 @@
  */
 package org.mule.test.config.spring.parsers.beans;
 
-public class ParameterAndChildElement
-{
+public class ParameterAndChildElement {
 
-    private SimplePojo simplePojo;
+  private SimplePojo simplePojo;
 
-    public SimplePojo getSimplePojo()
-    {
-        return simplePojo;
+  public SimplePojo getSimplePojo() {
+    return simplePojo;
+  }
+
+  public void setSimplePojo(SimplePojo simplePojo) {
+    this.simplePojo = simplePojo;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public void setSimplePojo(SimplePojo simplePojo)
-    {
-        this.simplePojo = simplePojo;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    ParameterAndChildElement that = (ParameterAndChildElement) o;
+    return simplePojo != null ? simplePojo.equals(that.simplePojo) : that.simplePojo == null;
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        ParameterAndChildElement that = (ParameterAndChildElement) o;
-        return simplePojo != null ? simplePojo.equals(that.simplePojo) : that.simplePojo == null;
+  }
 
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return simplePojo != null ? simplePojo.hashCode() : 0;
-    }
+  @Override
+  public int hashCode() {
+    return simplePojo != null ? simplePojo.hashCode() : 0;
+  }
 }

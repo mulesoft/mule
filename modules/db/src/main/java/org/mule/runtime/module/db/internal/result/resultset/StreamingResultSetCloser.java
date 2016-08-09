@@ -14,8 +14,7 @@ import java.sql.ResultSet;
 /**
  * Closes a {@link ResultSet} that was processed in streaming mode
  */
-public interface StreamingResultSetCloser
-{
+public interface StreamingResultSetCloser {
 
-    void close(DbConnection connection, ResultSet resultSet);
+  void close(DbConnection connection, ResultSet resultSet);
 }

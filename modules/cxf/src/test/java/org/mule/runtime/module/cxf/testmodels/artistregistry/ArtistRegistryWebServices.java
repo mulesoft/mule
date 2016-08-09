@@ -13,14 +13,15 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
-@WebService(targetNamespace = "http://example.cxf.module.runtime.mule.org/", name="ArtistRegistryWebServices")
+@WebService(targetNamespace = "http://example.cxf.module.runtime.mule.org/", name = "ArtistRegistryWebServices")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public interface ArtistRegistryWebServices
-{
-    @WebMethod
-    public void addArtist(@WebParam(partName = "arg0", name="arg0") Artist arg0);
+public interface ArtistRegistryWebServices {
 
-    @WebResult(name = "return", targetNamespace = "http://example.cxf.module.runtime.mule.org/", partName = "return")
-    @WebMethod
-    public ArtistArray getAll(@WebParam(partName = "pageSize", name="pageSize") int pageSize, @WebParam(partName = "pageNumber", name="pageNumber") int pageNumber);
+  @WebMethod
+  public void addArtist(@WebParam(partName = "arg0", name = "arg0") Artist arg0);
+
+  @WebResult(name = "return", targetNamespace = "http://example.cxf.module.runtime.mule.org/", partName = "return")
+  @WebMethod
+  public ArtistArray getAll(@WebParam(partName = "pageSize", name = "pageSize") int pageSize,
+                            @WebParam(partName = "pageNumber", name = "pageNumber") int pageNumber);
 }

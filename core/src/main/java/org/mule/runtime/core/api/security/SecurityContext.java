@@ -9,15 +9,14 @@ package org.mule.runtime.core.api.security;
 import java.io.Serializable;
 
 /**
- * <code>SecurityContext</code> holds security information and is associated
- * with the MuleSession.
+ * <code>SecurityContext</code> holds security information and is associated with the MuleSession.
  * 
  * @see org.mule.runtime.core.api.MuleSession
  */
 
-public interface SecurityContext extends Serializable
-{
-    void setAuthentication(Authentication authentication);
+public interface SecurityContext extends Serializable {
 
-    Authentication getAuthentication();
+  void setAuthentication(Authentication authentication);
+
+  Authentication getAuthentication();
 }

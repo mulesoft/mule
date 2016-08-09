@@ -9,16 +9,13 @@ package org.mule.runtime.core.api.cache;
 /**
  * Thrown to indicate an error during a cache invalidation action
  */
-public class InvalidateCacheException extends RuntimeException
-{
+public class InvalidateCacheException extends RuntimeException {
 
-    public InvalidateCacheException(String s)
-    {
-        super(s);
-    }
+  public InvalidateCacheException(String s) {
+    super(s);
+  }
 
-    public InvalidateCacheException(String s, Throwable throwable)
-    {
-        super(s, throwable);
-    }
+  public InvalidateCacheException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
 }

@@ -12,24 +12,20 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 
-public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase
-{
+public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 
-    public HttpRequestNtlmProxyTestCase()
-    {
-        super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
-    }
+  public HttpRequestNtlmProxyTestCase() {
+    super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-ntlm-proxy-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-ntlm-proxy-config.xml";
+  }
 
-    @Override
-    public void validNtlmAuth() throws Exception
-    {
-        super.validNtlmAuth();
-        assertThat(requestUrl, is("http://localhost:9999/basePath/requestPath"));
-    }
+  @Override
+  public void validNtlmAuth() throws Exception {
+    super.validNtlmAuth();
+    assertThat(requestUrl, is("http://localhost:9999/basePath/requestPath"));
+  }
 }

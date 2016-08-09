@@ -44,166 +44,132 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A decorator for {@link Source} which propagates lifecycle and performs injection of
- * both, dependencies and parameters
+ * A decorator for {@link Source} which propagates lifecycle and performs injection of both, dependencies and parameters
  *
  * @since 4.0
  */
-final class SourceWrapper extends Source implements Lifecycle, FlowConstructAware
-{
+final class SourceWrapper extends Source implements Lifecycle, FlowConstructAware {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SourceWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SourceWrapper.class);
 
-    private final Source delegate;
-    private final Optional<FieldSetter<Object, Object>> configurationSetter;
-    private final Optional<FieldSetter<Object, Object>> connectionSetter;
+  private final Source delegate;
+  private final Optional<FieldSetter<Object, Object>> configurationSetter;
+  private final Optional<FieldSetter<Object, Object>> connectionSetter;
 
-    private SourceContext sourceContext;
-    private ConnectionHandler<Object> connectionHandler;
-    private FlowConstruct flowConstruct;
-    private boolean connectionSet = false;
+  private SourceContext sourceContext;
+  private ConnectionHandler<Object> connectionHandler;
+  private FlowConstruct flowConstruct;
+  private boolean connectionSet = false;
 
-    @Inject
-    private ConnectionManager connectionManager;
+  @Inject
+  private ConnectionManager connectionManager;
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    SourceWrapper(Source delegate)
-    {
-        this.delegate = delegate;
+  SourceWrapper(Source delegate) {
+    this.delegate = delegate;
 
-        configurationSetter = fetchField(UseConfig.class);
-        connectionSetter = fetchField(Connection.class);
+    configurationSetter = fetchField(UseConfig.class);
+    connectionSetter = fetchField(Connection.class);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (delegate instanceof FlowConstructAware) {
+      ((FlowConstructAware) delegate).setFlowConstruct(flowConstruct);
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (delegate instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) delegate).setFlowConstruct(flowConstruct);
-        }
+    setConfiguration(sourceContext.getConfigurationInstance());
+    setConnection(sourceContext);
 
-        setConfiguration(sourceContext.getConfigurationInstance());
-        setConnection(sourceContext);
+    initialiseIfNeeded(delegate, true, muleContext);
+  }
 
-        initialiseIfNeeded(delegate, true, muleContext);
+  @Override
+  public void start() throws MuleException {
+    try {
+      setConnection(sourceContext);
+      delegate.start();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    try {
+      delegate.stop();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
+    } finally {
+      releaseConnection();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(delegate, LOGGER);
+  }
+
+  @Override
+  public void setSourceContext(SourceContext sourceContext) {
+    this.sourceContext = sourceContext;
+    delegate.setSourceContext(sourceContext);
+  }
+
+  private <T> void setConfiguration(ConfigurationInstance<T> configuration) {
+    if (configurationSetter.isPresent()) {
+      configurationSetter.get().set(delegate, configuration.getValue());
+    }
+  }
+
+  private void setConnection(SourceContext sourceContext) {
+    if (connectionSetter.isPresent() && !connectionSet) {
+      try {
+        connectionHandler = connectionManager.getConnection(sourceContext.getConfigurationInstance().getValue());
+        connectionSetter.get().set(delegate, connectionHandler.getConnection());
+        connectionSet = true;
+      } catch (ConnectionException e) {
+        throw new MuleRuntimeException(createStaticMessage(String
+            .format("Could not obtain connection for message source '%s' on flow '%s'", getName(), flowConstruct.getName())), e);
+      }
+    }
+  }
+
+  private void releaseConnection() {
+    if (connectionHandler != null) {
+      try {
+        connectionHandler.release();
+      } finally {
+        connectionHandler = null;
+        connectionSet = false;
+      }
+    }
+  }
+
+  private <T> Optional<FieldSetter<Object, T>> fetchField(Class<? extends Annotation> annotation) {
+    Set<Field> fields = getAllFields(delegate.getClass(), withAnnotation(annotation));
+    if (CollectionUtils.isEmpty(fields)) {
+      return Optional.empty();
     }
 
-    @Override
-    public void start() throws MuleException
-    {
-        try
-        {
-            setConnection(sourceContext);
-            delegate.start();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
+    if (fields.size() > 1) {
+      // TODO: MULE-9220 Move this to a syntax validator
+      throw new IllegalModelDefinitionException(format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+          + "Only one field in the class can bare such annotation", delegate.getClass().getName(),
+                                                       annotation.getClass().getSimpleName()));
     }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        try
-        {
-            delegate.stop();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
-        finally
-        {
-            releaseConnection();
-        }
-    }
+    return Optional.of(new FieldSetter<>(fields.iterator().next()));
+  }
 
-    @Override
-    public void dispose()
-    {
-        disposeIfNeeded(delegate, LOGGER);
-    }
+  public String getName() {
+    return IntrospectionUtils.getSourceName(delegate.getClass());
+  }
 
-    @Override
-    public void setSourceContext(SourceContext sourceContext)
-    {
-        this.sourceContext = sourceContext;
-        delegate.setSourceContext(sourceContext);
-    }
-
-    private <T> void setConfiguration(ConfigurationInstance<T> configuration)
-    {
-        if (configurationSetter.isPresent())
-        {
-            configurationSetter.get().set(delegate, configuration.getValue());
-        }
-    }
-
-    private void setConnection(SourceContext sourceContext)
-    {
-        if (connectionSetter.isPresent() && !connectionSet)
-        {
-            try
-            {
-                connectionHandler = connectionManager.getConnection(sourceContext.getConfigurationInstance().getValue());
-                connectionSetter.get().set(delegate, connectionHandler.getConnection());
-                connectionSet = true;
-            }
-            catch (ConnectionException e)
-            {
-                throw new MuleRuntimeException(createStaticMessage(String.format("Could not obtain connection for message source '%s' on flow '%s'",
-                                                                                 getName(), flowConstruct.getName())), e);
-            }
-        }
-    }
-
-    private void releaseConnection()
-    {
-        if (connectionHandler != null)
-        {
-            try
-            {
-                connectionHandler.release();
-            }
-            finally
-            {
-                connectionHandler = null;
-                connectionSet = false;
-            }
-        }
-    }
-
-    private <T> Optional<FieldSetter<Object, T>> fetchField(Class<? extends Annotation> annotation)
-    {
-        Set<Field> fields = getAllFields(delegate.getClass(), withAnnotation(annotation));
-        if (CollectionUtils.isEmpty(fields))
-        {
-            return Optional.empty();
-        }
-
-        if (fields.size() > 1)
-        {
-            //TODO: MULE-9220 Move this to a syntax validator
-            throw new IllegalModelDefinitionException(format("Message Source defined on class '%s' has more than one field annotated with '@%s'. " +
-                                                             "Only one field in the class can bare such annotation",
-                                                             delegate.getClass().getName(), annotation.getClass().getSimpleName()));
-        }
-
-        return Optional.of(new FieldSetter<>(fields.iterator().next()));
-    }
-
-    public String getName()
-    {
-        return IntrospectionUtils.getSourceName(delegate.getClass());
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 }

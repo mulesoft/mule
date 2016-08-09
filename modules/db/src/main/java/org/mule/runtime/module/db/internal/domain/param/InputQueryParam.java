@@ -10,8 +10,7 @@ package org.mule.runtime.module.db.internal.domain.param;
 /**
  * Defines a parameter that provides an input value
  */
-public interface InputQueryParam extends QueryParam
-{
+public interface InputQueryParam extends QueryParam {
 
-    Object getValue();
+  Object getValue();
 }

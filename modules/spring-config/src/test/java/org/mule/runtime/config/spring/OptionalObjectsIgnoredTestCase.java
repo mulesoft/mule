@@ -26,34 +26,30 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
-{
+public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OptionalObjectsIgnoredTestCase.class);
-    private static final String OPTIONAL_OBJECT_KEY = "problematic";
+  private static final Logger LOGGER = LoggerFactory.getLogger(OptionalObjectsIgnoredTestCase.class);
+  private static final String OPTIONAL_OBJECT_KEY = "problematic";
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    @Before
-    public void before() throws Exception
-    {
-        muleContext = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
-        muleContext.start();
-        muleContext.getRegistry().lookupByType(Calendar.class);
+  @Before
+  public void before() throws Exception {
+    muleContext =
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
+    muleContext.start();
+    muleContext.getRegistry().lookupByType(Calendar.class);
+  }
+
+  @After
+  public void after() throws Exception {
+    if (muleContext != null) {
+      LifecycleUtils.disposeIfNeeded(muleContext, LOGGER);
     }
+  }
 
-    @After
-    public void after() throws Exception
-    {
-        if (muleContext != null)
-        {
-            LifecycleUtils.disposeIfNeeded(muleContext, LOGGER);
-        }
-    }
-
-    @Test
-    public void optionalObjectSafelyIgnored()
-    {
-        assertThat(muleContext.getRegistry().lookupObject(OPTIONAL_OBJECT_KEY), is(nullValue()));
-    }
+  @Test
+  public void optionalObjectSafelyIgnored() {
+    assertThat(muleContext.getRegistry().lookupObject(OPTIONAL_OBJECT_KEY), is(nullValue()));
+  }
 }

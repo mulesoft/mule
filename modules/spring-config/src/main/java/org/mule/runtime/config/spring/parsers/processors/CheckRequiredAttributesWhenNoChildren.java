@@ -11,34 +11,29 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.w3c.dom.Element;
 
 /**
- * All attributes from at least one set must be provided when there are no child
- * elements with the name specified present.
+ * All attributes from at least one set must be provided when there are no child elements with the name specified present.
  */
-public class CheckRequiredAttributesWhenNoChildren extends CheckRequiredAttributes
-{
-    private String elementName;
-    private String elementNamespaceUrl;
+public class CheckRequiredAttributesWhenNoChildren extends CheckRequiredAttributes {
 
-    public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName, String elementNamespaceUrl)
-    {
-        super(attributeNames);
-        this.elementName = elementName;
-        this.elementNamespaceUrl = elementNamespaceUrl;
-    }
+  private String elementName;
+  private String elementNamespaceUrl;
 
-    public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName)
-    {
-        super(attributeNames);
-        this.elementName = elementName;
-    }
+  public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName, String elementNamespaceUrl) {
+    super(attributeNames);
+    this.elementName = elementName;
+    this.elementNamespaceUrl = elementNamespaceUrl;
+  }
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        // If there are child elements we skip this check
-        if (element.getElementsByTagNameNS(elementNamespaceUrl, elementName).getLength() > 0)
-        {
-            return;
-        }
-        super.preProcess(config, element);
+  public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName) {
+    super(attributeNames);
+    this.elementName = elementName;
+  }
+
+  public void preProcess(PropertyConfiguration config, Element element) {
+    // If there are child elements we skip this check
+    if (element.getElementsByTagNameNS(elementNamespaceUrl, elementName).getLength() > 0) {
+      return;
     }
+    super.preProcess(config, element);
+  }
 }

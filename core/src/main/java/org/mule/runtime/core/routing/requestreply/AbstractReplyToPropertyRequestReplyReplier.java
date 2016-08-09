@@ -19,58 +19,43 @@ import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.apache.commons.lang.BooleanUtils;
 
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
-        implements RequestReplyReplierMessageProcessor, InternalMessageProcessor
-{
+    implements RequestReplyReplierMessageProcessor, InternalMessageProcessor {
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        MuleEvent resultEvent;
-        if (shouldProcessEvent(event))
-        {
-            Object replyTo = event.getReplyToDestination();
-            ReplyToHandler replyToHandler = event.getReplyToHandler();
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    MuleEvent resultEvent;
+    if (shouldProcessEvent(event)) {
+      Object replyTo = event.getReplyToDestination();
+      ReplyToHandler replyToHandler = event.getReplyToHandler();
 
-            resultEvent = processNext(event);
+      resultEvent = processNext(event);
 
-            // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-            final String replyToStop = resultEvent.getFlowVariable(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
-            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)
-                && !BooleanUtils.toBoolean(replyToStop))
-            {
-                // reply-to processing should not resurrect a dead event
-                processReplyTo(event, resultEvent, replyToHandler, replyTo);
-            }
-        }
-        else
-        {
-            resultEvent = processNext(event);
-        }
-        return resultEvent;
+      // Allow components to stop processing of the ReplyTo property (e.g. CXF)
+      final String replyToStop = resultEvent.getFlowVariable(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+      if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent) && !BooleanUtils.toBoolean(replyToStop)) {
+        // reply-to processing should not resurrect a dead event
+        processReplyTo(event, resultEvent, replyToHandler, replyTo);
+      }
+    } else {
+      resultEvent = processNext(event);
     }
+    return resultEvent;
+  }
 
-    protected abstract boolean shouldProcessEvent(MuleEvent event);
+  protected abstract boolean shouldProcessEvent(MuleEvent event);
 
-    protected void processReplyTo(MuleEvent event,
-                                  MuleEvent result,
-                                  ReplyToHandler replyToHandler,
-                                  Object replyTo) throws MuleException
-    {
-        if (result != null && replyToHandler != null)
-        {
-            String requestor = result.getMessage().getOutboundProperty(
-                    MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-            if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName()))
-                || requestor == null)
-            {
-                replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
-            }
-        }
+  protected void processReplyTo(MuleEvent event, MuleEvent result, ReplyToHandler replyToHandler, Object replyTo)
+      throws MuleException {
+    if (result != null && replyToHandler != null) {
+      String requestor = result.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+      if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName())) || requestor == null) {
+        replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
+      }
     }
+  }
 
-    public void setReplyProcessor(MessageProcessor replyMessageProcessor)
-    {
-        // Not used
-    }
+  public void setReplyProcessor(MessageProcessor replyMessageProcessor) {
+    // Not used
+  }
 
 }

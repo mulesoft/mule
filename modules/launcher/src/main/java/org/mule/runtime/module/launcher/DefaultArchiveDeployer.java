@@ -33,571 +33,448 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Deployer of an artifact within mule container.
- * - Keeps track of deployed artifacts
- * - Avoid already deployed artifacts to be redeployed
- * - Deploys, undeploys, redeploys packaged and exploded artifacts
+ * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
+ * redeployed - Deploys, undeploys, redeploys packaged and exploded artifacts
  */
-public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T>
-{
+public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T> {
 
-    public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
-    public static final String ZIP_FILE_SUFFIX = ".zip";
-    public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
-    public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
-    private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
+  public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
+  public static final String ZIP_FILE_SUFFIX = ".zip";
+  public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
+  public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
+  private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
-    private final ArtifactDeployer<T> deployer;
-    private final ArtifactArchiveInstaller artifactArchiveInstaller;
-    private final ReentrantLock deploymentLock;
-    private final Map<String, ZombieFile> artifactZombieMap = new HashMap<String, ZombieFile>();
-    private final File artifactDir;
-    private final ObservableList<T> artifacts;
-    private final ArtifactDeploymentTemplate deploymentTemplate;
-    private ArtifactFactory<T> artifactFactory;
-    private DeploymentListener deploymentListener = new NullDeploymentListener();
+  private final ArtifactDeployer<T> deployer;
+  private final ArtifactArchiveInstaller artifactArchiveInstaller;
+  private final ReentrantLock deploymentLock;
+  private final Map<String, ZombieFile> artifactZombieMap = new HashMap<String, ZombieFile>();
+  private final File artifactDir;
+  private final ObservableList<T> artifacts;
+  private final ArtifactDeploymentTemplate deploymentTemplate;
+  private ArtifactFactory<T> artifactFactory;
+  private DeploymentListener deploymentListener = new NullDeploymentListener();
 
 
-    public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory, final ObservableList<T> artifacts, final ReentrantLock lock,
-            ArtifactDeploymentTemplate deploymentTemplate)
-    {
-        this.deployer = deployer;
-        this.artifactFactory = artifactFactory;
-        this.artifacts = artifacts;
-        this.deploymentLock = lock;
-        this.deploymentTemplate = deploymentTemplate;
-        this.artifactDir = artifactFactory.getArtifactDir();
-        this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
+  public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory,
+                                final ObservableList<T> artifacts, final ReentrantLock lock,
+                                ArtifactDeploymentTemplate deploymentTemplate) {
+    this.deployer = deployer;
+    this.artifactFactory = artifactFactory;
+    this.artifacts = artifacts;
+    this.deploymentLock = lock;
+    this.deploymentTemplate = deploymentTemplate;
+    this.artifactDir = artifactFactory.getArtifactDir();
+    this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
+  }
+
+  @Override
+  public T deployPackagedArtifact(String zip) throws DeploymentException {
+    URL url;
+    File artifactZip;
+    try {
+      final String artifactName = StringUtils.removeEnd(zip, ZIP_FILE_SUFFIX);
+      artifactZip = new File(artifactDir, zip);
+      url = artifactZip.toURI().toURL();
+      return deployPackagedArtifact(url, artifactName);
+    } catch (DeploymentException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new DeploymentException(CoreMessages.createStaticMessage("Failed to deploy from zip: " + zip), e);
+    }
+  }
+
+  @Override
+  public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
+    String artifactName = artifactDir;
+    @SuppressWarnings("rawtypes")
+    Collection<String> deployedAppNames =
+        CollectionUtils.collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
+
+    if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
+      return null;
     }
 
-    @Override
-    public T deployPackagedArtifact(String zip) throws DeploymentException
-    {
-        URL url;
-        File artifactZip;
-        try
-        {
-            final String artifactName = StringUtils.removeEnd(zip, ZIP_FILE_SUFFIX);
-            artifactZip = new File(artifactDir, zip);
-            url = artifactZip.toURI().toURL();
-            return deployPackagedArtifact(url, artifactName);
-        }
-        catch (DeploymentException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DeploymentException(CoreMessages.createStaticMessage("Failed to deploy from zip: " + zip), e);
-        }
+    ZombieFile zombieFile = artifactZombieMap.get(artifactName);
+
+    if ((zombieFile != null) && (!zombieFile.updatedZombieApp())) {
+      return null;
     }
 
-    @Override
-    public T deployExplodedArtifact(String artifactDir) throws DeploymentException
-    {
-        String artifactName = artifactDir;
-        @SuppressWarnings("rawtypes")
-        Collection<String> deployedAppNames = CollectionUtils.collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
+    return deployExplodedApp(artifactName);
+  }
 
-        if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName)))
-        {
-            return null;
-        }
-
-        ZombieFile zombieFile = artifactZombieMap.get(artifactName);
-
-        if ((zombieFile != null) && (!zombieFile.updatedZombieApp()))
-        {
-            return null;
-        }
-
-        return deployExplodedApp(artifactName);
+  @Override
+  public void undeployArtifact(String artifactId) {
+    ZombieFile zombieFile = artifactZombieMap.get(artifactId);
+    if ((zombieFile != null)) {
+      return;
     }
 
-    @Override
-    public void undeployArtifact(String artifactId)
-    {
-        ZombieFile zombieFile = artifactZombieMap.get(artifactId);
-        if ((zombieFile != null))
-        {
-            return;
-        }
+    T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
+    undeploy(artifact);
+  }
 
-        T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
-        undeploy(artifact);
+  @Override
+  public File getDeploymentDirectory() {
+    return artifactFactory.getArtifactDir();
+  }
+
+  @Override
+  public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException {
+    T artifact;
+
+    try {
+      try {
+        artifact = guardedInstallFrom(artifactAchivedUrl);
+        trackArtifact(artifact);
+      } catch (Throwable t) {
+        File artifactArchive = new File(artifactAchivedUrl.toURI());
+        String artifactName = StringUtils.removeEnd(artifactArchive.getName(), ZIP_FILE_SUFFIX);
+
+        // error text has been created by the deployer already
+        logDeploymentFailure(t, artifactName);
+
+        addZombieFile(artifactName, artifactArchive);
+
+        deploymentListener.onDeploymentFailure(artifactName, t);
+
+        throw t;
+      }
+
+      deployArtifact(artifact);
+      return artifact;
+    } catch (Throwable t) {
+      if (t instanceof DeploymentException) {
+        // re-throw
+        throw ((DeploymentException) t);
+      }
+
+      final String msg = "Failed to deploy from URL: " + artifactAchivedUrl;
+      throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+    }
+  }
+
+  private void logDeploymentFailure(Throwable t, String artifactName) {
+    final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
+    logger.error(msg, t);
+  }
+
+  @Override
+  public Map<URL, Long> getArtifactsZombieMap() {
+    Map<URL, Long> result = new HashMap<URL, Long>();
+
+    for (String artifact : artifactZombieMap.keySet()) {
+      ZombieFile file = artifactZombieMap.get(artifact);
+      result.put(file.url, file.originalTimestamp);
+    }
+    return result;
+  }
+
+  @Override
+  public void setArtifactFactory(final ArtifactFactory<T> artifactFactory) {
+    this.artifactFactory = artifactFactory;
+  }
+
+  @Override
+  public void undeployArtifactWithoutUninstall(T artifact) {
+    logRequestToUndeployArtifact(artifact);
+    try {
+      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
+        return;
+      }
+
+      deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+      deployer.undeploy(artifact);
+      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+    } catch (DeploymentException e) {
+      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+      throw e;
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (deploymentLock.isHeldByCurrentThread()) {
+        deploymentLock.unlock();
+      }
+    }
+  }
+
+  ArtifactDeployer getDeployer() {
+    return deployer;
+  }
+
+  @Override
+  public void setDeploymentListener(CompositeDeploymentListener deploymentListener) {
+    this.deploymentListener = deploymentListener;
+  }
+
+  private T deployPackagedArtifact(final URL artifactUrl, String artifactName) throws IOException {
+    ZombieFile zombieFile = artifactZombieMap.get(artifactName);
+    if (zombieFile != null) {
+      if (zombieFile.isFor(artifactUrl) && !zombieFile.updatedZombieApp()) {
+        // Skips the file because it was already deployed with failure
+        return null;
+      }
     }
 
-    @Override
-    public File getDeploymentDirectory()
-    {
-        return artifactFactory.getArtifactDir();
+    // check if this artifact is running first, undeployArtifact it then
+    T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    if (artifact != null) {
+      deploymentTemplate.preRedeploy(artifact);
+      undeployArtifact(artifactName);
     }
 
-    @Override
-    public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException
-    {
-        T artifact;
+    T deployedAtifact = deployPackagedArtifact(artifactUrl);
+    deploymentTemplate.postRedeploy(deployedAtifact);
+    return deployedAtifact;
+  }
 
-        try
-        {
-            try
-            {
-                artifact = guardedInstallFrom(artifactAchivedUrl);
-                trackArtifact(artifact);
-            }
-            catch (Throwable t)
-            {
-                File artifactArchive = new File(artifactAchivedUrl.toURI());
-                String artifactName = StringUtils.removeEnd(artifactArchive.getName(), ZIP_FILE_SUFFIX);
-
-                // error text has been created by the deployer already
-                logDeploymentFailure(t, artifactName);
-
-                addZombieFile(artifactName, artifactArchive);
-
-                deploymentListener.onDeploymentFailure(artifactName, t);
-
-                throw t;
-            }
-
-            deployArtifact(artifact);
-            return artifact;
-        }
-        catch (Throwable t)
-        {
-            if (t instanceof DeploymentException)
-            {
-                // re-throw
-                throw ((DeploymentException) t);
-            }
-
-            final String msg = "Failed to deploy from URL: " + artifactAchivedUrl;
-            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-        }
+  private T deployExplodedApp(String addedApp) throws DeploymentException {
+    if (logger.isInfoEnabled()) {
+      logger.info("================== New Exploded Artifact: " + addedApp);
     }
 
-    private void logDeploymentFailure(Throwable t, String artifactName)
-    {
-        final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
-        logger.error(msg, t);
+    T artifact;
+    try {
+      artifact = artifactFactory.createArtifact(addedApp);
+
+      // add to the list of known artifacts first to avoid deployment loop on failure
+      trackArtifact(artifact);
+    } catch (Throwable t) {
+      final File artifactDir1 = artifactDir;
+      File artifactDir = new File(artifactDir1, addedApp);
+
+      addZombieFile(addedApp, artifactDir);
+
+      String msg = miniSplash(String.format("Failed to deploy exploded artifact: '%s', see below", addedApp));
+      logger.error(msg, t);
+
+      deploymentListener.onDeploymentFailure(addedApp, t);
+
+      if (t instanceof DeploymentException) {
+        throw (DeploymentException) t;
+      } else {
+        msg = "Failed to deploy artifact: " + addedApp;
+        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      }
     }
 
-    @Override
-    public Map<URL, Long> getArtifactsZombieMap()
-    {
-        Map<URL, Long> result = new HashMap<URL, Long>();
+    deployArtifact(artifact);
+    return artifact;
+  }
 
-        for (String artifact : artifactZombieMap.keySet())
-        {
-            ZombieFile file = artifactZombieMap.get(artifact);
-            result.put(file.url, file.originalTimestamp);
-        }
-        return result;
+
+  private void guardedDeploy(T artifact) {
+    try {
+      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
+        return;
+      }
+      deployer.deploy(artifact);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (deploymentLock.isHeldByCurrentThread()) {
+        deploymentLock.unlock();
+      }
+    }
+  }
+
+  @Override
+  public void deployArtifact(T artifact) throws DeploymentException {
+    try {
+      deploymentListener.onDeploymentStart(artifact.getArtifactName());
+      guardedDeploy(artifact);
+      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+      artifactZombieMap.remove(artifact.getArtifactName());
+    } catch (Throwable t) {
+      // error text has been created by the deployer already
+      String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
+      logger.error(msg, t);
+
+      addZombieApp(artifact);
+
+      deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+      if (t instanceof DeploymentException) {
+        throw (DeploymentException) t;
+      } else {
+        msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      }
+    }
+  }
+
+  private void addZombieApp(Artifact artifact) {
+    File resourceFile = artifact.getResourceFiles()[0];
+
+    if (resourceFile.exists()) {
+      try {
+        artifactZombieMap.put(artifact.getArtifactName(), new ZombieFile(resourceFile));
+      } catch (Exception e) {
+        // ignore resource
+      }
+    }
+  }
+
+  private void addZombieFile(String artifactName, File marker) {
+    // no sync required as deploy operations are single-threaded
+    if (marker == null) {
+      return;
     }
 
-    @Override
-    public void setArtifactFactory(final ArtifactFactory<T> artifactFactory)
-    {
-        this.artifactFactory = artifactFactory;
+    if (!marker.exists()) {
+      return;
     }
 
-    @Override
-    public void undeployArtifactWithoutUninstall(T artifact)
-    {
-        logRequestToUndeployArtifact(artifact);
-        try
-        {
-            if (!deploymentLock.tryLock(0, TimeUnit.SECONDS))
-            {
-                return;
-            }
+    try {
+      artifactZombieMap.put(artifactName, new ZombieFile(marker));
+    } catch (Exception e) {
+      logger.debug(String.format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
+    }
+  }
 
-            deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-            deployer.undeploy(artifact);
-            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-        }
-        catch (DeploymentException e)
-        {
-            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-            throw e;
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
-        finally
-        {
-            if (deploymentLock.isHeldByCurrentThread())
-            {
-                deploymentLock.unlock();
-            }
-        }
+  private T findArtifact(String artifactName) {
+    return (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+  }
+
+  private void trackArtifact(T artifact) {
+    preTrackArtifact(artifact);
+
+    artifacts.add(artifact);
+  }
+
+  public void preTrackArtifact(T artifact) {
+    T previousArtifact = findArtifact(artifact.getArtifactName());
+    artifacts.remove(previousArtifact);
+  }
+
+  private void undeploy(T artifact) {
+    logRequestToUndeployArtifact(artifact);
+    try {
+      deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+
+      artifacts.remove(artifact);
+      guardedUndeploy(artifact);
+
+      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+
+      logArtifactUndeployed(artifact);
+    } catch (RuntimeException e) {
+      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+      throw e;
+    }
+  }
+
+  private void logRequestToUndeployArtifact(T artifact) {
+    if (logger.isInfoEnabled()) {
+      logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
+    }
+  }
+
+  private void logArtifactUndeployed(T artifact) {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(String.format("Undeployed artifact '%s'", artifact.getArtifactName())));
+    }
+  }
+
+  private T guardedInstallFrom(URL artifactUrl) throws IOException {
+    try {
+      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
+        throw new IOException(ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS);
+      }
+      return installFrom(artifactUrl);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IOException(INSTALL_OPERATION_HAS_BEEN_INTERRUPTED);
+    } finally {
+      if (deploymentLock.isHeldByCurrentThread()) {
+        deploymentLock.unlock();
+      }
+    }
+  }
+
+  private T installFrom(URL url) throws IOException {
+    String artifactName = artifactArchiveInstaller.installArtifact(url);
+    return artifactFactory.createArtifact(artifactName);
+  }
+
+  private void guardedUndeploy(T artifact) {
+    try {
+      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
+        return;
+      }
+
+      deployer.undeploy(artifact);
+      artifactArchiveInstaller.desinstallArtifact(artifact.getArtifactName());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (deploymentLock.isHeldByCurrentThread()) {
+        deploymentLock.unlock();
+      }
+    }
+  }
+
+  @Override
+  public void redeploy(T artifact) throws DeploymentException {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
     }
 
-    ArtifactDeployer getDeployer()
-    {
-        return deployer;
+    deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+    try {
+      deployer.undeploy(artifact);
+      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+    } catch (Throwable e) {
+      // TODO make the exception better
+      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
     }
 
-    @Override
-    public void setDeploymentListener(CompositeDeploymentListener deploymentListener)
-    {
-        this.deploymentListener = deploymentListener;
+    deploymentListener.onDeploymentStart(artifact.getArtifactName());
+    try {
+      artifact = artifactFactory.createArtifact(artifact.getArtifactName());
+      trackArtifact(artifact);
+
+      deployer.deploy(artifact);
+      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+    } catch (Throwable t) {
+      try {
+        logDeploymentFailure(t, artifact.getArtifactName());
+        if (t instanceof DeploymentException) {
+          throw (DeploymentException) t;
+        }
+        String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      } finally {
+        deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+      }
     }
 
-    private T deployPackagedArtifact(final URL artifactUrl, String artifactName) throws IOException
-    {
-        ZombieFile zombieFile = artifactZombieMap.get(artifactName);
-        if (zombieFile != null)
-        {
-            if (zombieFile.isFor(artifactUrl) && !zombieFile.updatedZombieApp())
-            {
-                // Skips the file because it was already deployed with failure
-                return null;
-            }
-        }
+    artifactZombieMap.remove(artifact.getArtifactName());
+  }
 
-        // check if this artifact is running first, undeployArtifact it then
-        T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
-        if (artifact != null)
-        {
-            deploymentTemplate.preRedeploy(artifact);
-            undeployArtifact(artifactName);
-        }
+  private static class ZombieFile {
 
-        T deployedAtifact = deployPackagedArtifact(artifactUrl);
-        deploymentTemplate.postRedeploy(deployedAtifact);
-        return deployedAtifact;
+    URL url;
+    Long originalTimestamp;
+    File file;
+
+    private ZombieFile(File file) {
+      this.file = file;
+      originalTimestamp = file.lastModified();
+      try {
+        url = file.toURI().toURL();
+      } catch (MalformedURLException e) {
+        throw new IllegalArgumentException(e);
+      }
     }
 
-    private T deployExplodedApp(String addedApp) throws DeploymentException
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("================== New Exploded Artifact: " + addedApp);
-        }
-
-        T artifact;
-        try
-        {
-            artifact = artifactFactory.createArtifact(addedApp);
-
-            // add to the list of known artifacts first to avoid deployment loop on failure
-            trackArtifact(artifact);
-        }
-        catch (Throwable t)
-        {
-            final File artifactDir1 = artifactDir;
-            File artifactDir = new File(artifactDir1, addedApp);
-
-            addZombieFile(addedApp, artifactDir);
-
-            String msg = miniSplash(String.format("Failed to deploy exploded artifact: '%s', see below", addedApp));
-            logger.error(msg, t);
-
-            deploymentListener.onDeploymentFailure(addedApp, t);
-
-            if (t instanceof DeploymentException)
-            {
-                throw (DeploymentException) t;
-            }
-            else
-            {
-                msg = "Failed to deploy artifact: " + addedApp;
-                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-            }
-        }
-
-        deployArtifact(artifact);
-        return artifact;
+    public boolean isFor(URL url) {
+      return this.url.equals(url);
     }
 
-
-    private void guardedDeploy(T artifact)
-    {
-        try
-        {
-            if (!deploymentLock.tryLock(0, TimeUnit.SECONDS))
-            {
-                return;
-            }
-            deployer.deploy(artifact);
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
-        finally
-        {
-            if (deploymentLock.isHeldByCurrentThread())
-            {
-                deploymentLock.unlock();
-            }
-        }
+    public boolean updatedZombieApp() {
+      return originalTimestamp != file.lastModified();
     }
-
-    @Override
-    public void deployArtifact(T artifact) throws DeploymentException
-    {
-        try
-        {
-            deploymentListener.onDeploymentStart(artifact.getArtifactName());
-            guardedDeploy(artifact);
-            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-            artifactZombieMap.remove(artifact.getArtifactName());
-        }
-        catch (Throwable t)
-        {
-            // error text has been created by the deployer already
-            String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
-            logger.error(msg, t);
-
-            addZombieApp(artifact);
-
-            deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-            if (t instanceof DeploymentException)
-            {
-                throw (DeploymentException) t;
-            }
-            else
-            {
-                msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-            }
-        }
-    }
-
-    private void addZombieApp(Artifact artifact)
-    {
-        File resourceFile = artifact.getResourceFiles()[0];
-
-        if (resourceFile.exists())
-        {
-            try
-            {
-                artifactZombieMap.put(artifact.getArtifactName(), new ZombieFile(resourceFile));
-            }
-            catch (Exception e)
-            {
-                // ignore resource
-            }
-        }
-    }
-
-    private void addZombieFile(String artifactName, File marker)
-    {
-        // no sync required as deploy operations are single-threaded
-        if (marker == null)
-        {
-            return;
-        }
-
-        if (!marker.exists())
-        {
-            return;
-        }
-
-        try
-        {
-            artifactZombieMap.put(artifactName, new ZombieFile(marker));
-        }
-        catch (Exception e)
-        {
-            logger.debug(String.format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
-        }
-    }
-
-    private T findArtifact(String artifactName)
-    {
-        return (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
-    }
-
-    private void trackArtifact(T artifact)
-    {
-        preTrackArtifact(artifact);
-
-        artifacts.add(artifact);
-    }
-
-    public void preTrackArtifact(T artifact)
-    {
-        T previousArtifact = findArtifact(artifact.getArtifactName());
-        artifacts.remove(previousArtifact);
-    }
-
-    private void undeploy(T artifact)
-    {
-        logRequestToUndeployArtifact(artifact);
-        try
-        {
-            deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-
-            artifacts.remove(artifact);
-            guardedUndeploy(artifact);
-
-            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-
-            logArtifactUndeployed(artifact);
-        }
-        catch (RuntimeException e)
-        {
-            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-            throw e;
-        }
-    }
-
-    private void logRequestToUndeployArtifact(T artifact)
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
-        }
-    }
-
-    private void logArtifactUndeployed(T artifact)
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Undeployed artifact '%s'", artifact.getArtifactName())));
-        }
-    }
-
-    private T guardedInstallFrom(URL artifactUrl) throws IOException
-    {
-        try
-        {
-            if (!deploymentLock.tryLock(0, TimeUnit.SECONDS))
-            {
-                throw new IOException(ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS);
-            }
-            return installFrom(artifactUrl);
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-            throw new IOException(INSTALL_OPERATION_HAS_BEEN_INTERRUPTED);
-        }
-        finally
-        {
-            if (deploymentLock.isHeldByCurrentThread())
-            {
-                deploymentLock.unlock();
-            }
-        }
-    }
-
-    private T installFrom(URL url) throws IOException
-    {
-        String artifactName = artifactArchiveInstaller.installArtifact(url);
-        return artifactFactory.createArtifact(artifactName);
-    }
-
-    private void guardedUndeploy(T artifact)
-    {
-        try
-        {
-            if (!deploymentLock.tryLock(0, TimeUnit.SECONDS))
-            {
-                return;
-            }
-
-            deployer.undeploy(artifact);
-            artifactArchiveInstaller.desinstallArtifact(artifact.getArtifactName());
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
-        finally
-        {
-            if (deploymentLock.isHeldByCurrentThread())
-            {
-                deploymentLock.unlock();
-            }
-        }
-    }
-
-    @Override
-    public void redeploy(T artifact) throws DeploymentException
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
-        }
-
-        deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-        try
-        {
-            deployer.undeploy(artifact);
-            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-        }
-        catch (Throwable e)
-        {
-            // TODO make the exception better
-            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-        }
-
-        deploymentListener.onDeploymentStart(artifact.getArtifactName());
-        try
-        {
-            artifact = artifactFactory.createArtifact(artifact.getArtifactName());
-            trackArtifact(artifact);
-
-            deployer.deploy(artifact);
-            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-        }
-        catch (Throwable t)
-        {
-            try
-            {
-                logDeploymentFailure(t, artifact.getArtifactName());
-                if (t instanceof DeploymentException)
-                {
-                    throw (DeploymentException) t;
-                }
-                String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-            }
-            finally
-            {
-                deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-            }
-        }
-
-        artifactZombieMap.remove(artifact.getArtifactName());
-    }
-
-    private static class ZombieFile
-    {
-
-        URL url;
-        Long originalTimestamp;
-        File file;
-
-        private ZombieFile(File file)
-        {
-            this.file = file;
-            originalTimestamp = file.lastModified();
-            try
-            {
-                url = file.toURI().toURL();
-            }
-            catch (MalformedURLException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        public boolean isFor(URL url)
-        {
-            return this.url.equals(url);
-        }
-
-        public boolean updatedZombieApp()
-        {
-            return originalTimestamp != file.lastModified();
-        }
-    }
+  }
 }

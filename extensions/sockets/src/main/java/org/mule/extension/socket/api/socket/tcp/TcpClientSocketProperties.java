@@ -17,24 +17,22 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  * @since 4.0
  */
 @Extensible
-public class TcpClientSocketProperties extends AbstractTcpSocketProperties
-{
+public class TcpClientSocketProperties extends AbstractTcpSocketProperties {
 
-    /**
-     * Number of milliseconds to wait until an outbound connection to a remote server is successfully created.
-     * Defaults to 30 seconds.
-     */
-    @Parameter
-    @Optional(defaultValue = "30000")
-    @Placement(group = TIMEOUT_CONFIGURATION)
-    private int connectionTimeout = 30000;
+  /**
+   * Number of milliseconds to wait until an outbound connection to a remote server is successfully created. Defaults to 30
+   * seconds.
+   */
+  @Parameter
+  @Optional(defaultValue = "30000")
+  @Placement(group = TIMEOUT_CONFIGURATION)
+  private int connectionTimeout = 30000;
 
-    /**
-     * Number of milliseconds to wait until an outbound connection to a remote server is successfully created.
-     * Defaults to 30 seconds.
-     */
-    public int getConnectionTimeout()
-    {
-        return connectionTimeout;
-    }
+  /**
+   * Number of milliseconds to wait until an outbound connection to a remote server is successfully created. Defaults to 30
+   * seconds.
+   */
+  public int getConnectionTimeout() {
+    return connectionTimeout;
+  }
 }

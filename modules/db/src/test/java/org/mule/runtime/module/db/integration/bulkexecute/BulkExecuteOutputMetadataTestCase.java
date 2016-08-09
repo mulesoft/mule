@@ -26,37 +26,32 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkExecuteOutputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class BulkExecuteOutputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public BulkExecuteOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/bulkexecute/bulk-execute-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsUpdateCountsMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("bulkUpdateMetadata");
+  @Test
+  public void returnsUpdateCountsMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("bulkUpdateMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        BulkExecuteMessageProcessor bulkExecuteMessageProcessor = (BulkExecuteMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = bulkExecuteMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    BulkExecuteMessageProcessor bulkExecuteMessageProcessor = (BulkExecuteMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = bulkExecuteMessageProcessor.getOutputMetaData(null);
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
-        SimpleMetaDataModel elementModel = (SimpleMetaDataModel) listMetaDataModel.getElementModel();
-        assertThat(elementModel.getDataType(), equalTo(DataType.DOUBLE));
-    }
+    DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
+    SimpleMetaDataModel elementModel = (SimpleMetaDataModel) listMetaDataModel.getElementModel();
+    assertThat(elementModel.getDataType(), equalTo(DataType.DOUBLE));
+  }
 }

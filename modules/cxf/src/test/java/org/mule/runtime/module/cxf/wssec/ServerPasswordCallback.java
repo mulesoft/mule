@@ -17,20 +17,18 @@ import org.apache.ws.security.WSPasswordCallback;
 /**
  * Trivial security which simply returns the password for user "joe".
  */
-public class ServerPasswordCallback implements CallbackHandler
-{
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+public class ServerPasswordCallback implements CallbackHandler {
 
-        WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+  public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 
-        if (pc.getIdentifier().equals("joe")) 
-        {
-            // set the password on the callback. This will be compared to the
-            // password which was sent from the client.
-            pc.setPassword("secret");
-        }
+    WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+    if (pc.getIdentifier().equals("joe")) {
+      // set the password on the callback. This will be compared to the
+      // password which was sent from the client.
+      pc.setPassword("secret");
     }
+  }
 }
-
 
 

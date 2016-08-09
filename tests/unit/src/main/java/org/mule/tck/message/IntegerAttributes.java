@@ -8,24 +8,20 @@ package org.mule.tck.message;
 
 import org.mule.runtime.api.message.Attributes;
 
-public class IntegerAttributes implements Attributes
-{
+public class IntegerAttributes implements Attributes {
 
-    private int value;
+  private int value;
 
-    public IntegerAttributes(int value)
-    {
-        this.value = value;
-    }
+  public IntegerAttributes(int value) {
+    this.value = value;
+  }
 
-    public int getValue()
-    {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 
-    public void setValue(int value)
-    {
-        this.value = value;
-    }
+  public void setValue(int value) {
+    this.value = value;
+  }
 
 }

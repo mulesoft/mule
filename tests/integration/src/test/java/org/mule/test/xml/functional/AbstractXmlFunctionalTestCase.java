@@ -15,19 +15,17 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractXmlFunctionalTestCase extends AbstractIntegrationTestCase
-{
-    public static final long TIMEOUT = 3000L;
-    
-    protected String getConfigAsString() throws IOException
-    {
-        return getResourceAsString(getConfigFile());
-    }
+public abstract class AbstractXmlFunctionalTestCase extends AbstractIntegrationTestCase {
 
-    protected String getResourceAsString(String resource) throws IOException
-    {
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-        assertNotNull(resource, is);
-        return IOUtils.toString(is);
-    }
+  public static final long TIMEOUT = 3000L;
+
+  protected String getConfigAsString() throws IOException {
+    return getResourceAsString(getConfigFile());
+  }
+
+  protected String getResourceAsString(String resource) throws IOException {
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+    assertNotNull(resource, is);
+    return IOUtils.toString(is);
+  }
 }

@@ -11,19 +11,17 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 /**
  * Describes an artifact that is deployable on the container
  */
-public class DeployableArtifactDescriptor extends ArtifactDescriptor
-{
-    public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
+public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
-    private boolean redeploymentEnabled = true;
+  public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
 
-    public boolean isRedeploymentEnabled()
-    {
-        return redeploymentEnabled;
-    }
+  private boolean redeploymentEnabled = true;
 
-    public void setRedeploymentEnabled(boolean redeploymentEnabled)
-    {
-        this.redeploymentEnabled = redeploymentEnabled;
-    }
+  public boolean isRedeploymentEnabled() {
+    return redeploymentEnabled;
+  }
+
+  public void setRedeploymentEnabled(boolean redeploymentEnabled) {
+    this.redeploymentEnabled = redeploymentEnabled;
+  }
 }

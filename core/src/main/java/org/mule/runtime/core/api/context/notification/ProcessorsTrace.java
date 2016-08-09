@@ -16,14 +16,12 @@ import java.util.List;
  * 
  * @since 3.8.0
  */
-public interface ProcessorsTrace extends Serializable
-{
+public interface ProcessorsTrace extends Serializable {
 
-    /**
-     * @return the paths of the processors that were executed as part of flows that have already been completed, ordered
-     *         by time of execution, if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. Empty list
-     *         otherwise.
-     */
-    List<String> getExecutedProcessors();
+  /**
+   * @return the paths of the processors that were executed as part of flows that have already been completed, ordered by time of
+   *         execution, if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. Empty list otherwise.
+   */
+  List<String> getExecutedProcessors();
 
 }

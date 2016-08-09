@@ -15,57 +15,51 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.junit.Test;
 
 /**
- * Test the propagation of a property in different scopes and in synchronous vs.
- * asynchronous flows.
+ * Test the propagation of a property in different scopes and in synchronous vs. asynchronous flows.
  */
-public class PropertyScopesTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/property-scopes.xml";
-    }
+public class PropertyScopesTestCase extends FunctionalTestCase {
 
-    @Test
-    public void noPropagationOfInboundScopeSynchronous() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addInboundProperty("foo", "bar").build();
-        MuleMessage response = client.send("vm://in-synch", message);
-        assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vm/property-scopes.xml";
+  }
 
-    @Test
-    public void noPropagationOfOutboundScopeSynchronous() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-        MuleMessage response = client.send("vm://in-synch", message);
-        assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
-    }
+  @Test
+  public void noPropagationOfInboundScopeSynchronous() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addInboundProperty("foo", "bar").build();
+    MuleMessage response = client.send("vm://in-synch", message);
+    assertNotNull(response);
+    assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
+  }
 
-    @Test
-    public void noPropagationOfInboundScopeAsynchronous() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-        client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
-    }
+  @Test
+  public void noPropagationOfOutboundScopeSynchronous() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    MuleMessage response = client.send("vm://in-synch", message);
+    assertNotNull(response);
+    assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
+  }
 
-    @Test
-    public void noPropagationOfOutboundScopeAsynchronous() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-        client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
-    }
+  @Test
+  public void noPropagationOfInboundScopeAsynchronous() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    client.dispatch("vm://in-asynch", message);
+    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
+  }
+
+  @Test
+  public void noPropagationOfOutboundScopeAsynchronous() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    client.dispatch("vm://in-asynch", message);
+    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
+  }
 
 }

@@ -13,34 +13,33 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase
-{
+public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase {
 
-    public static final String SINGLE_TENANT_OAUTH_CONFIG = "oauthConfig";
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  public static final String SINGLE_TENANT_OAUTH_CONFIG = "oauthConfig";
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "authorization-code/authorization-code-refresh-token-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "authorization-code/authorization-code-refresh-token-config.xml";
+  }
 
-    @Test
-    public void afterFailureDoRefreshTokenWithDefaultValueNoResourceOwnerId() throws Exception
-    {
-        executeRefreshToken("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403);
-    }
+  @Test
+  public void afterFailureDoRefreshTokenWithDefaultValueNoResourceOwnerId() throws Exception {
+    executeRefreshToken("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403);
+  }
 
-    /**
-     * Refresh token is optional therefore this test will validate an scenario where the access_token is invalid and refresh_token
-     * provided in previous token access has been revoked so a {@link ResponseValidatorException} should be thrown.
-     * @throws Exception
-     */
-    @Test
-    public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception
-    {
-        expectedException.expect(ResponseValidatorException.class);
-        executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403, 400);
-    }
+  /**
+   * Refresh token is optional therefore this test will validate an scenario where the access_token is invalid and refresh_token
+   * provided in previous token access has been revoked so a {@link ResponseValidatorException} should be thrown.
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception {
+    expectedException.expect(ResponseValidatorException.class);
+    executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers("testFlow", SINGLE_TENANT_OAUTH_CONFIG,
+                                                                        ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403,
+                                                                        400);
+  }
 }

@@ -19,34 +19,32 @@ import java.util.Map;
 /**
  * Builds {@link ResultSet} representing stored procedure columns
  */
-public class StoredProcedureColumnTypesBuilder
-{
+public class StoredProcedureColumnTypesBuilder {
 
-    private final ResultSetBuilder resultSetBuilder;
+  private final ResultSetBuilder resultSetBuilder;
 
-    public StoredProcedureColumnTypesBuilder()
-    {
-        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
-        columns.add(new ColumnMetadata(StoredProcedureParamTypeResolverTestCase.TYPE_COLUMN, StoredProcedureParamTypeResolver.TYPE_ID_COLUMN_INDEX));
-        columns.add(new ColumnMetadata(StoredProcedureParamTypeResolverTestCase.NAME_COLUMN, StoredProcedureParamTypeResolver.TYPE_NAME_COLUMN_INDEX));
+  public StoredProcedureColumnTypesBuilder() {
+    List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
+    columns.add(new ColumnMetadata(StoredProcedureParamTypeResolverTestCase.TYPE_COLUMN,
+                                   StoredProcedureParamTypeResolver.TYPE_ID_COLUMN_INDEX));
+    columns.add(new ColumnMetadata(StoredProcedureParamTypeResolverTestCase.NAME_COLUMN,
+                                   StoredProcedureParamTypeResolver.TYPE_NAME_COLUMN_INDEX));
 
-        resultSetBuilder = new ResultSetBuilder(columns);
-    }
+    resultSetBuilder = new ResultSetBuilder(columns);
+  }
 
-    public StoredProcedureColumnTypesBuilder with(TypeMetadata type)
-    {
+  public StoredProcedureColumnTypesBuilder with(TypeMetadata type) {
 
-        Map<String, Object> typeRecord = new HashMap<String, Object>();
-        typeRecord.put(StoredProcedureParamTypeResolverTestCase.TYPE_COLUMN, type.getId());
-        typeRecord.put(StoredProcedureParamTypeResolverTestCase.NAME_COLUMN, type.getName());
+    Map<String, Object> typeRecord = new HashMap<String, Object>();
+    typeRecord.put(StoredProcedureParamTypeResolverTestCase.TYPE_COLUMN, type.getId());
+    typeRecord.put(StoredProcedureParamTypeResolverTestCase.NAME_COLUMN, type.getName());
 
-        resultSetBuilder.with(typeRecord);
+    resultSetBuilder.with(typeRecord);
 
-        return this;
-    }
+    return this;
+  }
 
-    public ResultSet build()
-    {
-        return resultSetBuilder.build();
-    }
+  public ResultSet build() {
+    return resultSetBuilder.build();
+  }
 }

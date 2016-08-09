@@ -10,19 +10,17 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * Exception type that represents a failure when there's no {@link ConnectivityTestingService}
- * that can do connectivity testing over a provided component
+ * Exception type that represents a failure when there's no {@link ConnectivityTestingService} that can do connectivity testing
+ * over a provided component
  *
  * @since 4.0
  */
-public class UnsupportedConnectivityTestingObjectException extends MuleRuntimeException
-{
+public class UnsupportedConnectivityTestingObjectException extends MuleRuntimeException {
 
-    /**
-     * {@inheritDoc}
-     */
-    public UnsupportedConnectivityTestingObjectException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public UnsupportedConnectivityTestingObjectException(Message message) {
+    super(message);
+  }
 }

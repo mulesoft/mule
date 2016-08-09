@@ -14,24 +14,22 @@ import java.sql.SQLException;
 /**
  * Creates database connections
  */
-public interface DbConnectionFactory
-{
+public interface DbConnectionFactory {
 
-    /**
-     * Creates a connection with a given {@link TransactionalAction}
-     *
-     * @param transactionalAction indicates whether or not the factory should
-     *                            look at active transactions in order to lookup
-     *                            for already created connections
-     * @return a connection for the given {@link TransactionalAction}
-     * @throws SQLException when not able to obtain a new connection
-     */
-    DbConnection createConnection(TransactionalAction transactionalAction) throws SQLException;
+  /**
+   * Creates a connection with a given {@link TransactionalAction}
+   *
+   * @param transactionalAction indicates whether or not the factory should look at active transactions in order to lookup for
+   *        already created connections
+   * @return a connection for the given {@link TransactionalAction}
+   * @throws SQLException when not able to obtain a new connection
+   */
+  DbConnection createConnection(TransactionalAction transactionalAction) throws SQLException;
 
-    /**
-     * Indicates that the connection  is not used anymore
-     *
-     * @param connection connection to release
-     */
-    void releaseConnection(DbConnection connection);
+  /**
+   * Indicates that the connection is not used anymore
+   *
+   * @param connection connection to release
+   */
+  void releaseConnection(DbConnection connection);
 }

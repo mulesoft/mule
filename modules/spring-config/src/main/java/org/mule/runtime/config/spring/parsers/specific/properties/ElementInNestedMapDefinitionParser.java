@@ -13,27 +13,20 @@ import org.mule.runtime.config.spring.parsers.delegate.AbstractSingleParentFamil
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 
 /**
- * This constructs a nested map - keyed by "mapKey" - and then adds an entry in that
- * named from the attribute "keyAttribute".  Child elements can then set a value (or
- * values, if it is a collection) on {@link org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner#VALUE}
+ * This constructs a nested map - keyed by "mapKey" - and then adds an entry in that named from the attribute "keyAttribute".
+ * Child elements can then set a value (or values, if it is a collection) on
+ * {@link org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner#VALUE}
  */
-public class ElementInNestedMapDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-{
+public class ElementInNestedMapDefinitionParser extends AbstractSingleParentFamilyDefinitionParser {
 
-    public ElementInNestedMapDefinitionParser(String mapSetter, String mapKey, String keyAttribute)
-    {
-        // children (parameters) want to append to the inner map, not the outer one
-        setReturnFirstResult(false);
-        addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
-                .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, mapKey))
-                .addCollection(mapSetter)
-                .setIgnoredDefault(true)
-                .removeIgnored(MapEntryCombiner.KEY)
-                .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addChildDelegate(new ChildSingletonMapDefinitionParser(MapEntryCombiner.VALUE))
-                .addAlias(keyAttribute, MapEntryCombiner.KEY)
-                .addCollection(MapEntryCombiner.VALUE)
-                .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-    }
+  public ElementInNestedMapDefinitionParser(String mapSetter, String mapKey, String keyAttribute) {
+    // children (parameters) want to append to the inner map, not the outer one
+    setReturnFirstResult(false);
+    addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
+        .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, mapKey)).addCollection(mapSetter).setIgnoredDefault(true)
+        .removeIgnored(MapEntryCombiner.KEY).addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addChildDelegate(new ChildSingletonMapDefinitionParser(MapEntryCombiner.VALUE)).addAlias(keyAttribute, MapEntryCombiner.KEY)
+        .addCollection(MapEntryCombiner.VALUE).addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+  }
 
 }

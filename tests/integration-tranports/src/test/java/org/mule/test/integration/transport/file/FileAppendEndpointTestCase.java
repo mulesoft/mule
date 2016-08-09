@@ -15,34 +15,31 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
-{
+public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml";
+  }
 
-    @Override
-    @Test
-    public void testBasic() throws Exception
-    {
-        File myDir = FileUtils.newFile(OUTPUT_DIR);
+  @Override
+  @Test
+  public void testBasic() throws Exception {
+    File myDir = FileUtils.newFile(OUTPUT_DIR);
 
-        // output directory may not exist before dispatching to the endpoint with
-        // invalid
-        // configuration
-        File outputFile = FileUtils.newFile(myDir, OUTPUT_FILE);
-        assertFalse(outputFile.exists());
+    // output directory may not exist before dispatching to the endpoint with
+    // invalid
+    // configuration
+    File outputFile = FileUtils.newFile(myDir, OUTPUT_FILE);
+    assertFalse(outputFile.exists());
 
-        // this should throw java.lang.IllegalArgumentException: Configuring
-        // 'outputAppend' on a
-        // file endpoint is no longer supported. You may configure it on a file
-        // connector instead.
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://fileappend", "Hello1", null);
+    // this should throw java.lang.IllegalArgumentException: Configuring
+    // 'outputAppend' on a
+    // file endpoint is no longer supported. You may configure it on a file
+    // connector instead.
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://fileappend", "Hello1", null);
 
-        assertFalse(outputFile.exists());
-    }
+    assertFalse(outputFile.exists());
+  }
 }

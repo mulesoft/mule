@@ -14,14 +14,13 @@ import java.util.List;
 /**
  * Provides access to the services available in the container.
  */
-public interface ServiceRepository
-{
+public interface ServiceRepository {
 
-    /**
-     * Provides access to the services available in the container.
-     *
-     * @return a non null list of services.
-     */
-    List<Service> getServices();
+  /**
+   * Provides access to the services available in the container.
+   *
+   * @return a non null list of services.
+   */
+  List<Service> getServices();
 
 }

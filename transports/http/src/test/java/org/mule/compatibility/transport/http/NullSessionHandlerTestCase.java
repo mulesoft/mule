@@ -19,25 +19,23 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Session properties are not supported anymore")
-public class NullSessionHandlerTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+public class NullSessionHandlerTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "null-session-handler-config.xml";
-    }
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Test
-    public void verifiesNoMuleSessionHeader() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "null-session-handler-config.xml";
+  }
 
-        client.dispatch("vm://testInput", TEST_MESSAGE, null);
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+  @Test
+  public void verifiesNoMuleSessionHeader() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        assertNotNull("Message was filtered", response);
-    }
+    client.dispatch("vm://testInput", TEST_MESSAGE, null);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+
+    assertNotNull("Message was filtered", response);
+  }
 }

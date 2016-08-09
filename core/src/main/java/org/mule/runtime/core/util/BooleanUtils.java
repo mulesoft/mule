@@ -9,7 +9,6 @@ package org.mule.runtime.core.util;
 /**
  * <code>BoleanUtils</code> provides visibility to functions from plugins
  */
-public class BooleanUtils extends org.apache.commons.lang.BooleanUtils
-{
+public class BooleanUtils extends org.apache.commons.lang.BooleanUtils {
 
 }

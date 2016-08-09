@@ -28,47 +28,43 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ValidationPhaseTestCase extends AbstractMuleContextTestCase
-{
+public class ValidationPhaseTestCase extends AbstractMuleContextTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ValidationPhaseTemplate mockTemplate;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessContext mockContext;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private PhaseResultNotifier mockPhaseResultNotifier;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleException mockMulException;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ValidationPhaseTemplate mockTemplate;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessContext mockContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private PhaseResultNotifier mockPhaseResultNotifier;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleException mockMulException;
 
-    @Test
-    public void supportsTemplate()
-    {
-        new PhaseSupportTestHelper<ValidationPhaseTemplate>(ValidationPhaseTemplate.class).testSupportTemplates(new ValidationPhase());
-    }
+  @Test
+  public void supportsTemplate() {
+    new PhaseSupportTestHelper<ValidationPhaseTemplate>(ValidationPhaseTemplate.class)
+        .testSupportTemplates(new ValidationPhase());
+  }
 
-    @Test
-    public void valid()
-    {
-        when(mockTemplate.validateMessage()).thenReturn(true);
-        new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
-        verify(mockPhaseResultNotifier, Mockito.times(1)).phaseSuccessfully();
-    }
+  @Test
+  public void valid() {
+    when(mockTemplate.validateMessage()).thenReturn(true);
+    new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
+    verify(mockPhaseResultNotifier, Mockito.times(1)).phaseSuccessfully();
+  }
 
-    @Test
-    public void invalid() throws Exception
-    {
-        when(mockTemplate.validateMessage()).thenReturn(false);
-        new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
-        verify(mockTemplate,times(1)).discardInvalidMessage();
-        verify(mockPhaseResultNotifier, Mockito.times(1)).phaseConsumedMessage();
-    }
+  @Test
+  public void invalid() throws Exception {
+    when(mockTemplate.validateMessage()).thenReturn(false);
+    new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
+    verify(mockTemplate, times(1)).discardInvalidMessage();
+    verify(mockPhaseResultNotifier, Mockito.times(1)).phaseConsumedMessage();
+  }
 
-    @Test
-    public void validationFails() throws Exception
-    {
-        when(mockTemplate.validateMessage()).thenReturn(false);
-        doThrow(mockMulException).when(mockTemplate).discardInvalidMessage();
-        new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
-        verify(mockPhaseResultNotifier, Mockito.times(1)).phaseFailure(mockMulException);
-    }
+  @Test
+  public void validationFails() throws Exception {
+    when(mockTemplate.validateMessage()).thenReturn(false);
+    doThrow(mockMulException).when(mockTemplate).discardInvalidMessage();
+    new ValidationPhase().runPhase(mockTemplate, mockContext, mockPhaseResultNotifier);
+    verify(mockPhaseResultNotifier, Mockito.times(1)).phaseFailure(mockMulException);
+  }
 }

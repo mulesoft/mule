@@ -8,25 +8,24 @@ package org.mule.runtime.core.api.processor;
 
 import java.util.List;
 
-public interface MessageProcessorPathElement
-{
+public interface MessageProcessorPathElement {
 
 
-    public MessageProcessorPathElement getParent();
+  public MessageProcessorPathElement getParent();
 
-    public void setParent(MessageProcessorPathElement parent);
+  public void setParent(MessageProcessorPathElement parent);
 
-    public List<MessageProcessorPathElement> getChildren();
+  public List<MessageProcessorPathElement> getChildren();
 
-    public MessageProcessorPathElement addChild(MessageProcessor mp);
+  public MessageProcessorPathElement addChild(MessageProcessor mp);
 
-    public MessageProcessorPathElement addChild(String name);
+  public MessageProcessorPathElement addChild(String name);
 
-    public MessageProcessor getMessageProcessor();
+  public MessageProcessor getMessageProcessor();
 
-    public String getName();
+  public String getName();
 
-    public String getPath();
+  public String getPath();
 
 
 }

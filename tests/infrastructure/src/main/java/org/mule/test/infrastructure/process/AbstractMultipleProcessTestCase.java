@@ -13,13 +13,11 @@ import org.mule.tck.size.LargeTest;
 /**
  * Base test case class for creating a multi-process test case.
  */
-public abstract class AbstractMultipleProcessTestCase extends AbstractMuleContextTestCase
-{
+public abstract class AbstractMultipleProcessTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return TestUtils.getTimeout(120);
-    }
+  @Override
+  public int getTestTimeoutSecs() {
+    return TestUtils.getTimeout(120);
+  }
 
 }

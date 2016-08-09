@@ -9,15 +9,13 @@ package org.mule.runtime.core.work;
 import org.mule.runtime.core.api.context.WorkManager;
 
 /**
- * Provides a reference to a WorkManager making the client agnostic
- * of the WorkManager lifecycle.
+ * Provides a reference to a WorkManager making the client agnostic of the WorkManager lifecycle.
  */
-public interface WorkManagerHolder
-{
+public interface WorkManagerHolder {
 
-    /**
-     * @return work manager that is ready to use.
-     */
-    WorkManager getWorkManager();
+  /**
+   * @return work manager that is ready to use.
+   */
+  WorkManager getWorkManager();
 
 }

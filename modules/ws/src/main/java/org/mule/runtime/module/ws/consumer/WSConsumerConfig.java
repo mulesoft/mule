@@ -28,149 +28,128 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.ws.security.WSSecurity;
 
-public class WSConsumerConfig implements MuleContextAware
-{
+public class WSConsumerConfig implements MuleContextAware {
 
-    private MuleContext muleContext;
-    private String name;
-    private String wsdlLocation;
-    private String service;
-    private String port;
-    private String serviceAddress;
-    private LegacyConnector connector;
-    private HttpRequesterConfig connectorConfig;
-    private WSSecurity security;
+  private MuleContext muleContext;
+  private String name;
+  private String wsdlLocation;
+  private String service;
+  private String port;
+  private String serviceAddress;
+  private LegacyConnector connector;
+  private HttpRequesterConfig connectorConfig;
+  private WSSecurity security;
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  /**
+   * Creates an outbound endpoint for the service address.
+   */
+  public MessageProcessor createOutboundMessageProcessor() throws MuleException {
+    Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
+
+    if (connectorConfig != null && connector != null) {
+      throw new ConfigurationException(CoreMessages
+          .createStaticMessage("Cannot set both connector-config and connector-ref attributes. Set either one of them, or none for default behavior."));
     }
 
-    /**
-     * Creates an outbound endpoint for the service address.
-     */
-    public MessageProcessor createOutboundMessageProcessor() throws MuleException
-    {
-        Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
+    // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
+    return createHttpRequester();
+  }
 
-        if (connectorConfig != null && connector != null)
-        {
-            throw new ConfigurationException(CoreMessages.createStaticMessage("Cannot set both connector-config and connector-ref attributes. Set either one of them, or none for default behavior."));
+  private MessageProcessor createHttpRequester() throws MuleException {
+    return new MessageProcessor() {
+
+      private HttpRequestOptions requestOptions;
+
+      @Override
+      public MuleEvent process(MuleEvent event) throws MuleException {
+        ConnectorOperationLocator connectorOperationLocator =
+            muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
+        MessageProcessor messageProcessor =
+            connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
+        return messageProcessor.process(event);
+      }
+
+      private HttpRequestOptions getRequestOptions() {
+        if (requestOptions == null) {
+          final HttpRequestOptionsBuilder builder =
+              newOptions().method(POST.name()).disableStatusCodeValidation().disableParseResponse();
+          if (connectorConfig != null) {
+            builder.requestConfig(connectorConfig);
+          }
+          requestOptions = builder.build();
         }
+        return requestOptions;
+      }
+    };
+  }
 
-        // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
-        return createHttpRequester();
-    }
+  public String getName() {
+    return name;
+  }
 
-    private MessageProcessor createHttpRequester() throws MuleException
-    {
-        return new MessageProcessor()
-        {
-            private HttpRequestOptions requestOptions;
+  public void setName(String name) {
+    this.name = name;
+  }
 
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                ConnectorOperationLocator connectorOperationLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
-                MessageProcessor messageProcessor = connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
-                return messageProcessor.process(event);
-            }
+  public String getWsdlLocation() {
+    return wsdlLocation;
+  }
 
-            private HttpRequestOptions getRequestOptions()
-            {
-                if (requestOptions == null)
-                {
-                    final HttpRequestOptionsBuilder builder = newOptions().method(POST.name()).disableStatusCodeValidation().disableParseResponse();
-                    if (connectorConfig != null)
-                    {
-                        builder.requestConfig(connectorConfig);
-                    }
-                    requestOptions = builder.build();
-                }
-                return requestOptions;
-            }
-        };
-    }
+  public void setWsdlLocation(String wsdlLocation) {
+    this.wsdlLocation = wsdlLocation;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getService() {
+    return service;
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public void setService(String service) {
+    this.service = service;
+  }
 
-    public String getWsdlLocation()
-    {
-        return wsdlLocation;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public void setWsdlLocation(String wsdlLocation)
-    {
-        this.wsdlLocation = wsdlLocation;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 
-    public String getService()
-    {
-        return service;
-    }
+  public String getServiceAddress() {
+    return serviceAddress;
+  }
 
-    public void setService(String service)
-    {
-        this.service = service;
-    }
+  public void setServiceAddress(String serviceAddress) {
+    this.serviceAddress = serviceAddress;
+  }
 
-    public String getPort()
-    {
-        return port;
-    }
+  public LegacyConnector getConnector() {
+    return connector;
+  }
 
-    public void setPort(String port)
-    {
-        this.port = port;
-    }
+  public void setConnector(LegacyConnector connector) {
+    this.connector = connector;
+  }
 
-    public String getServiceAddress()
-    {
-        return serviceAddress;
-    }
+  public HttpRequesterConfig getConnectorConfig() {
+    return connectorConfig;
+  }
 
-    public void setServiceAddress(String serviceAddress)
-    {
-        this.serviceAddress = serviceAddress;
-    }
+  public void setConnectorConfig(HttpRequesterConfig connectorConfig) {
+    this.connectorConfig = connectorConfig;
+  }
 
-    public LegacyConnector getConnector()
-    {
-        return connector;
-    }
+  public WSSecurity getSecurity() {
+    return security;
+  }
 
-    public void setConnector(LegacyConnector connector)
-    {
-        this.connector = connector;
-    }
-
-    public HttpRequesterConfig getConnectorConfig()
-    {
-        return connectorConfig;
-    }
-
-    public void setConnectorConfig(HttpRequesterConfig connectorConfig)
-    {
-        this.connectorConfig = connectorConfig;
-    }
-
-    public WSSecurity getSecurity()
-    {
-        return security;
-    }
-
-    public void setSecurity(WSSecurity security)
-    {
-        this.security = security;
-    }
+  public void setSecurity(WSSecurity security) {
+    this.security = security;
+  }
 
 }

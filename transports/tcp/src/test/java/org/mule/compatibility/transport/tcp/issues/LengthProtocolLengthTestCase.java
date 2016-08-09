@@ -20,70 +20,56 @@ import java.util.Arrays;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class LengthProtocolLengthTestCase extends FunctionalTestCase
-{
+public class LengthProtocolLengthTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "length-protocol-length-test-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "length-protocol-length-test-flow.xml";
+  }
+
+  @Test
+  public void testLength() throws Exception {
+    doTest("length", 5, true);
+    doTest("length", 15, false);
+  }
+
+  @Test
+  public void testSafe() throws Exception {
+    doTest("safe", 5, true);
+    doTest("safe", 15, false);
+  }
+
+  protected void doTest(String endpoint, int length, boolean ok) throws Exception {
+    byte[] message = new byte[length];
+    for (int i = 0; i < length; ++i) {
+      message[i] = (byte) (i % 255);
     }
 
-    @Test
-    public void testLength() throws Exception
-    {
-        doTest("length", 5, true);
-        doTest("length", 15, false);
+    MuleClient client = muleContext.getClient();
+    if (ok) {
+      MuleMessage response = client.send(endpoint, message, null);
+      assertNotNull(response);
+      assertNotNull(response.getPayload());
+      assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
+    } else {
+      assertResponseBad(client.send(endpoint, message, null));
     }
+  }
 
-    @Test
-    public void testSafe() throws Exception
-    {
-        doTest("safe", 5, true);
-        doTest("safe", 15, false);
+  protected void assertResponseBad(MuleMessage message) {
+    try {
+      if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received")) {
+        fail("expected error");
+      }
+    } catch (Exception e) {
+      // expected
     }
-
-    protected void doTest(String endpoint, int length, boolean ok) throws Exception
-    {
-        byte[] message = new byte[length];
-        for (int i = 0; i < length; ++i)
-        {
-            message[i] = (byte)(i % 255);
-        }
-
-        MuleClient client = muleContext.getClient();
-        if (ok)
-        {
-            MuleMessage response = client.send(endpoint, message, null);
-            assertNotNull(response);
-            assertNotNull(response.getPayload());
-            assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
-        }
-        else
-        {
-            assertResponseBad(client.send(endpoint, message, null));
-        }
-    }
-
-    protected void assertResponseBad(MuleMessage message)
-    {
-        try
-        {
-            if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received"))
-            {
-                fail("expected error");
-            }
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-    }
+  }
 
 }

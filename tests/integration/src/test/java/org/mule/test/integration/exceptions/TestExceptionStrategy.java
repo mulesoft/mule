@@ -10,23 +10,20 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
-public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
-{
-    public TestExceptionStrategy()
-    {
-        super(null);
-    }
-    
-    @Override
-    public MuleEvent handleException(Exception exception, MuleEvent event)
-    {
-        MuleEvent result = super.handleException(exception, event);
-        result.setMessage(MuleMessage.builder(result.getMessage()).payload("Ka-boom!").build());
-        return result;
-    }
+public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
-    public boolean isRedeliver()
-    {
-        return false;
-    }
+  public TestExceptionStrategy() {
+    super(null);
+  }
+
+  @Override
+  public MuleEvent handleException(Exception exception, MuleEvent event) {
+    MuleEvent result = super.handleException(exception, event);
+    result.setMessage(MuleMessage.builder(result.getMessage()).payload("Ka-boom!").build());
+    return result;
+  }
+
+  public boolean isRedeliver() {
+    return false;
+  }
 }

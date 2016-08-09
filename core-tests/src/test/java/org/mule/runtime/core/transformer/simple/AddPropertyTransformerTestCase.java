@@ -18,36 +18,30 @@ import org.mule.tck.size.SmallTest;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
-public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
-{
+public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase {
 
-    public AddPropertyTransformerTestCase()
-    {
-        super(new AddPropertyTransformer());
-    }
+  public AddPropertyTransformerTestCase() {
+    super(new AddPropertyTransformer());
+  }
 
-    @Override
-    protected void verifyAdded(MuleEvent event, String key, String value)
-    {
-        assertThat(event.getMessage().getOutboundProperty(key), is(value));
-    }
+  @Override
+  protected void verifyAdded(MuleEvent event, String key, String value) {
+    assertThat(event.getMessage().getOutboundProperty(key), is(value));
+  }
 
-    @Override
-    protected void verifyNotAdded(MuleEvent event)
-    {
-        assertThat(event.getMessage().getOutboundPropertyNames(), empty());
-    }
+  @Override
+  protected void verifyNotAdded(MuleEvent event) {
+    assertThat(event.getMessage().getOutboundPropertyNames(), empty());
+  }
 
-    @Override
-    protected void verifyRemoved(MuleEvent event, String key)
-    {
-        assertThat(event.getMessage().getOutboundProperty(key), is(nullValue()));
-    }
+  @Override
+  protected void verifyRemoved(MuleEvent event, String key) {
+    assertThat(event.getMessage().getOutboundProperty(key), is(nullValue()));
+  }
 
-    @Override
-    protected DataType getVariableDataType(MuleEvent event, String key)
-    {
-        return event.getMessage().getOutboundPropertyDataType(key);
-    }
+  @Override
+  protected DataType getVariableDataType(MuleEvent event, String key) {
+    return event.getMessage().getOutboundPropertyDataType(key);
+  }
 
 }

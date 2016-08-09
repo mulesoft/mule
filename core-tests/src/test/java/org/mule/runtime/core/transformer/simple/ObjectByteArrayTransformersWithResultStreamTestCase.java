@@ -11,27 +11,22 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class ObjectByteArrayTransformersWithResultStreamTestCase extends
-    ObjectByteArrayTransformersWithObjectsTestCase
-{
+public class ObjectByteArrayTransformersWithResultStreamTestCase extends ObjectByteArrayTransformersWithObjectsTestCase {
 
-    @Override
-    public Object getResultData()
-    {
-        byte[] resultData = (byte[])super.getResultData();
-        return new ByteArrayInputStream(resultData);
-    }
+  @Override
+  public Object getResultData() {
+    byte[] resultData = (byte[]) super.getResultData();
+    return new ByteArrayInputStream(resultData);
+  }
 
-    @Override
-    public boolean compareResults(Object expected, Object result)
-    {
-        if (expected instanceof InputStream)
-        {
-            InputStream input = (InputStream)expected;
-            byte[] bytes = IOUtils.toByteArray(input);
-            return super.compareResults(bytes, result);
-        }
-        return super.compareResults(expected, result);
+  @Override
+  public boolean compareResults(Object expected, Object result) {
+    if (expected instanceof InputStream) {
+      InputStream input = (InputStream) expected;
+      byte[] bytes = IOUtils.toByteArray(input);
+      return super.compareResults(bytes, result);
     }
+    return super.compareResults(expected, result);
+  }
 
 }

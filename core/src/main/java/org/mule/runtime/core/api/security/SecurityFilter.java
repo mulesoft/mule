@@ -11,23 +11,21 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
- * <code>SecurityFilter</code> is a base filter for secure filtering of
- * inbound and outbound event flow.
+ * <code>SecurityFilter</code> is a base filter for secure filtering of inbound and outbound event flow.
  */
-public interface SecurityFilter extends Initialisable
-{
-    /**
-     * @param manager
-     */
-    void setSecurityManager(SecurityManager manager);
+public interface SecurityFilter extends Initialisable {
 
-    SecurityManager getSecurityManager();
+  /**
+   * @param manager
+   */
+  void setSecurityManager(SecurityManager manager);
 
-    String getSecurityProviders();
+  SecurityManager getSecurityManager();
 
-    void setSecurityProviders(String providers);
-    
-    void doFilter(MuleEvent event)
-            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
+  String getSecurityProviders();
+
+  void setSecurityProviders(String providers);
+
+  void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+      SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

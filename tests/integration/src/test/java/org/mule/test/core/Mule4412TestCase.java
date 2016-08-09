@@ -18,110 +18,91 @@ import org.mule.test.filters.FilterCounter;
 import org.junit.Test;
 
 /**
- * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the
- * filter is only applied once in the positive case, plus make sure it doesn't get
- * filtered at all when the message does not meet the filter criteria
+ * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the filter is only applied once in the positive
+ * case, plus make sure it doesn't get filtered at all when the message does not meet the filter criteria
  */
-public class Mule4412TestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-4412-flow.xml";
-    }
+public class Mule4412TestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        // reset the counter for every test
-        FilterCounter.counter.set(0);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-4412-flow.xml";
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        // reset the counter for every test
-        FilterCounter.counter.set(0);
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    // reset the counter for every test
+    FilterCounter.counter.set(0);
+  }
 
-    /**
-     * Make sure that the message only gets filtered once
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testFilterOnce() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("AsyncRequest").withPayload(TEST_MESSAGE)
-                                  .withInboundProperty("pass", "true")
-                                  .asynchronously()
-                                  .run();
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    // reset the counter for every test
+    FilterCounter.counter.set(0);
+  }
 
-        MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
-        int times = FilterCounter.counter.get();
-        assertThat("did not filter one time as expected", times, is(1));
-        assertNotNull(reply);
-        assertThat("wrong message received", getPayloadAsString(reply), is(TEST_MESSAGE));
-        assertThat("'pass' property value not correct", reply.getInboundProperty("pass"), is("true"));
+  /**
+   * Make sure that the message only gets filtered once
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testFilterOnce() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).withInboundProperty("pass", "true").asynchronously().run();
 
-        // make sure there are no more messages
-        assertNull(client.request("test://asyncResponse", RECEIVE_TIMEOUT));
-    }
+    MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+    int times = FilterCounter.counter.get();
+    assertThat("did not filter one time as expected", times, is(1));
+    assertNotNull(reply);
+    assertThat("wrong message received", getPayloadAsString(reply), is(TEST_MESSAGE));
+    assertThat("'pass' property value not correct", reply.getInboundProperty("pass"), is("true"));
 
-    /**
-     * Make sure the message does not get filtered when the property key is incorrect
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testWrongPropertyKey() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("AsyncRequest").withPayload(TEST_MESSAGE)
-                                  .withInboundProperty("fail", "true")
-                                  .asynchronously()
-                                  .run();
-        MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
-        assertNull(reply);
-        assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
-    }
+    // make sure there are no more messages
+    assertNull(client.request("test://asyncResponse", RECEIVE_TIMEOUT));
+  }
 
-    /**
-     * Make sure the message does not get filtered when the property value is not as
-     * expected
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testWrongPropertyValue() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("AsyncRequest").withPayload(TEST_MESSAGE)
-                                  .withInboundProperty("pass", "false")
-                                  .asynchronously()
-                                  .run();
+  /**
+   * Make sure the message does not get filtered when the property key is incorrect
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testWrongPropertyKey() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).withInboundProperty("fail", "true").asynchronously().run();
+    MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+    assertNull(reply);
+    assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
+  }
 
-        MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
-        assertNull(reply);
-        assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
-    }
+  /**
+   * Make sure the message does not get filtered when the property value is not as expected
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testWrongPropertyValue() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).withInboundProperty("pass", "false").asynchronously().run();
 
-    /**
-     * Make sure the message does not get filtered at all when the expected property
-     * is not defined
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testNoProperty() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).asynchronously().run();
-        MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
-        assertNull(reply);
-        assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
-    }
+    MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+    assertNull(reply);
+    assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
+  }
+
+  /**
+   * Make sure the message does not get filtered at all when the expected property is not defined
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testNoProperty() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).asynchronously().run();
+    MuleMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+    assertNull(reply);
+    assertThat("should not have filtered", FilterCounter.counter.get(), is(0));
+  }
 }

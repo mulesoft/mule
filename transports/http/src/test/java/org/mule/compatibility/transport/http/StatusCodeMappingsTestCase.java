@@ -21,45 +21,41 @@ import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
-public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
-{
-    MuleContext mockMuleContext = Mockito.mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    
-    @Before
-    public void setUp()
-    {
-        Mockito.when(mockMuleContext.getConfiguration().getId()).thenReturn("1");
-        Mockito.when(mockMuleContext.getExecutionClassLoader()).thenReturn(this.getClass().getClassLoader());
-    }
+public class StatusCodeMappingsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testErrorMappings()
-    {
-        String code = ExceptionHelper.getErrorMapping("http", RoutingException.class,mockMuleContext);
-        assertEquals("500", code);
+  MuleContext mockMuleContext = Mockito.mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
 
-        code = ExceptionHelper.getErrorMapping("HTTP", org.mule.runtime.core.api.security.SecurityException.class, mockMuleContext);
-        assertEquals("403", code);
+  @Before
+  public void setUp() {
+    Mockito.when(mockMuleContext.getConfiguration().getId()).thenReturn("1");
+    Mockito.when(mockMuleContext.getExecutionClassLoader()).thenReturn(this.getClass().getClassLoader());
+  }
 
-        code = ExceptionHelper.getErrorMapping("http", UnauthorisedException.class,mockMuleContext);
-        assertEquals("401", code);
+  @Test
+  public void testErrorMappings() {
+    String code = ExceptionHelper.getErrorMapping("http", RoutingException.class, mockMuleContext);
+    assertEquals("500", code);
 
-        code = ExceptionHelper.getErrorMapping("blah", DefaultMuleException.class,mockMuleContext);
-        assertEquals(
-            String.valueOf(new DefaultMuleException(MessageFactory.createStaticMessage("test")).getExceptionCode()), code);
+    code = ExceptionHelper.getErrorMapping("HTTP", org.mule.runtime.core.api.security.SecurityException.class, mockMuleContext);
+    assertEquals("403", code);
 
-    }
+    code = ExceptionHelper.getErrorMapping("http", UnauthorisedException.class, mockMuleContext);
+    assertEquals("401", code);
 
-    @Test
-    public void testHttpsErrorMappings()
-    {
-        String code = ExceptionHelper.getErrorMapping("httpS", RoutingException.class, mockMuleContext);
-        assertEquals("500", code);
+    code = ExceptionHelper.getErrorMapping("blah", DefaultMuleException.class, mockMuleContext);
+    assertEquals(String.valueOf(new DefaultMuleException(MessageFactory.createStaticMessage("test")).getExceptionCode()), code);
 
-        code = ExceptionHelper.getErrorMapping("HTTPS", org.mule.runtime.core.api.security.SecurityException.class, mockMuleContext);
-        assertEquals("403", code);
+  }
 
-        code = ExceptionHelper.getErrorMapping("https", UnauthorisedException.class, mockMuleContext);
-        assertEquals("401", code);
-    }
+  @Test
+  public void testHttpsErrorMappings() {
+    String code = ExceptionHelper.getErrorMapping("httpS", RoutingException.class, mockMuleContext);
+    assertEquals("500", code);
+
+    code = ExceptionHelper.getErrorMapping("HTTPS", org.mule.runtime.core.api.security.SecurityException.class, mockMuleContext);
+    assertEquals("403", code);
+
+    code = ExceptionHelper.getErrorMapping("https", UnauthorisedException.class, mockMuleContext);
+    assertEquals("401", code);
+  }
 }

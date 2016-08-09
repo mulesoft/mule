@@ -14,21 +14,18 @@ import javax.sql.DataSource;
 /**
  * Base class for {@link ConnectionFactory}
  */
-public abstract class AbstractConnectionFactory implements ConnectionFactory
-{
+public abstract class AbstractConnectionFactory implements ConnectionFactory {
 
-    @Override
-    public final Connection create(DataSource dataSource)
-    {
-        Connection connection = doCreateConnection(dataSource);
+  @Override
+  public final Connection create(DataSource dataSource) {
+    Connection connection = doCreateConnection(dataSource);
 
-        if (connection == null)
-        {
-          throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
-        }
-
-        return connection;
+    if (connection == null) {
+      throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
     }
 
-    protected abstract Connection doCreateConnection(DataSource dataSource);
+    return connection;
+  }
+
+  protected abstract Connection doCreateConnection(DataSource dataSource);
 }

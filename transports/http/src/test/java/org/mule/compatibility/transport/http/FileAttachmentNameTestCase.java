@@ -22,29 +22,27 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class FileAttachmentNameTestCase extends FunctionalTestCase
-{
+public class FileAttachmentNameTestCase extends FunctionalTestCase {
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-attachment-name-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-attachment-name-config.xml";
+  }
 
-    @Test
-    public void keepsAttachmentAndFileNames() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), MediaType.XML, "testAttachment.txt"));
-        MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("testAttachment", dataHandler).build();
-        MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
+  @Test
+  public void keepsAttachmentAndFileNames() throws Exception {
+    MuleClient client = muleContext.getClient();
+    DataHandler dataHandler =
+        new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), MediaType.XML, "testAttachment.txt"));
+    MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("testAttachment", dataHandler).build();
+    MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
 
-        assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
-    }
+    assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
+  }
 }

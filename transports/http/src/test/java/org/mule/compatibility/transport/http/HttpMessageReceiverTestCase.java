@@ -26,59 +26,52 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
-{
-    private static final String CONTEXT_PATH = "/resources";
-    private static final String CLIENT_PATH = "/resources/client";
-    private static final String CLIENT_NAME_PATH = "/resources/client/name";
+public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
 
-    private HttpMessageReceiver httpMessageReceiver;
+  private static final String CONTEXT_PATH = "/resources";
+  private static final String CLIENT_PATH = "/resources/client";
+  private static final String CLIENT_NAME_PATH = "/resources/client/name";
 
-    @Override
-    public MessageReceiver getMessageReceiver() throws Exception
-    {
-        Connector connector = endpoint.getConnector();
-        return new HttpMessageReceiver(connector, mock(Flow.class), endpoint);
-    }
+  private HttpMessageReceiver httpMessageReceiver;
 
-    @Override
-    public InboundEndpoint getEndpoint() throws Exception
-    {
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
-        endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));
-        endpoint = getEndpointFactory().getInboundEndpoint(endpointBuilder);
-        return endpoint;
-    }
+  @Override
+  public MessageReceiver getMessageReceiver() throws Exception {
+    Connector connector = endpoint.getConnector();
+    return new HttpMessageReceiver(connector, mock(Flow.class), endpoint);
+  }
 
-    @Before
-    public void setUp() throws Exception
-    {
-        httpMessageReceiver = (HttpMessageReceiver) getMessageReceiver();
-    }
+  @Override
+  public InboundEndpoint getEndpoint() throws Exception {
+    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
+    endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));
+    endpoint = getEndpointFactory().getInboundEndpoint(endpointBuilder);
+    return endpoint;
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    httpMessageReceiver = (HttpMessageReceiver) getMessageReceiver();
+  }
 
 
-    @Test
-    public void testProcessResourceRelativePath()
-    {
-        assertEquals("client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
-    }
+  @Test
+  public void testProcessResourceRelativePath() {
+    assertEquals("client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
+  }
 
-    @Test
-    public void testProcessRelativePathSameLevel()
-    {
-        assertEquals("", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
-    }
+  @Test
+  public void testProcessRelativePathSameLevel() {
+    assertEquals("", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
+  }
 
-    @Test
-    public void testProcessResourcePropertyRelativePath()
-    {
-        assertEquals("client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
-    }
+  @Test
+  public void testProcessResourcePropertyRelativePath() {
+    assertEquals("client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
+  }
 
-    @Test
-    public void messageSourceIsEndpointNotMessageReceiver()
-    {
-        MessageProcessContext messageContext = httpMessageReceiver.createMessageProcessContext();
-        assertThat((InboundEndpoint) messageContext.getMessageSource(), is(httpMessageReceiver.getEndpoint()));
-    }
+  @Test
+  public void messageSourceIsEndpointNotMessageReceiver() {
+    MessageProcessContext messageContext = httpMessageReceiver.createMessageProcessContext();
+    assertThat((InboundEndpoint) messageContext.getMessageSource(), is(httpMessageReceiver.getEndpoint()));
+  }
 }

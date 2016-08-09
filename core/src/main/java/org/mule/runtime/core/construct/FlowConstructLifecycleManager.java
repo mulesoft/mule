@@ -23,130 +23,112 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The lifecycle manager responsible for managing lifecycle transitions for a Mule service.  The Mule service adds some additional
- * states, namely pause and resume.  The lifecycle manager manages lifecycle notifications and logging as well.
+ * The lifecycle manager responsible for managing lifecycle transitions for a Mule service. The Mule service adds some additional
+ * states, namely pause and resume. The lifecycle manager manages lifecycle notifications and logging as well.
  */
-public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowConstruct>
-{
+public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowConstruct> {
 
-    /**
-     * logger used by this class
-     */
-    protected transient final Logger logger = LoggerFactory.getLogger(FlowConstructLifecycleManager.class);
-    protected MuleContext muleContext;
+  /**
+   * logger used by this class
+   */
+  protected transient final Logger logger = LoggerFactory.getLogger(FlowConstructLifecycleManager.class);
+  protected MuleContext muleContext;
 
 
-    public FlowConstructLifecycleManager(FlowConstruct flowConstruct, MuleContext muleContext)
-    {
-        super(flowConstruct.getName(), flowConstruct);
-        this.muleContext = muleContext;
+  public FlowConstructLifecycleManager(FlowConstruct flowConstruct, MuleContext muleContext) {
+    super(flowConstruct.getName(), flowConstruct);
+    this.muleContext = muleContext;
+  }
+
+  @Override
+  protected void registerTransitions() {
+    super.registerTransitions();
+
+    // pause resume
+    addDirectTransition(Startable.PHASE_NAME, Pausable.PHASE_NAME);
+    // Note that 'Resume' state gets removed and the current state is set to 'start'. See {@link #notifyTransition}
+    addDirectTransition(Pausable.PHASE_NAME, Resumable.PHASE_NAME);
+    addDirectTransition(Pausable.PHASE_NAME, Stoppable.PHASE_NAME);
+  }
+
+  @Override
+  protected void notifyTransition(String currentPhase) {
+    if (currentPhase.equals(Resumable.PHASE_NAME)) {
+      // Revert back to start phase
+      completedPhases.remove(Resumable.PHASE_NAME);
+      completedPhases.remove(Pausable.PHASE_NAME);
+      setCurrentPhase(Startable.PHASE_NAME);
+    }
+  }
+
+  @Override
+  public void fireInitialisePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Initialisable.PHASE_NAME);
+    // TODO No pre notification
+    if (logger.isInfoEnabled()) {
+      logger.info("Initialising flow: " + getLifecycleObject().getName());
+    }
+    invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED);
+  }
+
+
+  @Override
+  public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Startable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Starting flow: " + getLifecycleObject().getName());
+    }
+    // TODO No pre notification
+    invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STARTED);
+  }
+
+
+  public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Pausable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Pausing flow: " + getLifecycleObject().getName());
     }
 
-    @Override
-    protected void registerTransitions()
-    {
-        super.registerTransitions();
+    // TODO No pre notification
+    invokePhase(Pausable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_PAUSED);
+  }
 
-        //pause resume
-        addDirectTransition(Startable.PHASE_NAME, Pausable.PHASE_NAME);
-        //Note that 'Resume' state gets removed and the current state is set to 'start'. See {@link #notifyTransition}
-        addDirectTransition(Pausable.PHASE_NAME, Resumable.PHASE_NAME);
-        addDirectTransition(Pausable.PHASE_NAME, Stoppable.PHASE_NAME);
+  public void fireResumePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Resumable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Resuming flow: " + getLifecycleObject().getName());
     }
+    // TODO No pre notification
+    invokePhase(Resumable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_RESUMED);
+  }
 
-    @Override
-    protected void notifyTransition(String currentPhase)
-    {
-        if (currentPhase.equals(Resumable.PHASE_NAME))
-        {
-            //Revert back to start phase
-            completedPhases.remove(Resumable.PHASE_NAME);
-            completedPhases.remove(Pausable.PHASE_NAME);
-            setCurrentPhase(Startable.PHASE_NAME);
-        }
+  @Override
+  public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Stoppable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Stopping flow: " + getLifecycleObject().getName());
     }
+    // TODO No pre notification
+    invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STOPPED);
+  }
 
-    @Override
-    public void fireInitialisePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Initialisable.PHASE_NAME);
-        //TODO No pre notification
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Initialising flow: " + getLifecycleObject().getName());
-        }
-        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED);
+  @Override
+  public void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+    checkPhase(Disposable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Disposing flow: " + getLifecycleObject().getName());
     }
+    // TODO No pre notification
+    invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED);
+  }
 
-
-    @Override
-    public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Startable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Starting flow: " + getLifecycleObject().getName());
-        }
-        //TODO No pre notification
-        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STARTED);
-    }
-
-
-    public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Pausable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Pausing flow: " + getLifecycleObject().getName());
-        }
-
-        //TODO No pre notification
-        invokePhase(Pausable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_PAUSED);
-    }
-
-    public void fireResumePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Resumable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Resuming flow: " + getLifecycleObject().getName());
-        }
-        //TODO No pre notification
-        invokePhase(Resumable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_RESUMED);
-    }
-
-    @Override
-    public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Stoppable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Stopping flow: " + getLifecycleObject().getName());
-        }
-        //TODO No pre notification
-        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STOPPED);
-    }
-
-    @Override
-    public void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
-    {
-        checkPhase(Disposable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Disposing flow: " + getLifecycleObject().getName());
-        }
-        //TODO No pre notification
-        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
-        fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED);
-    }
-
-    protected void fireNotification(int action)
-    {
-        muleContext.fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
-    }
+  protected void fireNotification(int action) {
+    muleContext.fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
+  }
 }

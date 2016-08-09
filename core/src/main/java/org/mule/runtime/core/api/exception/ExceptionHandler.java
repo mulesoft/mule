@@ -7,9 +7,8 @@
 package org.mule.runtime.core.api.exception;
 
 
-public interface ExceptionHandler 
-{
-    // empty
+public interface ExceptionHandler {
+  // empty
 }
 
 

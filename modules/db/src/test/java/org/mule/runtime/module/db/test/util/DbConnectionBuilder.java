@@ -18,61 +18,46 @@ import java.sql.SQLException;
 /**
  * Builds {@link DbConnection} mocks
  */
-public class DbConnectionBuilder
-{
+public class DbConnectionBuilder {
 
-    private final DbConnection connection;
+  private final DbConnection connection;
 
-    public DbConnectionBuilder()
-    {
-        connection = mock(DbConnection.class);
+  public DbConnectionBuilder() {
+    connection = mock(DbConnection.class);
+  }
+
+  public DbConnectionBuilder onCalatog(String name) {
+    try {
+      when(connection.getCatalog()).thenReturn(name);
+    } catch (SQLException e) {
+      // Not going to happen when building the mock
     }
 
-    public DbConnectionBuilder onCalatog(String name)
-    {
-        try
-        {
-            when(connection.getCatalog()).thenReturn(name);
-        }
-        catch (SQLException e)
-        {
-            // Not going to happen when building the mock
-        }
+    return this;
+  }
 
-        return this;
+  public DbConnectionBuilder with(DatabaseMetaData metaData) {
+    try {
+      when(connection.getMetaData()).thenReturn(metaData);
+    } catch (SQLException e) {
+      // Not going to happen when building the mock
     }
 
-    public DbConnectionBuilder with(DatabaseMetaData metaData)
-    {
-        try
-        {
-            when(connection.getMetaData()).thenReturn(metaData);
-        }
-        catch (SQLException e)
-        {
-            // Not going to happen when building the mock
-        }
+    return this;
+  }
 
-        return this;
+  public DbConnectionBuilder preparing(String sqlText, PreparedStatement statement) {
+    try {
+      when(connection.prepareStatement(sqlText)).thenReturn(statement);
+    } catch (SQLException e) {
+      // Not going to happen when building the mock
     }
 
-    public DbConnectionBuilder preparing(String sqlText, PreparedStatement statement)
-    {
-        try
-        {
-            when(connection.prepareStatement(sqlText)).thenReturn(statement);
-        }
-        catch (SQLException e)
-        {
-            // Not going to happen when building the mock
-        }
-
-        return this;
-    }
+    return this;
+  }
 
 
-    public DbConnection build()
-    {
-        return connection;
-    }
+  public DbConnection build() {
+    return connection;
+  }
 }

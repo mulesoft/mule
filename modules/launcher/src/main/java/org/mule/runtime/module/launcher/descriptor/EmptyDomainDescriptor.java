@@ -9,10 +9,9 @@ package org.mule.runtime.module.launcher.descriptor;
 /**
  * Represents the description of a domain when none is given
  */
-public class EmptyDomainDescriptor extends DomainDescriptor
-{
-    public EmptyDomainDescriptor(String name)
-    {
-        this.setName(name);
-    }
+public class EmptyDomainDescriptor extends DomainDescriptor {
+
+  public EmptyDomainDescriptor(String name) {
+    this.setName(name);
+  }
 }

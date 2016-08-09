@@ -21,23 +21,21 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @SmallTest
-public class MuleFoldersUtilTestCase extends AbstractMuleTestCase
-{
+public class MuleFoldersUtilTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public TemporaryFolder muleHome = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder muleHome = new TemporaryFolder();
 
-    @Test
-    public void getsMuleHome() throws Exception
-    {
-        MuleTestUtils.testWithSystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getRoot().getAbsolutePath(), new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                File folder = MuleFoldersUtil.getMuleHomeFolder();
-                assertThat(folder.getAbsolutePath(), equalTo(muleHome.getRoot().getAbsolutePath()));
-            }
-        });
-    }
+  @Test
+  public void getsMuleHome() throws Exception {
+    MuleTestUtils.testWithSystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getRoot().getAbsolutePath(),
+                                         new MuleTestUtils.TestCallback() {
+
+                                           @Override
+                                           public void run() throws Exception {
+                                             File folder = MuleFoldersUtil.getMuleHomeFolder();
+                                             assertThat(folder.getAbsolutePath(), equalTo(muleHome.getRoot().getAbsolutePath()));
+                                           }
+                                         });
+  }
 }

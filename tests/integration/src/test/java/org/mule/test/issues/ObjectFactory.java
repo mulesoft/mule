@@ -14,6 +14,5 @@ import javax.xml.bind.annotation.XmlRegistry;
 @Ignore
 public class ObjectFactory {
 
-    public ObjectFactory() {
-    }
+  public ObjectFactory() {}
 }

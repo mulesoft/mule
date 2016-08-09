@@ -10,17 +10,13 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
-public class StopFurtherMessageProcessingMessageProcessor extends AbstractInterceptingMessageProcessor
-{
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (!event.isStopFurtherProcessing())
-        {
-            return processNext(event);
-        }
-        else
-        {
-            return event;
-        }
+public class StopFurtherMessageProcessingMessageProcessor extends AbstractInterceptingMessageProcessor {
+
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (!event.isStopFurtherProcessing()) {
+      return processNext(event);
+    } else {
+      return event;
     }
+  }
 }

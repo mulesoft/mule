@@ -41,112 +41,105 @@ import org.w3c.dom.Node;
  */
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class XPathFilterTestCase extends AbstractMuleTestCase
-{
+public class XPathFilterTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
 
-    private SaxonXpathEvaluator xpathManager;
+  private SaxonXpathEvaluator xpathManager;
 
-    private XPathFilter filter;
+  private XPathFilter filter;
 
-    @Before
-    public void before() throws Exception {
-        xpathManager = new SaxonXpathEvaluator();
-        when(muleContext.getRegistry()).thenReturn(mock(MuleRegistry.class, RETURNS_DEFAULTS));
+  @Before
+  public void before() throws Exception {
+    xpathManager = new SaxonXpathEvaluator();
+    when(muleContext.getRegistry()).thenReturn(mock(MuleRegistry.class, RETURNS_DEFAULTS));
 
 
-        filter = new XPathFilter();
-        filter.setMuleContext(muleContext);
-        filter.setXpathEvaluator(xpathManager);
-    }
+    filter = new XPathFilter();
+    filter.setMuleContext(muleContext);
+    filter.setXpathEvaluator(xpathManager);
+  }
 
-    /**
-     * tests accepting the mule message.
-     */
-    @Test
-    public void testAcceptMessage() throws Exception
-    {
-        final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        MuleEvent event = getTestEvent(null, muleContext);
-        XPathFilter filter = new XPathFilter()
-        {
-            @Override
-            public Node toDOMNode(Object src) throws Exception
-            {
-                return document;
-            }
+  /**
+   * tests accepting the mule message.
+   */
+  @Test
+  public void testAcceptMessage() throws Exception {
+    final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    MuleEvent event = getTestEvent(null, muleContext);
+    XPathFilter filter = new XPathFilter() {
 
-            @Override
-            protected boolean accept(Node node)
-            {
-                return node == document;
-            }
-        };
+      @Override
+      public Node toDOMNode(Object src) throws Exception {
+        return document;
+      }
 
-        assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event));
+      @Override
+      protected boolean accept(Node node) {
+        return node == document;
+      }
+    };
 
-        event = getTestEvent(new Object(), muleContext);
-        filter.setPattern("/some/pattern = null");
-        assertTrue(filter.accept(event));
-        assertEquals("null", filter.getExpectedValue());
-        assertEquals("/some/pattern", filter.getPattern().trim());
-        assertSame(document, event.getMessage().getPayload());
+    assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event));
 
-        event = getTestEvent(new Object(), muleContext);
-        filter.setExpectedValue(null);
-        assertTrue(filter.accept(event));
-        assertEquals("true", filter.getExpectedValue());
-        assertEquals("/some/pattern", filter.getPattern().trim());
-        assertSame(document, event.getMessage().getPayload());
-    }
+    event = getTestEvent(new Object(), muleContext);
+    filter.setPattern("/some/pattern = null");
+    assertTrue(filter.accept(event));
+    assertEquals("null", filter.getExpectedValue());
+    assertEquals("/some/pattern", filter.getPattern().trim());
+    assertSame(document, event.getMessage().getPayload());
 
-    /**
-     * tests accepting a node.
-     */
-    @Test
-    public void testAcceptNode() throws Exception
-    {
-        InputStream testXml = getClass().getResourceAsStream("/test.xml");
-        assertNotNull(testXml);
+    event = getTestEvent(new Object(), muleContext);
+    filter.setExpectedValue(null);
+    assertTrue(filter.accept(event));
+    assertEquals("true", filter.getExpectedValue());
+    assertEquals("/some/pattern", filter.getPattern().trim());
+    assertSame(document, event.getMessage().getPayload());
+  }
 
-        filter.setPattern("/some/unknown/path");
-        filter.setExpectedValue("bogus");
-        filter.initialise();
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setNamespaceAware(true);
-        Document document = builderFactory.newDocumentBuilder().parse(testXml);
-        assertFalse("shouldn't have accepted a null evaluation when expected value isn't null.",
-            filter.accept(document));
-        filter.setExpectedValue("null");
-        assertTrue(filter.accept(document));
-        filter.setPattern("test/some/in");
-        assertFalse(filter.accept(document));
-        filter.setExpectedValue("another");
-        assertTrue(filter.accept(document));
-    }
+  /**
+   * tests accepting a node.
+   */
+  @Test
+  public void testAcceptNode() throws Exception {
+    InputStream testXml = getClass().getResourceAsStream("/test.xml");
+    assertNotNull(testXml);
 
-    /**
-     * tests accepting a node.
-     */
-    @Test
-    public void testAcceptSoapNode() throws Exception
-    {
-        InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
-        assertNotNull(soapEnvelope);
+    filter.setPattern("/some/unknown/path");
+    filter.setExpectedValue("bogus");
+    filter.initialise();
+    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+    builderFactory.setNamespaceAware(true);
+    Document document = builderFactory.newDocumentBuilder().parse(testXml);
+    assertFalse("shouldn't have accepted a null evaluation when expected value isn't null.", filter.accept(document));
+    filter.setExpectedValue("null");
+    assertTrue(filter.accept(document));
+    filter.setPattern("test/some/in");
+    assertFalse(filter.accept(document));
+    filter.setExpectedValue("another");
+    assertTrue(filter.accept(document));
+  }
 
-        filter.setPattern("/soap:Envelope/soap:Body/mule:echo/mule:echo");
-        filter.setExpectedValue("Hello!");
-        HashMap<String, String> prefix2Namespace = new HashMap<String, String>();
-        prefix2Namespace.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
-        prefix2Namespace.put("mule", "http://simple.component.mule.org/");
-        filter.setNamespaces(prefix2Namespace);
-        filter.initialise();
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setNamespaceAware(true);
-        Document envDoc = builderFactory.newDocumentBuilder().parse(soapEnvelope);
-        assertTrue(filter.accept(envDoc));
-    }
+  /**
+   * tests accepting a node.
+   */
+  @Test
+  public void testAcceptSoapNode() throws Exception {
+    InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
+    assertNotNull(soapEnvelope);
+
+    filter.setPattern("/soap:Envelope/soap:Body/mule:echo/mule:echo");
+    filter.setExpectedValue("Hello!");
+    HashMap<String, String> prefix2Namespace = new HashMap<String, String>();
+    prefix2Namespace.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
+    prefix2Namespace.put("mule", "http://simple.component.mule.org/");
+    filter.setNamespaces(prefix2Namespace);
+    filter.initialise();
+    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+    builderFactory.setNamespaceAware(true);
+    Document envDoc = builderFactory.newDocumentBuilder().parse(soapEnvelope);
+    assertTrue(filter.accept(envDoc));
+  }
 
 }

@@ -18,52 +18,42 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WatermarkSelectorWrapper extends WatermarkSelector
-{
+public class WatermarkSelectorWrapper extends WatermarkSelector {
 
-    private static final Logger logger = LoggerFactory.getLogger(WatermarkSelectorWrapper.class);
+  private static final Logger logger = LoggerFactory.getLogger(WatermarkSelectorWrapper.class);
 
-    private final String selectorExpression;
-    private final WatermarkSelector wrapped;
-    private final MuleEvent muleEvent;
+  private final String selectorExpression;
+  private final WatermarkSelector wrapped;
+  private final MuleEvent muleEvent;
 
-    protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent)
-    {
-        this.selectorExpression = selectorExpression;
-        this.wrapped = wrapped;
-        this.muleEvent = DefaultMuleEvent.copy(muleEvent);
+  protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent) {
+    this.selectorExpression = selectorExpression;
+    this.wrapped = wrapped;
+    this.muleEvent = DefaultMuleEvent.copy(muleEvent);
+  }
+
+  @Override
+  public void acceptValue(Object value) {
+    muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(value).build());
+    try {
+      Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent);
+      this.wrapped.acceptValue(evaluated);
+    } catch (NotSerializableException e) {
+      logger.warn(String.format(
+                                "Watermark selector expression '%s' did not resolved to a Serializable value. Value will be ignored",
+                                this.selectorExpression),
+                  e);
     }
+  }
 
-    @Override
-    public void acceptValue(Object value)
-    {
-        muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage())
-                                        .payload(value)
-                                        .build());
-        try
-        {
-            Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent);
-            this.wrapped.acceptValue(evaluated);
-        }
-        catch (NotSerializableException e)
-        {
-            logger.warn(
-                String.format(
-                    "Watermark selector expression '%s' did not resolved to a Serializable value. Value will be ignored",
-                    this.selectorExpression), e);
-        }
-    }
+  @Override
+  public Object getSelectedValue() {
+    return this.wrapped.getSelectedValue();
+  }
 
-    @Override
-    public Object getSelectedValue()
-    {
-        return this.wrapped.getSelectedValue();
-    }
-
-    @Override
-    public void reset()
-    {
-        this.wrapped.reset();
-    }
+  @Override
+  public void reset() {
+    this.wrapped.reset();
+  }
 
 }

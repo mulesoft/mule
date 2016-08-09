@@ -11,13 +11,12 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 /**
  * A request matcher represents a condition that is fulfilled or not by an http request
  */
-public interface RequestMatcher
-{
+public interface RequestMatcher {
 
-    /**
-     * @param httpRequest request to evaluate against
-     *
-     * @return true if the request matches the expected condition, false otherwise.
-     */
-    boolean matches(HttpRequest httpRequest);
+  /**
+   * @param httpRequest request to evaluate against
+   *
+   * @return true if the request matches the expected condition, false otherwise.
+   */
+  boolean matches(HttpRequest httpRequest);
 }

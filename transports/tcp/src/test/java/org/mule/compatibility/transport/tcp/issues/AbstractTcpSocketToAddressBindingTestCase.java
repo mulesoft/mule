@@ -23,60 +23,55 @@ import org.junit.Rule;
 /**
  * Tests how sockets are bound to addresses by the TCP transport. This test is related to MULE-6584.
  */
-public abstract class AbstractTcpSocketToAddressBindingTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+public abstract class AbstractTcpSocketToAddressBindingTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    protected List<InetAddress> localInetAddresses;
+  @Rule
+  public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public AbstractTcpSocketToAddressBindingTestCase() throws SocketException
-    {
-        super();
-        localInetAddresses = getAllLocalInetAddresses();
-    }
+  protected List<InetAddress> localInetAddresses;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-socket-to-address-binding-test.xml";
-    }
+  public AbstractTcpSocketToAddressBindingTestCase() throws SocketException {
+    super();
+    localInetAddresses = getAllLocalInetAddresses();
+  }
 
-    /**
-     * Returns the name of the transport associated with this test.
-     * @return The transport name.
-     */
-    protected String getTransportName()
-    {
-        return "tcp";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-socket-to-address-binding-test.xml";
+  }
 
-    /**
-     * Returns all local {@link java.net.InetAddress} except the loopback address.
-     * @return A {@link java.util.List <InetAddress>} with the IPv4 local addresses.
-     * @throws java.net.SocketException If there is a problem getting the addresses.
-     */
-    private List<InetAddress> getAllLocalInetAddresses() throws SocketException
-    {
-        List<InetAddress> result = new ArrayList<InetAddress>();
-        Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-        for (NetworkInterface netInt : Collections.list(nets))
-        {
-            Enumeration<InetAddress> inetAddresses = netInt.getInetAddresses();
-            for (InetAddress inetAddress : Collections.list(inetAddresses))
-            {
-                if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress())
-                {
-                    result.add(inetAddress);
-                }
-            }
+  /**
+   * Returns the name of the transport associated with this test.
+   * 
+   * @return The transport name.
+   */
+  protected String getTransportName() {
+    return "tcp";
+  }
+
+  /**
+   * Returns all local {@link java.net.InetAddress} except the loopback address.
+   * 
+   * @return A {@link java.util.List <InetAddress>} with the IPv4 local addresses.
+   * @throws java.net.SocketException If there is a problem getting the addresses.
+   */
+  private List<InetAddress> getAllLocalInetAddresses() throws SocketException {
+    List<InetAddress> result = new ArrayList<InetAddress>();
+    Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+    for (NetworkInterface netInt : Collections.list(nets)) {
+      Enumeration<InetAddress> inetAddresses = netInt.getInetAddresses();
+      for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+        if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
+          result.add(inetAddress);
         }
-        return result;
+      }
     }
+    return result;
+  }
 }

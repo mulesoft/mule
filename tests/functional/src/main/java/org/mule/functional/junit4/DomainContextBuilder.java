@@ -20,40 +20,35 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DomainContextBuilder
-{
+public class DomainContextBuilder {
 
-    private String domainConfig;
-    private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder()
-    {
-        @Override
-        protected DefaultMuleContext createDefaultMuleContext()
-        {
-            DefaultMuleContext muleContext = super.createDefaultMuleContext();
-            muleContext.setArtifactType(DOMAIN);
-            return muleContext;
-        }
-    };
+  private String domainConfig;
+  private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
 
-    public DomainContextBuilder setDomainConfig(String domainConfig)
-    {
-        this.domainConfig = domainConfig;
-        return this;
+    @Override
+    protected DefaultMuleContext createDefaultMuleContext() {
+      DefaultMuleContext muleContext = super.createDefaultMuleContext();
+      muleContext.setArtifactType(DOMAIN);
+      return muleContext;
     }
+  };
 
-    public MuleContext build() throws Exception
-    {
-        List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
-        ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
-        builders.add(cfgBuilder);
-        DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
-        domainContext.start();
-        return domainContext;
-    }
+  public DomainContextBuilder setDomainConfig(String domainConfig) {
+    this.domainConfig = domainConfig;
+    return this;
+  }
 
-    protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception
-    {
-        return new SpringXmlConfigurationBuilder(configResource, emptyMap(), DOMAIN);
-    }
+  public MuleContext build() throws Exception {
+    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+    ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
+    builders.add(cfgBuilder);
+    DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
+    domainContext.start();
+    return domainContext;
+  }
+
+  protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception {
+    return new SpringXmlConfigurationBuilder(configResource, emptyMap(), DOMAIN);
+  }
 }

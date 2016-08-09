@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.module.http.internal.listener.async;
 
-public interface ResponseStatusCallback
-{
+public interface ResponseStatusCallback {
 
-    /**
-     * method to process a failure while sending the response to the client
-     *
-     * @param throwable exception thrown while sending the response
-     */
-    void responseSendFailure(Throwable throwable);
+  /**
+   * method to process a failure while sending the response to the client
+   *
+   * @param throwable exception thrown while sending the response
+   */
+  void responseSendFailure(Throwable throwable);
 
-    /**
-     * notifies that the response was successfully send.
-     */
-    void responseSendSuccessfully();
+  /**
+   * notifies that the response was successfully send.
+   */
+  void responseSendSuccessfully();
 
 }

@@ -15,60 +15,53 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractExceptionStrategyTestCase extends AbstractIntegrationTestCase
-{
+public abstract class AbstractExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
-    public static final int LATCH_AWAIT_TIMEOUT = 3000;
+  public static final int LATCH_AWAIT_TIMEOUT = 3000;
 
-    protected final AtomicInteger systemExceptionCounter = new AtomicInteger();
-    protected final AtomicInteger serviceExceptionCounter = new AtomicInteger();
-    protected Latch latch;
-    protected MuleClient client;
+  protected final AtomicInteger systemExceptionCounter = new AtomicInteger();
+  protected final AtomicInteger serviceExceptionCounter = new AtomicInteger();
+  protected Latch latch;
+  protected MuleClient client;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        if (client == null)
-        {
-            client = muleContext.getClient();
-        }
-        latch = new Latch();
-        systemExceptionCounter.set(0);
-        serviceExceptionCounter.set(0);
-
-        TestExceptionStrategy systemExceptionListener = new TestExceptionStrategy();
-        systemExceptionListener.setExceptionCallback(new ExceptionCallback()
-        {
-            @Override
-            public void onException(Throwable t)
-            {
-                systemExceptionCounter.incrementAndGet();
-                latch.countDown();
-            }
-        });
-        muleContext.setExceptionListener(systemExceptionListener);
-
-        for (FlowConstruct flow : muleContext.getRegistry().lookupFlowConstructs())
-        {
-            ((TestExceptionStrategy) flow.getExceptionListener()).setExceptionCallback(new ExceptionCallback()
-            {
-                @Override
-                public void onException(Throwable t)
-                {
-                    serviceExceptionCounter.incrementAndGet();
-                    latch.countDown();
-                }
-            });
-        }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    if (client == null) {
+      client = muleContext.getClient();
     }
+    latch = new Latch();
+    systemExceptionCounter.set(0);
+    serviceExceptionCounter.set(0);
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        latch = null;
+    TestExceptionStrategy systemExceptionListener = new TestExceptionStrategy();
+    systemExceptionListener.setExceptionCallback(new ExceptionCallback() {
+
+      @Override
+      public void onException(Throwable t) {
+        systemExceptionCounter.incrementAndGet();
+        latch.countDown();
+      }
+    });
+    muleContext.setExceptionListener(systemExceptionListener);
+
+    for (FlowConstruct flow : muleContext.getRegistry().lookupFlowConstructs()) {
+      ((TestExceptionStrategy) flow.getExceptionListener()).setExceptionCallback(new ExceptionCallback() {
+
+        @Override
+        public void onException(Throwable t) {
+          serviceExceptionCounter.incrementAndGet();
+          latch.countDown();
+        }
+      });
     }
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    latch = null;
+  }
 }
 
 

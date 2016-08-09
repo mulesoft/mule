@@ -9,15 +9,13 @@ package org.mule.compatibility.transport.tcp.issues;
 import org.mule.compatibility.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.compatibility.transport.tcp.integration.BigInputStream;
 
-public class InputStreamSource
-{
+public class InputStreamSource {
 
-    public static final long SIZE = 10 * AbstractStreamingCapacityTestCase.ONE_MB;
+  public static final long SIZE = 10 * AbstractStreamingCapacityTestCase.ONE_MB;
 
-    // whether this is declared to return Object or InputStream makes no difference
-    public Object doSomething(Object request)
-    {
-        return new BigInputStream(SIZE, 10);
-    }
+  // whether this is declared to return Object or InputStream makes no difference
+  public Object doSomething(Object request) {
+    return new BigInputStream(SIZE, 10);
+  }
 
 }

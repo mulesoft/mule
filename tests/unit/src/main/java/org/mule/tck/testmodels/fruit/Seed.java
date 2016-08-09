@@ -13,35 +13,31 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-public class Seed implements Serializable, Initialisable
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -7631993371500076921L;
+public class Seed implements Serializable, Initialisable {
 
-    private Latch initLatch = new Latch();
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -7631993371500076921L;
 
-    private Fruit fruit;
+  private Latch initLatch = new Latch();
 
-    public Fruit getFruit()
-    {
-        return fruit;
-    }
+  private Fruit fruit;
 
-    public void setFruit(Fruit fruit)
-    {
-        this.fruit = fruit;
-    }
+  public Fruit getFruit() {
+    return fruit;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initLatch.countDown();
-    }
+  public void setFruit(Fruit fruit) {
+    this.fruit = fruit;
+  }
 
-    public void awaitInitialize(long timeout, TimeUnit unit) throws InterruptedException
-    {
-        initLatch.await(timeout, unit);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    initLatch.countDown();
+  }
+
+  public void awaitInitialize(long timeout, TimeUnit unit) throws InterruptedException {
+    initLatch.await(timeout, unit);
+  }
 }

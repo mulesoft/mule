@@ -42,173 +42,148 @@ import java.util.Map;
 /**
  * Provider for {@code ComponentBuildingDefinition}s required to create transport runtime object.
  */
-public class TransportComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
-{
+public class TransportComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-    public static final String OUTBOUND_ENDPOINT_ELEMENT = "outbound-endpoint";
-    public static final String ENDPOINT_ELEMENT = "endpoint";
-    public static final String INBOUND_ENDPOINT_ELEMENT = "inbound-endpoint";
-    private static final String ENDPOINT_RESPONSE_ELEMENT = "response";
+  public static final String OUTBOUND_ENDPOINT_ELEMENT = "outbound-endpoint";
+  public static final String ENDPOINT_ELEMENT = "endpoint";
+  public static final String INBOUND_ENDPOINT_ELEMENT = "inbound-endpoint";
+  private static final String ENDPOINT_RESPONSE_ELEMENT = "response";
 
-    private ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(TRANSPORTS_NAMESPACE_NAME);
+  private ComponentBuildingDefinition.Builder baseDefinition =
+      new ComponentBuildingDefinition.Builder().withNamespace(TRANSPORTS_NAMESPACE_NAME);
 
-    @Override
-    public void init(MuleContext muleContext)
-    {
-    }
+  @Override
+  public void init(MuleContext muleContext) {}
 
-    @Override
-    public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
-    {
-        LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
-        componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().build());
-        componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
-        componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier(ENDPOINT_RESPONSE_ELEMENT)
-                                                 .withTypeDefinition(fromType(MessageProcessor.class))
-                                                 .withObjectFactoryType(MessageProcessorChainFactoryBean.class)
-                                                 .build());
-        componentBuildingDefinitions.add(baseDefinition.copy()
-                                                 .withIdentifier("service-overrides")
-                                                 .withObjectFactoryType(ServiceOverridesObjectFactory.class)
-                                                 .withTypeDefinition(fromType(Map.class))
-                                                 .withSetterParameterDefinition("messageReceiver", fromSimpleParameter("messageReceiver").build())
-                                                 .withSetterParameterDefinition("transactedMessageReceiver", fromSimpleParameter("transactedMessageReceiver").build())
-                                                 .withSetterParameterDefinition("xaTransactedMessageReceiver", fromSimpleParameter("xaTransactedMessageReceiver").build())
-                                                 .withSetterParameterDefinition("dispatcherFactory", fromSimpleParameter("dispatcherFactory").build())
-                                                 .withSetterParameterDefinition("inboundTransformer", fromSimpleParameter("inboundTransformer").build())
-                                                 .withSetterParameterDefinition("outboundTransformer", fromSimpleParameter("outboundTransformer").build())
-                                                 .withSetterParameterDefinition("responseTransformer", fromSimpleParameter("responseTransformer").build())
-                                                 .withSetterParameterDefinition("endpointBuilder", fromSimpleParameter("endpointBuilder").build())
-                                                 .withSetterParameterDefinition("messageFactory", fromSimpleParameter("messageFactory").build())
-                                                 .withSetterParameterDefinition("serviceFinder", fromSimpleParameter("serviceFinder").build())
-                                                 .withSetterParameterDefinition("sessionHandler", fromSimpleParameter("sessionHandler").build())
-                                                 .withSetterParameterDefinition("inboundExchangePatterns", fromSimpleParameter("inboundExchangePatterns").build())
-                                                 .withSetterParameterDefinition("outboundExchangePatterns", fromSimpleParameter("outboundExchangePatterns").build())
-                                                 .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build())
-                                                 .build());
-        return componentBuildingDefinitions;
-    }
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
+    componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().build());
+    componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
+    componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(ENDPOINT_RESPONSE_ELEMENT).withTypeDefinition(fromType(MessageProcessor.class))
+            .withObjectFactoryType(MessageProcessorChainFactoryBean.class).build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("service-overrides")
+        .withObjectFactoryType(ServiceOverridesObjectFactory.class).withTypeDefinition(fromType(Map.class))
+        .withSetterParameterDefinition("messageReceiver", fromSimpleParameter("messageReceiver").build())
+        .withSetterParameterDefinition("transactedMessageReceiver", fromSimpleParameter("transactedMessageReceiver").build())
+        .withSetterParameterDefinition("xaTransactedMessageReceiver", fromSimpleParameter("xaTransactedMessageReceiver").build())
+        .withSetterParameterDefinition("dispatcherFactory", fromSimpleParameter("dispatcherFactory").build())
+        .withSetterParameterDefinition("inboundTransformer", fromSimpleParameter("inboundTransformer").build())
+        .withSetterParameterDefinition("outboundTransformer", fromSimpleParameter("outboundTransformer").build())
+        .withSetterParameterDefinition("responseTransformer", fromSimpleParameter("responseTransformer").build())
+        .withSetterParameterDefinition("endpointBuilder", fromSimpleParameter("endpointBuilder").build())
+        .withSetterParameterDefinition("messageFactory", fromSimpleParameter("messageFactory").build())
+        .withSetterParameterDefinition("serviceFinder", fromSimpleParameter("serviceFinder").build())
+        .withSetterParameterDefinition("sessionHandler", fromSimpleParameter("sessionHandler").build())
+        .withSetterParameterDefinition("inboundExchangePatterns", fromSimpleParameter("inboundExchangePatterns").build())
+        .withSetterParameterDefinition("outboundExchangePatterns", fromSimpleParameter("outboundExchangePatterns").build())
+        .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build()).build());
+    return componentBuildingDefinitions;
+  }
 
-    protected ComponentBuildingDefinition.Builder getBaseConnector()
-    {
-        return baseDefinition.copy()
-                .withIdentifier("connector")
-                .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(Map.class).build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
-    }
+  protected ComponentBuildingDefinition.Builder getBaseConnector() {
+    return baseDefinition.copy().withIdentifier("connector")
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(Map.class).build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
+  }
 
-    protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder()
-    {
-        return baseDefinition.copy()
-                .withIdentifier(OUTBOUND_ENDPOINT_ELEMENT)
-                .withObjectFactoryType(OutboundEndpointFactoryBean.class)
-                .withTypeDefinition(fromType(OutboundEndpoint.class))
-                .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
-                .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
-                .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
-                .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
-                .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
-                .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
-                .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(HashMap.class).build())
-                .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build());
-    }
+  protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder() {
+    return baseDefinition.copy().withIdentifier(OUTBOUND_ENDPOINT_ELEMENT)
+        .withObjectFactoryType(OutboundEndpointFactoryBean.class).withTypeDefinition(fromType(OutboundEndpoint.class))
+        .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+        .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
+        .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
+        .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+        .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
+        .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(HashMap.class).build())
+        .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build());
+  }
 
-    protected ComponentBuildingDefinition.Builder getEndpointBuildingDefinitionBuilder()
-    {
-        return baseDefinition.copy()
-                .withIdentifier(ENDPOINT_ELEMENT)
-                .withTypeDefinition(fromType(EndpointURIEndpointBuilder.class))
-                .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
-                .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
-                .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
-                .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
-                .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
-                .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
-                .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
-                .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
-                .withSetterParameterDefinition("properties", fromUndefinedSimpleAttributes().build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .asPrototype();
-    }
+  protected ComponentBuildingDefinition.Builder getEndpointBuildingDefinitionBuilder() {
+    return baseDefinition.copy().withIdentifier(ENDPOINT_ELEMENT).withTypeDefinition(fromType(EndpointURIEndpointBuilder.class))
+        .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+        .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
+        .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
+        .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+        .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
+        .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+        .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
+        .withSetterParameterDefinition("properties", fromUndefinedSimpleAttributes().build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build()).asPrototype();
+  }
 
-    protected ComponentBuildingDefinition.Builder getInboundEndpointBuildingDefinitionBuilder()
-    {
-        return baseDefinition.copy()
-                .withIdentifier(INBOUND_ENDPOINT_ELEMENT)
-                .withObjectFactoryType(InboundEndpointFactoryBean.class)
-                .withTypeDefinition(fromType(InboundEndpoint.class))
-                .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
-                .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
-                .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
-                .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
-                .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
-                .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
-                .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
-                .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
-                .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-                .withSetterParameterDefinition("properties", fromUndefinedSimpleAttributes().build());
-    }
+  protected ComponentBuildingDefinition.Builder getInboundEndpointBuildingDefinitionBuilder() {
+    return baseDefinition.copy().withIdentifier(INBOUND_ENDPOINT_ELEMENT).withObjectFactoryType(InboundEndpointFactoryBean.class)
+        .withTypeDefinition(fromType(InboundEndpoint.class))
+        .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+        .withSetterParameterDefinition("transactionConfig", fromChildConfiguration(TransactionConfig.class).build())
+        .withSetterParameterDefinition("deleteUnacceptedMessages", fromSimpleParameter("deleteUnacceptedMessages").build())
+        .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+        .withSetterParameterDefinition("responseTimeout", fromSimpleParameter("responseTimeout").build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
+        .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+        .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
+        .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("properties", fromUndefinedSimpleAttributes().build());
+  }
 
-    protected ComponentBuildingDefinition.Builder getBaseTransactionDefinitionBuilder()
-    {
-        return baseDefinition.copy()
-                .withIdentifier("transaction")
-                .withTypeDefinition(fromType(MuleTransactionConfig.class))
-                .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-                .withSetterParameterDefinition("action", fromSimpleParameter("action", getTransactionActionTypeConverter()).build());
-    }
+  protected ComponentBuildingDefinition.Builder getBaseTransactionDefinitionBuilder() {
+    return baseDefinition.copy().withIdentifier("transaction").withTypeDefinition(fromType(MuleTransactionConfig.class))
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("action", fromSimpleParameter("action", getTransactionActionTypeConverter()).build());
+  }
 
 
-    private TypeConverter<String, Byte> getTransactionActionTypeConverter()
-    {
-        return action -> {
-            switch (action)
-            {
-                case "ALWAYS_BEGIN":
-                    return TransactionConfig.ACTION_ALWAYS_BEGIN;
-                case "ALWAYS_JOIN":
-                    return TransactionConfig.ACTION_ALWAYS_JOIN;
-                case "JOIN_IF_POSSIBLE":
-                    return TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
-                case "NONE":
-                    return TransactionConfig.ACTION_NONE;
-                case "BEGIN_OR_JOIN":
-                    return TransactionConfig.ACTION_BEGIN_OR_JOIN;
-                case "INDIFFERENT":
-                    return TransactionConfig.ACTION_INDIFFERENT;
-                case "NEVER":
-                    return TransactionConfig.ACTION_NEVER;
-                case "NOT_SUPPORTED":
-                    return TransactionConfig.ACTION_NOT_SUPPORTED;
-                default:
-                    throw new MuleRuntimeException(createStaticMessage("Wrong transaction action configuration parameter: " + action));
-            }
-        };
-    }
+  private TypeConverter<String, Byte> getTransactionActionTypeConverter() {
+    return action -> {
+      switch (action) {
+        case "ALWAYS_BEGIN":
+          return TransactionConfig.ACTION_ALWAYS_BEGIN;
+        case "ALWAYS_JOIN":
+          return TransactionConfig.ACTION_ALWAYS_JOIN;
+        case "JOIN_IF_POSSIBLE":
+          return TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+        case "NONE":
+          return TransactionConfig.ACTION_NONE;
+        case "BEGIN_OR_JOIN":
+          return TransactionConfig.ACTION_BEGIN_OR_JOIN;
+        case "INDIFFERENT":
+          return TransactionConfig.ACTION_INDIFFERENT;
+        case "NEVER":
+          return TransactionConfig.ACTION_NEVER;
+        case "NOT_SUPPORTED":
+          return TransactionConfig.ACTION_NOT_SUPPORTED;
+        default:
+          throw new MuleRuntimeException(createStaticMessage("Wrong transaction action configuration parameter: " + action));
+      }
+    };
+  }
 }

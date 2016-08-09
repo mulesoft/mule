@@ -30,94 +30,83 @@ import java.util.concurrent.TimeUnit;
 
 
 @Alias("ListenPayments")
-public class HeisenbergSource extends Source<Void, Attributes> implements Initialisable
-{
+public class HeisenbergSource extends Source<Void, Attributes> implements Initialisable {
 
-    public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
-    public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
+  public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
+  public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
 
-    private ScheduledExecutorService executor;
+  private ScheduledExecutorService executor;
 
-    @UseConfig
-    private HeisenbergExtension heisenberg;
+  @UseConfig
+  private HeisenbergExtension heisenberg;
 
-    @Connection
-    private HeisenbergConnection connection;
+  @Connection
+  private HeisenbergConnection connection;
 
-    @Parameter
-    private volatile int initialBatchNumber;
+  @Parameter
+  private volatile int initialBatchNumber;
 
-    @Parameter
-    @Optional(defaultValue = "1")
-    private int corePoolSize;
+  @Parameter
+  @Optional(defaultValue = "1")
+  private int corePoolSize;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        checkArgument(heisenberg != null, "config not injected");
-        connection.verifyLifecycle(1, 1, 0, 0);
+  @Override
+  public void initialise() throws InitialisationException {
+    checkArgument(heisenberg != null, "config not injected");
+    connection.verifyLifecycle(1, 1, 0, 0);
+  }
+
+  @Override
+  public void start() {
+    connection.verifyLifecycle(1, 1, 0, 0);
+    HeisenbergExtension.sourceTimesStarted++;
+
+    if (corePoolSize < 0) {
+      throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
     }
 
-    @Override
-    public void start()
-    {
-        connection.verifyLifecycle(1, 1, 0, 0);
-        HeisenbergExtension.sourceTimesStarted++;
+    executor = newScheduledThreadPool(1);
+    executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()),
+                                 0, 100, TimeUnit.MILLISECONDS);
+  }
 
-        if (corePoolSize < 0)
-        {
-            throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
-        }
+  private CompletionHandler<MuleEvent, Exception, MuleEvent> completionHandler() {
+    return new BlockingCompletionHandler<MuleEvent, Exception, MuleEvent>() {
 
-        executor = newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()), 0, 100, TimeUnit.MILLISECONDS);
+      @Override
+      protected void doOnCompletion(MuleEvent event) {
+        Long payment = (Long) ((org.mule.runtime.core.api.MuleEvent) event).getMessage().getPayload();
+        heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
+      }
+
+      @Override
+      public void onFailure(Exception exception) {
+        heisenberg.setMoney(BigDecimal.valueOf(-1));
+      }
+    };
+  }
+
+  @Override
+  public void stop() {
+    if (executor != null) {
+      executor.shutdown();
+      try {
+        executor.awaitTermination(500, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private MuleMessage makeMessage(SourceContext sourceContext) {
+    if (initialBatchNumber < 0) {
+      sourceContext.getExceptionCallback().onException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
     }
 
-    private CompletionHandler<MuleEvent, Exception, MuleEvent> completionHandler()
-    {
-        return new BlockingCompletionHandler<MuleEvent, Exception, MuleEvent>()
-        {
-            @Override
-            protected void doOnCompletion(MuleEvent event)
-            {
-                Long payment = (Long) ((org.mule.runtime.core.api.MuleEvent) event).getMessage().getPayload();
-                heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
-            }
-
-            @Override
-            public void onFailure(Exception exception)
-            {
-                heisenberg.setMoney(BigDecimal.valueOf(-1));
-            }
-        };
-    }
-
-    @Override
-    public void stop()
-    {
-        if (executor != null)
-        {
-            executor.shutdown();
-            try
-            {
-                executor.awaitTermination(500, TimeUnit.MILLISECONDS);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private MuleMessage makeMessage(SourceContext sourceContext)
-    {
-        if (initialBatchNumber < 0)
-        {
-            sourceContext.getExceptionCallback().onException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
-        }
-
-        return MuleMessage.builder().payload(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber())).build();
-    }
+    return MuleMessage.builder()
+        .payload(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber()))
+        .build();
+  }
 
 
 }

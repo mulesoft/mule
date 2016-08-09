@@ -12,58 +12,51 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
- * This service is useful for unit tests involving transactionality because it
- * will roll back the current transaction upon message arrival.  
+ * This service is useful for unit tests involving transactionality because it will roll back the current transaction upon message
+ * arrival.
  */
-public class TransactionalFunctionalTestComponent extends FunctionalTestComponent
-{
-    private boolean expectTransaction = true;
-    private boolean rollback = true;
+public class TransactionalFunctionalTestComponent extends FunctionalTestComponent {
 
-    /** {@inheritDoc} */
-    public Object onCall(MuleEventContext context) throws Exception
-    {
-        Object replyMessage = super.onCall(context);
+  private boolean expectTransaction = true;
+  private boolean rollback = true;
 
-        if (expectTransaction)
-        {
-            // Verify transaction has begun.
-            Transaction currentTx = context.getCurrentTransaction();
-            if (currentTx == null || !currentTx.isBegun())
-            {    
-                context.setStopFurtherProcessing(true);
-                throw new TransactionException(MessageFactory.createStaticMessage("Trying to roll back transaction but no transaction is underway."));
-            }            
+  /** {@inheritDoc} */
+  public Object onCall(MuleEventContext context) throws Exception {
+    Object replyMessage = super.onCall(context);
 
-            if (rollback)
-            {
-                // Mark the transaction for rollback.
-                logger.info("@@@@ Rolling back transaction @@@@");
-                currentTx.setRollbackOnly();
-            }        
-        }
-        
-        return replyMessage;
+    if (expectTransaction) {
+      // Verify transaction has begun.
+      Transaction currentTx = context.getCurrentTransaction();
+      if (currentTx == null || !currentTx.isBegun()) {
+        context.setStopFurtherProcessing(true);
+        throw new TransactionException(MessageFactory
+            .createStaticMessage("Trying to roll back transaction but no transaction is underway."));
+      }
+
+      if (rollback) {
+        // Mark the transaction for rollback.
+        logger.info("@@@@ Rolling back transaction @@@@");
+        currentTx.setRollbackOnly();
+      }
     }
 
-    public boolean isRollback()
-    {
-        return rollback;
-    }
+    return replyMessage;
+  }
 
-    public void setRollback(boolean rollback)
-    {
-        this.rollback = rollback;
-    }
+  public boolean isRollback() {
+    return rollback;
+  }
 
-    public boolean isExpectTransaction()
-    {
-        return expectTransaction;
-    }
+  public void setRollback(boolean rollback) {
+    this.rollback = rollback;
+  }
 
-    public void setExpectTransaction(boolean expectTransaction)
-    {
-        this.expectTransaction = expectTransaction;
-    }
+  public boolean isExpectTransaction() {
+    return expectTransaction;
+  }
+
+  public void setExpectTransaction(boolean expectTransaction) {
+    this.expectTransaction = expectTransaction;
+  }
 }
 

@@ -15,21 +15,16 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 
 @SmallTest
-public class KeyedPoolMessageDispatcherFactoryAdapterTestCase extends AbstractMuleTestCase
-{
+public class KeyedPoolMessageDispatcherFactoryAdapterTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testNullFactory()
-    {
-        try
-        {
-            new KeyedPoolMessageDispatcherFactoryAdapter(null);
-            fail("expected IllegalArgumentException");
-        }
-        catch (IllegalArgumentException iex)
-        {
-            // OK
-        }
+  @Test
+  public void testNullFactory() {
+    try {
+      new KeyedPoolMessageDispatcherFactoryAdapter(null);
+      fail("expected IllegalArgumentException");
+    } catch (IllegalArgumentException iex) {
+      // OK
     }
+  }
 
 }

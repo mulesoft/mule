@@ -13,6 +13,5 @@ package org.mule.runtime.core.util.queue.objectstore;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public interface TransientQueueInfoDelegate extends QueueInfoDelegate
-{
+public interface TransientQueueInfoDelegate extends QueueInfoDelegate {
 }

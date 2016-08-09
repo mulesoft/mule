@@ -23,54 +23,47 @@ import javanet.staxutils.events.EventAllocator;
 /**
  * XMLStreamReader decorator that saves the scope and allows accesing to information about all the parent XMLEvent elements
  */
-public class ScopeSaverXMLStreamReader extends DelegateXMLStreamReader
-{
+public class ScopeSaverXMLStreamReader extends DelegateXMLStreamReader {
 
-    private final XMLEventAllocator allocator = new EventAllocator();
-    private List<StartElement> scope = new ArrayList<StartElement>();
-    private boolean first = true;
+  private final XMLEventAllocator allocator = new EventAllocator();
+  private List<StartElement> scope = new ArrayList<StartElement>();
+  private boolean first = true;
 
-    public ScopeSaverXMLStreamReader(XMLStreamReader reader)
-    {
-        super(reader);
+  public ScopeSaverXMLStreamReader(XMLStreamReader reader) {
+    super(reader);
+  }
+
+  @Override
+  public int next() throws XMLStreamException {
+    if (first) {
+      first = false;
+      if (getEventType() == XMLStreamReader.START_ELEMENT) {
+        XMLEvent evt = allocator.allocate(this);
+        scope.add(evt.asStartElement());
+      }
     }
-
-    @Override
-    public int next() throws XMLStreamException
-    {
-        if (first)
-        {
-            first = false;
-            if (getEventType() == XMLStreamReader.START_ELEMENT)
-            {
-                XMLEvent evt = allocator.allocate(this);
-                scope.add(evt.asStartElement());
-            }
-        }
-        int res = super.next();
-        switch(res)
-        {
-            case XMLStreamReader.START_ELEMENT:
-                XMLEvent evt = allocator.allocate(this);
-                scope.add(evt.asStartElement());
-                break;
-            case XMLStreamReader.END_ELEMENT:
-                scope.remove(scope.size() - 1);
-                break;
-            default:
-                break;
-        }
-        return res;
+    int res = super.next();
+    switch (res) {
+      case XMLStreamReader.START_ELEMENT:
+        XMLEvent evt = allocator.allocate(this);
+        scope.add(evt.asStartElement());
+        break;
+      case XMLStreamReader.END_ELEMENT:
+        scope.remove(scope.size() - 1);
+        break;
+      default:
+        break;
     }
+    return res;
+  }
 
-    public StartElement currentScope()
-    {
-        Preconditions.checkState(scope.size() > 0, "No scope available");
-        return scope.get(scope.size() - 1);
-    }
+  public StartElement currentScope() {
+    Preconditions.checkState(scope.size() > 0, "No scope available");
+    return scope.get(scope.size() - 1);
+  }
 
-    public List<StartElement> scopes() {
-        return scope;
-    }
+  public List<StartElement> scopes() {
+    return scope;
+  }
 
 }

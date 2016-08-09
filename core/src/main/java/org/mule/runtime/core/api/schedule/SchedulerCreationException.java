@@ -13,16 +13,13 @@ package org.mule.runtime.core.api.schedule;
  *
  * @since 3.5.0
  */
-public class SchedulerCreationException extends RuntimeException
-{
+public class SchedulerCreationException extends RuntimeException {
 
-    public SchedulerCreationException(String s, Throwable throwable)
-    {
-        super(s, throwable);
-    }
+  public SchedulerCreationException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
 
-    public SchedulerCreationException(String s)
-    {
-        super(s);
-    }
+  public SchedulerCreationException(String s) {
+    super(s);
+  }
 }

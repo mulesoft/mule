@@ -29,93 +29,84 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class InterceptingOperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase
-{
+public class InterceptingOperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private InterceptingCallback interceptingCallback;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private InterceptingCallback interceptingCallback;
 
-    @Mock
-    private MessageProcessor next;
+  @Mock
+  private MessageProcessor next;
 
-    @Override
-    @Before
-    public void before() throws Exception
-    {
-        super.before();
-        when(interceptingCallback.shouldProcessNext()).thenReturn(true);
-        when(operationExecutor.execute(any())).thenReturn(interceptingCallback);
+  @Override
+  @Before
+  public void before() throws Exception {
+    super.before();
+    when(interceptingCallback.shouldProcessNext()).thenReturn(true);
+    when(operationExecutor.execute(any())).thenReturn(interceptingCallback);
+  }
+
+  @Override
+  protected OperationMessageProcessor createOperationMessageProcessor() {
+    InterceptingOperationMessageProcessor messageProcessor =
+        new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationName, target, resolverSet,
+                                                  extensionManager);
+
+    messageProcessor.setListener(next);
+
+    return messageProcessor;
+  }
+
+  @Test
+  public void nextExecuted() throws Exception {
+    org.mule.runtime.core.api.MuleEvent resultEvent = mock(org.mule.runtime.core.api.MuleEvent.class);
+    MuleMessage resultMessage = mock(MuleMessage.class);
+    when(resultEvent.getMessage()).thenReturn(resultMessage);
+    when(next.process(event)).thenReturn(resultEvent);
+
+    assertThat(messageProcessor.process(event), is(sameInstance(resultEvent)));
+    verify(next).process(event);
+    verify(interceptingCallback).onSuccess(resultMessage);
+    verify(interceptingCallback, never()).onException(any());
+    verify(interceptingCallback).onComplete();
+  }
+
+  @Test
+  public void nextSkipped() throws Exception {
+    when(interceptingCallback.shouldProcessNext()).thenReturn(false);
+
+    messageProcessor.process(event);
+    verify(next, never()).process(event);
+    verify(interceptingCallback, never()).onSuccess(any());
+    verify(interceptingCallback, never()).onException(any());
+    verify(interceptingCallback).onComplete();
+  }
+
+  @Test
+  public void nextFails() throws Exception {
+    final Exception exception = new RuntimeException();
+    when(next.process(any())).thenThrow(exception);
+
+    try {
+      messageProcessor.process(event);
+      fail("Should have failed");
+    } catch (Exception e) {
+      verify(next).process(event);
+      verify(interceptingCallback, never()).onSuccess(any());
+      verify(interceptingCallback).onException(exception);
+      verify(interceptingCallback).onComplete();
     }
+  }
 
-    @Override
-    protected OperationMessageProcessor createOperationMessageProcessor()
-    {
-        InterceptingOperationMessageProcessor messageProcessor = new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationName,
-                                                                                                           target, resolverSet, extensionManager);
+  @Test
+  public void thereIsNoNext() throws Exception {
+    ((InterceptingOperationMessageProcessor) messageProcessor).setListener(null);
 
-        messageProcessor.setListener(next);
+    messageProcessor.process(event);
 
-        return messageProcessor;
-    }
-
-    @Test
-    public void nextExecuted() throws Exception
-    {
-        org.mule.runtime.core.api.MuleEvent resultEvent = mock(org.mule.runtime.core.api.MuleEvent.class);
-        MuleMessage resultMessage = mock(MuleMessage.class);
-        when(resultEvent.getMessage()).thenReturn(resultMessage);
-        when(next.process(event)).thenReturn(resultEvent);
-
-        assertThat(messageProcessor.process(event), is(sameInstance(resultEvent)));
-        verify(next).process(event);
-        verify(interceptingCallback).onSuccess(resultMessage);
-        verify(interceptingCallback, never()).onException(any());
-        verify(interceptingCallback).onComplete();
-    }
-
-    @Test
-    public void nextSkipped() throws Exception
-    {
-        when(interceptingCallback.shouldProcessNext()).thenReturn(false);
-
-        messageProcessor.process(event);
-        verify(next, never()).process(event);
-        verify(interceptingCallback, never()).onSuccess(any());
-        verify(interceptingCallback, never()).onException(any());
-        verify(interceptingCallback).onComplete();
-    }
-
-    @Test
-    public void nextFails() throws Exception
-    {
-        final Exception exception = new RuntimeException();
-        when(next.process(any())).thenThrow(exception);
-
-        try
-        {
-            messageProcessor.process(event);
-            fail("Should have failed");
-        }
-        catch (Exception e)
-        {
-            verify(next).process(event);
-            verify(interceptingCallback, never()).onSuccess(any());
-            verify(interceptingCallback).onException(exception);
-            verify(interceptingCallback).onComplete();
-        }
-    }
-
-    @Test
-    public void thereIsNoNext() throws Exception
-    {
-        ((InterceptingOperationMessageProcessor) messageProcessor).setListener(null);
-
-        messageProcessor.process(event);
-
-        verify(next, never()).process(event);
-        verify(interceptingCallback).onSuccess(any());
-        verify(interceptingCallback, never()).onException(any());
-        verify(interceptingCallback).onComplete();
-    }
+    verify(next, never()).process(event);
+    verify(interceptingCallback).onSuccess(any());
+    verify(interceptingCallback, never()).onException(any());
+    verify(interceptingCallback).onComplete();
+  }
 
 }

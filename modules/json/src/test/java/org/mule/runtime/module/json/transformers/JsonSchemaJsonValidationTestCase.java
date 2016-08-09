@@ -18,79 +18,63 @@ import java.io.StringReader;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCase
-{
-    private static final String EXPECTED_JSON =
-            "{\n" +
-            "  \"homeTeam\": \"BAR\",\n" +
-            "  \"awayTeam\": \"RMA\",\n" +
-            "  \"homeTeamScore\": 3,\n" +
-            "  \"awayTeamScore\": 0\n" +
-            "}";
+public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCase {
 
-    private static final String BAD_JSON =
-            "{\n" +
-            "  \"homeTeam\": \"BARCA\",\n" +
-            "  \"awayTeam\": \"RMA\",\n" +
-            "  \"homeTeamScore\": 3,\n" +
-            "  \"awayTeamScore\": 0\n" +
-            "}";
+  private static final String EXPECTED_JSON = "{\n" + "  \"homeTeam\": \"BAR\",\n" + "  \"awayTeam\": \"RMA\",\n"
+      + "  \"homeTeamScore\": 3,\n" + "  \"awayTeamScore\": 0\n" + "}";
 
-    private JsonSchemaValidationFilter filter;
+  private static final String BAD_JSON = "{\n" + "  \"homeTeam\": \"BARCA\",\n" + "  \"awayTeam\": \"RMA\",\n"
+      + "  \"homeTeamScore\": 3,\n" + "  \"awayTeamScore\": 0\n" + "}";
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  private JsonSchemaValidationFilter filter;
 
-        filter = new JsonSchemaValidationFilter();
-        filter.setSchemaLocations("match-schema.json");
-        filter.setMuleContext(muleContext);
-        filter.initialise();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-    @Test
-    public void filterShouldAcceptStringInput() throws Exception
-    {
-        MuleEvent event = getTestEvent(EXPECTED_JSON, muleContext);
-        boolean accepted = filter.accept(event);
-        assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
-    }
+    filter = new JsonSchemaValidationFilter();
+    filter.setSchemaLocations("match-schema.json");
+    filter.setMuleContext(muleContext);
+    filter.initialise();
+  }
 
-    @Test
-    public void filterShouldAcceptReaderInput() throws Exception
-    {
-        MuleEvent event = getTestEvent(new StringReader(EXPECTED_JSON), muleContext);
-        boolean accepted = filter.accept(event);
-        assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
-    }
+  @Test
+  public void filterShouldAcceptStringInput() throws Exception {
+    MuleEvent event = getTestEvent(EXPECTED_JSON, muleContext);
+    boolean accepted = filter.accept(event);
+    assertTrue(accepted);
+    JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
+  }
 
-    @Test
-    public void filterShouldAcceptByteArrayInput() throws Exception
-    {
-        MuleEvent event = getTestEvent(EXPECTED_JSON.getBytes(), muleContext);
-        boolean accepted = filter.accept(event);
-        assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
-    }
+  @Test
+  public void filterShouldAcceptReaderInput() throws Exception {
+    MuleEvent event = getTestEvent(new StringReader(EXPECTED_JSON), muleContext);
+    boolean accepted = filter.accept(event);
+    assertTrue(accepted);
+    JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
+  }
 
-    @Test
-    public void filterShouldAcceptInputStreamInput() throws Exception
-    {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(EXPECTED_JSON.getBytes()), muleContext);
-        boolean accepted = filter.accept(event);
-        assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
-    }
+  @Test
+  public void filterShouldAcceptByteArrayInput() throws Exception {
+    MuleEvent event = getTestEvent(EXPECTED_JSON.getBytes(), muleContext);
+    boolean accepted = filter.accept(event);
+    assertTrue(accepted);
+    JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
+  }
 
-    @Test
-    public void filterShouldNotAcceptInvalidJson() throws Exception
-    {
-        MuleEvent event = getTestEvent(BAD_JSON, muleContext);
-        boolean accepted = filter.accept(event);
-        assertFalse(accepted);
-    }
+  @Test
+  public void filterShouldAcceptInputStreamInput() throws Exception {
+    MuleEvent event = getTestEvent(new ByteArrayInputStream(EXPECTED_JSON.getBytes()), muleContext);
+    boolean accepted = filter.accept(event);
+    assertTrue(accepted);
+    JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(event.getMessage()), false);
+  }
+
+  @Test
+  public void filterShouldNotAcceptInvalidJson() throws Exception {
+    MuleEvent event = getTestEvent(BAD_JSON, muleContext);
+    boolean accepted = filter.accept(event);
+    assertFalse(accepted);
+  }
 
 }

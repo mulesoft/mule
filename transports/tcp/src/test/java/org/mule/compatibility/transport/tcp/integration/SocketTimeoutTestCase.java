@@ -20,49 +20,40 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SocketTimeoutTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class SocketTimeoutTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-outbound-timeout-config.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void socketReadWriteResponseTimeout() throws Exception
-    {
-        final MuleClient client = new MuleClient(muleContext);
-        FutureMessageResult result = client.sendAsync("vm://inboundTest1", "something", null);
-        MuleMessage message = null;
-        try
-        {
-            message = result.getMessage(1000);
-        }
-        catch (TimeoutException e)
-        {
-            fail("Response timeout not honored.");
-        }
-        assertNotNull(message);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-outbound-timeout-config.xml";
+  }
 
-    @Test
-    public void socketConnectionResponseTimeout() throws Exception
-    {
-        final MuleClient client = new MuleClient(muleContext);
-        FutureMessageResult result = client.sendAsync("vm://inboundTest2", "something", null);
-        MuleMessage message = null;
-        try
-        {
-            message = result.getMessage(1000);
-        }
-        catch (TimeoutException e)
-        {
-            fail("Response timeout not honored.");
-        }
-        assertNotNull(message);
+  @Test
+  public void socketReadWriteResponseTimeout() throws Exception {
+    final MuleClient client = new MuleClient(muleContext);
+    FutureMessageResult result = client.sendAsync("vm://inboundTest1", "something", null);
+    MuleMessage message = null;
+    try {
+      message = result.getMessage(1000);
+    } catch (TimeoutException e) {
+      fail("Response timeout not honored.");
     }
+    assertNotNull(message);
+  }
+
+  @Test
+  public void socketConnectionResponseTimeout() throws Exception {
+    final MuleClient client = new MuleClient(muleContext);
+    FutureMessageResult result = client.sendAsync("vm://inboundTest2", "something", null);
+    MuleMessage message = null;
+    try {
+      message = result.getMessage(1000);
+    } catch (TimeoutException e) {
+      fail("Response timeout not honored.");
+    }
+    assertNotNull(message);
+  }
 
 }

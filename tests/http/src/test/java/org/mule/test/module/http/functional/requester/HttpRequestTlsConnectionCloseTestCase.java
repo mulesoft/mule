@@ -21,32 +21,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 
-public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-connection-close-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-connection-close-config.xml";
+  }
 
-    @Override
-    protected boolean enableHttps()
-    {
-        return true;
-    }
+  @Override
+  protected boolean enableHttps() {
+    return true;
+  }
 
-    @Override
-    protected void writeResponse(HttpServletResponse response) throws IOException
-    {
-        super.writeResponse(response);
-        response.addHeader(CONNECTION, CLOSE);
-    }
+  @Override
+  protected void writeResponse(HttpServletResponse response) throws IOException {
+    super.writeResponse(response);
+    response.addHeader(CONNECTION, CLOSE);
+  }
 
-    @Test
-    public void handlesRequest() throws Exception
-    {
-        MuleEvent response = flowRunner("testFlowHttps").withPayload(TEST_PAYLOAD).run();
-        assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is(DEFAULT_RESPONSE));
-    }
+  @Test
+  public void handlesRequest() throws Exception {
+    MuleEvent response = flowRunner("testFlowHttps").withPayload(TEST_PAYLOAD).run();
+    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is(DEFAULT_RESPONSE));
+  }
 }

@@ -14,58 +14,58 @@ import java.util.Date;
  * <code>MuleServiceMBean</code> is a JMX service interface for the MuleContext.
  * 
  */
-public interface MuleServiceMBean
-{
-    // CRITICAL: do not modify the order of key/value pairs here, it MUST
-    // match the one returned by ObjectName.getCanonicalKeyPropertyListString()
-    String DEFAULT_JMX_NAME = "name=MuleContext";
+public interface MuleServiceMBean {
 
-    boolean isInitialised();
+  // CRITICAL: do not modify the order of key/value pairs here, it MUST
+  // match the one returned by ObjectName.getCanonicalKeyPropertyListString()
+  String DEFAULT_JMX_NAME = "name=MuleContext";
 
-    boolean isStopped();
+  boolean isInitialised();
 
-    Date getStartTime();
+  boolean isStopped();
 
-    String getVersion();
+  Date getStartTime();
 
-    String getVendor();
+  String getVersion();
 
-    void start() throws MuleException;
+  String getVendor();
 
-    void stop() throws MuleException;
+  void start() throws MuleException;
 
-    void dispose() throws MuleException;
+  void stop() throws MuleException;
 
-    long getFreeMemory();
+  void dispose() throws MuleException;
 
-    long getMaxMemory();
+  long getFreeMemory();
 
-    long getTotalMemory();
+  long getMaxMemory();
 
-    String getServerId();
+  long getTotalMemory();
 
-    String getHostname();
+  String getServerId();
 
-    String getHostIp();
+  String getHostname();
 
-    String getOsVersion();
+  String getHostIp();
 
-    String getJdkVersion();
+  String getOsVersion();
 
-    String getCopyright();
+  String getJdkVersion();
 
-    String getLicense();
+  String getCopyright();
 
-    String getBuildDate();
+  String getLicense();
 
-    String getBuildNumber();
+  String getBuildDate();
 
-    String getInstanceId();
+  String getBuildNumber();
 
-    /**
-     * Contains value of option -builder
-     *
-     * @return builder class name
-     */
-    String getConfigBuilderClassName();
+  String getInstanceId();
+
+  /**
+   * Contains value of option -builder
+   *
+   * @return builder class name
+   */
+  String getConfigBuilderClassName();
 }

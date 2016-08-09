@@ -27,116 +27,94 @@ import org.mule.runtime.core.util.MapUtils;
 import java.util.List;
 
 /**
- * <code>HttpMessageReceiver</code> is a simple http server that can be used to
- * listen for HTTP requests on a particular port.
+ * <code>HttpMessageReceiver</code> is a simple http server that can be used to listen for HTTP requests on a particular port.
  */
-public class HttpMessageReceiver extends AbstractMessageReceiver
-{
+public class HttpMessageReceiver extends AbstractMessageReceiver {
 
-    public HttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-            throws CreateException
-    {
-        super(connector, flowConstruct, endpoint);
+  public HttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint) throws CreateException {
+    super(connector, flowConstruct, endpoint);
+  }
+
+  @Override
+  protected void doConnect() throws ConnectException {
+    ((HttpConnector) connector).connect(endpoint.getEndpointURI());
+  }
+
+  @Override
+  protected void doDisconnect() throws Exception {
+    ((HttpConnector) connector).disconnect(endpoint.getEndpointURI());
+  }
+
+  HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection) {
+    return new HttpMessageProcessTemplate(this, httpServerConnection);
+  }
+
+  MessageProcessContext createMessageProcessContext() {
+    return new TransportMessageProcessContext(this, getWorkManager());
+  }
+
+  void processRequest(HttpServerConnection httpServerConnection) throws InterruptedException, MuleException {
+    HttpMessageProcessTemplate messageProcessTemplate = createMessageProcessTemplate(httpServerConnection);
+    MessageProcessContext messageProcessContext = createMessageProcessContext();
+    processMessage(messageProcessTemplate, messageProcessContext);
+    messageProcessTemplate.awaitTermination();
+  }
+
+  protected String processRelativePath(String contextPath, String path) {
+    String relativePath = path.substring(contextPath.length());
+    if (relativePath.startsWith("/")) {
+      return relativePath.substring(1);
     }
+    return relativePath;
+  }
 
-    @Override
-    protected void doConnect() throws ConnectException
-    {
-        ((HttpConnector) connector).connect(endpoint.getEndpointURI());
+  @Override
+  protected void initializeMessageFactory() throws InitialisationException {
+    HttpMuleMessageFactory factory;
+    try {
+      factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
+
+      boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(), HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY,
+                                                       ((HttpConnector) connector).isEnableCookies());
+      factory.setEnableCookies(enableCookies);
+
+      String cookieSpec = MapUtils.getString(endpoint.getProperties(), HttpConnector.HTTP_COOKIE_SPEC_PROPERTY,
+                                             ((HttpConnector) connector).getCookieSpec());
+      factory.setCookieSpec(cookieSpec);
+
+      factory.setExchangePattern(endpoint.getExchangePattern());
+
+      muleMessageFactory = factory;
+    } catch (CreateException ce) {
+      Message message = MessageFactory.createStaticMessage(ce.getMessage());
+      throw new InitialisationException(message, ce, this);
     }
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        ((HttpConnector) connector).disconnect(endpoint.getEndpointURI());
+  @Override
+  protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Message request '" + message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
+          + "' is being rejected since it does not match the filter on this endpoint: " + endpoint);
     }
+    return MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE)).build();
+  }
 
-    HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection)
-    {
-        return new HttpMessageProcessTemplate(this,httpServerConnection);
+  public List<Transformer> getResponseTransportTransformers() {
+    return this.defaultResponseTransformers;
+  }
+
+  public static class EmptyRequestException extends RuntimeException {
+
+    public EmptyRequestException() {
+      super();
     }
+  }
 
-    MessageProcessContext createMessageProcessContext()
-    {
-        return new TransportMessageProcessContext(this, getWorkManager());
+  public static class FailureProcessingRequestException extends RuntimeException {
+
+    public FailureProcessingRequestException() {
+      super();
     }
-
-    void processRequest(HttpServerConnection httpServerConnection) throws InterruptedException, MuleException
-    {
-        HttpMessageProcessTemplate messageProcessTemplate = createMessageProcessTemplate(httpServerConnection);
-        MessageProcessContext messageProcessContext = createMessageProcessContext();
-        processMessage(messageProcessTemplate, messageProcessContext);
-        messageProcessTemplate.awaitTermination();
-    }
-
-    protected String processRelativePath(String contextPath, String path)
-    {
-        String relativePath = path.substring(contextPath.length());
-        if (relativePath.startsWith("/"))
-        {
-            return relativePath.substring(1);
-        }
-        return relativePath;
-    }
-
-    @Override
-    protected void initializeMessageFactory() throws InitialisationException
-    {
-        HttpMuleMessageFactory factory;
-        try
-        {
-            factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
-
-            boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
-                                                             HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
-            factory.setEnableCookies(enableCookies);
-
-            String cookieSpec = MapUtils.getString(endpoint.getProperties(),
-                                                   HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
-            factory.setCookieSpec(cookieSpec);
-
-            factory.setExchangePattern(endpoint.getExchangePattern());
-
-            muleMessageFactory = factory;
-        }
-        catch (CreateException ce)
-        {
-            Message message = MessageFactory.createStaticMessage(ce.getMessage());
-            throw new InitialisationException(message, ce, this);
-        }
-    }
-
-    @Override
-    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Message request '"
-                         + message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
-                         + "' is being rejected since it does not match the filter on this endpoint: "
-                         + endpoint);
-        }
-        return MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE)).build();
-    }
-
-    public List<Transformer> getResponseTransportTransformers()
-    {
-        return this.defaultResponseTransformers;
-    }
-
-    public static class EmptyRequestException extends RuntimeException
-    {
-        public EmptyRequestException()
-        {
-            super();
-        }
-    }
-
-    public static class FailureProcessingRequestException extends RuntimeException
-    {
-        public FailureProcessingRequestException()
-        {
-            super();
-        }
-    }
+  }
 }

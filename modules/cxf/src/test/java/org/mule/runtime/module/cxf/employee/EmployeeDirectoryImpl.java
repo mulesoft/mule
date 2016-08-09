@@ -16,43 +16,37 @@ import java.util.List;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "EmployeeDirectory", portName = "EmployeeDirectoryPort", endpointInterface = "org.mule.example.employee.EmployeeDirectory")
-public class EmployeeDirectoryImpl implements EmployeeDirectory
-{
+@WebService(serviceName = "EmployeeDirectory", portName = "EmployeeDirectoryPort",
+    endpointInterface = "org.mule.example.employee.EmployeeDirectory")
+public class EmployeeDirectoryImpl implements EmployeeDirectory {
 
-    private int invocationCount;
-    private List<Employee> employees = new ArrayList<Employee>();
+  private int invocationCount;
+  private List<Employee> employees = new ArrayList<Employee>();
 
-    public List<Employee> getEmployees()
-    {
-        return employees;
+  public List<Employee> getEmployees() {
+    return employees;
+  }
+
+  public void addEmployee(Employee employee) {
+    // Read the picture, otherwise the other side never finishes writing
+    try {
+      InputStream is = employee.getPicture().getInputStream();
+
+      while (is.read() != -1);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
-    public void addEmployee(Employee employee)
-    {
-        // Read the picture, otherwise the other side never finishes writing
-        try
-        {
-            InputStream is = employee.getPicture().getInputStream();
-            
-            while (is.read() != -1);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        
-        
-        
-        System.out.println("Added " + employee.getName() + " in division " + employee.getDivision()
-                           + " with a picture " + employee.getPicture());
-        employees.add(employee);
-        invocationCount++;
-    }
 
-    public int getInvocationCount()
-    {
-        return invocationCount;
-    }
+
+    System.out.println("Added " + employee.getName() + " in division " + employee.getDivision() + " with a picture "
+        + employee.getPicture());
+    employees.add(employee);
+    invocationCount++;
+  }
+
+  public int getInvocationCount() {
+    return invocationCount;
+  }
 
 }

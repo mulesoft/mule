@@ -7,12 +7,12 @@
 package org.mule.runtime.core.api.lifecycle;
 
 /**
- * Inject an objects lifecycle state.  This is useful for services that need to track or assert lifecycle state such as init, dispose
- * start, stop, dispose.
+ * Inject an objects lifecycle state. This is useful for services that need to track or assert lifecycle state such as init,
+ * dispose start, stop, dispose.
  *
  * @since 3.0
  */
-public interface LifecycleStateAware
-{
-    void setLifecycleState(LifecycleState state);
+public interface LifecycleStateAware {
+
+  void setLifecycleState(LifecycleState state);
 }

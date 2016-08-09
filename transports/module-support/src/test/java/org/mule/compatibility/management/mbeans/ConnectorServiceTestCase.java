@@ -21,50 +21,48 @@ import javax.management.ObjectName;
 
 import org.junit.Test;
 
-public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
-{
+public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase {
 
-    protected String domainName;
-    protected JmxApplicationAgent jmxAgent;
+  protected String domainName;
+  protected JmxApplicationAgent jmxAgent;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
 
-    }
+  }
 
-    @Test
-    public void testUndeploy() throws Exception
-    {
-        final Connector connector = new TestConnector(muleContext);
-        connector.setName("TEST_CONNECTOR");
-        registerConnector(muleContext.getRegistry(), connector);
-        muleContext.start();
+  @Test
+  public void testUndeploy() throws Exception {
+    final Connector connector = new TestConnector(muleContext);
+    connector.setName("TEST_CONNECTOR");
+    registerConnector(muleContext.getRegistry(), connector);
+    muleContext.start();
 
-        domainName = jmxSupport.getDomainName(muleContext);
-        final String query = domainName + ":*";
-        final ObjectName objectName = jmxSupport.getObjectName(query);
-        Set<ObjectInstance> mbeans = mBeanServer.queryMBeans(objectName, null);
+    domainName = jmxSupport.getDomainName(muleContext);
+    final String query = domainName + ":*";
+    final ObjectName objectName = jmxSupport.getObjectName(query);
+    Set<ObjectInstance> mbeans = mBeanServer.queryMBeans(objectName, null);
 
-        // Expecting following mbeans to be registered:
-        // 1) org.mule.management.mbeans.StatisticsService@Mule.ConnectorServiceTest:type=org.mule.Statistics,name=AllStatistics
-        // 2) org.mule.management.mbeans.MuleConfigurationService@Mule.ConnectorServiceTest:type=org.mule.Configuration,name=GlobalConfiguration
-        // 3) org.mule.management.mbeans.MuleService@Mule.ConnectorServiceTest:type=org.mule.MuleContext,name=MuleServerInfo
-        // 4) org.mule.management.mbeans.ConnectorService@Mule.ConnectorServiceTest:type=org.mule.Connector,name="TEST.CONNECTOR"
-        // 5) org.mule.module.management.mbean.ApplicationService:type=Application,name="totals for all flows and services"]
-        // 6) org.mule.module.management.mbean.FlowConstructStats:type=org.mule.Statistics,Application=totals for all flows and services]
-        assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
-        muleContext.dispose();
+    // Expecting following mbeans to be registered:
+    // 1) org.mule.management.mbeans.StatisticsService@Mule.ConnectorServiceTest:type=org.mule.Statistics,name=AllStatistics
+    // 2)
+    // org.mule.management.mbeans.MuleConfigurationService@Mule.ConnectorServiceTest:type=org.mule.Configuration,name=GlobalConfiguration
+    // 3) org.mule.management.mbeans.MuleService@Mule.ConnectorServiceTest:type=org.mule.MuleContext,name=MuleServerInfo
+    // 4) org.mule.management.mbeans.ConnectorService@Mule.ConnectorServiceTest:type=org.mule.Connector,name="TEST.CONNECTOR"
+    // 5) org.mule.module.management.mbean.ApplicationService:type=Application,name="totals for all flows and services"]
+    // 6) org.mule.module.management.mbean.FlowConstructStats:type=org.mule.Statistics,Application=totals for all flows and
+    // services]
+    assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
+    muleContext.dispose();
 
-        mbeans = mBeanServer.queryMBeans(objectName, null);
-        assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
-    }
+    mbeans = mBeanServer.queryMBeans(objectName, null);
+    assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        unregisterMBeansByMask(domainName + ":*");
-    }
+  @Override
+  protected void doTearDown() throws Exception {
+    unregisterMBeansByMask(domainName + ":*");
+  }
 }

@@ -16,14 +16,13 @@ import java.util.List;
  *
  * @since 3.8.0
  */
-public interface DebugInfoProvider
-{
+public interface DebugInfoProvider {
 
-    /**
-     * Returns debug information about the fields of this object.
-     *
-     * @param event event used while debugging. Non null
-     * @return a non null {@link List}
-     */
-    List<FieldDebugInfo<?>> getDebugInfo(MuleEvent event);
+  /**
+   * Returns debug information about the fields of this object.
+   *
+   * @param event event used while debugging. Non null
+   * @return a non null {@link List}
+   */
+  List<FieldDebugInfo<?>> getDebugInfo(MuleEvent event);
 }

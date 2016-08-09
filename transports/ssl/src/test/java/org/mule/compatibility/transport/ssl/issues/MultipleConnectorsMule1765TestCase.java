@@ -14,21 +14,19 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
-{
-    protected static String TEST_SSL_MESSAGE = "Test SSL Request";
+public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-connectors-test-flow.xml";
-    }
+  protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 
-    @Test
-    public void testSend() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null);
-        assertEquals(TEST_SSL_MESSAGE + " Received", getPayloadAsString(result));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiple-connectors-test-flow.xml";
+  }
+
+  @Test
+  public void testSend() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null);
+    assertEquals(TEST_SSL_MESSAGE + " Received", getPayloadAsString(result));
+  }
 }

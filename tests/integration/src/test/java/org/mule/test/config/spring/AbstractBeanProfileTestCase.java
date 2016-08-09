@@ -12,21 +12,18 @@ import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTestCase
-{
+public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTestCase {
 
-    protected String getConfigFile(String profile)
-    {
-        System.setProperty("spring.profiles.active", profile);
-        return "org/mule/test/integration/spring/bean-profiles-config.xml";
-    }
+  protected String getConfigFile(String profile) {
+    System.setProperty("spring.profiles.active", profile);
+    return "org/mule/test/integration/spring/bean-profiles-config.xml";
+  }
 
-    public void profile(String appended) throws Exception
-    {
-        flowRunner("service").withPayload("Homero").run();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://out", RECEIVE_TIMEOUT);
-        assertNotNull("Response is null", response);
-        assertEquals("Homero" + appended, response.getPayload());
-    }
+  public void profile(String appended) throws Exception {
+    flowRunner("service").withPayload("Homero").run();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://out", RECEIVE_TIMEOUT);
+    assertNotNull("Response is null", response);
+    assertEquals("Homero" + appended, response.getPayload());
+  }
 }

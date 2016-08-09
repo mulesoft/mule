@@ -16,23 +16,21 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TransformerOnMessageCollectionTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/transformers/transformer-on-message-collection-config.xml";
-    }
+public class TransformerOnMessageCollectionTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testIssue() throws Exception
-    {
-        List<String> values = new LinkedList<String>();
-        values.add("One");
-        values.add("Two");
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/transformers/transformer-on-message-collection-config.xml";
+  }
 
-        MuleMessage response = flowRunner("test").withPayload(values).run().getMessage();
-        assertEquals("foo", response.getPayload());
-        assertFalse(response.getPayload() instanceof List);
-    }
+  @Test
+  public void testIssue() throws Exception {
+    List<String> values = new LinkedList<String>();
+    values.add("One");
+    values.add("Two");
+
+    MuleMessage response = flowRunner("test").withPayload(values).run().getMessage();
+    assertEquals("foo", response.getPayload());
+    assertFalse(response.getPayload() instanceof List);
+  }
 }

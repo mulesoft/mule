@@ -11,16 +11,16 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
-public interface MessagingExceptionHandler extends ExceptionHandler
-{
-    /**
-     * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
-     * 
-     * @param exception which occurred
-     * @param event which was being processed when the exception occurred
-     * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
-     */
-    MuleEvent handleException(Exception exception, MuleEvent event);
+public interface MessagingExceptionHandler extends ExceptionHandler {
+
+  /**
+   * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
+   * 
+   * @param exception which occurred
+   * @param event which was being processed when the exception occurred
+   * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
+   */
+  MuleEvent handleException(Exception exception, MuleEvent event);
 }
 
 

@@ -13,30 +13,25 @@ import java.util.Collection;
 /**
  * <code>SimplePrinter</code> Default stats printer
  */
-public class SimplePrinter extends AbstractTablePrinter
-{
-    public SimplePrinter(Writer out)
-    {
-        super(out);
-    }
+public class SimplePrinter extends AbstractTablePrinter {
 
-    public SimplePrinter(OutputStream out)
-    {
-        super(out);
-    }
+  public SimplePrinter(Writer out) {
+    super(out);
+  }
 
-    public void print(Collection stats)
-    {
-        String[][] table = getTable(stats);
-        for (int i = 1; i < table.length; i++)
-        {
-            println();
-            println("---- Service Statistics ----");
-            for (int j = 0; j < table[0].length; j++)
-            {
-                println(table[0][j] + ": " + table[i][j]);
-            }
-            println("---- End Service Statistics ----");
-        }
+  public SimplePrinter(OutputStream out) {
+    super(out);
+  }
+
+  public void print(Collection stats) {
+    String[][] table = getTable(stats);
+    for (int i = 1; i < table.length; i++) {
+      println();
+      println("---- Service Statistics ----");
+      for (int j = 0; j < table[0].length; j++) {
+        println(table[0][j] + ": " + table[i][j]);
+      }
+      println("---- End Service Statistics ----");
     }
+  }
 }

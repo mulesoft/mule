@@ -19,61 +19,47 @@ import java.nio.charset.Charset;
 /**
  * Converts a Byte array to a Hex String.
  */
-public class ByteArrayToHexString extends AbstractTransformer
-{
-    private volatile boolean upperCase = false;
+public class ByteArrayToHexString extends AbstractTransformer {
 
-    public ByteArrayToHexString()
-    {
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.INPUT_STREAM);
-        setReturnDataType(DataType.STRING);
+  private volatile boolean upperCase = false;
+
+  public ByteArrayToHexString() {
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.INPUT_STREAM);
+    setReturnDataType(DataType.STRING);
+  }
+
+  public boolean getUpperCase() {
+    return upperCase;
+  }
+
+  public void setUpperCase(boolean value) {
+    upperCase = value;
+  }
+
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    if (src == null) {
+      return StringUtils.EMPTY;
     }
 
-    public boolean getUpperCase()
-    {
-        return upperCase;
-    }
-
-    public void setUpperCase(boolean value)
-    {
-        upperCase = value;
-    }
-
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        if (src == null)
-        {
-            return StringUtils.EMPTY;
+    try {
+      byte[] bytes = null;
+      if (src instanceof InputStream) {
+        InputStream input = (InputStream) src;
+        try {
+          bytes = IOUtils.toByteArray(input);
+        } finally {
+          IOUtils.closeQuietly(input);
         }
+      } else {
+        bytes = (byte[]) src;
+      }
 
-        try
-        {
-            byte[] bytes = null;
-            if (src instanceof InputStream)
-            {
-                InputStream input = (InputStream) src;
-                try
-                {
-                    bytes = IOUtils.toByteArray(input);
-                }
-                finally
-                {
-                    IOUtils.closeQuietly(input);
-                }
-            }
-            else
-            {
-                bytes = (byte[]) src;
-            }
-                
-            return StringUtils.toHexString(bytes, upperCase);
-        }
-        catch (Exception ex)
-        {
-            throw new TransformerException(this, ex);
-        }
+      return StringUtils.toHexString(bytes, upperCase);
+    } catch (Exception ex) {
+      throw new TransformerException(this, ex);
     }
+  }
 
 }

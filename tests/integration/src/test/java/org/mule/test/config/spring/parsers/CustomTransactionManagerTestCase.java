@@ -18,46 +18,36 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class CustomTransactionManagerTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    public String getConfigFile()
-    {
-        return "test-custom-transaction-manager.xml";
-    }
+public class CustomTransactionManagerTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testCustomTransactionManager() throws Exception
-    {
-        TransactionManager transactionManager = muleContext.getTransactionManager();
-        assertTrue(transactionManager instanceof Proxy);
-        Proxy proxy = (Proxy) transactionManager;
-        TestTransactionManagerFactory.InternalInvocationHandler ihandler =
-                (TestTransactionManagerFactory.InternalInvocationHandler) Proxy.getInvocationHandler(proxy);
-        TestTransactionManagerFactory factory = ihandler.getParent();
-        Map<?, ?> properties = factory.getEnvironment();
-        assertEquals(properties.size(), 2);
-        assertEquals(properties.get("property1"), "true");
-        assertEquals(properties.get("property2"), "Test");
-    }
+  @Override
+  public String getConfigFile() {
+    return "test-custom-transaction-manager.xml";
+  }
+
+  @Test
+  public void testCustomTransactionManager() throws Exception {
+    TransactionManager transactionManager = muleContext.getTransactionManager();
+    assertTrue(transactionManager instanceof Proxy);
+    Proxy proxy = (Proxy) transactionManager;
+    TestTransactionManagerFactory.InternalInvocationHandler ihandler =
+        (TestTransactionManagerFactory.InternalInvocationHandler) Proxy.getInvocationHandler(proxy);
+    TestTransactionManagerFactory factory = ihandler.getParent();
+    Map<?, ?> properties = factory.getEnvironment();
+    assertEquals(properties.size(), 2);
+    assertEquals(properties.get("property1"), "true");
+    assertEquals(properties.get("property2"), "Test");
+  }
 
 
-    /*
-     * Attention: this test only runs successful when it's the only one. As soon
-     * as the test above is added, muleContext contains more than one transaction
-     * manager and all kinds of havoc happen here.
-
-    @Test
-    public void testWeblogicTransactionManager() throws Exception
-    {
-        TransactionManager transactionManager = muleContext.getTransactionManager();
-        assertNotNull(transactionManager);
-        transactionManager.begin();
-        Transaction transaction = transactionManager.getTransaction();
-        assertNotNull(transaction);
-        transactionManager.rollback();
-        assertNull(transactionManager.getTransaction());
-    }
-    */
+  /*
+   * Attention: this test only runs successful when it's the only one. As soon as the test above is added, muleContext contains
+   * more than one transaction manager and all kinds of havoc happen here.
+   * 
+   * @Test public void testWeblogicTransactionManager() throws Exception { TransactionManager transactionManager =
+   * muleContext.getTransactionManager(); assertNotNull(transactionManager); transactionManager.begin(); Transaction transaction =
+   * transactionManager.getTransaction(); assertNotNull(transaction); transactionManager.rollback();
+   * assertNull(transactionManager.getTransaction()); }
+   */
 
 }

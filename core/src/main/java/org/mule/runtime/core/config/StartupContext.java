@@ -12,31 +12,27 @@ import java.util.Map;
 /**
  * A class holding cross-cutting startup info.
  */
-public class StartupContext
-{
-    private static final ThreadLocal<StartupContext> info = new ThreadLocal<StartupContext>()
-    {
-        @Override
-        protected StartupContext initialValue()
-        {
-            return new StartupContext();
-        }
-    };
+public class StartupContext {
 
-    private Map<String, Object> startupOptions = Collections.emptyMap();
+  private static final ThreadLocal<StartupContext> info = new ThreadLocal<StartupContext>() {
 
-    public static StartupContext get()
-    {
-        return info.get();
+    @Override
+    protected StartupContext initialValue() {
+      return new StartupContext();
     }
+  };
 
-    public Map<String, Object> getStartupOptions()
-    {
-        return Collections.unmodifiableMap(startupOptions);
-    }
+  private Map<String, Object> startupOptions = Collections.emptyMap();
 
-    public void setStartupOptions(Map<String, Object> startupOptions)
-    {
-        this.startupOptions = startupOptions;
-    }
+  public static StartupContext get() {
+    return info.get();
+  }
+
+  public Map<String, Object> getStartupOptions() {
+    return Collections.unmodifiableMap(startupOptions);
+  }
+
+  public void setStartupOptions(Map<String, Object> startupOptions) {
+    this.startupOptions = startupOptions;
+  }
 }

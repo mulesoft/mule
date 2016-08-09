@@ -11,31 +11,26 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public class HttpResponseAttributesReasonPhraseMatcher extends TypeSafeMatcher<HttpResponseAttributes>
-{
+public class HttpResponseAttributesReasonPhraseMatcher extends TypeSafeMatcher<HttpResponseAttributes> {
 
-    private final String reasonPhrase;
+  private final String reasonPhrase;
 
-    public HttpResponseAttributesReasonPhraseMatcher(String reasonPhrase)
-    {
-        this.reasonPhrase = reasonPhrase;
-    }
+  public HttpResponseAttributesReasonPhraseMatcher(String reasonPhrase) {
+    this.reasonPhrase = reasonPhrase;
+  }
 
-    @Override
-    protected boolean matchesSafely(HttpResponseAttributes item)
-    {
-        return reasonPhrase.equals(item.getReasonPhrase());
-    }
+  @Override
+  protected boolean matchesSafely(HttpResponseAttributes item) {
+    return reasonPhrase.equals(item.getReasonPhrase());
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("response attributes with reason phrase ").appendValue(reasonPhrase);
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("response attributes with reason phrase ").appendValue(reasonPhrase);
+  }
 
-    @Override
-    protected void describeMismatchSafely(HttpResponseAttributes attributes, Description mismatchDescription)
-    {
-        mismatchDescription.appendText("got response attributes with reason phrase ").appendValue(attributes.getReasonPhrase());
-    }
+  @Override
+  protected void describeMismatchSafely(HttpResponseAttributes attributes, Description mismatchDescription) {
+    mismatchDescription.appendText("got response attributes with reason phrase ").appendValue(attributes.getReasonPhrase());
+  }
 }

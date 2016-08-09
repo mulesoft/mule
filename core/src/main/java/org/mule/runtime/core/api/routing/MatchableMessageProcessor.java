@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
-public interface MatchableMessageProcessor extends MessageProcessor, Matchable
-{
+public interface MatchableMessageProcessor extends MessageProcessor, Matchable {
 
 }

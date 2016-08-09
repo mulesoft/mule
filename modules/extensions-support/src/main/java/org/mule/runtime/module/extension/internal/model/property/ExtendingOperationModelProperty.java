@@ -12,62 +12,54 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 /**
- * A custom model property which marks that an operation is augmenting
- * the functionality of an {@link Extension} which is defined in a type
- * annotated with {@link Extensible}.
+ * A custom model property which marks that an operation is augmenting the functionality of an {@link Extension} which is defined
+ * in a type annotated with {@link Extensible}.
  * <p>
- * The runtime consequences of this property depend on the runtime.
- * This class constructor throws {@link IllegalArgumentException} if
- * {@link #type} is not annotated with {@link Extensible}
+ * The runtime consequences of this property depend on the runtime. This class constructor throws {@link IllegalArgumentException}
+ * if {@link #type} is not annotated with {@link Extensible}
  *
  * @since 4.0
  */
-public final class ExtendingOperationModelProperty<T> implements ModelProperty
-{
+public final class ExtendingOperationModelProperty<T> implements ModelProperty {
 
-    private final Class<T> type;
+  private final Class<T> type;
 
-    /**
-     * Creates a new instance pointing to a {@code type} annotated
-     * with {@link IllegalArgumentException}
-     *
-     * @param type the type that is being implemented
-     * @throws IllegalArgumentException if {@code type} is not annotated with {@link Extensible}
-     */
-    public ExtendingOperationModelProperty(Class<T> type)
-    {
-        checkArgument(type != null, "cannot implement a null type");
-        checkArgument(type.getAnnotation(Extensible.class) != null, type.getName() + " is not annotated with @Extensible");
-        this.type = type;
-    }
+  /**
+   * Creates a new instance pointing to a {@code type} annotated with {@link IllegalArgumentException}
+   *
+   * @param type the type that is being implemented
+   * @throws IllegalArgumentException if {@code type} is not annotated with {@link Extensible}
+   */
+  public ExtendingOperationModelProperty(Class<T> type) {
+    checkArgument(type != null, "cannot implement a null type");
+    checkArgument(type.getAnnotation(Extensible.class) != null, type.getName() + " is not annotated with @Extensible");
+    this.type = type;
+  }
 
-    /**
-     * @return {@code type}
-     */
-    public Class<T> getType()
-    {
-        return type;
-    }
+  /**
+   * @return {@code type}
+   */
+  public Class<T> getType() {
+    return type;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code extendingOperation}
-     */
-    @Override
-    public String getName()
-    {
-        return "extendingOperation";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code extendingOperation}
+   */
+  @Override
+  public String getName() {
+    return "extendingOperation";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

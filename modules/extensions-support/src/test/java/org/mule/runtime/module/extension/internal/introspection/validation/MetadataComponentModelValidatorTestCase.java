@@ -38,120 +38,111 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionModel extensionModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionModel extensionModel;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private DictionaryType dictionaryType;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private DictionaryType dictionaryType;
 
-    @Mock
-    private RuntimeOperationModel operationModel;
+  @Mock
+  private RuntimeOperationModel operationModel;
 
-    @Mock
-    private RuntimeSourceModel sourceModel;
+  @Mock
+  private RuntimeSourceModel sourceModel;
 
-    private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
+  private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
 
-    public static class SimpleOutputResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>
-    {
-        @Override
-        public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-        {
-            return null;
-        }
+  public static class SimpleOutputResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String> {
 
-        @Override
-        public MetadataType getAttributesMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-        {
-            return null;
-        }
+    @Override
+    public MetadataType getOutputMetadata(MetadataContext context, String key)
+        throws MetadataResolvingException, ConnectionException {
+      return null;
     }
 
-    @Before
-    public void before()
-    {
-        when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-        when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
-
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
-        when(operationModel.getName()).thenReturn("operation");
-        when(operationModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
-
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
-        when(sourceModel.getName()).thenReturn("source");
-        when(sourceModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
+    @Override
+    public MetadataType getAttributesMetadata(MetadataContext context, String key)
+        throws MetadataResolvingException, ConnectionException {
+      return null;
     }
+  }
 
-    @Test
-    public void valid()
-    {
-        validator.validate(extensionModel);
-    }
+  @Before
+  public void before() {
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void operationReturnsObjectType()
-    {
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
-        validator.validate(extensionModel);
-    }
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(operationModel.getName()).thenReturn("operation");
+    when(operationModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void operationReturnsDictionaryTypeWithObjectTypeValue()
-    {
-        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-        validator.validate(extensionModel);
-    }
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(sourceModel.getName()).thenReturn("source");
+    when(sourceModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
+  }
 
-    @Test
-    public void operationReturnsDictionaryTypeWithPojoValue()
-    {
-        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Apple.class));
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void valid() {
+    validator.validate(extensionModel);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void sourceReturnsObjectType()
-    {
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void operationReturnsObjectType() {
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    validator.validate(extensionModel);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void sourceReturnsDictionaryType()
-    {
-        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void operationReturnsDictionaryTypeWithObjectTypeValue() {
+    when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
+    validator.validate(extensionModel);
+  }
 
-    @Test
-    public void sourceReturnsPojoType()
-    {
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Apple.class), false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void operationReturnsDictionaryTypeWithPojoValue() {
+    when(dictionaryType.getValueType()).thenReturn(toMetadataType(Apple.class));
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
+    validator.validate(extensionModel);
+  }
 
-    @Test
-    public void sourceReturnsObjectTypeWithDefinedOutputResolver()
-    {
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
-        when(sourceModel.getMetadataResolverFactory())
-                .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class, SimpleOutputResolver.class));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void sourceReturnsObjectType() {
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    validator.validate(extensionModel);
+  }
 
-    @Test
-    public void sourceReturnsDictionaryTypeWithDefinedOutputResolver()
-    {
-        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-        when(sourceModel.getMetadataResolverFactory())
-                .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class, SimpleOutputResolver.class));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void sourceReturnsDictionaryType() {
+    when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
+    validator.validate(extensionModel);
+  }
+
+  @Test
+  public void sourceReturnsPojoType() {
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Apple.class), false, emptySet()));
+    validator.validate(extensionModel);
+  }
+
+  @Test
+  public void sourceReturnsObjectTypeWithDefinedOutputResolver() {
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(sourceModel.getMetadataResolverFactory())
+        .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class,
+                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    validator.validate(extensionModel);
+  }
+
+  @Test
+  public void sourceReturnsDictionaryTypeWithDefinedOutputResolver() {
+    when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
+    when(sourceModel.getMetadataResolverFactory())
+        .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class,
+                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    validator.validate(extensionModel);
+  }
 }

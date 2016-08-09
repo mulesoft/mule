@@ -17,69 +17,46 @@ import java.io.PushbackInputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ByteArrayToObject</code> works in the same way as
- * <code>ByteArrayToSerializable</code> but checks if the byte array is a
- * serialised object and if not will return a String created from the bytes as the
- * returnType on the transformer.
+ * <code>ByteArrayToObject</code> works in the same way as <code>ByteArrayToSerializable</code> but checks if the byte array is a
+ * serialised object and if not will return a String created from the bytes as the returnType on the transformer.
  */
-public class ByteArrayToObject extends ByteArrayToSerializable
-{
+public class ByteArrayToObject extends ByteArrayToSerializable {
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        if (src instanceof byte[])
-        {
-            byte[] bytes = (byte[])src;
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    if (src instanceof byte[]) {
+      byte[] bytes = (byte[]) src;
 
-            if (this.checkStreamHeader(bytes[0]))
-            {
-                return super.doTransform(src, encoding);
-            }
-            else
-            {
-                return new String(bytes, encoding);
-            }
+      if (this.checkStreamHeader(bytes[0])) {
+        return super.doTransform(src, encoding);
+      } else {
+        return new String(bytes, encoding);
+      }
+    } else if (src instanceof InputStream) {
+      try {
+        PushbackInputStream pushbackStream = new PushbackInputStream((InputStream) src);
+        int firstByte = pushbackStream.read();
+        pushbackStream.unread((byte) firstByte);
+
+        if (this.checkStreamHeader((byte) firstByte)) {
+          return super.doTransform(pushbackStream, encoding);
+        } else {
+          try {
+            return IOUtils.toString(pushbackStream, encoding);
+          } finally {
+            // this also closes the underlying stream that's stored in src
+            pushbackStream.close();
+          }
         }
-        else if (src instanceof InputStream)
-        {
-            try
-            {
-                PushbackInputStream pushbackStream = new PushbackInputStream((InputStream)src);
-                int firstByte = pushbackStream.read();
-                pushbackStream.unread((byte)firstByte);
-                
-                if (this.checkStreamHeader((byte)firstByte))
-                {
-                    return super.doTransform(pushbackStream, encoding);
-                }
-                else
-                {
-                    try
-                    {
-                        return IOUtils.toString(pushbackStream, encoding);
-                    }
-                    finally
-                    {
-                        // this also closes the underlying stream that's stored in src
-                        pushbackStream.close();
-                    }
-                }
-            }
-            catch (IOException iox)
-            {
-                throw new TransformerException(this, iox);
-            }
-        }
-        else
-        {
-            throw new TransformerException(CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(
-                    this.getName(), src.getClass()));
-        }
+      } catch (IOException iox) {
+        throw new TransformerException(this, iox);
+      }
+    } else {
+      throw new TransformerException(CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(this.getName(), src.getClass()));
     }
+  }
 
-    private boolean checkStreamHeader(byte firstByte)
-    {
-        return (firstByte == (byte)((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF));
-    }
+  private boolean checkStreamHeader(byte firstByte) {
+    return (firstByte == (byte) ((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF));
+  }
 }

@@ -6,32 +6,31 @@
  */
 package org.mule.runtime.core.api.el.datetime;
 
-public interface Time extends Instant
-{
+public interface Time extends Instant {
 
-    long getMilliSeconds();
+  long getMilliSeconds();
 
-    int getSeconds();
+  int getSeconds();
 
-    int getMinutes();
+  int getMinutes();
 
-    int getHours();
+  int getHours();
 
-    Time plusMilliSeconds(int add);
+  Time plusMilliSeconds(int add);
 
-    Time plusSeconds(int add);
+  Time plusSeconds(int add);
 
-    Time plusMinutes(int add);
+  Time plusMinutes(int add);
 
-    Time plusHours(int add);
+  Time plusHours(int add);
 
-    @Override
-    Time withTimeZone(String newTimezone);
+  @Override
+  Time withTimeZone(String newTimezone);
 
-    @Override
-    Time changeTimeZone(String newTimezone);
+  @Override
+  Time changeTimeZone(String newTimezone);
 
-    @Override
-    Time withLocale(String locale);
+  @Override
+  Time withLocale(String locale);
 
 }

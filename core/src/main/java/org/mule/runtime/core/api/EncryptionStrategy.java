@@ -13,19 +13,17 @@ import org.mule.runtime.core.api.security.CryptoFailureException;
 import java.io.InputStream;
 
 /**
- * <code>EncryptionStrategy</code> can be used to provide different types of
- * Encryption strategy objects. These can be configured with different information
- * relivant with the encryption method being used. for example for Password Based
- * Encryption (PBE) a password, salt, iteration count and algorithm may be set on the
- * strategy.
+ * <code>EncryptionStrategy</code> can be used to provide different types of Encryption strategy objects. These can be configured
+ * with different information relivant with the encryption method being used. for example for Password Based Encryption (PBE) a
+ * password, salt, iteration count and algorithm may be set on the strategy.
  */
-public interface EncryptionStrategy extends Initialisable, NamedObject
-{
-    InputStream encrypt(InputStream data, Object info) throws CryptoFailureException;
+public interface EncryptionStrategy extends Initialisable, NamedObject {
 
-    InputStream decrypt(InputStream data, Object info) throws CryptoFailureException;
-    
-    byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
+  InputStream encrypt(InputStream data, Object info) throws CryptoFailureException;
 
-    byte[] decrypt(byte[] data, Object info) throws CryptoFailureException;
+  InputStream decrypt(InputStream data, Object info) throws CryptoFailureException;
+
+  byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
+
+  byte[] decrypt(byte[] data, Object info) throws CryptoFailureException;
 }

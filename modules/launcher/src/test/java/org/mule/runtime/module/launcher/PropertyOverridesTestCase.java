@@ -31,100 +31,90 @@ import org.junit.Test;
 /**
  * Test the overriding of app properties by system properties
  */
-public class PropertyOverridesTestCase extends AbstractMuleTestCase
-{
-    private Map<String, String> existingProperties = new HashMap<String, String>();
+public class PropertyOverridesTestCase extends AbstractMuleTestCase {
 
-    private void setSystemProperties()
-    {
-        setSystemProperty("texas", "province");
-        setSystemProperty("-Operu", "nation");
-        setSystemProperty("-Dtexas.capital", "houston");
-        setSystemProperty("-O-Dperu.capital", "bogota");
-        setSystemProperty("-Omule", "wayCool");
-        setSystemProperty("-Omule.mmc", "evenCooler");
+  private Map<String, String> existingProperties = new HashMap<String, String>();
+
+  private void setSystemProperties() {
+    setSystemProperty("texas", "province");
+    setSystemProperty("-Operu", "nation");
+    setSystemProperty("-Dtexas.capital", "houston");
+    setSystemProperty("-O-Dperu.capital", "bogota");
+    setSystemProperty("-Omule", "wayCool");
+    setSystemProperty("-Omule.mmc", "evenCooler");
+  }
+
+  private ArtifactPluginRepository applicationPluginRepository;
+
+  @Before
+  public void setUp() throws Exception {
+    applicationPluginRepository = mock(ArtifactPluginRepository.class);
+    when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
+  }
+
+  @Test
+  public void testOverrides() throws Exception {
+    File tempProps = File.createTempFile("property", "overrides");
+    InputStream input = getClass().getClassLoader().getResourceAsStream("overridden.properties");
+    FileOutputStream output = new FileOutputStream(tempProps);
+    IOUtils.copy(input, output);
+    input.close();
+    output.close();
+    ApplicationDescriptor descriptor = new ApplicationDescriptor();
+    ApplicationDescriptorFactory applicationDescriptorFactory =
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory())),
+                                         applicationPluginRepository);
+    applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
+    Map<String, String> appProps = descriptor.getAppProperties();
+    assertEquals("state", appProps.get("texas"));
+    assertEquals("country", appProps.get("peru"));
+    assertEquals("austin", appProps.get("texas.capital"));
+    assertEquals("4", appProps.get("peru.capital.numberOfletters"));
+    assertEquals("runtime", appProps.get("mule"));
+    assertEquals("ipaas", appProps.get("mule.ion"));
+
+    try {
+      setSystemProperties();
+      descriptor = new ApplicationDescriptor();
+      applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
+      appProps = descriptor.getAppProperties();
+      assertEquals("state", appProps.get("texas"));
+      assertEquals("nation", appProps.get("peru"));
+      assertEquals("austin", appProps.get("texas.capital"));
+      assertEquals("4", appProps.get("peru.capital.numberOfletters"));
+      assertEquals("wayCool", appProps.get("mule"));
+      assertEquals("ipaas", appProps.get("mule.ion"));
+      assertEquals("evenCooler", appProps.get("mule.mmc"));
+
+      descriptor = new ApplicationDescriptor();
+      applicationDescriptorFactory.setApplicationProperties(descriptor, new File("nonexistent.nonexistent"));
+      appProps = descriptor.getAppProperties();
+      assertNull(appProps.get("texas"));
+      assertEquals("nation", appProps.get("peru"));
+      assertNull(appProps.get("texas.capital"));
+      assertNull(appProps.get("peru.capital.numberOfletters"));
+      assertEquals("wayCool", appProps.get("mule"));
+      assertNull(appProps.get("mule.ion"));
+      assertEquals("evenCooler", appProps.get("mule.mmc"));
+    } finally {
+      resetSystemProperties();
     }
+  }
 
-    private ArtifactPluginRepository applicationPluginRepository;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        applicationPluginRepository = mock(ArtifactPluginRepository.class);
-        when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
+  private void resetSystemProperties() {
+    for (Map.Entry<String, String> entry : existingProperties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      if (value == null) {
+        System.getProperties().remove(key);
+      } else {
+        System.setProperty(key, entry.getValue());
+      }
     }
+  }
 
-    @Test
-    public void testOverrides() throws Exception
-    {
-        File tempProps = File.createTempFile("property", "overrides");
-        InputStream input = getClass().getClassLoader().getResourceAsStream("overridden.properties");
-        FileOutputStream output = new FileOutputStream(tempProps);
-        IOUtils.copy(input, output);
-        input.close();
-        output.close();
-        ApplicationDescriptor descriptor = new ApplicationDescriptor();
-        ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory())), applicationPluginRepository);
-        applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
-        Map<String, String>appProps = descriptor.getAppProperties();
-        assertEquals("state", appProps.get("texas"));
-        assertEquals("country", appProps.get("peru"));
-        assertEquals("austin", appProps.get("texas.capital"));
-        assertEquals("4", appProps.get("peru.capital.numberOfletters"));
-        assertEquals("runtime", appProps.get("mule"));
-        assertEquals("ipaas", appProps.get("mule.ion"));
-
-        try
-        {
-            setSystemProperties();
-            descriptor = new ApplicationDescriptor();
-            applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
-            appProps = descriptor.getAppProperties();
-            assertEquals("state", appProps.get("texas"));
-            assertEquals("nation", appProps.get("peru"));
-            assertEquals("austin", appProps.get("texas.capital"));
-            assertEquals("4", appProps.get("peru.capital.numberOfletters"));
-            assertEquals("wayCool", appProps.get("mule"));
-            assertEquals("ipaas", appProps.get("mule.ion"));
-            assertEquals("evenCooler", appProps.get("mule.mmc"));
-
-            descriptor = new ApplicationDescriptor();
-            applicationDescriptorFactory.setApplicationProperties(descriptor, new File("nonexistent.nonexistent"));
-            appProps = descriptor.getAppProperties();
-            assertNull(appProps.get("texas"));
-            assertEquals("nation", appProps.get("peru"));
-            assertNull(appProps.get("texas.capital"));
-            assertNull(appProps.get("peru.capital.numberOfletters"));
-            assertEquals("wayCool", appProps.get("mule"));
-            assertNull(appProps.get("mule.ion"));
-            assertEquals("evenCooler", appProps.get("mule.mmc"));
-        }
-        finally
-        {
-            resetSystemProperties();
-        }
-    }
-
-    private void resetSystemProperties()
-    {
-        for (Map.Entry<String, String> entry: existingProperties.entrySet())
-        {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (value == null)
-            {
-                System.getProperties().remove(key);
-            }
-            else
-            {
-                System.setProperty(key, entry.getValue());
-            }
-        }
-    }
-
-    private void setSystemProperty(String key, String value)
-    {
-        String previous = System.setProperty(key, value);
-        existingProperties.put(key, previous);
-    }
+  private void setSystemProperty(String key, String value) {
+    String previous = System.setProperty(key, value);
+    existingProperties.put(key, previous);
+  }
 }

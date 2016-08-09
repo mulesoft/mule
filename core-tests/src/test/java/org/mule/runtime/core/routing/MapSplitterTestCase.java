@@ -20,41 +20,38 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MapSplitterTestCase extends AbstractMuleContextTestCase
-{
-    private MapSplitter mapSplitter;
-    private List<String> splitPayloads = new ArrayList<String>();
-    private List<String> splitKeyProperties = new ArrayList<String>();
+public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        mapSplitter = new MapSplitter();
-        mapSplitter.setMuleContext(muleContext);
-        mapSplitter.setListener(new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                splitPayloads.add(event.getMessageAsString());
-                return event;
-            }
-        });
-    }
+  private MapSplitter mapSplitter;
+  private List<String> splitPayloads = new ArrayList<String>();
+  private List<String> splitKeyProperties = new ArrayList<String>();
 
-    @Test
-    public void testSplit() throws Exception
-    {
-        Map<String, Object> testMap = new HashMap<String, Object>();
-        testMap.put("1", "one");
-        testMap.put("2", "two");
-        testMap.put("3", "three");
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    mapSplitter = new MapSplitter();
+    mapSplitter.setMuleContext(muleContext);
+    mapSplitter.setListener(new MessageProcessor() {
 
-        mapSplitter.process(getTestEvent(testMap));
+      public MuleEvent process(MuleEvent event) throws MuleException {
+        splitPayloads.add(event.getMessageAsString());
+        return event;
+      }
+    });
+  }
 
-        assertEquals(3, splitPayloads.size());
-        assertTrue(splitPayloads.contains("one"));
-        assertTrue(splitPayloads.contains("two"));
-        assertTrue(splitPayloads.contains("three"));
-    }
+  @Test
+  public void testSplit() throws Exception {
+    Map<String, Object> testMap = new HashMap<String, Object>();
+    testMap.put("1", "one");
+    testMap.put("2", "two");
+    testMap.put("3", "three");
+
+    mapSplitter.process(getTestEvent(testMap));
+
+    assertEquals(3, splitPayloads.size());
+    assertTrue(splitPayloads.contains("one"));
+    assertTrue(splitPayloads.contains("two"));
+    assertTrue(splitPayloads.contains("three"));
+  }
 }

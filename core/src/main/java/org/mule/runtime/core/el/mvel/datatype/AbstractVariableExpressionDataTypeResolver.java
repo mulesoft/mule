@@ -20,51 +20,41 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * Base class for extracting data type from map variables
  */
-public abstract class AbstractVariableExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver
-{
+public abstract class AbstractVariableExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver {
 
-    private final String propertyName;
+  private final String propertyName;
 
-    public AbstractVariableExpressionDataTypeResolver(String propertyName)
-    {
-        this.propertyName = propertyName;
-    }
+  public AbstractVariableExpressionDataTypeResolver(String propertyName) {
+    this.propertyName = propertyName;
+  }
 
-    @Override
-    protected DataType getDataType(MuleEvent event, ASTNode node)
-    {
-        final Accessor accessor = node.getAccessor();
+  @Override
+  protected DataType getDataType(MuleEvent event, ASTNode node) {
+    final Accessor accessor = node.getAccessor();
 
-        if (accessor instanceof VariableAccessor)
-        {
-            VariableAccessor variableAccessor = (VariableAccessor) accessor;
-            if (variableAccessor.getProperty().equals(propertyName))
-            {
-                final AccessorNode nextNode = variableAccessor.getNextNode();
-                String propertyName = null;
-                if (nextNode instanceof MapAccessorNest)
-                {
-                    final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
-                    if (mapAccesorNest.getProperty().isLiteralOnly())
-                    {
-                        propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
-                    }
-                }
-                else if (nextNode instanceof MapAccessor)
-                {
-                    propertyName = (String) ((MapAccessor) nextNode).getProperty();
-                }
-
-                if (propertyName != null)
-                {
-                    return getVariableDataType(event, propertyName);
-                }
-            }
+    if (accessor instanceof VariableAccessor) {
+      VariableAccessor variableAccessor = (VariableAccessor) accessor;
+      if (variableAccessor.getProperty().equals(propertyName)) {
+        final AccessorNode nextNode = variableAccessor.getNextNode();
+        String propertyName = null;
+        if (nextNode instanceof MapAccessorNest) {
+          final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
+          if (mapAccesorNest.getProperty().isLiteralOnly()) {
+            propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
+          }
+        } else if (nextNode instanceof MapAccessor) {
+          propertyName = (String) ((MapAccessor) nextNode).getProperty();
         }
 
-        return null;
+        if (propertyName != null) {
+          return getVariableDataType(event, propertyName);
+        }
+      }
     }
 
-    protected abstract DataType getVariableDataType(MuleEvent event, String propertyName);
+    return null;
+  }
+
+  protected abstract DataType getVariableDataType(MuleEvent event, String propertyName);
 
 }

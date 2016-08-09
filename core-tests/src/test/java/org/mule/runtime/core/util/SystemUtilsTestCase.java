@@ -21,93 +21,87 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 @SmallTest
-public class SystemUtilsTestCase extends AbstractMuleTestCase
-{
+public class SystemUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testEnvironment() throws Exception
-    {
-        Map env = SystemUtils.getenv();
-        assertNotNull(env);
-        assertFalse(env.isEmpty());
-        assertSame(env, SystemUtils.getenv());
+  @Test
+  public void testEnvironment() throws Exception {
+    Map env = SystemUtils.getenv();
+    assertNotNull(env);
+    assertFalse(env.isEmpty());
+    assertSame(env, SystemUtils.getenv());
 
-        String envVarToTest = "PATH";
-        if (SystemUtils.IS_OS_WINDOWS)
-        {
-            // Depending on the presence of Cygwin, it might be one or the other.
-            if (env.get(envVarToTest) == null)
-            {
-                envVarToTest = "Path";
-            }
-        }
-
-        assertNotNull(env.get(envVarToTest));
+    String envVarToTest = "PATH";
+    if (SystemUtils.IS_OS_WINDOWS) {
+      // Depending on the presence of Cygwin, it might be one or the other.
+      if (env.get(envVarToTest) == null) {
+        envVarToTest = "Path";
+      }
     }
 
-    @Test
-    public void testParsePropertyDefinitions()
-    {
-        Map expected = Collections.EMPTY_MAP;
-        String input;
+    assertNotNull(env.get(envVarToTest));
+  }
 
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(null));
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(""));
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" "));
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("foo"));
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D"));
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D="));
+  @Test
+  public void testParsePropertyDefinitions() {
+    Map expected = Collections.EMPTY_MAP;
+    String input;
 
-        expected = Collections.singletonMap("-D", "true");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D"));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(null));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(""));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(" "));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("foo"));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D"));
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D="));
 
-        expected = Collections.singletonMap("-D-D", "true");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D"));
+    expected = Collections.singletonMap("-D", "true");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D"));
 
-        expected = Collections.singletonMap("-D-D-D", "true");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D-D"));
+    expected = Collections.singletonMap("-D-D", "true");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D"));
 
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=noKey"));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("=-D"));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("foo =foo foo"));
+    expected = Collections.singletonMap("-D-D-D", "true");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D-D"));
 
-        expected = Collections.singletonMap("k", "true");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk "));
+    assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=noKey"));
+    assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("=-D"));
+    assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("foo =foo foo"));
 
-        expected = Collections.singletonMap("key", "true");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey"));
+    expected = Collections.singletonMap("k", "true");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk "));
 
-        expected = Collections.singletonMap("k", "v");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk=v "));
+    expected = Collections.singletonMap("key", "true");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey"));
 
-        expected = Collections.singletonMap("key", "value");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=value"));
+    expected = Collections.singletonMap("k", "v");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk=v "));
 
-        expected = Collections.singletonMap("key", "quoted");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"quoted\""));
+    expected = Collections.singletonMap("key", "value");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=value"));
 
-        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"key", "foo"}, new String[]{
-            "-Dvalue", "bar"});
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=-Dvalue -Dfoo=bar"));
+    expected = Collections.singletonMap("key", "quoted");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"quoted\""));
 
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=-Dfoo-D== =foo"));
+    expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"key", "foo"}, new String[] {"-Dvalue", "bar"});
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=-Dvalue -Dfoo=bar"));
 
-        expected = Collections.singletonMap("key", "split value");
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"split value\""));
+    assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=-Dfoo-D== =foo"));
 
-        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"key1", "key2"}, new String[]{
-            "split one", "split two"});
-        input = "-Dkey1=\"split one\" -Dkey2=\"split two\" ";
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+    expected = Collections.singletonMap("key", "split value");
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"split value\""));
 
-        expected = Collections.singletonMap("key", "open end");
-        input = "-Dkey=\"open end";
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+    expected =
+        MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"key1", "key2"}, new String[] {"split one", "split two"});
+    input = "-Dkey1=\"split one\" -Dkey2=\"split two\" ";
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
 
-        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"keyOnly", "mule.foo",
-            "mule.bar"}, new String[]{"true", "xfoo", "xbar"});
-        input = "  standalone key=value -D -D= -DkeyOnly -D=noKey -Dmule.foo=xfoo -Dmule.bar=xbar ";
-        assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
-    }
+    expected = Collections.singletonMap("key", "open end");
+    input = "-Dkey=\"open end";
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+
+    expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"keyOnly", "mule.foo", "mule.bar"},
+                                             new String[] {"true", "xfoo", "xbar"});
+    input = "  standalone key=value -D -D= -DkeyOnly -D=noKey -Dmule.foo=xfoo -Dmule.bar=xbar ";
+    assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+  }
 
 }

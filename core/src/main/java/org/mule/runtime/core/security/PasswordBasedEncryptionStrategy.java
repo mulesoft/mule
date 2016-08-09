@@ -19,81 +19,66 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 /**
- * Provides password-based encryption using JCE. Users must specify a password and
- * optionally a salt and iteration count as well. The default algorithm is
- * PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
+ * Provides password-based encryption using JCE. Users must specify a password and optionally a salt and iteration count as well.
+ * The default algorithm is PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
  */
-public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrategy
-{
+public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrategy {
 
-    public static final String DEFAULT_ALGORITHM = "PBEWithMD5AndDES";
-    public static final int DEFAULT_ITERATION_COUNT = 20;
+  public static final String DEFAULT_ALGORITHM = "PBEWithMD5AndDES";
+  public static final int DEFAULT_ITERATION_COUNT = 20;
 
-    private byte[] salt = null;
+  private byte[] salt = null;
 
-    private int iterationCount = DEFAULT_ITERATION_COUNT;
+  private int iterationCount = DEFAULT_ITERATION_COUNT;
 
-    private char[] password;
+  private char[] password;
 
-    public PasswordBasedEncryptionStrategy()
-    {
-        algorithm = DEFAULT_ALGORITHM;
+  public PasswordBasedEncryptionStrategy() {
+    algorithm = DEFAULT_ALGORITHM;
+  }
+
+  public void initialise() throws InitialisationException {
+    if (salt == null) {
+      salt = new byte[] {(byte) 0xc7, (byte) 0x73, (byte) 0x21, (byte) 0x8c, (byte) 0x7e, (byte) 0xc8, (byte) 0xee, (byte) 0x99};
+      logger.debug("Salt is not set. Using default salt");
     }
 
-    public void initialise() throws InitialisationException
-    {
-        if (salt == null)
-        {
-            salt = new byte[]{(byte) 0xc7, (byte) 0x73, (byte) 0x21, (byte) 0x8c, (byte) 0x7e, (byte) 0xc8,
-                (byte) 0xee, (byte) 0x99};
-            logger.debug("Salt is not set. Using default salt");
-        }
-
-        if (password == null)
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("Password"), this);
-        }
-        super.initialise();
+    if (password == null) {
+      throw new InitialisationException(CoreMessages.objectIsNull("Password"), this);
     }
+    super.initialise();
+  }
 
-    protected KeySpec createKeySpec()
-    {
-        return new PBEKeySpec(password);
-    }
+  protected KeySpec createKeySpec() {
+    return new PBEKeySpec(password);
+  }
 
-    protected AlgorithmParameterSpec createAlgorithmParameterSpec()
-    {
-        return new PBEParameterSpec(salt, iterationCount);
-    }
+  protected AlgorithmParameterSpec createAlgorithmParameterSpec() {
+    return new PBEParameterSpec(salt, iterationCount);
+  }
 
-    public byte[] getSalt()
-    {
-        return salt;
-    }
+  public byte[] getSalt() {
+    return salt;
+  }
 
-    public void setSalt(byte[] salt)
-    {
-        this.salt = salt;
-    }
+  public void setSalt(byte[] salt) {
+    this.salt = salt;
+  }
 
-    public int getIterationCount()
-    {
-        return iterationCount;
-    }
+  public int getIterationCount() {
+    return iterationCount;
+  }
 
-    public void setIterationCount(int iterationCount)
-    {
-        this.iterationCount = iterationCount;
-    }
+  public void setIterationCount(int iterationCount) {
+    this.iterationCount = iterationCount;
+  }
 
-    public void setPassword(String password)
-    {
-        this.password = password.toCharArray();
-    }
+  public void setPassword(String password) {
+    this.password = password.toCharArray();
+  }
 
-    protected SecretKey getSecretKey() throws GeneralSecurityException
-    {
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(getAlgorithm());
-        return keyFactory.generateSecret(keySpec);
-    }
+  protected SecretKey getSecretKey() throws GeneralSecurityException {
+    SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(getAlgorithm());
+    return keyFactory.generateSecret(keySpec);
+  }
 }

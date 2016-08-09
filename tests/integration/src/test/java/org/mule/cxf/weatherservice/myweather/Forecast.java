@@ -15,9 +15,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for Forecast complex type.
+ * <p>
+ * Java class for Forecast complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="Forecast">
@@ -38,137 +40,116 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Forecast", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {
-    "date",
-    "weatherID",
-    "desciption",
-    "temperatures",
-    "probabilityOfPrecipiation"
-})
+@XmlType(name = "Forecast", namespace = "http://ws.cdyne.com/WeatherWS/",
+    propOrder = {"date", "weatherID", "desciption", "temperatures", "probabilityOfPrecipiation"})
 public class Forecast {
 
-    @XmlElement(name = "Date", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar date;
-    @XmlElement(name = "WeatherID", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected short weatherID;
-    @XmlElement(name = "Desciption", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String desciption;
-    @XmlElement(name = "Temperatures", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
-    protected Temp temperatures;
-    @XmlElement(name = "ProbabilityOfPrecipiation", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
-    protected POP probabilityOfPrecipiation;
+  @XmlElement(name = "Date", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
+  @XmlSchemaType(name = "dateTime")
+  protected XMLGregorianCalendar date;
+  @XmlElement(name = "WeatherID", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected short weatherID;
+  @XmlElement(name = "Desciption", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String desciption;
+  @XmlElement(name = "Temperatures", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
+  protected Temp temperatures;
+  @XmlElement(name = "ProbabilityOfPrecipiation", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
+  protected POP probabilityOfPrecipiation;
 
-    /**
-     * Gets the value of the date property.
-     *
-     * @return
-     *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
-     *
-     */
-    public XMLGregorianCalendar getDate() {
-        return date;
-    }
+  /**
+   * Gets the value of the date property.
+   *
+   * @return possible object is {@link javax.xml.datatype.XMLGregorianCalendar }
+   *
+   */
+  public XMLGregorianCalendar getDate() {
+    return date;
+  }
 
-    /**
-     * Sets the value of the date property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
-     *
-     */
-    public void setDate(XMLGregorianCalendar value) {
-        this.date = value;
-    }
+  /**
+   * Sets the value of the date property.
+   *
+   * @param value allowed object is {@link javax.xml.datatype.XMLGregorianCalendar }
+   *
+   */
+  public void setDate(XMLGregorianCalendar value) {
+    this.date = value;
+  }
 
-    /**
-     * Gets the value of the weatherID property.
-     *
-     */
-    public short getWeatherID() {
-        return weatherID;
-    }
+  /**
+   * Gets the value of the weatherID property.
+   *
+   */
+  public short getWeatherID() {
+    return weatherID;
+  }
 
-    /**
-     * Sets the value of the weatherID property.
-     *
-     */
-    public void setWeatherID(short value) {
-        this.weatherID = value;
-    }
+  /**
+   * Sets the value of the weatherID property.
+   *
+   */
+  public void setWeatherID(short value) {
+    this.weatherID = value;
+  }
 
-    /**
-     * Gets the value of the desciption property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getDesciption() {
-        return desciption;
-    }
+  /**
+   * Gets the value of the desciption property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getDesciption() {
+    return desciption;
+  }
 
-    /**
-     * Sets the value of the desciption property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setDesciption(String value) {
-        this.desciption = value;
-    }
+  /**
+   * Sets the value of the desciption property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setDesciption(String value) {
+    this.desciption = value;
+  }
 
-    /**
-     * Gets the value of the temperatures property.
-     *
-     * @return
-     *     possible object is
-     *     {@link Temp }
-     *
-     */
-    public Temp getTemperatures() {
-        return temperatures;
-    }
+  /**
+   * Gets the value of the temperatures property.
+   *
+   * @return possible object is {@link Temp }
+   *
+   */
+  public Temp getTemperatures() {
+    return temperatures;
+  }
 
-    /**
-     * Sets the value of the temperatures property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link Temp }
-     *
-     */
-    public void setTemperatures(Temp value) {
-        this.temperatures = value;
-    }
+  /**
+   * Sets the value of the temperatures property.
+   *
+   * @param value allowed object is {@link Temp }
+   *
+   */
+  public void setTemperatures(Temp value) {
+    this.temperatures = value;
+  }
 
-    /**
-     * Gets the value of the probabilityOfPrecipiation property.
-     *
-     * @return
-     *     possible object is
-     *     {@link POP }
-     *
-     */
-    public POP getProbabilityOfPrecipiation() {
-        return probabilityOfPrecipiation;
-    }
+  /**
+   * Gets the value of the probabilityOfPrecipiation property.
+   *
+   * @return possible object is {@link POP }
+   *
+   */
+  public POP getProbabilityOfPrecipiation() {
+    return probabilityOfPrecipiation;
+  }
 
-    /**
-     * Sets the value of the probabilityOfPrecipiation property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link POP }
-     *
-     */
-    public void setProbabilityOfPrecipiation(POP value) {
-        this.probabilityOfPrecipiation = value;
-    }
+  /**
+   * Sets the value of the probabilityOfPrecipiation property.
+   *
+   * @param value allowed object is {@link POP }
+   *
+   */
+  public void setProbabilityOfPrecipiation(POP value) {
+    this.probabilityOfPrecipiation = value;
+  }
 
 }

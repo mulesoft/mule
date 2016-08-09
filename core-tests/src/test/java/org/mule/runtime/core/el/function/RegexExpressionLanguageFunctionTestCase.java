@@ -36,207 +36,180 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCase
-{
+public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCase {
 
-    protected ExpressionExecutor<MVELExpressionLanguageContext> expressionExecutor;
-    protected MVELExpressionLanguageContext context;
-    protected RegexExpressionLanguageFuntion regexFuntion;
-    protected MuleContext muleContext;
-    private MuleEvent event;
-    private MuleMessage message;
+  protected ExpressionExecutor<MVELExpressionLanguageContext> expressionExecutor;
+  protected MVELExpressionLanguageContext context;
+  protected RegexExpressionLanguageFuntion regexFuntion;
+  protected MuleContext muleContext;
+  private MuleEvent event;
+  private MuleMessage message;
 
-    @Before
-    public void setup() throws InitialisationException
-    {
-        ParserConfiguration parserConfiguration = new ParserConfiguration();
-        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-        muleContext = mock(MuleContext.class);
-        context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
-        regexFuntion = new RegexExpressionLanguageFuntion();
-        context.declareFunction("regex", regexFuntion);
-    }
+  @Before
+  public void setup() throws InitialisationException {
+    ParserConfiguration parserConfiguration = new ParserConfiguration();
+    expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
+    muleContext = mock(MuleContext.class);
+    context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
+    regexFuntion = new RegexExpressionLanguageFuntion();
+    context.declareFunction("regex", regexFuntion);
+  }
 
-    @Test
-    public void testReturnNullWhenDoesNotMatches() throws Exception
-    {
-        addMessageToContextWithPayload("TEST");
-        Object result = regexFuntion.call(new Object[]{"'TESTw+TEST'"}, context);
-        assertNull(result);
-    }
+  @Test
+  public void testReturnNullWhenDoesNotMatches() throws Exception {
+    addMessageToContextWithPayload("TEST");
+    Object result = regexFuntion.call(new Object[] {"'TESTw+TEST'"}, context);
+    assertNull(result);
+  }
 
-    @Test
-    public void testReturnNullWhenDoesNotMatchesMVEL() throws Exception
-    {
-        addMessageToContextWithPayload("TEST");
-        Object result = expressionExecutor.execute("regex('TESTw+TEST')", context);
-        assertNull(result);
-    }
+  @Test
+  public void testReturnNullWhenDoesNotMatchesMVEL() throws Exception {
+    addMessageToContextWithPayload("TEST");
+    Object result = expressionExecutor.execute("regex('TESTw+TEST')", context);
+    assertNull(result);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefined() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTEST");
-        Object result = regexFuntion.call(new Object[]{"TEST\\w+TEST"}, context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefined() throws Exception {
+    addMessageToContextWithPayload("TESTfooTEST");
+    Object result = regexFuntion.call(new Object[] {"TEST\\w+TEST"}, context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedMVEL() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTEST");
-        Object result = expressionExecutor.execute("regex('TEST\\\\w+TEST')", context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedMVEL() throws Exception {
+    addMessageToContextWithPayload("TESTfooTEST");
+    Object result = expressionExecutor.execute("regex('TEST\\\\w+TEST')", context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test
-    public void testReturnsMatchedValueIfCaptureGroupDefined() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTEST");
-        Object result = regexFuntion.call(new Object[]{"TEST(\\w+)TEST"}, context);
-        assertEquals("foo", result);
-    }
+  @Test
+  public void testReturnsMatchedValueIfCaptureGroupDefined() throws Exception {
+    addMessageToContextWithPayload("TESTfooTEST");
+    Object result = regexFuntion.call(new Object[] {"TEST(\\w+)TEST"}, context);
+    assertEquals("foo", result);
+  }
 
-    @Test
-    public void testReturnsMatchedValueIfCaptureGroupDefinedMVEL() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTEST");
-        Object result = expressionExecutor.execute("regex('TEST(\\\\w+)TEST')", context);
-        assertEquals("foo", result);
-    }
+  @Test
+  public void testReturnsMatchedValueIfCaptureGroupDefinedMVEL() throws Exception {
+    addMessageToContextWithPayload("TESTfooTEST");
+    Object result = expressionExecutor.execute("regex('TEST(\\\\w+)TEST')", context);
+    assertEquals("foo", result);
+  }
 
-    @Test
-    public void testReturnsMultipleValuesIfMultipleCaptureGroupDefine() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTESTbar");
-        Object result = regexFuntion.call(new Object[]{"TEST(\\w+)TEST(\\w+)"}, context);
+  @Test
+  public void testReturnsMultipleValuesIfMultipleCaptureGroupDefine() throws Exception {
+    addMessageToContextWithPayload("TESTfooTESTbar");
+    Object result = regexFuntion.call(new Object[] {"TEST(\\w+)TEST(\\w+)"}, context);
 
-        assertTrue(result instanceof String[]);
-        String[] values = (String[]) result;
-        assertEquals(2, values.length);
-        assertEquals("foo", values[0]);
-        assertEquals("bar", values[1]);
-    }
+    assertTrue(result instanceof String[]);
+    String[] values = (String[]) result;
+    assertEquals(2, values.length);
+    assertEquals("foo", values[0]);
+    assertEquals("bar", values[1]);
+  }
 
-    @Test
-    public void testReturnsMultipleValuesIfMultipleCaptureGroupDefineMVEL() throws Exception
-    {
-        addMessageToContextWithPayload("TESTfooTESTbar");
-        Object result = expressionExecutor.execute("regex('TEST(\\\\w+)TEST(\\\\w+)')", context);
+  @Test
+  public void testReturnsMultipleValuesIfMultipleCaptureGroupDefineMVEL() throws Exception {
+    addMessageToContextWithPayload("TESTfooTESTbar");
+    Object result = expressionExecutor.execute("regex('TEST(\\\\w+)TEST(\\\\w+)')", context);
 
-        assertTrue(result instanceof String[]);
-        String[] values = (String[]) result;
-        assertEquals(2, values.length);
-        assertEquals("foo", values[0]);
-        assertEquals("bar", values[1]);
-    }
+    assertTrue(result instanceof String[]);
+    String[] values = (String[]) result;
+    assertEquals(2, values.length);
+    assertEquals("foo", values[0]);
+    assertEquals("bar", values[1]);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextArgument() throws Exception
-    {
-        Object result = regexFuntion.call(new Object[]{"TEST\\w+TEST", "TESTfooTEST"}, context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextArgument() throws Exception {
+    Object result = regexFuntion.call(new Object[] {"TEST\\w+TEST", "TESTfooTEST"}, context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextArgumentMVEL() throws Exception
-    {
-        Object result = expressionExecutor.execute("regex('TEST\\\\w+TEST','TESTfooTEST')", context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextArgumentMVEL() throws Exception {
+    Object result = expressionExecutor.execute("regex('TEST\\\\w+TEST','TESTfooTEST')", context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextAndFlagsArgument() throws Exception
-    {
-        Object result = regexFuntion.call(new Object[]{"test\\w+test", "TESTfooTEST",
-            Pattern.CASE_INSENSITIVE}, context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextAndFlagsArgument() throws Exception {
+    Object result = regexFuntion.call(new Object[] {"test\\w+test", "TESTfooTEST", Pattern.CASE_INSENSITIVE}, context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test
-    public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextAndFlagsArgumentMVEL()
-        throws Exception
-    {
-        Object result = expressionExecutor.execute(
-            "regex('test\\\\w+test','TESTfooTEST', java.util.regex.Pattern.CASE_INSENSITIVE)", context);
-        assertEquals("TESTfooTEST", result);
-    }
+  @Test
+  public void testReturnsPayloadWhenMatchesIfNoCaptureGroupDefinedTextAndFlagsArgumentMVEL() throws Exception {
+    Object result =
+        expressionExecutor.execute("regex('test\\\\w+test','TESTfooTEST', java.util.regex.Pattern.CASE_INSENSITIVE)", context);
+    assertEquals("TESTfooTEST", result);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNullRegex() throws Exception
-    {
-        regexFuntion.call(new Object[]{null}, context);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidNullRegex() throws Exception {
+    regexFuntion.call(new Object[] {null}, context);
+  }
 
-    @Test(expected = CompileException.class)
-    public void testInvalidNullRegexMVEL() throws Exception
-    {
-        expressionExecutor.execute("regex(null)", context);
-    }
+  @Test(expected = CompileException.class)
+  public void testInvalidNullRegexMVEL() throws Exception {
+    expressionExecutor.execute("regex(null)", context);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNonStringRegex() throws Exception
-    {
-        regexFuntion.call(new Object[]{new Date()}, context);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidNonStringRegex() throws Exception {
+    regexFuntion.call(new Object[] {new Date()}, context);
+  }
 
-    @Test(expected = CompileException.class)
-    public void testInvalidNonStringRegexMVEL() throws Exception
-    {
-        expressionExecutor.execute("regex(new Date())", context);
-    }
+  @Test(expected = CompileException.class)
+  public void testInvalidNonStringRegexMVEL() throws Exception {
+    expressionExecutor.execute("regex(new Date())", context);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNullText() throws Exception
-    {
-        regexFuntion.call(new Object[]{"TESTw+TEST", null}, context);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidNullText() throws Exception {
+    regexFuntion.call(new Object[] {"TESTw+TEST", null}, context);
+  }
 
-    @Test(expected = CompileException.class)
-    public void testInvalidNullTextMVEL() throws Exception
-    {
-        expressionExecutor.execute("regex('TESTw+TEST',null)", context);
-    }
+  @Test(expected = CompileException.class)
+  public void testInvalidNullTextMVEL() throws Exception {
+    expressionExecutor.execute("regex('TESTw+TEST',null)", context);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNonStringText() throws Exception
-    {
-        regexFuntion.call(new Object[]{"TESTw+TEST", new Date()}, context);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidNonStringText() throws Exception {
+    regexFuntion.call(new Object[] {"TESTw+TEST", new Date()}, context);
+  }
 
-    @Test(expected = CompileException.class)
-    public void testInvalidNonStringTextMVEL() throws Exception
-    {
-        expressionExecutor.execute("regex('TESTw+TEST',new Date())", context);
-    }
+  @Test(expected = CompileException.class)
+  public void testInvalidNonStringTextMVEL() throws Exception {
+    expressionExecutor.execute("regex('TESTw+TEST',new Date())", context);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNonIntFlags() throws Exception
-    {
-        regexFuntion.call(new Object[]{"TESTw+TEST", "text", "foo"}, context);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidNonIntFlags() throws Exception {
+    regexFuntion.call(new Object[] {"TESTw+TEST", "text", "foo"}, context);
+  }
 
-    @Test(expected = CompileException.class)
-    public void testInvalidNonIntFlagsMVEL() throws Exception
-    {
-        expressionExecutor.execute("regex('TESTw+TEST','text','foo')", context);
-    }
+  @Test(expected = CompileException.class)
+  public void testInvalidNonIntFlagsMVEL() throws Exception {
+    expressionExecutor.execute("regex('TESTw+TEST','text','foo')", context);
+  }
 
-    protected void addMessageToContextWithPayload(String payload) throws TransformerException
-    {
-        event = mock(MuleEvent.class);
-        message = mock(MuleMessage.class);
-        doAnswer(invocation -> {
-            message = (MuleMessage) invocation.getArguments()[0];
-            return null;
-        }).when(event).setMessage(any(MuleMessage.class));
-        when(event.getMessage()).thenAnswer(invocation -> message);
-        MuleMessage transformedMessage = mock(MuleMessage.class);
-        when(transformedMessage.getPayload()).thenReturn(payload);
-        TransformationService transformationService = mock(TransformationService.class);
-        when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
-        context.addFinalVariable("message", new MessageContext(event, muleContext));
-    }
+  protected void addMessageToContextWithPayload(String payload) throws TransformerException {
+    event = mock(MuleEvent.class);
+    message = mock(MuleMessage.class);
+    doAnswer(invocation -> {
+      message = (MuleMessage) invocation.getArguments()[0];
+      return null;
+    }).when(event).setMessage(any(MuleMessage.class));
+    when(event.getMessage()).thenAnswer(invocation -> message);
+    MuleMessage transformedMessage = mock(MuleMessage.class);
+    when(transformedMessage.getPayload()).thenReturn(payload);
+    TransformationService transformationService = mock(TransformationService.class);
+    when(muleContext.getTransformationService()).thenReturn(transformationService);
+    when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    context.addFinalVariable("message", new MessageContext(event, muleContext));
+  }
 
 }

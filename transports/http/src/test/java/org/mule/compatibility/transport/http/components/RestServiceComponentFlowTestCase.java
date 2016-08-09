@@ -22,49 +22,47 @@ import java.text.MessageFormat;
 
 import org.junit.Test;
 
-public class RestServiceComponentFlowTestCase extends FunctionalTestCase
-{
-    public static final String FLOW_NAME = "WORMS";
-    public static final String FLOW_URL = MessageFormat.format("{0}header:serviceUrl{1}",
-                                                                  ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                                  ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+public class RestServiceComponentFlowTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "rest-service-component-test-flow.xml";
-    }
+  public static final String FLOW_NAME = "WORMS";
+  public static final String FLOW_URL =
+      MessageFormat.format("{0}header:serviceUrl{1}", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                           ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
-    @Test
-    public void testResetServiceNamespaceHandler() throws Exception
-    {
-        Flow f = (Flow) muleContext.getRegistry().lookupFlowConstruct(FLOW_NAME);
-        
-        Component component = (Component) f.getMessageProcessors().get(0);
-        
-        assertTrue(component instanceof RestServiceWrapper);
-        RestServiceWrapper restServiceWrapper = (RestServiceWrapper) component;
-        assertEquals(restServiceWrapper.getServiceUrl(), FLOW_URL);
-        assertEquals(restServiceWrapper.getHttpMethod(), "POST");
-        assertNotNull(restServiceWrapper.getFilter());
-        assertEquals(NotFilter.class, restServiceWrapper.getFilter().getClass());
-        NotFilter filter = (NotFilter) restServiceWrapper.getFilter();
-        assertEquals(filter.getFilter().getClass(), WildcardFilter.class);
-        WildcardFilter innerFilter = (WildcardFilter) filter.getFilter();
-        assertEquals(innerFilter.getPattern(), "*xyz*");
-        assertNotNull(restServiceWrapper.getPayloadParameterNames());
-        assertEquals(restServiceWrapper.getPayloadParameterNames().size(), 2);
-        assertEquals(restServiceWrapper.getPayloadParameterNames().get(0), "test-property1");
-        assertEquals(restServiceWrapper.getPayloadParameterNames().get(1), "test-property2");
+  @Override
+  protected String getConfigFile() {
+    return "rest-service-component-test-flow.xml";
+  }
 
-        assertNotNull(restServiceWrapper.getRequiredParams());
-        assertEquals(restServiceWrapper.getRequiredParams().size(), 2);
-        assertEquals(restServiceWrapper.getRequiredParams().get("r1"), "rv1");
-        assertEquals(restServiceWrapper.getRequiredParams().get("r2"), "rv2");
+  @Test
+  public void testResetServiceNamespaceHandler() throws Exception {
+    Flow f = (Flow) muleContext.getRegistry().lookupFlowConstruct(FLOW_NAME);
 
-        assertNotNull(restServiceWrapper.getOptionalParams());
-        assertEquals(restServiceWrapper.getOptionalParams().size(), 2);
-        assertEquals(restServiceWrapper.getOptionalParams().get("o1"), "ov1");
-        assertEquals(restServiceWrapper.getOptionalParams().get("o2"), "ov2");
-    }
+    Component component = (Component) f.getMessageProcessors().get(0);
+
+    assertTrue(component instanceof RestServiceWrapper);
+    RestServiceWrapper restServiceWrapper = (RestServiceWrapper) component;
+    assertEquals(restServiceWrapper.getServiceUrl(), FLOW_URL);
+    assertEquals(restServiceWrapper.getHttpMethod(), "POST");
+    assertNotNull(restServiceWrapper.getFilter());
+    assertEquals(NotFilter.class, restServiceWrapper.getFilter().getClass());
+    NotFilter filter = (NotFilter) restServiceWrapper.getFilter();
+    assertEquals(filter.getFilter().getClass(), WildcardFilter.class);
+    WildcardFilter innerFilter = (WildcardFilter) filter.getFilter();
+    assertEquals(innerFilter.getPattern(), "*xyz*");
+    assertNotNull(restServiceWrapper.getPayloadParameterNames());
+    assertEquals(restServiceWrapper.getPayloadParameterNames().size(), 2);
+    assertEquals(restServiceWrapper.getPayloadParameterNames().get(0), "test-property1");
+    assertEquals(restServiceWrapper.getPayloadParameterNames().get(1), "test-property2");
+
+    assertNotNull(restServiceWrapper.getRequiredParams());
+    assertEquals(restServiceWrapper.getRequiredParams().size(), 2);
+    assertEquals(restServiceWrapper.getRequiredParams().get("r1"), "rv1");
+    assertEquals(restServiceWrapper.getRequiredParams().get("r2"), "rv2");
+
+    assertNotNull(restServiceWrapper.getOptionalParams());
+    assertEquals(restServiceWrapper.getOptionalParams().size(), 2);
+    assertEquals(restServiceWrapper.getOptionalParams().get("o1"), "ov1");
+    assertEquals(restServiceWrapper.getOptionalParams().get("o2"), "ov2");
+  }
 }

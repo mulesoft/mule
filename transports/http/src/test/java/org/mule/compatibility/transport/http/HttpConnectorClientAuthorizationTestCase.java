@@ -39,120 +39,117 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContextEndpointTestCase
-{
-    private static final String CREDENTIALS_USER = "myUser";
+public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContextEndpointTestCase {
 
-    private static final String CREDENTIALS_PASSWORD = "myPassword";
+  private static final String CREDENTIALS_USER = "myUser";
 
-    private static final String URI_WITHOUT_CREDENTIALS = "http://localhost:60127";
+  private static final String CREDENTIALS_PASSWORD = "myPassword";
 
-    private static final String URI_WITH_CREDENTIALS = "http://" + CREDENTIALS_USER + ":" + CREDENTIALS_PASSWORD + "@localhost:60127";
+  private static final String URI_WITHOUT_CREDENTIALS = "http://localhost:60127";
 
-    private static final String HEADER_AUTHORIZATION_VALUE = "headerAuthValue";
+  private static final String URI_WITH_CREDENTIALS =
+      "http://" + CREDENTIALS_USER + ":" + CREDENTIALS_PASSWORD + "@localhost:60127";
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleEvent mockMuleEvent;
+  private static final String HEADER_AUTHORIZATION_VALUE = "headerAuthValue";
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpClient mockHttpClient;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleEvent mockMuleEvent;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpMethod mockHttpMethod;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpClient mockHttpClient;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ImmutableEndpoint mockImmutableEndpoint;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpMethod mockHttpMethod;
 
-    private URI uri;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ImmutableEndpoint mockImmutableEndpoint;
 
-    private MuleMessage message;
+  private URI uri;
 
-    private Charset encoding;
+  private MuleMessage message;
 
-    private HttpConnector connector;
+  private Charset encoding;
 
-    @Before
-    public void setup() throws URISyntaxException {
-        uri = new URI(URI_WITHOUT_CREDENTIALS);
-        message = MuleMessage.builder().payload(StringUtils.EMPTY).build();
-        encoding = getDefaultEncoding(muleContext);
-        connector = new HttpConnector(muleContext);
-        connector.setName("test");
-    }
+  private HttpConnector connector;
 
-    @Test
-    public void testWithCredentials() throws Exception
-    {
-        Credentials credentials = new MuleCredentials(CREDENTIALS_USER, CREDENTIALS_PASSWORD.toCharArray());
+  @Before
+  public void setup() throws URISyntaxException {
+    uri = new URI(URI_WITHOUT_CREDENTIALS);
+    message = MuleMessage.builder().payload(StringUtils.EMPTY).build();
+    encoding = getDefaultEncoding(muleContext);
+    connector = new HttpConnector(muleContext);
+    connector.setName("test");
+  }
 
-        when(mockMuleEvent.getCredentials()).thenReturn(credentials);
-        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-        when(mockMuleEvent.getMessage()).thenReturn(message);
+  @Test
+  public void testWithCredentials() throws Exception {
+    Credentials credentials = new MuleCredentials(CREDENTIALS_USER, CREDENTIALS_PASSWORD.toCharArray());
 
-        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+    when(mockMuleEvent.getCredentials()).thenReturn(credentials);
+    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+    when(mockMuleEvent.getMessage()).thenReturn(message);
 
-        verify(mockHttpClient.getState(), atLeast(1)).setCredentials(isA(AuthScope.class), isA(org.apache.commons.httpclient.Credentials.class));
-    }
+    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
 
-    @Test
-    public void testWithUserInfo() throws Exception
-    {
-        URI uri = new URI(URI_WITH_CREDENTIALS);
+    verify(mockHttpClient.getState(), atLeast(1)).setCredentials(isA(AuthScope.class),
+                                                                 isA(org.apache.commons.httpclient.Credentials.class));
+  }
 
-        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-        when(mockMuleEvent.getMessage()).thenReturn(message);
-        when(mockMuleEvent.getCredentials()).thenReturn(null);
-        when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(null);
-        when(mockImmutableEndpoint.getEncoding()).thenReturn(encoding);
-        when(mockImmutableEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI(URI_WITH_CREDENTIALS, muleContext));
+  @Test
+  public void testWithUserInfo() throws Exception {
+    URI uri = new URI(URI_WITH_CREDENTIALS);
 
-        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+    when(mockMuleEvent.getMessage()).thenReturn(message);
+    when(mockMuleEvent.getCredentials()).thenReturn(null);
+    when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(null);
+    when(mockImmutableEndpoint.getEncoding()).thenReturn(encoding);
+    when(mockImmutableEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI(URI_WITH_CREDENTIALS, muleContext));
 
-        verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HEADER_AUTHORIZATION), anyString());
-    }
+    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
 
-    @Test
-    public void testWithAuthorizationHeader() throws Exception
-    {
-        message = MuleMessage.builder(message).addOutboundProperty(HEADER_AUTHORIZATION, HEADER_AUTHORIZATION_VALUE).build();
+    verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HEADER_AUTHORIZATION), anyString());
+  }
 
-        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-        when(mockMuleEvent.getMessage()).thenReturn(message);
-        when(mockMuleEvent.getCredentials()).thenReturn(null);
-        when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(HEADER_AUTHORIZATION_VALUE);
-        when(mockHttpMethod.getRequestHeader(HEADER_AUTHORIZATION)).thenReturn(null);
+  @Test
+  public void testWithAuthorizationHeader() throws Exception {
+    message = MuleMessage.builder(message).addOutboundProperty(HEADER_AUTHORIZATION, HEADER_AUTHORIZATION_VALUE).build();
 
-        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+    when(mockMuleEvent.getMessage()).thenReturn(message);
+    when(mockMuleEvent.getCredentials()).thenReturn(null);
+    when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(HEADER_AUTHORIZATION_VALUE);
+    when(mockHttpMethod.getRequestHeader(HEADER_AUTHORIZATION)).thenReturn(null);
 
-        verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HEADER_AUTHORIZATION), anyString());
-    }
+    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
 
-    @Test
-    public void testWithProxyAuth() throws Exception
-    {
-        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-        when(mockMuleEvent.getMessage()).thenReturn(message);
-        when(mockMuleEvent.getCredentials()).thenReturn(null);
+    verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HEADER_AUTHORIZATION), anyString());
+  }
 
-        connector.setProxyUsername(CREDENTIALS_USER);
-        connector.setProxyPassword(CREDENTIALS_PASSWORD);
-        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+  @Test
+  public void testWithProxyAuth() throws Exception {
+    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+    when(mockMuleEvent.getMessage()).thenReturn(message);
+    when(mockMuleEvent.getCredentials()).thenReturn(null);
 
-        verify(mockHttpClient.getParams(), never()).setAuthenticationPreemptive(false);
-    }
+    connector.setProxyUsername(CREDENTIALS_USER);
+    connector.setProxyPassword(CREDENTIALS_PASSWORD);
+    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
 
-    @Test
-    public void testClean() throws Exception
-    {
-        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-        when(mockMuleEvent.getMessage()).thenReturn(message);
-        when(mockMuleEvent.getCredentials()).thenReturn(null);
+    verify(mockHttpClient.getParams(), never()).setAuthenticationPreemptive(false);
+  }
 
-        connector.setProxyUsername(null);
-        connector.setProxyPassword(null);
-        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+  @Test
+  public void testClean() throws Exception {
+    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+    when(mockMuleEvent.getMessage()).thenReturn(message);
+    when(mockMuleEvent.getCredentials()).thenReturn(null);
 
-        verify(mockHttpClient.getParams(), atLeast(1)).setAuthenticationPreemptive(false);
-    }
+    connector.setProxyUsername(null);
+    connector.setProxyPassword(null);
+    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+
+    verify(mockHttpClient.getParams(), atLeast(1)).setAuthenticationPreemptive(false);
+  }
 
 }

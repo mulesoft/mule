@@ -9,62 +9,52 @@ package org.mule.tck.testmodels.fruit;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
- * A test object not implementing Callable, but having a matching method accepting
- * MuleEventContext.
+ * A test object not implementing Callable, but having a matching method accepting MuleEventContext.
  */
-public class Kiwi implements Fruit
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1468423665948468954L;
+public class Kiwi implements Fruit {
 
-    private boolean bitten;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -1468423665948468954L;
 
-    public void handle(MuleEventContext eventContext) throws Exception
-    {
-        final Object payload = eventContext.getMessage().getPayload();
-        if (payload instanceof FruitLover)
-        {
-            this.bite();
-        }
+  private boolean bitten;
+
+  public void handle(MuleEventContext eventContext) throws Exception {
+    final Object payload = eventContext.getMessage().getPayload();
+    if (payload instanceof FruitLover) {
+      this.bite();
+    }
+  }
+
+  public void bite() {
+    this.bitten = true;
+  }
+
+  public boolean isBitten() {
+    return this.bitten;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Kiwi)) {
+      return false;
     }
 
-    public void bite()
-    {
-        this.bitten = true;
+    Kiwi kiwi = (Kiwi) o;
+
+    if (bitten != kiwi.bitten) {
+      return false;
     }
 
-    public boolean isBitten()
-    {
-        return this.bitten;
-    }
+    return true;
+  }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof Kiwi))
-        {
-            return false;
-        }
-
-        Kiwi kiwi = (Kiwi) o;
-
-        if (bitten != kiwi.bitten)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return (bitten ? 1 : 0);
-    }
+  @Override
+  public int hashCode() {
+    return (bitten ? 1 : 0);
+  }
 }

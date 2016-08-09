@@ -16,16 +16,15 @@ import java.util.List;
 /**
  * Resolves the values of a template query for a given event
  */
-public interface ParamValueResolver
-{
+public interface ParamValueResolver {
 
-    /**
-     * Resolves query parameters
-     *
-     * @param muleEvent event used to evaluate any parameter value expression
-     * @param templateParams parameters defined in the query template
-     * @return the list of resolved parameters to use. Non null
-     */
-    List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams);
+  /**
+   * Resolves query parameters
+   *
+   * @param muleEvent event used to evaluate any parameter value expression
+   * @param templateParams parameters defined in the query template
+   * @return the list of resolved parameters to use. Non null
+   */
+  List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams);
 
 }

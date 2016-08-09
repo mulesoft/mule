@@ -14,24 +14,19 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 
 /**
- * This parser parses nested endpoint elements adding the resulting beans to the map
- * of properties on the EndpointBuilder rather than attempting to inject them on the
- * EndpointBuilder itself.
+ * This parser parses nested endpoint elements adding the resulting beans to the map of properties on the EndpointBuilder rather
+ * than attempting to inject them on the EndpointBuilder itself.
  */
-public class EndpointPropertyElementDefinitionParser extends AbstractSingleParentFamilyChildDefinitionParser
-{
-    public static final String ENDPOINT_PROPERTIES_ATTRIBUTE = "properties";
+public class EndpointPropertyElementDefinitionParser extends AbstractSingleParentFamilyChildDefinitionParser {
 
-    public EndpointPropertyElementDefinitionParser(String propertyKey, Class beanClass)
-    {
-        setReturnFirstResult(false);
-        addDelegate(new ChildSingletonMapDefinitionParser(ENDPOINT_PROPERTIES_ATTRIBUTE)).registerPreProcessor(
-            new AddAttribute(MapEntryCombiner.KEY, propertyKey))
-            .addCollection(ENDPOINT_PROPERTIES_ATTRIBUTE)
-            .setIgnoredDefault(true)
-            .removeIgnored(MapEntryCombiner.KEY)
-            .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addChildDelegate(new ChildDefinitionParser(MapEntryCombiner.VALUE, beanClass)).addIgnored(
-            AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME).addIgnored(MapEntryCombiner.KEY);
-    }
+  public static final String ENDPOINT_PROPERTIES_ATTRIBUTE = "properties";
+
+  public EndpointPropertyElementDefinitionParser(String propertyKey, Class beanClass) {
+    setReturnFirstResult(false);
+    addDelegate(new ChildSingletonMapDefinitionParser(ENDPOINT_PROPERTIES_ATTRIBUTE))
+        .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, propertyKey)).addCollection(ENDPOINT_PROPERTIES_ATTRIBUTE)
+        .setIgnoredDefault(true).removeIgnored(MapEntryCombiner.KEY).addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addChildDelegate(new ChildDefinitionParser(MapEntryCombiner.VALUE, beanClass))
+        .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME).addIgnored(MapEntryCombiner.KEY);
+  }
 }

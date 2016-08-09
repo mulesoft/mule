@@ -12,46 +12,39 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
 import java.util.Date;
 
-public class TransactionalPetStoreClient extends PetStoreClient implements TransactionalConnection
-{
+public class TransactionalPetStoreClient extends PetStoreClient implements TransactionalConnection {
 
-    private boolean begun, commited, rolledback = false;
+  private boolean begun, commited, rolledback = false;
 
-    public TransactionalPetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName, Date openingDate)
-    {
-        super(username, password, tlsContextFactory, threadingProfile, configName, openingDate);
-    }
+  public TransactionalPetStoreClient(String username, String password, TlsContextFactory tlsContextFactory,
+                                     ThreadingProfile threadingProfile, String configName, Date openingDate) {
+    super(username, password, tlsContextFactory, threadingProfile, configName, openingDate);
+  }
 
-    @Override
-    public void begin() throws Exception
-    {
-        begun = true;
-    }
+  @Override
+  public void begin() throws Exception {
+    begun = true;
+  }
 
-    @Override
-    public void commit() throws Exception
-    {
-        commited = true;
-    }
+  @Override
+  public void commit() throws Exception {
+    commited = true;
+  }
 
-    @Override
-    public void rollback() throws Exception
-    {
-        rolledback = true;
-    }
+  @Override
+  public void rollback() throws Exception {
+    rolledback = true;
+  }
 
-    public boolean isBegun()
-    {
-        return begun;
-    }
+  public boolean isBegun() {
+    return begun;
+  }
 
-    public boolean isCommited()
-    {
-        return commited;
-    }
+  public boolean isCommited() {
+    return commited;
+  }
 
-    public boolean isRolledback()
-    {
-        return rolledback;
-    }
+  public boolean isRolledback() {
+    return rolledback;
+  }
 }

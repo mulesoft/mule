@@ -24,187 +24,154 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates object instances based on the class and sets any properties.  This factory is also responsible for applying
- * any object processors on the object before the lifecycle callbacks are called.
+ * Creates object instances based on the class and sets any properties. This factory is also responsible for applying any object
+ * processors on the object before the lifecycle callbacks are called.
  */
-public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstructAware
-{
+public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstructAware {
 
-    public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
-    public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
+  public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
+  public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
-    protected String objectClassName;
-    protected Class<?> objectClass;
-    protected Map properties = null;
-    protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
-    protected FlowConstruct flowConstruct;
-    protected boolean disposed = false;
+  protected String objectClassName;
+  protected Class<?> objectClass;
+  protected Map properties = null;
+  protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
+  protected FlowConstruct flowConstruct;
+  protected boolean disposed = false;
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     * For Spring only
-     */
-    public AbstractObjectFactory()
-    {
-        // nop
+  /**
+   * For Spring only
+   */
+  public AbstractObjectFactory() {
+    // nop
+  }
+
+  public AbstractObjectFactory(String objectClassName) {
+    this(objectClassName, null);
+  }
+
+  public AbstractObjectFactory(String objectClassName, Map properties) {
+    super();
+    this.objectClassName = objectClassName;
+    this.properties = properties;
+    setupObjectClassFromObjectClassName();
+  }
+
+  public AbstractObjectFactory(Class<?> objectClass) {
+    this(objectClass, null);
+  }
+
+  public AbstractObjectFactory(Class<?> objectClass, Map properties) {
+    super();
+    this.objectClassName = objectClass.getName();
+    this.objectClass = objectClass;
+    this.properties = properties;
+  }
+
+  protected Class<?> setupObjectClassFromObjectClassName() {
+    try {
+      Class<?> klass = ClassUtils.getClass(objectClassName);
+      objectClass = klass;
+      return klass;
+    } catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  public void initialise() throws InitialisationException {
+    if ((objectClassName == null) || (objectClass == null)) {
+      throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+    }
+    disposed = false;
+  }
+
+  public void dispose() {
+    disposed = true;
+    // Don't reset the component config state i.e. objectClass since service objects can be recycled
+  }
+
+  /**
+   * Creates an initialized object instance based on the class and sets any properties. This method handles all injection of
+   * properties for the resulting object
+   *
+   * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing
+   *        registry lookups applying processors to newly created objects or even firing custom notifications
+   * @throws Exception Can throw any type of exception while creating a new object
+   */
+  public Object getInstance(MuleContext muleContext) throws Exception {
+    if (objectClass == null || disposed) {
+      throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
     }
 
-    public AbstractObjectFactory(String objectClassName)
-    {
-        this(objectClassName, null);
+    Object object = ClassUtils.instanciateClass(objectClass);
+
+    if (properties != null) {
+      BeanUtils.populateWithoutFail(object, properties, true);
     }
 
-    public AbstractObjectFactory(String objectClassName, Map properties)
-    {
-        super();
-        this.objectClassName = objectClassName;
-        this.properties = properties;
-        setupObjectClassFromObjectClassName();
+    if (object instanceof FlowConstructAware) {
+      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
     }
 
-    public AbstractObjectFactory(Class<?> objectClass)
-    {
-        this(objectClass, null);
+    if (isAutoWireObject()) {
+      muleContext.getRegistry().applyProcessors(object);
     }
+    fireInitialisationCallbacks(object);
 
-    public AbstractObjectFactory(Class<?> objectClass, Map properties)
-    {
-        super();
-        this.objectClassName = objectClass.getName();
-        this.objectClass = objectClass;
-        this.properties = properties;
+    return object;
+  }
+
+  protected void fireInitialisationCallbacks(Object component) throws InitialisationException {
+    for (InitialisationCallback callback : initialisationCallbacks) {
+      callback.initialise(component);
     }
+  }
 
-    protected Class<?> setupObjectClassFromObjectClassName()
-    {
-        try
-        {
-            Class<?> klass = ClassUtils.getClass(objectClassName);
-            objectClass = klass;
-            return klass;
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new IllegalArgumentException(e);
-        }
-    }
+  public Class<?> getObjectClass() {
+    return objectClass;
+  }
 
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
+  public void setObjectClass(Class<?> objectClass) {
+    this.objectClass = objectClass;
+    this.objectClassName = objectClass.getName();
+  }
 
-    public void initialise() throws InitialisationException
-    {
-        if ((objectClassName == null) || (objectClass == null))
-        {
-            throw new InitialisationException(
-                    MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
-        }
-        disposed = false;
-    }
+  protected String getObjectClassName() {
+    return objectClassName;
+  }
 
-    public void dispose()
-    {
-        disposed = true;
-        //Don't reset the component config state i.e. objectClass since service objects can be recycled
-    }
+  public void setObjectClassName(String objectClassName) {
+    this.objectClassName = objectClassName;
+    setupObjectClassFromObjectClassName();
+  }
 
-    /**
-     * Creates an initialized object instance based on the class and sets any properties.
-     * This method handles all injection of properties for the resulting object
-     *
-     * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing registry lookups
-     *                    applying processors to newly created objects or even firing custom notifications
-     * @throws Exception Can throw any type of exception while creating a new object
-     */
-    public Object getInstance(MuleContext muleContext) throws Exception
-    {
-        if (objectClass == null || disposed)
-        {
-            throw new InitialisationException(
-                    MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
-        }
+  protected Map getProperties() {
+    return properties;
+  }
 
-        Object object = ClassUtils.instanciateClass(objectClass);
+  public void setProperties(Map properties) {
+    this.properties = properties;
+  }
 
-        if (properties != null)
-        {
-            BeanUtils.populateWithoutFail(object, properties, true);
-        }
+  public void addObjectInitialisationCallback(InitialisationCallback callback) {
+    initialisationCallbacks.add(callback);
+  }
 
-        if (object instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
-        }
+  public boolean isSingleton() {
+    return false;
+  }
 
-        if (isAutoWireObject())
-        {
-            muleContext.getRegistry().applyProcessors(object);
-        }
-        fireInitialisationCallbacks(object);
+  public boolean isExternallyManagedLifecycle() {
+    return false;
+  }
 
-        return object;
-    }
-
-    protected void fireInitialisationCallbacks(Object component) throws InitialisationException
-    {
-        for (InitialisationCallback callback : initialisationCallbacks)
-        {
-            callback.initialise(component);
-        }
-    }
-
-    public Class<?> getObjectClass()
-    {
-        return objectClass;
-    }
-
-    public void setObjectClass(Class<?> objectClass)
-    {
-        this.objectClass = objectClass;
-        this.objectClassName = objectClass.getName();
-    }
-
-    protected String getObjectClassName()
-    {
-        return objectClassName;
-    }
-
-    public void setObjectClassName(String objectClassName)
-    {
-        this.objectClassName = objectClassName;
-        setupObjectClassFromObjectClassName();
-    }
-
-    protected Map getProperties()
-    {
-        return properties;
-    }
-
-    public void setProperties(Map properties)
-    {
-        this.properties = properties;
-    }
-
-    public void addObjectInitialisationCallback(InitialisationCallback callback)
-    {
-        initialisationCallbacks.add(callback);
-    }
-
-    public boolean isSingleton()
-    {
-        return false;
-    }
-
-    public boolean isExternallyManagedLifecycle()
-    {
-        return false;
-    }
-
-    public boolean isAutoWireObject()
-    {
-        return true;
-    }
+  public boolean isAutoWireObject() {
+    return true;
+  }
 }

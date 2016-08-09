@@ -15,15 +15,13 @@ import org.mule.runtime.config.spring.parsers.processors.NameAttribute;
 /**
  * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
-public class DefaultThreadingProfileDefinitionParser extends OrphanDefinitionParser
-{
+public class DefaultThreadingProfileDefinitionParser extends OrphanDefinitionParser {
 
-    public DefaultThreadingProfileDefinitionParser(String propertyName)
-    {
-        super(ChainedThreadingProfile.class, true);
-        addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS);
-        registerPostProcessor(new IdAttribute(propertyName));
-        registerPostProcessor(new NameAttribute(propertyName));
-    }
+  public DefaultThreadingProfileDefinitionParser(String propertyName) {
+    super(ChainedThreadingProfile.class, true);
+    addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS);
+    registerPostProcessor(new IdAttribute(propertyName));
+    registerPostProcessor(new NameAttribute(propertyName));
+  }
 
 }

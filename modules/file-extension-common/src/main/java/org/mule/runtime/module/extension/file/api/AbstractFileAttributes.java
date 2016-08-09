@@ -18,41 +18,36 @@ import java.time.ZoneId;
  *
  * @since 4.0
  */
-public abstract class AbstractFileAttributes extends BaseAttributes implements FileAttributes
-{
+public abstract class AbstractFileAttributes extends BaseAttributes implements FileAttributes {
 
-    protected final Path path;
+  protected final Path path;
 
-    /**
-     * Creates a new instance
-     *
-     * @param path a {@link Path} pointing to the represented file
-     */
-    protected AbstractFileAttributes(Path path)
-    {
-        this.path = path;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param path a {@link Path} pointing to the represented file
+   */
+  protected AbstractFileAttributes(Path path) {
+    this.path = path;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPath()
-    {
-        return path.toString();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getPath() {
+    return path.toString();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return path.getFileName().toString();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return path.getFileName().toString();
+  }
 
-    protected LocalDateTime asDateTime(Instant instant)
-    {
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-    }
+  protected LocalDateTime asDateTime(Instant instant) {
+    return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+  }
 }

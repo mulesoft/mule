@@ -18,50 +18,48 @@ import java.util.Collection;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public interface QueueInfoDelegate
-{
-    /**
-     * append a new member to the end of the queue
-     */
-    void putNow(Serializable o);
+public interface QueueInfoDelegate {
 
-    /**
-     * Offer to append a new member to the end of the queue
-     */
-    boolean offer(Serializable o, int room, long timeout) throws InterruptedException, ObjectStoreException;
+  /**
+   * append a new member to the end of the queue
+   */
+  void putNow(Serializable o);
 
-    /**
-     * Poll the queue for its first member, and, if there is one, remove and return
-     * it
-     */
-    Serializable poll(long timeout) throws InterruptedException;
+  /**
+   * Offer to append a new member to the end of the queue
+   */
+  boolean offer(Serializable o, int room, long timeout) throws InterruptedException, ObjectStoreException;
 
-    /**
-     * return, but do not remove, the first member of the queue
-     */
-    Serializable peek() throws InterruptedException;
+  /**
+   * Poll the queue for its first member, and, if there is one, remove and return it
+   */
+  Serializable poll(long timeout) throws InterruptedException;
 
-    /**
-     * Restore a previously removed member to the front of the queue
-     */
-    void untake(Serializable item) throws InterruptedException, ObjectStoreException;
+  /**
+   * return, but do not remove, the first member of the queue
+   */
+  Serializable peek() throws InterruptedException;
 
-    /**
-     * Return the size of the queue
-     */
-    int getSize();
+  /**
+   * Restore a previously removed member to the front of the queue
+   */
+  void untake(Serializable item) throws InterruptedException, ObjectStoreException;
 
-    /**
-     * Discards all the elements in the queue
-     */
-    void clear() throws InterruptedException;
+  /**
+   * Return the size of the queue
+   */
+  int getSize();
 
-    /**
-     * Appends all of the elements in the specified collection to the queue (optional
-     * operation).
-     * 
-     * @param items to be added to the queue
-     * @return <tt>true</tt> if this queue changed as a result of the call
-     */
-    boolean addAll(Collection<? extends Serializable> items);
+  /**
+   * Discards all the elements in the queue
+   */
+  void clear() throws InterruptedException;
+
+  /**
+   * Appends all of the elements in the specified collection to the queue (optional operation).
+   * 
+   * @param items to be added to the queue
+   * @return <tt>true</tt> if this queue changed as a result of the call
+   */
+  boolean addAll(Collection<? extends Serializable> items);
 }

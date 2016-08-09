@@ -15,23 +15,19 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleStoredProcedureUpdateTestCase extends AbstractStoredProcedureUpdateTestCase
-{
+public class OracleStoredProcedureUpdateTestCase extends AbstractStoredProcedureUpdateTestCase {
 
-    public OracleStoredProcedureUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public OracleStoredProcedureUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getOracleResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getOracleResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-update-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/vendor/oracle/oracle-stored-procedure-update-config.xml"};
+  }
 }

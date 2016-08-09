@@ -14,59 +14,52 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class OutboundTransactionsTestCase extends FunctionalTestCase
-{
-    private static final int TIMEOUT = 2000;
+public class OutboundTransactionsTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transaction/outbound-transactions.xml";
+  private static final int TIMEOUT = 2000;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transaction/outbound-transactions.xml";
+  }
+
+  @Test
+  public void testOutboundRouterTransactions() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
+
+    while (client.request("jms://my.queue1", TIMEOUT) != null) {
+      // consume messages
     }
 
-    @Test
-    public void testOutboundRouterTransactions() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        while (client.request("jms://my.queue1", TIMEOUT) != null)
-        {
-            // consume messages
-        }
-
-        while (client.request("jms://my.queue2", TIMEOUT) != null)
-        {
-            // consume messages
-        }
-
-        client.sendNoReceive("vm://component1", "test", null);
-
-        assertNotNull(client.request("jms://my.queue1", TIMEOUT));
-        assertNotNull(client.request("jms://my.queue2", TIMEOUT));
-        assertNull(client.request("jms://my.queue1", TIMEOUT));
-        assertNull(client.request("jms://my.queue2", TIMEOUT));
+    while (client.request("jms://my.queue2", TIMEOUT) != null) {
+      // consume messages
     }
 
-    @Test
-    public void testOutboundRouterTransactions2() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
+    client.sendNoReceive("vm://component1", "test", null);
 
-        while (client.request("jms://my.queue3", TIMEOUT) != null)
-        {
-            // consume messages
-        }
+    assertNotNull(client.request("jms://my.queue1", TIMEOUT));
+    assertNotNull(client.request("jms://my.queue2", TIMEOUT));
+    assertNull(client.request("jms://my.queue1", TIMEOUT));
+    assertNull(client.request("jms://my.queue2", TIMEOUT));
+  }
 
-        while (client.request("jms://my.queue4", TIMEOUT) != null)
-        {
-            // consume messages
-        }
+  @Test
+  public void testOutboundRouterTransactions2() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
 
-        client.sendNoReceive("jms://component2", "test", null);
-
-        assertNotNull(client.request("jms://my.queue3", TIMEOUT));
-        assertNotNull(client.request("jms://my.queue4", TIMEOUT));
-        assertNull(client.request("jms://my.queue3", TIMEOUT));
-        assertNull(client.request("jms://my.queue4", TIMEOUT));
+    while (client.request("jms://my.queue3", TIMEOUT) != null) {
+      // consume messages
     }
+
+    while (client.request("jms://my.queue4", TIMEOUT) != null) {
+      // consume messages
+    }
+
+    client.sendNoReceive("jms://component2", "test", null);
+
+    assertNotNull(client.request("jms://my.queue3", TIMEOUT));
+    assertNotNull(client.request("jms://my.queue4", TIMEOUT));
+    assertNull(client.request("jms://my.queue3", TIMEOUT));
+    assertNull(client.request("jms://my.queue4", TIMEOUT));
+  }
 }

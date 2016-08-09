@@ -19,17 +19,15 @@ import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
  */
 @Deprecated
 public interface InboundEndpoint
-    extends ImmutableEndpoint, MessageRequesting, MessageSource, FlowConstructAware, Startable, Stoppable, LegacyInboundEndpoint
-{
-    AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
+    extends ImmutableEndpoint, MessageRequesting, MessageSource, FlowConstructAware, Startable, Stoppable, LegacyInboundEndpoint {
 
-    default boolean isCompatibleWithAsync()
-    {
-        return true;
-    }
+  AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
 
-    default String getCanonicalURI()
-    {
-        return getConnector().getCanonicalURI(getEndpointURI());
-    }
+  default boolean isCompatibleWithAsync() {
+    return true;
+  }
+
+  default String getCanonicalURI() {
+    return getConnector().getCanonicalURI(getEndpointURI());
+  }
 }

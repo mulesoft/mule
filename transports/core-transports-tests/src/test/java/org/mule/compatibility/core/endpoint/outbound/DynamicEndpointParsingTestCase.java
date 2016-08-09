@@ -25,92 +25,82 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointTestCase {
 
-    public DynamicEndpointParsingTestCase()
-    {
-        setStartContext(true);
-    }
+  public DynamicEndpointParsingTestCase() {
+    setStartContext(true);
+  }
 
-    @Test
-    public void testDynamicEventMessageSourceURIUntouched() throws Exception
-    {
-        OutboundEndpoint endpoint = createRequestResponseEndpoint("test://localhost:#[message.outboundProperties.port]");
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+  @Test
+  public void testDynamicEventMessageSourceURIUntouched() throws Exception {
+    OutboundEndpoint endpoint = createRequestResponseEndpoint("test://localhost:#[message.outboundProperties.port]");
+    assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .addOutboundProperty("port", 12345)
-                                    .build());
+    MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("port", 12345).build());
 
-        MuleEvent response = endpoint.process(event);
+    MuleEvent response = endpoint.process(event);
 
-        assertEquals("test://test", response.getMessageSourceURI().toString());
-    }
+    assertEquals("test://test", response.getMessageSourceURI().toString());
+  }
 
-    @Test(expected = MalformedEndpointException.class)
-    public void testExpressionInSchemeIsForbidden() throws Exception
-    {
-        createRequestResponseEndpoint("#[message.outboundProperties.scheme]://#[message.outboundProperties.host]:#[message.outboundProperties:port]");
-    }
+  @Test(expected = MalformedEndpointException.class)
+  public void testExpressionInSchemeIsForbidden() throws Exception {
+    createRequestResponseEndpoint("#[message.outboundProperties.scheme]://#[message.outboundProperties.host]:#[message.outboundProperties:port]");
+  }
 
-    @Test(expected = MalformedEndpointException.class)
-    public void testMalformedExpressionInUriIsDetected() throws Exception
-    {
-        createRequestResponseEndpoint("test://#[message.outboundProperties.host:#[message.outboundProperties.port]");
-    }
+  @Test(expected = MalformedEndpointException.class)
+  public void testMalformedExpressionInUriIsDetected() throws Exception {
+    createRequestResponseEndpoint("test://#[message.outboundProperties.host:#[message.outboundProperties.port]");
+  }
 
-    @Test(expected = MalformedEndpointException.class)
-    public void testDynamicInboundEndpointNotAllowed() throws Exception
-    {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]", muleContext);
-        endpointBuilder.buildInboundEndpoint();
-    }
+  @Test(expected = MalformedEndpointException.class)
+  public void testDynamicInboundEndpointNotAllowed() throws Exception {
+    EndpointURIEndpointBuilder endpointBuilder =
+        new EndpointURIEndpointBuilder("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]",
+                                       muleContext);
+    endpointBuilder.buildInboundEndpoint();
+  }
 
-    @Test
-    public void testMEPOverridingInUri() throws Exception
-    {
-        OutboundEndpoint endpoint = createEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]", MessageExchangePattern.ONE_WAY);
+  @Test
+  public void testMEPOverridingInUri() throws Exception {
+    OutboundEndpoint endpoint = createEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]",
+                                               MessageExchangePattern.ONE_WAY);
 
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+    assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .addOutboundProperty("port", 12345)
-                                    .addOutboundProperty("host", "localhost")
-                                    .build());
+    MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("port", 12345)
+        .addOutboundProperty("host", "localhost").build());
 
-        MuleEvent response = endpoint.process(event);
-        assertSame(VoidMuleEvent.getInstance(), response);
+    MuleEvent response = endpoint.process(event);
+    assertSame(VoidMuleEvent.getInstance(), response);
 
-        // Now test set on the endpoint
-        endpoint = createRequestResponseEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]?exchangePattern=REQUEST_RESPONSE");
+    // Now test set on the endpoint
+    endpoint =
+        createRequestResponseEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]?exchangePattern=REQUEST_RESPONSE");
 
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+    assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .addOutboundProperty("port", 12345)
-                                    .addOutboundProperty("host", "localhost")
-                                    .build());
+    event = getTestEvent("test", getTestInboundEndpoint("test1"));
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("port", 12345)
+        .addOutboundProperty("host", "localhost").build());
 
-        response = endpoint.process(event);
-        assertNotNull(response);
-        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, endpoint.getExchangePattern());
-    }
+    response = endpoint.process(event);
+    assertNotNull(response);
+    assertEquals(MessageExchangePattern.REQUEST_RESPONSE, endpoint.getExchangePattern());
+  }
 
-    protected OutboundEndpoint createRequestResponseEndpoint(String uri) throws EndpointException, InitialisationException
-    {
-        return createEndpoint(uri, MessageExchangePattern.REQUEST_RESPONSE);
-    }
+  protected OutboundEndpoint createRequestResponseEndpoint(String uri) throws EndpointException, InitialisationException {
+    return createEndpoint(uri, MessageExchangePattern.REQUEST_RESPONSE);
+  }
 
-    private OutboundEndpoint createEndpoint(String uri, MessageExchangePattern exchangePattern) throws EndpointException, InitialisationException
-    {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        endpointBuilder.setExchangePattern(exchangePattern);
+  private OutboundEndpoint createEndpoint(String uri, MessageExchangePattern exchangePattern)
+      throws EndpointException, InitialisationException {
+    EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    endpointBuilder.setExchangePattern(exchangePattern);
 
-        return endpointBuilder.buildOutboundEndpoint();
-    }
+    return endpointBuilder.buildOutboundEndpoint();
+  }
 
 }

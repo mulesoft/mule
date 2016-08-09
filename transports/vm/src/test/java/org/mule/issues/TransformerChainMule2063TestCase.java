@@ -15,47 +15,41 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class TransformerChainMule2063TestCase extends FunctionalTestCase
-{
+public class TransformerChainMule2063TestCase extends FunctionalTestCase {
 
-    public static final String IN = "in";
-    public static final String TEST1_OUT = IN + "123";
-    public static final String TEST2_OUT = IN + "123";
-    public static final String TEST3_OUT = IN + "123abc";
-    public static final long WAIT_MS = 3000L;
+  public static final String IN = "in";
+  public static final String TEST1_OUT = IN + "123";
+  public static final String TEST2_OUT = IN + "123";
+  public static final String TEST3_OUT = IN + "123abc";
+  public static final long WAIT_MS = 3000L;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "issues/transformer-chain-mule-2063-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "issues/transformer-chain-mule-2063-test-flow.xml";
+  }
 
-    protected void doTest(String name, String result) throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.send("vm://" + name + "-in", IN, null);
-        MuleMessage message = client.request("vm://" + name + "-out", WAIT_MS);
+  protected void doTest(String name, String result) throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.send("vm://" + name + "-in", IN, null);
+    MuleMessage message = client.request("vm://" + name + "-out", WAIT_MS);
 
-        assertNotNull(message);
-        assertNotNull(getPayloadAsString(message));
-        assertEquals(result, getPayloadAsString(message));
-    }
+    assertNotNull(message);
+    assertNotNull(getPayloadAsString(message));
+    assertEquals(result, getPayloadAsString(message));
+  }
 
-    @Test
-    public void testInputTransformers() throws Exception
-    {
-        doTest("test1", TEST1_OUT);
-    }
+  @Test
+  public void testInputTransformers() throws Exception {
+    doTest("test1", TEST1_OUT);
+  }
 
-    @Test
-    public void testGlobalTransformers() throws Exception
-    {
-        doTest("test2", TEST2_OUT);
-    }
+  @Test
+  public void testGlobalTransformers() throws Exception {
+    doTest("test2", TEST2_OUT);
+  }
 
-    @Test
-    public void testOutputTransformers() throws Exception
-    {
-        doTest("test3", TEST3_OUT);
-    }
+  @Test
+  public void testOutputTransformers() throws Exception {
+    doTest("test3", TEST3_OUT);
+  }
 }

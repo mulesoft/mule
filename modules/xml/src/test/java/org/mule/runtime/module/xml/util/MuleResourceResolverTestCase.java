@@ -25,90 +25,89 @@ import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.ls.LSInput;
 
 @SmallTest
-public class MuleResourceResolverTestCase extends AbstractMuleTestCase
-{
-    private static final String NON_EXISTENT_RESOURCE = "non-existent-resource";
+public class MuleResourceResolverTestCase extends AbstractMuleTestCase {
 
-    private static final String EXISTENT_CLASSPATH_SUBDIRECTORY = "localresourceresolver";
+  private static final String NON_EXISTENT_RESOURCE = "non-existent-resource";
 
-    private static final String EXISTENT_CLASSPATH_SUBDIRECTORY_RESOURCE = "resource.txt";
+  private static final String EXISTENT_CLASSPATH_SUBDIRECTORY = "localresourceresolver";
 
-    private static final String EXISTENT_CLASSPATH_ABSOLUTE_RESOURCE = EXISTENT_CLASSPATH_SUBDIRECTORY + "/" + EXISTENT_CLASSPATH_SUBDIRECTORY_RESOURCE;
+  private static final String EXISTENT_CLASSPATH_SUBDIRECTORY_RESOURCE = "resource.txt";
 
-    private static final String IDENTIFIER_TYPE = "myTestType";
+  private static final String EXISTENT_CLASSPATH_ABSOLUTE_RESOURCE =
+      EXISTENT_CLASSPATH_SUBDIRECTORY + "/" + EXISTENT_CLASSPATH_SUBDIRECTORY_RESOURCE;
 
-    private static final String IDENTIFIER_NAMESPACE = "myTestNameSpace";
+  private static final String IDENTIFIER_TYPE = "myTestType";
 
-    private static final String IDENTIFIER_PUBLIC_ID = "myTestPublicId";
+  private static final String IDENTIFIER_NAMESPACE = "myTestNameSpace";
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  private static final String IDENTIFIER_PUBLIC_ID = "myTestPublicId";
 
-    MuleResourceResolver resolver;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Before
-    public void prepare()
-    {
-        resolver = new MuleResourceResolver();
-    }
+  MuleResourceResolver resolver;
 
-    @Test
-    public void testsNonExistentResource()
-    {
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, NON_EXISTENT_RESOURCE, null);
-        assertThat(outcome, is(nullValue()));
-    }
+  @Before
+  public void prepare() {
+    resolver = new MuleResourceResolver();
+  }
 
-    @Test
-    public void testsExistentClasspathResource()
-    {
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, EXISTENT_CLASSPATH_ABSOLUTE_RESOURCE, null);
-        assertThat(outcome, is(not(nullValue())));
-        assertThat(outcome.getBaseURI(), is(nullValue()));
-        assertCommon(outcome);
-    }
+  @Test
+  public void testsNonExistentResource() {
+    LSInput outcome =
+        resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, NON_EXISTENT_RESOURCE, null);
+    assertThat(outcome, is(nullValue()));
+  }
 
-    @Test
-    public void testsExistentAbsoluteFileSystemResource() throws IOException
-    {
-        File file = temporaryFolder.newFile(UUID.getUUID());
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getAbsolutePath(), null);
-        assertThat(outcome, is(not(nullValue())));
-        assertThat(outcome.getBaseURI(), is(nullValue()));
-        assertCommon(outcome);
-    }
+  @Test
+  public void testsExistentClasspathResource() {
+    LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID,
+                                               EXISTENT_CLASSPATH_ABSOLUTE_RESOURCE, null);
+    assertThat(outcome, is(not(nullValue())));
+    assertThat(outcome.getBaseURI(), is(nullValue()));
+    assertCommon(outcome);
+  }
 
-    @Test
-    public void testsNonExistentAbsoluteFileSystemResource() throws IOException
-    {
-        String nonExistentAbsoluteFileSystemResource = new File(temporaryFolder.getRoot(), NON_EXISTENT_RESOURCE).getAbsolutePath();
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, nonExistentAbsoluteFileSystemResource, null);
-        assertThat(outcome, is(nullValue()));
-    }
+  @Test
+  public void testsExistentAbsoluteFileSystemResource() throws IOException {
+    File file = temporaryFolder.newFile(UUID.getUUID());
+    LSInput outcome =
+        resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getAbsolutePath(), null);
+    assertThat(outcome, is(not(nullValue())));
+    assertThat(outcome.getBaseURI(), is(nullValue()));
+    assertCommon(outcome);
+  }
 
-    @Test
-    public void testsExistentFileSystemResourceWithBaseUri() throws IOException
-    {
-        File file = temporaryFolder.newFile(UUID.getUUID());
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getName(), file.getPath());
-        assertThat(outcome, is(not(nullValue())));
-        assertThat(outcome.getBaseURI(), is(not(nullValue())));
-        assertCommon(outcome);
-    }
+  @Test
+  public void testsNonExistentAbsoluteFileSystemResource() throws IOException {
+    String nonExistentAbsoluteFileSystemResource = new File(temporaryFolder.getRoot(), NON_EXISTENT_RESOURCE).getAbsolutePath();
+    LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID,
+                                               nonExistentAbsoluteFileSystemResource, null);
+    assertThat(outcome, is(nullValue()));
+  }
 
-    @Test
-    public void testsNonExistentFileSystemResourceWithBaseUri() throws IOException
-    {
-        File file = temporaryFolder.newFile(UUID.getUUID());
-        LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getName(), NON_EXISTENT_RESOURCE);
-        assertThat(outcome, is(nullValue()));
-    }
+  @Test
+  public void testsExistentFileSystemResourceWithBaseUri() throws IOException {
+    File file = temporaryFolder.newFile(UUID.getUUID());
+    LSInput outcome =
+        resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getName(), file.getPath());
+    assertThat(outcome, is(not(nullValue())));
+    assertThat(outcome.getBaseURI(), is(not(nullValue())));
+    assertCommon(outcome);
+  }
 
-    private void assertCommon(LSInput outcome)
-    {
-        assertThat(outcome.getByteStream(), is(not(nullValue())));
-        assertThat(outcome.getSystemId(), is(not(nullValue())));
-        assertThat(outcome.getPublicId(), is(IDENTIFIER_PUBLIC_ID));
-    }
+  @Test
+  public void testsNonExistentFileSystemResourceWithBaseUri() throws IOException {
+    File file = temporaryFolder.newFile(UUID.getUUID());
+    LSInput outcome = resolver.resolveResource(IDENTIFIER_TYPE, IDENTIFIER_NAMESPACE, IDENTIFIER_PUBLIC_ID, file.getName(),
+                                               NON_EXISTENT_RESOURCE);
+    assertThat(outcome, is(nullValue()));
+  }
+
+  private void assertCommon(LSInput outcome) {
+    assertThat(outcome.getByteStream(), is(not(nullValue())));
+    assertThat(outcome.getSystemId(), is(not(nullValue())));
+    assertThat(outcome.getPublicId(), is(IDENTIFIER_PUBLIC_ID));
+  }
 
 }

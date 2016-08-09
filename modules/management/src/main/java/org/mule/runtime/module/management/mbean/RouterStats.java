@@ -13,39 +13,32 @@ import java.util.Map;
 /**
  * <code>RouterStats</code> TODO
  */
-public class RouterStats implements RouterStatsMBean
-{
+public class RouterStats implements RouterStatsMBean {
 
-    private RouterStatistics statistics;
+  private RouterStatistics statistics;
 
-    public RouterStats(RouterStatistics statistics)
-    {
-        this.statistics = statistics;
-    }
+  public RouterStats(RouterStatistics statistics) {
+    this.statistics = statistics;
+  }
 
-    public long getCaughtMessages()
-    {
-        return statistics.getCaughtMessages();
-    }
+  public long getCaughtMessages() {
+    return statistics.getCaughtMessages();
+  }
 
-    public long getNotRouted()
-    {
-        return statistics.getNotRouted();
-    }
+  public long getNotRouted() {
+    return statistics.getNotRouted();
+  }
 
-    public long getTotalReceived()
-    {
-        return statistics.getTotalReceived();
-    }
+  public long getTotalReceived() {
+    return statistics.getTotalReceived();
+  }
 
-    public long getTotalRouted()
-    {
-        return statistics.getTotalRouted();
-    }
+  public long getTotalRouted() {
+    return statistics.getTotalRouted();
+  }
 
-    public Map getRouted()
-    {
-        return statistics.getRouted();
-    }
+  public Map getRouted() {
+    return statistics.getRouted();
+  }
 
 }

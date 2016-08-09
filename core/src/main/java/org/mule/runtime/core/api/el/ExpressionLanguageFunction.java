@@ -9,9 +9,8 @@ package org.mule.runtime.core.api.el;
 /**
  * @since 3.3
  */
-public interface ExpressionLanguageFunction
-{
+public interface ExpressionLanguageFunction {
 
-    Object call(Object[] params, ExpressionLanguageContext context);
+  Object call(Object[] params, ExpressionLanguageContext context);
 
 }

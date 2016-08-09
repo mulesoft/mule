@@ -12,18 +12,15 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 /**
  * Provides a {@link ClassLoaderFilter} that does not filter any class or resource.
  */
-public class PassThroughClassLoaderFilter implements ClassLoaderFilter
-{
+public class PassThroughClassLoaderFilter implements ClassLoaderFilter {
 
-    @Override
-    public boolean exportsClass(String name)
-    {
-        return true;
-    }
+  @Override
+  public boolean exportsClass(String name) {
+    return true;
+  }
 
-    @Override
-    public boolean exportsResource(String name)
-    {
-        return true;
-    }
+  @Override
+  public boolean exportsResource(String name) {
+    return true;
+  }
 }

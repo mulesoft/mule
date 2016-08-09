@@ -20,40 +20,31 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingTyp
 import java.util.Optional;
 
 /**
- * A {@link GeneratedResourceFactory} which generates a {@link ExtensionManifest}
- * and stores it in {@code XML} format
+ * A {@link GeneratedResourceFactory} which generates a {@link ExtensionManifest} and stores it in {@code XML} format
  *
  * @since 4.0
  */
-public final class ExtensionManifestGenerator implements GeneratedResourceFactory
-{
+public final class ExtensionManifestGenerator implements GeneratedResourceFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel)
-    {
-        Optional<ImplementingTypeModelProperty> typeProperty = extensionModel.getModelProperty(ImplementingTypeModelProperty.class);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+    Optional<ImplementingTypeModelProperty> typeProperty = extensionModel.getModelProperty(ImplementingTypeModelProperty.class);
 
-        if (!typeProperty.isPresent())
-        {
-            return Optional.empty();
-        }
-
-        ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
-        ExtensionManifestBuilder builder = new ExtensionManifestBuilder();
-        builder.setName(extensionModel.getName())
-                .setDescription(extensionModel.getDescription())
-                .setVersion(extensionModel.getVersion())
-                .setMinMuleVersion(extensionModel.getMinMuleVersion())
-                .addExportedPackages(exportCollector.getExportedPackages())
-                .addExportedResources(exportCollector.getExportedResources())
-                .withDescriber()
-                .setId(DESCRIBER_ID)
-                .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
-
-        String manifestXml = new ExtensionManifestXmlSerializer().serialize(builder.build());
-        return Optional.of(new GeneratedResource(EXTENSION_MANIFEST_FILE_NAME, manifestXml.getBytes()));
+    if (!typeProperty.isPresent()) {
+      return Optional.empty();
     }
+
+    ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
+    ExtensionManifestBuilder builder = new ExtensionManifestBuilder();
+    builder.setName(extensionModel.getName()).setDescription(extensionModel.getDescription())
+        .setVersion(extensionModel.getVersion()).setMinMuleVersion(extensionModel.getMinMuleVersion())
+        .addExportedPackages(exportCollector.getExportedPackages()).addExportedResources(exportCollector.getExportedResources())
+        .withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
+
+    String manifestXml = new ExtensionManifestXmlSerializer().serialize(builder.build());
+    return Optional.of(new GeneratedResource(EXTENSION_MANIFEST_FILE_NAME, manifestXml.getBytes()));
+  }
 }

@@ -16,62 +16,47 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * <code>IsXmlFilter</code> accepts a String or byte[] if its contents are valid
- * (well-formed) XML.
+ * <code>IsXmlFilter</code> accepts a String or byte[] if its contents are valid (well-formed) XML.
  */
 // @ThreadSafe
-public class IsXmlFilter implements Filter
-{
-    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+public class IsXmlFilter implements Filter {
 
-    // TODO: add validation against a DTD, see MULE-1055
+  private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
-    public IsXmlFilter()
-    {
-        super();
-    }
+  // TODO: add validation against a DTD, see MULE-1055
 
-    public boolean accept(MuleMessage obj)
-    {
-        return accept((Object) obj.getPayload());
-    }
+  public IsXmlFilter() {
+    super();
+  }
 
-    private boolean accept(Object obj)
-    {
-        XMLStreamReader parser = null;
-        try
-        {
-            parser = XMLUtils.toXMLStreamReader(factory, obj);
-            if (parser == null)
-            {
-                return false;
-            }
+  public boolean accept(MuleMessage obj) {
+    return accept((Object) obj.getPayload());
+  }
 
-            while (parser.next() != XMLStreamConstants.END_DOCUMENT)
-            {
-                // meep meep!
-            }
+  private boolean accept(Object obj) {
+    XMLStreamReader parser = null;
+    try {
+      parser = XMLUtils.toXMLStreamReader(factory, obj);
+      if (parser == null) {
+        return false;
+      }
 
-            return true;
+      while (parser.next() != XMLStreamConstants.END_DOCUMENT) {
+        // meep meep!
+      }
+
+      return true;
+    } catch (XMLStreamException ex) {
+      return false;
+    } finally {
+      if (parser != null) {
+        try {
+          parser.close();
+        } catch (XMLStreamException ignored) {
+          // bummer
         }
-        catch (XMLStreamException ex)
-        {
-            return false;
-        }
-        finally
-        {
-            if (parser != null)
-            {
-                try
-                {
-                    parser.close();
-                }
-                catch (XMLStreamException ignored)
-                {
-                    // bummer
-                }
-            }
-        }
+      }
     }
+  }
 
 }

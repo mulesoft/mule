@@ -12,18 +12,15 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 /**
  * Notifies when there are a cluster node event
  */
-public class ClusterNodeNotification extends ServerNotification implements BlockingServerEvent
-{
+public class ClusterNodeNotification extends ServerNotification implements BlockingServerEvent {
 
-    public static final int PRIMARY_CLUSTER_NODE_SELECTED = CLUSTER_NODE_EVENT_ACTION_START_RANGE + 1;
+  public static final int PRIMARY_CLUSTER_NODE_SELECTED = CLUSTER_NODE_EVENT_ACTION_START_RANGE + 1;
 
-    static
-    {
-        registerAction("cluster node selected as primary", PRIMARY_CLUSTER_NODE_SELECTED);
-    }
+  static {
+    registerAction("cluster node selected as primary", PRIMARY_CLUSTER_NODE_SELECTED);
+  }
 
-    public ClusterNodeNotification(Object message, int action)
-    {
-        super(message, action);
-    }
+  public ClusterNodeNotification(Object message, int action) {
+    super(message, action);
+  }
 }

@@ -13,29 +13,25 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ServiceDefinitionParser extends OrphanDefinitionParser
-{
+public class ServiceDefinitionParser extends OrphanDefinitionParser {
 
-    // for custom services
-    public ServiceDefinitionParser()
-    {
-        super(true);
-        registerPreProcessor(new ProvideDefaultName("service"));
-    }
+  // for custom services
+  public ServiceDefinitionParser() {
+    super(true);
+    registerPreProcessor(new ProvideDefaultName("service"));
+  }
 
-    public ServiceDefinitionParser(Class clazz)
-    {
-        super(clazz, true);
-        registerPreProcessor(new ProvideDefaultName("service"));
-    }
+  public ServiceDefinitionParser(Class clazz) {
+    super(clazz, true);
+    registerPreProcessor(new ProvideDefaultName("service"));
+  }
 
-    @java.lang.Override
-    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        Element parent = (Element) element.getParentNode();
-        String modelName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("model", modelName);
-        super.doParse(element, parserContext, builder);
-    }
+  @java.lang.Override
+  protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    Element parent = (Element) element.getParentNode();
+    String modelName = parent.getAttribute(ATTRIBUTE_NAME);
+    builder.addPropertyReference("model", modelName);
+    super.doParse(element, parserContext, builder);
+  }
 
 }

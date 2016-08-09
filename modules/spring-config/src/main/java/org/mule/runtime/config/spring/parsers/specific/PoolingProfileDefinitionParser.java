@@ -11,14 +11,12 @@ import org.mule.runtime.core.config.PoolingProfile;
 /**
  * This parser is responsible for processing the <code><pooling-profile><code> configuration elements.
  */
-public class PoolingProfileDefinitionParser extends ConfigurationChildDefinitionParser
-{
+public class PoolingProfileDefinitionParser extends ConfigurationChildDefinitionParser {
 
-    public PoolingProfileDefinitionParser()
-    {
-        super("poolingProfile", PoolingProfile.class);
-        addMapping("initialisationPolicy", PoolingProfile.POOL_INITIALISATION_POLICIES);
-        addMapping("exhaustedAction", PoolingProfile.POOL_EXHAUSTED_ACTIONS);
-    }
+  public PoolingProfileDefinitionParser() {
+    super("poolingProfile", PoolingProfile.class);
+    addMapping("initialisationPolicy", PoolingProfile.POOL_INITIALISATION_POLICIES);
+    addMapping("exhaustedAction", PoolingProfile.POOL_EXHAUSTED_ACTIONS);
+  }
 
 }

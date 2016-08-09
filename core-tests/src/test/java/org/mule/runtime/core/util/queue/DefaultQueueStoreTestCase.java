@@ -8,13 +8,11 @@ package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
 
-public class DefaultQueueStoreTestCase extends QueueStoreTestCase
-{
+public class DefaultQueueStoreTestCase extends QueueStoreTestCase {
 
-    @Override
-    protected QueueStore createQueueInfoDelegate(int capacity, MuleContext mockMuleContext)
-    {
-        return new DefaultQueueStore("testQueue", mockMuleContext, new DefaultQueueConfiguration(capacity, false));
-    }
+  @Override
+  protected QueueStore createQueueInfoDelegate(int capacity, MuleContext mockMuleContext) {
+    return new DefaultQueueStore("testQueue", mockMuleContext, new DefaultQueueConfiguration(capacity, false));
+  }
 
 }

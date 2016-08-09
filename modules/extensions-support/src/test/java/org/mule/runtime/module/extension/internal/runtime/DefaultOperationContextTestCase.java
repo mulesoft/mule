@@ -38,107 +38,98 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultOperationContextTestCase extends AbstractMuleTestCase
-{
+public class DefaultOperationContextTestCase extends AbstractMuleTestCase {
 
-    private static final String CONFIG_NAME = "config";
-    private static final String PARAM_NAME = "param1";
-    private static final String VALUE = "Do you want to build a snowman?";
+  private static final String CONFIG_NAME = "config";
+  private static final String PARAM_NAME = "param1";
+  private static final String VALUE = "Do you want to build a snowman?";
 
-    @Mock
-    private ExtensionModel extensionModel;
+  @Mock
+  private ExtensionModel extensionModel;
 
-    @Mock
-    private RuntimeConfigurationModel configurationModel;
+  @Mock
+  private RuntimeConfigurationModel configurationModel;
 
-    @Mock
-    private RuntimeOperationModel operationModel;
+  @Mock
+  private RuntimeOperationModel operationModel;
 
-    @Mock
-    private ResolverSetResult resolverSetResult;
+  @Mock
+  private ResolverSetResult resolverSetResult;
 
-    @Mock
-    private MuleEvent event;
+  @Mock
+  private MuleEvent event;
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    @Mock
-    private ExtensionManager extensionManager;
+  @Mock
+  private ExtensionManager extensionManager;
 
-    private Object configurationInstance = new Object();
-    private ConfigurationInstance<Object> configuration;
-    private DefaultOperationContext operationContext;
+  private Object configurationInstance = new Object();
+  private ConfigurationInstance<Object> configuration;
+  private DefaultOperationContext operationContext;
 
 
-    @Before
-    public void before()
-    {
-        configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList(), Optional.empty());
-        Map<String, Object> parametersMap = new HashMap<>();
-        parametersMap.put(PARAM_NAME, VALUE);
-        when(resolverSetResult.asMap()).thenReturn(parametersMap);
+  @Before
+  public void before() {
+    configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList(),
+                                                              Optional.empty());
+    Map<String, Object> parametersMap = new HashMap<>();
+    parametersMap.put(PARAM_NAME, VALUE);
+    when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-        operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event, muleContext);
-    }
+    operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event, muleContext);
+  }
 
-    @Test
-    public void getParameter()
-    {
-        assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
-        assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
-    }
+  @Test
+  public void getParameter() {
+    assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
+    assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
+  }
 
-    @Test
-    public void getTypeSafeParameter()
-    {
-        assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
-        assertThat(operationContext.getTypeSafeParameter(PARAM_NAME, String.class), is(VALUE));
-    }
+  @Test
+  public void getTypeSafeParameter() {
+    assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
+    assertThat(operationContext.getTypeSafeParameter(PARAM_NAME, String.class), is(VALUE));
+  }
 
-    @Test(expected = NoSuchElementException.class)
-    public void getNonExistantTypeSafeParameter()
-    {
-        assertThat(operationContext.hasParameter(PARAM_NAME + "_"), is(false));
-        operationContext.getTypeSafeParameter(PARAM_NAME + "_", String.class);
-    }
+  @Test(expected = NoSuchElementException.class)
+  public void getNonExistantTypeSafeParameter() {
+    assertThat(operationContext.hasParameter(PARAM_NAME + "_"), is(false));
+    operationContext.getTypeSafeParameter(PARAM_NAME + "_", String.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getTypeSafeParameterFails()
-    {
-        operationContext.getTypeSafeParameter(PARAM_NAME, Integer.class);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void getTypeSafeParameterFails() {
+    operationContext.getTypeSafeParameter(PARAM_NAME, Integer.class);
+  }
 
-    @Test
-    public void variables()
-    {
-        final String key = "foo";
-        final String value = "bar";
+  @Test
+  public void variables() {
+    final String key = "foo";
+    final String value = "bar";
 
-        assertThat(operationContext.getVariable(key), is(nullValue()));
-        assertThat(operationContext.setVariable(key, value), is(nullValue()));
-        assertThat(operationContext.getVariable(key), is(value));
-        assertThat(operationContext.setVariable(key, EMPTY), is(value));
-        assertThat(operationContext.getVariable(key), is(EMPTY));
-        assertThat(operationContext.removeVariable(key), is(EMPTY));
-        assertThat(operationContext.getVariable(key), is(nullValue()));
-    }
+    assertThat(operationContext.getVariable(key), is(nullValue()));
+    assertThat(operationContext.setVariable(key, value), is(nullValue()));
+    assertThat(operationContext.getVariable(key), is(value));
+    assertThat(operationContext.setVariable(key, EMPTY), is(value));
+    assertThat(operationContext.getVariable(key), is(EMPTY));
+    assertThat(operationContext.removeVariable(key), is(EMPTY));
+    assertThat(operationContext.getVariable(key), is(nullValue()));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void setNullKeyVariable()
-    {
-        operationContext.setVariable(null, "");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void setNullKeyVariable() {
+    operationContext.setVariable(null, "");
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void setNullValueVariable()
-    {
-        operationContext.setVariable("key", null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void setNullValueVariable() {
+    operationContext.setVariable("key", null);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void removeNullValueVariable()
-    {
-        operationContext.removeVariable(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void removeNullValueVariable() {
+    operationContext.removeVariable(null);
+  }
 }

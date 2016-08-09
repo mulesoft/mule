@@ -20,65 +20,57 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase
-{
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "cxf-echo-service-conf-httpn-nb.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testCxfService() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String contentType = received.getDataType().getMediaType().toRfcString();
-        assertNotNull(contentType);
-        assertTrue(contentType.contains("charset"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "cxf-echo-service-conf-httpn-nb.xml";
+  }
 
-    @Test
-    public void testCxfClient() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload("hello").build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String contentType = received.getInboundProperty("contentType");
-        assertNotNull(contentType);
-        assertTrue(contentType.contains("charset"));
-        getSensingInstance("sensingRequestResponseProcessor").assertRequestResponseThreadsDifferent();
-    }
+  @Test
+  public void testCxfService() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    String contentType = received.getDataType().getMediaType().toRfcString();
+    assertNotNull(contentType);
+    assertTrue(contentType.contains("charset"));
+  }
 
-    @Test
-    public void testCxfClientProxy() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload("hello").build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String contentType = received.getInboundProperty("contentType");
-        assertNotNull(contentType);
-        assertTrue(contentType.contains("charset"));
-        getSensingInstance("sensingRequestResponseProcessorProxy").assertRequestResponseThreadsDifferent();
-    }
+  @Test
+  public void testCxfClient() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload("hello").build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request,
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    String contentType = received.getInboundProperty("contentType");
+    assertNotNull(contentType);
+    assertTrue(contentType.contains("charset"));
+    getSensingInstance("sensingRequestResponseProcessor").assertRequestResponseThreadsDifferent();
+  }
 
-    private SensingNullRequestResponseMessageProcessor getSensingInstance(String instanceBeanName)
-    {
-        return ((SensingNullRequestResponseMessageProcessor) muleContext.getRegistry().lookupObject(instanceBeanName));
-    }
+  @Test
+  public void testCxfClientProxy() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload("hello").build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request,
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    String contentType = received.getInboundProperty("contentType");
+    assertNotNull(contentType);
+    assertTrue(contentType.contains("charset"));
+    getSensingInstance("sensingRequestResponseProcessorProxy").assertRequestResponseThreadsDifferent();
+  }
+
+  private SensingNullRequestResponseMessageProcessor getSensingInstance(String instanceBeanName) {
+    return ((SensingNullRequestResponseMessageProcessor) muleContext.getRegistry().lookupObject(instanceBeanName));
+  }
 
 }

@@ -23,73 +23,54 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class WsCustomValidatorDefinitionParser extends ChildDefinitionParser
-{
+public class WsCustomValidatorDefinitionParser extends ChildDefinitionParser {
 
-    public WsCustomValidatorDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, ManagedMap.class);
-    }
+  public WsCustomValidatorDefinitionParser(String setterMethod) {
+    super(setterMethod, ManagedMap.class);
+  }
 
-    protected Class getBeanClass(Element element)
-    {
-        return MapFactoryBean.class;
-    }
+  protected Class getBeanClass(Element element) {
+    return MapFactoryBean.class;
+  }
 
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        ManagedMap values = new ManagedMap();
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    ManagedMap values = new ManagedMap();
 
-        NodeList properties = element.getChildNodes();
-        for(int index = 0; index < properties.getLength(); index ++)
-        {
-            Node property = properties.item(index);
-            if(property instanceof Element)
-            {
-                String localName = property.getLocalName();
-                String ref = ((Element)property).getAttribute("ref");
-                String key = "";
+    NodeList properties = element.getChildNodes();
+    for (int index = 0; index < properties.getLength(); index++) {
+      Node property = properties.item(index);
+      if (property instanceof Element) {
+        String localName = property.getLocalName();
+        String ref = ((Element) property).getAttribute("ref");
+        String key = "";
 
-                if("username-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.USERNAME_TOKEN_VALIDATOR;
-                }
-                else if("saml1-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.SAML1_TOKEN_VALIDATOR;
-                }
-                else if("saml2-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.SAML2_TOKEN_VALIDATOR;
-                }
-                else if("timestamp-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR;
-                }
-                else if("signature-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.SIGNATURE_TOKEN_VALIDATOR;
-                }
-                else if("bst-token-validator".equals(localName))
-                {
-                    key = SecurityConstants.BST_TOKEN_VALIDATOR;
-                } 
-                else
-                {
-                    throw new IllegalArgumentException("Illegal custom validator: " + localName);
-                }
-
-                values.put(key, new RuntimeBeanReference(ref));
-            }
+        if ("username-token-validator".equals(localName)) {
+          key = SecurityConstants.USERNAME_TOKEN_VALIDATOR;
+        } else if ("saml1-token-validator".equals(localName)) {
+          key = SecurityConstants.SAML1_TOKEN_VALIDATOR;
+        } else if ("saml2-token-validator".equals(localName)) {
+          key = SecurityConstants.SAML2_TOKEN_VALIDATOR;
+        } else if ("timestamp-token-validator".equals(localName)) {
+          key = SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR;
+        } else if ("signature-token-validator".equals(localName)) {
+          key = SecurityConstants.SIGNATURE_TOKEN_VALIDATOR;
+        } else if ("bst-token-validator".equals(localName)) {
+          key = SecurityConstants.BST_TOKEN_VALIDATOR;
+        } else {
+          throw new IllegalArgumentException("Illegal custom validator: " + localName);
         }
 
-        builder.addPropertyValue("sourceMap", values);
-        builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
-        postProcess(parserContext, getBeanAssembler(element, builder), element);
-
-        builder.getBeanDefinition().setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, Boolean.TRUE);
+        values.put(key, new RuntimeBeanReference(ref));
+      }
     }
+
+    builder.addPropertyValue("sourceMap", values);
+    builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
+    postProcess(parserContext, getBeanAssembler(element, builder), element);
+
+    builder.getBeanDefinition().setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, Boolean.TRUE);
+  }
 
 }

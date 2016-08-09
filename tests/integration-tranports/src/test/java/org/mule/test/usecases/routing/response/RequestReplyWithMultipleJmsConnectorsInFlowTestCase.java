@@ -6,12 +6,10 @@
  */
 package org.mule.test.usecases.routing.response;
 
-public class RequestReplyWithMultipleJmsConnectorsInFlowTestCase extends RequestReplyInFlowTestCase
-{
+public class RequestReplyWithMultipleJmsConnectorsInFlowTestCase extends RequestReplyInFlowTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/request-reply-with-multiple-jms-connectors-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/request-reply-with-multiple-jms-connectors-flow.xml";
+  }
 }

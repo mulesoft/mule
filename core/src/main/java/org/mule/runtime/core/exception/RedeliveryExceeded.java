@@ -22,62 +22,49 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RedeliveryExceeded implements FlowConstructAware, Initialisable
-{
-    private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
-    private MessageProcessorChain configuredMessageProcessors;
-    private FlowConstruct flowConstruct;
+public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder(this.flowConstruct);
-        try
-        {
-            configuredMessageProcessors = defaultMessageProcessorChainBuilder.chain(messageProcessors).build();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
+  private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
+  private MessageProcessorChain configuredMessageProcessors;
+  private FlowConstruct flowConstruct;
 
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return Collections.unmodifiableList(messageProcessors);
+  @Override
+  public void initialise() throws InitialisationException {
+    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder =
+        new DefaultMessageProcessorChainBuilder(this.flowConstruct);
+    try {
+      configuredMessageProcessors = defaultMessageProcessorChainBuilder.chain(messageProcessors).build();
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
     }
+  }
 
-    public void setMessageProcessors(List<MessageProcessor> processors)
-    {
-        if (processors != null)
-        {
-            this.messageProcessors.clear();
-            this.messageProcessors.addAll(processors);
-        }
-        else
-        {
-            throw new IllegalArgumentException("List of targets = null");
-        }
-    }
+  public List<MessageProcessor> getMessageProcessors() {
+    return Collections.unmodifiableList(messageProcessors);
+  }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        MuleEvent result = event;
-        if (!messageProcessors.isEmpty()) {
-            result = configuredMessageProcessors.process(event);
-        }
-        if (result != null && !VoidMuleEvent.getInstance().equals(result))
-        {
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                                        .exceptionPayload(null)
-                                        .build());
-        }
-        return result;
+  public void setMessageProcessors(List<MessageProcessor> processors) {
+    if (processors != null) {
+      this.messageProcessors.clear();
+      this.messageProcessors.addAll(processors);
+    } else {
+      throw new IllegalArgumentException("List of targets = null");
     }
+  }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    MuleEvent result = event;
+    if (!messageProcessors.isEmpty()) {
+      result = configuredMessageProcessors.process(event);
     }
+    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+      event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
+    }
+    return result;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 }

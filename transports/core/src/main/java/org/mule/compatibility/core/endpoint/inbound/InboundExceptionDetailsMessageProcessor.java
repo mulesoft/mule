@@ -21,78 +21,63 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Sets error message properties as specified by the transport based on the exception
- * type of the exception payload. This mechanism uses a transport properties file in
- * the META-INF/services/org/mule/config directory called
- * mule-exception-codes.properties. This property file maps the fully qualified class
- * names of exceptions to the value of the property that should be set. The name of
- * the property is defined by the error.code.property property in the same properties
+ * Sets error message properties as specified by the transport based on the exception type of the exception payload. This
+ * mechanism uses a transport properties file in the META-INF/services/org/mule/config directory called
+ * mule-exception-codes.properties. This property file maps the fully qualified class names of exceptions to the value of the
+ * property that should be set. The name of the property is defined by the error.code.property property in the same properties
  * file.
  */
-public class InboundExceptionDetailsMessageProcessor implements MessageProcessor, MuleContextAware
-{
+public class InboundExceptionDetailsMessageProcessor implements MessageProcessor, MuleContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(InboundExceptionDetailsMessageProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(InboundExceptionDetailsMessageProcessor.class);
 
-    protected Connector connector;
-    private MuleContext muleContext;
+  protected Connector connector;
+  private MuleContext muleContext;
 
-    public InboundExceptionDetailsMessageProcessor(Connector connector)
-    {
-        this.connector = connector;
-    }
+  public InboundExceptionDetailsMessageProcessor(Connector connector) {
+    this.connector = connector;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (event != null && !VoidMuleEvent.getInstance().equals(event))
-        {
-            MuleMessage resultMessage = event.getMessage();
-            if (resultMessage != null)
-            {
-                if (resultMessage.getExceptionPayload() != null)
-                {
-                    setExceptionDetails(event, connector, resultMessage.getExceptionPayload()
-                        .getException());
-                }
-            }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
+      MuleMessage resultMessage = event.getMessage();
+      if (resultMessage != null) {
+        if (resultMessage.getExceptionPayload() != null) {
+          setExceptionDetails(event, connector, resultMessage.getExceptionPayload().getException());
         }
-        return event;
+      }
     }
+    return event;
+  }
 
-    /**
-     * This method is used to set any additional and possibly transport specific
-     * information on the return message where it has an exception payload.
-     * 
-     * @param event
-     * @param exception
-     */
-    protected void setExceptionDetails(MuleEvent event, Connector connector, Throwable exception)
-    {
-        String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
-        // If we dont find a error code property we can assume there are not
-        // error code mappings for this connector
-        if (propName != null)
-        {
-            String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass(), muleContext);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
-                             + code);
-            }
-            event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build());
-        }
+  /**
+   * This method is used to set any additional and possibly transport specific information on the return message where it has an
+   * exception payload.
+   * 
+   * @param event
+   * @param exception
+   */
+  protected void setExceptionDetails(MuleEvent event, Connector connector, Throwable exception) {
+    String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
+    // If we dont find a error code property we can assume there are not
+    // error code mappings for this connector
+    if (propName != null) {
+      String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass(), muleContext);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
+      }
+      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build());
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

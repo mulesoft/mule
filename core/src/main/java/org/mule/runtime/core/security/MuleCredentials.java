@@ -19,114 +19,95 @@ import java.io.Serializable;
 import java.util.StringTokenizer;
 
 /**
- * <code>MuleCredentials</code> can be used to read and set Mule user information
- * that can be stored in a message header.
+ * <code>MuleCredentials</code> can be used to read and set Mule user information that can be stored in a message header.
  */
 
-public class MuleCredentials implements Credentials, Serializable
-{
-    public static final String TOKEN_DELIM = "::";
+public class MuleCredentials implements Credentials, Serializable {
 
-    private final String username;
-    private final char[] password;
-    private Object roles;
+  public static final String TOKEN_DELIM = "::";
 
-    public MuleCredentials(String username, char[] password)
-    {
-        this.username = username;
-        this.password = ArrayUtils.clone(password);
+  private final String username;
+  private final char[] password;
+  private Object roles;
+
+  public MuleCredentials(String username, char[] password) {
+    this.username = username;
+    this.password = ArrayUtils.clone(password);
+  }
+
+  public MuleCredentials(String username, char[] password, Object roles) {
+    this.username = username;
+    this.password = ArrayUtils.clone(password);
+    this.roles = roles;
+  }
+
+  public MuleCredentials(String header, SecurityManager sm) throws EncryptionStrategyNotFoundException, CryptoFailureException {
+
+    int i = header.indexOf(' ');
+    if (i == -1) {
+      throw new IllegalArgumentException(CoreMessages.headerMalformedValueIs(MuleProperties.MULE_USER_PROPERTY, header)
+          .toString());
     }
 
-    public MuleCredentials(String username, char[] password, Object roles)
-    {
-        this.username = username;
-        this.password = ArrayUtils.clone(password);
-        this.roles = roles;
+    String scheme = header.substring(0, i);
+    String creds = header.substring(i + 1);
+
+    if (!scheme.equalsIgnoreCase("plain")) {
+      EncryptionStrategy es = sm.getEncryptionStrategy(scheme);
+      if (es == null) {
+        throw new EncryptionStrategyNotFoundException(scheme);
+      } else {
+        creds = new String(es.decrypt(creds.getBytes(), null));
+      }
     }
 
-    public MuleCredentials(String header, SecurityManager sm) throws EncryptionStrategyNotFoundException, CryptoFailureException
-    {
+    StringTokenizer st = new StringTokenizer(creds, TOKEN_DELIM);
+    username = st.nextToken();
+    password = st.nextToken().toCharArray();
+    if (st.hasMoreTokens()) {
+      roles = st.nextToken();
+    }
+  }
 
-        int i = header.indexOf(' ');
-        if (i == -1)
-        {
-            throw new IllegalArgumentException(
-                CoreMessages.headerMalformedValueIs(MuleProperties.MULE_USER_PROPERTY, header).toString());
-        }
+  public String getToken() {
+    StringBuilder buf = new StringBuilder();
+    buf.append(username).append(TOKEN_DELIM);
+    buf.append(password).append(TOKEN_DELIM);
 
-        String scheme = header.substring(0, i);
-        String creds = header.substring(i + 1);
-
-        if (!scheme.equalsIgnoreCase("plain"))
-        {
-            EncryptionStrategy es = sm.getEncryptionStrategy(scheme);
-            if (es == null)
-            {
-                throw new EncryptionStrategyNotFoundException(scheme);
-            }
-            else
-            {
-                creds = new String(es.decrypt(creds.getBytes(), null));
-            }
-        }
-
-        StringTokenizer st = new StringTokenizer(creds, TOKEN_DELIM);
-        username = st.nextToken();
-        password = st.nextToken().toCharArray();
-        if (st.hasMoreTokens())
-        {
-            roles = st.nextToken();
-        }
+    if (roles != null) {
+      buf.append(roles);
     }
 
-    public String getToken()
-    {
-        StringBuilder buf = new StringBuilder();
-        buf.append(username).append(TOKEN_DELIM);
-        buf.append(password).append(TOKEN_DELIM);
+    return buf.toString();
+  }
 
-        if (roles != null)
-        {
-            buf.append(roles);
-        }
+  public String getUsername() {
+    return username;
+  }
 
-        return buf.toString();
-    }
+  public char[] getPassword() {
+    return ArrayUtils.clone(password);
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public Object getRoles() {
+    return roles;
+  }
 
-    public char[] getPassword()
-    {
-        return ArrayUtils.clone(password);
-    }
+  public static String createHeader(String username, char[] password) {
+    StringBuilder buf = new StringBuilder(32);
+    buf.append("Plain ");
+    buf.append(username).append(TOKEN_DELIM);
+    buf.append(password).append(TOKEN_DELIM);
+    return buf.toString();
+  }
 
-    public Object getRoles()
-    {
-        return roles;
-    }
-
-    public static String createHeader(String username, char[] password)
-    {
-        StringBuilder buf = new StringBuilder(32);
-        buf.append("Plain ");
-        buf.append(username).append(TOKEN_DELIM);
-        buf.append(password).append(TOKEN_DELIM);
-        return buf.toString();
-    }
-
-    public static String createHeader(String username,
-                                      String password,
-                                      String encryptionName,
-                                      EncryptionStrategy es) throws CryptoFailureException
-    {
-        StringBuilder buf = new StringBuilder();
-        buf.append(encryptionName).append(" ");
-        String creds = username + TOKEN_DELIM + password;
-        byte[] encrypted = es.encrypt(creds.getBytes(), null);
-        buf.append(new String(encrypted));
-        return buf.toString();
-    }
+  public static String createHeader(String username, String password, String encryptionName, EncryptionStrategy es)
+      throws CryptoFailureException {
+    StringBuilder buf = new StringBuilder();
+    buf.append(encryptionName).append(" ");
+    String creds = username + TOKEN_DELIM + password;
+    byte[] encrypted = es.encrypt(creds.getBytes(), null);
+    buf.append(new String(encrypted));
+    return buf.toString();
+  }
 }

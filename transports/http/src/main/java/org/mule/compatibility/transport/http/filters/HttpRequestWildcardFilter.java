@@ -11,27 +11,23 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 /**
- * <code>HttpRequestWildcardFilter</code> filters out wildcard URL expressions. You
- * can use a comma-separated list of URL patterns such as "*.gif, *blah*".
+ * <code>HttpRequestWildcardFilter</code> filters out wildcard URL expressions. You can use a comma-separated list of URL patterns
+ * such as "*.gif, *blah*".
  */
-public class HttpRequestWildcardFilter extends WildcardFilter
-{
+public class HttpRequestWildcardFilter extends WildcardFilter {
 
-    public HttpRequestWildcardFilter()
-    {
-        super();
-    }
+  public HttpRequestWildcardFilter() {
+    super();
+  }
 
-    public HttpRequestWildcardFilter(String pattern)
-    {
-        super(pattern);
-    }
+  public HttpRequestWildcardFilter(String pattern) {
+    super(pattern);
+  }
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        Object requestProperty = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        return super.accept(requestProperty);
-    }
-    
+  @Override
+  public boolean accept(MuleMessage message) {
+    Object requestProperty = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+    return super.accept(requestProperty);
+  }
+
 }

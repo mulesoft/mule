@@ -18,39 +18,31 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public abstract class AbstractDynamicXaTransactionalTestCase extends AbstractXaTransactionalTestCase
-{
+public abstract class AbstractDynamicXaTransactionalTestCase extends AbstractXaTransactionalTestCase {
 
-    public AbstractDynamicXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public AbstractDynamicXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return Collections.singletonList(new Object[] {"integration/config/dynamic-derby-xa-db-config.xml", new DerbyTestDatabase()});
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {getTransactionManagerResource(), "integration/xa/dynamic-xa-transactional-config.xml"};
+  }
+
+  @Override
+  protected DbConfig resolveConfig(DbConfigResolver dbConfigResolver) {
+    try {
+      MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
+      muleEvent.setFlowVariable("dataSourceUrl", "jdbc:derby:muleEmbeddedDB;create=true");
+
+      return dbConfigResolver.resolve(muleEvent);
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to create test event to resolve DbConfig");
     }
-
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return Collections.singletonList(new Object[] {"integration/config/dynamic-derby-xa-db-config.xml", new DerbyTestDatabase()});
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {getTransactionManagerResource(), "integration/xa/dynamic-xa-transactional-config.xml"};
-    }
-
-    @Override
-    protected DbConfig resolveConfig(DbConfigResolver dbConfigResolver)
-    {
-        try
-        {
-            MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
-            muleEvent.setFlowVariable("dataSourceUrl", "jdbc:derby:muleEmbeddedDB;create=true");
-
-            return dbConfigResolver.resolve(muleEvent);
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Unable to create test event to resolve DbConfig");
-        }
-    }
+  }
 }

@@ -23,56 +23,54 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpRemoteSyncTestCase extends FunctionalTestCase
-{
-    public static final String message = "mule";
+public class TcpRemoteSyncTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  public static final String message = "mule";
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-remotesync-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    @Test
-    public void testTcpTcpRemoteSync() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
+  @Override
+  protected String getConfigFile() {
+    return "tcp-remotesync-flow.xml";
+  }
 
-        // must notify the client to wait for a response from the server
-        props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
-        MuleMessage reply = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo1")).getMessageSource()).getAddress(),
-            MuleMessage.builder().payload(message).inboundProperties(props).build());
+  @Test
+  public void testTcpTcpRemoteSync() throws Exception {
+    MuleClient client = muleContext.getClient();
+    Map<String, Serializable> props = new HashMap<>();
 
-        assertNotNull(reply);
-        assertNotNull(reply.getPayload());
-        assertEquals("Received: " + message, getPayloadAsString(reply));
-    }
+    // must notify the client to wait for a response from the server
+    props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
+    MuleMessage reply =
+        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo1")).getMessageSource()).getAddress(),
+                    MuleMessage.builder().payload(message).inboundProperties(props).build());
 
-    @Test
-    public void testTcpVmRemoteSync() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
+    assertNotNull(reply);
+    assertNotNull(reply.getPayload());
+    assertEquals("Received: " + message, getPayloadAsString(reply));
+  }
 
-        //must notify the client to wait for a response from the server
-        props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
+  @Test
+  public void testTcpVmRemoteSync() throws Exception {
+    MuleClient client = muleContext.getClient();
+    Map<String, Serializable> props = new HashMap<>();
 
-        MuleMessage reply = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo2"))
-                .getMessageSource()).getAddress(), MuleMessage.builder().payload(message).inboundProperties(props)
-                .build());
+    // must notify the client to wait for a response from the server
+    props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
 
-        assertNotNull(reply);
-        assertNotNull(reply.getPayload());
-        assertEquals("Received: " + message, getPayloadAsString(reply));
-    }
+    MuleMessage reply =
+        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo2")).getMessageSource()).getAddress(),
+                    MuleMessage.builder().payload(message).inboundProperties(props).build());
+
+    assertNotNull(reply);
+    assertNotNull(reply.getPayload());
+    assertEquals("Received: " + message, getPayloadAsString(reply));
+  }
 }

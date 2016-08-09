@@ -13,17 +13,15 @@ import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 /**
  * Creates {@link DbConfigResolver} for Oracle databases
  */
-public class OracleConfigResolverFactoryBean extends AbstractVendorConfigResolverFactoryBean
-{
+public class OracleConfigResolverFactoryBean extends AbstractVendorConfigResolverFactoryBean {
 
-    private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
-    private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
+  private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+  private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
 
-    public OracleConfigResolverFactoryBean()
-    {
-        super(ORACLE_URL_PREFIX, new OracleDbConfigFactory());
-        setDriverClassName(DRIVER_CLASS_NAME);
-    }
+  public OracleConfigResolverFactoryBean() {
+    super(ORACLE_URL_PREFIX, new OracleDbConfigFactory());
+    setDriverClassName(DRIVER_CLASS_NAME);
+  }
 
 
 }

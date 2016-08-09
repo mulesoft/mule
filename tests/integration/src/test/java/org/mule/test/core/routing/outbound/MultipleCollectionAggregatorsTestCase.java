@@ -11,18 +11,15 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class MultipleCollectionAggregatorsTestCase extends AbstractIntegrationTestCase
-{
+public class MultipleCollectionAggregatorsTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-collection-aggregators-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiple-collection-aggregators-config-flow.xml";
+  }
 
-    @Test
-    public void testStartsCorrectly()
-    {
-        assertTrue(muleContext.isStarted());
-    }
+  @Test
+  public void testStartsCorrectly() {
+    assertTrue(muleContext.isStarted());
+  }
 }

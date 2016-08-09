@@ -27,106 +27,92 @@ import org.junit.Test;
 /**
  * Tests the "jms" namespace for vendor-specific configs.
  */
-public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    public JmsVendorNamespaceHandlerTestCase()
-    {
-        setStartContext(false);
+public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase {
+
+  public JmsVendorNamespaceHandlerTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "jms-vendor-namespace-config.xml";
+  }
+
+  @Test
+  public void testActiveMqDefault() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqConnectorDefaults");
+    c.connect();
+    assertNotNull(c);
+    assertTrue(c instanceof ActiveMQJmsConnector);
+
+    assertNotNull(c.getConnectionFactory());
+    ConnectionFactory cf = c.getConnectionFactory();
+    assertTrue(cf instanceof ActiveMQConnectionFactory);
+    assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
+  }
+
+  @Test
+  public void testActiveMqBrokerURL() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqConnectorBroker");
+    try {
+      c.connect();
+    } catch (Exception e) {
+      // Connection will fail due there's no broker but the connection factory will be created.
     }
+    assertNotNull(c);
+    assertTrue(c instanceof ActiveMQJmsConnector);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-vendor-namespace-config.xml";
-    }
+    assertNotNull(c.getConnectionFactory());
+    ConnectionFactory cf = c.getConnectionFactory();
+    assertTrue(cf instanceof ActiveMQConnectionFactory);
+    assertEquals("tcp://localhost:1234", ((ActiveMQConnectionFactory) cf).getBrokerURL());
+  }
 
-    @Test
-    public void testActiveMqDefault() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry()
-                                                   .lookupObject("activeMqConnectorDefaults");
-        c.connect();
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
+  @Test
+  public void testWeblogicDefaultConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("weblogicConnector");
+    assertNotNull(c);
+    assertTrue(c instanceof WeblogicJmsConnector);
+  }
 
-        assertNotNull(c.getConnectionFactory());
-        ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQConnectionFactory);
-        assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
-    }
+  @Test
+  public void testWebsphereDefaultConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("websphereConnector");
+    assertNotNull(c);
+    assertTrue(c instanceof WebsphereJmsConnector);
+  }
 
-    @Test
-    public void testActiveMqBrokerURL() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqConnectorBroker");
-        try
-        {
-            c.connect();
-        }
-        catch (Exception e)
-        {
-            //Connection will fail due there's no broker but the connection factory will be created.
-        }
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
+  @Test
+  public void testMuleMQDefaultConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnector");
+    assertNotNull(c);
+    assertTrue(c instanceof MuleMQJmsConnector);
+    assertEquals("nsp://localhost:9000", ((MuleMQJmsConnector) c).getRealmURL());
+    assertEquals(JmsConstants.JMS_SPECIFICATION_11, ((MuleMQJmsConnector) c).getSpecification());
+  }
 
-        assertNotNull(c.getConnectionFactory());
-        ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQConnectionFactory);
-        assertEquals("tcp://localhost:1234", ((ActiveMQConnectionFactory) cf).getBrokerURL());
-    }
+  @Test
+  public void testMuleMQBrokerURL() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnectorBroker");
+    assertNotNull(c);
+    assertTrue(c instanceof MuleMQJmsConnector);
+    assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
+  }
 
-    @Test
-    public void testWeblogicDefaultConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("weblogicConnector");
-        assertNotNull(c);
-        assertTrue(c instanceof WeblogicJmsConnector);
-    }
+  @Test
+  public void testMuleMQXaDefaultConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnector");
+    assertNotNull(c);
+    assertTrue(c instanceof MuleMQXAJmsConnector);
+    assertEquals("nsp://localhost:9000", ((MuleMQXAJmsConnector) c).getRealmURL());
+  }
 
-    @Test
-    public void testWebsphereDefaultConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("websphereConnector");
-        assertNotNull(c);
-        assertTrue(c instanceof WebsphereJmsConnector);
-    }
-
-    @Test
-    public void testMuleMQDefaultConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnector");
-        assertNotNull(c);
-        assertTrue(c instanceof MuleMQJmsConnector);
-        assertEquals("nsp://localhost:9000", ((MuleMQJmsConnector) c).getRealmURL());
-        assertEquals(JmsConstants.JMS_SPECIFICATION_11, ((MuleMQJmsConnector) c).getSpecification());
-    }
-
-    @Test
-    public void testMuleMQBrokerURL() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnectorBroker");
-        assertNotNull(c);
-        assertTrue(c instanceof MuleMQJmsConnector);
-        assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
-    }
-
-    @Test
-    public void testMuleMQXaDefaultConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnector");
-        assertNotNull(c);
-        assertTrue(c instanceof MuleMQXAJmsConnector);
-        assertEquals("nsp://localhost:9000", ((MuleMQXAJmsConnector) c).getRealmURL());
-    }
-
-    @Test
-    public void testMuleMQXaBrokerURL() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnectorBroker");
-        assertNotNull(c);
-        assertTrue(c instanceof MuleMQXAJmsConnector);
-        assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
-    }
+  @Test
+  public void testMuleMQXaBrokerURL() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnectorBroker");
+    assertNotNull(c);
+    assertTrue(c instanceof MuleMQXAJmsConnector);
+    assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
+  }
 
 }

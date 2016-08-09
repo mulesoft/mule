@@ -18,41 +18,35 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class CustomValidatorInstanceReusedTestCase extends ValidationTestCase
-{
+public class CustomValidatorInstanceReusedTestCase extends ValidationTestCase {
 
-    private static Set<Validator> executedValidators;
+  private static Set<Validator> executedValidators;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    executedValidators = new HashSet<>();
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "custom-validator.xml";
+  }
+
+  @Test
+  public void byClassInstanceReused() throws Exception {
+    runFlow("byClassInstanceReused");
+    runFlow("byClassInstanceReused");
+    assertThat(executedValidators, hasSize(1));
+  }
+
+  public static class TestValidator implements Validator {
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        executedValidators = new HashSet<>();
+    public ValidationResult validate(MuleEvent event) {
+      executedValidators.add(this);
+      return ok();
     }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "custom-validator.xml";
-    }
-
-    @Test
-    public void byClassInstanceReused() throws Exception
-    {
-        runFlow("byClassInstanceReused");
-        runFlow("byClassInstanceReused");
-        assertThat(executedValidators, hasSize(1));
-    }
-
-    public static class TestValidator implements Validator
-    {
-
-        @Override
-        public ValidationResult validate(MuleEvent event)
-        {
-            executedValidators.add(this);
-            return ok();
-        }
-    }
+  }
 
 }

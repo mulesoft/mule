@@ -25,41 +25,33 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ConfigLevelOperationTestCase extends ExtensionFunctionalTestCase
-{
+public class ConfigLevelOperationTestCase extends ExtensionFunctionalTestCase {
 
-    @Parameters
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {Apple.class}, {Banana.class}, {Kiwi.class}
-        });
-    }
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{Apple.class}, {Banana.class}, {Kiwi.class}});
+  }
 
-    private final Class<? extends Fruit> fruitType;
+  private final Class<? extends Fruit> fruitType;
 
-    public ConfigLevelOperationTestCase(Class<? extends Fruit> fruitType)
-    {
-        this.fruitType = fruitType;
-    }
+  public ConfigLevelOperationTestCase(Class<? extends Fruit> fruitType) {
+    this.fruitType = fruitType;
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class[] {VeganExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {VeganExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vegan-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vegan-config.xml";
+  }
 
-    @Test
-    public void execute() throws Exception
-    {
-        Fruit fruit = (Fruit) flowRunner(fruitType.getSimpleName().toLowerCase() + "Ok").run().getMessage().getPayload();
-        assertThat(fruit.getClass(), equalTo(fruitType));
-        assertThat(fruit.isBitten(), is(true));
-    }
+  @Test
+  public void execute() throws Exception {
+    Fruit fruit = (Fruit) flowRunner(fruitType.getSimpleName().toLowerCase() + "Ok").run().getMessage().getPayload();
+    assertThat(fruit.getClass(), equalTo(fruitType));
+    assertThat(fruit.isBitten(), is(true));
+  }
 }

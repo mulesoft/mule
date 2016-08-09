@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.select;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class SelectNamedParamParameterizedQueryTestCase extends SelectParameterizedQueryTestCase
-{
+public class SelectNamedParamParameterizedQueryTestCase extends SelectParameterizedQueryTestCase {
 
-    public SelectNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-named-param-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-named-param-parameterized-query-config.xml"};
+  }
 }

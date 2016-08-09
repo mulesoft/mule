@@ -8,13 +8,12 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.MessagingException;
 
-public interface Aggregator
-{
+public interface Aggregator {
 
-    void setTimeout(long timeout);
+  void setTimeout(long timeout);
 
-    void setFailOnTimeout(boolean failOnTimeout);
+  void setFailOnTimeout(boolean failOnTimeout);
 
-    void expireAggregation(String groupId) throws MessagingException;
+  void expireAggregation(String groupId) throws MessagingException;
 
 }

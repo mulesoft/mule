@@ -21,108 +21,89 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * TODO: document this class
  */
-public class SpringTransactionFactory implements TransactionFactory
-{
+public class SpringTransactionFactory implements TransactionFactory {
 
-    private PlatformTransactionManager manager;
+  private PlatformTransactionManager manager;
 
-    public SpringTransactionFactory()
-    {
-        super();
+  public SpringTransactionFactory() {
+    super();
+  }
+
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    Transaction tx = new SpringTransaction(muleContext);
+    tx.begin();
+    return tx;
+  }
+
+  public boolean isTransacted() {
+    return true;
+  }
+
+  /**
+   * @return Returns the manager.
+   */
+  synchronized public PlatformTransactionManager getManager() {
+    return manager;
+  }
+
+  /**
+   * @param manager The manager to set.
+   */
+  synchronized public void setManager(PlatformTransactionManager manager) {
+    this.manager = manager;
+  }
+
+  /**
+   * TODO: document this class
+   */
+  public class SpringTransaction extends AbstractSingleResourceTransaction {
+
+    protected final TransactionStatus status;
+
+    public SpringTransaction(MuleContext muleContext) {
+      super(muleContext);
+      status = manager.getTransaction(null);
     }
 
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
-    {
-        Transaction tx = new SpringTransaction(muleContext);
-        tx.begin();
-        return tx;
+    protected void doBegin() throws TransactionException {
+      // nothing to do
     }
 
-    public boolean isTransacted()
-    {
-        return true;
+    protected void doCommit() throws TransactionException {
+      manager.commit(status);
     }
 
-    /**
-     * @return Returns the manager.
-     */
-    synchronized public PlatformTransactionManager getManager()
-    {
-        return manager;
+    protected void doRollback() throws TransactionException {
+      manager.rollback(status);
     }
 
-    /**
-     * @param manager The manager to set.
-     */
-    synchronized public void setManager(PlatformTransactionManager manager)
-    {
-        this.manager = manager;
+    public Object getResource(Object key) {
+      Object res = TransactionSynchronizationManager.getResource(key);
+      if (res != null) {
+        if (!(res instanceof ConnectionHolder)) {
+          if (res instanceof JmsResourceHolder) {
+            return ((JmsResourceHolder) res).getConnection();
+          }
+        } else {
+          return ((ConnectionHolder) res).getConnection();
+        }
+      }
+      return res;
     }
 
-    /**
-     * TODO: document this class
-     */
-    public class SpringTransaction extends AbstractSingleResourceTransaction
-    {
-        protected final TransactionStatus status;
-
-        public SpringTransaction(MuleContext muleContext)
-        {
-            super(muleContext);
-            status = manager.getTransaction(null);
-        }
-
-        protected void doBegin() throws TransactionException
-        {
-            // nothing to do
-        }
-
-        protected void doCommit() throws TransactionException
-        {
-           manager.commit(status);
-        }
-
-        protected void doRollback() throws TransactionException
-        {
-           manager.rollback(status);
-        }
-
-        public Object getResource(Object key)
-        {
-            Object res = TransactionSynchronizationManager.getResource(key);
-            if (res != null)
-            {
-                if (!(res instanceof ConnectionHolder))
-                {
-                    if (res instanceof JmsResourceHolder)
-                    {
-                        return ((JmsResourceHolder)res).getConnection();
-                    }
-                }
-                else
-                {
-                    return ((ConnectionHolder)res).getConnection();
-                }
-            }
-            return res;
-        }
-
-        public boolean hasResource(Object key)
-        {
-            return getResource(key) != null;
-        }
-
-        public void bindResource(Object key, Object resource) throws TransactionException
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public void setRollbackOnly()
-        {
-            super.setRollbackOnly();
-            status.setRollbackOnly();
-        }
-
+    public boolean hasResource(Object key) {
+      return getResource(key) != null;
     }
+
+    public void bindResource(Object key, Object resource) throws TransactionException {
+      throw new UnsupportedOperationException();
+    }
+
+    public void setRollbackOnly() {
+      super.setRollbackOnly();
+      status.setRollbackOnly();
+    }
+
+  }
 
 }

@@ -14,21 +14,18 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 
 @WebService
-public class AsyncServiceWithSoapAction
-{
+public class AsyncServiceWithSoapAction {
 
-    private CountDownLatch latch = new CountDownLatch(1);
+  private CountDownLatch latch = new CountDownLatch(1);
 
-    @WebMethod(action="send")
-    @Oneway
-    public void send(@WebParam(name = "text") String s)
-    {
-        latch.countDown();
-    }
+  @WebMethod(action = "send")
+  @Oneway
+  public void send(@WebParam(name = "text") String s) {
+    latch.countDown();
+  }
 
-    @WebMethod(exclude = true)
-    public CountDownLatch getLatch()
-    {
-        return latch;
-    }
+  @WebMethod(exclude = true)
+  public CountDownLatch getLatch() {
+    return latch;
+  }
 }

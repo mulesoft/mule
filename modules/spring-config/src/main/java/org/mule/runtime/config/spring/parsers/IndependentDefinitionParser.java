@@ -12,13 +12,11 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class IndependentDefinitionParser implements BeanDefinitionParser
-{
+public class IndependentDefinitionParser implements BeanDefinitionParser {
 
-    public BeanDefinition parse(Element element, ParserContext parserContext)
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(Object.class);
-        return builder.getBeanDefinition();
-    }
+  public BeanDefinition parse(Element element, ParserContext parserContext) {
+    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(Object.class);
+    return builder.getBeanDefinition();
+  }
 
 }

@@ -18,60 +18,49 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Base class for implementations of {@link FileCommand} which operate
- * on a local file system
+ * Base class for implementations of {@link FileCommand} which operate on a local file system
  *
  * @since 4.0
  */
-abstract class LocalFileCommand extends FileCommand<LocalFileSystem>
-{
+abstract class LocalFileCommand extends FileCommand<LocalFileSystem> {
 
-    /**
-     * {@inheritDoc}
-     */
-    LocalFileCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  LocalFileCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
 
-    /**
-     * @return a {@link Path} derived from {@link FileConnector#getWorkingDir()}
-     */
-    @Override
-    protected Path getBasePath(FileConnectorConfig config)
-    {
-        return Paths.get(config.getWorkingDir());
-    }
+  /**
+   * @return a {@link Path} derived from {@link FileConnector#getWorkingDir()}
+   */
+  @Override
+  protected Path getBasePath(FileConnectorConfig config) {
+    return Paths.get(config.getWorkingDir());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean exists(FileConnectorConfig config, Path path)
-    {
-        return Files.exists(path);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean exists(FileConnectorConfig config, Path path) {
+    return Files.exists(path);
+  }
 
-    /**
-     * Transforms the {@code directoryPath} to a {@link} {@link File}
-     * and invokes {@link File#mkdirs()} on it
-     *
-     * @param directoryPath a {@link Path} pointing to the directory you want to create
-     */
-    @Override
-    protected void doMkDirs(FileConnectorConfig config, Path directoryPath)
-    {
-        File target = directoryPath.toFile();
-        try
-        {
-            if (!target.mkdirs())
-            {
-                throw exception(format("Directory '%s' could not be created", target));
-            }
-        }
-        catch (Exception e)
-        {
-            throw exception(format("Exception was found creating directory '%s'", target), e);
-        }
+  /**
+   * Transforms the {@code directoryPath} to a {@link} {@link File} and invokes {@link File#mkdirs()} on it
+   *
+   * @param directoryPath a {@link Path} pointing to the directory you want to create
+   */
+  @Override
+  protected void doMkDirs(FileConnectorConfig config, Path directoryPath) {
+    File target = directoryPath.toFile();
+    try {
+      if (!target.mkdirs()) {
+        throw exception(format("Directory '%s' could not be created", target));
+      }
+    } catch (Exception e) {
+      throw exception(format("Exception was found creating directory '%s'", target), e);
     }
+  }
 }

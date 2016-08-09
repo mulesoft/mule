@@ -9,6 +9,6 @@ package org.mule.test.core.context.notification;
 import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 
-public class ExceptionStrategyNotificationLogger extends AbstractNotificationLogger<ExceptionStrategyNotification> implements ExceptionStrategyNotificationListener<ExceptionStrategyNotification>
-{
+public class ExceptionStrategyNotificationLogger extends AbstractNotificationLogger<ExceptionStrategyNotification>
+    implements ExceptionStrategyNotificationListener<ExceptionStrategyNotification> {
 }

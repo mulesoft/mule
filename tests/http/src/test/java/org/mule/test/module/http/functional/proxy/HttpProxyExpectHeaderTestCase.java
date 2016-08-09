@@ -22,42 +22,35 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
-{
+public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
-    @Rule
-    public DynamicPort proxyPort = new DynamicPort("proxyPort");
+  @Rule
+  public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-proxy-template-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-proxy-template-config.xml";
+  }
 
-    @Test
-    public void handlesContinueResponse() throws Exception
-    {
-        startExpectContinueServer();
-        Response response = sendRequest();
-        assertThat(response.returnContent().asString(), equalTo(TEST_MESSAGE));
-        stopServer();
-    }
+  @Test
+  public void handlesContinueResponse() throws Exception {
+    startExpectContinueServer();
+    Response response = sendRequest();
+    assertThat(response.returnContent().asString(), equalTo(TEST_MESSAGE));
+    stopServer();
+  }
 
-    @Test
-    public void handlesExpectationFailedResponse() throws Exception
-    {
-        startExpectFailedServer();
-        Response response = sendRequest();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
-        stopServer();
-    }
+  @Test
+  public void handlesExpectationFailedResponse() throws Exception {
+    startExpectFailedServer();
+    Response response = sendRequest();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+    stopServer();
+  }
 
-    private Response sendRequest() throws IOException
-    {
-        return Request.Post(String.format("http://localhost:%s", proxyPort.getNumber()))
-                .useExpectContinue()
-                .bodyString(TEST_MESSAGE, DEFAULT_TEXT)
-                .connectTimeout(RECEIVE_TIMEOUT).execute();
-    }
+  private Response sendRequest() throws IOException {
+    return Request.Post(String.format("http://localhost:%s", proxyPort.getNumber())).useExpectContinue()
+        .bodyString(TEST_MESSAGE, DEFAULT_TEXT).connectTimeout(RECEIVE_TIMEOUT).execute();
+  }
 
 }

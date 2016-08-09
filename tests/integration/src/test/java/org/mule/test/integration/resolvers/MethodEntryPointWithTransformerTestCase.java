@@ -13,26 +13,22 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class MethodEntryPointWithTransformerTestCase extends AbstractIntegrationTestCase
-{
+public class MethodEntryPointWithTransformerTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml";
+  }
 
-    /**
-     * Tests that a MethodEntryPointResolver is able to receive the method property
-     * from a MessagePropertyTransformer, that means that the transformer is applied
-     * before resolving that property.
-     */
-    @Test
-    public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception
-    {
-        MuleMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
-        assertNotNull(response);
-        assertNotNull(response.getPayload());
-        assertEquals("Transformed payload", getPayloadAsString(response));
-    }
+  /**
+   * Tests that a MethodEntryPointResolver is able to receive the method property from a MessagePropertyTransformer, that means
+   * that the transformer is applied before resolving that property.
+   */
+  @Test
+  public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception {
+    MuleMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
+    assertNotNull(response);
+    assertNotNull(response.getPayload());
+    assertEquals("Transformed payload", getPayloadAsString(response));
+  }
 }

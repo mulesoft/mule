@@ -14,39 +14,33 @@ import org.mule.test.transactional.TransactionalExtension;
 
 import org.junit.Test;
 
-public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase
-{
+public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {TransactionalExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {TransactionalExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "transaction-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "transaction-config.xml";
+  }
 
-    @Test
-    public void commited() throws Exception
-    {
-        flowRunner("commitLocalTx").withPayload("").run();
-    }
+  @Test
+  public void commited() throws Exception {
+    flowRunner("commitLocalTx").withPayload("").run();
+  }
 
-    @Test
-    public void rolledBack() throws Exception
-    {
-        flowRunner("rollbackLocalTx").withPayload("").run();
-    }
+  @Test
+  public void rolledBack() throws Exception {
+    flowRunner("rollbackLocalTx").withPayload("").run();
+  }
 
-    @Test
-    public void executeTransactionless() throws Exception
-    {
-        TestTransactionalConnection connection = flowRunner("executeTransactionless").withPayload("").run().getMessage().getPayload();
-        assertThat(connection.isTransactionBegun(), is(false));
-        assertThat(connection.isTransactionCommited(), is(false));
-        assertThat(connection.isTransactionRolledback(), is(false));
-    }
+  @Test
+  public void executeTransactionless() throws Exception {
+    TestTransactionalConnection connection = flowRunner("executeTransactionless").withPayload("").run().getMessage().getPayload();
+    assertThat(connection.isTransactionBegun(), is(false));
+    assertThat(connection.isTransactionCommited(), is(false));
+    assertThat(connection.isTransactionRolledback(), is(false));
+  }
 }

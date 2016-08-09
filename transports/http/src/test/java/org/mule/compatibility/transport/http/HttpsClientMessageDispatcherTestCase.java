@@ -21,20 +21,18 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class HttpsClientMessageDispatcherTestCase extends AbstractMuleTestCase
-{
+public class HttpsClientMessageDispatcherTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void getHost() throws Exception
-    {
-        OutboundEndpoint oe = Mockito.mock(OutboundEndpoint.class);
-        Connector connector = Mockito.mock(HttpsConnector.class);
-        Mockito.when(oe.getConnector()).thenReturn(connector);
-        HttpsClientMessageDispatcher dispatcher = new HttpsClientMessageDispatcher(oe);
+  @Test
+  public void getHost() throws Exception {
+    OutboundEndpoint oe = Mockito.mock(OutboundEndpoint.class);
+    Connector connector = Mockito.mock(HttpsConnector.class);
+    Mockito.when(oe.getConnector()).thenReturn(connector);
+    HttpsClientMessageDispatcher dispatcher = new HttpsClientMessageDispatcher(oe);
 
-        URI uri = new URI("https://www.mulesoft.org/");
-        HostConfiguration hc1 = dispatcher.getHostConfig(uri);
-        HostConfiguration hc2 = dispatcher.getHostConfig(uri);
-        Assert.assertEquals(hc1, hc2);
-    }
+    URI uri = new URI("https://www.mulesoft.org/");
+    HostConfiguration hc1 = dispatcher.getHostConfig(uri);
+    HostConfiguration hc2 = dispatcher.getHostConfig(uri);
+    Assert.assertEquals(hc1, hc2);
+  }
 }

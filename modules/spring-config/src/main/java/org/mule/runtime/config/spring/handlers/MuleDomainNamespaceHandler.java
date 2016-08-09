@@ -10,14 +10,12 @@ package org.mule.runtime.config.spring.handlers;
  * This is the domain namespace handler for Mule domains and configures all domains configuration elements under the
  * <code>http://www.mulesoft.org/schema/mule/domain/${version}</code> Namespace.
  */
-public class MuleDomainNamespaceHandler extends MuleNamespaceHandler
-{
+public class MuleDomainNamespaceHandler extends MuleNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        super.init();
-        registerIgnoredElement("mule-domain");
-    }
+  @Override
+  public void init() {
+    super.init();
+    registerIgnoredElement("mule-domain");
+  }
 
 }

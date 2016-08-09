@@ -36,164 +36,163 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 
 @SmallTest
-public class ParameterizedQueryTemplateFactoryBeanTestCase extends AbstractMuleTestCase
-{
+public class ParameterizedQueryTemplateFactoryBeanTestCase extends AbstractMuleTestCase {
 
-    public static final String QUERY = "select * from test";
-    public static final String PARAMETERIZED_QUERY = "select * from test where position = :position";
-    public static final String PARSED_PARAMETERIZED_QUERY = "select * from test where position = ?";
-    public static final String POSITION_PARAM_NAME = "position";
-    public static final String TEMPLATE_PARAM_VALUE = "5";
-    public static final String OVERRIDDEN_PARAM_VALUE = "10";
+  public static final String QUERY = "select * from test";
+  public static final String PARAMETERIZED_QUERY = "select * from test where position = :position";
+  public static final String PARSED_PARAMETERIZED_QUERY = "select * from test where position = ?";
+  public static final String POSITION_PARAM_NAME = "position";
+  public static final String TEMPLATE_PARAM_VALUE = "5";
+  public static final String OVERRIDDEN_PARAM_VALUE = "10";
 
-    @Test
-    public void createsQueryWithNoParams() throws Exception
-    {
-        QueryTemplate queryTemplate = new QueryTemplate(QUERY, QueryType.SELECT, Collections.<QueryParam>emptyList());
+  @Test
+  public void createsQueryWithNoParams() throws Exception {
+    QueryTemplate queryTemplate = new QueryTemplate(QUERY, QueryType.SELECT, Collections.<QueryParam>emptyList());
 
-        QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
-        when(queryParser.parse(QUERY)).thenReturn(queryTemplate);
+    QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
+    when(queryParser.parse(QUERY)).thenReturn(queryTemplate);
 
-        ParameterizedQueryTemplateFactoryBean factoryBean = new ParameterizedQueryTemplateFactoryBean(QUERY, Collections.EMPTY_LIST, queryParser);
+    ParameterizedQueryTemplateFactoryBean factoryBean =
+        new ParameterizedQueryTemplateFactoryBean(QUERY, Collections.EMPTY_LIST, queryParser);
 
-        QueryTemplate createdQueryTemplate = factoryBean.getObject();
+    QueryTemplate createdQueryTemplate = factoryBean.getObject();
 
-        assertThat(createdQueryTemplate.getSqlText(), equalTo(QUERY));
-        assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
-        assertThat(createdQueryTemplate.getParams(), is(empty()));
-    }
+    assertThat(createdQueryTemplate.getSqlText(), equalTo(QUERY));
+    assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
+    assertThat(createdQueryTemplate.getParams(), is(empty()));
+  }
 
-    @Test
-    public void createsQueryWithDefaultParams() throws Exception
-    {
-        List<QueryParam> defaultParams = Collections.<QueryParam>singletonList(new DefaultInputQueryParam(1, JdbcTypes.INTEGER_DB_TYPE, TEMPLATE_PARAM_VALUE, POSITION_PARAM_NAME));
-        QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
+  @Test
+  public void createsQueryWithDefaultParams() throws Exception {
+    List<QueryParam> defaultParams =
+        Collections.<QueryParam>singletonList(new DefaultInputQueryParam(1, JdbcTypes.INTEGER_DB_TYPE, TEMPLATE_PARAM_VALUE,
+                                                                         POSITION_PARAM_NAME));
+    QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
 
-        QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
-        when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
+    QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
+    when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
 
-        ParameterizedQueryTemplateFactoryBean factoryBean = new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, Collections.EMPTY_LIST, queryParser);
+    ParameterizedQueryTemplateFactoryBean factoryBean =
+        new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, Collections.EMPTY_LIST, queryParser);
 
-        QueryTemplate createdQueryTemplate = factoryBean.getObject();
+    QueryTemplate createdQueryTemplate = factoryBean.getObject();
 
-        assertThat(createdQueryTemplate.getSqlText(), equalTo(PARSED_PARAMETERIZED_QUERY));
-        assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
-        assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
-        InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
-        assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(TEMPLATE_PARAM_VALUE));
-    }
+    assertThat(createdQueryTemplate.getSqlText(), equalTo(PARSED_PARAMETERIZED_QUERY));
+    assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
+    assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
+    InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
+    assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(TEMPLATE_PARAM_VALUE));
+  }
 
-    @Test
-    public void createsQueryWithOverriddenParams() throws Exception
-    {
-        QueryTemplate createdQueryTemplate = doOverriddenParamTest(JdbcTypes.INTEGER_DB_TYPE, new DefaultInputQueryParam(1, JdbcTypes.INTEGER_DB_TYPE, OVERRIDDEN_PARAM_VALUE, POSITION_PARAM_NAME));
+  @Test
+  public void createsQueryWithOverriddenParams() throws Exception {
+    QueryTemplate createdQueryTemplate =
+        doOverriddenParamTest(JdbcTypes.INTEGER_DB_TYPE, new DefaultInputQueryParam(1, JdbcTypes.INTEGER_DB_TYPE,
+                                                                                    OVERRIDDEN_PARAM_VALUE, POSITION_PARAM_NAME));
 
-        assertThat(createdQueryTemplate.getSqlText(), equalTo(PARSED_PARAMETERIZED_QUERY));
-        assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
-        assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
-        InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
-        assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
-    }
+    assertThat(createdQueryTemplate.getSqlText(), equalTo(PARSED_PARAMETERIZED_QUERY));
+    assertThat(createdQueryTemplate.getType(), equalTo(QueryType.SELECT));
+    assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
+    InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
+    assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
+  }
 
-    @Test
-    public void overrideInputParamUsingTemplateType() throws Exception
-    {
-        doInputParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideInputParamUsingTemplateType() throws Exception {
+    doInputParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    @Test
-    public void overrideInputParamUsingOverriddenType() throws Exception
-    {
-        doInputParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideInputParamUsingOverriddenType() throws Exception {
+    doInputParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    @Test
-    public void overrideInOutParamUsingTemplateType() throws Exception
-    {
-        doInOutParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideInOutParamUsingTemplateType() throws Exception {
+    doInOutParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    @Test
-    public void overrideInOutParamUsingOverriddenType() throws Exception
-    {
-        doInOutParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideInOutParamUsingOverriddenType() throws Exception {
+    doInOutParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    @Test
-    public void overrideOutputParamUsingTemplateType() throws Exception
-    {
-        doOutputParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideOutputParamUsingTemplateType() throws Exception {
+    doOutputParamOverrideTest(JdbcTypes.INTEGER_DB_TYPE, UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    @Test
-    public void overrideOutputParamUsingOverriddenType() throws Exception
-    {
-        doOutputParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
-    }
+  @Test
+  public void overrideOutputParamUsingOverriddenType() throws Exception {
+    doOutputParamOverrideTest(UnknownDbType.getInstance(), JdbcTypes.INTEGER_DB_TYPE, JdbcTypes.INTEGER_DB_TYPE);
+  }
 
-    private void doInputParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType) throws Exception
-    {
-        QueryParam overriddenParam = new DefaultInputQueryParam(2, overriddenParamType, OVERRIDDEN_PARAM_VALUE, POSITION_PARAM_NAME);
+  private void doInputParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType)
+      throws Exception {
+    QueryParam overriddenParam = new DefaultInputQueryParam(2, overriddenParamType, OVERRIDDEN_PARAM_VALUE, POSITION_PARAM_NAME);
 
-        QueryTemplate createdQueryTemplate = doOverriddenParamTest(templateParamType, overriddenParam);
+    QueryTemplate createdQueryTemplate = doOverriddenParamTest(templateParamType, overriddenParam);
 
-        assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
-        InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
-        assertThat(inputQueryParam.getIndex(), equalTo(1));
-        assertThat(inputQueryParam.getType(), equalTo(expectedParamType));
-        assertThat(inputQueryParam.getName(), equalTo(POSITION_PARAM_NAME));
-        assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
-    }
+    assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
+    InputQueryParam inputQueryParam = createdQueryTemplate.getInputParams().get(0);
+    assertThat(inputQueryParam.getIndex(), equalTo(1));
+    assertThat(inputQueryParam.getType(), equalTo(expectedParamType));
+    assertThat(inputQueryParam.getName(), equalTo(POSITION_PARAM_NAME));
+    assertThat(inputQueryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
+  }
 
-    private void doInOutParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType) throws Exception
-    {
-        QueryParam overriddenParam = new DefaultInOutQueryParam(2, overriddenParamType, POSITION_PARAM_NAME, OVERRIDDEN_PARAM_VALUE);
+  private void doInOutParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType)
+      throws Exception {
+    QueryParam overriddenParam = new DefaultInOutQueryParam(2, overriddenParamType, POSITION_PARAM_NAME, OVERRIDDEN_PARAM_VALUE);
 
-        QueryTemplate createdQueryTemplate = doOverriddenParamTest(templateParamType, overriddenParam);
+    QueryTemplate createdQueryTemplate = doOverriddenParamTest(templateParamType, overriddenParam);
 
-        assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
-        InOutQueryParam queryParam = (InOutQueryParam) createdQueryTemplate.getParams().get(0);
-        assertThat(queryParam.getIndex(), equalTo(1));
-        assertThat(queryParam.getType(), equalTo(expectedParamType));
-        assertThat(queryParam.getName(), equalTo(POSITION_PARAM_NAME));
-        assertThat(queryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
-    }
+    assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
+    InOutQueryParam queryParam = (InOutQueryParam) createdQueryTemplate.getParams().get(0);
+    assertThat(queryParam.getIndex(), equalTo(1));
+    assertThat(queryParam.getType(), equalTo(expectedParamType));
+    assertThat(queryParam.getName(), equalTo(POSITION_PARAM_NAME));
+    assertThat(queryParam.getValue(), IsEqual.<Object>equalTo(OVERRIDDEN_PARAM_VALUE));
+  }
 
-    private QueryTemplate doOverriddenParamTest(DbType templateParamType, QueryParam overriddenParam) throws Exception
-    {
-        List<QueryParam> defaultParams = Collections.<QueryParam>singletonList(new DefaultInputQueryParam(1, templateParamType, TEMPLATE_PARAM_VALUE, POSITION_PARAM_NAME));
-        QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
+  private QueryTemplate doOverriddenParamTest(DbType templateParamType, QueryParam overriddenParam) throws Exception {
+    List<QueryParam> defaultParams = Collections
+        .<QueryParam>singletonList(new DefaultInputQueryParam(1, templateParamType, TEMPLATE_PARAM_VALUE, POSITION_PARAM_NAME));
+    QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
 
-        QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
-        when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
+    QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
+    when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
 
-        List<QueryParam> overriddenParams = Collections.<QueryParam>singletonList(overriddenParam);
+    List<QueryParam> overriddenParams = Collections.<QueryParam>singletonList(overriddenParam);
 
-        ParameterizedQueryTemplateFactoryBean factoryBean = new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, overriddenParams, queryParser);
+    ParameterizedQueryTemplateFactoryBean factoryBean =
+        new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, overriddenParams, queryParser);
 
-        return factoryBean.getObject();
-    }
+    return factoryBean.getObject();
+  }
 
-    private void doOutputParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType) throws Exception
-    {
-        QueryParam overriddenParam = new DefaultOutputQueryParam(2, overriddenParamType, POSITION_PARAM_NAME);
+  private void doOutputParamOverrideTest(DbType templateParamType, DbType overriddenParamType, DbType expectedParamType)
+      throws Exception {
+    QueryParam overriddenParam = new DefaultOutputQueryParam(2, overriddenParamType, POSITION_PARAM_NAME);
 
-        List<QueryParam> defaultParams = Collections.<QueryParam>singletonList(new DefaultInputQueryParam(1, templateParamType, TEMPLATE_PARAM_VALUE, POSITION_PARAM_NAME));
-        QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
+    List<QueryParam> defaultParams = Collections
+        .<QueryParam>singletonList(new DefaultInputQueryParam(1, templateParamType, TEMPLATE_PARAM_VALUE, POSITION_PARAM_NAME));
+    QueryTemplate queryTemplate = new QueryTemplate(PARSED_PARAMETERIZED_QUERY, QueryType.SELECT, defaultParams);
 
-        QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
-        when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
+    QueryTemplateParser queryParser = mock(QueryTemplateParser.class);
+    when(queryParser.parse(PARAMETERIZED_QUERY)).thenReturn(queryTemplate);
 
-        List<QueryParam> overriddenParams = Collections.singletonList(overriddenParam);
+    List<QueryParam> overriddenParams = Collections.singletonList(overriddenParam);
 
-        ParameterizedQueryTemplateFactoryBean factoryBean = new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, overriddenParams, queryParser);
+    ParameterizedQueryTemplateFactoryBean factoryBean =
+        new ParameterizedQueryTemplateFactoryBean(PARAMETERIZED_QUERY, overriddenParams, queryParser);
 
-        QueryTemplate createdQueryTemplate = factoryBean.getObject();
+    QueryTemplate createdQueryTemplate = factoryBean.getObject();
 
-        assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
-        OutputQueryParam queryParam = createdQueryTemplate.getOutputParams().get(0);
-        assertThat(queryParam.getIndex(), equalTo(1));
-        assertThat(queryParam.getType(), equalTo(expectedParamType));
-        assertThat(queryParam.getName(), equalTo(POSITION_PARAM_NAME));
-    }
+    assertThat(createdQueryTemplate.getParams().size(), equalTo(1));
+    OutputQueryParam queryParam = createdQueryTemplate.getOutputParams().get(0);
+    assertThat(queryParam.getIndex(), equalTo(1));
+    assertThat(queryParam.getType(), equalTo(expectedParamType));
+    assertThat(queryParam.getName(), equalTo(POSITION_PARAM_NAME));
+  }
 }

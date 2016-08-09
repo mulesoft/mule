@@ -20,92 +20,75 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JsonDataTestCase extends AbstractMuleTestCase
-{
+public class JsonDataTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testReadingArrayData() throws Exception
-    {
-        JsonData jsonData = readJsonData("test-data.json");
-        assertTrue(jsonData.isArray());
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.getAsString("[0]/text"));
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492",
-            jsonData.getAsString("[0]/'text'"));
+  @Test
+  public void testReadingArrayData() throws Exception {
+    JsonData jsonData = readJsonData("test-data.json");
+    assertTrue(jsonData.isArray());
+    assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.getAsString("[0]/text"));
+    assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.getAsString("[0]/'text'"));
 
-        assertEquals("Mule Test", jsonData.getAsString("[0]/'user'/name"));
-        assertEquals("Mule Test9", jsonData.getAsString("[9]/user/name"));
-        // test toString() since it was broken for arrays
-        assertNotNull(jsonData.toString());
-        try
-        {
-            assertNull(jsonData.get("[0]/user/XXX"));
-            fail("Property XXX does not exist");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-        try
-        {
-            jsonData.get("foo[0]/user");
-            fail("foo is not the root element name");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-
-        try
-        {
-            jsonData.get("[10]/user");
-            fail("Index should be out of bounds");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+    assertEquals("Mule Test", jsonData.getAsString("[0]/'user'/name"));
+    assertEquals("Mule Test9", jsonData.getAsString("[9]/user/name"));
+    // test toString() since it was broken for arrays
+    assertNotNull(jsonData.toString());
+    try {
+      assertNull(jsonData.get("[0]/user/XXX"));
+      fail("Property XXX does not exist");
+    } catch (Exception e) {
+      // expected
+    }
+    try {
+      jsonData.get("foo[0]/user");
+      fail("foo is not the root element name");
+    } catch (Exception e) {
+      // expected
     }
 
-    @Test
-    public void testReadingComplexData() throws Exception
-    {
-        JsonData jsonData = readJsonData("filters.json");
-        assertFalse(jsonData.isArray());
-
-        // assertEquals("/**", jsonData.get("filters[0]/channels"));
-        assertEquals("teh ", jsonData.getAsString("filters[1]/init[1][0]"));
-        assertEquals("the ", jsonData.getAsString("filters[1]/init[1][1]"));
-        // test toString() since it was broken for arrays
-        assertNotNull(jsonData.toString());
+    try {
+      jsonData.get("[10]/user");
+      fail("Index should be out of bounds");
+    } catch (Exception e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testReadingWithQuotedString() throws Exception
-    {
-        JsonData jsonData = readJsonData("bitly-response.json");
-        assertEquals("NfeyS",
-            jsonData.getAsString("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
-    }
+  @Test
+  public void testReadingComplexData() throws Exception {
+    JsonData jsonData = readJsonData("filters.json");
+    assertFalse(jsonData.isArray());
 
-    @Test
-    public void testReadingArray() throws Exception
-    {
-        JsonData jsonData = readJsonData("flickr-response.json");
+    // assertEquals("/**", jsonData.get("filters[0]/channels"));
+    assertEquals("teh ", jsonData.getAsString("filters[1]/init[1][0]"));
+    assertEquals("the ", jsonData.getAsString("filters[1]/init[1][1]"));
+    // test toString() since it was broken for arrays
+    assertNotNull(jsonData.toString());
+  }
 
-        assertEquals("4136507840", jsonData.getAsString("photos/photo[0]/id"));
+  @Test
+  public void testReadingWithQuotedString() throws Exception {
+    JsonData jsonData = readJsonData("bitly-response.json");
+    assertEquals("NfeyS", jsonData.getAsString("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
+  }
 
-        ArrayNode photos = (ArrayNode) jsonData.get("photos/photo");
-        assertNotNull(photos);
-        assertEquals(10, photos.size());
+  @Test
+  public void testReadingArray() throws Exception {
+    JsonData jsonData = readJsonData("flickr-response.json");
 
-        Object o = jsonData.get("photos");
-        assertNotNull(o);
-        assertTrue(o instanceof ObjectNode);
-    }
+    assertEquals("4136507840", jsonData.getAsString("photos/photo[0]/id"));
 
-    private JsonData readJsonData(String filename) throws Exception
-    {
-        String json = IOUtils.getResourceAsString(filename, getClass());
-        return new JsonData(json);
-    }
+    ArrayNode photos = (ArrayNode) jsonData.get("photos/photo");
+    assertNotNull(photos);
+    assertEquals(10, photos.size());
+
+    Object o = jsonData.get("photos");
+    assertNotNull(o);
+    assertTrue(o instanceof ObjectNode);
+  }
+
+  private JsonData readJsonData(String filename) throws Exception {
+    String json = IOUtils.getResourceAsString(filename, getClass());
+    return new JsonData(json);
+  }
 }

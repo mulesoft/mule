@@ -24,110 +24,99 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
 /**
- * An {@link AbstractFtpConnectionProvider} which provides instances of
- * {@link ClassicFtpFileSystem} from instances of {@link FtpConnector}
+ * An {@link AbstractFtpConnectionProvider} which provides instances of {@link ClassicFtpFileSystem} from instances of
+ * {@link FtpConnector}
  *
  * @since 4.0
  */
 @DisplayName("FTP Connection")
 @Summary("Connection to connect against an FTP server")
-public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem>
-{
+public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem> {
 
-    /**
-     * The port number of the FTP server to connect
-     */
-    @Parameter
-    @Optional(defaultValue = "21")
-    @Placement(group = CONNECTION, order = 2)
-    private int port = 21;
+  /**
+   * The port number of the FTP server to connect
+   */
+  @Parameter
+  @Optional(defaultValue = "21")
+  @Placement(group = CONNECTION, order = 2)
+  private int port = 21;
 
-    /**
-     * Username for the FTP Server. Required if the server is authenticated.
-     */
-    @Parameter
-    @Optional
-    @Placement(group = CONNECTION, order = 3)
-    private String username;
+  /**
+   * Username for the FTP Server. Required if the server is authenticated.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 3)
+  private String username;
 
-    /**
-     * Password for the FTP Server. Required if the server is authenticated.
-     */
-    @Parameter
-    @Password
-    @Optional
-    @Placement(group = CONNECTION, order = 4)
-    private String password;
+  /**
+   * Password for the FTP Server. Required if the server is authenticated.
+   */
+  @Parameter
+  @Password
+  @Optional
+  @Placement(group = CONNECTION, order = 4)
+  private String password;
 
-    /**
-     * The transfer mode to be used. Currently {@code BINARY} and {@code ASCII} are supported.
-     * <p>
-     * Defaults to {@code BINARY}
-     */
-    @Parameter
-    @Optional(defaultValue = "BINARY")
-    @Summary("Transfer mode to be used")
-    private FtpTransferMode transferMode;
+  /**
+   * The transfer mode to be used. Currently {@code BINARY} and {@code ASCII} are supported.
+   * <p>
+   * Defaults to {@code BINARY}
+   */
+  @Parameter
+  @Optional(defaultValue = "BINARY")
+  @Summary("Transfer mode to be used")
+  private FtpTransferMode transferMode;
 
-    /**
-     * Whether to use passive mode. Set to {@code false} to switch to active mode.
-     * <p>
-     * Defaults to {@code true}.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Summary("Whether to use passive mode. Set to \"false\" to switch to active mode")
-    private boolean passive = true;
+  /**
+   * Whether to use passive mode. Set to {@code false} to switch to active mode.
+   * <p>
+   * Defaults to {@code true}.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Summary("Whether to use passive mode. Set to \"false\" to switch to active mode")
+  private boolean passive = true;
 
-    /**
-     * Creates and returns a new instance of {@link ClassicFtpFileSystem}
-     *
-     * @return a {@link ClassicFtpFileSystem}
-     */
-    @Override
-    public ClassicFtpFileSystem connect() throws ConnectionException
-    {
-        return new ClassicFtpFileSystem(setupClient(), muleContext);
+  /**
+   * Creates and returns a new instance of {@link ClassicFtpFileSystem}
+   *
+   * @return a {@link ClassicFtpFileSystem}
+   */
+  @Override
+  public ClassicFtpFileSystem connect() throws ConnectionException {
+    return new ClassicFtpFileSystem(setupClient(), muleContext);
+  }
+
+  private FTPClient setupClient() throws ConnectionException {
+    FTPClient client = createClient();
+    if (getConnectionTimeout() != null && getConnectionTimeoutUnit() != null) {
+      client.setConnectTimeout(new Long(getConnectionTimeoutUnit().toMillis(getConnectionTimeout())).intValue());
     }
 
-    private FTPClient setupClient() throws ConnectionException
-    {
-        FTPClient client = createClient();
-        if (getConnectionTimeout() != null && getConnectionTimeoutUnit() != null)
-        {
-            client.setConnectTimeout(new Long(getConnectionTimeoutUnit().toMillis(getConnectionTimeout())).intValue());
-        }
-
-        try
-        {
-            client.connect(getHost(), port);
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
-            {
-                throw new IOException("Ftp connect failed: " + client.getReplyCode());
-            }
-            if (!client.login(username, password))
-            {
-                throw new IOException("Ftp login failed: " + client.getReplyCode());
-            }
-        }
-        catch (Exception e)
-        {
-            throw new ConnectionException("Could not establish FTP connection", e);
-        }
-
-        return client;
+    try {
+      client.connect(getHost(), port);
+      if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+        throw new IOException("Ftp connect failed: " + client.getReplyCode());
+      }
+      if (!client.login(username, password)) {
+        throw new IOException("Ftp login failed: " + client.getReplyCode());
+      }
+    } catch (Exception e) {
+      throw new ConnectionException("Could not establish FTP connection", e);
     }
 
-    protected FTPClient createClient()
-    {
-        return new FTPClient();
-    }
+    return client;
+  }
 
-    @Override
-    public void onBorrow(ClassicFtpFileSystem connection)
-    {
-        connection.setTransferMode(transferMode);
-        connection.setResponseTimeout(getResponseTimeout(), getResponseTimeoutUnit());
-        connection.setPassiveMode(passive);
-    }
+  protected FTPClient createClient() {
+    return new FTPClient();
+  }
+
+  @Override
+  public void onBorrow(ClassicFtpFileSystem connection) {
+    connection.setTransferMode(transferMode);
+    connection.setResponseTimeout(getResponseTimeout(), getResponseTimeoutUnit());
+    connection.setPassiveMode(passive);
+  }
 }

@@ -17,33 +17,28 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyWithValidationTestCase extends FunctionalTestCase
-{
+public class ProxyWithValidationTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
-    public static final String SAMPLE_REQUEST = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                                                + "<soap:Body> " +
-                                                "<echo xmlns=\"http://www.muleumo.org\">" +
-                                                "  <echo><![CDATA[bla]]></echo>" +
-                                                "</echo>"
-                                                + "</soap:Body>"
-                                                + "</soap:Envelope>";
+  public static final String SAMPLE_REQUEST = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+      + "<soap:Body> " + "<echo xmlns=\"http://www.muleumo.org\">" + "  <echo><![CDATA[bla]]></echo>" + "</echo>" + "</soap:Body>"
+      + "</soap:Envelope>";
 
-    @Rule
-    public final DynamicPort httpPort = new DynamicPort("port1");
+  @Rule
+  public final DynamicPort httpPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "proxy-with-validation-config-httpn.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "proxy-with-validation-config-httpn.xml";
+  }
 
-    @Test
-    public void acceptsRequestWithCData() throws Exception
-    {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo", getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS);
+  @Test
+  public void acceptsRequestWithCData() throws Exception {
+    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo",
+                                                        getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS);
 
-        assertTrue(getPayloadAsString(response).contains("bla"));
-    }
+    assertTrue(getPayloadAsString(response).contains("bla"));
+  }
 }

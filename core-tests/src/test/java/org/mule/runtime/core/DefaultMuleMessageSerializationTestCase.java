@@ -23,78 +23,71 @@ import java.util.Arrays;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase
-{
-    private static final String INNER_TEST_MESSAGE = "TestTestTestHello";
+public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testSerializablePayload() throws Exception
-    {
-        final MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-        MuleMessage deserializedMessage = serializationRoundtrip(message);
+  private static final String INNER_TEST_MESSAGE = "TestTestTestHello";
 
-        assertEquals(TEST_MESSAGE, deserializedMessage.getPayload());
-        assertEquals("bar", deserializedMessage.getOutboundProperty("foo"));
+  @Test
+  public void testSerializablePayload() throws Exception {
+    final MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    MuleMessage deserializedMessage = serializationRoundtrip(message);
+
+    assertEquals(TEST_MESSAGE, deserializedMessage.getPayload());
+    assertEquals("bar", deserializedMessage.getOutboundProperty("foo"));
+  }
+
+  @Test
+  public void testNonSerializablePayload() throws Exception {
+    // add a transformer to the registry that can convert a NonSerializable to byte[]. This
+    // will be used during Serialization
+    muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
+
+    final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
+
+    RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
+    MuleMessage deserializedMessage = serializationRoundtrip(message);
+
+    assertTrue(deserializedMessage.getPayload() instanceof byte[]);
+    assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
+  }
+
+  @Test
+  public void testStreamPayloadSerialization() throws Exception {
+    InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
+    final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
+    RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
+    MuleMessage deserializedMessage = serializationRoundtrip(message);
+
+    assertEquals(byte[].class, deserializedMessage.getDataType().getType());
+    byte[] payload = (byte[]) deserializedMessage.getPayload();
+    assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
+  }
+
+  private MuleMessage serializationRoundtrip(MuleMessage message) throws Exception {
+    return (MuleMessage) SerializationUtils.deserialize(SerializationUtils.serialize(message));
+  }
+
+  static class NonSerializable {
+
+    private String content = INNER_TEST_MESSAGE;
+
+    String getContent() {
+      return content;
+    }
+  }
+
+  static class NonSerializableToByteArray extends ObjectToByteArray {
+
+    public NonSerializableToByteArray() {
+      super();
+      registerSourceType(DataType.fromType(NonSerializable.class));
+      setReturnDataType(DataType.BYTE_ARRAY);
     }
 
-    @Test
-    public void testNonSerializablePayload() throws Exception
-    {
-        // add a transformer to the registry that can convert a NonSerializable to byte[]. This
-        // will be used during Serialization
-        muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
-
-        final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
-
-        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
-        MuleMessage deserializedMessage = serializationRoundtrip(message);
-
-        assertTrue(deserializedMessage.getPayload() instanceof byte[]);
-        assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
+    @Override
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+      String content = ((NonSerializable) src).getContent();
+      return content.getBytes();
     }
-
-    @Test
-    public void testStreamPayloadSerialization() throws Exception
-    {
-        InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-        final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
-        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
-        MuleMessage deserializedMessage = serializationRoundtrip(message);
-
-        assertEquals(byte[].class, deserializedMessage.getDataType().getType());
-        byte[] payload = (byte[]) deserializedMessage.getPayload();
-        assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
-    }
-
-    private MuleMessage serializationRoundtrip(MuleMessage message) throws Exception
-    {
-        return (MuleMessage) SerializationUtils.deserialize(SerializationUtils.serialize(message));
-    }
-
-    static class NonSerializable
-    {
-        private String content = INNER_TEST_MESSAGE;
-
-        String getContent()
-        {
-            return content;
-        }
-    }
-
-    static class NonSerializableToByteArray extends ObjectToByteArray
-    {
-        public NonSerializableToByteArray()
-        {
-            super();
-            registerSourceType(DataType.fromType(NonSerializable.class));
-            setReturnDataType(DataType.BYTE_ARRAY);
-        }
-
-        @Override
-        public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-        {
-            String content = ((NonSerializable) src).getContent();
-            return content.getBytes();
-        }
-    }
+  }
 }

@@ -11,26 +11,22 @@ import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
- * An implementation of {@link ArgumentResolver} which
- * returns the {@link MuleEvent} associated with a given
+ * An implementation of {@link ArgumentResolver} which returns the {@link MuleEvent} associated with a given
  * {@link OperationContext}.
  * <p/>
- * Notice that for this to work, the {@link OperationContext}
- * has to be an instance of {@link OperationContextAdapter}
+ * Notice that for this to work, the {@link OperationContext} has to be an instance of {@link OperationContextAdapter}
  *
  * @since 3.7.0
  */
-public final class EventArgumentResolver implements ArgumentResolver<MuleEvent>
-{
+public final class EventArgumentResolver implements ArgumentResolver<MuleEvent> {
 
-    /**
-     * Returns the {@link MuleEvent} associated to the {@code operationContext}
-     *
-     * @throws ClassCastException if {@code operationContext} is not an {@link OperationContextAdapter}
-     */
-    @Override
-    public MuleEvent resolve(OperationContext operationContext)
-    {
-        return ((OperationContextAdapter) operationContext).getEvent();
-    }
+  /**
+   * Returns the {@link MuleEvent} associated to the {@code operationContext}
+   *
+   * @throws ClassCastException if {@code operationContext} is not an {@link OperationContextAdapter}
+   */
+  @Override
+  public MuleEvent resolve(OperationContext operationContext) {
+    return ((OperationContextAdapter) operationContext).getEvent();
+  }
 }

@@ -12,33 +12,30 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLooku
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
- * Default {@link ValueResolverParsingDelegate} which accepts any {@link MetadataType}
- * and parses it by performing a registry lookup
+ * Default {@link ValueResolverParsingDelegate} which accepts any {@link MetadataType} and parses it by performing a registry
+ * lookup
  *
  * @since 4.0
  */
-public class DefaultValueResolverParsingDelegate implements ValueResolverParsingDelegate
-{
+public class DefaultValueResolverParsingDelegate implements ValueResolverParsingDelegate {
 
-    /**
-     * @param metadataType a {@link MetadataType}
-     * @return {@code true}
-     */
-    @Override
-    public boolean accepts(MetadataType metadataType)
-    {
-        return true;
-    }
+  /**
+   * @param metadataType a {@link MetadataType}
+   * @return {@code true}
+   */
+  @Override
+  public boolean accepts(MetadataType metadataType) {
+    return true;
+  }
 
-    /**
-     * @param key          the parsed entity key
-     * @param metadataType a {@link MetadataType}
-     * @param dslElementResolver
-     * @return A {@link ValueResolver} that performs a registry lookup using the given {@code key}
-     */
-    @Override
-    public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl)
-    {
-        return new RegistryLookupValueResolver<>(key);
-    }
+  /**
+   * @param key the parsed entity key
+   * @param metadataType a {@link MetadataType}
+   * @param dslElementResolver
+   * @return A {@link ValueResolver} that performs a registry lookup using the given {@code key}
+   */
+  @Override
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
+    return new RegistryLookupValueResolver<>(key);
+  }
 }

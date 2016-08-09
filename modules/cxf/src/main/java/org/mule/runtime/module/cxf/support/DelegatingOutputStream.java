@@ -9,67 +9,56 @@ package org.mule.runtime.module.cxf.support;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DelegatingOutputStream extends OutputStream
-{
-    private OutputStream outputStream;
+public class DelegatingOutputStream extends OutputStream {
+
+  private OutputStream outputStream;
 
 
-    public DelegatingOutputStream(OutputStream outputStream)
-    {
-        super();
-        this.outputStream = outputStream;
-    }
-    
-    public OutputStream getOutputStream()
-    {
-        return outputStream;
-    }
+  public DelegatingOutputStream(OutputStream outputStream) {
+    super();
+    this.outputStream = outputStream;
+  }
 
-    public void setOutputStream(OutputStream outputStream)
-    {
-        this.outputStream = outputStream;
-    }
+  public OutputStream getOutputStream() {
+    return outputStream;
+  }
 
-    public void close() throws IOException
-    {
-        outputStream.close();
-    }
+  public void setOutputStream(OutputStream outputStream) {
+    this.outputStream = outputStream;
+  }
 
-    public boolean equals(Object obj)
-    {
-        return outputStream.equals(obj);
-    }
+  public void close() throws IOException {
+    outputStream.close();
+  }
 
-    public void flush() throws IOException
-    {
-        outputStream.flush();
-    }
+  public boolean equals(Object obj) {
+    return outputStream.equals(obj);
+  }
 
-    public int hashCode()
-    {
-        return outputStream.hashCode();
-    }
+  public void flush() throws IOException {
+    outputStream.flush();
+  }
 
-    public String toString()
-    {
-        return outputStream.toString();
-    }
+  public int hashCode() {
+    return outputStream.hashCode();
+  }
 
-    public void write(byte[] b, int off, int len) throws IOException
-    {
-        outputStream.write(b, off, len);
-    }
+  public String toString() {
+    return outputStream.toString();
+  }
 
-    public void write(byte[] b) throws IOException
-    {
-        outputStream.write(b);
-    }
+  public void write(byte[] b, int off, int len) throws IOException {
+    outputStream.write(b, off, len);
+  }
 
-    public void write(int b) throws IOException
-    {
-        outputStream.write(b);
-    }
-    
+  public void write(byte[] b) throws IOException {
+    outputStream.write(b);
+  }
+
+  public void write(int b) throws IOException {
+    outputStream.write(b);
+  }
+
 }
 
 

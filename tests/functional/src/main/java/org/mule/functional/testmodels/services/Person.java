@@ -10,56 +10,47 @@ package org.mule.functional.testmodels.services;
  * <code>Person</code> part of the PeopleService
  */
 
-public class Person
-{
-    private String firstName;
-    private String lastName;
-    private Address address = new Address();
+public class Person {
 
-    public Person()
-    {
-        super();
-    }
+  private String firstName;
+  private String lastName;
+  private Address address = new Address();
 
-    public Person(String firstName, String lastName)
-    {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
+  public Person() {
+    super();
+  }
 
-    public String getFirstName()
-    {
-        return firstName;
-    }
+  public Person(String firstName, String lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
 
-    public void setFirstName(String firstName)
-    {
-        this.firstName = firstName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public String getLastName()
-    {
-        return lastName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public void setLastName(String lastName)
-    {
-        this.lastName = lastName;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public String toString()
-    {
-        return firstName + " " + lastName;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    public Address getAddress()
-    {
-        return address;
-    }
+  public String toString() {
+    return firstName + " " + lastName;
+  }
 
-    public void setAddress(Address address)
-    {
-        this.address = address;
-    }
+  public Address getAddress() {
+    return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
+  }
 
 }

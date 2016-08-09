@@ -11,20 +11,20 @@ import java.beans.PropertyChangeListener;
 /**
  * Observable that dispatches calls to registered listeners when the inner log configuration is changed.
  */
-public interface LogConfigChangeSubject
-{
-    /**
-     * Register a listener to be called when log config is changed.
-     * 
-     * @param logConfigChangeListener the listener to register.
-     */
-    void registerLogConfigChangeListener(PropertyChangeListener logConfigChangeListener);
+public interface LogConfigChangeSubject {
 
-    /**
-     * Unregister a listener to no longer be called when log config is changed.
-     * 
-     * @param logConfigChangeListener the listener to unregister.
-     */
-    void unregisterLogConfigChangeListener(PropertyChangeListener logConfigChangeListener);
+  /**
+   * Register a listener to be called when log config is changed.
+   * 
+   * @param logConfigChangeListener the listener to register.
+   */
+  void registerLogConfigChangeListener(PropertyChangeListener logConfigChangeListener);
+
+  /**
+   * Unregister a listener to no longer be called when log config is changed.
+   * 
+   * @param logConfigChangeListener the listener to unregister.
+   */
+  void unregisterLogConfigChangeListener(PropertyChangeListener logConfigChangeListener);
 
 }

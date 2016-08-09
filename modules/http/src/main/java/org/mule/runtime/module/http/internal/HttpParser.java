@@ -38,289 +38,237 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.io.IOUtils;
 
-public class HttpParser
-{
+public class HttpParser {
 
-    private static final String SPACE_ENTITY = "%20";
-    private static final String PLUS_SIGN = "\\+";
-    private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
-    private static final String NAME_ATTRIBUTE = "name";
+  private static final String SPACE_ENTITY = "%20";
+  private static final String PLUS_SIGN = "\\+";
+  private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
+  private static final String NAME_ATTRIBUTE = "name";
 
-    public static String extractPath(String uri)
-    {
-        String path = uri;
-        int i = path.indexOf('?');
-        if (i > -1)
-        {
-            path = path.substring(0, i);
-        }
-        return path;
+  public static String extractPath(String uri) {
+    String path = uri;
+    int i = path.indexOf('?');
+    if (i > -1) {
+      path = path.substring(0, i);
+    }
+    return path;
+  }
+
+  public static String extractQueryParams(String uri) {
+    int i = uri.indexOf("?");
+    String queryString = "";
+    if (i > -1) {
+      queryString = uri.substring(i + 1);
+    }
+    return queryString;
+  }
+
+  public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
+    MimeMultipart mimeMultipart = null;
+    List<HttpPart> parts = Lists.newArrayList();
+
+    try {
+      mimeMultipart = new MimeMultipart(new ByteArrayDataSource(content, contentType));
+    } catch (MessagingException e) {
+      throw new IOException(e);
     }
 
-    public static String extractQueryParams(String uri)
-    {
-        int i = uri.indexOf("?");
-        String queryString = "";
-        if(i > -1)
-        {
-            queryString = uri.substring(i + 1);
+    try {
+      int partCount = mimeMultipart.getCount();
+
+      for (int i = 0; i < partCount; i++) {
+        BodyPart part = mimeMultipart.getBodyPart(i);
+
+        String filename = part.getFileName();
+        String partName = filename;
+        String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
+        if (contentDispositions != null) {
+          String contentDisposition = contentDispositions[0];
+          if (contentDisposition.contains(NAME_ATTRIBUTE)) {
+            partName = contentDisposition.substring(contentDisposition.indexOf(NAME_ATTRIBUTE) + NAME_ATTRIBUTE.length() + 2);
+            partName = partName.substring(0, partName.indexOf("\""));
+          }
         }
-        return queryString;
+        HttpPart httpPart =
+            new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
+
+        Enumeration<Header> headers = part.getAllHeaders();
+
+        while (headers.hasMoreElements()) {
+          Header header = headers.nextElement();
+          httpPart.addHeader(header.getName(), header.getValue());
+        }
+        parts.add(httpPart);
+      }
+    } catch (MessagingException e) {
+      throw new IOException(e);
     }
 
-    public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException
-    {
-        MimeMultipart mimeMultipart = null;
-        List<HttpPart> parts = Lists.newArrayList();
+    return parts;
+  }
 
-        try
-        {
-            mimeMultipart = new MimeMultipart(new ByteArrayDataSource(content, contentType));
+  public static String sanitizePathWithStartSlash(String path) {
+    if (path == null) {
+      return null;
+    }
+    return path.startsWith("/") ? path : "/" + path;
+  }
+
+  public static ParameterMap decodeQueryString(String queryString) {
+    return decodeUrlEncodedBody(queryString, UTF_8);
+  }
+
+  public static String encodeQueryString(Map parameters) {
+    return encodeString(UTF_8, parameters);
+  }
+
+  public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding) {
+    return decodeString(urlEncodedBody, encoding);
+  }
+
+  public static ParameterMap decodeString(String encodedString, Charset encoding) {
+    ParameterMap queryParams = new ParameterMap();
+    if (!StringUtils.isBlank(encodedString)) {
+      String[] pairs = encodedString.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+
+        if (idx != -1) {
+          addParam(queryParams, pair.substring(0, idx), pair.substring(idx + 1), encoding);
+        } else {
+          addParam(queryParams, pair, null, encoding);
+
         }
-        catch (MessagingException e)
-        {
-            throw new IOException(e);
+      }
+    }
+    return queryParams;
+  }
+
+  private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding) {
+    queryParams.put(decode(name, encoding), decode(value, encoding));
+  }
+
+
+  public static String encodeString(Charset encoding, Map parameters) {
+    String body;
+    StringBuilder result = new StringBuilder();
+    for (Map.Entry<?, ?> entry : (Set<Map.Entry<?, ?>>) ((parameters).entrySet())) {
+      String paramName = entry.getKey().toString();
+      Object paramValue = entry.getValue();
+
+      Iterable paramValues = paramValue instanceof Iterable ? (Iterable) paramValue : Arrays.asList(paramValue);
+      for (Object value : paramValues) {
+        try {
+          paramName = URLEncoder.encode(paramName, encoding.name());
+          paramValue = value != null ? URLEncoder.encode(value.toString(), encoding.name()) : null;
+        } catch (UnsupportedEncodingException e) {
+          throw new MuleRuntimeException(e);
         }
 
-        try
-        {
-            int partCount = mimeMultipart.getCount();
-
-            for (int i = 0; i < partCount; i++)
-            {
-                BodyPart part = mimeMultipart.getBodyPart(i);
-
-                String filename = part.getFileName();
-                String partName = filename;
-                String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
-                if (contentDispositions != null)
-                {
-                    String contentDisposition = contentDispositions[0];
-                    if (contentDisposition.contains(NAME_ATTRIBUTE))
-                    {
-                        partName = contentDisposition.substring(contentDisposition.indexOf(NAME_ATTRIBUTE) + NAME_ATTRIBUTE.length() + 2);
-                        partName = partName.substring(0, partName.indexOf("\""));
-                    }
-                }
-                HttpPart httpPart = new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
-
-                Enumeration<Header> headers = part.getAllHeaders();
-
-                while (headers.hasMoreElements())
-                {
-                    Header header = headers.nextElement();
-                    httpPart.addHeader(header.getName(), header.getValue());
-                }
-                parts.add(httpPart);
-            }
+        if (result.length() > 0) {
+          result.append("&");
         }
-        catch (MessagingException e)
-        {
-            throw new IOException(e);
+        result.append(paramName);
+        if (paramValue != null) {
+          // Allowing parameters name with no value assigned
+          result.append("=");
+          result.append(paramValue);
         }
-
-        return parts;
+      }
     }
 
-    public static String sanitizePathWithStartSlash(String path)
-    {
-        if (path == null)
-        {
-            return null;
+    body = result.toString();
+    return body;
+  }
+
+  /**
+   * Decodes uri params from a request path
+   *
+   * @param pathWithUriParams path with uri param place holders
+   * @param requestPath request path
+   * @return a map with the uri params present in the request path with the values decoded.
+   */
+  public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath) {
+    ParameterMap uriParams = new ParameterMap();
+    if (pathWithUriParams.contains("{")) {
+      final String[] requestPathParts = requestPath.split("/");
+      final String[] listenerPathParts = pathWithUriParams.split("/");
+      int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
+      // split will return an empty string as first path before /
+      for (int i = 1; i < longerPathSize; i++) {
+        final String listenerPart = listenerPathParts[i];
+        if (listenerPart.startsWith("{") && listenerPart.endsWith("}")) {
+          String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
+          String parameterValue = requestPathParts[i];
+          uriParams.put(parameterName, decode(parameterValue, UTF_8));
         }
-        return path.startsWith("/") ? path : "/" + path;
+      }
     }
+    return uriParams;
+  }
 
-    public static ParameterMap decodeQueryString(String queryString)
-    {
-        return decodeUrlEncodedBody(queryString, UTF_8);
+  private static String decode(String text, Charset encoding) {
+    if (text == null) {
+      return null;
     }
-
-    public static String encodeQueryString(Map parameters)
-    {
-        return encodeString(UTF_8, parameters);
+    try {
+      return URLDecoder.decode(text, encoding.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding)
-    {
-        return decodeString(urlEncodedBody, encoding);
+  /**
+   * Extracts the subtype from a content type
+   *
+   * @param contentType the content type
+   * @return subtype of the content type.
+   */
+  public static String getContentTypeSubType(String contentType) {
+    final ContentType contentTypeValue;
+    try {
+      contentTypeValue = new ContentType(contentType);
+      return contentTypeValue.getSubType();
+    } catch (ParseException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    public static ParameterMap decodeString(String encodedString, Charset encoding)
-    {
-        ParameterMap queryParams = new ParameterMap();
-        if (!StringUtils.isBlank(encodedString))
-        {
-            String[] pairs = encodedString.split("&");
-            for (String pair : pairs) {
-                int idx = pair.indexOf("=");
+  /**
+   * Normalize a path that may contains spaces, %20 or +.
+   *
+   * @param path path with encoded spaces or raw spaces
+   * @return path with only spaces.
+   */
+  public static String normalizePathWithSpacesOrEncodedSpaces(String path) {
+    return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
+  }
 
-                if (idx != -1)
-                {
-                    addParam(queryParams, pair.substring(0, idx), pair.substring(idx + 1), encoding);
-                }
-                else
-                {
-                    addParam(queryParams, pair, null, encoding);
+  /**
+   * Encodes spaces in a path, replacing them by %20.
+   *
+   * @param path Path that may contain spaces
+   * @return The path with all spaces replaced by %20.
+   */
+  public static String encodeSpaces(String path) {
+    return path.replaceAll(WHITE_SPACE, SPACE_ENTITY);
+  }
 
-                }
-            }
-        }
-        return queryParams;
+  /**
+   * Appends a query parameter to an URL that may or may not contain query parameters already.
+   *
+   * @param url base URL to apply the new query parameter
+   * @param queryParamName query parameter name
+   * @param queryParamValue query parameter value
+   * @return a new string with the query parameter appended
+   */
+  public static String appendQueryParam(String url, String queryParamName, String queryParamValue) {
+    try {
+      String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
+      return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, UTF_8.name()) + "="
+          + URLEncoder.encode(queryParamValue, UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new MuleRuntimeException(e);
     }
-
-    private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding)
-    {
-        queryParams.put(decode(name, encoding), decode(value, encoding));
-    }
-
-
-    public static String encodeString(Charset encoding, Map parameters)
-    {
-        String body;
-        StringBuilder result = new StringBuilder();
-        for (Map.Entry<?,?> entry : (Set<Map.Entry<?,?>>)((parameters).entrySet()))
-        {
-            String paramName = entry.getKey().toString();
-            Object paramValue = entry.getValue();
-
-            Iterable paramValues = paramValue instanceof Iterable ? (Iterable) paramValue : Arrays.asList(paramValue);
-            for (Object value : paramValues)
-            {
-                try
-                {
-                    paramName = URLEncoder.encode(paramName, encoding.name());
-                    paramValue = value != null ? URLEncoder.encode(value.toString(), encoding.name()) : null;
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-
-                if (result.length() > 0)
-                {
-                    result.append("&");
-                }
-                result.append(paramName);
-                if (paramValue != null)
-                {
-                    // Allowing parameters name with no value assigned
-                    result.append("=");
-                    result.append(paramValue);
-                }
-            }
-        }
-
-        body = result.toString();
-        return body;
-    }
-
-    /**
-     * Decodes uri params from a request path
-     *
-     * @param pathWithUriParams path with uri param place holders
-     * @param requestPath request path
-     * @return a map with the uri params present in the request path with the values decoded.
-     */
-    public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath)
-    {
-        ParameterMap uriParams = new ParameterMap();
-        if (pathWithUriParams.contains("{"))
-        {
-            final String[] requestPathParts = requestPath.split("/");
-            final String[] listenerPathParts = pathWithUriParams.split("/");
-            int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
-            //split will return an empty string as first path before /
-            for (int i = 1; i < longerPathSize; i++)
-            {
-                final String listenerPart = listenerPathParts[i];
-                if (listenerPart.startsWith("{") && listenerPart.endsWith("}"))
-                {
-                    String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
-                    String parameterValue = requestPathParts[i];
-                    uriParams.put(parameterName, decode(parameterValue, UTF_8));
-                }
-            }
-        }
-        return uriParams;
-    }
-
-    private static String decode(String text, Charset encoding)
-    {
-        if(text == null)
-        {
-            return null;
-        }
-        try
-        {
-            return URLDecoder.decode(text, encoding.name());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    /**
-     * Extracts the subtype from a content type
-     *
-     * @param contentType the content type
-     * @return subtype of the content type.
-     */
-    public static String getContentTypeSubType(String contentType)
-    {
-        final ContentType contentTypeValue;
-        try
-        {
-            contentTypeValue = new ContentType(contentType);
-            return contentTypeValue.getSubType();
-        }
-        catch (ParseException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    /**
-     * Normalize a path that may contains spaces, %20 or +.
-     *
-     * @param path path with encoded spaces or raw spaces
-     * @return path with only spaces.
-     */
-    public static String normalizePathWithSpacesOrEncodedSpaces(String path)
-    {
-        return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
-    }
-
-    /**
-     * Encodes spaces in a path, replacing them by %20.
-     *
-     * @param path Path that may contain spaces
-     * @return The path with all spaces replaced by %20.
-     */
-    public static String encodeSpaces(String path)
-    {
-        return path.replaceAll(WHITE_SPACE, SPACE_ENTITY);
-    }
-
-    /**
-     * Appends a query parameter to an URL that may or may not contain query parameters already.
-     *
-     * @param url base URL to apply the new query parameter
-     * @param queryParamName query parameter name
-     * @param queryParamValue query parameter value
-     * @return a new string with the query parameter appended
-     */
-    public static String appendQueryParam(String url, String queryParamName, String queryParamValue)
-    {
-        try
-        {
-            String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
-            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, UTF_8.name());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
+  }
 }

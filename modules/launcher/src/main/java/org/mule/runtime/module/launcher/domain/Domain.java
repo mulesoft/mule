@@ -13,31 +13,32 @@ import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 /**
- * A domain is a deployable Artifact that contains shared resources for {@link org.mule.runtime.module.launcher.application.Application}
+ * A domain is a deployable Artifact that contains shared resources for
+ * {@link org.mule.runtime.module.launcher.application.Application}
  * <p/>
  * A domain can just consist of a set of jar libraries to share between the domain applications or it can also contain shared
  * resources such as connectors or other mule components.
  */
-public interface Domain extends DeployableArtifact<DomainDescriptor>
-{
-    /**
-     * Domain configuration file name
-     */
-    String DOMAIN_CONFIG_FILE_LOCATION = "mule-domain-config.xml";
+public interface Domain extends DeployableArtifact<DomainDescriptor> {
 
-    /**
-     * Name of the default domain
-     */
-    String DEFAULT_DOMAIN_NAME = "default";
+  /**
+   * Domain configuration file name
+   */
+  String DOMAIN_CONFIG_FILE_LOCATION = "mule-domain-config.xml";
 
-    /**
-     * @return true if this domain has shared mule components, false if it doesn't
-     */
-    boolean containsSharedResources();
+  /**
+   * Name of the default domain
+   */
+  String DEFAULT_DOMAIN_NAME = "default";
 
-    /**
-     * @return the MuleContext created with the domain resources. It can return null if it doesn't contains shared resources
-     */
-    MuleContext getMuleContext();
+  /**
+   * @return true if this domain has shared mule components, false if it doesn't
+   */
+  boolean containsSharedResources();
+
+  /**
+   * @return the MuleContext created with the domain resources. It can return null if it doesn't contains shared resources
+   */
+  MuleContext getMuleContext();
 
 }

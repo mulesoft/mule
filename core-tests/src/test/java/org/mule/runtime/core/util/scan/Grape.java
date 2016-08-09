@@ -11,22 +11,19 @@ import org.mule.tck.testmodels.fruit.Fruit;
 /**
  * TODO
  */
-public class Grape implements Fruit
-{
-    private boolean bitten;
+public class Grape implements Fruit {
 
-    public void bite()
-    {
-        bitten = true;
-    }
+  private boolean bitten;
 
-    public boolean isBitten()
-    {
-        return bitten;
-    }
+  public void bite() {
+    bitten = true;
+  }
 
-    public int getSeeds()
-    {
-        return 4;
-    }
+  public boolean isBitten() {
+    return bitten;
+  }
+
+  public int getSeeds() {
+    return 4;
+  }
 }

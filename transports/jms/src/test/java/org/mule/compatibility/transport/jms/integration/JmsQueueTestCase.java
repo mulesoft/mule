@@ -13,31 +13,28 @@ import org.junit.Test;
  * Message is sent to and received from simple queue.
  */
 @Ignore("MULE-9628")
-public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-queue.xml";
-    }
+public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    public void testJmsQueue() throws Exception
-    {
-        dispatchMessage();
-        receiveMessage();
-        receive(scenarioNotReceive);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-queue.xml";
+  }
 
-    @Test
-    public void testMultipleSend() throws Exception
-    {
-        dispatchMessage();
-        dispatchMessage();
-        dispatchMessage();
-        receiveMessage();
-        receiveMessage();
-        receiveMessage();
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testJmsQueue() throws Exception {
+    dispatchMessage();
+    receiveMessage();
+    receive(scenarioNotReceive);
+  }
+
+  @Test
+  public void testMultipleSend() throws Exception {
+    dispatchMessage();
+    dispatchMessage();
+    dispatchMessage();
+    receiveMessage();
+    receiveMessage();
+    receiveMessage();
+    receive(scenarioNotReceive);
+  }
 }

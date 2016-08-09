@@ -24,33 +24,32 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase
-{
+public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/sync/http-jms-bridge-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/sync/http-jms-bridge-flow.xml";
+  }
 
-    @Test
-    public void testBridge() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        String payload = "payload";
+  @Test
+  public void testBridge() throws Exception {
+    MuleClient client = muleContext.getClient();
+    String payload = "payload";
 
-        Map<String, Serializable> headers = new HashMap<>();
-        final String customHeader = "X-Custom-Header";
-        headers.put(customHeader, "value");
+    Map<String, Serializable> headers = new HashMap<>();
+    final String customHeader = "X-Custom-Header";
+    headers.put(customHeader, "value");
 
-        client.dispatch(format("http://localhost:%d/in", httpPort.getNumber()), MuleMessage.builder().payload(payload).outboundProperties(headers).build(), newOptions().method(POST.name()).build());
+    client.dispatch(format("http://localhost:%d/in", httpPort.getNumber()),
+                    MuleMessage.builder().payload(payload).outboundProperties(headers).build(),
+                    newOptions().method(POST.name()).build());
 
-        MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
-        assertNotNull(msg);
-        assertThat(getPayloadAsString(msg), is(payload));
-        assertThat(msg.getInboundProperty(customHeader), is("value"));
-    }
+    MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
+    assertNotNull(msg);
+    assertThat(getPayloadAsString(msg), is(payload));
+    assertThat(msg.getInboundProperty(customHeader), is("value"));
+  }
 }

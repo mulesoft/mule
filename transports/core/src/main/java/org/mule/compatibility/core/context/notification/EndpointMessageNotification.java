@@ -12,48 +12,41 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 
 /**
- * These notifications are fired when either a message is either: received by an
- * endpoint, sent or dispatched from an endpoint or requested from an endpoint.
+ * These notifications are fired when either a message is either: received by an endpoint, sent or dispatched from an endpoint or
+ * requested from an endpoint.
  */
-public class EndpointMessageNotification extends ConnectorMessageNotification
-{
+public class EndpointMessageNotification extends ConnectorMessageNotification {
 
-    public static final int MESSAGE_DISPATCH_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 2;
-    public static final int MESSAGE_SEND_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 3;
-    public static final int MESSAGE_DISPATCH_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 1;
-    public static final int MESSAGE_SEND_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 2;
+  public static final int MESSAGE_DISPATCH_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 2;
+  public static final int MESSAGE_SEND_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 3;
+  public static final int MESSAGE_DISPATCH_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 1;
+  public static final int MESSAGE_SEND_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 2;
 
-    static
-    {
-        registerAction("begin dispatch", MESSAGE_DISPATCH_BEGIN);
-        registerAction("begin send", MESSAGE_SEND_BEGIN);
+  static {
+    registerAction("begin dispatch", MESSAGE_DISPATCH_BEGIN);
+    registerAction("begin send", MESSAGE_SEND_BEGIN);
 
-        registerAction("end dispatch", MESSAGE_DISPATCH_END);
-        registerAction("end send", MESSAGE_SEND_END);
-    }
+    registerAction("end dispatch", MESSAGE_DISPATCH_END);
+    registerAction("end send", MESSAGE_SEND_END);
+  }
 
-    /**
-     * For backwards compatibility.  BEGIN is chosen where it contains the message sent, and END where it contains the message
-     * received, again for backwards compatibility.
-     */
-    public static final int MESSAGE_DISPATCHED = MESSAGE_DISPATCH_BEGIN;
-    public static final int MESSAGE_SENT = MESSAGE_SEND_BEGIN;
-    public static final int MESSAGE_REQUESTED = MESSAGE_REQUEST_END;
+  /**
+   * For backwards compatibility. BEGIN is chosen where it contains the message sent, and END where it contains the message
+   * received, again for backwards compatibility.
+   */
+  public static final int MESSAGE_DISPATCHED = MESSAGE_DISPATCH_BEGIN;
+  public static final int MESSAGE_SENT = MESSAGE_SEND_BEGIN;
+  public static final int MESSAGE_REQUESTED = MESSAGE_REQUEST_END;
 
-    private ImmutableEndpoint immutableEndpoint;
+  private ImmutableEndpoint immutableEndpoint;
 
-    public EndpointMessageNotification(MuleMessage resource,
-                               ImmutableEndpoint endpoint,
-                               FlowConstruct flowConstruct,
-                               int action)
-    {
-        super(null, resource, endpoint.getEndpointURI().toString(), flowConstruct, action);
-        this.immutableEndpoint = endpoint;
-    }
+  public EndpointMessageNotification(MuleMessage resource, ImmutableEndpoint endpoint, FlowConstruct flowConstruct, int action) {
+    super(null, resource, endpoint.getEndpointURI().toString(), flowConstruct, action);
+    this.immutableEndpoint = endpoint;
+  }
 
-    public ImmutableEndpoint getImmutableEndpoint()
-    {
-        return immutableEndpoint;
-    }
+  public ImmutableEndpoint getImmutableEndpoint() {
+    return immutableEndpoint;
+  }
 
 }

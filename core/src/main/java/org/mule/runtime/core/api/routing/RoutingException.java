@@ -13,60 +13,50 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>RoutingException</code> is a base class for all routing exceptions.
- * Routing exceptions are only thrown for DefaultInboundRouterCollection and
- * DefaultOutboundRouterCollection and deriving types. Mule itself does not throw routing
+ * <code>RoutingException</code> is a base class for all routing exceptions. Routing exceptions are only thrown for
+ * DefaultInboundRouterCollection and DefaultOutboundRouterCollection and deriving types. Mule itself does not throw routing
  * exceptions when routing internal events.
  */
-public class RoutingException extends MessagingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 2478458847072048645L;
+public class RoutingException extends MessagingException {
 
-    protected final transient MessageProcessor route;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 2478458847072048645L;
 
-    public RoutingException(MuleEvent event, MessageProcessor route)
-    {
-        super(generateMessage(null, route), event, route);
-        this.route = route;
+  protected final transient MessageProcessor route;
+
+  public RoutingException(MuleEvent event, MessageProcessor route) {
+    super(generateMessage(null, route), event, route);
+    this.route = route;
+  }
+
+  public RoutingException(MuleEvent event, MessageProcessor route, Throwable cause) {
+    super(generateMessage(null, route), event, cause, route);
+    this.route = route;
+  }
+
+  public RoutingException(Message message, MuleEvent event, MessageProcessor route) {
+    super(generateMessage(message, route), event, route);
+    this.route = route;
+  }
+
+  public RoutingException(Message message, MuleEvent event, MessageProcessor route, Throwable cause) {
+    super(generateMessage(message, route), event, cause, route);
+    this.route = route;
+  }
+
+  public MessageProcessor getRoute() {
+    return route;
+  }
+
+  private static Message generateMessage(Message message, MessageProcessor target) {
+    Message m = CoreMessages.failedToRouterViaEndpoint(target);
+    if (message != null) {
+      message.setNextMessage(m);
+      return message;
+    } else {
+      return m;
     }
-
-    public RoutingException(MuleEvent event, MessageProcessor route, Throwable cause)
-    {
-        super(generateMessage(null, route), event, cause, route);
-        this.route = route;
-    }
-
-    public RoutingException(Message message, MuleEvent event, MessageProcessor route)
-    {
-        super(generateMessage(message, route), event, route);
-        this.route = route;
-    }
-
-    public RoutingException(Message message, MuleEvent event, MessageProcessor route, Throwable cause)
-    {
-        super(generateMessage(message, route), event, cause, route);
-        this.route = route;
-    }
-
-    public MessageProcessor getRoute()
-    {
-        return route;
-    }
-
-    private static Message generateMessage(Message message, MessageProcessor target)
-    {
-        Message m = CoreMessages.failedToRouterViaEndpoint(target);
-        if (message != null)
-        {
-            message.setNextMessage(m);
-            return message;
-        }
-        else
-        {
-            return m;
-        }
-    }
+  }
 }

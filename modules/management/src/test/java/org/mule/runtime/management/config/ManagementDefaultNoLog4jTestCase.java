@@ -14,21 +14,19 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ManagementDefaultNoLog4jTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "management-default-no-log4j-config.xml";
-    }
+public class ManagementDefaultNoLog4jTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testDefaultJmxAgentConfig() throws Exception
-    {
-        Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
-        assertNotNull(agent);
+  @Override
+  protected String getConfigFile() {
+    return "management-default-no-log4j-config.xml";
+  }
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
-        assertNull(agent);
-    }
+  @Test
+  public void testDefaultJmxAgentConfig() throws Exception {
+    Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
+    assertNotNull(agent);
+
+    agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
+    assertNull(agent);
+  }
 }

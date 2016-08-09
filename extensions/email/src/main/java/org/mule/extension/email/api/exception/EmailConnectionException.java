@@ -13,27 +13,24 @@ import org.mule.runtime.api.connection.ConnectionException;
  *
  * @since 4.0
  */
-public class EmailConnectionException extends ConnectionException
-{
+public class EmailConnectionException extends ConnectionException {
 
-    /**
-     * Creates a new instance with the specified detail {@code message}
-     *
-     * @param message the detail message
-     */
-    public EmailConnectionException(String message)
-    {
-        super(message);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
+  public EmailConnectionException(String message) {
+    super(message);
+  }
 
-    /**
-     * Creates a new instance with the specified detail {@code message} and {@code cause}
-     *
-     * @param message the detail message
-     * @param cause   the exception's cause
-     */
-    public EmailConnectionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message} and {@code cause}
+   *
+   * @param message the detail message
+   * @param cause the exception's cause
+   */
+  public EmailConnectionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

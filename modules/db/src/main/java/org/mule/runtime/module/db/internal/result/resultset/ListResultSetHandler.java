@@ -21,37 +21,29 @@ import java.util.Map;
  * <p/>
  * The processed {@link ResultSet} is closed immediately after fetching its data.
  */
-public class ListResultSetHandler implements ResultSetHandler
-{
+public class ListResultSetHandler implements ResultSetHandler {
 
-    private final RowHandler rowHandler;
+  private final RowHandler rowHandler;
 
-    public ListResultSetHandler(RowHandler rowHandler)
-    {
-        this.rowHandler = rowHandler;
+  public ListResultSetHandler(RowHandler rowHandler) {
+    this.rowHandler = rowHandler;
+  }
+
+  @Override
+  public List<Map<String, Object>> processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException {
+    List<Map<String, Object>> results = new LinkedList<Map<String, Object>>();
+    try {
+      while (resultSet.next()) {
+        results.add(rowHandler.process(resultSet));
+      }
+    } finally {
+      resultSet.close();
     }
+    return results;
+  }
 
-    @Override
-    public List<Map<String, Object>> processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
-    {
-        List<Map<String, Object>> results = new LinkedList<Map<String, Object>>();
-        try
-        {
-            while (resultSet.next())
-            {
-                results.add(rowHandler.process(resultSet));
-            }
-        }
-        finally
-        {
-            resultSet.close();
-        }
-        return results;
-    }
-
-    @Override
-    public boolean requiresMultipleOpenedResults()
-    {
-        return false;
-    }
+  @Override
+  public boolean requiresMultipleOpenedResults() {
+    return false;
+  }
 }

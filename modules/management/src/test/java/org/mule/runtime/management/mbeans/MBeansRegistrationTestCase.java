@@ -33,87 +33,75 @@ import org.junit.Test;
 /**
  * Verify that expected MBeans are registered based on the config.
  */
-public class MBeansRegistrationTestCase extends FunctionalTestCase
-{
+public class MBeansRegistrationTestCase extends FunctionalTestCase {
 
-    private MBeanServer mBeanServer;
-    private String domainName;
-    private JmxSupport jmxSupport;
+  private MBeanServer mBeanServer;
+  private String domainName;
+  private JmxSupport jmxSupport;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mbeans-test-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "mbeans-test-flow.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    JmxApplicationAgent jmxAgent = (JmxApplicationAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
+    jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
+    domainName = jmxSupport.getDomainName(muleContext);
+    mBeanServer = jmxAgent.getMBeanServer();
+  }
+
+  /**
+   * Verify that all expected MBeans are registered for a default config
+   */
+  @Test
+  public void testDefaultMBeansRegistration() throws Exception {
+    List<String> mbeanClasses = getMBeanClasses();
+
+    assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$BroadcastNotificationService"));
+    assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$NotificationListener"));
+    assertTrue(mbeanClasses.contains(MuleService.class.getName()));
+    assertTrue(mbeanClasses.contains(MuleConfigurationService.class.getName()));
+    assertTrue(mbeanClasses.contains(StatisticsService.class.getName()));
+
+    // Only if registerMx4jAdapter="true"
+    assertTrue(mbeanClasses.contains(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
+  }
+
+  /**
+   * Verify that all expected MBeans are registered for connectors, services, routers, and endpoints.
+   */
+  @Test
+  public void testServiceMBeansRegistration() throws Exception {
+    List<String> mbeanClasses = getMBeanClasses();
+
+    assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));
+    assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
+  }
+
+  /**
+   * Verify that all MBeans were unregistered during disposal phase.
+   */
+  @Test
+  public void testMBeansUnregistration() throws Exception {
+    muleContext.dispose();
+    assertEquals("No MBeans should be registered after disposal of MuleContext", 0, getMBeanClasses().size());
+  }
+
+  protected List<String> getMBeanClasses() throws MalformedObjectNameException {
+    Set<ObjectInstance> mbeans = getMBeans();
+    Iterator<ObjectInstance> it = mbeans.iterator();
+    List<String> mbeanClasses = new ArrayList<String>();
+    while (it.hasNext()) {
+      mbeanClasses.add(it.next().getClassName());
     }
+    return mbeanClasses;
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
-        jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
-        domainName = jmxSupport.getDomainName(muleContext);
-        mBeanServer = jmxAgent.getMBeanServer();
-    }
-
-    /**
-     * Verify that all expected MBeans are registered for a default config
-     */
-    @Test
-    public void testDefaultMBeansRegistration() throws Exception
-    {
-        List<String> mbeanClasses = getMBeanClasses();
-
-        assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName()
-                                         + "$BroadcastNotificationService"));
-        assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$NotificationListener"));
-        assertTrue(mbeanClasses.contains(MuleService.class.getName()));
-        assertTrue(mbeanClasses.contains(MuleConfigurationService.class.getName()));
-        assertTrue(mbeanClasses.contains(StatisticsService.class.getName()));
-
-        // Only if registerMx4jAdapter="true"
-        assertTrue(mbeanClasses.contains(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
-    }
-
-    /**
-     * Verify that all expected MBeans are registered for connectors, services,
-     * routers, and endpoints.
-     */
-    @Test
-    public void testServiceMBeansRegistration() throws Exception
-    {
-        List<String> mbeanClasses = getMBeanClasses();
-
-        assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));
-        assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
-    }
-
-    /**
-     * Verify that all MBeans were unregistered during disposal phase.
-     */
-    @Test
-    public void testMBeansUnregistration() throws Exception
-    {
-        muleContext.dispose();
-        assertEquals("No MBeans should be registered after disposal of MuleContext", 0,
-            getMBeanClasses().size());
-    }
-
-    protected List<String> getMBeanClasses() throws MalformedObjectNameException
-    {
-        Set<ObjectInstance> mbeans = getMBeans();
-        Iterator<ObjectInstance> it = mbeans.iterator();
-        List<String> mbeanClasses = new ArrayList<String>();
-        while (it.hasNext())
-        {
-            mbeanClasses.add(it.next().getClassName());
-        }
-        return mbeanClasses;
-    }
-
-    protected Set<ObjectInstance> getMBeans() throws MalformedObjectNameException
-    {
-        return mBeanServer.queryMBeans(jmxSupport.getObjectName(domainName + ":*"), null);
-    }
+  protected Set<ObjectInstance> getMBeans() throws MalformedObjectNameException {
+    return mBeanServer.queryMBeans(jmxSupport.getObjectName(domainName + ":*"), null);
+  }
 
 }

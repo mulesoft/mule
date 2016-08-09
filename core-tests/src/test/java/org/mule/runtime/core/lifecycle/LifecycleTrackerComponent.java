@@ -18,39 +18,32 @@ import org.mockito.Mockito;
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements FlowConstructAware, Component
-{
+public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements FlowConstructAware, Component {
 
-    private FlowConstruct flowConstruct;
+  private FlowConstruct flowConstruct;
 
-    public void springInitialize()
-    {
-        getTracker().add("springInitialize");
-    }
+  public void springInitialize() {
+    getTracker().add("springInitialize");
+  }
 
-    public void springDestroy()
-    {
-        getTracker().add("springDestroy");
-    }
+  public void springDestroy() {
+    getTracker().add("springDestroy");
+  }
 
-    public void setFlowConstruct(final FlowConstruct flowConstruct)
-    {
-        getTracker().add("setService");
-        this.flowConstruct = flowConstruct;
-    }
+  public void setFlowConstruct(final FlowConstruct flowConstruct) {
+    getTracker().add("setService");
+    this.flowConstruct = flowConstruct;
+  }
 
-    public FlowConstruct getFlowConstruct()
-    {
-        return flowConstruct;
-    }
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
 
-    public ComponentStatistics getStatistics()
-    {
-        return Mockito.mock(ComponentStatistics.class);
-    }
+  public ComponentStatistics getStatistics() {
+    return Mockito.mock(ComponentStatistics.class);
+  }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return event;
-    }
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return event;
+  }
 }

@@ -14,30 +14,26 @@ import org.hamcrest.Matcher;
 import org.junit.internal.matchers.TypeSafeMatcher;
 
 
-public class HasRegex extends TypeSafeMatcher<String>
-{
-    private String regex;
+public class HasRegex extends TypeSafeMatcher<String> {
 
-    private HasRegex(String regex)
-    {
-        this.regex = regex;
-    }
+  private String regex;
 
-    @Factory
-    public static Matcher<String> hasRegex(String regex)
-    {
-        return new HasRegex(regex);
-    }
+  private HasRegex(String regex) {
+    this.regex = regex;
+  }
+
+  @Factory
+  public static Matcher<String> hasRegex(String regex) {
+    return new HasRegex(regex);
+  }
 
 
-    public boolean matchesSafely(String s)
-    {
-        return s.matches(regex);
-    }
+  public boolean matchesSafely(String s) {
+    return s.matches(regex);
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("matches the regex: " + regex);
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("matches the regex: " + regex);
+  }
 }

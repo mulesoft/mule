@@ -12,36 +12,31 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class HttpResponseReasonPhraseMatcher extends TypeSafeMatcher<HttpResponse>
-{
-    private String reasonPhrase;
+public class HttpResponseReasonPhraseMatcher extends TypeSafeMatcher<HttpResponse> {
 
-    public HttpResponseReasonPhraseMatcher(String reasonPhrase)
-    {
-        this.reasonPhrase = reasonPhrase;
-    }
+  private String reasonPhrase;
 
-    @Override
-    public boolean matchesSafely(HttpResponse response)
-    {
-        return reasonPhrase.equals(response.getStatusLine().getReasonPhrase());
-    }
+  public HttpResponseReasonPhraseMatcher(String reasonPhrase) {
+    this.reasonPhrase = reasonPhrase;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("a response with reason phrase ").appendValue(reasonPhrase);
-    }
+  @Override
+  public boolean matchesSafely(HttpResponse response) {
+    return reasonPhrase.equals(response.getStatusLine().getReasonPhrase());
+  }
 
-    @Override
-    protected void describeMismatchSafely(HttpResponse response, Description mismatchDescription)
-    {
-        mismatchDescription.appendText("got a response with reason phrase ").appendValue(response.getStatusLine().getReasonPhrase());
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("a response with reason phrase ").appendValue(reasonPhrase);
+  }
 
-    @Factory
-    public static Matcher<HttpResponse> hasReasonPhrase(String reasonPhrease)
-    {
-        return new HttpResponseReasonPhraseMatcher(reasonPhrease);
-    }
+  @Override
+  protected void describeMismatchSafely(HttpResponse response, Description mismatchDescription) {
+    mismatchDescription.appendText("got a response with reason phrase ").appendValue(response.getStatusLine().getReasonPhrase());
+  }
+
+  @Factory
+  public static Matcher<HttpResponse> hasReasonPhrase(String reasonPhrease) {
+    return new HttpResponseReasonPhraseMatcher(reasonPhrease);
+  }
 }

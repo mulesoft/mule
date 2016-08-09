@@ -22,64 +22,47 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JsonSchemaValidationFilterTestCase extends AbstractIntegrationTestCase
-{
+public class JsonSchemaValidationFilterTestCase extends AbstractIntegrationTestCase {
 
-    private static final String JSON_ACCEPT =
-            "{\n" +
-            "  \"homeTeam\": \"BAR\",\n" +
-            "  \"awayTeam\": \"RMA\",\n" +
-            "  \"homeTeamScore\": 3,\n" +
-            "  \"awayTeamScore\": 0\n" +
-            "}";
+  private static final String JSON_ACCEPT = "{\n" + "  \"homeTeam\": \"BAR\",\n" + "  \"awayTeam\": \"RMA\",\n"
+      + "  \"homeTeamScore\": 3,\n" + "  \"awayTeamScore\": 0\n" + "}";
 
-    private static final String JSON_REJECT =
-            "{\n" +
-            "  \"homeTeam\": \"BARCA\",\n" +
-            "  \"awayTeam\": \"RMA\",\n" +
-            "  \"homeTeamScore\": 3,\n" +
-            "  \"awayTeamScore\": 0\n" +
-            "}";
+  private static final String JSON_REJECT = "{\n" + "  \"homeTeam\": \"BARCA\",\n" + "  \"awayTeam\": \"RMA\",\n"
+      + "  \"homeTeamScore\": 3,\n" + "  \"awayTeamScore\": 0\n" + "}";
 
-    private static final String JSON_BROKEN =
-            "{\n" +
-            "  \"homeTeam\": BARCA\n" +
-            "}";
+  private static final String JSON_BROKEN = "{\n" + "  \"homeTeam\": BARCA\n" + "}";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "json-filter-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "json-filter-config.xml";
+  }
 
-    @Test
-    public void validSchema() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_ACCEPT), httpRequestOptions);
-        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
-        assertEquals("accepted", getPayloadAsString(message));
-    }
+  @Test
+  public void validSchema() throws Exception {
+    MuleClient client = muleContext.getClient();
+    final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
+    MuleMessage message =
+        client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_ACCEPT), httpRequestOptions);
+    assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+    assertEquals("accepted", getPayloadAsString(message));
+  }
 
-    @Test
-    public void invalidSchema() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_REJECT));
-        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
-        assertFalse("accepted".equals(getPayloadAsString(message)));
-    }
+  @Test
+  public void invalidSchema() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_REJECT));
+    assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+    assertFalse("accepted".equals(getPayloadAsString(message)));
+  }
 
-    @Test
-    public void brokenJson() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_BROKEN));
-        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
-        assertFalse("accepted".equals(getPayloadAsString(message)));
-    }
+  @Test
+  public void brokenJson() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_BROKEN));
+    assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+    assertFalse("accepted".equals(getPayloadAsString(message)));
+  }
 }

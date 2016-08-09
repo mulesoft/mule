@@ -18,45 +18,37 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ClientCredentialsTokenRequestTestCase extends AbstractOAuthAuthorizationTestCase
-{
+public class ClientCredentialsTokenRequestTestCase extends AbstractOAuthAuthorizationTestCase {
 
-    @Rule
-    public SystemProperty tokenUrl = new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
+  @Rule
+  public SystemProperty tokenUrl =
+      new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "client-credentials/client-credentials-token-request-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "client-credentials/client-credentials-token-request-config.xml";
+  }
 
-    @Override
-    public void doSetUpBeforeMuleContextCreation()
-    {
-        configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(ACCESS_TOKEN);
-        wireMockRule.stubFor(post(urlEqualTo("/resource"))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withBody(TEST_MESSAGE)
-                                                         .withStatus(200)));
-    }
+  @Override
+  public void doSetUpBeforeMuleContextCreation() {
+    configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(ACCESS_TOKEN);
+    wireMockRule.stubFor(post(urlEqualTo("/resource")).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
+        .willReturn(aResponse().withBody(TEST_MESSAGE).withStatus(200)));
+  }
 
 
-    @Test
-    public void sendCredentialsInBody() throws Exception
-    {
-        testFlowAndExpectCredentialsInBody("credentialsInBody", true);
-    }
+  @Test
+  public void sendCredentialsInBody() throws Exception {
+    testFlowAndExpectCredentialsInBody("credentialsInBody", true);
+  }
 
-    @Test
-    public void sendCredentialsInHeader() throws Exception
-    {
-        testFlowAndExpectCredentialsInBody("credentialsInHeader", false);
-    }
+  @Test
+  public void sendCredentialsInHeader() throws Exception {
+    testFlowAndExpectCredentialsInBody("credentialsInHeader", false);
+  }
 
-    private void testFlowAndExpectCredentialsInBody(String flowName, boolean credentialsInBody) throws Exception
-    {
-        flowRunner(flowName).withPayload(TEST_MESSAGE).run();
-        verifyRequestDoneToTokenUrlForClientCredentials(scopes.getValue(), credentialsInBody);
-    }
+  private void testFlowAndExpectCredentialsInBody(String flowName, boolean credentialsInBody) throws Exception {
+    flowRunner(flowName).withPayload(TEST_MESSAGE).run();
+    verifyRequestDoneToTokenUrlForClientCredentials(scopes.getValue(), credentialsInBody);
+  }
 }

@@ -43,219 +43,163 @@ import org.xml.sax.SAXException;
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
  */
 @Deprecated
-public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
-{
+public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaJsonValidationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaJsonValidationFilter.class);
 
-    private JsonSchema jsonSchema;
-    private String schemaLocations;
+  private JsonSchema jsonSchema;
+  private String schemaLocations;
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
-    }
+  @Override
+  public boolean accept(MuleMessage message) {
+    throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
+  }
 
-    @Override
-    public boolean accept(MuleEvent event)
-    {
-        JsonNode data;
-        Object input = event.getMessage().getPayload();
-        Object output = input;
+  @Override
+  public boolean accept(MuleEvent event) {
+    JsonNode data;
+    Object input = event.getMessage().getPayload();
+    Object output = input;
 
-        try
-        {
-            if (input instanceof String)
-            {
-                data = JsonLoader.fromString((String) input);
-            }
-            else if (input instanceof Reader)
-            {
-                data = JsonLoader.fromReader((Reader) input);
-                output = data.toString();
-            }
-            else if (input instanceof InputStream)
-            {
-                data = JsonLoader.fromReader(new InputStreamReader((InputStream) input));
-                output = data.toString();
-            }
-            else if (input instanceof byte[])
-            {
-                data = JsonLoader.fromReader(new InputStreamReader(new ByteArrayInputStream((byte[]) input)));
-            }
-            else if (input instanceof JsonNode)
-            {
-                data = (JsonNode) input;
-            }
-            else if (input instanceof JsonData)
-            {
-                JsonData jsonData = (JsonData) input;
-                data = JsonLoader.fromReader(new StringReader(jsonData.toString()));
-            }
-            else
-            {
-                LOGGER.warn("Payload type " + input.getClass().getName() + " is not supported");
-                return false;
-            }
-
-            event.setMessage(MuleMessage.builder(event.getMessage()).payload(output).build());
-            ProcessingReport report = jsonSchema.validate(data);
-
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug("JSON Schema validation report: " + report.toString());
-            }
-
-            return report.isSuccess();
-        }
-        catch (Exception e)
-        {
-            LOGGER.error("Unable to validate JSON!", e);
-            return false;
-        }
-    }
-
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            InputStream inputStream = IOUtils.getResourceAsStream(schemaLocations, getClass());
-            InputStreamReader reader = new InputStreamReader(inputStream);
-            // TODO https://github.com/fge/msg-simple/issues/1
-            // There is way currently to destroy threads created by this component
-            JsonNode jsonNode = JsonLoader.fromReader(reader);
-            JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
-            jsonSchema = schemaFactory.getJsonSchema(jsonNode);
-        }
-        catch (Exception e)
-        {
-            Message msg = MessageFactory.createStaticMessage("Unable to load or parse JSON Schema file at: " + schemaLocations);
-            throw new InitialisationException(msg, e, this);
-        }
-    }
-
-    @Override
-    public void setSchemaLocations(String schemaLocations)
-    {
-        this.schemaLocations = schemaLocations;
-    }
-
-    @Override
-    public String getSchemaLocations()
-    {
-        return schemaLocations;
-    }
-
-    @Override
-    public Validator createValidator() throws SAXException
-    {
-        return null;
-    }
-
-    @Override
-    public String getSchemaLanguage()
-    {
-        return null;
-    }
-
-    @Override
-    public void setSchemaLanguage(String schemaLanguage)
-    {
-    }
-
-    @Override
-    public Schema getSchemaObject()
-    {
-        return null;
-    }
-
-    @Override
-    public void setSchemaObject(Schema schemaObject)
-    {
-    }
-
-    @Override
-    public ErrorHandler getErrorHandler()
-    {
-        return null;
-    }
-
-    @Override
-    public void setErrorHandler(ErrorHandler errorHandler)
-    {
-    }
-
-    @Override
-    public LSResourceResolver getResourceResolver()
-    {
-        return null;
-    }
-
-    @Override
-    public void setResourceResolver(LSResourceResolver resourceResolver)
-    {
-    }
-
-    @Override
-    public Map<String, Boolean> getValidatorFeatures()
-    {
-        return null;
-    }
-
-    @Override
-    public void setValidatorFeatures(Map<String, Boolean> validatorFeatures)
-    {
-    }
-
-    @Override
-    public Map<String, Object> getValidatorProperties()
-    {
-        return null;
-    }
-
-    @Override
-    public void setValidatorProperties(Map<String, Object> validatorProperties)
-    {
-    }
-
-    @Override
-    public XMLInputFactory getXMLInputFactory()
-    {
-        return null;
-    }
-
-    @Override
-    public void setXMLInputFactory(XMLInputFactory xmlInputFactory)
-    {
-    }
-
-    @Override
-    public boolean isUseStaxSource()
-    {
+    try {
+      if (input instanceof String) {
+        data = JsonLoader.fromString((String) input);
+      } else if (input instanceof Reader) {
+        data = JsonLoader.fromReader((Reader) input);
+        output = data.toString();
+      } else if (input instanceof InputStream) {
+        data = JsonLoader.fromReader(new InputStreamReader((InputStream) input));
+        output = data.toString();
+      } else if (input instanceof byte[]) {
+        data = JsonLoader.fromReader(new InputStreamReader(new ByteArrayInputStream((byte[]) input)));
+      } else if (input instanceof JsonNode) {
+        data = (JsonNode) input;
+      } else if (input instanceof JsonData) {
+        JsonData jsonData = (JsonData) input;
+        data = JsonLoader.fromReader(new StringReader(jsonData.toString()));
+      } else {
+        LOGGER.warn("Payload type " + input.getClass().getName() + " is not supported");
         return false;
-    }
+      }
 
-    @Override
-    public void setUseStaxSource(boolean useStaxSource)
-    {
-    }
+      event.setMessage(MuleMessage.builder(event.getMessage()).payload(output).build());
+      ProcessingReport report = jsonSchema.validate(data);
 
-    @Override
-    public boolean isReturnResult()
-    {
-        return false;
-    }
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("JSON Schema validation report: " + report.toString());
+      }
 
-    @Override
-    public void setReturnResult(boolean returnResult)
-    {
+      return report.isSuccess();
+    } catch (Exception e) {
+      LOGGER.error("Unable to validate JSON!", e);
+      return false;
     }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {}
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      InputStream inputStream = IOUtils.getResourceAsStream(schemaLocations, getClass());
+      InputStreamReader reader = new InputStreamReader(inputStream);
+      // TODO https://github.com/fge/msg-simple/issues/1
+      // There is way currently to destroy threads created by this component
+      JsonNode jsonNode = JsonLoader.fromReader(reader);
+      JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
+      jsonSchema = schemaFactory.getJsonSchema(jsonNode);
+    } catch (Exception e) {
+      Message msg = MessageFactory.createStaticMessage("Unable to load or parse JSON Schema file at: " + schemaLocations);
+      throw new InitialisationException(msg, e, this);
+    }
+  }
+
+  @Override
+  public void setSchemaLocations(String schemaLocations) {
+    this.schemaLocations = schemaLocations;
+  }
+
+  @Override
+  public String getSchemaLocations() {
+    return schemaLocations;
+  }
+
+  @Override
+  public Validator createValidator() throws SAXException {
+    return null;
+  }
+
+  @Override
+  public String getSchemaLanguage() {
+    return null;
+  }
+
+  @Override
+  public void setSchemaLanguage(String schemaLanguage) {}
+
+  @Override
+  public Schema getSchemaObject() {
+    return null;
+  }
+
+  @Override
+  public void setSchemaObject(Schema schemaObject) {}
+
+  @Override
+  public ErrorHandler getErrorHandler() {
+    return null;
+  }
+
+  @Override
+  public void setErrorHandler(ErrorHandler errorHandler) {}
+
+  @Override
+  public LSResourceResolver getResourceResolver() {
+    return null;
+  }
+
+  @Override
+  public void setResourceResolver(LSResourceResolver resourceResolver) {}
+
+  @Override
+  public Map<String, Boolean> getValidatorFeatures() {
+    return null;
+  }
+
+  @Override
+  public void setValidatorFeatures(Map<String, Boolean> validatorFeatures) {}
+
+  @Override
+  public Map<String, Object> getValidatorProperties() {
+    return null;
+  }
+
+  @Override
+  public void setValidatorProperties(Map<String, Object> validatorProperties) {}
+
+  @Override
+  public XMLInputFactory getXMLInputFactory() {
+    return null;
+  }
+
+  @Override
+  public void setXMLInputFactory(XMLInputFactory xmlInputFactory) {}
+
+  @Override
+  public boolean isUseStaxSource() {
+    return false;
+  }
+
+  @Override
+  public void setUseStaxSource(boolean useStaxSource) {}
+
+  @Override
+  public boolean isReturnResult() {
+    return false;
+  }
+
+  @Override
+  public void setReturnResult(boolean returnResult) {}
 
 }

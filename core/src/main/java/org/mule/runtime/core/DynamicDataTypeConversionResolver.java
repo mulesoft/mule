@@ -19,49 +19,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Resolves data type conversion finding an appropriate converter that is able
- * to execute the required transformation. The lookup is executed dynamically
- * using the discovering of transformers using the application's
- * {@link MuleContext}
+ * Resolves data type conversion finding an appropriate converter that is able to execute the required transformation. The lookup
+ * is executed dynamically using the discovering of transformers using the application's {@link MuleContext}
  */
-public class DynamicDataTypeConversionResolver implements DataTypeConversionResolver
-{
+public class DynamicDataTypeConversionResolver implements DataTypeConversionResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(DynamicDataTypeConversionResolver.class);
+  private static final Logger logger = LoggerFactory.getLogger(DynamicDataTypeConversionResolver.class);
 
-    private final  MuleContext muleContext;
+  private final MuleContext muleContext;
 
-    @Inject
-    public DynamicDataTypeConversionResolver(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  @Inject
+  public DynamicDataTypeConversionResolver(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
-    @Override
-    public Transformer resolve(DataType sourceType, List<DataType> targetDataTypes)
-    {
-        Transformer transformer = null;
+  @Override
+  public Transformer resolve(DataType sourceType, List<DataType> targetDataTypes) {
+    Transformer transformer = null;
 
-        for (DataType targetDataType : targetDataTypes)
-        {
-            try
-            {
-                transformer = muleContext.getRegistry().lookupTransformer(sourceType, targetDataType);
+    for (DataType targetDataType : targetDataTypes) {
+      try {
+        transformer = muleContext.getRegistry().lookupTransformer(sourceType, targetDataType);
 
-                if (transformer != null)
-                {
-                    break;
-                }
-            }
-            catch (TransformerException e)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Unable to find an implicit conversion from " + sourceType + " to " + targetDataType);
-                }
-            }
+        if (transformer != null) {
+          break;
         }
-
-        return transformer;
+      } catch (TransformerException e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Unable to find an implicit conversion from " + sourceType + " to " + targetDataType);
+        }
+      }
     }
+
+    return transformer;
+  }
 }

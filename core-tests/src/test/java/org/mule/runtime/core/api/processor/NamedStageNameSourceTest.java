@@ -20,51 +20,44 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 @SmallTest
-public class NamedStageNameSourceTest
-{
+public class NamedStageNameSourceTest {
 
-    private static final String OWNER = "owner";
-    private static final String NAME = "name";
+  private static final String OWNER = "owner";
+  private static final String NAME = "name";
 
-    @Test
-    public void getName()
-    {
-        final int count = 10;
-        StageNameSource source = new NamedStageNameSource(OWNER, NAME);
+  @Test
+  public void getName() {
+    final int count = 10;
+    StageNameSource source = new NamedStageNameSource(OWNER, NAME);
 
-        for (int i = 0; i < count; i++)
-        {
-            assertEquals(String.format("%s.%s", OWNER, NAME), source.getName());
+    for (int i = 0; i < count; i++) {
+      assertEquals(String.format("%s.%s", OWNER, NAME), source.getName());
+    }
+  }
+
+  /**
+   * This test verifies that if invoked concurrently, the same {@link org.mule.runtime.api.processor.NamedStageNameSource} doesn't
+   * break and consistently generates the same name
+   */
+  @Test
+  public void threadSafe() throws Exception {
+    final int count = 10;
+    final StageNameSource source = new NamedStageNameSource(OWNER, NAME);
+    final Set<String> names = Collections.synchronizedSet(new HashSet<String>());
+    final CountDownLatch latch = new CountDownLatch(count);
+
+    for (int i = 0; i < count; i++) {
+      new Thread() {
+
+        @Override
+        public void run() {
+          names.add(source.getName());
+          latch.countDown();
         }
+      }.start();
     }
 
-    /**
-     * This test verifies that if invoked concurrently,
-     * the same {@link org.mule.runtime.api.processor.NamedStageNameSource}
-     * doesn't break and consistently generates the same name
-     */
-    @Test
-    public void threadSafe() throws Exception
-    {
-        final int count = 10;
-        final StageNameSource source = new NamedStageNameSource(OWNER, NAME);
-        final Set<String> names = Collections.synchronizedSet(new HashSet<String>());
-        final CountDownLatch latch = new CountDownLatch(count);
-
-        for (int i = 0; i < count; i++)
-        {
-            new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    names.add(source.getName());
-                    latch.countDown();
-                }
-            }.start();
-        }
-
-        assertTrue(latch.await(5, TimeUnit.SECONDS));
-        assertEquals(1, names.size());
-    }
+    assertTrue(latch.await(5, TimeUnit.SECONDS));
+    assertEquals(1, names.size());
+  }
 }

@@ -15,9 +15,8 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 
 /**
- * This transformer will evaluate one or more expressions on the current message and return the
- * results as an Array. If only one expression is defined it will return the object returned from
- * the expression.
+ * This transformer will evaluate one or more expressions on the current message and return the results as an Array. If only one
+ * expression is defined it will return the object returned from the expression.
  * <p/>
  * You can use expressions to extract
  * <ul>
@@ -30,70 +29,55 @@ import java.util.Iterator;
  * </ul>
  * and more.
  * <p/>
- * This transformer provides a very powerful way to pull different bits of information from the
- * message and pass them to the service.
+ * This transformer provides a very powerful way to pull different bits of information from the message and pass them to the
+ * service.
  */
-public class ExpressionTransformer extends AbstractExpressionTransformer
-{
-    private boolean returnSourceIfNull = false;
+public class ExpressionTransformer extends AbstractExpressionTransformer {
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Object results[] = new Object[arguments.size()];
-        int i = 0;
-        for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext(); i++)
-        {
-            ExpressionArgument argument = iterator.next();
-            try
-            {
-                results[i] = argument.evaluate(event);
-            }
-            catch (ExpressionRuntimeException e)
-            {
-                throw new TransformerException(this, e);
-            }
+  private boolean returnSourceIfNull = false;
 
-            if (!argument.isOptional() && results[i] == null)
-            {
-                throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
-            }
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Object results[] = new Object[arguments.size()];
+    int i = 0;
+    for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext(); i++) {
+      ExpressionArgument argument = iterator.next();
+      try {
+        results[i] = argument.evaluate(event);
+      } catch (ExpressionRuntimeException e) {
+        throw new TransformerException(this, e);
+      }
 
-        }
-        if (isReturnSourceIfNull() && checkIfAllAreNull(results))
-        {
-            return event.getMessage();
-        }
+      if (!argument.isOptional() && results[i] == null) {
+        throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
+      }
 
-        if (results.length == 1)
-        {
-            return results[0];
-        }
-        else
-        {
-            return results;
-        }
+    }
+    if (isReturnSourceIfNull() && checkIfAllAreNull(results)) {
+      return event.getMessage();
     }
 
-    private boolean checkIfAllAreNull(Object[] objects)
-    {
-        for (Object object : objects)
-        {
-            if (object != null)
-            {
-                return false;
-            }
-        }
-        return true;
+    if (results.length == 1) {
+      return results[0];
+    } else {
+      return results;
     }
+  }
 
-    public boolean isReturnSourceIfNull()
-    {
-        return returnSourceIfNull;
+  private boolean checkIfAllAreNull(Object[] objects) {
+    for (Object object : objects) {
+      if (object != null) {
+        return false;
+      }
     }
+    return true;
+  }
 
-    public void setReturnSourceIfNull(boolean returnSourceIfNull)
-    {
-        this.returnSourceIfNull = returnSourceIfNull;
-    }
+  public boolean isReturnSourceIfNull() {
+    return returnSourceIfNull;
+  }
+
+  public void setReturnSourceIfNull(boolean returnSourceIfNull) {
+    this.returnSourceIfNull = returnSourceIfNull;
+  }
 }

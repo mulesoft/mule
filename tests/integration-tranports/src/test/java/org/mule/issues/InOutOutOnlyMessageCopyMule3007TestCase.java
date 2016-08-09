@@ -17,23 +17,21 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    @Test
-    public void testStreamMessage() throws MuleException
-    {
-        MuleClient client = muleContext.getClient();
-        String url = String.format("http://localhost:%1d/services", port1.getNumber());
-        MuleMessage response = client.send(url, "test", null);
-        assertNull(response.getExceptionPayload());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml";
+  }
+
+  @Test
+  public void testStreamMessage() throws MuleException {
+    MuleClient client = muleContext.getClient();
+    String url = String.format("http://localhost:%1d/services", port1.getNumber());
+    MuleMessage response = client.send(url, "test", null);
+    assertNull(response.getExceptionPayload());
+  }
 }

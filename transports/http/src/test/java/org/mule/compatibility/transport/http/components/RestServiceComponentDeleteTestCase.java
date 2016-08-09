@@ -23,48 +23,43 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
-{
-    private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
-    private boolean deleteRequestFound = false;
+public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
+  private boolean deleteRequestFound = false;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "rest-service-component-delete-test-flow.xml";
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "rest-service-component-delete-test-flow.xml";
+  }
+
+  @Override
+  protected MockHttpServer getHttpServer() {
+    return new SimpleHttpServer(dynamicPort.getNumber());
+  }
+
+  @Test
+  public void testRestServiceComponentDelete() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.send("vm://fromTest", TEST_MESSAGE, null);
+
+    assertTrue(serverRequestCompleteLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(deleteRequestFound);
+  }
+
+  private class SimpleHttpServer extends SingleRequestMockHttpServer {
+
+    public SimpleHttpServer(int listenPort) {
+      super(listenPort, getDefaultEncoding(muleContext));
     }
 
     @Override
-    protected MockHttpServer getHttpServer()
-    {
-        return new SimpleHttpServer(dynamicPort.getNumber());
+    protected void processSingleRequest(HttpRequest httpRequest) throws Exception {
+      deleteRequestFound = httpRequest.getRequestLine().getMethod().equals(HttpConstants.METHOD_DELETE);
+      serverRequestCompleteLatch.countDown();
     }
-
-    @Test
-    public void testRestServiceComponentDelete() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.send("vm://fromTest", TEST_MESSAGE, null);
-
-        assertTrue(serverRequestCompleteLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertTrue(deleteRequestFound);
-    }
-
-    private class SimpleHttpServer extends SingleRequestMockHttpServer
-    {
-        public SimpleHttpServer(int listenPort)
-        {
-            super(listenPort, getDefaultEncoding(muleContext));
-        }
-
-        @Override
-        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
-        {
-            deleteRequestFound = httpRequest.getRequestLine().getMethod().equals(HttpConstants.METHOD_DELETE);
-            serverRequestCompleteLatch.countDown();
-        }
-    }
+  }
 }

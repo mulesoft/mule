@@ -8,12 +8,11 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.AuthenticationNamespaceHandlerFlowTestCase;
 
-public class SSAuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerFlowTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "spring-security/authentication-config-flow.xml";
-    }
- 
+public class SSAuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerFlowTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "spring-security/authentication-config-flow.xml";
+  }
+
 }

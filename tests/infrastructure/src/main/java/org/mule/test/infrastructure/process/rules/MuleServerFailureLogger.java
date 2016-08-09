@@ -20,49 +20,44 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *  This rules logs Mule server logs content in case of a test failure.
+ * This rules logs Mule server logs content in case of a test failure.
  * <p>
+ * 
  * <pre>
  * public class MuleServerTestCase {
  *
- *  protected MuleInstallation installation = new MuleInstallation(getProperty("distribution"));
- *  &#064;Rule
- *  public TestRule chain = outerRule(installation).around(new MuleServerFailureLogger(installation));
+ *   protected MuleInstallation installation = new MuleInstallation(getProperty("distribution"));
+ *   &#064;Rule
+ *   public TestRule chain = outerRule(installation).around(new MuleServerFailureLogger(installation));
  *
- *  &#064;Test
- *  public void testMuleServer() throws IOException {
- *      // Start Mule
- *      // This code exercises Mule server
- *  }
+ *   &#064;Test
+ *   public void testMuleServer() throws IOException {
+ *     // Start Mule
+ *     // This code exercises Mule server
+ *   }
  * }
  * </pre>
-
  *
+ * 
  */
-public class MuleServerFailureLogger extends TestWatcher
-{
+public class MuleServerFailureLogger extends TestWatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MuleServerFailureLogger.class);
-    private final MuleInstallation installation;
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleServerFailureLogger.class);
+  private final MuleInstallation installation;
 
-    public MuleServerFailureLogger(MuleInstallation installation)
-    {
-        this.installation = installation;
+  public MuleServerFailureLogger(MuleInstallation installation) {
+    this.installation = installation;
+  }
+
+  @Override
+  protected void failed(Throwable e, Description description) {
+    String serverLog = new MuleProcessController(installation.getMuleHome()).getLog().getAbsolutePath();
+    try (Stream<String> stream = Files.lines(Paths.get(serverLog))) {
+      LOGGER.error("====================== Server log ===============================");
+      stream.forEach(LOGGER::error);
+      LOGGER.error("=================================================================");
+    } catch (IOException e1) {
+      LOGGER.error("Failed to log server log");
     }
-
-    @Override
-    protected void failed(Throwable e, Description description)
-    {
-        String serverLog = new MuleProcessController(installation.getMuleHome()).getLog().getAbsolutePath();
-        try (Stream<String> stream = Files.lines(Paths.get(serverLog)))
-        {
-            LOGGER.error("====================== Server log ===============================");
-            stream.forEach(LOGGER::error);
-            LOGGER.error("=================================================================");
-        }
-        catch (IOException e1)
-        {
-            LOGGER.error("Failed to log server log");
-        }
-    }
+  }
 }

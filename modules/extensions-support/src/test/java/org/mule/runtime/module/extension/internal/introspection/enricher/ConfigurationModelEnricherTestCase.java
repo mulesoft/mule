@@ -27,39 +27,36 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ConfigurationModelEnricherTestCase
-{
+public class ConfigurationModelEnricherTestCase {
 
-    private static final String GET_ENEMY = "getEnemy";
-    private static final String LISTEN_PAYMENTS = "ListenPayments";
-    private ExtensionDeclaration declaration = null;
-    private ClassTypeLoader typeLoader;
+  private static final String GET_ENEMY = "getEnemy";
+  private static final String LISTEN_PAYMENTS = "ListenPayments";
+  private ExtensionDeclaration declaration = null;
+  private ClassTypeLoader typeLoader;
 
-    @Before
-    public void setUp()
-    {
-        final AnnotationsBasedDescriber basedDescriber = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
-        ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
-        new ConfigurationModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
-        declaration = declarer.getDeclaration();
-        typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(HeisenbergExtension.class.getClassLoader());
-    }
+  @Before
+  public void setUp() {
+    final AnnotationsBasedDescriber basedDescriber =
+        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
+    ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
+    new ConfigurationModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
+    declaration = declarer.getDeclaration();
+    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(HeisenbergExtension.class.getClassLoader());
+  }
 
-    @Test
-    public void verifyConfigurationModelPropertyOnOperation()
-    {
-        OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), GET_ENEMY);
-        final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(operationDeclaration, ConfigTypeModelProperty.class);
+  @Test
+  public void verifyConfigurationModelPropertyOnOperation() {
+    OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), GET_ENEMY);
+    final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(operationDeclaration, ConfigTypeModelProperty.class);
 
-        assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
-    }
+    assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
+  }
 
-    @Test
-    public void verifyConfigurationModelPropertyOnSource()
-    {
-        SourceDeclaration sourceDeclaration = getDeclaration(declaration.getMessageSources(), LISTEN_PAYMENTS);
-        final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(sourceDeclaration, ConfigTypeModelProperty.class);
+  @Test
+  public void verifyConfigurationModelPropertyOnSource() {
+    SourceDeclaration sourceDeclaration = getDeclaration(declaration.getMessageSources(), LISTEN_PAYMENTS);
+    final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(sourceDeclaration, ConfigTypeModelProperty.class);
 
-        assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
-    }
+    assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
+  }
 }

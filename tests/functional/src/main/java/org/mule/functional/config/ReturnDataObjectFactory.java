@@ -18,36 +18,29 @@ import org.springframework.beans.factory.BeanCreationException;
  *
  * @since 4.0
  */
-public class ReturnDataObjectFactory implements ObjectFactory<Object>
-{
-    private String file;
-    private String content;
+public class ReturnDataObjectFactory implements ObjectFactory<Object> {
 
-    public void setFile(String file)
-    {
-        this.file = file;
-    }
+  private String file;
+  private String content;
 
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
+  public void setFile(String file) {
+    this.file = file;
+  }
 
-    @Override
-    public Object getObject() throws Exception
-    {
-        String returnData = content;
-        if (file != null)
-        {
-            try
-            {
-                returnData = getResourceAsString(file, getClass());
-            }
-            catch (IOException e)
-            {
-                throw new BeanCreationException("Failed to load test-data resource: " + file, e);
-            }
-        }
-        return returnData;
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  @Override
+  public Object getObject() throws Exception {
+    String returnData = content;
+    if (file != null) {
+      try {
+        returnData = getResourceAsString(file, getClass());
+      } catch (IOException e) {
+        throw new BeanCreationException("Failed to load test-data resource: " + file, e);
+      }
     }
+    return returnData;
+  }
 }

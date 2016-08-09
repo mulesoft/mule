@@ -11,7 +11,7 @@ package org.mule.runtime.module.launcher.util;
 */
 public class ElementAddedEvent extends ElementEvent {
 
-    public ElementAddedEvent(Object source, Object newValue, int index) {
-        super(source, null, newValue, index, ElementEvent.ADDED);
-    }
+  public ElementAddedEvent(Object source, Object newValue, int index) {
+    super(source, null, newValue, index, ElementEvent.ADDED);
+  }
 }

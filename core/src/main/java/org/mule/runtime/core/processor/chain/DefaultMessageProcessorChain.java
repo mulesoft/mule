@@ -17,54 +17,47 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
-{
-    protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate();
+public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
-    protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
-    {
-        super(null, processors);
-    }
+  protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate =
+      MessageProcessorExecutionTemplate.createExecutionTemplate();
 
-    protected DefaultMessageProcessorChain(MessageProcessor... processors)
-    {
-        super(null, new ArrayList(Arrays.asList(processors)));
-    }
+  protected DefaultMessageProcessorChain(List<MessageProcessor> processors) {
+    super(null, processors);
+  }
 
-    protected DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
-    {
-        super(name, processors);
-    }
+  protected DefaultMessageProcessorChain(MessageProcessor... processors) {
+    super(null, new ArrayList(Arrays.asList(processors)));
+  }
 
-    protected DefaultMessageProcessorChain(String name, MessageProcessor... processors)
-    {
-        super(name, Arrays.asList(processors));
-    }
+  protected DefaultMessageProcessorChain(String name, List<MessageProcessor> processors) {
+    super(name, processors);
+  }
 
-    public static MessageProcessorChain from(MessageProcessor messageProcessor)
-    {
-        return new DefaultMessageProcessorChain(messageProcessor);
-    }
+  protected DefaultMessageProcessorChain(String name, MessageProcessor... processors) {
+    super(name, Arrays.asList(processors));
+  }
 
-    public static MessageProcessorChain from(MessageProcessor... messageProcessors) throws MuleException
-    {
-        return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
-    }
+  public static MessageProcessorChain from(MessageProcessor messageProcessor) {
+    return new DefaultMessageProcessorChain(messageProcessor);
+  }
 
-    public static MessageProcessorChain from(List<MessageProcessor> messageProcessors) throws MuleException
-    {
-        return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
-    }
+  public static MessageProcessorChain from(MessageProcessor... messageProcessors) throws MuleException {
+    return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+  }
 
-    @Override
-    protected MuleEvent doProcess(MuleEvent event) throws MuleException
-    {
-        return new ProcessorExecutorFactory().createProcessorExecutor(event, processors, messageProcessorExecutionTemplate, true).execute();
-    }
+  public static MessageProcessorChain from(List<MessageProcessor> messageProcessors) throws MuleException {
+    return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-    }
+  @Override
+  protected MuleEvent doProcess(MuleEvent event) throws MuleException {
+    return new ProcessorExecutorFactory().createProcessorExecutor(event, processors, messageProcessorExecutionTemplate, true)
+        .execute();
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+  }
 }

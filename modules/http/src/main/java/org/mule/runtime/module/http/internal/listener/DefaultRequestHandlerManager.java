@@ -6,33 +6,29 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-public class DefaultRequestHandlerManager implements RequestHandlerManager
-{
+public class DefaultRequestHandlerManager implements RequestHandlerManager {
 
-    private final HttpListenerRegistry.PathMap requestHandlerOwner;
-    private final HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair;
+  private final HttpListenerRegistry.PathMap requestHandlerOwner;
+  private final HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair;
 
-    public DefaultRequestHandlerManager(HttpListenerRegistry.PathMap requestHandlerOwner, HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair)
-    {
-        this.requestHandlerOwner = requestHandlerOwner;
-        this.requestHandlerMatcherPair = requestHandlerMatcherPair;
-    }
+  public DefaultRequestHandlerManager(HttpListenerRegistry.PathMap requestHandlerOwner,
+                                      HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair) {
+    this.requestHandlerOwner = requestHandlerOwner;
+    this.requestHandlerMatcherPair = requestHandlerMatcherPair;
+  }
 
-    @Override
-    public void stop()
-    {
-        requestHandlerMatcherPair.setIsRunning(false);
-    }
+  @Override
+  public void stop() {
+    requestHandlerMatcherPair.setIsRunning(false);
+  }
 
-    @Override
-    public void start()
-    {
-        requestHandlerMatcherPair.setIsRunning(true);
-    }
+  @Override
+  public void start() {
+    requestHandlerMatcherPair.setIsRunning(true);
+  }
 
-    @Override
-    public void dispose()
-    {
-        requestHandlerOwner.removeRequestHandlerMatcherPair(requestHandlerMatcherPair);
-    }
+  @Override
+  public void dispose() {
+    requestHandlerOwner.removeRequestHandlerMatcherPair(requestHandlerMatcherPair);
+  }
 }

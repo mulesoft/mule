@@ -28,94 +28,88 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Rule;
 
-public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends AbstractOAuthAuthorizationTestCase
-{
+public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends AbstractOAuthAuthorizationTestCase {
 
-    private static final String RESOURCE_PATH = "/resource";
-    public static final String RESOURCE_RESULT = "resource result";
-    public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
+  private static final String RESOURCE_PATH = "/resource";
+  public static final String RESOURCE_RESULT = "resource result";
+  public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
 
-    @Rule
-    public SystemProperty localAuthorizationUrl = new SystemProperty("local.authorization.url", String.format("http://localhost:%d/authorization", localHostPort.getNumber()));
-    @Rule
-    public SystemProperty authorizationUrl = new SystemProperty("authorization.url", String.format("http://localhost:%d" + AUTHORIZE_PATH, oauthServerPort.getNumber()));
-    @Rule
-    public SystemProperty redirectUrl = new SystemProperty("redirect.url", String.format("http://localhost:%d/redirect", localHostPort.getNumber()));
-    @Rule
-    public SystemProperty tokenUrl = new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
-    @Rule
-    public SystemProperty tokenHost = new SystemProperty("token.host", String.format("localhost"));
-    @Rule
-    public SystemProperty tokenPort = new SystemProperty("token.port", String.valueOf(oauthServerPort.getNumber()));
-    @Rule
-    public SystemProperty tokenPath = new SystemProperty("token.path", TOKEN_PATH);
+  @Rule
+  public SystemProperty localAuthorizationUrl =
+      new SystemProperty("local.authorization.url",
+                         String.format("http://localhost:%d/authorization", localHostPort.getNumber()));
+  @Rule
+  public SystemProperty authorizationUrl =
+      new SystemProperty("authorization.url", String.format("http://localhost:%d" + AUTHORIZE_PATH, oauthServerPort.getNumber()));
+  @Rule
+  public SystemProperty redirectUrl =
+      new SystemProperty("redirect.url", String.format("http://localhost:%d/redirect", localHostPort.getNumber()));
+  @Rule
+  public SystemProperty tokenUrl =
+      new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
+  @Rule
+  public SystemProperty tokenHost = new SystemProperty("token.host", String.format("localhost"));
+  @Rule
+  public SystemProperty tokenPort = new SystemProperty("token.port", String.valueOf(oauthServerPort.getNumber()));
+  @Rule
+  public SystemProperty tokenPath = new SystemProperty("token.path", TOKEN_PATH);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "authorization-code/authorization-code-refresh-token-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "authorization-code/authorization-code-refresh-token-config.xml";
+  }
 
-    protected void executeRefreshToken(String flowName, String oauthConfigName, String userId, int failureStatusCode) throws Exception
-    {
-        configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
+  protected void executeRefreshToken(String flowName, String oauthConfigName, String userId, int failureStatusCode)
+      throws Exception {
+    configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
 
-        final MuleEvent result = flowRunner(flowName).withPayload("message")
-                .withFlowVariable("userId", userId)
-                .run();
-        assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
+    final MuleEvent result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+    assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
-        wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "=" + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
-    }
+    wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
+        .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "="
+            + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
+        .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "="
+            + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
+        .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "="
+            + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
+        .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
+            + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
+  }
 
-    protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName, String userId, int resourceFailureStatusCode, int tokenFailureStatusCode) throws Exception
-    {
-        configureResourceResponsesForRefreshToken(oauthConfigName, userId, resourceFailureStatusCode);
+  protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName,
+                                                                                     String userId, int resourceFailureStatusCode,
+                                                                                     int tokenFailureStatusCode)
+      throws Exception {
+    configureResourceResponsesForRefreshToken(oauthConfigName, userId, resourceFailureStatusCode);
 
-        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION,
-                                                 containing(REFRESHED_ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withStatus(tokenFailureStatusCode)
-                                                         .withBody("")));
-        runFlow(flowName, userId);
-    }
+    wireMockRule
+        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
+            .willReturn(aResponse().withStatus(tokenFailureStatusCode).withBody("")));
+    runFlow(flowName, userId);
+  }
 
-    private MuleEvent runFlow(String flowName, String userId) throws Exception
-    {
-        final MuleEvent result = flowRunner(flowName).withPayload("message")
-                .withFlowVariable("userId", userId)
-                .run();
-        return result;
-    }
+  private MuleEvent runFlow(String flowName, String userId) throws Exception {
+    final MuleEvent result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+    return result;
+  }
 
-    private void configureResourceResponsesForRefreshToken(String oauthConfigName, String userId, int failureStatusCode)
-    {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN);
+  private void configureResourceResponsesForRefreshToken(String oauthConfigName, String userId, int failureStatusCode) {
+    configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN);
 
-        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION,
-                                                 containing(REFRESHED_ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withStatus(200)
-                                                         .withBody(RESOURCE_RESULT)));
-        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
-                                     .withHeader(HttpHeaders.Names.AUTHORIZATION,
-                                                 containing(ACCESS_TOKEN))
-                                     .willReturn(aResponse()
-                                                         .withStatus(failureStatusCode)
-                                                         .withBody("")));
+    wireMockRule
+        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
+            .willReturn(aResponse().withStatus(200).withBody(RESOURCE_RESULT)));
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
+        .willReturn(aResponse().withStatus(failureStatusCode).withBody("")));
 
-        final ConfigOAuthContext configOAuthContext = muleContext.getRegistry().<TokenManagerConfig>lookupObject(oauthConfigName).getConfigOAuthContext();
-        final ResourceOwnerOAuthContext resourceOwnerOauthContext = configOAuthContext.getContextForResourceOwner(userId);
-        resourceOwnerOauthContext.setAccessToken(ACCESS_TOKEN);
-        resourceOwnerOauthContext.setRefreshToken(REFRESH_TOKEN);
-        configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
-    }
+    final ConfigOAuthContext configOAuthContext =
+        muleContext.getRegistry().<TokenManagerConfig>lookupObject(oauthConfigName).getConfigOAuthContext();
+    final ResourceOwnerOAuthContext resourceOwnerOauthContext = configOAuthContext.getContextForResourceOwner(userId);
+    resourceOwnerOauthContext.setAccessToken(ACCESS_TOKEN);
+    resourceOwnerOauthContext.setRefreshToken(REFRESH_TOKEN);
+    configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
+  }
 
 }
 

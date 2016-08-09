@@ -13,12 +13,12 @@ import java.util.List;
 /**
  * Composes multiple {@link MessageSource}s.
  */
-public interface CompositeMessageSource extends MessageSource
-{
-    void addSource(MessageSource messageSource) throws MuleException;
+public interface CompositeMessageSource extends MessageSource {
 
-    void removeSource(MessageSource messageSource) throws MuleException;
+  void addSource(MessageSource messageSource) throws MuleException;
 
-    List<MessageSource> getSources();
+  void removeSource(MessageSource messageSource) throws MuleException;
+
+  List<MessageSource> getSources();
 
 }

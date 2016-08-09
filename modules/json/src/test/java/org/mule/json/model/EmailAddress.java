@@ -12,28 +12,24 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
  * An Email object
  */
 @JsonSerialize
-public class EmailAddress
-{
-    private String type;
-    private String address;
+public class EmailAddress {
 
-    public String getType()
-    {
-        return type;
-    }
+  private String type;
+  private String address;
 
-    public void setType(String type)
-    {
-        this.type = type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getAddress()
-    {
-        return address;
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
 
-    public void setAddress(String address)
-    {
-        this.address = address;
-    }
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
 }

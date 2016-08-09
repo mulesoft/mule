@@ -8,54 +8,46 @@ package org.mule.test.integration.transaction.extras;
 
 import java.io.Serializable;
 
-public class Book implements Serializable
-{
-    private static final long serialVersionUID = -2519185601486498262L;
+public class Book implements Serializable {
 
-    int serialNo;
-    String title;
-    String author;
+  private static final long serialVersionUID = -2519185601486498262L;
 
-    public Book()
-    {
-        // empty constructor
-    }
+  int serialNo;
+  String title;
+  String author;
 
-    public Book(int serialNo, String title, String author)
-    {
-        super();
-        this.serialNo = serialNo;
-        this.title = title;
-        this.author = author;
-    }
+  public Book() {
+    // empty constructor
+  }
 
-    public String getAuthor()
-    {
-        return author;
-    }
+  public Book(int serialNo, String title, String author) {
+    super();
+    this.serialNo = serialNo;
+    this.title = title;
+    this.author = author;
+  }
 
-    public void setAuthor(String author)
-    {
-        this.author = author;
-    }
+  public String getAuthor() {
+    return author;
+  }
 
-    public int getSerialNo()
-    {
-        return serialNo;
-    }
+  public void setAuthor(String author) {
+    this.author = author;
+  }
 
-    public void setSerialNo(int serialNo)
-    {
-        this.serialNo = serialNo;
-    }
+  public int getSerialNo() {
+    return serialNo;
+  }
 
-    public String getTitle()
-    {
-        return title;
-    }
+  public void setSerialNo(int serialNo) {
+    this.serialNo = serialNo;
+  }
 
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
 }

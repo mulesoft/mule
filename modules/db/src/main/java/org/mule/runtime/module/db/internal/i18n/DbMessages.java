@@ -10,15 +10,13 @@ package org.mule.runtime.module.db.internal.i18n;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class DbMessages extends MessageFactory
-{
+public class DbMessages extends MessageFactory {
 
-    private static final DbMessages factory = new DbMessages();
+  private static final DbMessages factory = new DbMessages();
 
-    private static final String BUNDLE_PATH = getBundlePath("db");
+  private static final String BUNDLE_PATH = getBundlePath("db");
 
-    public static Message transactionSetAutoCommitFailed()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  public static Message transactionSetAutoCommitFailed() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
 }

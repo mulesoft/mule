@@ -9,19 +9,18 @@ package org.mule.runtime.core.util.queue;
 /**
  * Provides access to a certain queue.
  */
-public interface QueueProvider
-{
+public interface QueueProvider {
 
-    /**
-     * @param queueName queue name
-     * @return the queue store related to the queue with queueName
-     */
-    QueueStore getQueue(String queueName);
+  /**
+   * @param queueName queue name
+   * @return the queue store related to the queue with queueName
+   */
+  QueueStore getQueue(String queueName);
 
-    /**
-     * @param queueName queue name
-     * @return a recovery queue store for the queue with queueName
-     */
-    RecoverableQueueStore getRecoveryQueue(String queueName);
+  /**
+   * @param queueName queue name
+   * @return a recovery queue store for the queue with queueName
+   */
+  RecoverableQueueStore getRecoveryQueue(String queueName);
 
 }

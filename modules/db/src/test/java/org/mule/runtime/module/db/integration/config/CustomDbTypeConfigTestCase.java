@@ -26,56 +26,47 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class CustomDbTypeConfigTestCase extends AbstractDbIntegrationTestCase
-{
+public class CustomDbTypeConfigTestCase extends AbstractDbIntegrationTestCase {
 
-    public static final String CUSTOM_TYPE_NAME1 = "CUSTOM_TYPE1";
-    public static final int CUSTOM_TYPE_ID1 = 3001;
-    public static final String CUSTOM_TYPE_NAME2 = "CUSTOM_TYPE2";
-    public static final int CUSTOM_TYPE_ID2 = 3002;
+  public static final String CUSTOM_TYPE_NAME1 = "CUSTOM_TYPE1";
+  public static final int CUSTOM_TYPE_ID1 = 3001;
+  public static final String CUSTOM_TYPE_NAME2 = "CUSTOM_TYPE2";
+  public static final int CUSTOM_TYPE_ID2 = 3002;
 
-    public CustomDbTypeConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public CustomDbTypeConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return Collections.singletonList(new Object[] {"integration/config/custom-type-db-config.xml", new DerbyTestDatabase()});
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[0];
+  }
+
+  @Test
+  public void resolvesCustomDbTypes() throws Exception {
+    DbConfigResolver dbConfigResolver = muleContext.getRegistry().lookupObject("dbConfig");
+    GenericDbConfig dbConfig = (GenericDbConfig) dbConfigResolver.resolve(null);
+    DbTypeManager dbTypeManager = dbConfig.getDbTypeManager();
+    DbConnectionFactory connectionFactory = dbConfig.getConnectionFactory();
+    DbConnection connection = connectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED);
+
+    try {
+      assertResolvesType(connection, dbTypeManager, CUSTOM_TYPE_NAME1, CUSTOM_TYPE_ID1);
+      assertResolvesType(connection, dbTypeManager, CUSTOM_TYPE_NAME2, CUSTOM_TYPE_ID2);
+    } finally {
+      connectionFactory.releaseConnection(connection);
     }
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return Collections.singletonList(new Object[] {"integration/config/custom-type-db-config.xml", new DerbyTestDatabase()});
-    }
+  protected void assertResolvesType(DbConnection connection, DbTypeManager dbTypeManager, String name, int id) {
+    DbType cursor = dbTypeManager.lookup(connection, name);
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[0];
-    }
-
-    @Test
-    public void resolvesCustomDbTypes() throws Exception
-    {
-        DbConfigResolver dbConfigResolver  = muleContext.getRegistry().lookupObject("dbConfig");
-        GenericDbConfig dbConfig = (GenericDbConfig) dbConfigResolver.resolve(null);
-        DbTypeManager dbTypeManager = dbConfig.getDbTypeManager();
-        DbConnectionFactory connectionFactory = dbConfig.getConnectionFactory();
-        DbConnection connection = connectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED);
-
-        try
-        {
-            assertResolvesType(connection, dbTypeManager, CUSTOM_TYPE_NAME1, CUSTOM_TYPE_ID1);
-            assertResolvesType(connection, dbTypeManager, CUSTOM_TYPE_NAME2, CUSTOM_TYPE_ID2);
-        }
-        finally
-        {
-            connectionFactory.releaseConnection(connection);
-        }
-    }
-
-    protected void assertResolvesType(DbConnection connection, DbTypeManager dbTypeManager, String name, int id)
-    {
-        DbType cursor = dbTypeManager.lookup(connection, name);
-
-        assertThat(name, equalTo(cursor.getName()));
-        assertThat(id, equalTo(cursor.getId()));
-    }
+    assertThat(name, equalTo(cursor.getName()));
+    assertThat(id, equalTo(cursor.getId()));
+  }
 }

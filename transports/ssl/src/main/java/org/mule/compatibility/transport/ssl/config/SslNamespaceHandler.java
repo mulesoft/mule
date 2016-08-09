@@ -17,18 +17,16 @@ import org.mule.runtime.config.spring.parsers.specific.tls.TrustStoreDefinitionP
 /**
  * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
  */
-public class SslNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
-{
+public class SslNamespaceHandler extends AbstractMuleTransportsNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnectorDefinitionParser(SslConnector.class);
-        registerBeanDefinitionParser("key-store", new KeyStoreDefinitionParser());
-        registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
-        registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
-        registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
-    }
-    
+  @Override
+  public void init() {
+    registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
+    registerConnectorDefinitionParser(SslConnector.class);
+    registerBeanDefinitionParser("key-store", new KeyStoreDefinitionParser());
+    registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
+    registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
+    registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
+  }
+
 }

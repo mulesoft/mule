@@ -13,45 +13,40 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
- * <code>JmsSelectorFilter</code> is a wrapper for a JMS Selector. This filter
- * should not be called. Instead the JmsConnector sets the selector on the
- * destination to the expression set on this filer.
+ * <code>JmsSelectorFilter</code> is a wrapper for a JMS Selector. This filter should not be called. Instead the JmsConnector sets
+ * the selector on the destination to the expression set on this filer.
  */
-public class JmsSelectorFilter implements Filter
-{
+public class JmsSelectorFilter implements Filter {
 
-    private String expression = null;
+  private String expression = null;
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        // If we have received the message the selector has been honoured
-        return true;
-    }
+  @Override
+  public boolean accept(MuleMessage message) {
+    // If we have received the message the selector has been honoured
+    return true;
+  }
 
-    public String getExpression()
-    {
-        return expression;
-    }
+  public String getExpression() {
+    return expression;
+  }
 
-    public void setExpression(String expression)
-    {
-        this.expression = expression;
-    }
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null || getClass() != obj.getClass())
+      return false;
 
-        final JmsSelectorFilter other = (JmsSelectorFilter) obj;
-        return equal(expression, other.expression);
-    }
+    final JmsSelectorFilter other = (JmsSelectorFilter) obj;
+    return equal(expression, other.expression);
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return hash(new Object[]{this.getClass(), expression});
-    }
+  @Override
+  public int hashCode() {
+    return hash(new Object[] {this.getClass(), expression});
+  }
 }

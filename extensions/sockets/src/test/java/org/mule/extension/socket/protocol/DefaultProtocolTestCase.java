@@ -16,33 +16,28 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultProtocolTestCase extends AbstractMuleTestCase
-{
+public class DefaultProtocolTestCase extends AbstractMuleTestCase {
 
-    private TcpProtocol protocol;
-    private int expectedLength;
+  private TcpProtocol protocol;
+  private int expectedLength;
 
-    public DefaultProtocolTestCase()
-    {
-        this(new DirectProtocol(), SlowInputStream.FULL_LENGTH);
-    }
+  public DefaultProtocolTestCase() {
+    this(new DirectProtocol(), SlowInputStream.FULL_LENGTH);
+  }
 
-    protected DefaultProtocolTestCase(TcpProtocol protocol, int expectedLength)
-    {
-        this.protocol = protocol;
-        this.expectedLength = expectedLength;
-    }
+  protected DefaultProtocolTestCase(TcpProtocol protocol, int expectedLength) {
+    this.protocol = protocol;
+    this.expectedLength = expectedLength;
+  }
 
-    @Test
-    public void testRead() throws Exception
-    {
-        byte[] result = IOUtils.toByteArray(protocol.read(new SlowInputStream()));
-        assertEquals(expectedLength, result.length);
-    }
+  @Test
+  public void testRead() throws Exception {
+    byte[] result = IOUtils.toByteArray(protocol.read(new SlowInputStream()));
+    assertEquals(expectedLength, result.length);
+  }
 
-    protected TcpProtocol getProtocol()
-    {
-        return protocol;
-    }
+  protected TcpProtocol getProtocol() {
+    return protocol;
+  }
 
 }

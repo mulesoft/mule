@@ -27,52 +27,45 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase {
 
-    public UpdateDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-default-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-default-config.xml"};
+  }
 
-    @Test
-    public void updatesDataRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void updatesDataRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), equalTo(1));
-        verifyUpdatedRecord();
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), equalTo(1));
+    verifyUpdatedRecord();
+  }
 
-    @Test
-    public void updatesDataOneWay() throws Exception
-    {
-        flowRunner("jdbcUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
+  @Test
+  public void updatesDataOneWay() throws Exception {
+    flowRunner("jdbcUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertThat(response.getPayload(), equalTo(1));
+    assertThat(response.getPayload(), equalTo(1));
 
-        verifyUpdatedRecord();
-    }
+    verifyUpdatedRecord();
+  }
 
-    private void verifyUpdatedRecord() throws SQLException
-    {
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+  private void verifyUpdatedRecord() throws SQLException {
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 }

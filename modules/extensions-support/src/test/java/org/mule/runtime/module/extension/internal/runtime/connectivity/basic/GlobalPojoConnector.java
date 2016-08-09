@@ -14,17 +14,16 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
 @Extension(name = "Basic", description = "Basic Test connector")
 @Operations(VoidOperations.class)
-public class GlobalPojoConnector
-{
+public class GlobalPojoConnector {
 
-    /**
-     * This should generate a Global element for the Owner, but no child element inside the config
-     */
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private Owner requiredPojoExpressionRequired;
+  /**
+   * This should generate a Global element for the Owner, but no child element inside the config
+   */
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private Owner requiredPojoExpressionRequired;
 
-    @Parameter
-    private ExtensibleOwner requiredExtensiblePojo;
+  @Parameter
+  private ExtensibleOwner requiredExtensiblePojo;
 
 }

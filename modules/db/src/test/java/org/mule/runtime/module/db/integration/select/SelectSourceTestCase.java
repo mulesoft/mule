@@ -20,32 +20,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectSourceTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectSourceTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-source-config.xml"};
+  }
 
-    @Test
-    public void usesCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getMarsRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getMarsRecord());
+  }
 }

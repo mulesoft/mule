@@ -9,17 +9,15 @@ package org.mule.runtime.module.tls.internal.config;
 import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 
 
-public class KeyStoreTlsContextDefinitionParser extends ParentDefinitionParser
-{
+public class KeyStoreTlsContextDefinitionParser extends ParentDefinitionParser {
 
-    public KeyStoreTlsContextDefinitionParser()
-    {
-        addAlias("path", "keyStorePath");
-        addAlias("type", "keyStoreType");
-        addAlias("password", "keyStorePassword");
-        addAlias("keyPassword", "keyManagerPassword");
-        addAlias("algorithm", "keyManagerAlgorithm");
-        addAlias("alias", "keyAlias");
-    }
+  public KeyStoreTlsContextDefinitionParser() {
+    addAlias("path", "keyStorePath");
+    addAlias("type", "keyStoreType");
+    addAlias("password", "keyStorePassword");
+    addAlias("keyPassword", "keyManagerPassword");
+    addAlias("algorithm", "keyManagerAlgorithm");
+    addAlias("alias", "keyAlias");
+  }
 
 }

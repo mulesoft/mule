@@ -27,145 +27,126 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCase
-{
+public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCase {
 
-    private static final String KEEP_ALIVE_ONE_WAY_PATH = "vm://keepAliveOneWay";
-    private static final String KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://keepAliveRequestResponse";
-    private static final String NO_KEEP_ALIVE_ONE_WAY_PATH = "vm://noKeepAliveOneWay";
-    private static final String NO_KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://noKeepAliveRequestResponse";
-    private static final String DEFAULT_KEEP_ALIVE_ONE_WAY_PATH = "vm://defaultKeepAliveOneWay";
-    private static final String DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://defaultKeepAliveRequestResponse";
+  private static final String KEEP_ALIVE_ONE_WAY_PATH = "vm://keepAliveOneWay";
+  private static final String KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://keepAliveRequestResponse";
+  private static final String NO_KEEP_ALIVE_ONE_WAY_PATH = "vm://noKeepAliveOneWay";
+  private static final String NO_KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://noKeepAliveRequestResponse";
+  private static final String DEFAULT_KEEP_ALIVE_ONE_WAY_PATH = "vm://defaultKeepAliveOneWay";
+  private static final String DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://defaultKeepAliveRequestResponse";
 
-    private static final String CONNECTION_CLOSE_VALUE = "close";
+  private static final String CONNECTION_CLOSE_VALUE = "close";
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    private volatile String connectionHeader;
-    private volatile int requestCount;
+  private volatile String connectionHeader;
+  private volatile int requestCount;
 
-    private Prober prober = new PollingProber(2000, 100);
+  private Prober prober = new PollingProber(2000, 100);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-outbound-keep-alive.xml";
+  @Override
+  protected String getConfigFile() {
+    return "http-outbound-keep-alive.xml";
+  }
+
+  @Override
+  protected MockHttpServer getHttpServer() {
+    return new KeepAliveHTTPServer(httpPort.getNumber());
+  }
+
+  @Test
+  public void closesConnectionWhenOneWayEndpointHasNoKeepAlive() throws MuleException {
+    assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
+  }
+
+  @Test
+  public void closesConnectionWhenRequestResponseEndpointHasNoKeepAlive() throws MuleException {
+    assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
+  }
+
+  @Test
+  public void reusesConnectionWhenOneWayEndpointHasKeepAlive() throws MuleException {
+    assertKeepAlive(KEEP_ALIVE_ONE_WAY_PATH);
+  }
+
+  @Test
+  @Ignore("MULE-6926: Flaky test")
+  public void reusesConnectionWhenRequestResponseEndpointHasKeepAlive() throws MuleException {
+    assertKeepAlive(KEEP_ALIVE_REQUEST_RESPONSE_PATH);
+  }
+
+
+  @Test
+  public void reusesConnectionWhenOneWayEndpointHasDefaultKeepAlive() throws MuleException {
+    assertKeepAlive(DEFAULT_KEEP_ALIVE_ONE_WAY_PATH);
+  }
+
+  @Test
+  public void reusesConnectionWhenRequestResponseEndpointHasDefaultKeepAlive() throws MuleException {
+    assertKeepAlive(DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH);
+  }
+
+  private void assertKeepAlive(String endpoint) throws MuleException {
+    muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
+    assertRequestCount(1);
+    muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
+    assertRequestCount(2);
+  }
+
+  private void assertConnectionClosed(String endpoint) throws MuleException {
+    muleContext.getClient().dispatch(NO_KEEP_ALIVE_REQUEST_RESPONSE_PATH, TEST_MESSAGE, null);
+    assertRequestCount(1);
+    assertEquals(CONNECTION_CLOSE_VALUE, connectionHeader);
+  }
+
+  private void assertRequestCount(final int expectedRequestCount) {
+    prober.check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return requestCount == expectedRequestCount;
+      }
+
+      @Override
+      public String describeFailure() {
+        return String.format("Expected %d requests but received %d.", expectedRequestCount, requestCount);
+      }
+    });
+  }
+
+
+  private class KeepAliveHTTPServer extends MockHttpServer {
+
+    private static final int MAX_REQUESTS = 2;
+
+    public KeepAliveHTTPServer(int port) {
+      super(port);
     }
 
     @Override
-    protected MockHttpServer getHttpServer()
-    {
-        return new KeepAliveHTTPServer(httpPort.getNumber());
-    }
+    protected void processRequests(InputStream in, OutputStream out) throws IOException {
+      boolean closeConnection = false;
 
-    @Test
-    public void closesConnectionWhenOneWayEndpointHasNoKeepAlive() throws MuleException
-    {
-        assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
-    }
+      while (requestCount < MAX_REQUESTS && !closeConnection) {
+        HttpRequest request = parseRequest(in, getDefaultEncoding(muleContext));
+        Header connHeader = request.getFirstHeader(HttpConstants.HEADER_CONNECTION);
 
-    @Test
-    public void closesConnectionWhenRequestResponseEndpointHasNoKeepAlive() throws MuleException
-    {
-        assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
-    }
+        connectionHeader = (connHeader == null) ? null : connHeader.getValue();
+        requestCount++;
 
-    @Test
-    public void reusesConnectionWhenOneWayEndpointHasKeepAlive() throws MuleException
-    {
-        assertKeepAlive(KEEP_ALIVE_ONE_WAY_PATH);
-    }
+        closeConnection = CONNECTION_CLOSE_VALUE.equals(connectionHeader);
 
-    @Test
-    @Ignore("MULE-6926: Flaky test")
-    public void reusesConnectionWhenRequestResponseEndpointHasKeepAlive() throws MuleException
-    {
-        assertKeepAlive(KEEP_ALIVE_REQUEST_RESPONSE_PATH);
-    }
+        StringBuilder response = new StringBuilder(HTTP_STATUS_LINE_OK);
 
-
-    @Test
-    public void reusesConnectionWhenOneWayEndpointHasDefaultKeepAlive() throws MuleException
-    {
-        assertKeepAlive(DEFAULT_KEEP_ALIVE_ONE_WAY_PATH);
-    }
-
-    @Test
-    public void reusesConnectionWhenRequestResponseEndpointHasDefaultKeepAlive() throws MuleException
-    {
-        assertKeepAlive(DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH);
-    }
-
-    private void assertKeepAlive(String endpoint) throws MuleException
-    {
-        muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
-        assertRequestCount(1);
-        muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
-        assertRequestCount(2);
-    }
-
-    private void assertConnectionClosed(String endpoint) throws MuleException
-    {
-        muleContext.getClient().dispatch(NO_KEEP_ALIVE_REQUEST_RESPONSE_PATH, TEST_MESSAGE, null);
-        assertRequestCount(1);
-        assertEquals(CONNECTION_CLOSE_VALUE, connectionHeader);
-    }
-
-    private void assertRequestCount(final int expectedRequestCount)
-    {
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return requestCount == expectedRequestCount;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return String.format("Expected %d requests but received %d.", expectedRequestCount, requestCount);
-            }
-        });
-    }
-
-
-    private class KeepAliveHTTPServer extends MockHttpServer
-    {
-
-        private static final int MAX_REQUESTS = 2;
-
-        public KeepAliveHTTPServer(int port)
-        {
-            super(port);
+        if (closeConnection) {
+          response.append(String.format("%s: %s\n", HttpConstants.HEADER_CONNECTION, CONNECTION_CLOSE_VALUE));
         }
+        response.append("Content-Length: 4\n\nTEST");
 
-        @Override
-        protected void processRequests(InputStream in, OutputStream out) throws IOException
-        {
-            boolean closeConnection = false;
-
-            while (requestCount < MAX_REQUESTS && !closeConnection)
-            {
-                HttpRequest request = parseRequest(in, getDefaultEncoding(muleContext));
-                Header connHeader = request.getFirstHeader(HttpConstants.HEADER_CONNECTION);
-
-                connectionHeader = (connHeader == null) ? null : connHeader.getValue();
-                requestCount++;
-
-                closeConnection = CONNECTION_CLOSE_VALUE.equals(connectionHeader);
-
-                StringBuilder response = new StringBuilder(HTTP_STATUS_LINE_OK);
-
-                if (closeConnection)
-                {
-                    response.append(String.format("%s: %s\n", HttpConstants.HEADER_CONNECTION, CONNECTION_CLOSE_VALUE));
-                }
-                response.append("Content-Length: 4\n\nTEST");
-
-                out.write(response.toString().getBytes());
-            }
-        }
+        out.write(response.toString().getBytes());
+      }
     }
+  }
 }

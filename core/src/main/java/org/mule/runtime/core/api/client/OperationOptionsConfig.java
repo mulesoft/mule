@@ -7,15 +7,14 @@
 package org.mule.runtime.core.api.client;
 
 /**
- *  Common configuration options for all operations
+ * Common configuration options for all operations
  */
-public interface OperationOptionsConfig<BuilderType>
-{
+public interface OperationOptionsConfig<BuilderType> {
 
-    /**
-     * @param timeout maximum amount of time to wait for the HTTP response
-     * @return the builder
-     */
-    BuilderType responseTimeout(final long timeout);
+  /**
+   * @param timeout maximum amount of time to wait for the HTTP response
+   * @return the builder
+   */
+  BuilderType responseTimeout(final long timeout);
 
 }

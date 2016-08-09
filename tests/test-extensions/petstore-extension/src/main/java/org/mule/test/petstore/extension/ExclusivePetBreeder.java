@@ -11,13 +11,13 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 @ExclusiveOptionals(isOneRequired = true)
-public class ExclusivePetBreeder
-{
-    @Optional
-    @Parameter
-    private String mammals;
+public class ExclusivePetBreeder {
 
-    @Optional
-    @Parameter
-    private String birds;
+  @Optional
+  @Parameter
+  private String mammals;
+
+  @Optional
+  @Parameter
+  private String birds;
 }

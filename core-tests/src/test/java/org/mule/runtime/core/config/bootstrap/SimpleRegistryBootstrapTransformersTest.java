@@ -30,102 +30,86 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContextTestCase
-{
+public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContextTestCase {
 
-    @Test
-    public void registeringTransformersWithCustomKey() throws MuleException
-    {
-        Properties properties = new Properties();
-        properties.setProperty("core.transformer.1", ExpectedKeyTransformer.class.getName());
-        properties.setProperty("custom1", CustomKeyTransformer.class.getName());
+  @Test
+  public void registeringTransformersWithCustomKey() throws MuleException {
+    Properties properties = new Properties();
+    properties.setProperty("core.transformer.1", ExpectedKeyTransformer.class.getName());
+    properties.setProperty("custom1", CustomKeyTransformer.class.getName());
 
-        TestTransformerResolver transformerResolver = new TestTransformerResolver();
-        muleContext.getRegistry().registerObject("testTransformerResolver", transformerResolver);
+    TestTransformerResolver transformerResolver = new TestTransformerResolver();
+    muleContext.getRegistry().registerObject("testTransformerResolver", transformerResolver);
 
-        final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
-        ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
+    final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
+    ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
 
-        SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap(APP, muleContext);
-        registryBootstrap.initialise();
+    SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap(APP, muleContext);
+    registryBootstrap.initialise();
 
-        assertEquals(2, transformerResolver.getTransformersCount());
+    assertEquals(2, transformerResolver.getTransformersCount());
 
-        assertTrue(transformerResolver.contains(ExpectedKeyTransformer.class));
+    assertTrue(transformerResolver.contains(ExpectedKeyTransformer.class));
 
-        assertTrue(transformerResolver.contains(CustomKeyTransformer.class));
+    assertTrue(transformerResolver.contains(CustomKeyTransformer.class));
+  }
+
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    // Avoid to use DefaultsConfigurationBuilder because it registers a new instance of SimpleRegistryBootstrap
+    // that conflicts with the one being tested in the test
+    return new DummyConfigurationBuilder();
+  }
+
+  private class DummyConfigurationBuilder extends DefaultsConfigurationBuilder {
+
+    @Override
+    protected void doConfigure(MuleContext muleContext) throws Exception {
+      // Do nothing
+    }
+  }
+
+  public static class ExpectedKeyTransformer extends AbstractDiscoverableTransformer {
+
+    @Override
+    protected Object doTransform(Object src, Charset enc) throws TransformerException {
+      return null;
+    }
+  }
+
+  public static class CustomKeyTransformer extends AbstractDiscoverableTransformer {
+
+    @Override
+    protected Object doTransform(Object src, Charset enc) throws TransformerException {
+      return null;
+    }
+  }
+
+  private static class TestTransformerResolver implements TransformerResolver {
+
+    private List<Transformer> transformers = new ArrayList<>();
+
+    @Override
+    public Transformer resolve(DataType source, DataType result) throws ResolverException {
+      return null;
     }
 
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        // Avoid to use DefaultsConfigurationBuilder because it registers a new instance of SimpleRegistryBootstrap
-        // that conflicts with the one being tested in the test
-        return new DummyConfigurationBuilder();
+    public void transformerChange(Transformer transformer, RegistryAction registryAction) {
+      transformers.add(transformer);
     }
 
-    private class DummyConfigurationBuilder extends DefaultsConfigurationBuilder
-    {
-
-        @Override
-        protected void doConfigure(MuleContext muleContext) throws Exception
-        {
-            // Do nothing
-        }
+    public int getTransformersCount() {
+      return transformers.size();
     }
 
-    public static class ExpectedKeyTransformer extends AbstractDiscoverableTransformer
-    {
-
-        @Override
-        protected Object doTransform(Object src, Charset enc) throws TransformerException
-        {
-            return null;
+    private boolean contains(Class<? extends Transformer> transformerClass) {
+      for (Transformer transformer : transformers) {
+        if (transformerClass.isAssignableFrom(transformer.getClass())) {
+          return true;
         }
+      }
+      return false;
     }
-
-    public static class CustomKeyTransformer extends AbstractDiscoverableTransformer
-    {
-
-        @Override
-        protected Object doTransform(Object src, Charset enc) throws TransformerException
-        {
-            return null;
-        }
-    }
-
-    private static class TestTransformerResolver implements TransformerResolver
-    {
-
-        private List<Transformer> transformers = new ArrayList<>();
-
-        @Override
-        public Transformer resolve(DataType source, DataType result) throws ResolverException
-        {
-            return null;
-        }
-
-        @Override
-        public void transformerChange(Transformer transformer, RegistryAction registryAction)
-        {
-            transformers.add(transformer);
-        }
-
-        public int getTransformersCount()
-        {
-            return transformers.size();
-        }
-
-        private boolean contains(Class<? extends Transformer> transformerClass)
-        {
-            for (Transformer transformer : transformers)
-            {
-                if (transformerClass.isAssignableFrom(transformer.getClass()))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+  }
 }

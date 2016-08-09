@@ -34,75 +34,71 @@ import org.xml.sax.InputSource;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultStreamCloserServiceTestCase
-{
+public class DefaultStreamCloserServiceTestCase {
 
-    private DefaultStreamCloserService service;
+  private DefaultStreamCloserService service;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    @Before
-    public void setUp()
-    {
-        this.muleContext = mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS);
+  @Before
+  public void setUp() {
+    this.muleContext = mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS);
 
-        this.service = new DefaultStreamCloserService();
-        this.service.setMuleContext(this.muleContext);
-    }
+    this.service = new DefaultStreamCloserService();
+    this.service.setMuleContext(this.muleContext);
+  }
 
-    @Test
-    public void closeCoreTypes() throws Exception
-    {
-        Collection<Object> closeableMocks = new ArrayList<>();
-        InputStream in = mock(ByteArrayInputStream.class);
-        closeableMocks.add(in);
+  @Test
+  public void closeCoreTypes() throws Exception {
+    Collection<Object> closeableMocks = new ArrayList<>();
+    InputStream in = mock(ByteArrayInputStream.class);
+    closeableMocks.add(in);
 
-        InputSource inputSource1 = mock(InputSource.class);
-        InputStream byteStream = mock(InputStream.class);
-        when(inputSource1.getByteStream()).thenReturn(byteStream);
-        closeableMocks.add(inputSource1);
+    InputSource inputSource1 = mock(InputSource.class);
+    InputStream byteStream = mock(InputStream.class);
+    when(inputSource1.getByteStream()).thenReturn(byteStream);
+    closeableMocks.add(inputSource1);
 
-        InputSource inputSource2 = mock(InputSource.class);
-        Reader reader = mock(Reader.class);
-        when(inputSource2.getCharacterStream()).thenReturn(reader);
-        closeableMocks.add(inputSource2);
+    InputSource inputSource2 = mock(InputSource.class);
+    Reader reader = mock(Reader.class);
+    when(inputSource2.getCharacterStream()).thenReturn(reader);
+    closeableMocks.add(inputSource2);
 
-        SAXSource sax1 = mock(SAXSource.class, Mockito.RETURNS_DEEP_STUBS);
-        when(sax1.getInputSource()).thenReturn(inputSource1);
-        closeableMocks.add(sax1);
+    SAXSource sax1 = mock(SAXSource.class, Mockito.RETURNS_DEEP_STUBS);
+    when(sax1.getInputSource()).thenReturn(inputSource1);
+    closeableMocks.add(sax1);
 
-        SAXSource sax2 = mock(SAXSource.class, Mockito.RETURNS_DEEP_STUBS);
-        when(sax2.getInputSource()).thenReturn(inputSource2);
-        closeableMocks.add(sax2);
+    SAXSource sax2 = mock(SAXSource.class, Mockito.RETURNS_DEEP_STUBS);
+    when(sax2.getInputSource()).thenReturn(inputSource2);
+    closeableMocks.add(sax2);
 
-        Closeable closeable = mock(Consumer.class);
-        closeableMocks.add(closeable);
+    Closeable closeable = mock(Consumer.class);
+    closeableMocks.add(closeable);
 
-        java.io.Closeable javaClosable = mock(java.io.Closeable.class);
-        closeableMocks.add(javaClosable);
+    java.io.Closeable javaClosable = mock(java.io.Closeable.class);
+    closeableMocks.add(javaClosable);
 
-        when(this.muleContext.getRegistry().lookupObjects(StreamCloser.class)).thenReturn(new ArrayList<>());
+    when(this.muleContext.getRegistry().lookupObjects(StreamCloser.class)).thenReturn(new ArrayList<>());
 
-        closeableMocks.forEach(service::closeStream);
+    closeableMocks.forEach(service::closeStream);
 
-        verify(in).close();
+    verify(in).close();
 
-        // expect twice. Once for the InputSource and another for the SAXSource
-        verify(byteStream, times(2)).close();
-        verify(reader, times(2)).close();
+    // expect twice. Once for the InputSource and another for the SAXSource
+    verify(byteStream, times(2)).close();
+    verify(reader, times(2)).close();
 
-        verify(closeable).close();
-        verify(javaClosable).close();
-    }
+    verify(closeable).close();
+    verify(javaClosable).close();
+  }
 
-    @Test
-    public void customCloser() throws Exception
-    {
-        StreamCloser closer = mock(StreamCloser.class);
-        when(closer.canClose(getClass())).thenReturn(true);
-        when(muleContext.getRegistry().lookupObjects(StreamCloser.class)).thenReturn(asList(closer));
+  @Test
+  public void customCloser() throws Exception {
+    StreamCloser closer = mock(StreamCloser.class);
+    when(closer.canClose(getClass())).thenReturn(true);
+    when(muleContext.getRegistry().lookupObjects(StreamCloser.class)).thenReturn(asList(closer));
 
-        this.service.closeStream(this);
-        verify(closer).close(this);
-    }
+    this.service.closeStream(this);
+    verify(closer).close(this);
+  }
 }

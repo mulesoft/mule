@@ -15,32 +15,26 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
-{
+public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/message/jms-property-scope-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/message/jms-property-scope-flow.xml";
+  }
 
-    @Override
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  @Test
+  public void testRequestResponse() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        final MuleMessage message = MuleMessage.builder()
-                                               .payload(TEST_PAYLOAD)
-                                               .addOutboundProperty("foo", "fooValue")
-                                               .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://reply")
-                                               .build();
+    final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("foo", "fooValue")
+        .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://reply").build();
 
-        client.dispatch("inbound", message);
-        MuleMessage result = client.request("jms://reply", 10000);
+    client.dispatch("inbound", message);
+    MuleMessage result = client.request("jms://reply", 10000);
 
-        assertNotNull(result);
-        assertEquals("test bar", result.getPayload());
-        assertEquals("fooValue", result.getInboundProperty("foo"));
-    }
+    assertNotNull(result);
+    assertEquals("test bar", result.getPayload());
+    assertEquals("fooValue", result.getInboundProperty("foo"));
+  }
 }

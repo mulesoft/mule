@@ -32,60 +32,49 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  * @since 4.0
  */
-public final class FtpReadCommand extends ClassicFtpCommand implements ReadCommand
-{
+public final class FtpReadCommand extends ClassicFtpCommand implements ReadCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FtpReadCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
-    {
-        super(fileSystem, client);
+  /**
+   * {@inheritDoc}
+   */
+  public FtpReadCommand(ClassicFtpFileSystem fileSystem, FTPClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+                                                           boolean lock) {
+    FtpFileAttributes attributes = getExistingFile(config, filePath);
+    if (attributes.isDirectory()) {
+      throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
-    {
-        FtpFileAttributes attributes = getExistingFile(config, filePath);
-        if (attributes.isDirectory())
-        {
-            throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
-        }
-
-        try
-        {
-            attributes = new ClassicFtpFileAttributes(resolvePath(config, filePath), client.listFiles(filePath)[0]);
-        }
-        catch (Exception e)
-        {
-            throw exception("Found exception while trying to read path " + filePath, e);
-        }
-
-        Path path = Paths.get(attributes.getPath());
-
-        PathLock pathLock;
-        if (lock)
-        {
-            pathLock = fileSystem.lock(path);
-        }
-        else
-        {
-            fileSystem.verifyNotLocked(path);
-            pathLock = new NullPathLock();
-        }
-
-        try
-        {
-            InputStream payload = ClassicFtpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
-            MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
-            return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes).build();
-        }
-        catch (ConnectionException e)
-        {
-            throw exception("Could not obtain connection to fetch file " + path, e);
-        }
+    try {
+      attributes = new ClassicFtpFileAttributes(resolvePath(config, filePath), client.listFiles(filePath)[0]);
+    } catch (Exception e) {
+      throw exception("Found exception while trying to read path " + filePath, e);
     }
+
+    Path path = Paths.get(attributes.getPath());
+
+    PathLock pathLock;
+    if (lock) {
+      pathLock = fileSystem.lock(path);
+    } else {
+      fileSystem.verifyNotLocked(path);
+      pathLock = new NullPathLock();
+    }
+
+    try {
+      InputStream payload = ClassicFtpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
+      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
+      return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes)
+          .build();
+    } catch (ConnectionException e) {
+      throw exception("Could not obtain connection to fetch file " + path, e);
+    }
+  }
 }

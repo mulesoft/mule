@@ -22,92 +22,71 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
-public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer
-{
+public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer {
 
-    /** Give core transformers a slighty higher priority */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  /** Give core transformers a slighty higher priority */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public ObjectToOutputHandler()
-    {
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.STRING);
-        registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.fromType(Serializable.class));
-        setReturnDataType(DataType.fromType(OutputHandler.class));
+  public ObjectToOutputHandler() {
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.STRING);
+    registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.fromType(Serializable.class));
+    setReturnDataType(DataType.fromType(OutputHandler.class));
+  }
+
+  @Override
+  public Object doTransform(final Object src, final Charset encoding) throws TransformerException {
+    if (src instanceof String) {
+      return new OutputHandler() {
+
+        @Override
+        public void write(MuleEvent event, OutputStream out) throws IOException {
+          out.write(((String) src).getBytes(encoding));
+        }
+      };
+    } else if (src instanceof byte[]) {
+      return new OutputHandler() {
+
+        @Override
+        public void write(MuleEvent event, OutputStream out) throws IOException {
+          out.write((byte[]) src);
+        }
+      };
+    } else if (src instanceof InputStream) {
+      return new OutputHandler() {
+
+        @Override
+        public void write(MuleEvent event, OutputStream out) throws IOException {
+          InputStream is = (InputStream) src;
+          try {
+            IOUtils.copyLarge(is, out);
+          } finally {
+            is.close();
+          }
+        }
+      };
+    } else if (src instanceof Serializable) {
+      return new OutputHandler() {
+
+        @Override
+        public void write(MuleEvent event, OutputStream out) throws IOException {
+          muleContext.getObjectSerializer().serialize(src, out);
+        }
+      };
+    } else {
+      throw new TransformerException(MessageFactory
+          .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
     }
+  }
 
-    @Override
-    public Object doTransform(final Object src, final Charset encoding) throws TransformerException
-    {
-        if (src instanceof String)
-        {
-            return new OutputHandler()
-            {
-                @Override
-                public void write(MuleEvent event, OutputStream out) throws IOException
-                {
-                    out.write(((String) src).getBytes(encoding));
-                }
-            };
-        }
-        else if (src instanceof byte[])
-        {
-            return new OutputHandler()
-            {
-                @Override
-                public void write(MuleEvent event, OutputStream out) throws IOException
-                {
-                    out.write((byte[]) src);
-                }
-            };
-        }
-        else if (src instanceof InputStream)
-        {
-            return new OutputHandler()
-            {
-                @Override
-                public void write(MuleEvent event, OutputStream out) throws IOException
-                {
-                    InputStream is = (InputStream) src;
-                    try
-                    {
-                        IOUtils.copyLarge(is, out);
-                    }
-                    finally
-                    {
-                        is.close();
-                    }
-                }
-            };
-        }
-        else if (src instanceof Serializable)
-        {
-            return new OutputHandler()
-            {
-                @Override
-                public void write(MuleEvent event, OutputStream out) throws IOException
-                {
-                    muleContext.getObjectSerializer().serialize(src, out);
-                }
-            };
-        }
-        else
-        {
-            throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
-        }
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

@@ -8,12 +8,11 @@ package org.mule.functional.functional;
 
 import java.io.InputStream;
 
-public class FunctionalStreamingEchoComponent
-{
-    public InputStream echo(InputStream stream)
-    {
-        return stream;
-    }
+public class FunctionalStreamingEchoComponent {
+
+  public InputStream echo(InputStream stream) {
+    return stream;
+  }
 }
 
 

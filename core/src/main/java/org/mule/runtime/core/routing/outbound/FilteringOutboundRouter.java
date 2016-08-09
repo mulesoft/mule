@@ -25,134 +25,108 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <code>FilteringRouter</code> is a router that accepts events based on a filter
- * set.
+ * <code>FilteringRouter</code> is a router that accepts events based on a filter set.
  */
 
-public class FilteringOutboundRouter extends AbstractOutboundRouter implements TransformingMatchable
-{
-    protected ExpressionManager expressionManager;
+public class FilteringOutboundRouter extends AbstractOutboundRouter implements TransformingMatchable {
 
-    private List<Transformer> transformers = new LinkedList<Transformer>();
+  protected ExpressionManager expressionManager;
 
-    private Filter filter;
+  private List<Transformer> transformers = new LinkedList<Transformer>();
 
-    private boolean useTemplates = true;
-    
-    // We used Square templates as they can exist as part of an URI.
-    protected TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
+  private Filter filter;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        expressionManager = muleContext.getExpressionManager();
+  private boolean useTemplates = true;
+
+  // We used Square templates as they can exist as part of an URI.
+  protected TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    expressionManager = muleContext.getExpressionManager();
+  }
+
+  @Override
+  public MuleEvent route(MuleEvent event) throws RoutingException {
+    MuleEvent result;
+
+    MuleMessage message = event.getMessage();
+
+    if (routes == null || routes.size() == 0) {
+      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
     }
 
-    @Override
-    public MuleEvent route(MuleEvent event) throws RoutingException
-    {
-        MuleEvent result;
+    MessageProcessor ep = getRoute(0, event);
 
-        MuleMessage message = event.getMessage();
+    try {
+      result = sendRequest(event, createEventToRoute(event, message), ep, true);
+    } catch (RoutingException e) {
+      throw e;
+    } catch (MuleException e) {
+      throw new CouldNotRouteOutboundMessageException(event, ep, e);
+    }
+    return result;
+  }
 
-        if (routes == null || routes.size() == 0)
-        {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
-        }
+  public Filter getFilter() {
+    return filter;
+  }
 
-        MessageProcessor ep = getRoute(0, event);
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+  }
 
-        try
-        {
-            result = sendRequest(event, createEventToRoute(event, message), ep, true);
-        }
-        catch (RoutingException e)
-        {
-            throw e;
-        }
-        catch (MuleException e)
-        {
-            throw new CouldNotRouteOutboundMessageException(event, ep, e);
-        }
-        return result;
+  @Override
+  public boolean isMatch(MuleEvent event) throws MuleException {
+    if (getFilter() == null) {
+      return true;
     }
 
-    public Filter getFilter()
-    {
-        return filter;
-    }
+    event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers));
 
-    public void setFilter(Filter filter)
-    {
-        this.filter = filter;
-    }
+    return getFilter().accept(event);
+  }
 
-    @Override
-    public boolean isMatch(MuleEvent event) throws MuleException
-    {
-        if (getFilter() == null)
-        {
-            return true;
-        }
+  public List<Transformer> getTransformers() {
+    return transformers;
+  }
 
-        event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers));
+  public void setTransformers(List<Transformer> transformers) {
+    this.transformers = transformers;
+  }
 
-        return getFilter().accept(event);
+  /**
+   * Will Return the target at the given index and will resolve any template tags on the Endpoint URI if necessary
+   * 
+   * @param index the index of the endpoint to get
+   * @param event the current event. This is required if template matching is being used
+   * @return the endpoint at the index, with any template tags resolved
+   * @throws CouldNotRouteOutboundMessageException if the template causs the endpoint to become illegal or malformed
+   */
+  public MessageProcessor getRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {
+    if (!useTemplates) {
+      return routes.get(index);
+    } else {
+      return getTemplateRoute(index, event);
     }
+  }
 
-    public List<Transformer> getTransformers()
-    {
-        return transformers;
-    }
+  protected MessageProcessor getTemplateRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {
+    return routes.get(index);
+  }
 
-    public void setTransformers(List<Transformer> transformers)
-    {
-        this.transformers = transformers;
-    }
+  public boolean isUseTemplates() {
+    return useTemplates;
+  }
 
-    /**
-     * Will Return the target at the given index and will resolve any template tags
-     * on the Endpoint URI if necessary
-     * 
-     * @param index the index of the endpoint to get
-     * @param event the current event. This is required if template matching is
-     *            being used
-     * @return the endpoint at the index, with any template tags resolved
-     * @throws CouldNotRouteOutboundMessageException if the template causs the
-     *             endpoint to become illegal or malformed
-     */
-    public MessageProcessor getRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException
-    {
-        if (!useTemplates)
-        {
-            return routes.get(index);
-        }
-        else
-        {
-            return getTemplateRoute(index, event);
-        }
-    }
+  public void setUseTemplates(boolean useTemplates) {
+    this.useTemplates = useTemplates;
+  }
 
-    protected MessageProcessor getTemplateRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException
-    {
-        return routes.get(index);
-    }
-
-    public boolean isUseTemplates()
-    {
-        return useTemplates;
-    }
-
-    public void setUseTemplates(boolean useTemplates)
-    {
-        this.useTemplates = useTemplates;
-    }
-    
-    @Override
-    public boolean isTransformBeforeMatch()
-    {
-        return !transformers.isEmpty();
-    }
+  @Override
+  public boolean isTransformBeforeMatch() {
+    return !transformers.isEmpty();
+  }
 
 }

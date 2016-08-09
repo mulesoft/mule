@@ -10,31 +10,27 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.compression.CompressionStrategy;
 
 /**
- * <code>AbstractCompressionTransformer</code> is a base class for all transformers
- * that can compress or uncompress data when they performa message transformation.
- * Compression is done via a pluggable strategy.
+ * <code>AbstractCompressionTransformer</code> is a base class for all transformers that can compress or uncompress data when they
+ * performa message transformation. Compression is done via a pluggable strategy.
  */
 
-public abstract class AbstractCompressionTransformer extends AbstractTransformer
-{
-    private CompressionStrategy strategy;
+public abstract class AbstractCompressionTransformer extends AbstractTransformer {
 
-    /**
-     * default constructor required for discovery
-     */
-    public AbstractCompressionTransformer()
-    {
-        super();
-    }
+  private CompressionStrategy strategy;
 
-    public CompressionStrategy getStrategy()
-    {
-        return strategy;
-    }
+  /**
+   * default constructor required for discovery
+   */
+  public AbstractCompressionTransformer() {
+    super();
+  }
 
-    public void setStrategy(CompressionStrategy strategy)
-    {
-        this.strategy = strategy;
-    }
+  public CompressionStrategy getStrategy() {
+    return strategy;
+  }
+
+  public void setStrategy(CompressionStrategy strategy) {
+    this.strategy = strategy;
+  }
 
 }

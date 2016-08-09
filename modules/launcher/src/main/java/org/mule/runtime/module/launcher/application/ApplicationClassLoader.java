@@ -9,6 +9,5 @@ package org.mule.runtime.module.launcher.application;
 /**
  * Identifies a classLoader created for a given Mule application
  */
-public interface ApplicationClassLoader
-{
+public interface ApplicationClassLoader {
 }

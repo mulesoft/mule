@@ -11,11 +11,10 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Logs a prepared bulk query
  */
-public interface PreparedBulkQueryLogger extends SingleQueryLogger
-{
+public interface PreparedBulkQueryLogger extends SingleQueryLogger {
 
-    /**
-     * Adds another set of parameters to the bulk query logger
-     */
-    void addParameterSet();
+  /**
+   * Adds another set of parameters to the bulk query logger
+   */
+  void addParameterSet();
 }

@@ -19,54 +19,45 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingMessageProcessor implements Lifecycle, MessageProcessor
-{
+public class LifecycleSensingMessageProcessor implements Lifecycle, MessageProcessor {
 
-    private List<LifecycleAction> lifecycleActions = new LinkedList<>();
-    private LifecycleSensingObjectFactory objectFactory;
+  private List<LifecycleAction> lifecycleActions = new LinkedList<>();
+  private LifecycleSensingObjectFactory objectFactory;
 
-    public void setObjectFactory(LifecycleSensingObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
+  public void setObjectFactory(LifecycleSensingObjectFactory objectFactory) {
+    this.objectFactory = objectFactory;
+  }
 
-    @Override
-    public void dispose()
-    {
-        lifecycleActions.add(DISPOSE);
-    }
+  @Override
+  public void dispose() {
+    lifecycleActions.add(DISPOSE);
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        lifecycleActions.add(INITIALISE);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    lifecycleActions.add(INITIALISE);
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        lifecycleActions.add(START);
-    }
+  @Override
+  public void start() throws MuleException {
+    lifecycleActions.add(START);
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        lifecycleActions.add(STOP);
-    }
+  @Override
+  public void stop() throws MuleException {
+    lifecycleActions.add(STOP);
+  }
 
-    public List<LifecycleAction> getLifecycleActions()
-    {
-        return lifecycleActions;
-    }
+  public List<LifecycleAction> getLifecycleActions() {
+    return lifecycleActions;
+  }
 
-    public LifecycleSensingObjectFactory getObjectFactory()
-    {
-        return objectFactory;
-    }
+  public LifecycleSensingObjectFactory getObjectFactory() {
+    return objectFactory;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return event;
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return event;
+  }
 }

@@ -15,15 +15,12 @@ import java.util.Collection;
  *
  * @since 3.7.0
  */
-public interface RegistryProvider
-{
+public interface RegistryProvider {
 
-    /**
-     * Returns an immutable view of all active {@link Registry} instances for
-     * the current {@link MuleContext}.
-     * {@link Collection}s returned by this method will not remain synced with
-     * the {@link MuleContext}. If a {@link Registry} is added or removed this
-     * {@link Collection} will not be automatically updated.
-     */
-    Collection<Registry> getRegistries();
+  /**
+   * Returns an immutable view of all active {@link Registry} instances for the current {@link MuleContext}. {@link Collection}s
+   * returned by this method will not remain synced with the {@link MuleContext}. If a {@link Registry} is added or removed this
+   * {@link Collection} will not be automatically updated.
+   */
+  Collection<Registry> getRegistries();
 }

@@ -19,69 +19,60 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extends {@link ClassNotFoundException} providing additional trubleshooting information from the
- * context of the {@link FilteringArtifactClassLoader}.
+ * Extends {@link ClassNotFoundException} providing additional trubleshooting information from the context of the
+ * {@link FilteringArtifactClassLoader}.
  */
-public class NotExportedClassException extends ClassNotFoundException
-{
+public class NotExportedClassException extends ClassNotFoundException {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
+  private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
 
-    private static final long serialVersionUID = 2510347069070514569L;
+  private static final long serialVersionUID = 2510347069070514569L;
 
-    private String className;
-    private String artifactName;
-    private ClassLoaderFilter filter;
+  private String className;
+  private String artifactName;
+  private ClassLoaderFilter filter;
 
-    /**
-     * Builds the exception.
-     * 
-     * @param className the name of the class that was trying to be loaded.
-     * @param artifactName the name of the artifact the class was being loaded from.
-     * @param filter the applied filter for the artifact.
-     */
-    public NotExportedClassException(String className, String artifactName, ClassLoaderFilter filter)
-    {
-        super(format("Class '%s' not found in classloader for artifact '%s'.", className, artifactName));
-        this.className = className;
-        this.artifactName = artifactName;
-        this.filter = filter;
+  /**
+   * Builds the exception.
+   * 
+   * @param className the name of the class that was trying to be loaded.
+   * @param artifactName the name of the artifact the class was being loaded from.
+   * @param filter the applied filter for the artifact.
+   */
+  public NotExportedClassException(String className, String artifactName, ClassLoaderFilter filter) {
+    super(format("Class '%s' not found in classloader for artifact '%s'.", className, artifactName));
+    this.className = className;
+    this.artifactName = artifactName;
+    this.filter = filter;
+  }
+
+  /**
+   * @return the name of the class that was trying to be loaded.
+   */
+  public String getClassName() {
+    return className;
+  }
+
+  /**
+   * @return the name of the artifact the class was being loaded from.
+   */
+  public String getArtifactName() {
+    return artifactName;
+  }
+
+  /**
+   * @return the applied filter for the artifact.
+   */
+  public ClassLoaderFilter getFilter() {
+    return filter;
+  }
+
+  @Override
+  public String getMessage() {
+    if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)) || logger.isTraceEnabled()) {
+      return super.getMessage() + lineSeparator() + filter.toString();
+    } else {
+      return super.getMessage();
     }
-
-    /**
-     * @return the name of the class that was trying to be loaded.
-     */
-    public String getClassName()
-    {
-        return className;
-    }
-
-    /**
-     * @return the name of the artifact the class was being loaded from.
-     */
-    public String getArtifactName()
-    {
-        return artifactName;
-    }
-
-    /**
-     * @return the applied filter for the artifact.
-     */
-    public ClassLoaderFilter getFilter()
-    {
-        return filter;
-    }
-
-    @Override
-    public String getMessage()
-    {
-        if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)) || logger.isTraceEnabled())
-        {
-            return super.getMessage() + lineSeparator() + filter.toString();
-        }
-        else
-        {
-            return super.getMessage();
-        }
-    }
+  }
 }

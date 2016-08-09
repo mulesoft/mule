@@ -41,141 +41,128 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 
-public class HttpRequestOperations
-{
+public class HttpRequestOperations {
 
-    private static final int WAIT_FOR_EVER = MAX_VALUE;
+  private static final int WAIT_FOR_EVER = MAX_VALUE;
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    /**
-     * Consumes an HTTP service.
-     *
-     * @param path                 Path where the request will be sent.
-     * @param method               The HTTP method for the request.
-     * @param host                 Host where the requests will be sent.
-     * @param port                 Port where the requests will be sent.
-     * @param source               The expression used to obtain the body that will be sent in the request. Default is empty, so the payload will be used as the body.
-     * @param followRedirects      Specifies whether to follow redirects or not.
-     * @param parseResponse        Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
-     * @param requestStreamingMode Defines if the request should be sent using streaming or not.
-     * @param sendBodyMode         Defines if the request should contain a body or not.
-     * @param responseTimeout      Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
-     * @param responseValidator    Configures error handling of the response.
-     * @param config               the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from it.
-     * @param muleEvent            the current {@link MuleEvent}
-     * @return an {@link OperationResult} with {@link HttpResponseAttributes}
-     */
-    @Summary("Executes a HTTP Request")
-    @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
-    public OperationResult<Object, HttpResponseAttributes> request(String path,
-                                                                   @Optional(defaultValue = "GET") String method,
-                                                                   @Optional @Placement(tab = ADVANCED, group = URL_OVERRIDE_CONFIGURATION, order = 1) String host,
-                                                                   @Optional @Placement(tab = ADVANCED, group = URL_OVERRIDE_CONFIGURATION, order = 2) Integer port,
-                                                                   @Optional String source,
-                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Boolean followRedirects,
-                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Boolean parseResponse,
-                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) HttpStreamingType requestStreamingMode,
-                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) HttpSendBodyMode sendBodyMode,
-                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Integer responseTimeout,
-                                                                   @Optional @Placement(tab = ADVANCED, group = "Status Code Settings") ResponseValidator responseValidator,
-                                                                   @Optional HttpRequesterRequestBuilder requestBuilder,
-                                                                   @MetadataKeyId String key,
-                                                                   @Connection HttpClient client,
-                                                                   @UseConfig HttpRequesterConfig config,
-                                                                   MuleEvent muleEvent) throws MuleException
-    {
-        HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder
-                                                                             : new HttpRequesterRequestBuilder();
-        UriParameters uriParameters = client.getDefaultUriParameters();
+  /**
+   * Consumes an HTTP service.
+   *
+   * @param path Path where the request will be sent.
+   * @param method The HTTP method for the request.
+   * @param host Host where the requests will be sent.
+   * @param port Port where the requests will be sent.
+   * @param source The expression used to obtain the body that will be sent in the request. Default is empty, so the payload will
+   *        be used as the body.
+   * @param followRedirects Specifies whether to follow redirects or not.
+   * @param parseResponse Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
+   * @param requestStreamingMode Defines if the request should be sent using streaming or not.
+   * @param sendBodyMode Defines if the request should contain a body or not.
+   * @param responseTimeout Maximum time that the request element will block the execution of the flow waiting for the HTTP
+   *        response.
+   * @param responseValidator Configures error handling of the response.
+   * @param config the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from
+   *        it.
+   * @param muleEvent the current {@link MuleEvent}
+   * @return an {@link OperationResult} with {@link HttpResponseAttributes}
+   */
+  @Summary("Executes a HTTP Request")
+  @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
+  public OperationResult<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = URL_OVERRIDE_CONFIGURATION, order = 1) String host,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = URL_OVERRIDE_CONFIGURATION, order = 2) Integer port,
+                                                                 @Optional String source,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) Boolean followRedirects,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) Boolean parseResponse,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) HttpStreamingType requestStreamingMode,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) HttpSendBodyMode sendBodyMode,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) Integer responseTimeout,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = "Status Code Settings") ResponseValidator responseValidator,
+                                                                 @Optional HttpRequesterRequestBuilder requestBuilder,
+                                                                 @MetadataKeyId String key, @Connection HttpClient client,
+                                                                 @UseConfig HttpRequesterConfig config, MuleEvent muleEvent)
+      throws MuleException {
+    HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
+    UriParameters uriParameters = client.getDefaultUriParameters();
 
-        String resolvedHost = resolveIfNecessary(host, uriParameters.getHost(), muleEvent);
-        Integer resolvedPort = resolveIfNecessary(port, uriParameters.getPort(), muleEvent);
-        String resolvedBasePath = config.getBasePath().apply(muleEvent);
-        String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
+    String resolvedHost = resolveIfNecessary(host, uriParameters.getHost(), muleEvent);
+    Integer resolvedPort = resolveIfNecessary(port, uriParameters.getPort(), muleEvent);
+    String resolvedBasePath = config.getBasePath().apply(muleEvent);
+    String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
 
-        String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
-        Boolean resolvedFollowRedirects = resolveIfNecessary(followRedirects, config.getFollowRedirects(), muleEvent);
-        HttpStreamingType resolvedStreamingMode = resolveIfNecessary(requestStreamingMode, config.getRequestStreamingMode(), muleEvent);
-        HttpSendBodyMode resolvedSendBody = resolveIfNecessary(sendBodyMode, config.getSendBodyMode(), muleEvent);
-        Boolean resolvedParseResponse = resolveIfNecessary(parseResponse, config.getParseResponse(), muleEvent);
-        Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, responseTimeout);
-        ResponseValidator resolvedValidator = responseValidator != null ? responseValidator
-                                                                        : new SuccessStatusCodeValidator("0..399");
+    String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
+    Boolean resolvedFollowRedirects = resolveIfNecessary(followRedirects, config.getFollowRedirects(), muleEvent);
+    HttpStreamingType resolvedStreamingMode =
+        resolveIfNecessary(requestStreamingMode, config.getRequestStreamingMode(), muleEvent);
+    HttpSendBodyMode resolvedSendBody = resolveIfNecessary(sendBodyMode, config.getSendBodyMode(), muleEvent);
+    Boolean resolvedParseResponse = resolveIfNecessary(parseResponse, config.getParseResponse(), muleEvent);
+    Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, responseTimeout);
+    ResponseValidator resolvedValidator =
+        responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
 
-        HttpRequester requester = new HttpRequester.Builder()
-                .setUri(resolvedUri)
-                .setMethod(method)
-                .setFollowRedirects(resolvedFollowRedirects)
-                .setRequestStreamingMode(resolvedStreamingMode)
-                .setSendBodyMode(resolvedSendBody)
-                .setSource(source)
-                .setAuthentication(config.getAuthentication())
-                .setParseResponse(resolvedParseResponse)
-                .setResponseTimeout(resolvedTimeout)
-                .setResponseValidator(resolvedValidator)
-                .setConfig(config)
-                .build();
+    HttpRequester requester =
+        new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
+            .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody).setSource(source)
+            .setAuthentication(config.getAuthentication()).setParseResponse(resolvedParseResponse)
+            .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config).build();
 
-        return OperationResult.<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true)).build();
+    return OperationResult.<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true))
+        .build();
+  }
+
+  private <T> T resolveIfNecessary(T value, Function<MuleEvent, T> function, MuleEvent event) {
+    return value != null ? value : function.apply(event);
+  }
+
+  private String resolveUri(HttpConstants.Protocols scheme, String host, Integer port, String path) {
+    // Encode spaces to generate a valid HTTP request.
+    String resolvedPath = HttpParser.encodeSpaces(path);
+
+    return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
+  }
+
+  private int resolveResponseTimeout(MuleEvent muleEvent, HttpRequesterConfig config, Integer responseTimeout) {
+    if (responseTimeout == null && config.getResponseTimeout() != null) {
+      responseTimeout = config.getResponseTimeout().apply(muleEvent);
     }
 
-    private <T> T resolveIfNecessary(T value, Function<MuleEvent, T> function, MuleEvent event)
-    {
-        return value != null ? value : function.apply(event);
+    if (muleContext.getConfiguration().isDisableTimeouts()) {
+      return WAIT_FOR_EVER;
+    } else if (responseTimeout == null) {
+      return muleEvent.getTimeout();
+    } else {
+      return responseTimeout;
+    }
+  }
+
+  protected String buildPath(String basePath, String path) {
+    String resolvedBasePath = basePath;
+    String resolvedRequestPath = path;
+
+    if (!resolvedBasePath.startsWith("/")) {
+      resolvedBasePath = "/" + resolvedBasePath;
     }
 
-    private String resolveUri(HttpConstants.Protocols scheme, String host, Integer port, String path)
-    {
-        // Encode spaces to generate a valid HTTP request.
-        String resolvedPath = HttpParser.encodeSpaces(path);
-
-        return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
+    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
+      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
     }
 
-    private int resolveResponseTimeout(MuleEvent muleEvent, HttpRequesterConfig config, Integer responseTimeout)
-    {
-        if (responseTimeout == null && config.getResponseTimeout() != null)
-        {
-            responseTimeout = config.getResponseTimeout().apply(muleEvent);
-        }
-
-        if (muleContext.getConfiguration().isDisableTimeouts())
-        {
-            return WAIT_FOR_EVER;
-        }
-        else if (responseTimeout == null)
-        {
-            return muleEvent.getTimeout();
-        }
-        else
-        {
-            return responseTimeout;
-        }
+    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
+      resolvedBasePath += "/";
     }
 
-    protected String buildPath(String basePath, String path)
-    {
-        String resolvedBasePath = basePath;
-        String resolvedRequestPath = path;
+    return resolvedBasePath + resolvedRequestPath;
 
-        if (!resolvedBasePath.startsWith("/"))
-        {
-            resolvedBasePath = "/" + resolvedBasePath;
-        }
-
-        if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/"))
-        {
-            resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
-        }
-
-        if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty())
-        {
-            resolvedBasePath += "/";
-        }
-
-        return resolvedBasePath + resolvedRequestPath;
-
-    }
+  }
 }

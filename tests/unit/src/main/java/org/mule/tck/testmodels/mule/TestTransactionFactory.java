@@ -16,53 +16,42 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
  * 
  */
 
-public class TestTransactionFactory implements TransactionFactory
-{
+public class TestTransactionFactory implements TransactionFactory {
 
-    // for testsing properties
-    private String value;
-    private Transaction mockTransaction;
+  // for testsing properties
+  private String value;
+  private Transaction mockTransaction;
 
-    public TestTransactionFactory()
-    {
+  public TestTransactionFactory() {}
+
+  public TestTransactionFactory(Transaction mockTransaction) {
+    this.mockTransaction = mockTransaction;
+  }
+
+
+
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    Transaction testTransaction;
+    if (mockTransaction != null) {
+      testTransaction = mockTransaction;
+    } else {
+      testTransaction = new TestTransaction(muleContext);
     }
 
-    public TestTransactionFactory(Transaction mockTransaction)
-    {
-        this.mockTransaction = mockTransaction;
-    }
+    testTransaction.begin();
+    return testTransaction;
+  }
 
+  public boolean isTransacted() {
+    return true;
+  }
 
+  public String getValue() {
+    return value;
+  }
 
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
-    {
-        Transaction testTransaction;
-        if (mockTransaction != null)
-        {
-            testTransaction = mockTransaction;
-        }
-        else
-        {
-            testTransaction = new TestTransaction(muleContext);
-        }
-
-        testTransaction.begin();
-        return testTransaction;
-    }
-
-    public boolean isTransacted()
-    {
-        return true;
-    }
-
-    public String getValue()
-    {
-        return value;
-    }
-
-    public void setValue(String value)
-    {
-        this.value = value;
-    }
+  public void setValue(String value) {
+    this.value = value;
+  }
 
 }

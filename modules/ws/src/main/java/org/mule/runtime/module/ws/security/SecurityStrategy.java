@@ -8,15 +8,14 @@ package org.mule.runtime.module.ws.security;
 
 import java.util.Map;
 
-public interface SecurityStrategy
-{
+public interface SecurityStrategy {
 
-    /**
-     * Applies this security strategy to inbound and outbound configuration maps.
-     *
-     * @param outConfigProperties Properties to be set on the out interceptor (applied to the SOAP request).
-     * @param inConfigProperties Properties to be set on the in interceptor (applied to the SOAP response).
-     */
-    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties);
+  /**
+   * Applies this security strategy to inbound and outbound configuration maps.
+   *
+   * @param outConfigProperties Properties to be set on the out interceptor (applied to the SOAP request).
+   * @param inConfigProperties Properties to be set on the in interceptor (applied to the SOAP response).
+   */
+  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties);
 
 }

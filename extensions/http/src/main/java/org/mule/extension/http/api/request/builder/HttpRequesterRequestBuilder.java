@@ -20,41 +20,37 @@ import java.util.Map;
  * @since 4.0
  */
 @Alias("request-builder")
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder
-{
-    /**
-     * Query parameters the request should include.
-     */
-    @Parameter
-    @Optional
-    private Map<String, String> queryParams = new HashMap<>();
+public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
-    /**
-     * URI parameters that should be used to create the request.
-     */
-    @Parameter
-    @Optional
-    private Map<String, String> uriParams = new HashMap<>();
+  /**
+   * Query parameters the request should include.
+   */
+  @Parameter
+  @Optional
+  private Map<String, String> queryParams = new HashMap<>();
 
-    //For now, only handle single params
-    public String replaceUriParams(String path)
-    {
-        for (String uriParamName : uriParams.keySet())
-        {
-            String uriParamValue = uriParams.get(uriParamName);
+  /**
+   * URI parameters that should be used to create the request.
+   */
+  @Parameter
+  @Optional
+  private Map<String, String> uriParams = new HashMap<>();
 
-            if (uriParamValue == null)
-            {
-                throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
-            }
+  // For now, only handle single params
+  public String replaceUriParams(String path) {
+    for (String uriParamName : uriParams.keySet()) {
+      String uriParamValue = uriParams.get(uriParamName);
 
-            path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
-        }
-        return path;
+      if (uriParamValue == null) {
+        throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+      }
+
+      path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
     }
+    return path;
+  }
 
-    public Map<String, String> getQueryParams()
-    {
-        return queryParams;
-    }
+  public Map<String, String> getQueryParams() {
+    return queryParams;
+  }
 }

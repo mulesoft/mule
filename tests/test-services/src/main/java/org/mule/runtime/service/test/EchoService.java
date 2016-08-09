@@ -11,14 +11,13 @@ import org.mule.runtime.api.service.Service;
 /**
  * Service API used for testing purposes.
  */
-public interface EchoService extends Service
-{
+public interface EchoService extends Service {
 
-    /**
-     * Echoes the input message.
-     *
-     * @param message text to be echoed.
-     * @return the echoed message.
-     */
-    String echo(String message);
+  /**
+   * Echoes the input message.
+   *
+   * @param message text to be echoed.
+   * @return the echoed message.
+   */
+  String echo(String message);
 }

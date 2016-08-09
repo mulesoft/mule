@@ -13,19 +13,18 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
-public class MessageRedeliveredException extends org.mule.compatibility.core.api.exception.EndpointMessageRedeliveredException
-{
-    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
-    {
-        super(messageId, redeliveryCount, maxRedelivery, endpoint,
-            buildEvent(endpoint, flow, muleMessage),JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint));
-    }
+public class MessageRedeliveredException extends org.mule.compatibility.core.api.exception.EndpointMessageRedeliveredException {
 
-    protected static DefaultMuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
-    {
-        final DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
-        return event;
-    }
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint,
+                                     FlowConstruct flow, MuleMessage muleMessage) {
+    super(messageId, redeliveryCount, maxRedelivery, endpoint, buildEvent(endpoint, flow, muleMessage),
+          JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint));
+  }
+
+  protected static DefaultMuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage) {
+    final DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
+    return event;
+  }
 
 }

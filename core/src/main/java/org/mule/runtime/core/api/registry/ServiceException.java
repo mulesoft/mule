@@ -12,15 +12,13 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Any service-related exception: service not found, service lookup error, etc.
  */
-public class ServiceException extends MuleException
-{
-    public ServiceException(Message message)
-    {
-        super(message);
-    }
+public class ServiceException extends MuleException {
 
-    public ServiceException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ServiceException(Message message) {
+    super(message);
+  }
+
+  public ServiceException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 }

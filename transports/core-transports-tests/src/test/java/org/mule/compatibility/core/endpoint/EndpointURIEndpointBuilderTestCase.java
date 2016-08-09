@@ -30,126 +30,116 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextEndpointTestCase
-{
-    @Test
-    public void testBuildInboundEndpoint() throws Exception
-    {
-        String uri = "test://address";
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
-        assertTrue(ep instanceof InboundEndpoint);
-        assertFalse(ep instanceof OutboundEndpoint);
-        assertNotNull(ep.getMessageProcessors());
-        // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getMessageProcessors().size());
-        assertNotNull(ep.getResponseMessageProcessors());
-        // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getResponseMessageProcessors().size());
-        testDefaultCommonEndpointAttributes(ep);
+public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextEndpointTestCase {
+
+  @Test
+  public void testBuildInboundEndpoint() throws Exception {
+    String uri = "test://address";
+    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
+    assertTrue(ep instanceof InboundEndpoint);
+    assertFalse(ep instanceof OutboundEndpoint);
+    assertNotNull(ep.getMessageProcessors());
+    // We no longer apply default transport transformers as part of endpoint processing
+    assertEquals(0, ep.getMessageProcessors().size());
+    assertNotNull(ep.getResponseMessageProcessors());
+    // We no longer apply default transport transformers as part of endpoint processing
+    assertEquals(0, ep.getResponseMessageProcessors().size());
+    testDefaultCommonEndpointAttributes(ep);
+  }
+
+  @Test
+  public void testBuildOutboundEndpoint() throws MuleException {
+    String uri = "test://address";
+    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
+    assertFalse(ep instanceof InboundEndpoint);
+    assertTrue(ep instanceof OutboundEndpoint);
+    // We no longer apply default transport transformers as part of endpoint processing
+    assertEquals(0, ep.getMessageProcessors().size());
+    assertNotNull(ep.getResponseMessageProcessors());
+    // We no longer apply default transport transformers as part of endpoint processing
+    assertEquals(0, ep.getResponseMessageProcessors().size());
+    testDefaultCommonEndpointAttributes(ep);
+  }
+
+  // TODO DF: Test more than defaults with tests using builder to set non-default
+  // values
+
+  protected void testDefaultCommonEndpointAttributes(ImmutableEndpoint ep) {
+    assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+    assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(), ep.getResponseTimeout());
+    assertTrue("ep.getRetryPolicyTemplate() = " + ep.getRetryPolicyTemplate().getClass(),
+               ep.getRetryPolicyTemplate() instanceof NoRetryPolicyTemplate);
+    assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
+    assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
+    assertEquals(null, ep.getSecurityFilter());
+    assertTrue(ep.getConnector() instanceof TestConnector);
+    assertEquals(new TransportObjectNameHelper(muleContext).getEndpointName(ep.getEndpointURI()), ep.getName());
+    assertFalse(ep.isDeleteUnacceptedMessages());
+    assertEquals(getDefaultEncoding(muleContext), ep.getEncoding());
+    assertEquals(null, ep.getFilter());
+    assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
+  }
+
+  @Test
+  public void testHasSetEncodingMethod() throws Exception {
+    String uri = "test://address";
+    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[] {Charset.class}));
+  }
+
+  @Test
+  public void testEndpointBuilderFromEndpoint() throws Exception {
+    String uri = "test://address";
+    ImmutableEndpoint endpoint = getTestInboundEndpoint("endpoint.test.address", uri);
+    SensingEndpointURIEndpointBuilder builder = new SensingEndpointURIEndpointBuilder(endpoint);
+    assertEquals(uri, builder.getEndpointBuilder().getEndpoint().getUri().toString());
+    assertEquals(endpoint.getConnector(), builder.getConnector());
+    assertEquals(endpoint.getProperties(), builder.getProperties());
+    assertEquals(endpoint.getTransactionConfig(), builder.getTransactionConfig());
+    assertEquals(endpoint.isDeleteUnacceptedMessages(), builder.getDeleteUnacceptedMessages(builder.getConnector()));
+    assertEquals(endpoint.getInitialState(), builder.getInitialState(builder.getConnector()));
+    assertEquals(endpoint.getResponseTimeout(), builder.getResponseTimeout(builder.getConnector()));
+    assertEquals(endpoint.getSecurityFilter(), builder.getSecurityFilter());
+    assertEquals(endpoint.getRetryPolicyTemplate(), builder.getRetryPolicyTemplate(builder.getConnector()));
+    assertEquals(MessageExchangePattern.ONE_WAY, builder.getExchangePattern());
+  }
+
+  /**
+   * Assert that the builder state (message prococessors/transformers) doesn't change when endpont is built multiple times
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void testEndpointBuilderTransformersState() throws Exception {
+    muleContext.getRegistry().registerObject("tran1", new StringAppendTransformer("1"));
+    muleContext.getRegistry().registerObject("tran2", new StringAppendTransformer("2"));
+
+    String uri = "test://address?transformers=tran1&responseTransformers=tran2";
+    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    endpointBuilder.setTransformers(java.util.Collections.<Transformer>singletonList(new StringAppendTransformer("3")));
+    endpointBuilder.setResponseTransformers(java.util.Collections.<Transformer>singletonList(new StringAppendTransformer("4")));
+
+    InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
+
+    assertEquals(2, endpoint.getMessageProcessors().size());
+    assertEquals(2, endpoint.getResponseMessageProcessors().size());
+
+    endpoint = endpointBuilder.buildInboundEndpoint();
+
+    assertEquals(2, endpoint.getMessageProcessors().size());
+    assertEquals(2, endpoint.getResponseMessageProcessors().size());
+  }
+
+  private static class SensingEndpointURIEndpointBuilder extends EndpointURIEndpointBuilder {
+
+    public SensingEndpointURIEndpointBuilder(ImmutableEndpoint endpoint) {
+      super(endpoint);
     }
 
-    @Test
-    public void testBuildOutboundEndpoint() throws MuleException
-    {
-        String uri = "test://address";
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-        assertFalse(ep instanceof InboundEndpoint);
-        assertTrue(ep instanceof OutboundEndpoint);
-        // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getMessageProcessors().size());
-        assertNotNull(ep.getResponseMessageProcessors());
-        // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getResponseMessageProcessors().size());
-        testDefaultCommonEndpointAttributes(ep);
+    public MessageExchangePattern getExchangePattern() {
+      return messageExchangePattern;
     }
-
-    // TODO DF: Test more than defaults with tests using builder to set non-default
-    // values
-
-    protected void testDefaultCommonEndpointAttributes(ImmutableEndpoint ep)
-    {
-        assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(), ep.getResponseTimeout());
-        assertTrue("ep.getRetryPolicyTemplate() = " + ep.getRetryPolicyTemplate().getClass(), ep.getRetryPolicyTemplate() instanceof NoRetryPolicyTemplate);
-        assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
-        assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
-        assertEquals(null, ep.getSecurityFilter());
-        assertTrue(ep.getConnector() instanceof TestConnector);
-        assertEquals(new TransportObjectNameHelper(muleContext).getEndpointName(ep.getEndpointURI()), ep.getName());
-        assertFalse(ep.isDeleteUnacceptedMessages());
-        assertEquals(getDefaultEncoding(muleContext), ep.getEncoding());
-        assertEquals(null, ep.getFilter());
-        assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
-    }
-    
-    @Test
-    public void testHasSetEncodingMethod() throws Exception
-    {
-        String uri = "test://address";
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[] {Charset.class}));
-    }
-    
-    @Test
-    public void testEndpointBuilderFromEndpoint() throws Exception
-    {
-        String uri = "test://address";
-        ImmutableEndpoint endpoint = getTestInboundEndpoint("endpoint.test.address", uri);
-        SensingEndpointURIEndpointBuilder builder = new SensingEndpointURIEndpointBuilder(endpoint);
-        assertEquals(uri, builder.getEndpointBuilder().getEndpoint().getUri().toString());
-        assertEquals(endpoint.getConnector(), builder.getConnector());
-        assertEquals(endpoint.getProperties(), builder.getProperties());
-        assertEquals(endpoint.getTransactionConfig(), builder.getTransactionConfig());
-        assertEquals(endpoint.isDeleteUnacceptedMessages(), builder.getDeleteUnacceptedMessages(builder.getConnector()));
-        assertEquals(endpoint.getInitialState(), builder.getInitialState(builder.getConnector()));
-        assertEquals(endpoint.getResponseTimeout(), builder.getResponseTimeout(builder.getConnector()));
-        assertEquals(endpoint.getSecurityFilter(), builder.getSecurityFilter());
-        assertEquals(endpoint.getRetryPolicyTemplate(), builder.getRetryPolicyTemplate(builder.getConnector()));
-        assertEquals(MessageExchangePattern.ONE_WAY, builder.getExchangePattern());
-    }
-    
-    /**
-     * Assert that the builder state (message prococessors/transformers) doesn't change when endpont is built
-     * multiple times
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testEndpointBuilderTransformersState() throws Exception
-    {
-        muleContext.getRegistry().registerObject("tran1", new StringAppendTransformer("1"));
-        muleContext.getRegistry().registerObject("tran2", new StringAppendTransformer("2"));
-
-        String uri = "test://address?transformers=tran1&responseTransformers=tran2";
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        endpointBuilder.setTransformers(java.util.Collections.<Transformer> singletonList(new StringAppendTransformer(
-            "3")));
-        endpointBuilder.setResponseTransformers(java.util.Collections.<Transformer> singletonList(new StringAppendTransformer(
-            "4")));
-
-        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-
-        assertEquals(2, endpoint.getMessageProcessors().size());
-        assertEquals(2, endpoint.getResponseMessageProcessors().size());
-
-        endpoint = endpointBuilder.buildInboundEndpoint();
-
-        assertEquals(2, endpoint.getMessageProcessors().size());
-        assertEquals(2, endpoint.getResponseMessageProcessors().size());
-    }
-    
-    private static class SensingEndpointURIEndpointBuilder extends EndpointURIEndpointBuilder
-    {
-        public SensingEndpointURIEndpointBuilder(ImmutableEndpoint endpoint)
-        {
-            super(endpoint);
-        }
-        
-        public MessageExchangePattern getExchangePattern()
-        {
-            return messageExchangePattern;
-        }
-    }
+  }
 }

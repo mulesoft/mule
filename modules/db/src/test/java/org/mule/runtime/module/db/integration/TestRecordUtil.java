@@ -26,111 +26,87 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TestRecordUtil
-{
+public class TestRecordUtil {
 
-    public static Record[] getAllPlanetRecords()
-    {
-        return new Record[] {getVenusRecord(), getEarthRecord(), getMarsRecord()};
+  public static Record[] getAllPlanetRecords() {
+    return new Record[] {getVenusRecord(), getEarthRecord(), getMarsRecord()};
+  }
+
+  public static Record[] getAllAlienRecords() {
+    return new Record[] {getMonguitoRecord(), getEtRecord()};
+  }
+
+  public static void assertMessageContains(MuleMessage message, Record... records) {
+    assertRecords(message.getPayload(), records);
+  }
+
+  public static void assertRecords(Object value, Record... records) {
+    assertTrue("Expected a list but received: " + ((value == null) ? "null" : value.getClass().getName()), value instanceof List);
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) value;
+    assertThat(resultList.size(), equalTo(records.length));
+
+    for (int i = 0, recordsLength = records.length; i < recordsLength; i++) {
+      Record actualRecord = createRecord(resultList.get(i));
+      assertRecord(records[i], actualRecord);
     }
+  }
 
-    public static Record[] getAllAlienRecords()
-    {
-        return new Record[] {getMonguitoRecord(), getEtRecord()};
-    }
-
-    public static void assertMessageContains(MuleMessage message, Record... records)
-    {
-        assertRecords(message.getPayload(), records);
-    }
-
-    public static void assertRecords(Object value, Record... records)
-    {
-        assertTrue("Expected a list but received: " + ((value == null) ? "null" : value.getClass().getName()), value instanceof List);
-        List<Map<String, Object>> resultList = (List<Map<String, Object>>) value;
-        assertThat(resultList.size(), equalTo(records.length));
-
-        for (int i = 0, recordsLength = records.length; i < recordsLength; i++)
-        {
-            Record actualRecord = createRecord(resultList.get(i));
-            assertRecord(records[i], actualRecord);
+  private static Record createRecord(Map<String, Object> fields) {
+    Map<String, Object> recordFields = new HashMap<>();
+    for (String fieldName : fields.keySet()) {
+      Object fieldValue = fields.get(fieldName);
+      if (fieldValue instanceof Object[] && ((Object[]) fieldValue).length > 0) {
+        final Object[] arrayValue = (Object[]) fieldValue;
+        if (arrayValue[0] instanceof Struct) {
+          fieldValue = convertStructToObjectArray((Struct) arrayValue[0]);
         }
+      } else if (fieldValue instanceof Struct) {
+        fieldValue = convertStructToObjectArray((Struct) fieldValue);
+      }
+      recordFields.put(fieldName, fieldValue);
     }
 
-    private static Record createRecord(Map<String, Object> fields)
-    {
-        Map<String, Object> recordFields = new HashMap<>();
-        for (String fieldName : fields.keySet())
-        {
-            Object fieldValue = fields.get(fieldName);
-            if (fieldValue instanceof Object[] && ((Object[]) fieldValue).length > 0)
-            {
-                final Object[] arrayValue = (Object[]) fieldValue;
-                if (arrayValue[0] instanceof Struct)
-                {
-                    fieldValue = convertStructToObjectArray((Struct) arrayValue[0]);
-                }
-            }
-            else if (fieldValue instanceof Struct)
-            {
-                fieldValue = convertStructToObjectArray((Struct) fieldValue);
-            }
-            recordFields.put(fieldName, fieldValue);
-        }
+    return new Record(recordFields);
+  }
 
-        return new Record(recordFields);
+  private static Object[] convertStructToObjectArray(Struct value) {
+    try {
+      final Object[] attributes = value.getAttributes();
+      Object[] arrayFieldValue = new Object[attributes.length];
+      for (int i = 0; i < attributes.length; i++) {
+        arrayFieldValue[i] = attributes[i];
+      }
+      return arrayFieldValue;
+    } catch (SQLException e) {
+      throw new IllegalArgumentException("Cannot transform Struct to Object[]");
     }
+  }
 
-    private static Object[] convertStructToObjectArray(Struct value)
-    {
-        try
-        {
-            final Object[] attributes = value.getAttributes();
-            Object[] arrayFieldValue = new Object[attributes.length];
-            for (int i = 0; i < attributes.length; i++)
-            {
-                arrayFieldValue[i] = attributes[i];
-            }
-            return arrayFieldValue;
-        }
-        catch (SQLException e)
-        {
-            throw new IllegalArgumentException("Cannot transform Struct to Object[]");
-        }
+  public static void assertRecord(Record expected, Record actual) {
+    Record expectedRecord = expected;
+
+    for (Field field : expectedRecord.getFields()) {
+      assertThat(actual, containsField(field));
     }
+  }
 
-    public static void assertRecord(Record expected, Record actual)
-    {
-        Record expectedRecord = expected;
+  public static Record getMarsRecord() {
+    return new Record(new Field("NAME", MARS.getName()));
+  }
 
-        for (Field field : expectedRecord.getFields())
-        {
-            assertThat(actual, containsField(field));
-        }
-    }
+  public static Record getVenusRecord() {
+    return new Record(new Field("NAME", VENUS.getName()));
+  }
 
-    public static Record getMarsRecord()
-    {
-        return new Record(new Field("NAME", MARS.getName()));
-    }
+  public static Record getEarthRecord() {
+    return new Record(new Field("NAME", EARTH.getName()));
+  }
 
-    public static Record getVenusRecord()
-    {
-        return new Record(new Field("NAME", VENUS.getName()));
-    }
+  public static Record getMonguitoRecord() {
+    return new Record(new Field("NAME", Alien.MONGUITO.getName()), new XmlField("DESCRIPTION", Alien.MONGUITO.getXml()));
+  }
 
-    public static Record getEarthRecord()
-    {
-        return new Record(new Field("NAME", EARTH.getName()));
-    }
-
-    public static Record getMonguitoRecord()
-    {
-        return new Record(new Field("NAME", Alien.MONGUITO.getName()), new XmlField("DESCRIPTION", Alien.MONGUITO.getXml()));
-    }
-
-    public static Record getEtRecord()
-    {
-        return new Record(new Field("NAME", Alien.ET.getName()), new XmlField("DESCRIPTION", Alien.ET.getXml()));
-    }
+  public static Record getEtRecord() {
+    return new Record(new Field("NAME", Alien.ET.getName()), new XmlField("DESCRIPTION", Alien.ET.getXml()));
+  }
 }

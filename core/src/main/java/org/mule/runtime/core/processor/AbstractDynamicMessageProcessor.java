@@ -12,25 +12,21 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
- * Implementation of {@link MessageProcessor} that dynamically chooses and uses
- * another {@link MessageProcessor}
+ * Implementation of {@link MessageProcessor} that dynamically chooses and uses another {@link MessageProcessor}
  */
-public abstract class AbstractDynamicMessageProcessor implements MessageProcessor
-{
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return resolveMessageProcessor(event).process(event);
-    }
+public abstract class AbstractDynamicMessageProcessor implements MessageProcessor {
 
-    /**
-     * Determines which MessageProcessor should be used. Implementations may choose
-     * to use a message property, configure this
-     */
-    protected abstract MessageProcessor resolveMessageProcessor(MuleEvent event) throws MuleException;
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return resolveMessageProcessor(event).process(event);
+  }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  /**
+   * Determines which MessageProcessor should be used. Implementations may choose to use a message property, configure this
+   */
+  protected abstract MessageProcessor resolveMessageProcessor(MuleEvent event) throws MuleException;
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

@@ -22,79 +22,68 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-public abstract class AbstractTransportsJmxAgent extends AbstractJmxAgent
-{
-    protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
-    {
-        for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
-        {
-            if (connector instanceof AbstractConnector)
-            {
-                for (MessageReceiver messageReceiver : ((AbstractConnector) connector).getReceivers().values())
-                {
-                    if (muleContext.equals(messageReceiver.getFlowConstruct().getMuleContext()))
-                    {
-                        EndpointServiceMBean service = new EndpointService(messageReceiver);
+public abstract class AbstractTransportsJmxAgent extends AbstractJmxAgent {
 
-                        String fullName = buildFullyQualifiedEndpointName(service, connector);
-                        if (logger.isInfoEnabled())
-                        {
-                            logger.info("Attempting to register service with name: " + fullName);
-                        }
+  protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
+      InstanceAlreadyExistsException, MalformedObjectNameException {
+    for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class)) {
+      if (connector instanceof AbstractConnector) {
+        for (MessageReceiver messageReceiver : ((AbstractConnector) connector).getReceivers().values()) {
+          if (muleContext.equals(messageReceiver.getFlowConstruct().getMuleContext())) {
+            EndpointServiceMBean service = new EndpointService(messageReceiver);
 
-                        ObjectName on = jmxSupport.getObjectName(fullName);
-                        ClassloaderSwitchingMBeanWrapper mBean = new ClassloaderSwitchingMBeanWrapper(service, EndpointServiceMBean.class, muleContext.getExecutionClassLoader());
-                        getMBeanServer().registerMBean(mBean, on);
-                        if (logger.isInfoEnabled())
-                        {
-                            logger.info("Registered Endpoint Service with name: " + on);
-                        }
-                    }
-                }
+            String fullName = buildFullyQualifiedEndpointName(service, connector);
+            if (logger.isInfoEnabled()) {
+              logger.info("Attempting to register service with name: " + fullName);
             }
-            else
-            {
-                logger.warn("Connector: " + connector
-                            + " is not an istance of AbstractConnector, cannot obtain Endpoint MBeans from it");
+
+            ObjectName on = jmxSupport.getObjectName(fullName);
+            ClassloaderSwitchingMBeanWrapper mBean =
+                new ClassloaderSwitchingMBeanWrapper(service, EndpointServiceMBean.class, muleContext.getExecutionClassLoader());
+            getMBeanServer().registerMBean(mBean, on);
+            if (logger.isInfoEnabled()) {
+              logger.info("Registered Endpoint Service with name: " + on);
             }
+          }
         }
+      } else {
+        logger.warn("Connector: " + connector + " is not an istance of AbstractConnector, cannot obtain Endpoint MBeans from it");
+      }
     }
+  }
 
-    protected String buildFullyQualifiedEndpointName(EndpointServiceMBean mBean, Connector connector)
-    {
-        String rawName = jmxSupport.escape(mBean.getName());
+  protected String buildFullyQualifiedEndpointName(EndpointServiceMBean mBean, Connector connector) {
+    String rawName = jmxSupport.escape(mBean.getName());
 
-        StringBuilder fullName = new StringBuilder(128);
-        fullName.append(jmxSupport.getDomainName(muleContext, !containerMode));
-        fullName.append(":type=Endpoint,service=");
-        fullName.append(jmxSupport.escape(mBean.getComponentName()));
-        fullName.append(",connector=");
-        fullName.append(connector.getName());
-        fullName.append(",name=");
-        fullName.append(rawName);
-        return fullName.toString();
+    StringBuilder fullName = new StringBuilder(128);
+    fullName.append(jmxSupport.getDomainName(muleContext, !containerMode));
+    fullName.append(":type=Endpoint,service=");
+    fullName.append(jmxSupport.escape(mBean.getComponentName()));
+    fullName.append(",connector=");
+    fullName.append(connector.getName());
+    fullName.append(",name=");
+    fullName.append(rawName);
+    return fullName.toString();
+  }
+
+  protected void registerConnectorServices() throws MalformedObjectNameException, NotCompliantMBeanException,
+      MBeanRegistrationException, InstanceAlreadyExistsException {
+    for (Connector connector : muleContext.getRegistry().lookupLocalObjects(Connector.class)) {
+      ConnectorServiceMBean service = new ConnectorService(connector);
+      final String rawName = service.getName();
+      final String name = jmxSupport.escape(rawName);
+      final String jmxName = String.format("%s:%s%s", jmxSupport.getDomainName(muleContext, !containerMode),
+                                           ConnectorServiceMBean.DEFAULT_JMX_NAME_PREFIX, name);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Attempting to register service with name: " + jmxName);
+      }
+      ObjectName oName = jmxSupport.getObjectName(jmxName);
+      ClassloaderSwitchingMBeanWrapper mBean =
+          new ClassloaderSwitchingMBeanWrapper(service, ConnectorServiceMBean.class, muleContext.getExecutionClassLoader());
+      getMBeanServer().registerMBean(mBean, oName);
+      logger.info("Registered Connector Service with name " + oName);
     }
-
-    protected void registerConnectorServices() throws MalformedObjectNameException,
-            NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException
-    {
-        for (Connector connector : muleContext.getRegistry().lookupLocalObjects(Connector.class))
-{
-            ConnectorServiceMBean service = new ConnectorService(connector);
-            final String rawName = service.getName();
-            final String name = jmxSupport.escape(rawName);
-            final String jmxName = String.format("%s:%s%s", jmxSupport.getDomainName(muleContext, !containerMode), ConnectorServiceMBean.DEFAULT_JMX_NAME_PREFIX, name);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Attempting to register service with name: " + jmxName);
-            }
-            ObjectName oName = jmxSupport.getObjectName(jmxName);
-            ClassloaderSwitchingMBeanWrapper mBean = new ClassloaderSwitchingMBeanWrapper(service, ConnectorServiceMBean.class, muleContext.getExecutionClassLoader());
-            getMBeanServer().registerMBean(mBean, oName);
-            logger.info("Registered Connector Service with name " + oName);
-        }
-    }
+  }
 
 
 }

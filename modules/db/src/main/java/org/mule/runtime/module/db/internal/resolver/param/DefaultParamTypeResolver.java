@@ -22,73 +22,57 @@ import java.util.Map;
 /**
  * Resolves unknown and dynamic types using metadata if possible
  */
-public class DefaultParamTypeResolver implements ParamTypeResolver
-{
+public class DefaultParamTypeResolver implements ParamTypeResolver {
 
-    protected final DbTypeManager dbTypeManager;
-    private ParamTypeResolver metadataParamTypeResolver;
+  protected final DbTypeManager dbTypeManager;
+  private ParamTypeResolver metadataParamTypeResolver;
 
-    protected DefaultParamTypeResolver(DbTypeManager dbTypeManager, ParamTypeResolver metadataParamTypeResolver)
-    {
-        this.dbTypeManager = dbTypeManager;
-        this.metadataParamTypeResolver = metadataParamTypeResolver;
-    }
+  protected DefaultParamTypeResolver(DbTypeManager dbTypeManager, ParamTypeResolver metadataParamTypeResolver) {
+    this.dbTypeManager = dbTypeManager;
+    this.metadataParamTypeResolver = metadataParamTypeResolver;
+  }
 
-    public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
-    {
-        Map<Integer, DbType> resolvedParamTypes = new HashMap<Integer, DbType>();
+  public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException {
+    Map<Integer, DbType> resolvedParamTypes = new HashMap<Integer, DbType>();
 
-        Map<Integer, DbType> metadataParamTypes = null;
+    Map<Integer, DbType> metadataParamTypes = null;
 
-        for (QueryParam queryParam : queryTemplate.getParams())
-        {
-            if (queryParam.getType() instanceof UnknownDbType)
-            {
-                if (metadataParamTypes == null)
-                {
-                    metadataParamTypes = getParamTypesUsingMetadata(connection, queryTemplate);
-                }
-
-                resolvedParamTypes.put(queryParam.getIndex(), metadataParamTypes.get(queryParam.getIndex()));
-            }
-            else if (queryParam.getType() instanceof DynamicDbType)
-            {
-                DbType dbType = dbTypeManager.lookup(connection, queryParam.getType().getName());
-
-                resolvedParamTypes.put(queryParam.getIndex(), dbType);
-            }
-            else
-            {
-                resolvedParamTypes.put(queryParam.getIndex(), queryParam.getType());
-            }
+    for (QueryParam queryParam : queryTemplate.getParams()) {
+      if (queryParam.getType() instanceof UnknownDbType) {
+        if (metadataParamTypes == null) {
+          metadataParamTypes = getParamTypesUsingMetadata(connection, queryTemplate);
         }
 
-        return resolvedParamTypes;
+        resolvedParamTypes.put(queryParam.getIndex(), metadataParamTypes.get(queryParam.getIndex()));
+      } else if (queryParam.getType() instanceof DynamicDbType) {
+        DbType dbType = dbTypeManager.lookup(connection, queryParam.getType().getName());
+
+        resolvedParamTypes.put(queryParam.getIndex(), dbType);
+      } else {
+        resolvedParamTypes.put(queryParam.getIndex(), queryParam.getType());
+      }
     }
 
-    protected Map<Integer, DbType> getParamTypesUsingMetadata(DbConnection connection, QueryTemplate queryTemplate)
-    {
-        Map<Integer, DbType> metadataParamTypes;
-        try
-        {
-            metadataParamTypes = metadataParamTypeResolver.getParameterTypes(connection, queryTemplate);
-        }
-        catch (SQLException e)
-        {
-            metadataParamTypes = getParamTypesFromQueryTemplate(queryTemplate);
-        }
-        return metadataParamTypes;
+    return resolvedParamTypes;
+  }
+
+  protected Map<Integer, DbType> getParamTypesUsingMetadata(DbConnection connection, QueryTemplate queryTemplate) {
+    Map<Integer, DbType> metadataParamTypes;
+    try {
+      metadataParamTypes = metadataParamTypeResolver.getParameterTypes(connection, queryTemplate);
+    } catch (SQLException e) {
+      metadataParamTypes = getParamTypesFromQueryTemplate(queryTemplate);
+    }
+    return metadataParamTypes;
+  }
+
+  private Map<Integer, DbType> getParamTypesFromQueryTemplate(QueryTemplate queryTemplate) {
+    Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
+
+    for (QueryParam queryParam : queryTemplate.getParams()) {
+      paramTypes.put(queryParam.getIndex(), queryParam.getType());
     }
 
-    private Map<Integer, DbType> getParamTypesFromQueryTemplate(QueryTemplate queryTemplate)
-    {
-        Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
-
-        for (QueryParam queryParam : queryTemplate.getParams())
-        {
-            paramTypes.put(queryParam.getIndex(), queryParam.getType());
-        }
-
-        return paramTypes;
-    }
+    return paramTypes;
+  }
 }

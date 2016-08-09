@@ -9,10 +9,10 @@ package org.mule.runtime.core.api.context;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * Objects who want to be aware of the MuleContext should implement this interface. Once the context has
- * been initialised it will be passed to all objects implementing this interface.
+ * Objects who want to be aware of the MuleContext should implement this interface. Once the context has been initialised it will
+ * be passed to all objects implementing this interface.
  */
-public interface MuleContextAware
-{
-    void setMuleContext(MuleContext context);
+public interface MuleContextAware {
+
+  void setMuleContext(MuleContext context);
 }

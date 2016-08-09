@@ -17,59 +17,49 @@ import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnect
 import java.util.function.Function;
 
 /**
- * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit
- * {@link ConnectionProvider}.
+ * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit {@link ConnectionProvider}.
  * <p>
- * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created
- * the first time the {@link #resolve(MuleEvent)} method is invoked on {@code this} instance.
- * Subsequent invokations will return the same instance.
+ * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the
+ * {@link #resolve(MuleEvent)} method is invoked on {@code this} instance. Subsequent invokations will return the same instance.
  * <p>
  * This class is thread-safe
  *
  * @since 4.0
  */
-public final class ImplicitConnectionProviderValueResolver implements ValueResolver<ConnectionProvider>
-{
+public final class ImplicitConnectionProviderValueResolver implements ValueResolver<ConnectionProvider> {
 
-    private ConnectionProvider connectionProvider = null;
-    private Function<MuleEvent, ConnectionProvider> delegate;
+  private ConnectionProvider connectionProvider = null;
+  private Function<MuleEvent, ConnectionProvider> delegate;
 
-    public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel)
-    {
-        if (getAllConnectionProviders(configurationModel).isEmpty())
-        {
-            // No connection provider to resolve
-            delegate = nextEvent -> null;
+  public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel) {
+    if (getAllConnectionProviders(configurationModel).isEmpty()) {
+      // No connection provider to resolve
+      delegate = nextEvent -> null;
+    } else {
+      delegate = event -> {
+        synchronized (this) {
+          if (connectionProvider == null) {
+            connectionProvider =
+                new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
+            delegate = nextEvent -> connectionProvider;
+          }
+          return connectionProvider;
         }
-        else
-        {
-            delegate = event -> {
-                synchronized (this)
-                {
-                    if (connectionProvider == null)
-                    {
-                        connectionProvider = new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
-                        delegate = nextEvent -> connectionProvider;
-                    }
-                    return connectionProvider;
-                }
-            };
-        }
+      };
     }
+  }
 
-    @Override
-    public ConnectionProvider resolve(MuleEvent event) throws MuleException
-    {
-        return delegate.apply(event);
-    }
+  @Override
+  public ConnectionProvider resolve(MuleEvent event) throws MuleException {
+    return delegate.apply(event);
+  }
 
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isDynamic()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }

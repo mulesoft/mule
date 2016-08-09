@@ -18,47 +18,35 @@ import java.util.Map;
  * <code>MapLookup</code> looks up and returns an object from a Map based on a key.
  */
 
-public class MapLookup extends AbstractTransformer
-{
+public class MapLookup extends AbstractTransformer {
 
-    protected volatile Object key;
+  protected volatile Object key;
 
-    public MapLookup()
-    {
-        registerSourceType(DataType.fromType(Map.class));
-        setReturnDataType(DataType.OBJECT);
+  public MapLookup() {
+    registerSourceType(DataType.fromType(Map.class));
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    if (src instanceof Map) {
+      if (key != null) {
+        return ((Map) src).get(key);
+      } else {
+        throw new TransformerException(MessageFactory
+            .createStaticMessage("Property 'key' must be set in order to use this transformer."));
+      }
+    } else {
+      throw new TransformerException(MessageFactory.createStaticMessage("Message to transform must be of type java.util.Map"));
     }
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        if (src instanceof Map)
-        {
-            if (key != null)
-            {
-                return ((Map) src).get(key);
-            }
-            else
-            {
-                throw new TransformerException(MessageFactory
-                        .createStaticMessage("Property 'key' must be set in order to use this transformer."));
-            }
-        }
-        else
-        {
-            throw new TransformerException(MessageFactory
-                    .createStaticMessage("Message to transform must be of type java.util.Map"));
-        }
-    }
+  public Object getKey() {
+    return key;
+  }
 
-    public Object getKey()
-    {
-        return key;
-    }
-
-    public void setKey(Object key)
-    {
-        this.key = key;
-    }
+  public void setKey(Object key) {
+    this.key = key;
+  }
 
 }

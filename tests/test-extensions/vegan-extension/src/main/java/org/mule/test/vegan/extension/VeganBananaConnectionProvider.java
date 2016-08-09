@@ -13,24 +13,20 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Banana;
 
 @Alias("banana")
-public class VeganBananaConnectionProvider implements ConnectionProvider<Banana>
-{
+public class VeganBananaConnectionProvider implements ConnectionProvider<Banana> {
 
-    @Override
-    public Banana connect() throws ConnectionException
-    {
-        return new Banana();
-    }
+  @Override
+  public Banana connect() throws ConnectionException {
+    return new Banana();
+  }
 
-    @Override
-    public void disconnect(Banana banana)
-    {
+  @Override
+  public void disconnect(Banana banana) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(Banana banana)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(Banana banana) {
+    return ConnectionValidationResult.success();
+  }
 }

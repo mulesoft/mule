@@ -16,46 +16,42 @@ import java.nio.charset.Charset;
 /**
  * Converts a FruitBowl to a FruitBasket (for testing obviously :)
  */
-public class FruitBowlToFruitBasket extends AbstractTransformer implements DiscoverableTransformer
-{
-    private int weighting = 1;
+public class FruitBowlToFruitBasket extends AbstractTransformer implements DiscoverableTransformer {
 
-    public FruitBowlToFruitBasket()
-    {
-        registerSourceType(DataType.fromType(FruitBowl.class));
-        setReturnDataType(DataType.fromType(FruitBasket.class));
-    }
+  private int weighting = 1;
 
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        FruitBowl bowl = (FruitBowl)src;
-        FruitBasket basket = new FruitBasket();
-        basket.setFruit(bowl.getFruit());
-        return basket;
-    }
+  public FruitBowlToFruitBasket() {
+    registerSourceType(DataType.fromType(FruitBowl.class));
+    setReturnDataType(DataType.fromType(FruitBasket.class));
+  }
 
-    /**
-     * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
-     *
-     * @return the priority weighting for this transformer. This is a value between
-     *         {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
-     */
-    @Override
-    public int getPriorityWeighting()
-    {
-        return weighting;
-    }
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    FruitBowl bowl = (FruitBowl) src;
+    FruitBasket basket = new FruitBasket();
+    basket.setFruit(bowl.getFruit());
+    return basket;
+  }
 
-    /**
-     * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
-     *
-     * @param weighting the priority weighting for this transformer. This is a value between
-     *                  {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
-     */
-    @Override
-    public void setPriorityWeighting(int weighting)
-    {
-        this.weighting = weighting;
-    }
+  /**
+   * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
+   *
+   * @return the priority weighting for this transformer. This is a value between {@link #MIN_PRIORITY_WEIGHTING} and
+   *         {@link #MAX_PRIORITY_WEIGHTING}.
+   */
+  @Override
+  public int getPriorityWeighting() {
+    return weighting;
+  }
+
+  /**
+   * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
+   *
+   * @param weighting the priority weighting for this transformer. This is a value between {@link #MIN_PRIORITY_WEIGHTING} and
+   *        {@link #MAX_PRIORITY_WEIGHTING}.
+   */
+  @Override
+  public void setPriorityWeighting(int weighting) {
+    this.weighting = weighting;
+  }
 }

@@ -9,22 +9,19 @@ package org.mule.runtime.core.time;
 import java.util.function.Supplier;
 
 /**
- * A {@link Supplier} which provides the current system time
- * in milliseconds.
+ * A {@link Supplier} which provides the current system time in milliseconds.
  *
  * @since 4.0
  */
-public class TimeSupplier implements Supplier<Long>
-{
+public class TimeSupplier implements Supplier<Long> {
 
-    /**
-     * Returns {@link System#currentTimeMillis()}
-     *
-     * @return the current time in milliseconds
-     */
-    @Override
-    public Long get()
-    {
-        return System.currentTimeMillis();
-    }
+  /**
+   * Returns {@link System#currentTimeMillis()}
+   *
+   * @return the current time in milliseconds
+   */
+  @Override
+  public Long get() {
+    return System.currentTimeMillis();
+  }
 }

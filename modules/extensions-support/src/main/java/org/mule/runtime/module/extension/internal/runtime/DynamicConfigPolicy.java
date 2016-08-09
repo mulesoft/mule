@@ -15,42 +15,37 @@ import org.mule.runtime.core.time.TimeSupplier;
  *
  * @since 4.0
  */
-public final class DynamicConfigPolicy
-{
+public final class DynamicConfigPolicy {
 
-    /**
-     * Returns an instance with the default settings, using the given
-     * {@code timeSupplier}
-     *
-     * @param timeSupplier the {@link TimeSupplier} for the returned instance
-     * @return a {@link DynamicConfigPolicy} with the default settings
-     */
-    public static DynamicConfigPolicy getDefault(TimeSupplier timeSupplier)
-    {
-        return new DynamicConfigPolicy(ImmutableExpirationPolicy.getDefault(timeSupplier));
-    }
+  /**
+   * Returns an instance with the default settings, using the given {@code timeSupplier}
+   *
+   * @param timeSupplier the {@link TimeSupplier} for the returned instance
+   * @return a {@link DynamicConfigPolicy} with the default settings
+   */
+  public static DynamicConfigPolicy getDefault(TimeSupplier timeSupplier) {
+    return new DynamicConfigPolicy(ImmutableExpirationPolicy.getDefault(timeSupplier));
+  }
 
-    private final ExpirationPolicy expirationPolicy;
+  private final ExpirationPolicy expirationPolicy;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param expirationPolicy the expiration policy to be used.
-     * @throws IllegalArgumentException is {@code expirationPolicy} is {@code null}
-     */
-    public DynamicConfigPolicy(ExpirationPolicy expirationPolicy)
-    {
-        checkArgument(expirationPolicy != null, "expiration policy cannot be null");
-        this.expirationPolicy = expirationPolicy;
-    }
+  /**
+   * Creates a new instance.
+   *
+   * @param expirationPolicy the expiration policy to be used.
+   * @throws IllegalArgumentException is {@code expirationPolicy} is {@code null}
+   */
+  public DynamicConfigPolicy(ExpirationPolicy expirationPolicy) {
+    checkArgument(expirationPolicy != null, "expiration policy cannot be null");
+    this.expirationPolicy = expirationPolicy;
+  }
 
-    /**
-     * Returns the {@link ExpirationPolicy} for the dynamic configuration instances
-     *
-     * @return a {@link ExpirationPolicy}. It will never be {@code null}
-     */
-    public ExpirationPolicy getExpirationPolicy()
-    {
-        return expirationPolicy;
-    }
+  /**
+   * Returns the {@link ExpirationPolicy} for the dynamic configuration instances
+   *
+   * @return a {@link ExpirationPolicy}. It will never be {@code null}
+   */
+  public ExpirationPolicy getExpirationPolicy() {
+    return expirationPolicy;
+  }
 }

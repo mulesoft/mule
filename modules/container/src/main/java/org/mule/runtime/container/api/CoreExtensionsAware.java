@@ -12,11 +12,10 @@ import java.util.List;
 /**
  * Enables injection of all available {@link MuleCoreExtension}.
  * <p/>
- * Classes implementing this interface cannot contain methods annotated with
- * {@link MuleCoreExtensionDependency} as that will create an unresolvable dependency on runtime.
+ * Classes implementing this interface cannot contain methods annotated with {@link MuleCoreExtensionDependency} as that will
+ * create an unresolvable dependency on runtime.
  */
-public interface CoreExtensionsAware
-{
+public interface CoreExtensionsAware {
 
-    void setCoreExtensions(List<MuleCoreExtension> coreExtensions);
+  void setCoreExtensions(List<MuleCoreExtension> coreExtensions);
 }

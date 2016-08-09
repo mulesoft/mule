@@ -23,308 +23,273 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
- * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined
- * in an artifact configuration file.
+ * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
+ * artifact configuration file.
  * <p/>
- * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which configuration
- * element this object represents is identified by a {@link org.mule.runtime.config.spring.dsl.model.ComponentIdentifier} that can be retrieved
- * using {@code #getIdentifier}.
+ * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which
+ * configuration element this object represents is identified by a
+ * {@link org.mule.runtime.config.spring.dsl.model.ComponentIdentifier} that can be retrieved using {@code #getIdentifier}.
  * <p/>
  * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.
  * <p/>
- * There's a set of configuration attributes or custom attributes that may not be mapped directly to the object that runs on runtime
- * but may be hold by a {@code ComponentModel}. Those attributes are retrieved by using {@code #getCustomAttributes}.
+ * There's a set of configuration attributes or custom attributes that may not be mapped directly to the object that runs on
+ * runtime but may be hold by a {@code ComponentModel}. Those attributes are retrieved by using {@code #getCustomAttributes}.
  *
  * @since 4.0
  */
-public class ComponentModel
-{
+public class ComponentModel {
 
-    private boolean root = false;
-    private ComponentIdentifier identifier;
-    private Map<String, Object> customAttributes = new HashMap<>();
-    private Map<String, String> parameters = new HashMap<>();
-    private Set<String> schemaValueParameter = new HashSet<>();
-    //TODO MULE-9638 This must go away from component model once it's immutable.
-    private ComponentModel parent;
-    private List<ComponentModel> innerComponents = new ArrayList<>();
-    private String textContent;
+  private boolean root = false;
+  private ComponentIdentifier identifier;
+  private Map<String, Object> customAttributes = new HashMap<>();
+  private Map<String, String> parameters = new HashMap<>();
+  private Set<String> schemaValueParameter = new HashSet<>();
+  // TODO MULE-9638 This must go away from component model once it's immutable.
+  private ComponentModel parent;
+  private List<ComponentModel> innerComponents = new ArrayList<>();
+  private String textContent;
 
-    //TODO  MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
-    private BeanReference beanReference;
-    private BeanDefinition beanDefinition;
-    private Class<?> type;
+  // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
+  private BeanReference beanReference;
+  private BeanDefinition beanDefinition;
+  private Class<?> type;
 
-    /**
-     * @return the configuration identifier.
-     */
-    public ComponentIdentifier getIdentifier()
-    {
-        return identifier;
-    }
+  /**
+   * @return the configuration identifier.
+   */
+  public ComponentIdentifier getIdentifier() {
+    return identifier;
+  }
 
-    /**
-     * @return a {@code java.util.Map} with the simple parameters of the configuration.
-     */
-    public Map<String, String> getParameters()
-    {
-        return Collections.unmodifiableMap(parameters);
-    }
+  /**
+   * @return a {@code java.util.Map} with the simple parameters of the configuration.
+   */
+  public Map<String, String> getParameters() {
+    return Collections.unmodifiableMap(parameters);
+  }
 
-    /**
-     * @return a {@code java.util.List} of all the child {@code ComponentModel}s
-     */
-    public List<ComponentModel> getInnerComponents()
-    {
-        return innerComponents;
-    }
+  /**
+   * @return a {@code java.util.List} of all the child {@code ComponentModel}s
+   */
+  public List<ComponentModel> getInnerComponents() {
+    return innerComponents;
+  }
 
-    /**
-     * @return a {@code java.util.Map} with all the custom attributes.
-     */
-    public Map<String, Object> getCustomAttributes()
-    {
-        return copyOf(customAttributes);
-    }
+  /**
+   * @return a {@code java.util.Map} with all the custom attributes.
+   */
+  public Map<String, Object> getCustomAttributes() {
+    return copyOf(customAttributes);
+  }
 
-    /**
-     * @return true if the {@code ComponentModel} is a top level configuration element, false otherwise.
-     */
-    public boolean isRoot()
-    {
-        return root;
-    }
+  /**
+   * @return true if the {@code ComponentModel} is a top level configuration element, false otherwise.
+   */
+  public boolean isRoot() {
+    return root;
+  }
 
-    /**
-     * @param beanDefinition the {@code BeanDefinition} created based on the {@code ComponentModel} values.
-     */
-    public void setBeanDefinition(BeanDefinition beanDefinition)
-    {
-        this.beanDefinition = beanDefinition;
-    }
+  /**
+   * @param beanDefinition the {@code BeanDefinition} created based on the {@code ComponentModel} values.
+   */
+  public void setBeanDefinition(BeanDefinition beanDefinition) {
+    this.beanDefinition = beanDefinition;
+  }
 
-    /**
-     * @return the {@code BeanDefinition} created based on the {@code ComponentModel} values.
-     */
-    public BeanDefinition getBeanDefinition()
-    {
-        return beanDefinition;
-    }
+  /**
+   * @return the {@code BeanDefinition} created based on the {@code ComponentModel} values.
+   */
+  public BeanDefinition getBeanDefinition() {
+    return beanDefinition;
+  }
 
-    /**
-     * @return the type of the object to be created when processing this {@code ComponentModel}.
-     */
-    public Class<?> getType()
-    {
-        return type;
-    }
+  /**
+   * @return the type of the object to be created when processing this {@code ComponentModel}.
+   */
+  public Class<?> getType() {
+    return type;
+  }
 
-    /**
-     * @param type the type of the object to be created when processing this {@code ComponentModel}.
-     */
-    public void setType(Class<?> type)
-    {
-        this.type = type;
-    }
+  /**
+   * @param type the type of the object to be created when processing this {@code ComponentModel}.
+   */
+  public void setType(Class<?> type) {
+    this.type = type;
+  }
 
-    /**
-     * @return the value of the name attribute.
-     */
-    public String getNameAttribute()
-    {
-        return parameters.get(NAME_ATTRIBUTE);
-    }
+  /**
+   * @return the value of the name attribute.
+   */
+  public String getNameAttribute() {
+    return parameters.get(NAME_ATTRIBUTE);
+  }
 
-    /**
-     * @return true if this {@code ComponentModel} represents a {@code org.mule.runtime.core.api.processor.MessageProcessor} scope.
-     */
-    public boolean isScope()
-    {
-        //TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
-        return MessageRouter.class.isAssignableFrom(type);
-    }
+  /**
+   * @return true if this {@code ComponentModel} represents a {@code org.mule.runtime.core.api.processor.MessageProcessor} scope.
+   */
+  public boolean isScope() {
+    // TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
+    return MessageRouter.class.isAssignableFrom(type);
+  }
 
-    public void setParent(ComponentModel parent)
-    {
-        this.parent = parent;
-    }
+  public void setParent(ComponentModel parent) {
+    this.parent = parent;
+  }
 
-    /**
-     * @return the parent component model in the configuration.
-     */
-    public ComponentModel getParent()
-    {
-        return parent;
-    }
+  /**
+   * @return the parent component model in the configuration.
+   */
+  public ComponentModel getParent() {
+    return parent;
+  }
 
-    /**
-     * @return content of the configuration element.
-     */
-    public String getTextContent()
-    {
-        return textContent;
-    }
+  /**
+   * @return content of the configuration element.
+   */
+  public String getTextContent() {
+    return textContent;
+  }
 
-    /**
-     * @param beanReference the {@code BeanReference} that represents this object.
-     */
-    public void setBeanReference(BeanReference beanReference)
-    {
-        this.beanReference = beanReference;
-    }
+  /**
+   * @param beanReference the {@code BeanReference} that represents this object.
+   */
+  public void setBeanReference(BeanReference beanReference) {
+    this.beanReference = beanReference;
+  }
 
-    /**
-     * @return the {@code BeanReference} that represents this object.
-     */
-    public BeanReference getBeanReference()
-    {
-        return beanReference;
-    }
+  /**
+   * @return the {@code BeanReference} that represents this object.
+   */
+  public BeanReference getBeanReference() {
+    return beanReference;
+  }
 
-    /**
-     * @param parameterName configuration parameter name
-     * @return true if the value provided for the configuration parameter was get from the DSL schema, false if it was explicitly defined in the config
-     */
-    public boolean isParameterValueProvidedBySchema(String parameterName)
-    {
-        return this.schemaValueParameter.contains(parameterName);
-    }
+  /**
+   * @param parameterName configuration parameter name
+   * @return true if the value provided for the configuration parameter was get from the DSL schema, false if it was explicitly
+   *         defined in the config
+   */
+  public boolean isParameterValueProvidedBySchema(String parameterName) {
+    return this.schemaValueParameter.contains(parameterName);
+  }
+
+  /**
+   * Builder to create instances of {@code ComponentModel}.
+   */
+  public static class Builder {
+
+    private ComponentModel model = new ComponentModel();
 
     /**
-     * Builder to create instances of {@code ComponentModel}.
+     * @param identifier identifier for the configuration element this object represents.
+     * @return the builder.
      */
-    public static class Builder
-    {
-
-        private ComponentModel model = new ComponentModel();
-
-        /**
-         * @param identifier identifier for the configuration element this object represents.
-         * @return the builder.
-         */
-        public Builder setIdentifier(ComponentIdentifier identifier)
-        {
-            this.model.identifier = identifier;
-            return this;
-        }
-
-        /**
-         * @param parameterName name of the configuration parameter.
-         * @param value         value contained by the configuration parameter.
-         * @param valueFromSchema
-         * @return the builder.
-         */
-        public Builder addParameter(String parameterName, String value, boolean valueFromSchema)
-        {
-            this.model.parameters.put(parameterName, value);
-            if (valueFromSchema)
-            {
-                this.model.schemaValueParameter.add(parameterName);
-            }
-            return this;
-        }
-
-        /**
-         * Adds a new complex child object to this {@code ComponentModel}.
-         *
-         * @param componentModel child {@code ComponentModel} declared in the configuration.
-         * @return the builder.
-         */
-        public Builder addChildComponentModel(ComponentModel componentModel)
-        {
-            this.model.innerComponents.add(componentModel);
-            return this;
-        }
-
-        /**
-         * Sets the inner content of the configuration element.
-         *
-         * @param textContent inner text content from the configuration.
-         * @return the builder.
-         */
-        public Builder setTextContent(String textContent)
-        {
-            this.model.textContent = textContent;
-            return this;
-        }
-
-        /**
-         * When invoked the created {@code ComponentModel} will be marked us
-         * a top level configuration.
-         *
-         * @return the builder.
-         */
-        public Builder markAsRootComponent()
-        {
-            this.model.root = true;
-            return this;
-        }
-
-        /**
-         * Adds a custom attribute to the {@code ComponentModel}. This custom attribute
-         * is meant to hold metadata of the configuration and not to be used to instantiate
-         * the runtime object that corresponds to this configuration.
-         *
-         * @param name  custom attribute name.
-         * @param value custom attribute value.
-         * @return the builder.
-         */
-        public Builder addCustomAttribute(String name, Object value)
-        {
-            this.model.customAttributes.put(name, value);
-            return this;
-        }
-
-        /**
-         * @return a {@code ComponentModel} created based on the supplied parameters.
-         */
-        public ComponentModel build()
-        {
-            Preconditions.checkState(model.identifier != null, "An identifier must be provided");
-            return model;
-        }
-
+    public Builder setIdentifier(ComponentIdentifier identifier) {
+      this.model.identifier = identifier;
+      return this;
     }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        ComponentModel that = (ComponentModel) o;
-
-        if (root != that.root)
-        {
-            return false;
-        }
-        if (!identifier.equals(that.identifier))
-        {
-            return false;
-        }
-        if (!parameters.equals(that.parameters))
-        {
-            return false;
-        }
-        return innerComponents.equals(that.innerComponents);
-
+    /**
+     * @param parameterName name of the configuration parameter.
+     * @param value value contained by the configuration parameter.
+     * @param valueFromSchema
+     * @return the builder.
+     */
+    public Builder addParameter(String parameterName, String value, boolean valueFromSchema) {
+      this.model.parameters.put(parameterName, value);
+      if (valueFromSchema) {
+        this.model.schemaValueParameter.add(parameterName);
+      }
+      return this;
     }
 
-    @Override
-    public int hashCode()
-    {
-        int result = (root ? 1 : 0);
-        result = 31 * result + identifier.hashCode();
-        result = 31 * result + parameters.hashCode();
-        result = 31 * result + innerComponents.hashCode();
-        return result;
+    /**
+     * Adds a new complex child object to this {@code ComponentModel}.
+     *
+     * @param componentModel child {@code ComponentModel} declared in the configuration.
+     * @return the builder.
+     */
+    public Builder addChildComponentModel(ComponentModel componentModel) {
+      this.model.innerComponents.add(componentModel);
+      return this;
     }
+
+    /**
+     * Sets the inner content of the configuration element.
+     *
+     * @param textContent inner text content from the configuration.
+     * @return the builder.
+     */
+    public Builder setTextContent(String textContent) {
+      this.model.textContent = textContent;
+      return this;
+    }
+
+    /**
+     * When invoked the created {@code ComponentModel} will be marked us a top level configuration.
+     *
+     * @return the builder.
+     */
+    public Builder markAsRootComponent() {
+      this.model.root = true;
+      return this;
+    }
+
+    /**
+     * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
+     * and not to be used to instantiate the runtime object that corresponds to this configuration.
+     *
+     * @param name custom attribute name.
+     * @param value custom attribute value.
+     * @return the builder.
+     */
+    public Builder addCustomAttribute(String name, Object value) {
+      this.model.customAttributes.put(name, value);
+      return this;
+    }
+
+    /**
+     * @return a {@code ComponentModel} created based on the supplied parameters.
+     */
+    public ComponentModel build() {
+      Preconditions.checkState(model.identifier != null, "An identifier must be provided");
+      return model;
+    }
+
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ComponentModel that = (ComponentModel) o;
+
+    if (root != that.root) {
+      return false;
+    }
+    if (!identifier.equals(that.identifier)) {
+      return false;
+    }
+    if (!parameters.equals(that.parameters)) {
+      return false;
+    }
+    return innerComponents.equals(that.innerComponents);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (root ? 1 : 0);
+    result = 31 * result + identifier.hashCode();
+    result = 31 * result + parameters.hashCode();
+    result = 31 * result + innerComponents.hashCode();
+    return result;
+  }
 
 }

@@ -26,79 +26,73 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTestCase
-{
+public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testWriteReadMessage() throws Exception
-    {
-        // Create message to send over wire
-        Map<String, Serializable> messageProerties = new HashMap<>();
-        messageProerties.put("key1", "val1");
-        MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
+  @Test
+  public void testWriteReadMessage() throws Exception {
+    // Create message to send over wire
+    Map<String, Serializable> messageProerties = new HashMap<>();
+    messageProerties.put("key1", "val1");
+    MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
-        Object outMessage = readWrite(inMessage);
+    Object outMessage = readWrite(inMessage);
 
-        // NOTE: Since we are not using SerializedMuleMessageWireFormat we only get
-        // the payload back and not the MuleMessage.
-        assertTrue(outMessage instanceof String);
-        assertEquals("testMessage", outMessage);
-    }
+    // NOTE: Since we are not using SerializedMuleMessageWireFormat we only get
+    // the payload back and not the MuleMessage.
+    assertTrue(outMessage instanceof String);
+    assertEquals("testMessage", outMessage);
+  }
 
-    @Test
-    public void testWriteReadPayload() throws Exception
-    {
-        // Create orange to send over the wire
-        Properties messageProerties = new Properties();
-        messageProerties.put("key1", "val1");
-        Orange inOrange = new Orange();
-        inOrange.setBrand("Walmart");
-        inOrange.setMapProperties(messageProerties);
+  @Test
+  public void testWriteReadPayload() throws Exception {
+    // Create orange to send over the wire
+    Properties messageProerties = new Properties();
+    messageProerties.put("key1", "val1");
+    Orange inOrange = new Orange();
+    inOrange.setBrand("Walmart");
+    inOrange.setMapProperties(messageProerties);
 
-        Object outObject = readWrite(inOrange);
+    Object outObject = readWrite(inOrange);
 
-        // Test deserialized Fruit
-        assertTrue(outObject instanceof Orange);
-        assertEquals("Walmart", ((Orange) outObject).getBrand());
-        assertEquals("val1", ((Orange) outObject).getMapProperties().get("key1"));
-    }
+    // Test deserialized Fruit
+    assertTrue(outObject instanceof Orange);
+    assertEquals("Walmart", ((Orange) outObject).getBrand());
+    assertEquals("val1", ((Orange) outObject).getMapProperties().get("key1"));
+  }
 
-    protected Object readWrite(Object inObject) throws Exception
-    {
-        // Serialize
-        WireFormat wireFormat = getWireFormat();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        wireFormat.write(out, inObject, UTF_8);
+  protected Object readWrite(Object inObject) throws Exception {
+    // Serialize
+    WireFormat wireFormat = getWireFormat();
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    wireFormat.write(out, inObject, UTF_8);
 
-        // De-serialize
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-        Object outMessage = wireFormat.read(in);
-        assertNotNull(outMessage);
-        return outMessage;
-    }
+    // De-serialize
+    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+    Object outMessage = wireFormat.read(in);
+    assertNotNull(outMessage);
+    return outMessage;
+  }
 
-    @Test
-    public void testSetInboundTransformer() throws Exception
-    {
-        TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
-        transPairWireFormat.setInboundTransformer(new ObjectToString());
-        assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
-    }
+  @Test
+  public void testSetInboundTransformer() throws Exception {
+    TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
+    transPairWireFormat.setInboundTransformer(new ObjectToString());
+    assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
+  }
 
-    @Test
-    public void testSetOutboundTransformer() throws Exception
-    {
-        TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
-        transPairWireFormat.setInboundTransformer(new ObjectToString());
-        assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
-    }
+  @Test
+  public void testSetOutboundTransformer() throws Exception {
+    TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
+    transPairWireFormat.setInboundTransformer(new ObjectToString());
+    assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
+  }
 
-    @Test
-    public abstract void testGetDefaultInboundTransformer() throws Exception;
+  @Test
+  public abstract void testGetDefaultInboundTransformer() throws Exception;
 
-    @Test
-    public abstract void testGetDefaultOutboundTransformer() throws Exception;
+  @Test
+  public abstract void testGetDefaultOutboundTransformer() throws Exception;
 
-    protected abstract WireFormat getWireFormat() throws Exception;
+  protected abstract WireFormat getWireFormat() throws Exception;
 
 }

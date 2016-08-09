@@ -16,24 +16,22 @@ import org.junit.rules.ExternalResource;
 /**
  * Allows tests to use the mule logging infrastructure without initializing a {@link MuleContext}.
  */
-public class UseMuleLog4jContextFactory extends ExternalResource
-{
-    private static MuleLog4jContextFactory muleLog4jContextFactory = new MuleLog4jContextFactory();
+public class UseMuleLog4jContextFactory extends ExternalResource {
 
-    private LoggerContextFactory originalLog4jContextFactory;
+  private static MuleLog4jContextFactory muleLog4jContextFactory = new MuleLog4jContextFactory();
 
-    @Override
-    protected void before() throws Throwable
-    {
-        originalLog4jContextFactory = LogManager.getFactory();
-        LogManager.setFactory(muleLog4jContextFactory);
-    }
+  private LoggerContextFactory originalLog4jContextFactory;
 
-    @Override
-    protected void after()
-    {
-        // We can safely force a removal of the old logger contexts instead of waiting for the reaper thread to do it.
-        ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
-        LogManager.setFactory(originalLog4jContextFactory);
-    }
+  @Override
+  protected void before() throws Throwable {
+    originalLog4jContextFactory = LogManager.getFactory();
+    LogManager.setFactory(muleLog4jContextFactory);
+  }
+
+  @Override
+  protected void after() {
+    // We can safely force a removal of the old logger contexts instead of waiting for the reaper thread to do it.
+    ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
+    LogManager.setFactory(originalLog4jContextFactory);
+  }
 }

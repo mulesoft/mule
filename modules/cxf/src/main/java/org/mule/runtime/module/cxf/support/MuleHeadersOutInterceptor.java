@@ -31,70 +31,58 @@ import org.w3c.dom.Text;
 /**
  * Writes the Mule Soap Header to the outgoing request.
  */
-public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor
-{
+public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor {
 
-    public MuleHeadersOutInterceptor()
-    {
-        super(Phase.PRE_PROTOCOL);
+  public MuleHeadersOutInterceptor() {
+    super(Phase.PRE_PROTOCOL);
+  }
+
+  public void handleMessage(Message m) throws Fault {
+    if (!(m instanceof SoapMessage)) {
+      return;
     }
 
-    public void handleMessage(Message m) throws Fault
-    {
-        if (!(m instanceof SoapMessage))
-        {
-            return;
-        }
+    SoapMessage message = (SoapMessage) m;
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
 
-        SoapMessage message = (SoapMessage) m;
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-
-        if (event == null || event instanceof NonBlockingVoidMuleEvent)
-        {
-            return;
-        }
-
-        MuleSoapHeaders muleHeaders = new MuleSoapHeaders(event);
-
-        if (muleHeaders.getCorrelationId() == null && muleHeaders.getReplyTo() == null)
-        {
-            return;
-        }
-
-        Document owner_doc = DOMUtils.createDocument();
-
-        Element mule_header = owner_doc.createElementNS(MULE_NS_URI, QUALIFIED_MULE_HEADER);
-        // setup mule: namespace prefix declaration so that we can use it.
-        mule_header.setAttribute("xmlns:mule", MULE_NS_URI);
-
-        if (muleHeaders.getCorrelationId() != null)
-        {
-            mule_header.appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_ID_PROPERTY,
-                muleHeaders.getCorrelationId()));
-            mule_header.appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                muleHeaders.getCorrelationGroup()));
-            mule_header.appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_SEQUENCE_PROPERTY,
-                muleHeaders.getCorrelationSequence()));
-        }
-        if (muleHeaders.getReplyTo() != null)
-        {
-            mule_header.appendChild(buildMuleHeader(owner_doc, MULE_REPLY_TO_PROPERTY,
-                muleHeaders.getReplyTo()));
-        }
-
-        SoapHeader sh = new SoapHeader(new QName(MULE_NS_URI, MULE_HEADER), mule_header);
-        message.getHeaders().add(sh);
+    if (event == null || event instanceof NonBlockingVoidMuleEvent) {
+      return;
     }
 
-    Element buildMuleHeader(Document owner_doc, String localName, String value)
-    {
-        Element out = owner_doc.createElementNS(MULE_NS_URI, "mule:" + localName);
-        if (value != null)
-        {
-            Text text = owner_doc.createTextNode(value);
-            out.appendChild(text);
-        }
-        return out;
+    MuleSoapHeaders muleHeaders = new MuleSoapHeaders(event);
+
+    if (muleHeaders.getCorrelationId() == null && muleHeaders.getReplyTo() == null) {
+      return;
     }
+
+    Document owner_doc = DOMUtils.createDocument();
+
+    Element mule_header = owner_doc.createElementNS(MULE_NS_URI, QUALIFIED_MULE_HEADER);
+    // setup mule: namespace prefix declaration so that we can use it.
+    mule_header.setAttribute("xmlns:mule", MULE_NS_URI);
+
+    if (muleHeaders.getCorrelationId() != null) {
+      mule_header.appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_ID_PROPERTY, muleHeaders.getCorrelationId()));
+      mule_header
+          .appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_GROUP_SIZE_PROPERTY, muleHeaders.getCorrelationGroup()));
+      mule_header
+          .appendChild(buildMuleHeader(owner_doc, MULE_CORRELATION_SEQUENCE_PROPERTY, muleHeaders.getCorrelationSequence()));
+    }
+    if (muleHeaders.getReplyTo() != null) {
+      mule_header.appendChild(buildMuleHeader(owner_doc, MULE_REPLY_TO_PROPERTY, muleHeaders.getReplyTo()));
+    }
+
+    SoapHeader sh = new SoapHeader(new QName(MULE_NS_URI, MULE_HEADER), mule_header);
+    message.getHeaders().add(sh);
+  }
+
+  Element buildMuleHeader(Document owner_doc, String localName, String value) {
+    Element out = owner_doc.createElementNS(MULE_NS_URI, "mule:" + localName);
+    if (value != null) {
+      Text text = owner_doc.createTextNode(value);
+      out.appendChild(text);
+    }
+    return out;
+  }
 
 }

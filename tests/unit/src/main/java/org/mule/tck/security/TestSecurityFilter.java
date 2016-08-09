@@ -16,52 +16,43 @@ import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 
-public class TestSecurityFilter extends AbstractAuthenticationFilter
-{
-    private boolean accept;
-    private boolean called;
+public class TestSecurityFilter extends AbstractAuthenticationFilter {
 
-    public static final String SECURITY_EXCEPTION_MESSAGE = "unauthorized!!";
+  private boolean accept;
+  private boolean called;
 
-    public TestSecurityFilter(boolean accept)
-    {
-        this.accept = accept;
+  public static final String SECURITY_EXCEPTION_MESSAGE = "unauthorized!!";
+
+  public TestSecurityFilter(boolean accept) {
+    this.accept = accept;
+  }
+
+  @Override
+  public void authenticate(MuleEvent event) throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
+      EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
+    called = true;
+    if (!accept) {
+      throw new StaticMessageUnauthorisedException();
+    }
+  }
+
+  @Override
+  protected void doInitialise() throws InitialisationException {}
+
+  public boolean wasCalled() {
+    return called;
+  }
+
+  public static class StaticMessageUnauthorisedException extends UnauthorisedException {
+
+    public StaticMessageUnauthorisedException() {
+      super(null);
     }
 
     @Override
-    public void authenticate(MuleEvent event)
-        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
-        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
-    {
-        called = true;
-        if (!accept)
-        {
-            throw new StaticMessageUnauthorisedException();
-        }
+    public String getLocalizedMessage() {
+      return SECURITY_EXCEPTION_MESSAGE;
     }
-
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-    }
-
-    public boolean wasCalled()
-    {
-        return called;
-    }
-
-    public static class StaticMessageUnauthorisedException extends UnauthorisedException
-    {
-        public StaticMessageUnauthorisedException()
-        {
-            super(null);
-        }
-
-        @Override
-        public String getLocalizedMessage()
-        {
-            return SECURITY_EXCEPTION_MESSAGE;
-        }
-    }
+  }
 
 }

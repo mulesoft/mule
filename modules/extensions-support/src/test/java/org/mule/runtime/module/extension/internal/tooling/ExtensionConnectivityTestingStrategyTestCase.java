@@ -26,56 +26,54 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase
-{
+public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    private ExtensionConnectivityTestingStrategy extensionConnectivityTestingStrategy;
-    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
-    private ConnectionProviderResolver mockConnectionProviderResolver = mock(ConnectionProviderResolver.class, RETURNS_DEEP_STUBS.get());
-    private ConnectionValidationResult mockConnectionValidationResult = mock(ConnectionValidationResult.class, RETURNS_DEEP_STUBS.get());
-    private ConnectionProvider mockConnectionProvider = mock(ConnectionProvider.class, RETURNS_DEEP_STUBS.get());
+  private ExtensionConnectivityTestingStrategy extensionConnectivityTestingStrategy;
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private ConnectionProviderResolver mockConnectionProviderResolver =
+      mock(ConnectionProviderResolver.class, RETURNS_DEEP_STUBS.get());
+  private ConnectionValidationResult mockConnectionValidationResult =
+      mock(ConnectionValidationResult.class, RETURNS_DEEP_STUBS.get());
+  private ConnectionProvider mockConnectionProvider = mock(ConnectionProvider.class, RETURNS_DEEP_STUBS.get());
 
 
-    @Before
-    public void createTestingInstance()
-    {
-        extensionConnectivityTestingStrategy = new ExtensionConnectivityTestingStrategy();
-        extensionConnectivityTestingStrategy.setMuleContext(mockMuleContext);
-    }
+  @Before
+  public void createTestingInstance() {
+    extensionConnectivityTestingStrategy = new ExtensionConnectivityTestingStrategy();
+    extensionConnectivityTestingStrategy.setMuleContext(mockMuleContext);
+  }
 
-    @Test
-    public void connectionProviderInConfigWithInvalidConnection() throws MuleException
-    {
-        ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(false);
-        assertThat(connectionResult.isValid(), is(false));
-    }
+  @Test
+  public void connectionProviderInConfigWithInvalidConnection() throws MuleException {
+    ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(false);
+    assertThat(connectionResult.isValid(), is(false));
+  }
 
-    @Test
-    public void connectionProviderInConfigWithValidConnection() throws MuleException
-    {
-        ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(true);
-        assertThat(connectionResult.isValid(), is(true));
-    }
+  @Test
+  public void connectionProviderInConfigWithValidConnection() throws MuleException {
+    ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(true);
+    assertThat(connectionResult.isValid(), is(true));
+  }
 
-    @Test
-    public void connectionProviderThrowsExceprtion() throws MuleException
-    {
-        when(mockConnectionProviderResolver.resolve(any())).thenThrow(mock(RuntimeException.class));
-        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
-        assertThat(connectionResult.isValid(), is(false));
-        assertThat(connectionResult.getException(), instanceOf(RuntimeException.class));
-    }
+  @Test
+  public void connectionProviderThrowsExceprtion() throws MuleException {
+    when(mockConnectionProviderResolver.resolve(any())).thenThrow(mock(RuntimeException.class));
+    ConnectionValidationResult connectionResult =
+        extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
+    assertThat(connectionResult.isValid(), is(false));
+    assertThat(connectionResult.getException(), instanceOf(RuntimeException.class));
+  }
 
-    private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws MuleException
-    {
-        when(mockConnectionProviderResolver.resolve(any())).thenReturn(mockConnectionProvider);
-        when(mockConnectionProvider.validate(any())).thenReturn(mockConnectionValidationResult);
-        when(mockConnectionValidationResult.isValid()).thenReturn(isValidConnection);
-        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
-        return connectionResult;
-    }
+  private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws MuleException {
+    when(mockConnectionProviderResolver.resolve(any())).thenReturn(mockConnectionProvider);
+    when(mockConnectionProvider.validate(any())).thenReturn(mockConnectionValidationResult);
+    when(mockConnectionValidationResult.isValid()).thenReturn(isValidConnection);
+    ConnectionValidationResult connectionResult =
+        extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
+    return connectionResult;
+  }
 
 }

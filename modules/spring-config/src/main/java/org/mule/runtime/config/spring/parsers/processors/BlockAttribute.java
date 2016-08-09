@@ -19,43 +19,36 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * Throws an exception if any of the disallowed attributes (after translation) is present.
- * Designed to cooperates with
+ * Throws an exception if any of the disallowed attributes (after translation) is present. Designed to cooperates with
  * {@link org.mule.runtime.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser#addHandledException(Class)}
  */
-public class BlockAttribute implements PreProcessor
-{
-    private Set<String> disallowed;
+public class BlockAttribute implements PreProcessor {
 
-    public BlockAttribute(String disallowed)
-    {
-        this(new String[]{ disallowed });
-    }
+  private Set<String> disallowed;
 
-    public BlockAttribute(String[] disallowed)
-    {
-        this.disallowed = new HashSet<String>(Arrays.asList(disallowed));
-    }
+  public BlockAttribute(String disallowed) {
+    this(new String[] {disallowed});
+  }
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        NamedNodeMap attributes = element.getAttributes();
-        for (int i = 0; i < attributes.getLength(); i++)
-        {
-            String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-            String name = config.translateName(alias);
-            if (disallowed.contains(name))
-            {
-                throw new BlockAttributeException("Attribute " + alias + " is not allowed here.");
-            }
-        }
-    }
+  public BlockAttribute(String[] disallowed) {
+    this.disallowed = new HashSet<String>(Arrays.asList(disallowed));
+  }
 
-    public static class BlockAttributeException extends IllegalStateException
-    {
-        BlockAttributeException(String message)
-        {
-            super(message);
-        }
+  public void preProcess(PropertyConfiguration config, Element element) {
+    NamedNodeMap attributes = element.getAttributes();
+    for (int i = 0; i < attributes.getLength(); i++) {
+      String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+      String name = config.translateName(alias);
+      if (disallowed.contains(name)) {
+        throw new BlockAttributeException("Attribute " + alias + " is not allowed here.");
+      }
     }
+  }
+
+  public static class BlockAttributeException extends IllegalStateException {
+
+    BlockAttributeException(String message) {
+      super(message);
+    }
+  }
 }

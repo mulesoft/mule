@@ -21,52 +21,45 @@ import java.nio.file.Path;
  *
  * @since 4.0
  */
-public final class LocalCopyCommand extends AbstractLocalCopyCommand implements CopyCommand
-{
+public final class LocalCopyCommand extends AbstractLocalCopyCommand implements CopyCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public LocalCopyCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public LocalCopyCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
-    {
-        execute(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
+                   boolean createParentDirectories, MuleEvent event) {
+    execute(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
+  }
 
-    /**
-     * Implements recursive copy
-     *
-     * @param source     the path to be copied
-     * @param targetPath the path to the target destination
-     * @param overwrite  whether to overwrite existing target paths
-     * @param options    an array of {@link CopyOption} which configure the copying operation
-     */
-    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception
-    {
-        if (Files.isDirectory(source))
-        {
-            FileUtils.copyDirectory(source.toFile(), targetPath.toFile());
-        }
-        else
-        {
-            Files.copy(source, targetPath, options);
-        }
+  /**
+   * Implements recursive copy
+   *
+   * @param source the path to be copied
+   * @param targetPath the path to the target destination
+   * @param overwrite whether to overwrite existing target paths
+   * @param options an array of {@link CopyOption} which configure the copying operation
+   */
+  protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception {
+    if (Files.isDirectory(source)) {
+      FileUtils.copyDirectory(source.toFile(), targetPath.toFile());
+    } else {
+      Files.copy(source, targetPath, options);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getAction()
-    {
-        return "copying";
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected String getAction() {
+    return "copying";
+  }
 }

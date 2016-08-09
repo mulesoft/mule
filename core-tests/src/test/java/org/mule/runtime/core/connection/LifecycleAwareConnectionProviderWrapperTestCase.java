@@ -23,46 +23,42 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase
-{
+public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase {
 
-    @Mock
-    private ConnectionProvider<Lifecycle> connectionProvider;
+  @Mock
+  private ConnectionProvider<Lifecycle> connectionProvider;
 
-    @Mock
-    private Lifecycle connection;
+  @Mock
+  private Lifecycle connection;
 
-    private LifecycleAwareConnectionProviderWrapper<Lifecycle> wrapper;
+  private LifecycleAwareConnectionProviderWrapper<Lifecycle> wrapper;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(connectionProvider.connect()).thenReturn(connection);
+  @Before
+  public void before() throws Exception {
+    when(connectionProvider.connect()).thenReturn(connection);
 
-        wrapper = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
-        muleContext.start();
-    }
+    wrapper = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
+    muleContext.start();
+  }
 
-    @Test
-    public void connect() throws Exception
-    {
-        wrapper.connect();
-        InOrder inOrder = inOrder(connection);
-        inOrder.verify(connection).initialise();
-        inOrder.verify(connection).start();
-    }
+  @Test
+  public void connect() throws Exception {
+    wrapper.connect();
+    InOrder inOrder = inOrder(connection);
+    inOrder.verify(connection).initialise();
+    inOrder.verify(connection).start();
+  }
 
 
-    @Test
-    public void disconnect() throws Exception
-    {
-        wrapper.connect();
-        wrapper.disconnect(connection);
+  @Test
+  public void disconnect() throws Exception {
+    wrapper.connect();
+    wrapper.disconnect(connection);
 
-        InOrder inOrder = inOrder(connection);
-        inOrder.verify(connection).initialise();
-        inOrder.verify(connection).start();
-        inOrder.verify(connection).stop();
-        inOrder.verify(connection).dispose();
-    }
+    InOrder inOrder = inOrder(connection);
+    inOrder.verify(connection).initialise();
+    inOrder.verify(connection).start();
+    inOrder.verify(connection).stop();
+    inOrder.verify(connection).dispose();
+  }
 }

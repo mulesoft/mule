@@ -6,21 +6,18 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-public class TestResourceReleaser implements ResourceReleaser
-{
+public class TestResourceReleaser implements ResourceReleaser {
 
-    private ClassLoader classLoader;
+  private ClassLoader classLoader;
 
-    @Override
-    public void release()
-    {
-        classLoader = this.getClass().getClassLoader();
-    }
+  @Override
+  public void release() {
+    classLoader = this.getClass().getClassLoader();
+  }
 
-    public ClassLoader getClassLoader()
-    {
-        return classLoader;
-    }
+  public ClassLoader getClassLoader() {
+    return classLoader;
+  }
 
 }
 

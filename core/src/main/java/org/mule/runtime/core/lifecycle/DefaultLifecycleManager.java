@@ -20,83 +20,65 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * <p>
- * Default implementation of a {@link SimpleLifecycleManager} it allows {@link Lifecycle} objects to manage their
- * lifecycle easily.
+ * Default implementation of a {@link SimpleLifecycleManager} it allows {@link Lifecycle} objects to manage their lifecycle
+ * easily.
  * </p>
  *
  * @param <T> Type of the object that we need to manage the lifecycle
  * @since 3.5.0
  */
-public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycleManager<T>
-{
+public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycleManager<T> {
 
 
-    public DefaultLifecycleManager(String id, T object)
-    {
-        super(id, object);
+  public DefaultLifecycleManager(String id, T object) {
+    super(id, object);
+  }
+
+
+  @Override
+  public void fireInitialisePhase(LifecycleCallback<T> callback) throws InitialisationException {
+    checkPhase(Initialisable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Initialising Bean: " + lifecycleManagerId);
     }
-
-
-    @Override
-    public void fireInitialisePhase(LifecycleCallback<T> callback) throws InitialisationException
-    {
-        checkPhase(Initialisable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Initialising Bean: " + lifecycleManagerId);
-        }
-        try
-        {
-            invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
-        }
-        catch (InitialisationException e)
-        {
-            throw e;
-        }
-        catch (LifecycleException e)
-        {
-            throw new InitialisationException(e, object);
-        }
+    try {
+      invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+    } catch (InitialisationException e) {
+      throw e;
+    } catch (LifecycleException e) {
+      throw new InitialisationException(e, object);
     }
+  }
 
-    @Override
-    public void fireStartPhase(LifecycleCallback<T> callback) throws MuleException
-    {
-        checkPhase(Startable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Starting Bean: " + lifecycleManagerId);
-        }
-        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+  @Override
+  public void fireStartPhase(LifecycleCallback<T> callback) throws MuleException {
+    checkPhase(Startable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Starting Bean: " + lifecycleManagerId);
     }
+    invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+  }
 
-    @Override
-    public void fireStopPhase(LifecycleCallback<T> callback) throws MuleException
-    {
-        checkPhase(Stoppable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Stopping Bean: " + lifecycleManagerId);
-        }
-        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+  @Override
+  public void fireStopPhase(LifecycleCallback<T> callback) throws MuleException {
+    checkPhase(Stoppable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Stopping Bean: " + lifecycleManagerId);
     }
+    invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+  }
 
-    @Override
-    public void fireDisposePhase(LifecycleCallback<T> callback)
-    {
-        checkPhase(Disposable.PHASE_NAME);
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Disposing Bean: " + lifecycleManagerId);
-        }
-        try
-        {
-            invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
-        }
-        catch (LifecycleException e)
-        {
-            logger.warn(CoreMessages.failedToDispose(lifecycleManagerId).toString(), e);
-        }
+  @Override
+  public void fireDisposePhase(LifecycleCallback<T> callback) {
+    checkPhase(Disposable.PHASE_NAME);
+    if (logger.isInfoEnabled()) {
+      logger.info("Disposing Bean: " + lifecycleManagerId);
     }
+    try {
+      invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+    } catch (LifecycleException e) {
+      logger.warn(CoreMessages.failedToDispose(lifecycleManagerId).toString(), e);
+    }
+  }
 
 }

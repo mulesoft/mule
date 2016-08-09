@@ -13,35 +13,30 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-class CallAndExpectPayloadResult implements CallAndExpect
-{
-    private Object expectedPayloadResult;
-    private String outputEndpointName;
-    private Object payload;
-    private final MuleContext muleContext;
+class CallAndExpectPayloadResult implements CallAndExpect {
 
-    public CallAndExpectPayloadResult(String outputEndpointName,
-                                      Object payload,
-                                      Object expectedPayloadResult,
-                                      MuleContext muleContext)
-    {
-        this.expectedPayloadResult = expectedPayloadResult;
-        this.outputEndpointName = outputEndpointName;
-        this.payload = payload;
-        this.muleContext = muleContext;
-    }
+  private Object expectedPayloadResult;
+  private String outputEndpointName;
+  private Object payload;
+  private final MuleContext muleContext;
 
-    @Override
-    public void callEndpointAndExecuteAsserts() throws MuleException
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(outputEndpointName, payload, null);
+  public CallAndExpectPayloadResult(String outputEndpointName, Object payload, Object expectedPayloadResult,
+                                    MuleContext muleContext) {
+    this.expectedPayloadResult = expectedPayloadResult;
+    this.outputEndpointName = outputEndpointName;
+    this.payload = payload;
+    this.muleContext = muleContext;
+  }
 
-        assertEquals(here(), expectedPayloadResult, result.getPayload());
-    }
+  @Override
+  public void callEndpointAndExecuteAsserts() throws MuleException {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send(outputEndpointName, payload, null);
 
-    private String here()
-    {
-        return "In [" + outputEndpointName + "," + payload + "," + expectedPayloadResult + "]";
-    }
+    assertEquals(here(), expectedPayloadResult, result.getPayload());
+  }
+
+  private String here() {
+    return "In [" + outputEndpointName + "," + payload + "," + expectedPayloadResult + "]";
+  }
 }

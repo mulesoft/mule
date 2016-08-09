@@ -25,54 +25,47 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase
-{
+public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
-    private static final String KEY = "key";
-    private static final String FAKE_KEY = "not there";
+  private static final String KEY = "key";
+  private static final String FAKE_KEY = "not there";
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleEvent event;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleEvent event;
 
-    private ValueResolver resolver;
+  private ValueResolver resolver;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(event.getMuleContext().getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
-        when(event.getMuleContext().getRegistry().get(FAKE_KEY)).thenReturn(null);
-        resolver = new RegistryLookupValueResolver(KEY);
-    }
+  @Before
+  public void before() throws Exception {
+    when(event.getMuleContext().getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
+    when(event.getMuleContext().getRegistry().get(FAKE_KEY)).thenReturn(null);
+    resolver = new RegistryLookupValueResolver(KEY);
+  }
 
-    @Test
-    public void cache() throws Exception
-    {
-        Object value = resolver.resolve(event);
-        assertThat(value, is(HELLO_WORLD));
-        verify(event.getMuleContext().getRegistry()).get(KEY);
-    }
+  @Test
+  public void cache() throws Exception {
+    Object value = resolver.resolve(event);
+    assertThat(value, is(HELLO_WORLD));
+    verify(event.getMuleContext().getRegistry()).get(KEY);
+  }
 
-    @Test
-    public void isDynamic()
-    {
-        assertThat(resolver.isDynamic(), is(false));
-    }
+  @Test
+  public void isDynamic() {
+    assertThat(resolver.isDynamic(), is(false));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullKey()
-    {
-        new RegistryLookupValueResolver(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void nullKey() {
+    new RegistryLookupValueResolver(null);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void blankKey()
-    {
-        new RegistryLookupValueResolver("");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void blankKey() {
+    new RegistryLookupValueResolver("");
+  }
 
-    @Test(expected = ConfigurationException.class)
-    public void nonExistingKey() throws Exception
-    {
-        new RegistryLookupValueResolver<>(FAKE_KEY).resolve(event);
-    }
+  @Test(expected = ConfigurationException.class)
+  public void nonExistingKey() throws Exception {
+    new RegistryLookupValueResolver<>(FAKE_KEY).resolve(event);
+  }
 }

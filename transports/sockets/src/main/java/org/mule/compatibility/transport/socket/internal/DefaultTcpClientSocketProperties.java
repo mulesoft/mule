@@ -11,113 +11,97 @@ import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 /**
  * Default mutable implementation of the {@code TcpClientSocketProperties} interface.
  */
-public class DefaultTcpClientSocketProperties implements TcpClientSocketProperties
-{
-    // Use default value of 'true' even though Socket default is false because optimizing to reduce amount of network
-    // traffic over latency is hardly ever a concern today.
-    private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
-    private static final int DEFAULT_CONNECTION_TIMEOUT = 30000;
+public class DefaultTcpClientSocketProperties implements TcpClientSocketProperties {
 
-    private String name;
+  // Use default value of 'true' even though Socket default is false because optimizing to reduce amount of network
+  // traffic over latency is hardly ever a concern today.
+  private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
+  private static final int DEFAULT_CONNECTION_TIMEOUT = 30000;
 
-    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
-    private Integer connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+  private String name;
 
-    // These options are undefined by default so that java.net.Socket defaults are used.  We do however document the
-    // java.net.Socket defaults in the schema for usability.
-    private Integer timeout;
-    private Integer linger;
+  private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
+  private Integer connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
-    // These options are undefined by default so that by default it is the OS TCP/IP stack that configures, or dynamically
-    // manages, these values.
-    private Integer sendBufferSize;
-    private Integer receiveBufferSize;
-    private Boolean keepAlive;
+  // These options are undefined by default so that java.net.Socket defaults are used. We do however document the
+  // java.net.Socket defaults in the schema for usability.
+  private Integer timeout;
+  private Integer linger;
 
-    public String getName()
-    {
-        return name;
-    }
+  // These options are undefined by default so that by default it is the OS TCP/IP stack that configures, or dynamically
+  // manages, these values.
+  private Integer sendBufferSize;
+  private Integer receiveBufferSize;
+  private Boolean keepAlive;
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public Integer getSendBufferSize()
-    {
-        return sendBufferSize;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setSendBufferSize(Integer sendBufferSize)
-    {
-        this.sendBufferSize = sendBufferSize;
-    }
+  @Override
+  public Integer getSendBufferSize() {
+    return sendBufferSize;
+  }
 
-    @Override
-    public Integer getReceiveBufferSize()
-    {
-        return receiveBufferSize;
-    }
+  public void setSendBufferSize(Integer sendBufferSize) {
+    this.sendBufferSize = sendBufferSize;
+  }
 
-    public void setReceiveBufferSize(Integer receiveBufferSize)
-    {
-        this.receiveBufferSize = receiveBufferSize;
-    }
+  @Override
+  public Integer getReceiveBufferSize() {
+    return receiveBufferSize;
+  }
 
-    @Override
-    public Boolean getSendTcpNoDelay()
-    {
-        return sendTcpNoDelay;
-    }
+  public void setReceiveBufferSize(Integer receiveBufferSize) {
+    this.receiveBufferSize = receiveBufferSize;
+  }
 
-    public void setSendTcpNoDelay(Boolean sendTcpNoDelay)
-    {
-        this.sendTcpNoDelay = sendTcpNoDelay;
-    }
+  @Override
+  public Boolean getSendTcpNoDelay() {
+    return sendTcpNoDelay;
+  }
 
-    @Override
-    public Integer getConnectionTimeout()
-    {
-        return connectionTimeout;
-    }
+  public void setSendTcpNoDelay(Boolean sendTcpNoDelay) {
+    this.sendTcpNoDelay = sendTcpNoDelay;
+  }
 
-    public void setConnectionTimeout(Integer connectionTimeout)
-    {
-        this.connectionTimeout = connectionTimeout;
-    }
+  @Override
+  public Integer getConnectionTimeout() {
+    return connectionTimeout;
+  }
 
-    @Override
-    public Integer getTimeout()
-    {
-        return timeout;
-    }
+  public void setConnectionTimeout(Integer connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
 
-    public void setTimeout(Integer timeout)
-    {
-        this.timeout = timeout;
-    }
+  @Override
+  public Integer getTimeout() {
+    return timeout;
+  }
 
-    @Override
-    public Integer getLinger()
-    {
-        return linger;
-    }
+  public void setTimeout(Integer timeout) {
+    this.timeout = timeout;
+  }
 
-    public void setLinger(Integer linger)
-    {
-        this.linger = linger;
-    }
+  @Override
+  public Integer getLinger() {
+    return linger;
+  }
 
-    @Override
-    public Boolean getKeepAlive()
-    {
-        return keepAlive;
-    }
+  public void setLinger(Integer linger) {
+    this.linger = linger;
+  }
 
-    public void setKeepAlive(Boolean keepAlive)
-    {
-        this.keepAlive = keepAlive;
-    }
+  @Override
+  public Boolean getKeepAlive() {
+    return keepAlive;
+  }
+
+  public void setKeepAlive(Boolean keepAlive) {
+    this.keepAlive = keepAlive;
+  }
 }

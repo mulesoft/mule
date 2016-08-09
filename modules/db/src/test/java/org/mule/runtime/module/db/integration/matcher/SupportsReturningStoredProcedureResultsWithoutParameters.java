@@ -14,28 +14,24 @@ import java.util.Set;
 
 import org.hamcrest.Description;
 
-public class SupportsReturningStoredProcedureResultsWithoutParameters extends AbstractDataSourceFeatureMatcher
-{
+public class SupportsReturningStoredProcedureResultsWithoutParameters extends AbstractDataSourceFeatureMatcher {
 
-    private static final Set<String> supportedProducts;
+  private static final Set<String> supportedProducts;
 
-    static
-    {
-       supportedProducts = new HashSet<String>();
-       supportedProducts.add("MYSQL");
-       supportedProducts.add("APACHE DERBY");
-    }
+  static {
+    supportedProducts = new HashSet<String>();
+    supportedProducts.add("MYSQL");
+    supportedProducts.add("APACHE DERBY");
+  }
 
-    @Override
-    protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException
-    {
-        String productName = metaData.getDatabaseProductName().toUpperCase();
-        return supportedProducts.contains(productName);
-    }
+  @Override
+  protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException {
+    String productName = metaData.getDatabaseProductName().toUpperCase();
+    return supportedProducts.contains(productName);
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("Database only returns stored procedure results with output parameters");
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("Database only returns stored procedure results with output parameters");
+  }
 }

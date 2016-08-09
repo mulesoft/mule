@@ -16,57 +16,48 @@ import java.util.Map;
  * <code>DefaultExceptionPayload</code> TODO
  */
 
-public class DefaultExceptionPayload implements ExceptionPayload
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -7114836033686599024L;
+public class DefaultExceptionPayload implements ExceptionPayload {
 
-    private int code = 0;
-    private String message = null;
-    private Map info = null;
-    private Throwable exception;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -7114836033686599024L;
 
-    public DefaultExceptionPayload(Throwable exception)
-    {
-        this.exception = exception;
-        MuleException muleRoot = ExceptionHelper.getRootMuleException(exception);
-        if (muleRoot != null)
-        {
-            message = muleRoot.getMessage();
-            code = muleRoot.getExceptionCode();
-            info = muleRoot.getInfo();
-        }
-        else
-        {
-            message = exception.getMessage();
-        }
+  private int code = 0;
+  private String message = null;
+  private Map info = null;
+  private Throwable exception;
+
+  public DefaultExceptionPayload(Throwable exception) {
+    this.exception = exception;
+    MuleException muleRoot = ExceptionHelper.getRootMuleException(exception);
+    if (muleRoot != null) {
+      message = muleRoot.getMessage();
+      code = muleRoot.getExceptionCode();
+      info = muleRoot.getInfo();
+    } else {
+      message = exception.getMessage();
     }
+  }
 
-    public Throwable getRootException()
-    {
-        return ExceptionHelper.getRootException(exception);
-    }
+  public Throwable getRootException() {
+    return ExceptionHelper.getRootException(exception);
+  }
 
-    public int getCode()
-    {
-        return code;
-    }
+  public int getCode() {
+    return code;
+  }
 
-    public String getMessage()
-    {
-        return message;
-    }
+  public String getMessage() {
+    return message;
+  }
 
-    public Map getInfo()
-    {
-        return info;
-    }
+  public Map getInfo() {
+    return info;
+  }
 
-    public Throwable getException()
-    {
-        return exception;
-    }
+  public Throwable getException() {
+    return exception;
+  }
 
 }

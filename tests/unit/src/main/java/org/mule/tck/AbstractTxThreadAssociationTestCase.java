@@ -30,318 +30,295 @@ import javax.transaction.TransactionManager;
 import org.junit.Test;
 
 /**
- * Validate certain expectations when working with JTA API. It is called to catch discrepancies in TM implementations
- * and alert early. Subclasses are supposed to plug in specific transaction managers for tests.
+ * Validate certain expectations when working with JTA API. It is called to catch discrepancies in TM implementations and alert
+ * early. Subclasses are supposed to plug in specific transaction managers for tests.
  */
-public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleContextTestCase
-{
-    /* To allow access from the dead TX threads we spawn. */
-    private TransactionManager tm;
-    protected static final int TRANSACTION_TIMEOUT_SECONDS = 3;
+public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        TransactionManagerFactory factory = getTransactionManagerFactory();
-        tm = factory.create(muleContext.getConfiguration());
-        assertNotNull("Transaction Manager should be available.", tm);
-        assertNull("There should be no current transaction associated.", tm.getTransaction());
-    }
+  /* To allow access from the dead TX threads we spawn. */
+  private TransactionManager tm;
+  protected static final int TRANSACTION_TIMEOUT_SECONDS = 3;
 
-    @Test
-    public void testTxHandleCommitKeepsThreadAssociation() throws Exception
-    {
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
-        tm.begin();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    TransactionManagerFactory factory = getTransactionManagerFactory();
+    tm = factory.create(muleContext.getConfiguration());
+    assertNotNull("Transaction Manager should be available.", tm);
+    assertNull("There should be no current transaction associated.", tm.getTransaction());
+  }
 
-        Transaction tx = tm.getTransaction();
-        assertNotNull("Transaction should have started.", tx);
-        assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
+  @Test
+  public void testTxHandleCommitKeepsThreadAssociation() throws Exception {
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+    tm.begin();
 
-        tx.commit();
+    Transaction tx = tm.getTransaction();
+    assertNotNull("Transaction should have started.", tx);
+    assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
 
-        tx = tm.getTransaction();
-        assertNotNull("Committing via TX handle should NOT disassociated TX from the current thread.",
-                      tx);
-        assertEquals("TX status should have been COMMITTED.", Status.STATUS_COMMITTED, tx.getStatus());
+    tx.commit();
 
-        // Remove the TX-thread association. The only public API to achieve it is suspend(),
-        // technically we never resume the same transaction (TX forget).
-        Transaction suspended = tm.suspend();
-        assertTrue("Wrong TX suspended?.", suspended.equals(tx));
-        assertNull("TX should've been disassociated from the thread.", tm.getTransaction());
+    tx = tm.getTransaction();
+    assertNotNull("Committing via TX handle should NOT disassociated TX from the current thread.", tx);
+    assertEquals("TX status should have been COMMITTED.", Status.STATUS_COMMITTED, tx.getStatus());
 
-        // should be no-op and never fail
-        tm.resume(null);
+    // Remove the TX-thread association. The only public API to achieve it is suspend(),
+    // technically we never resume the same transaction (TX forget).
+    Transaction suspended = tm.suspend();
+    assertTrue("Wrong TX suspended?.", suspended.equals(tx));
+    assertNull("TX should've been disassociated from the thread.", tm.getTransaction());
 
-        // ensure we don't have any TX-Thread association lurking around a main thread
-        assertNull(tm.getTransaction());
-    }
+    // should be no-op and never fail
+    tm.resume(null);
 
-    @Test
-    public void testTxManagerCommitDissassociatesThread() throws Exception
-    {
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
-        tm.begin();
+    // ensure we don't have any TX-Thread association lurking around a main thread
+    assertNull(tm.getTransaction());
+  }
 
-        Transaction tx = tm.getTransaction();
-        assertNotNull("Transaction should have started.", tx);
-        assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
+  @Test
+  public void testTxManagerCommitDissassociatesThread() throws Exception {
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+    tm.begin();
 
-        tm.commit();
+    Transaction tx = tm.getTransaction();
+    assertNotNull("Transaction should have started.", tx);
+    assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
 
-        assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
-    }
+    tm.commit();
 
-    @Test
-    public void testTxManagerRollbackDissassociatesThread() throws Exception
-    {
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
-        tm.begin();
+    assertNull("Committing via TX Manager should have disassociated TX from the current thread.", tm.getTransaction());
+  }
 
-        Transaction tx = tm.getTransaction();
-        assertNotNull("Transaction should have started.", tx);
-        assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
+  @Test
+  public void testTxManagerRollbackDissassociatesThread() throws Exception {
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+    tm.begin();
 
-        tm.rollback();
+    Transaction tx = tm.getTransaction();
+    assertNotNull("Transaction should have started.", tx);
+    assertEquals("TX should have been active", Status.STATUS_ACTIVE, tx.getStatus());
 
-        assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
-    }
+    tm.rollback();
 
-    /**
-     * AlwaysBegin action suspends current transaction and begins a new one.
-     *
-     * @throws Exception if any error
-     */
-    @Test
-    public void testAlwaysBeginXaTransactionSuspendResume() throws Exception
-    {
-        muleContext.setTransactionManager(tm);
-        assertNull("There should be no current transaction associated.", tm.getTransaction());
+    assertNull("Committing via TX Manager should have disassociated TX from the current thread.", tm.getTransaction());
+  }
 
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+  /**
+   * AlwaysBegin action suspends current transaction and begins a new one.
+   *
+   * @throws Exception if any error
+   */
+  @Test
+  public void testAlwaysBeginXaTransactionSuspendResume() throws Exception {
+    muleContext.setTransactionManager(tm);
+    assertNull("There should be no current transaction associated.", tm.getTransaction());
 
-        // this is one component with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        config.setFactory(new XaTransactionFactory());
-        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
-        // and the callee component which should begin new transaction, current must be suspended
-        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        nestedConfig.setFactory(new XaTransactionFactory());
+    // this is one component with a TX always begin
+    TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+    config.setFactory(new XaTransactionFactory());
+    ExecutionTemplate<Void> executionTemplate =
+        TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
 
-        // start the call chain
-        executionTemplate.execute(new ExecutionCallback<Void>()
-        {
-            @Override
-            public Void process() throws Exception
-            {
-                // the callee executes within its own TX template, but uses the same global XA transaction,
-                // bound to the current thread of execution via a ThreadLocal
-                ExecutionTemplate<Void> innerExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
-                final Transaction firstTx = tm.getTransaction();
-                assertNotNull(firstTx);
-                assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return innerExecutionTemplate.execute(new ExecutionCallback<Void>()
-                {
-                    @Override
-                    public Void process() throws Exception
-                    {
-                        Transaction secondTx = tm.getTransaction();
-                        assertNotNull(secondTx);
-                        assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                        assertEquals(secondTx.getStatus(), Status.STATUS_ACTIVE);
-                        try
-                        {
-                            tm.resume(firstTx);
-                            fail("Second transaction must be active");
-                        }
-                        catch (java.lang.IllegalStateException e)
-                        {
-                            // expected
+    // and the callee component which should begin new transaction, current must be suspended
+    final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+    nestedConfig.setFactory(new XaTransactionFactory());
 
-                            // Thrown if the thread is already associated with another transaction.
-                            // Second tx is associated with the current thread
-                        }
-                        try
-                        {
-                            Transaction currentTx = tm.suspend();
-                            assertTrue(currentTx.equals(secondTx));
-                            tm.resume(firstTx);
-                            assertEquals(firstTx, tm.getTransaction());
-                            assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                            assertEquals(secondTx.getStatus(), Status.STATUS_ACTIVE);
-                            Transaction a = tm.suspend();
-                            assertTrue(a.equals(firstTx));
-                            tm.resume(secondTx);
-                        }
-                        catch (Exception e)
-                        {
-                            fail("Error: " + e);
-                        }
+    // start the call chain
+    executionTemplate.execute(new ExecutionCallback<Void>() {
 
-                        // do not care about the return really
-                        return null;
-                    }
-                });
+      @Override
+      public Void process() throws Exception {
+        // the callee executes within its own TX template, but uses the same global XA transaction,
+        // bound to the current thread of execution via a ThreadLocal
+        ExecutionTemplate<Void> innerExecutionTemplate =
+            TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
+        final Transaction firstTx = tm.getTransaction();
+        assertNotNull(firstTx);
+        assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+        return innerExecutionTemplate.execute(new ExecutionCallback<Void>() {
+
+          @Override
+          public Void process() throws Exception {
+            Transaction secondTx = tm.getTransaction();
+            assertNotNull(secondTx);
+            assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+            assertEquals(secondTx.getStatus(), Status.STATUS_ACTIVE);
+            try {
+              tm.resume(firstTx);
+              fail("Second transaction must be active");
+            } catch (java.lang.IllegalStateException e) {
+              // expected
+
+              // Thrown if the thread is already associated with another transaction.
+              // Second tx is associated with the current thread
             }
-        });
-        assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
-    }
-
-    /**
-     * NONE action suspends current transaction and begins a new one.
-     *
-     * @throws Exception if any error
-     */
-    @Test
-    public void testNoneXaTransactionSuspendResume() throws Exception
-    {
-        muleContext.setTransactionManager(tm);
-        assertNull("There should be no current transaction associated.", tm.getTransaction());
-
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
-
-        // this is one component with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        config.setFactory(new XaTransactionFactory());
-        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
-
-        // and the callee component which should begin new transaction, current must be suspended
-        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        nestedConfig.setFactory(new XaTransactionFactory());
-
-        // start the call chain
-        executionTemplate.execute(new ExecutionCallback<Void>()
-        {
-            @Override
-            public Void process() throws Exception
-            {
-                // the callee executes within its own TX template, but uses the same global XA transaction,
-                // bound to the current thread of execution via a ThreadLocal
-                ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
-                final Transaction firstTx = tm.getTransaction();
-                assertNotNull(firstTx);
-                assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
-                {
-                    @Override
-                    public Void process() throws Exception
-                    {
-                        Transaction secondTx = tm.getTransaction();
-                        assertNull(secondTx);
-                        assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                        try
-                        {
-                            tm.resume(firstTx);
-                            assertEquals(firstTx, tm.getTransaction());
-                            assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                            Transaction a = tm.suspend();
-                            assertTrue(a.equals(firstTx));
-                        }
-                        catch (Exception e)
-                        {
-                            fail("Error: " + e);
-                        }
-
-                        // do not care about the return really
-                        return null;
-                    }
-                });
+            try {
+              Transaction currentTx = tm.suspend();
+              assertTrue(currentTx.equals(secondTx));
+              tm.resume(firstTx);
+              assertEquals(firstTx, tm.getTransaction());
+              assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+              assertEquals(secondTx.getStatus(), Status.STATUS_ACTIVE);
+              Transaction a = tm.suspend();
+              assertTrue(a.equals(firstTx));
+              tm.resume(secondTx);
+            } catch (Exception e) {
+              fail("Error: " + e);
             }
+
+            // do not care about the return really
+            return null;
+          }
         });
-        assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
-    }
-    
-    /**
-     * This is a former XaTransactionTestCase.
-     *
-     * @throws Exception in case of any error
-     */
-    @Test
-    public void testXaTransactionTermination() throws Exception
-    {
-        muleContext.setTransactionManager(tm);
-        assertNull("There should be no current transaction associated.", tm.getTransaction());
+      }
+    });
+    assertNull("Committing via TX Manager should have disassociated TX from the current thread.", tm.getTransaction());
+  }
 
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+  /**
+   * NONE action suspends current transaction and begins a new one.
+   *
+   * @throws Exception if any error
+   */
+  @Test
+  public void testNoneXaTransactionSuspendResume() throws Exception {
+    muleContext.setTransactionManager(tm);
+    assertNull("There should be no current transaction associated.", tm.getTransaction());
 
-        XaTransaction muleTx = new XaTransaction(muleContext);
-        assertFalse(muleTx.isBegun());
-        assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
-        muleTx.begin();
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
-        assertTrue(muleTx.isBegun());
+    // this is one component with a TX always begin
+    TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+    config.setFactory(new XaTransactionFactory());
+    ExecutionTemplate<Void> executionTemplate =
+        TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
 
-        muleTx.commit();
+    // and the callee component which should begin new transaction, current must be suspended
+    final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
+    nestedConfig.setFactory(new XaTransactionFactory());
 
-        Transaction jtaTx = tm.getTransaction();
-        assertNull("Committing via TX Manager should have disassociated TX from the current thread.", jtaTx);
-        assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
-    }
+    // start the call chain
+    executionTemplate.execute(new ExecutionCallback<Void>() {
 
-    /**
-     * This is a former TransactionTemplateTestCase. http://mule.mulesoft.org/jira/browse/MULE-1494
-     *
-     * @throws Exception in case of any error
-     */
-    @Test
-    public void testNoNestedTxStarted() throws Exception
-    {
-        muleContext.setTransactionManager(tm);
-        assertNull("There should be no current transaction associated.", tm.getTransaction());
+      @Override
+      public Void process() throws Exception {
+        // the callee executes within its own TX template, but uses the same global XA transaction,
+        // bound to the current thread of execution via a ThreadLocal
+        ExecutionTemplate<Void> nestedExecutionTemplate =
+            TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
+        final Transaction firstTx = tm.getTransaction();
+        assertNotNull(firstTx);
+        assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+        return nestedExecutionTemplate.execute(new ExecutionCallback<Void>() {
 
-        // don't wait for ages, has to be set before TX is begun
-        tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
-
-        // this is one service with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        config.setFactory(new XaTransactionFactory());
-        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
-
-        // and the callee service which should join the current XA transaction, not begin a nested one
-        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
-        nestedConfig.setFactory(new XaTransactionFactory());
-
-        // start the call chain
-        executionTemplate.execute(new ExecutionCallback<Void>()
-        {
-            @Override
-            public Void process() throws Exception
-            {
-                // the callee executes within its own TX template, but uses the same global XA transaction,
-                // bound to the current thread of execution via a ThreadLocal
-                ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
-                return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
-                {
-                    @Override
-                    public Void process() throws Exception
-                    {
-                        // do not care about the return really
-                        return null;
-                    }
-                });
+          @Override
+          public Void process() throws Exception {
+            Transaction secondTx = tm.getTransaction();
+            assertNull(secondTx);
+            assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+            try {
+              tm.resume(firstTx);
+              assertEquals(firstTx, tm.getTransaction());
+              assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+              Transaction a = tm.suspend();
+              assertTrue(a.equals(firstTx));
+            } catch (Exception e) {
+              fail("Error: " + e);
             }
+
+            // do not care about the return really
+            return null;
+          }
         });
-    }
+      }
+    });
+    assertNull("Committing via TX Manager should have disassociated TX from the current thread.", tm.getTransaction());
+  }
+
+  /**
+   * This is a former XaTransactionTestCase.
+   *
+   * @throws Exception in case of any error
+   */
+  @Test
+  public void testXaTransactionTermination() throws Exception {
+    muleContext.setTransactionManager(tm);
+    assertNull("There should be no current transaction associated.", tm.getTransaction());
+
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+
+    XaTransaction muleTx = new XaTransaction(muleContext);
+    assertFalse(muleTx.isBegun());
+    assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
+    muleTx.begin();
+
+    assertTrue(muleTx.isBegun());
+
+    muleTx.commit();
+
+    Transaction jtaTx = tm.getTransaction();
+    assertNull("Committing via TX Manager should have disassociated TX from the current thread.", jtaTx);
+    assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
+  }
+
+  /**
+   * This is a former TransactionTemplateTestCase. http://mule.mulesoft.org/jira/browse/MULE-1494
+   *
+   * @throws Exception in case of any error
+   */
+  @Test
+  public void testNoNestedTxStarted() throws Exception {
+    muleContext.setTransactionManager(tm);
+    assertNull("There should be no current transaction associated.", tm.getTransaction());
+
+    // don't wait for ages, has to be set before TX is begun
+    tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
+
+    // this is one service with a TX always begin
+    TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+    config.setFactory(new XaTransactionFactory());
+    ExecutionTemplate<Void> executionTemplate =
+        TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
+
+    // and the callee service which should join the current XA transaction, not begin a nested one
+    final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
+    nestedConfig.setFactory(new XaTransactionFactory());
+
+    // start the call chain
+    executionTemplate.execute(new ExecutionCallback<Void>() {
+
+      @Override
+      public Void process() throws Exception {
+        // the callee executes within its own TX template, but uses the same global XA transaction,
+        // bound to the current thread of execution via a ThreadLocal
+        ExecutionTemplate<Void> nestedExecutionTemplate =
+            TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
+        return nestedExecutionTemplate.execute(new ExecutionCallback<Void>() {
+
+          @Override
+          public Void process() throws Exception {
+            // do not care about the return really
+            return null;
+          }
+        });
+      }
+    });
+  }
 
 
-    protected TransactionManager getTransactionManager()
-    {
-        return tm;
-    }
+  protected TransactionManager getTransactionManager() {
+    return tm;
+  }
 
-    protected abstract TransactionManagerFactory getTransactionManagerFactory();
+  protected abstract TransactionManagerFactory getTransactionManagerFactory();
 
 }

@@ -13,107 +13,92 @@ import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public class SpringAuthenticationAdapter implements Authentication
-{
-    private static final long serialVersionUID = -5906282218126929871L;
+public class SpringAuthenticationAdapter implements Authentication {
 
-    private org.springframework.security.core.Authentication delegate;
-    private Map<String, Object> properties;
-    transient private MuleEvent event;
-    
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)
-    {
-        this(authentication, null);
-    }
+  private static final long serialVersionUID = -5906282218126929871L;
 
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map<String, Object> properties)
-    {
-        this(authentication, properties, null);
-    }
+  private org.springframework.security.core.Authentication delegate;
+  private Map<String, Object> properties;
+  transient private MuleEvent event;
 
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map<String, Object> properties, MuleEvent event)
-    {
-        this.delegate = authentication;
-        this.properties = properties;
-        this.event = event;
-    }
+  public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication) {
+    this(authentication, null);
+  }
 
-    @Override
-    public void setAuthenticated(boolean b)
-    {
-        delegate.setAuthenticated(b);
-    }
+  public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication,
+                                     Map<String, Object> properties) {
+    this(authentication, properties, null);
+  }
 
-    @Override
-    public boolean isAuthenticated()
-    {
-        return delegate.isAuthenticated();
-    }
+  public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication,
+                                     Map<String, Object> properties, MuleEvent event) {
+    this.delegate = authentication;
+    this.properties = properties;
+    this.event = event;
+  }
 
-    public org.springframework.security.core.GrantedAuthority[] getAuthorities()
-    {
-        return delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);
-    }
+  @Override
+  public void setAuthenticated(boolean b) {
+    delegate.setAuthenticated(b);
+  }
 
-    @Override
-    public Object getCredentials()
-    {
-        return delegate.getCredentials();
-    }
+  @Override
+  public boolean isAuthenticated() {
+    return delegate.isAuthenticated();
+  }
 
-    public Object getDetails()
-    {
-        return delegate.getDetails();
-    }
+  public org.springframework.security.core.GrantedAuthority[] getAuthorities() {
+    return delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);
+  }
 
-    @Override
-    public Object getPrincipal()
-    {
-        return delegate.getPrincipal();
-    }
+  @Override
+  public Object getCredentials() {
+    return delegate.getCredentials();
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return delegate.hashCode();
-    }
+  public Object getDetails() {
+    return delegate.getDetails();
+  }
 
-    @Override
-    public boolean equals(Object another)
-    {
-        return delegate.equals(another);
-    }
+  @Override
+  public Object getPrincipal() {
+    return delegate.getPrincipal();
+  }
 
-    public String getName()
-    {
-        return delegate.getName();
-    }
+  @Override
+  public int hashCode() {
+    return delegate.hashCode();
+  }
 
-    public org.springframework.security.core.Authentication getDelegate()
-    {
-        return delegate;
-    }
+  @Override
+  public boolean equals(Object another) {
+    return delegate.equals(another);
+  }
 
-    @Override
-    public Map<String, Object> getProperties()
-    {
-        return properties;
-    }
+  public String getName() {
+    return delegate.getName();
+  }
 
-    @Override
-    public void setProperties(Map<String, Object> properties)
-    {
-        this.properties = properties;
-    }
+  public org.springframework.security.core.Authentication getDelegate() {
+    return delegate;
+  }
 
-    @Override
-    public MuleEvent getEvent()
-    {
-        return event;
-    }
+  @Override
+  public Map<String, Object> getProperties() {
+    return properties;
+  }
 
-    public void setEvent(MuleEvent muleEvent)
-    {
-        this.event = muleEvent;
-    }
+  @Override
+  public void setProperties(Map<String, Object> properties) {
+    this.properties = properties;
+  }
+
+  @Override
+  public MuleEvent getEvent() {
+    return event;
+  }
+
+  public void setEvent(MuleEvent muleEvent) {
+    this.event = muleEvent;
+  }
 }

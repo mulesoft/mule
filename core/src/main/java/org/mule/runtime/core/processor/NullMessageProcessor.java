@@ -16,27 +16,23 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class NullMessageProcessor implements MessageProcessorChain
-{
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return event;
-    }
+public class NullMessageProcessor implements MessageProcessorChain {
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return event;
+  }
 
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return Collections.emptyList();
-    }
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 
-    public String getName()
-    {
-        return null;
-    }
+  public List<MessageProcessor> getMessageProcessors() {
+    return Collections.emptyList();
+  }
+
+  public String getName() {
+    return null;
+  }
 
 }

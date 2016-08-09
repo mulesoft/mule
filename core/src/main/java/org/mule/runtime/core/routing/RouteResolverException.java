@@ -16,22 +16,18 @@ import java.lang.Throwable;
 /**
  * Exception thrown when a route for an event can not be found
  */
-public class RouteResolverException extends RoutingFailedMessagingException
-{
+public class RouteResolverException extends RoutingFailedMessagingException {
 
-    public RouteResolverException(MuleEvent event, Throwable cause)
-    {
-        super(event, cause);
-    }
+  public RouteResolverException(MuleEvent event, Throwable cause) {
+    super(event, cause);
+  }
 
-    public RouteResolverException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  public RouteResolverException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
 
-    public RouteResolverException(Message message, MuleEvent event)
-    {
-        super(message, event);
-    }
+  public RouteResolverException(Message message, MuleEvent event) {
+    super(message, event);
+  }
 
 }

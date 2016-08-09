@@ -13,45 +13,38 @@ import java.io.Serializable;
  * 
  * @since 3.8.0
  */
-public class FlowStackElement implements Serializable
-{
-    private static final long serialVersionUID = -851491195125245390L;
+public class FlowStackElement implements Serializable {
 
-    private String flowName;
-    private String processorPath;
+  private static final long serialVersionUID = -851491195125245390L;
 
-    public FlowStackElement(String flowName, String processorPath)
-    {
-        this.flowName = flowName;
-        this.processorPath = processorPath;
+  private String flowName;
+  private String processorPath;
+
+  public FlowStackElement(String flowName, String processorPath) {
+    this.flowName = flowName;
+    this.processorPath = processorPath;
+  }
+
+  /**
+   * @return the path of the currently executing processor in the flow represented by this element.
+   */
+  public String getProcessorPath() {
+    return processorPath;
+  }
+
+  /**
+   * @return the name of the flow which execution is represented by this element.
+   */
+  public String getFlowName() {
+    return flowName;
+  }
+
+  @Override
+  public String toString() {
+    if (processorPath == null) {
+      return String.format("%s", flowName);
+    } else {
+      return String.format("%s(%s)", flowName, processorPath);
     }
-
-    /**
-     * @return the path of the currently executing processor in the flow represented by this element.
-     */
-    public String getProcessorPath()
-    {
-        return processorPath;
-    }
-
-    /**
-     * @return the name of the flow which execution is represented by this element.
-     */
-    public String getFlowName()
-    {
-        return flowName;
-    }
-
-    @Override
-    public String toString()
-    {
-        if (processorPath == null)
-        {
-            return String.format("%s", flowName);
-        }
-        else
-        {
-            return String.format("%s(%s)", flowName, processorPath);
-        }
-    }
+  }
 }

@@ -11,24 +11,20 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 
-public class LocalTransactionProvider implements PoolingConnectionProvider<TestTransactionalConnection>
-{
+public class LocalTransactionProvider implements PoolingConnectionProvider<TestTransactionalConnection> {
 
-    @Override
-    public TestTransactionalConnection connect() throws ConnectionException
-    {
-        return new TestTransactionalConnection();
-    }
+  @Override
+  public TestTransactionalConnection connect() throws ConnectionException {
+    return new TestTransactionalConnection();
+  }
 
-    @Override
-    public void disconnect(TestTransactionalConnection testTransactionalConnection)
-    {
-        testTransactionalConnection.disconnect();
-    }
+  @Override
+  public void disconnect(TestTransactionalConnection testTransactionalConnection) {
+    testTransactionalConnection.disconnect();
+  }
 
-    @Override
-    public ConnectionValidationResult validate(TestTransactionalConnection testTransactionalConnection)
-    {
-        return success();
-    }
+  @Override
+  public ConnectionValidationResult validate(TestTransactionalConnection testTransactionalConnection) {
+    return success();
+  }
 }

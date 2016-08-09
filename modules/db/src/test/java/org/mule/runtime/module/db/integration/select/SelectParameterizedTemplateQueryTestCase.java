@@ -21,32 +21,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectParameterizedTemplateQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectParameterizedTemplateQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectParameterizedTemplateQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectParameterizedTemplateQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-parameterized-template-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-parameterized-template-query-config.xml"};
+  }
 
-    @Test
-    public void usesParameterizedQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run();
+  @Test
+  public void usesParameterizedQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getMarsRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getMarsRecord());
+  }
 }

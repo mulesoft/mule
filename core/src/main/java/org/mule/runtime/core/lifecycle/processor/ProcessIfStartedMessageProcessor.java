@@ -14,40 +14,32 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
-public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessageProcessor
-{
+public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessageProcessor {
 
-    protected Startable startable;
-    protected LifecycleState lifecycleState;
+  protected Startable startable;
+  protected LifecycleState lifecycleState;
 
-    public ProcessIfStartedMessageProcessor(Startable startable, LifecycleState lifecycleState)
-    {
-        this.startable = startable;
-        this.lifecycleState = lifecycleState;
+  public ProcessIfStartedMessageProcessor(Startable startable, LifecycleState lifecycleState) {
+    this.startable = startable;
+    this.lifecycleState = lifecycleState;
+  }
+
+  @Override
+  protected boolean accept(MuleEvent event) {
+    return lifecycleState.isStarted();
+  }
+
+  @Override
+  protected MuleEvent handleUnaccepted(MuleEvent event) throws LifecycleException {
+    throw new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
+  }
+
+  protected String getStartableName(Startable startableObject) {
+    if (startableObject instanceof NameableObject) {
+      return ((NameableObject) startableObject).getName();
+    } else {
+      return startableObject.toString();
     }
-
-    @Override
-    protected boolean accept(MuleEvent event)
-    {
-        return lifecycleState.isStarted();
-    }
-
-    @Override
-    protected MuleEvent handleUnaccepted(MuleEvent event) throws LifecycleException
-    {
-        throw new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
-    }
-
-    protected String getStartableName(Startable startableObject)
-    {
-        if (startableObject instanceof NameableObject)
-        {
-            return ((NameableObject) startableObject).getName();
-        }
-        else
-        {
-            return startableObject.toString();
-        }
-    }
+  }
 
 }

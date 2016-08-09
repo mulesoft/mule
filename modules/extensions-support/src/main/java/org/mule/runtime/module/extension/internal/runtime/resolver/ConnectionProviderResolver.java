@@ -12,42 +12,37 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 /**
- * A {@link ValueResolver} specialization for producing {@link ConnectionProvider}
- * instances through a {@link ConnectionProviderObjectBuilder}
+ * A {@link ValueResolver} specialization for producing {@link ConnectionProvider} instances through a
+ * {@link ConnectionProviderObjectBuilder}
  *
  * @since 4.0
  */
-public class ConnectionProviderResolver implements ValueResolver<ConnectionProvider>
-{
+public class ConnectionProviderResolver implements ValueResolver<ConnectionProvider> {
 
-    private final ConnectionProviderObjectBuilder objectBuilder;
-    private final ObjectBuilderValueResolver<ConnectionProvider> valueResolver;
+  private final ConnectionProviderObjectBuilder objectBuilder;
+  private final ObjectBuilderValueResolver<ConnectionProvider> valueResolver;
 
-    /**
-     * Creates a new instance
-     *
-     * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
-     */
-    public ConnectionProviderResolver(ConnectionProviderObjectBuilder objectBuilder)
-    {
-        this.objectBuilder = objectBuilder;
-        this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
+   */
+  public ConnectionProviderResolver(ConnectionProviderObjectBuilder objectBuilder) {
+    this.objectBuilder = objectBuilder;
+    this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
+  }
 
-    @Override
-    public ConnectionProvider resolve(MuleEvent event) throws MuleException
-    {
-        return valueResolver.resolve(event);
-    }
+  @Override
+  public ConnectionProvider resolve(MuleEvent event) throws MuleException {
+    return valueResolver.resolve(event);
+  }
 
-    @Override
-    public boolean isDynamic()
-    {
-        return valueResolver.isDynamic();
-    }
+  @Override
+  public boolean isDynamic() {
+    return valueResolver.isDynamic();
+  }
 
-    public void setOwnerConfigName(String ownerConfigName)
-    {
-        objectBuilder.setOwnerConfigName(ownerConfigName);
-    }
+  public void setOwnerConfigName(String ownerConfigName) {
+    objectBuilder.setOwnerConfigName(ownerConfigName);
+  }
 }

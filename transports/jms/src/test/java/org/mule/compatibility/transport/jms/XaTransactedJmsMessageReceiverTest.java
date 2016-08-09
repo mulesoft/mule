@@ -57,191 +57,177 @@ import org.mockito.stubbing.Answer;
 public class XaTransactedJmsMessageReceiverTest extends AbstractMuleTestCase {
 
 
-    @Mock
-    private JmsSupport jmsSupport;
-    @Mock
-    private JmsConnector mockJmsConnector;
-    @Mock
-    private FlowConstruct mockFlowConstruct;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private InboundEndpoint mockInboundEndpoint;
-    @Mock
-    private MessageConsumer messageConsumer;
-    @Mock
-    private Transaction transaction;
+  @Mock
+  private JmsSupport jmsSupport;
+  @Mock
+  private JmsConnector mockJmsConnector;
+  @Mock
+  private FlowConstruct mockFlowConstruct;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private InboundEndpoint mockInboundEndpoint;
+  @Mock
+  private MessageConsumer messageConsumer;
+  @Mock
+  private Transaction transaction;
 
-    private ExecutorService executor;
+  private ExecutorService executor;
 
-    @Before
-    public void setUpMocks() throws JMSException
-    {
-        when(mockJmsConnector.getJmsSupport()).thenReturn(jmsSupport);
-        when(mockJmsConnector.isConnected()).thenReturn(true);
-        when(mockJmsConnector.getTopicResolver()).thenReturn(mock(JmsTopicResolver.class));
-        when(mockJmsConnector.getSelector(mockInboundEndpoint)).thenReturn(null);
-        when(mockJmsConnector.getSession(mockInboundEndpoint)).thenReturn(mock(Session.class, withSettings().extraInterfaces(XaTransaction.MuleXaObject.class)));
+  @Before
+  public void setUpMocks() throws JMSException {
+    when(mockJmsConnector.getJmsSupport()).thenReturn(jmsSupport);
+    when(mockJmsConnector.isConnected()).thenReturn(true);
+    when(mockJmsConnector.getTopicResolver()).thenReturn(mock(JmsTopicResolver.class));
+    when(mockJmsConnector.getSelector(mockInboundEndpoint)).thenReturn(null);
+    when(mockJmsConnector.getSession(mockInboundEndpoint))
+        .thenReturn(mock(Session.class, withSettings().extraInterfaces(XaTransaction.MuleXaObject.class)));
 
-        when(mockInboundEndpoint.getEndpointURI()).thenReturn(mock(EndpointURI.class));
-        when(mockInboundEndpoint.getProperties()).thenReturn(emptyMap());
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    when(mockInboundEndpoint.getEndpointURI()).thenReturn(mock(EndpointURI.class));
+    when(mockInboundEndpoint.getProperties()).thenReturn(emptyMap());
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+  }
+
+  @After
+  public void clearInterruptedFlag() {
+    Thread.interrupted();
+  }
+
+  @After
+  public void shutdownExecutor() {
+    if (executor != null) {
+      executor.shutdown();
     }
+  }
 
-    @After
-    public void clearInterruptedFlag()
-    {
-        Thread.interrupted();
-    }
+  @Test
+  public void testTopicReceiverShouldBeStartedOnlyInPrimaryNode() throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(true);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    XaTransactedJmsMessageReceiver messageReceiver =
+        new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(false));
+  }
 
-    @After
-    public void shutdownExecutor()
-    {
-        if (executor != null)
-        {
-            executor.shutdown();
-        }
-    }
+  @Test
+  public void testQueueReceiverShouldBeStartedInEveryNode() throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(false);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    XaTransactedJmsMessageReceiver messageReceiver =
+        new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(true));
+  }
 
-    @Test
-    public void testTopicReceiverShouldBeStartedOnlyInPrimaryNode() throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(true);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
-        XaTransactedJmsMessageReceiver messageReceiver = new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(false));
-    }
+  private void doDisconnectExceptionTest(final Exception exceptionToThrow) throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(false);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
 
-    @Test
-    public void testQueueReceiverShouldBeStartedInEveryNode() throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(false);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
-        XaTransactedJmsMessageReceiver messageReceiver = new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(true));
-    }
+    XaTransactedJmsMessageReceiver messageReceiver =
+        spy(new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint));
+    doReturn(messageConsumer).when(messageReceiver).createConsumer();
 
-    private void doDisconnectExceptionTest(final Exception exceptionToThrow) throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint)).thenReturn(false);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    when(messageConsumer.receive(messageReceiver.timeout)).thenAnswer(invocation -> {
+      Thread.currentThread().interrupt();
+      throw exceptionToThrow;
+    });
 
-        XaTransactedJmsMessageReceiver messageReceiver = spy(new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint));
-        doReturn(messageConsumer).when(messageReceiver).createConsumer();
+    doAnswer(invocation -> {
+      assertThat(Thread.currentThread().isInterrupted(), is(true));
+      return null;
+    }).when(transaction).setRollbackOnly();
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+    messageReceiver.getMessages();
 
-        when(messageConsumer.receive(messageReceiver.timeout)).thenAnswer(invocation ->
-        {
-            Thread.currentThread().interrupt();
-            throw exceptionToThrow;
-        });
-
-        doAnswer(invocation ->
-        {
-            assertThat(Thread.currentThread().isInterrupted(), is(true));
-            return null;
-        }).when(transaction).setRollbackOnly();
-        TransactionCoordination.getInstance().bindTransaction(transaction);
-        messageReceiver.getMessages();
-
-        verify(transaction).setRollbackOnly();
-    }
+    verify(transaction).setRollbackOnly();
+  }
 
 
-    @Test
-    public void jmsExceptionWhileDisconnecting() throws Exception
-    {
-        doDisconnectExceptionTest(new JMSException("Test exception"));
-    }
+  @Test
+  public void jmsExceptionWhileDisconnecting() throws Exception {
+    doDisconnectExceptionTest(new JMSException("Test exception"));
+  }
 
-    @Test
-    public void undeclaredThrowableExceptionWhileDisconnecting() throws Exception
-    {
-        doDisconnectExceptionTest(new UndeclaredThrowableException(new RuntimeException(new JMSException("Test exception"))));
-    }
+  @Test
+  public void undeclaredThrowableExceptionWhileDisconnecting() throws Exception {
+    doDisconnectExceptionTest(new UndeclaredThrowableException(new RuntimeException(new JMSException("Test exception"))));
+  }
 
-    @Test(expected = RuntimeException.class)
-    public void otherExceptionWhileDisconnecting() throws Exception
-    {
-        doDisconnectExceptionTest(new RuntimeException("Test exception"));
-    }
+  @Test(expected = RuntimeException.class)
+  public void otherExceptionWhileDisconnecting() throws Exception {
+    doDisconnectExceptionTest(new RuntimeException("Test exception"));
+  }
 
-    @Test
-    public void disconnectFromOtherThread() throws Exception
-    {
-        final Latch receivingLatch = new Latch();
-        final Latch disconnectedLatch = new Latch();
+  @Test
+  public void disconnectFromOtherThread() throws Exception {
+    final Latch receivingLatch = new Latch();
+    final Latch disconnectedLatch = new Latch();
 
-        final MessageConsumer consumer = mock(MessageConsumer.class);
-        when(consumer.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
+    final MessageConsumer consumer = mock(MessageConsumer.class);
+    when(consumer.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
 
-        when(jmsSupport.createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(), anyBoolean(), eq(mockInboundEndpoint))).thenReturn(consumer);
+    when(jmsSupport.createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(),
+                                   anyBoolean(), eq(mockInboundEndpoint))).thenReturn(consumer);
 
-        final XaTransactedJmsMessageReceiver messageReceiver = new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    final XaTransactedJmsMessageReceiver messageReceiver =
+        new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
 
-        executor = newSingleThreadExecutor();
-        executor.execute(buildReceiverPoller(messageReceiver));
+    executor = newSingleThreadExecutor();
+    executor.execute(buildReceiverPoller(messageReceiver));
 
-        receivingLatch.await(10, TimeUnit.SECONDS);
-        messageReceiver.disconnect();
+    receivingLatch.await(10, TimeUnit.SECONDS);
+    messageReceiver.disconnect();
 
-        verify(mockJmsConnector).closeQuietly(eq(consumer));
+    verify(mockJmsConnector).closeQuietly(eq(consumer));
 
-        disconnectedLatch.countDown();
-    }
+    disconnectedLatch.countDown();
+  }
 
-    @Test
-    public void receiverSharedAmongThreads() throws Exception
-    {
-        final CountDownLatch receivingLatch = new CountDownLatch(3);
-        final Latch disconnectedLatch = new Latch();
+  @Test
+  public void receiverSharedAmongThreads() throws Exception {
+    final CountDownLatch receivingLatch = new CountDownLatch(3);
+    final Latch disconnectedLatch = new Latch();
 
-        final MessageConsumer consumer1 = mock(MessageConsumer.class, "consumer1");
-        final MessageConsumer consumer2 = mock(MessageConsumer.class, "consumer2");
-        final MessageConsumer consumer3 = mock(MessageConsumer.class, "consumer3");
-        when(consumer1.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
-        when(consumer2.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
-        when(consumer3.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
+    final MessageConsumer consumer1 = mock(MessageConsumer.class, "consumer1");
+    final MessageConsumer consumer2 = mock(MessageConsumer.class, "consumer2");
+    final MessageConsumer consumer3 = mock(MessageConsumer.class, "consumer3");
+    when(consumer1.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
+    when(consumer2.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
+    when(consumer3.receive(anyLong())).then(buildLatchedReceiveAnswer(receivingLatch, disconnectedLatch));
 
-        when(jmsSupport.createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(), anyBoolean(), eq(mockInboundEndpoint))).thenReturn(consumer1, consumer2,
-                consumer3);
+    when(jmsSupport.createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(),
+                                   anyBoolean(), eq(mockInboundEndpoint))).thenReturn(consumer1, consumer2, consumer3);
 
-        final XaTransactedJmsMessageReceiver messageReceiver = new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    final XaTransactedJmsMessageReceiver messageReceiver =
+        new XaTransactedJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
 
-        executor = newFixedThreadPool(3);
-        executor.execute(buildReceiverPoller(messageReceiver));
-        executor.execute(buildReceiverPoller(messageReceiver));
-        executor.execute(buildReceiverPoller(messageReceiver));
+    executor = newFixedThreadPool(3);
+    executor.execute(buildReceiverPoller(messageReceiver));
+    executor.execute(buildReceiverPoller(messageReceiver));
+    executor.execute(buildReceiverPoller(messageReceiver));
 
-        receivingLatch.await(10, TimeUnit.SECONDS);
-        messageReceiver.disconnect();
+    receivingLatch.await(10, TimeUnit.SECONDS);
+    messageReceiver.disconnect();
 
-        verify(mockJmsConnector).closeQuietly(eq(consumer1));
-        verify(mockJmsConnector).closeQuietly(eq(consumer2));
-        verify(mockJmsConnector).closeQuietly(eq(consumer3));
+    verify(mockJmsConnector).closeQuietly(eq(consumer1));
+    verify(mockJmsConnector).closeQuietly(eq(consumer2));
+    verify(mockJmsConnector).closeQuietly(eq(consumer3));
 
-        disconnectedLatch.countDown();
-    }
+    disconnectedLatch.countDown();
+  }
 
-    protected Answer<Message> buildLatchedReceiveAnswer(final CountDownLatch receivingLatch, final Latch disconnectedLatch)
-    {
-        return invocation ->
-        {
-            receivingLatch.countDown();
-            disconnectedLatch.await();
-            throw new JMSException("Mocking disconnection");
-        };
-    }
+  protected Answer<Message> buildLatchedReceiveAnswer(final CountDownLatch receivingLatch, final Latch disconnectedLatch) {
+    return invocation -> {
+      receivingLatch.countDown();
+      disconnectedLatch.await();
+      throw new JMSException("Mocking disconnection");
+    };
+  }
 
-    protected Runnable buildReceiverPoller(final XaTransactedJmsMessageReceiver messageReceiver)
-    {
-        return () ->
-        {
-            try
-            {
-                messageReceiver.poll();
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        };
-    }
+  protected Runnable buildReceiverPoller(final XaTransactedJmsMessageReceiver messageReceiver) {
+    return () -> {
+      try {
+        messageReceiver.poll();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    };
+  }
 }

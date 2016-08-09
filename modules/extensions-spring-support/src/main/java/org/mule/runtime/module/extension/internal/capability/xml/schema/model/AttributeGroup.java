@@ -32,10 +32,13 @@ import javax.xml.namespace.QName;
 
 
 /**
- * <p>Java class for attributeGroup complex type.
+ * <p>
+ * Java class for attributeGroup complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType name="attributeGroup">
  *   &lt;complexContent>
@@ -49,125 +52,99 @@ import javax.xml.namespace.QName;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "attributeGroup", propOrder = {
-        "attributeOrAttributeGroup",
-        "anyAttribute"
-})
-@XmlSeeAlso({
-                    NamedAttributeGroup.class,
-                    AttributeGroupRef.class
-            })
-public abstract class AttributeGroup
-        extends Annotated
-{
+@XmlType(name = "attributeGroup", propOrder = {"attributeOrAttributeGroup", "anyAttribute"})
+@XmlSeeAlso({NamedAttributeGroup.class, AttributeGroupRef.class})
+public abstract class AttributeGroup extends Annotated {
 
-    @XmlElements({
-                         @XmlElement(name = "attributeGroup", type = AttributeGroupRef.class),
-                         @XmlElement(name = "attribute", type = Attribute.class)
-                 })
-    protected List<Annotated> attributeOrAttributeGroup;
-    protected Wildcard anyAttribute;
-    @XmlAttribute(name = "name")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
-    protected String name;
-    @XmlAttribute(name = "ref")
-    protected QName ref;
+  @XmlElements({@XmlElement(name = "attributeGroup", type = AttributeGroupRef.class),
+      @XmlElement(name = "attribute", type = Attribute.class)})
+  protected List<Annotated> attributeOrAttributeGroup;
+  protected Wildcard anyAttribute;
+  @XmlAttribute(name = "name")
+  @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+  @XmlSchemaType(name = "NCName")
+  protected String name;
+  @XmlAttribute(name = "ref")
+  protected QName ref;
 
-    /**
-     * Gets the value of the attributeOrAttributeGroup property.
-     * <p/>
-     * <p/>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the attributeOrAttributeGroup property.
-     * <p/>
-     * <p/>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAttributeOrAttributeGroup().add(newItem);
-     * </pre>
-     * <p/>
-     * <p/>
-     * <p/>
-     * Objects of the following type(s) are allowed in the list
-     * {@link AttributeGroupRef }
-     * {@link Attribute }
-     */
-    public List<Annotated> getAttributeOrAttributeGroup()
-    {
-        if (attributeOrAttributeGroup == null)
-        {
-            attributeOrAttributeGroup = new ArrayList<Annotated>();
-        }
-        return this.attributeOrAttributeGroup;
+  /**
+   * Gets the value of the attributeOrAttributeGroup property.
+   * <p/>
+   * <p/>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+   * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the
+   * attributeOrAttributeGroup property.
+   * <p/>
+   * <p/>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getAttributeOrAttributeGroup().add(newItem);
+   * </pre>
+   * <p/>
+   * <p/>
+   * <p/>
+   * Objects of the following type(s) are allowed in the list {@link AttributeGroupRef } {@link Attribute }
+   */
+  public List<Annotated> getAttributeOrAttributeGroup() {
+    if (attributeOrAttributeGroup == null) {
+      attributeOrAttributeGroup = new ArrayList<Annotated>();
     }
+    return this.attributeOrAttributeGroup;
+  }
 
-    /**
-     * Gets the value of the anyAttribute property.
-     *
-     * @return possible object is
-     * {@link Wildcard }
-     */
-    public Wildcard getAnyAttribute()
-    {
-        return anyAttribute;
-    }
+  /**
+   * Gets the value of the anyAttribute property.
+   *
+   * @return possible object is {@link Wildcard }
+   */
+  public Wildcard getAnyAttribute() {
+    return anyAttribute;
+  }
 
-    /**
-     * Sets the value of the anyAttribute property.
-     *
-     * @param value allowed object is
-     *              {@link Wildcard }
-     */
-    public void setAnyAttribute(Wildcard value)
-    {
-        this.anyAttribute = value;
-    }
+  /**
+   * Sets the value of the anyAttribute property.
+   *
+   * @param value allowed object is {@link Wildcard }
+   */
+  public void setAnyAttribute(Wildcard value) {
+    this.anyAttribute = value;
+  }
 
-    /**
-     * Gets the value of the name property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getName()
-    {
-        return name;
-    }
+  /**
+   * Gets the value of the name property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Sets the value of the name property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setName(String value)
-    {
-        this.name = value;
-    }
+  /**
+   * Sets the value of the name property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setName(String value) {
+    this.name = value;
+  }
 
-    /**
-     * Gets the value of the ref property.
-     *
-     * @return possible object is
-     * {@link QName }
-     */
-    public QName getRef()
-    {
-        return ref;
-    }
+  /**
+   * Gets the value of the ref property.
+   *
+   * @return possible object is {@link QName }
+   */
+  public QName getRef() {
+    return ref;
+  }
 
-    /**
-     * Sets the value of the ref property.
-     *
-     * @param value allowed object is
-     *              {@link QName }
-     */
-    public void setRef(QName value)
-    {
-        this.ref = value;
-    }
+  /**
+   * Sets the value of the ref property.
+   *
+   * @param value allowed object is {@link QName }
+   */
+  public void setRef(QName value) {
+    this.ref = value;
+  }
 
 }

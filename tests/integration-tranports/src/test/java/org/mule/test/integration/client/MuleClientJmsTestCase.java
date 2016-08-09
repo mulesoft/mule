@@ -20,91 +20,81 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MuleClientJmsTestCase extends FunctionalTestCase
-{
-    public static final int INTERATIONS = 1;
+public class MuleClientJmsTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
+  public static final int INTERATIONS = 1;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
+  }
+
+  @Test
+  public void testClientSend() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
+
+    MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+    assertNotNull(message);
+    assertEquals("Received: Test Client Send message", message.getPayload());
+  }
+
+  @Test
+  public void testClientMultiSend() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
+
+    for (int i = 0; i < INTERATIONS; i++) {
+      MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+      assertNotNull(message);
+      assertEquals("Received: Test Client Send message " + i, message.getPayload());
     }
+  }
 
-    @Test
-    public void testClientSend() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
+  @Test
+  public void testClientMultiDispatch() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
-        assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayload());
+    int i = 0;
+    // to init
+    client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
+    long start = System.currentTimeMillis();
+    for (i = 0; i < INTERATIONS; i++) {
+      client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
     }
+    long time = System.currentTimeMillis() - start;
+    logger.debug(i + " took " + time + "ms to process");
+    Thread.sleep(1000);
+  }
 
-    @Test
-    public void testClientMultiSend() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
+  @Test
+  public void testClientDispatchAndReceiveOnReplyTo() throws Exception {
+    MuleClient client = new MuleClient(muleContext);
 
-        for (int i = 0; i < INTERATIONS; i++)
-        {
-            MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
-            assertNotNull(message);
-            assertEquals("Received: Test Client Send message " + i, message.getPayload());
-        }
+    Map props = new HashMap();
+    props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");
+
+    long start = System.currentTimeMillis();
+    int i = 0;
+    for (i = 0; i < INTERATIONS; i++) {
+      logger.debug("Sending message " + i);
+      client.dispatch(getDispatchUrl(), "Test Client Dispatch message " + i, props);
     }
+    long time = System.currentTimeMillis() - start;
+    logger.debug("It took " + time + " ms to send " + i + " messages");
 
-    @Test
-    public void testClientMultiDispatch() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        int i = 0;
-        // to init
-        client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
-        long start = System.currentTimeMillis();
-        for (i = 0; i < INTERATIONS; i++)
-        {
-            client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
-        }
-        long time = System.currentTimeMillis() - start;
-        logger.debug(i + " took " + time + "ms to process");
-        Thread.sleep(1000);
+    Thread.sleep(5000);
+    start = System.currentTimeMillis();
+    for (i = 0; i < INTERATIONS; i++) {
+      MuleMessage message = client.request("jms://replyTo.queue", 5000);
+      assertNotNull("message should not be null from Reply queue", message);
+      logger.debug("Count is " + i);
+      logger.debug("ReplyTo Message is: " + getPayloadAsString(message));
+      assertTrue(getPayloadAsString(message).startsWith("Received"));
     }
+    time = System.currentTimeMillis() - start;
+    logger.debug("It took " + time + "ms to receive " + i + " messages");
+  }
 
-    @Test
-    public void testClientDispatchAndReceiveOnReplyTo() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");
-
-        long start = System.currentTimeMillis();
-        int i = 0;
-        for (i = 0; i < INTERATIONS; i++)
-        {
-            logger.debug("Sending message " + i);
-            client.dispatch(getDispatchUrl(), "Test Client Dispatch message " + i, props);
-        }
-        long time = System.currentTimeMillis() - start;
-        logger.debug("It took " + time + " ms to send " + i + " messages");
-
-        Thread.sleep(5000);
-        start = System.currentTimeMillis();
-        for (i = 0; i < INTERATIONS; i++)
-        {
-            MuleMessage message = client.request("jms://replyTo.queue", 5000);
-            assertNotNull("message should not be null from Reply queue", message);
-            logger.debug("Count is " + i);
-            logger.debug("ReplyTo Message is: " + getPayloadAsString(message));
-            assertTrue(getPayloadAsString(message).startsWith("Received"));
-        }
-        time = System.currentTimeMillis() - start;
-        logger.debug("It took " + time + "ms to receive " + i + " messages");
-    }
-
-    public String getDispatchUrl()
-    {
-        return "jms://test.queue";
-    }
+  public String getDispatchUrl() {
+    return "jms://test.queue";
+  }
 }

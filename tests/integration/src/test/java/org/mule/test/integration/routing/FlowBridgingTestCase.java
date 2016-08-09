@@ -13,20 +13,17 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class FlowBridgingTestCase extends AbstractIntegrationTestCase
-{
+public class FlowBridgingTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/bridge-mule-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/bridge-mule-flow.xml";
+  }
 
-    @Test
-    public void testSynchronousBridging() throws Exception
-    {
-        MuleMessage result = flowRunner("bridge").withPayload(TEST_PAYLOAD).run().getMessage();
-        assertNotNull(result);
-        assertEquals("Received: test", getPayloadAsString(result));
-    }
+  @Test
+  public void testSynchronousBridging() throws Exception {
+    MuleMessage result = flowRunner("bridge").withPayload(TEST_PAYLOAD).run().getMessage();
+    assertNotNull(result);
+    assertEquals("Received: test", getPayloadAsString(result));
+  }
 }

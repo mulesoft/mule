@@ -17,47 +17,39 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 
-public class VerifySignatureSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class VerifySignatureSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "verify-signature-security-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "verify-signature-security-config.xml";
+  }
+
+  @Test
+  public void responseWithValidSignatureReturnsExpectedResult() throws Exception {
+    assertValidResponse("responseWithValidSignature");
+  }
+
+  @Test
+  public void responseWithInvalidSignatureFails() throws Exception {
+    assertSoapFault("responseWithInvalidSignature", "FailedCheck");
+  }
+
+  @Test
+  public void responseWithoutSignatureFails() throws Exception {
+    assertSoapFault("responseWithoutSignature", "InvalidSecurity");
+  }
+
+  @Test
+  public void responseWithInvalidSignatureDefaultCertificatesFails() throws Exception {
+    assertSoapFault("responseWithInvalidSignatureDefaultCertificates", "FailedCheck");
+  }
+
+  public static class ServerPasswordCallback implements CallbackHandler {
+
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+      WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+      pc.setPassword("mulepassword");
     }
-
-    @Test
-    public void responseWithValidSignatureReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("responseWithValidSignature");
-    }
-
-    @Test
-    public void responseWithInvalidSignatureFails() throws Exception
-    {
-        assertSoapFault("responseWithInvalidSignature", "FailedCheck");
-    }
-
-    @Test
-    public void responseWithoutSignatureFails() throws Exception
-    {
-        assertSoapFault("responseWithoutSignature", "InvalidSecurity");
-    }
-
-    @Test
-    public void responseWithInvalidSignatureDefaultCertificatesFails() throws Exception
-    {
-        assertSoapFault("responseWithInvalidSignatureDefaultCertificates", "FailedCheck");
-    }
-
-    public static class ServerPasswordCallback implements CallbackHandler
-    {
-
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-        {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-            pc.setPassword("mulepassword");
-        }
-    }
+  }
 
 }

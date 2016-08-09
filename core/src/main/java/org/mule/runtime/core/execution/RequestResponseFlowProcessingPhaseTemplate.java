@@ -11,26 +11,26 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.runtime.core.api.source.MessageSource}
- * that requires sending a response of the message processed.
+ * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.runtime.core.api.source.MessageSource} that requires
+ * sending a response of the message processed.
  */
-public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessingPhaseTemplate
-{
+public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessingPhaseTemplate {
 
-    /**
-     * Template method to send a response after processing the message.
-     * <p/>
-     * This method is executed within the flow so if it fails it will trigger the exception strategy.
-     *
-     * @param muleEvent the event with the content of the response to be sent.
-     * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing the response
-     *                       using the underlying transport or connector then the exception to throw must be a {@link ResponseDispatchException}.
-     */
-    void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
+  /**
+   * Template method to send a response after processing the message.
+   * <p/>
+   * This method is executed within the flow so if it fails it will trigger the exception strategy.
+   *
+   * @param muleEvent the event with the content of the response to be sent.
+   * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing
+   *         the response using the underlying transport or connector then the exception to throw must be a
+   *         {@link ResponseDispatchException}.
+   */
+  void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
 
-    /**
-     * @param messagingException exception thrown during the flow execution.
-     * @throws MuleException exception thrown when processing the message to send the response.
-     */
-    void sendFailureResponseToClient(MessagingException messagingException) throws MuleException;
+  /**
+   * @param messagingException exception thrown during the flow execution.
+   * @throws MuleException exception thrown when processing the message to send the response.
+   */
+  void sendFailureResponseToClient(MessagingException messagingException) throws MuleException;
 }

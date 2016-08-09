@@ -12,19 +12,18 @@ import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.compiler.CompiledExpression;
 
 /**
- * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side
- * of an assignment expression if possible
+ * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side of an assignment expression if
+ * possible
  */
-public interface EnricherDataTypePropagator
-{
+public interface EnricherDataTypePropagator {
 
-    /**
-     * Propagates {@link org.mule.runtime.api.metadata.DataType} on message enrichment
-     *
-     * @param event event being enriched
-     * @param typedValue value used to enrich the message
-     * @param compiledExpression assignment expression used for enrichment
-     * @return true if propagation was done, false otherwise
-     */
-    boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression);
+  /**
+   * Propagates {@link org.mule.runtime.api.metadata.DataType} on message enrichment
+   *
+   * @param event event being enriched
+   * @param typedValue value used to enrich the message
+   * @param compiledExpression assignment expression used for enrichment
+   * @return true if propagation was done, false otherwise
+   */
+  boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression);
 }

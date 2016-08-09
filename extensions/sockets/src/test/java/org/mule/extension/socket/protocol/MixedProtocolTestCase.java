@@ -10,18 +10,15 @@ import org.mule.extension.socket.SocketExtensionTestCase;
 
 import org.junit.Test;
 
-public class MixedProtocolTestCase extends SocketExtensionTestCase
-{
+public class MixedProtocolTestCase extends SocketExtensionTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mixed-protocols-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mixed-protocols-config.xml";
+  }
 
-    @Test
-    public void sendString() throws Exception
-    {
-        sendString("tcp-send");
-    }
+  @Test
+  public void sendString() throws Exception {
+    sendString("tcp-send");
+  }
 }

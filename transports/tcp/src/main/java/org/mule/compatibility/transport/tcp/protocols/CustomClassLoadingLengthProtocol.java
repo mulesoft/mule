@@ -17,54 +17,41 @@ import org.apache.log4j.Logger;
  * 
  * @since 2.2.6
  */
-public class CustomClassLoadingLengthProtocol extends LengthProtocol
-{
-    private final Logger logger = Logger.getLogger(this.getClass());
+public class CustomClassLoadingLengthProtocol extends LengthProtocol {
 
-    private ClassLoader classLoader;
+  private final Logger logger = Logger.getLogger(this.getClass());
 
-    @Override
-    public Object read(InputStream is) throws IOException
-    {
-        byte[] bytes = (byte[]) super.read(is);
+  private ClassLoader classLoader;
 
-        if (bytes == null)
-        {
-            return null;
-        }
-        else
-        {
-            ClassLoaderObjectInputStream classLoaderIS = new ClassLoaderObjectInputStream(this.getClassLoader(),
-                is);
-            try
-            {
-                return classLoaderIS.readObject();
-            }
-            catch (ClassNotFoundException e)
-            {
-                logger.warn(e.getMessage());
-                IOException iox = new IOException();
-                iox.initCause(e);
-                throw iox;
-            }
-            finally
-            {
-                classLoaderIS.close();
-            }
-        }
+  @Override
+  public Object read(InputStream is) throws IOException {
+    byte[] bytes = (byte[]) super.read(is);
+
+    if (bytes == null) {
+      return null;
+    } else {
+      ClassLoaderObjectInputStream classLoaderIS = new ClassLoaderObjectInputStream(this.getClassLoader(), is);
+      try {
+        return classLoaderIS.readObject();
+      } catch (ClassNotFoundException e) {
+        logger.warn(e.getMessage());
+        IOException iox = new IOException();
+        iox.initCause(e);
+        throw iox;
+      } finally {
+        classLoaderIS.close();
+      }
     }
+  }
 
-    public ClassLoader getClassLoader()
-    {
-        if (this.classLoader == null)
-        {
-            this.classLoader = this.getClass().getClassLoader();
-        }
-        return classLoader;
+  public ClassLoader getClassLoader() {
+    if (this.classLoader == null) {
+      this.classLoader = this.getClass().getClassLoader();
     }
+    return classLoader;
+  }
 
-    public void setClassLoader(ClassLoader classLoader)
-    {
-        this.classLoader = classLoader;
-    }
+  public void setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
+  }
 }

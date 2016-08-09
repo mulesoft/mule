@@ -18,39 +18,32 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public abstract class AbstractResultSetHandlerProcessorDefinitionParser extends AbstractSingleQueryProcessorDefinitionParser
-{
+public abstract class AbstractResultSetHandlerProcessorDefinitionParser extends AbstractSingleQueryProcessorDefinitionParser {
 
-    protected String resultSetHandlerBeanName;
+  protected String resultSetHandlerBeanName;
 
-    @Override
-    protected void doParseElement(Element element, ParserContext context, BeanDefinitionBuilder builder)
-    {
-        resultSetHandlerBeanName = getBeanName(element) + ".resultSetHandler";
-        super.doParseElement(element, context, builder);
-        builder.addConstructorArgValue(streaming);
+  @Override
+  protected void doParseElement(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+    resultSetHandlerBeanName = getBeanName(element) + ".resultSetHandler";
+    super.doParseElement(element, context, builder);
+    builder.addConstructorArgValue(streaming);
+  }
+
+  @Override
+  protected void processStreamingAttribute(String streamingValue) {
+    super.processStreamingAttribute(streamingValue);
+
+    InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
+
+    BeanDefinition beanDefinition;
+    if (Boolean.parseBoolean(streamingValue)) {
+      beanDefinition = genericBeanDefinition(IteratorResultSetHandler.class).addConstructorArgValue(recordHandler)
+          .addConstructorArgReference("db.statementStreamingResultSetCloser").getBeanDefinition();
+    } else {
+      beanDefinition =
+          genericBeanDefinition(ListResultSetHandler.class).addConstructorArgValue(recordHandler).getBeanDefinition();
     }
 
-    @Override
-    protected void processStreamingAttribute(String streamingValue)
-    {
-        super.processStreamingAttribute(streamingValue);
-
-        InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
-
-        BeanDefinition beanDefinition;
-        if (Boolean.parseBoolean(streamingValue))
-        {
-            beanDefinition = genericBeanDefinition(IteratorResultSetHandler.class)
-                                                  .addConstructorArgValue(recordHandler)
-                                                  .addConstructorArgReference("db.statementStreamingResultSetCloser")
-                                                  .getBeanDefinition();
-        }
-        else
-        {
-            beanDefinition = genericBeanDefinition(ListResultSetHandler.class).addConstructorArgValue(recordHandler).getBeanDefinition();
-        }
-
-        getRegistry().registerBeanDefinition(resultSetHandlerBeanName, beanDefinition);
-    }
+    getRegistry().registerBeanDefinition(resultSetHandlerBeanName, beanDefinition);
+  }
 }

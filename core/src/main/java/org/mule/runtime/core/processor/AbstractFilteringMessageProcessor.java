@@ -17,95 +17,75 @@ import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and
- * used for filtering message flow through a {@link MessageProcessor} chain. The
- * default behaviour when the filter is not accepted is to return the request event.
+ * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
+ * {@link MessageProcessor} chain. The default behaviour when the filter is not accepted is to return the request event.
  */
-public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
-{
-    /** 
-     * Throw a FilterUnacceptedException when a message is rejected by the filter? 
-     */
-    protected boolean throwOnUnaccepted = false;
-    protected boolean onUnacceptedFlowConstruct;
+public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor
+    implements NonBlockingSupported {
 
-    
-    /** 
-     * The <code>MessageProcessor</code> that should be used to handle messages that are not accepted by the filter.
-     */
-    protected MessageProcessor unacceptedMessageProcessor;
+  /**
+   * Throw a FilterUnacceptedException when a message is rejected by the filter?
+   */
+  protected boolean throwOnUnaccepted = false;
+  protected boolean onUnacceptedFlowConstruct;
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        boolean accepted;
-        try
-        {
-            accepted = accept(event);
-        }
-        catch (Exception ex)
-        {
-            throw filterFailureException(event, ex);
-        }
-        if (accepted)
-        {
-            return processNext(event);
-        }
-        else
-        {
-            return handleUnaccepted(event);
-        }
+
+  /**
+   * The <code>MessageProcessor</code> that should be used to handle messages that are not accepted by the filter.
+   */
+  protected MessageProcessor unacceptedMessageProcessor;
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    boolean accepted;
+    try {
+      accepted = accept(event);
+    } catch (Exception ex) {
+      throw filterFailureException(event, ex);
     }
-
-    protected abstract boolean accept(MuleEvent event);
-
-    protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
-    {        
-        if (unacceptedMessageProcessor != null)
-        {
-            return unacceptedMessageProcessor.process(event);
-        }
-        else if (throwOnUnaccepted)
-        {
-            throw filterUnacceptedException(event);
-        }
-        else
-        {
-            return null;
-        }
+    if (accepted) {
+      return processNext(event);
+    } else {
+      return handleUnaccepted(event);
     }
+  }
 
-    protected MessagingException filterFailureException(MuleEvent event, Exception ex)
-    {
-        return new MessagingException(event, ex, this);
-    }
+  protected abstract boolean accept(MuleEvent event);
 
-    protected MuleException filterUnacceptedException(MuleEvent event)
-    {
-        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, this);
+  protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException {
+    if (unacceptedMessageProcessor != null) {
+      return unacceptedMessageProcessor.process(event);
+    } else if (throwOnUnaccepted) {
+      throw filterUnacceptedException(event);
+    } else {
+      return null;
     }
-    
-    public MessageProcessor getUnacceptedMessageProcessor()
-    {
-        return unacceptedMessageProcessor;
-    }
+  }
 
-    public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor)
-    {
-        this.unacceptedMessageProcessor = unacceptedMessageProcessor;
-        if (unacceptedMessageProcessor instanceof FlowConstruct)
-        {
-            onUnacceptedFlowConstruct = true;
-        }
-    }
+  protected MessagingException filterFailureException(MuleEvent event, Exception ex) {
+    return new MessagingException(event, ex, this);
+  }
 
-    public boolean isThrowOnUnaccepted()
-    {
-        return throwOnUnaccepted;
-    }
+  protected MuleException filterUnacceptedException(MuleEvent event) {
+    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, this);
+  }
 
-    public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
-    {
-        this.throwOnUnaccepted = throwOnUnaccepted;
+  public MessageProcessor getUnacceptedMessageProcessor() {
+    return unacceptedMessageProcessor;
+  }
+
+  public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor) {
+    this.unacceptedMessageProcessor = unacceptedMessageProcessor;
+    if (unacceptedMessageProcessor instanceof FlowConstruct) {
+      onUnacceptedFlowConstruct = true;
     }
+  }
+
+  public boolean isThrowOnUnaccepted() {
+    return throwOnUnaccepted;
+  }
+
+  public void setThrowOnUnaccepted(boolean throwOnUnaccepted) {
+    this.throwOnUnaccepted = throwOnUnaccepted;
+  }
 }

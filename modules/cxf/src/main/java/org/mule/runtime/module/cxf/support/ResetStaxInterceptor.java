@@ -18,29 +18,25 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * Replaces the XMLStreamReader with a ReversibleXMLStreamReader which caches the xml events so 
- * we can replay them later.
+ * Replaces the XMLStreamReader with a ReversibleXMLStreamReader which caches the xml events so we can replay them later.
  */
-public class ResetStaxInterceptor extends AbstractPhaseInterceptor<Message>
-{
+public class ResetStaxInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public ResetStaxInterceptor()
-    {
-        super(Phase.PRE_INVOKE);
-        getAfter().add(StaxInInterceptor.class.getName());
-    }
+  public ResetStaxInterceptor() {
+    super(Phase.PRE_INVOKE);
+    getAfter().add(StaxInInterceptor.class.getName());
+  }
 
-    public void handleMessage(Message message) throws Fault
-    {
-        ReversibleXMLStreamReader reader = message.getContent(ReversibleXMLStreamReader.class);
-        reader.reset();
-        
-        // Replace the message contents because if you're using WSS4J, it leaves the
-        // stream pointing to the body, when we want it pointing to the envelope.
-        MessageContentsList parameters = new MessageContentsList();
-        parameters.add(reader);
-        message.setContent(List.class, parameters);
-    }
+  public void handleMessage(Message message) throws Fault {
+    ReversibleXMLStreamReader reader = message.getContent(ReversibleXMLStreamReader.class);
+    reader.reset();
+
+    // Replace the message contents because if you're using WSS4J, it leaves the
+    // stream pointing to the body, when we want it pointing to the envelope.
+    MessageContentsList parameters = new MessageContentsList();
+    parameters.add(reader);
+    message.setContent(List.class, parameters);
+  }
 }
 
 

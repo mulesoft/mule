@@ -12,15 +12,14 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.junit.Test;
 
-public class WatermarkInvalidSelectorExpressionTestCase
-{
+public class WatermarkInvalidSelectorExpressionTestCase {
 
-    @Test(expected = InitialisationException.class)
-    public void invalidSelectorExpression() throws Exception
-    {
-        ApplicationContextBuilder builder = new ApplicationContextBuilder();
-        builder.setApplicationResources(new String[] {"org/mule/test/integration/watermark/watermark-invalid-selector-expression-config.xml"});
-        builder.build();
-    }
+  @Test(expected = InitialisationException.class)
+  public void invalidSelectorExpression() throws Exception {
+    ApplicationContextBuilder builder = new ApplicationContextBuilder();
+    builder.setApplicationResources(new String[] {
+        "org/mule/test/integration/watermark/watermark-invalid-selector-expression-config.xml"});
+    builder.build();
+  }
 
 }

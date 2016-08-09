@@ -22,43 +22,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-default-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-default-config.xml"};
+  }
 
-    @Test
-    public void testOneWay() throws Exception
-    {
-        flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
+  @Test
+  public void testOneWay() throws Exception {
+    flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void testRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 }

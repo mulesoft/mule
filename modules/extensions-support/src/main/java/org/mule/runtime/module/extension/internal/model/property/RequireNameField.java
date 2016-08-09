@@ -13,58 +13,52 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 import java.lang.reflect.Field;
 
 /**
- * A custom model property used to indicate that the class
- * implementing a {@link ConfigurationModel} has a {@link Field}
- * on which the config's name should be injected.
+ * A custom model property used to indicate that the class implementing a {@link ConfigurationModel} has a {@link Field} on which
+ * the config's name should be injected.
  *
  * @see ConfigName
  * @since 4.0
  */
-public final class RequireNameField implements ModelProperty
-{
+public final class RequireNameField implements ModelProperty {
 
-    /**
-     * The {@link Field} on which the name should be injected
-     */
-    private final Field configNameField;
+  /**
+   * The {@link Field} on which the name should be injected
+   */
+  private final Field configNameField;
 
-    /**
-     * Creates a new instance
-     *
-     * @param configNameField on which the name should be injected
-     */
-    public RequireNameField(Field configNameField)
-    {
-        this.configNameField = configNameField;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param configNameField on which the name should be injected
+   */
+  public RequireNameField(Field configNameField) {
+    this.configNameField = configNameField;
+  }
 
-    /**
-     * @return on which the name should be injected
-     */
-    public Field getConfigNameField()
-    {
-        return configNameField;
-    }
+  /**
+   * @return on which the name should be injected
+   */
+  public Field getConfigNameField() {
+    return configNameField;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code requireNameField}
-     */
-    @Override
-    public String getName()
-    {
-        return "requireNameField";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code requireNameField}
+   */
+  @Override
+  public String getName() {
+    return "requireNameField";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

@@ -12,14 +12,12 @@ import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 
-public class TlsContextDefinitionParser extends ParentContextDefinitionParser
-{
+public class TlsContextDefinitionParser extends ParentContextDefinitionParser {
 
-    public TlsContextDefinitionParser()
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
-        and(MuleOrphanDefinitionParser.DOMAIN_ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
-        otherwise(new ChildDefinitionParser("tlsContext", DefaultTlsContextFactory.class));
-    }
+  public TlsContextDefinitionParser() {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
+    and(MuleOrphanDefinitionParser.DOMAIN_ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
+    otherwise(new ChildDefinitionParser("tlsContext", DefaultTlsContextFactory.class));
+  }
 
 }

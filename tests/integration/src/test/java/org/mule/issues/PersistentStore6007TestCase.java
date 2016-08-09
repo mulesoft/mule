@@ -38,128 +38,112 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PersistentStore6007TestCase extends AbstractIntegrationTestCase
-{
-    private static final Logger log = LoggerFactory.getLogger(PersistentStore6007TestCase.class);
+public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
 
-    private Latch latch;
+  private static final Logger log = LoggerFactory.getLogger(PersistentStore6007TestCase.class);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/issues/persistent-store-6007.xml";
+  private Latch latch;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/issues/persistent-store-6007.xml";
+  }
+
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    setStartContext(false);
+    return super.createMuleContext();
+  }
+
+  @Test
+  public void testPersistentNonQueueStores() throws Exception {
+    latch = new Latch();
+    Component.latch = latch;
+    PersistentObjectStore.addEvents();
+    muleContext.start();
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
+    assertEquals("Hello", result.getPayload());
+    assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
+  }
+
+  /** A store that "persists" events using keys that are not QueueEntry's */
+  public static class PersistentObjectStore implements ListableObjectStore<Serializable> {
+
+    private static Map<Serializable, Serializable> events = new HashMap<>();
+
+    static void addEvents() throws Exception {
+      for (String str : new String[] {"A", "B", "C"}) {
+        MuleEvent event =
+            new DefaultMuleEvent(MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
+        events.put(buildQueueKey(event), event);
+      }
     }
 
     @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        setStartContext(false);
-        return super.createMuleContext();
+    public void open() throws ObjectStoreException {
+      // does nothing
     }
 
-    @Test
-    public void testPersistentNonQueueStores() throws Exception
-    {
-        latch = new Latch();
-        Component.latch = latch;
-        PersistentObjectStore.addEvents();
-        muleContext.start();
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
-        assertEquals("Hello", result.getPayload());
-        assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
+    @Override
+    public void close() throws ObjectStoreException {
+      // does nothing
     }
 
-    /** A store that "persists" events using keys that are not QueueEntry's */
-    public static class PersistentObjectStore implements ListableObjectStore<Serializable>
-    {
-        private static Map<Serializable, Serializable> events = new HashMap<>();
-
-        static void addEvents() throws Exception
-        {
-            for (String str : new String[] {"A", "B", "C"})
-            {
-                MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
-                events.put(buildQueueKey(event), event);
-            }
-        }
-
-        @Override
-        public void open() throws ObjectStoreException
-        {
-            // does nothing
-        }
-
-        @Override
-        public void close() throws ObjectStoreException
-        {
-            // does nothing
-        }
-
-        @Override
-        public synchronized List<Serializable> allKeys() throws ObjectStoreException
-        {
-            return new ArrayList<>(events.keySet());
-        }
-
-        @Override
-        public synchronized boolean contains(Serializable key) throws ObjectStoreException
-        {
-            return events.containsKey(key);
-        }
-
-        @Override
-        public synchronized void store(Serializable key, Serializable value) throws ObjectStoreException
-        {
-            events.put(key, value);
-        }
-
-        @Override
-        public synchronized Serializable retrieve(Serializable key) throws ObjectStoreException
-        {
-            return events.get(key);
-        }
-
-        @Override
-        public synchronized Serializable remove(Serializable key) throws ObjectStoreException
-        {
-            return events.remove(key);
-        }
-        
-        @Override
-        public synchronized void clear() throws ObjectStoreException
-        {
-            events.clear();
-        }
-
-        @Override
-        public boolean isPersistent()
-        {
-            return true;
-        }
+    @Override
+    public synchronized List<Serializable> allKeys() throws ObjectStoreException {
+      return new ArrayList<>(events.keySet());
     }
 
-    public static class Component implements Callable
-    {
-        private static Set<String> payloads = new HashSet<>();
-        private static Latch latch;
-        private static Object lock = new Object();
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            synchronized (lock)
-            {
-                String payload = eventContext.getMessageAsString();
-                payloads.add(payload);
-                log.warn("Saw new payload: " + payload);
-                log.warn("Count is now " + payloads.size());
-                if (payloads.size() == 4)
-                {
-                    latch.countDown();
-                }
-                return eventContext.getMessage().getPayload();
-            }
-        }
+    @Override
+    public synchronized boolean contains(Serializable key) throws ObjectStoreException {
+      return events.containsKey(key);
     }
+
+    @Override
+    public synchronized void store(Serializable key, Serializable value) throws ObjectStoreException {
+      events.put(key, value);
+    }
+
+    @Override
+    public synchronized Serializable retrieve(Serializable key) throws ObjectStoreException {
+      return events.get(key);
+    }
+
+    @Override
+    public synchronized Serializable remove(Serializable key) throws ObjectStoreException {
+      return events.remove(key);
+    }
+
+    @Override
+    public synchronized void clear() throws ObjectStoreException {
+      events.clear();
+    }
+
+    @Override
+    public boolean isPersistent() {
+      return true;
+    }
+  }
+
+  public static class Component implements Callable {
+
+    private static Set<String> payloads = new HashSet<>();
+    private static Latch latch;
+    private static Object lock = new Object();
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      synchronized (lock) {
+        String payload = eventContext.getMessageAsString();
+        payloads.add(payload);
+        log.warn("Saw new payload: " + payload);
+        log.warn("Count is now " + payloads.size());
+        if (payloads.size() == 4) {
+          latch.countDown();
+        }
+        return eventContext.getMessage().getPayload();
+      }
+    }
+  }
 }

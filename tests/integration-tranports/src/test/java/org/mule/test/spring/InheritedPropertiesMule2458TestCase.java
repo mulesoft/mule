@@ -15,39 +15,35 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
-{
+public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml";
+  }
 
-    @Test
-    public void testProperties()
-    {
-        Object flow = muleContext.getRegistry().lookupObject("service");
-        assertNotNull(flow);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow)flow).getMessageSource();
+  @Test
+  public void testProperties() {
+    Object flow = muleContext.getRegistry().lookupObject("service");
+    assertNotNull(flow);
+    ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
-        assertNotNull(endpoint);
-        assertProperty(endpoint, "global-only", "global");
-        assertProperty(endpoint, "local-only", "local");
-        assertProperty(endpoint, "url-only", "url");
+    assertNotNull(endpoint);
+    assertProperty(endpoint, "global-only", "global");
+    assertProperty(endpoint, "local-only", "local");
+    assertProperty(endpoint, "url-only", "url");
 
-        assertProperty(endpoint, "global-and-local", "local");
-        assertProperty(endpoint, "global-and-url", "global");
-        assertProperty(endpoint, "local-and-url", "local");
+    assertProperty(endpoint, "global-and-local", "local");
+    assertProperty(endpoint, "global-and-url", "global");
+    assertProperty(endpoint, "local-and-url", "local");
 
-        assertProperty(endpoint, "all", "local");
-    }
+    assertProperty(endpoint, "all", "local");
+  }
 
-    protected void assertProperty(ImmutableEndpoint endpoint, String key, String value)
-    {
-        Object property = endpoint.getProperty(key);
-        assertNotNull("Property " + key + " is missing", property);
-        String actual = property.toString();
-        assertEquals("Unexpected value for " + key + ": " + actual + ", not " + value, value, actual);
-    }
+  protected void assertProperty(ImmutableEndpoint endpoint, String key, String value) {
+    Object property = endpoint.getProperty(key);
+    assertNotNull("Property " + key + " is missing", property);
+    String actual = property.toString();
+    assertEquals("Unexpected value for " + key + ": " + actual + ", not " + value, value, actual);
+  }
 }

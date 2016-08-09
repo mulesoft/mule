@@ -9,20 +9,19 @@ package org.mule.tck.probe;
 /**
  * A probe indicates whether the state of the system satisfies a given criteria
  */
-public interface Probe
-{
+public interface Probe {
 
-    /**
-     * Indicates wheter or not the specified criteria was met or not.
-     *
-     * @return true if the criteria is satisfied.
-     */
-    boolean isSatisfied();
+  /**
+   * Indicates wheter or not the specified criteria was met or not.
+   *
+   * @return true if the criteria is satisfied.
+   */
+  boolean isSatisfied();
 
-    /**
-     * Describes the cause of the criteria failure for further analysis.
-     *
-     * @return the error message.
-     */
-    String describeFailure();
+  /**
+   * Describes the cause of the criteria failure for further analysis.
+   *
+   * @return the error message.
+   */
+  String describeFailure();
 }

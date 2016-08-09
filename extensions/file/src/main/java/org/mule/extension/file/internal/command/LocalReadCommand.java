@@ -27,43 +27,38 @@ import java.nio.file.Path;
  *
  * @since 4.0
  */
-public final class LocalReadCommand extends LocalFileCommand implements ReadCommand
-{
+public final class LocalReadCommand extends LocalFileCommand implements ReadCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public LocalReadCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
+  /**
+   * {@inheritDoc}
+   */
+  public LocalReadCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+                                                           boolean lock) {
+    Path path = resolveExistingPath(config, filePath);
+    if (Files.isDirectory(path)) {
+      throw cannotReadDirectoryException(path);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
-    {
-        Path path = resolveExistingPath(config, filePath);
-        if (Files.isDirectory(path))
-        {
-            throw cannotReadDirectoryException(path);
-        }
-
-        PathLock pathLock;
-        if (lock)
-        {
-            pathLock = fileSystem.lock(path);
-        }
-        else
-        {
-            fileSystem.verifyNotLocked(path);
-            pathLock = new NullPathLock();
-        }
-
-        InputStream payload = new FileInputStream(path, pathLock);
-        FileAttributes fileAttributes = new LocalFileAttributes(path);
-        MediaType fileMediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), fileAttributes);
-        return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(fileMediaType).attributes(fileAttributes).build();
+    PathLock pathLock;
+    if (lock) {
+      pathLock = fileSystem.lock(path);
+    } else {
+      fileSystem.verifyNotLocked(path);
+      pathLock = new NullPathLock();
     }
+
+    InputStream payload = new FileInputStream(path, pathLock);
+    FileAttributes fileAttributes = new LocalFileAttributes(path);
+    MediaType fileMediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), fileAttributes);
+    return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(fileMediaType)
+        .attributes(fileAttributes).build();
+  }
 }

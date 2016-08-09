@@ -15,45 +15,38 @@ import java.util.Map;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * {@code FactoryBean} that creates a {@code Map} from a collection of
- * {@code MapEntry} and the type of the map.
+ * {@code FactoryBean} that creates a {@code Map} from a collection of {@code MapEntry} and the type of the map.
  */
-public class MapFactoryBean implements FactoryBean
-{
+public class MapFactoryBean implements FactoryBean {
 
-    private final List<MapEntry> mapEntries;
-    private final Class<? extends Map> mapType;
+  private final List<MapEntry> mapEntries;
+  private final Class<? extends Map> mapType;
 
-    /**
-     * @param mapEntries the collection of entries to store in the map
-     * @param mapType the map type
-     */
-    public MapFactoryBean(List<MapEntry> mapEntries, Class<? extends Map> mapType)
-    {
-        this.mapEntries = mapEntries;
-        this.mapType = mapType;
+  /**
+   * @param mapEntries the collection of entries to store in the map
+   * @param mapType the map type
+   */
+  public MapFactoryBean(List<MapEntry> mapEntries, Class<? extends Map> mapType) {
+    this.mapEntries = mapEntries;
+    this.mapType = mapType;
+  }
+
+  @Override
+  public Map getObject() throws Exception {
+    Map map = ClassUtils.instanciateClass(mapType);
+    for (MapEntry mapEntry : mapEntries) {
+      map.put(mapEntry.getKey(), mapEntry.getValue());
     }
+    return map;
+  }
 
-    @Override
-    public Map getObject() throws Exception
-    {
-        Map map = ClassUtils.instanciateClass(mapType);
-        for (MapEntry mapEntry : mapEntries)
-        {
-            map.put(mapEntry.getKey(), mapEntry.getValue());
-        }
-        return map;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return Map.class;
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return Map.class;
-    }
-
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 }

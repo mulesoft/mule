@@ -15,9 +15,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * A custom model property that specifies that a certain group of {@link ParameterModel parameterModels}
- * are grouped. This grouping is transparent and is not reflected on the introspection
- * model because it's implementation specific.
+ * A custom model property that specifies that a certain group of {@link ParameterModel parameterModels} are grouped. This
+ * grouping is transparent and is not reflected on the introspection model because it's implementation specific.
  * <p>
  * This property provides the necessary metadata for the runtime to handle those parameters accordingly.
  * <p>
@@ -27,45 +26,39 @@ import java.util.List;
  *
  * @since 4.0
  */
-public final class ParameterGroupModelProperty implements ModelProperty
-{
+public final class ParameterGroupModelProperty implements ModelProperty {
 
-    private final List<ParameterGroup> groups;
+  private final List<ParameterGroup> groups;
 
-    public ParameterGroupModelProperty(List<ParameterGroup> groups)
-    {
-        this.groups = ImmutableList.copyOf(groups);
-    }
+  public ParameterGroupModelProperty(List<ParameterGroup> groups) {
+    this.groups = ImmutableList.copyOf(groups);
+  }
 
-    public List<ParameterGroup> getGroups()
-    {
-        return groups;
-    }
+  public List<ParameterGroup> getGroups() {
+    return groups;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code parameterGroup}
-     */
-    @Override
-    public String getName()
-    {
-        return "parameterGroup";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code parameterGroup}
+   */
+  @Override
+  public String getName() {
+    return "parameterGroup";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 
-    public boolean hasExclusiveOptionals()
-    {
-        return groups.stream().anyMatch(g -> g.hasExclusiveOptionals());
-    }
+  public boolean hasExclusiveOptionals() {
+    return groups.stream().anyMatch(g -> g.hasExclusiveOptionals());
+  }
 }

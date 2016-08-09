@@ -21,37 +21,32 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase
-{
+public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase {
 
-    public DatasourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DatasourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/derby-pooling-db-config.xml", "integration/config/connection-pooling-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/derby-pooling-db-config.xml", "integration/config/connection-pooling-config.xml"};
+  }
 
-    @Test
-    public void providesMultipleConnections() throws Exception
-    {
-        flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
-        flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
+  @Test
+  public void providesMultipleConnections() throws Exception {
+    flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
+    flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
-        assertThat(response.getExceptionPayload(), is(nullValue()));
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    assertThat(response.getExceptionPayload(), is(nullValue()));
 
-        response = client.request("test://testOut", RECEIVE_TIMEOUT);
-        assertThat(response.getExceptionPayload(), is(nullValue()));
-    }
+    response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    assertThat(response.getExceptionPayload(), is(nullValue()));
+  }
 }

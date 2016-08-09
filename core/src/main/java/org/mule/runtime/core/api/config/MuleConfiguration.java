@@ -12,112 +12,107 @@ import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.construct.Flow;
 
 /**
- * Configuration info. which can be set when creating the MuleContext but becomes
- * immutable after startup.
+ * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
  */
-public interface MuleConfiguration
-{
-    int getDefaultResponseTimeout();
+public interface MuleConfiguration {
 
-    String getWorkingDirectory();
+  int getDefaultResponseTimeout();
 
-    String getMuleHomeDirectory();
+  String getWorkingDirectory();
 
-    int getDefaultTransactionTimeout();
+  String getMuleHomeDirectory();
 
-    boolean isClientMode();
+  int getDefaultTransactionTimeout();
 
-    String getDefaultEncoding();
+  boolean isClientMode();
 
-    String getId();
+  String getDefaultEncoding();
 
-    String getDomainId();
+  String getId();
 
-    String getSystemModelType();
+  String getDomainId();
 
-    String getSystemName();
+  String getSystemModelType();
 
-    boolean isAutoWrapMessageAwareTransform();
+  String getSystemName();
 
-    boolean isCacheMessageAsBytes();
+  boolean isAutoWrapMessageAwareTransform();
 
-    boolean isEnableStreaming();
+  boolean isCacheMessageAsBytes();
 
-    boolean isValidateExpressions();
+  boolean isEnableStreaming();
 
-    int getDefaultQueueTimeout();
+  boolean isValidateExpressions();
 
-    int getShutdownTimeout();
+  int getDefaultQueueTimeout();
 
-    /**
-     * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.
-     *
-     * Take into account that this number applies both to the set of transaction log files for XA and for local transactions.
-     * If both type of transactions are used then the approximated maximum space used will be twice the configured value.
-     *
-     * @return the approximated maximum space in disk that the transactions logs can use in megabytes.
-     */
-    int getMaxQueueTransactionFilesSizeInMegabytes();
+  int getShutdownTimeout();
 
-    /**
-     * A container mode implies multiple Mule apps running. When true, Mule changes behavior in some areas, e.g.:
-     * <ul>
-     *     <li>Splash screens</li>
-     *     <li>Thread names have app name in the prefix to guarantee uniqueness</li>
-     * </ul>
-     * etc.
-     *
-     * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded
-     * for management purposes.
-     *
-     * @see #isStandalone()
-     */
-    boolean isContainerMode();
+  /**
+   * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.
+   *
+   * Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If
+   * both type of transactions are used then the approximated maximum space used will be twice the configured value.
+   *
+   * @return the approximated maximum space in disk that the transactions logs can use in megabytes.
+   */
+  int getMaxQueueTransactionFilesSizeInMegabytes();
 
-    /**
-     * Try to guess if we're embedded. If "mule.home" JVM property has been set, then we've been
-     * started via Mule script and can assume we're running standalone. Otherwise (no property set), Mule
-     * has been started via a different mechanism.
-     * <p/>
-     * A standalone Mule is always considered running in 'container' mode.
-     *
-     * @see #isContainerMode()
-     */
-    boolean isStandalone();
+  /**
+   * A container mode implies multiple Mule apps running. When true, Mule changes behavior in some areas, e.g.:
+   * <ul>
+   * <li>Splash screens</li>
+   * <li>Thread names have app name in the prefix to guarantee uniqueness</li>
+   * </ul>
+   * etc.
+   *
+   * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded for management purposes.
+   *
+   * @see #isStandalone()
+   */
+  boolean isContainerMode();
 
-    /**
-     * @return default exception strategy to be used on flows and services if there's no exception strategy
-     * configured explicitly.
-     */
-    String getDefaultExceptionStrategyName();
+  /**
+   * Try to guess if we're embedded. If "mule.home" JVM property has been set, then we've been started via Mule script and can
+   * assume we're running standalone. Otherwise (no property set), Mule has been started via a different mechanism.
+   * <p/>
+   * A standalone Mule is always considered running in 'container' mode.
+   *
+   * @see #isContainerMode()
+   */
+  boolean isStandalone();
 
-    boolean isDisableTimeouts();
+  /**
+   * @return default exception strategy to be used on flows and services if there's no exception strategy configured explicitly.
+   */
+  String getDefaultExceptionStrategyName();
 
-    /**
-     * @param extensionType class instance of the extension type
-     * @param <T> type of the extension
-     * @return extension configured of type extensionType, if there's no such extension then null.
-     */
-    <T> T getExtension(final Class<T> extensionType);
+  boolean isDisableTimeouts();
 
-    /**
-     * Returns the default instance of {@link ObjectSerializer} to be
-     * used. This instance will be accessible through {@link MuleContext#getObjectSerializer()}.
-     * <p/>
-     * If not provided, if defaults to an instance of {@link ObjectSerializer}
-     *
-     * @return a {@link ObjectSerializer}
-     * @since 3.7.0
-     */
-    ObjectSerializer getDefaultObjectSerializer();
+  /**
+   * @param extensionType class instance of the extension type
+   * @param <T> type of the extension
+   * @return extension configured of type extensionType, if there's no such extension then null.
+   */
+  <T> T getExtension(final Class<T> extensionType);
 
-    /**
-     * The default {@link ProcessingStrategy} to be used by
-     * all {@link Flow}s which doesn't specify otherwise
-     *
-     * @return a {@link ProcessingStrategy}
-     * @since 3.7.0
-     */
-    ProcessingStrategy getDefaultProcessingStrategy();
+  /**
+   * Returns the default instance of {@link ObjectSerializer} to be used. This instance will be accessible through
+   * {@link MuleContext#getObjectSerializer()}.
+   * <p/>
+   * If not provided, if defaults to an instance of {@link ObjectSerializer}
+   *
+   * @return a {@link ObjectSerializer}
+   * @since 3.7.0
+   */
+  ObjectSerializer getDefaultObjectSerializer();
+
+  /**
+   * The default {@link ProcessingStrategy} to be used by all {@link Flow}s which doesn't specify otherwise
+   *
+   * @return a {@link ProcessingStrategy}
+   * @since 3.7.0
+   */
+  ProcessingStrategy getDefaultProcessingStrategy();
 
 }

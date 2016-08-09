@@ -8,12 +8,10 @@ package org.mule.issues;
 
 import org.junit.Test;
 
-public class TransformerChainMule2131TestCase extends TransformerChainMule2063TestCase
-{
+public class TransformerChainMule2131TestCase extends TransformerChainMule2063TestCase {
 
-    @Test
-    public void testOutputTransformers() throws Exception
-    {
-        doTest("test3", TEST3_OUT);
-    }
+  @Test
+  public void testOutputTransformers() throws Exception {
+    doTest("test3", TEST3_OUT);
+  }
 }

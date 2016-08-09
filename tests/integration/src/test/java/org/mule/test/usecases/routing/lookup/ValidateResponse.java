@@ -15,33 +15,26 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * Throws an exception if the message does not contain "success".  In the real world, we might use XPath to 
- * extract a particular tag or error code based on the expected response message format.
+ * Throws an exception if the message does not contain "success". In the real world, we might use XPath to extract a particular
+ * tag or error code based on the expected response message format.
  */
-public class ValidateResponse extends AbstractTransformer
-{
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        String response = null;
-        if (src instanceof InputStream)
-        {
-            response = IOUtils.toString((InputStream) src);
-        }
-        else if (src instanceof String)
-        {
-            response = (String) src;
-        }
-        
-        if (response != null && response.contains("<ErrorStatus>Success</ErrorStatus>"))
-        {
-            return response;
-        }
-        else
-        {
-            throw new TransformerException(MessageFactory.createStaticMessage("Invalid response from service: " + response));
-        }
+public class ValidateResponse extends AbstractTransformer {
+
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    String response = null;
+    if (src instanceof InputStream) {
+      response = IOUtils.toString((InputStream) src);
+    } else if (src instanceof String) {
+      response = (String) src;
     }
+
+    if (response != null && response.contains("<ErrorStatus>Success</ErrorStatus>")) {
+      return response;
+    } else {
+      throw new TransformerException(MessageFactory.createStaticMessage("Invalid response from service: " + response));
+    }
+  }
 }
 
 

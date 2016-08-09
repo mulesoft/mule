@@ -7,29 +7,25 @@
 
 package org.mule.runtime.module.db.integration.model;
 
-public class Planet
-{
+public class Planet {
 
-    public static final Planet VENUS = new Planet("Venus", 2);
-    public static final Planet EARTH = new Planet("Earth", 3);
-    public static final Planet MARS = new Planet("Mars", 4);
+  public static final Planet VENUS = new Planet("Venus", 2);
+  public static final Planet EARTH = new Planet("Earth", 3);
+  public static final Planet MARS = new Planet("Mars", 4);
 
-    private String name;
-    private int position;
+  private String name;
+  private int position;
 
-    public Planet(String name, int position)
-    {
-        this.name = name;
-        this.position = position;
-    }
+  public Planet(String name, int position) {
+    this.name = name;
+    this.position = position;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getPosition()
-    {
-        return position;
-    }
+  public int getPosition() {
+    return position;
+  }
 }

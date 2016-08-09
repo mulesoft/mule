@@ -20,19 +20,17 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
  * @since 4.0
  */
 @Extensible
-public class RamlApiConfiguration
-{
+public class RamlApiConfiguration {
 
-    /**
-     * The location of the RAML file.
-     */
-    @Parameter
-    @Expression(NOT_SUPPORTED)
-    @DisplayName("RAML Location")
-    private String location;
+  /**
+   * The location of the RAML file.
+   */
+  @Parameter
+  @Expression(NOT_SUPPORTED)
+  @DisplayName("RAML Location")
+  private String location;
 
-    public String getLocation()
-    {
-        return location;
-    }
+  public String getLocation() {
+    return location;
+  }
 }

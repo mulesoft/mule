@@ -9,10 +9,9 @@ package org.mule.runtime.config.spring.parsers.collection;
 import org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
-public class ChildSingletonMapDefinitionParser extends ChildDefinitionParser
-{
-    public ChildSingletonMapDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, MapEntryCombiner.class);
-    }
+public class ChildSingletonMapDefinitionParser extends ChildDefinitionParser {
+
+  public ChildSingletonMapDefinitionParser(String setterMethod) {
+    super(setterMethod, MapEntryCombiner.class);
+  }
 }

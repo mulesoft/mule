@@ -10,11 +10,9 @@ package org.mule.runtime.module.db.internal.domain.connection;
 /**
  * Thrown to indicate an error closing connection
  */
-public class ConnectionClosingException extends RuntimeException
-{
+public class ConnectionClosingException extends RuntimeException {
 
-    public ConnectionClosingException(Throwable throwable)
-    {
-        super(throwable);
-    }
+  public ConnectionClosingException(Throwable throwable) {
+    super(throwable);
+  }
 }

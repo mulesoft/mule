@@ -13,39 +13,29 @@ import java.util.concurrent.locks.Lock;
 /**
  *
  */
-public class FakeLock implements Lock
-{
+public class FakeLock implements Lock {
 
-    @Override
-    public void lock()
-    {
-    }
+  @Override
+  public void lock() {}
 
-    @Override
-    public void lockInterruptibly() throws InterruptedException
-    {
-    }
+  @Override
+  public void lockInterruptibly() throws InterruptedException {}
 
-    @Override
-    public boolean tryLock()
-    {
-        return false;
-    }
+  @Override
+  public boolean tryLock() {
+    return false;
+  }
 
-    @Override
-    public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException
-    {
-        return true;
-    }
+  @Override
+  public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    return true;
+  }
 
-    @Override
-    public void unlock()
-    {
-    }
+  @Override
+  public void unlock() {}
 
-    @Override
-    public Condition newCondition()
-    {
-        return null;
-    }
+  @Override
+  public Condition newCondition() {
+    return null;
+  }
 };

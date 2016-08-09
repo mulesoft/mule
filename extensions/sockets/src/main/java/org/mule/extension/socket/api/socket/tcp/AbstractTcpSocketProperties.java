@@ -19,89 +19,84 @@ import java.net.Socket;
  *
  * @since 4.0
  */
-public abstract class AbstractTcpSocketProperties extends AbstractSocketProperties implements TcpSocketProperties
-{
+public abstract class AbstractTcpSocketProperties extends AbstractSocketProperties implements TcpSocketProperties {
 
-    /**
-     * If set, transmitted data is not collected together for greater efficiency but sent immediately.
-     * <p>
-     * Defaults to {@code true} even though {@link Socket} default is false because optimizing
-     * to reduce amount of network traffic over latency is hardly ever a concern today.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Summary("Indicates whether the transmitted data should not be collected together for greater efficiency, and sent immediately")
-    @DisplayName("Send TCP With No Delay")
-    protected boolean sendTcpNoDelay = true;
-
-
-    /**
-     * This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so
-     * that any remaining data is transmitted correctly.
-     */
-    @Parameter
-    @Optional
-    @Summary("This indicates for how long, in milliseconds, the socket will take to close so any remaining data is" +
-             "transmitted correctly")
-    protected Integer linger;
-
-    /**
-     * Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but
-     * unused for long periods and closes them if the connection becomes unavailable.
-     * <p>
-     * This is a property on the socket itself and is used by a server socket to control whether connections to the
-     * server are kept alive before they are recycled.
-     */
-    @Parameter
-    @Optional(defaultValue = "false")
-    @Summary("Indicates whether the open socket connections unused for a long period and with an unavailable connection " +
-             "should be closed")
-    protected boolean keepAlive = false;
+  /**
+   * If set, transmitted data is not collected together for greater efficiency but sent immediately.
+   * <p>
+   * Defaults to {@code true} even though {@link Socket} default is false because optimizing to reduce amount of network traffic
+   * over latency is hardly ever a concern today.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Summary("Indicates whether the transmitted data should not be collected together for greater efficiency, and sent immediately")
+  @DisplayName("Send TCP With No Delay")
+  protected boolean sendTcpNoDelay = true;
 
 
-    /**
-     * Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved.
-     * However, it can be set to false to allow unresolved hosts (useful when connecting through a proxy).
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Summary("Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved")
-    protected boolean failOnUnresolvedHost = true;
+  /**
+   * This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any
+   * remaining data is transmitted correctly.
+   */
+  @Parameter
+  @Optional
+  @Summary("This indicates for how long, in milliseconds, the socket will take to close so any remaining data is"
+      + "transmitted correctly")
+  protected Integer linger;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getLinger()
-    {
-        return linger;
-    }
+  /**
+   * Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long
+   * periods and closes them if the connection becomes unavailable.
+   * <p>
+   * This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept
+   * alive before they are recycled.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Summary("Indicates whether the open socket connections unused for a long period and with an unavailable connection "
+      + "should be closed")
+  protected boolean keepAlive = false;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean getKeepAlive()
-    {
-        return keepAlive;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean getSendTcpNoDelay()
-    {
-        return sendTcpNoDelay;
-    }
+  /**
+   * Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved. However, it can be set
+   * to false to allow unresolved hosts (useful when connecting through a proxy).
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Summary("Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved")
+  protected boolean failOnUnresolvedHost = true;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean getFailOnUnresolvedHost()
-    {
-        return failOnUnresolvedHost;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Integer getLinger() {
+    return linger;
+  }
 
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Boolean getKeepAlive() {
+    return keepAlive;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean getSendTcpNoDelay() {
+    return sendTcpNoDelay;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean getFailOnUnresolvedHost() {
+    return failOnUnresolvedHost;
+
+  }
 }

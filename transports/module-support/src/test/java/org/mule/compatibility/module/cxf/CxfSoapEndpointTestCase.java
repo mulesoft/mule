@@ -15,50 +15,44 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class CxfSoapEndpointTestCase extends AbstractMuleContextTestCase
-{
+public class CxfSoapEndpointTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testEndpoint() throws Exception
-    {
-        String url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
-        endpointUri.initialise();
+  @Test
+  public void testEndpoint() throws Exception {
+    String url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
+    EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
+    endpointUri.initialise();
 
-        assertEquals("cxf", endpointUri.getSchemeMetaInfo());
-        // it's up to the client to actually strip off the method name if necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
-        assertEquals(3, endpointUri.getParams().size());
+    assertEquals("cxf", endpointUri.getSchemeMetaInfo());
+    // it's up to the client to actually strip off the method name if necessary
+    assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+    assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
+    assertEquals(3, endpointUri.getParams().size());
 
-        url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        endpointUri = new MuleEndpointURI(url, muleContext);
-        endpointUri.initialise();
+    url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
+    endpointUri = new MuleEndpointURI(url, muleContext);
+    endpointUri.initialise();
 
-        assertEquals("cxf", endpointUri.getSchemeMetaInfo());
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
-        assertEquals(3, endpointUri.getParams().size());
-    }
+    assertEquals("cxf", endpointUri.getSchemeMetaInfo());
+    assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+    assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
+    assertEquals(3, endpointUri.getParams().size());
+  }
 
-    @Test
-    public void testEndpointWithUserInfo() throws Exception
-    {
-        String url = "cxf:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
-        endpointUri.initialise();
+  @Test
+  public void testEndpointWithUserInfo() throws Exception {
+    String url = "cxf:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
+    EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
+    endpointUri.initialise();
 
-        assertEquals("cxf", endpointUri.getSchemeMetaInfo());
-        // it's up to the client to actually strip off the method name if necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
-        assertEquals(3, endpointUri.getParams().size());
-        assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUser());
-        assertEquals("pwd", endpointUri.getPassword());
-    }
+    assertEquals("cxf", endpointUri.getSchemeMetaInfo());
+    // it's up to the client to actually strip off the method name if necessary
+    assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+    assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
+    assertEquals(3, endpointUri.getParams().size());
+    assertEquals("admin:pwd", endpointUri.getUserInfo());
+    assertEquals("admin", endpointUri.getUser());
+    assertEquals("pwd", endpointUri.getPassword());
+  }
 
 }

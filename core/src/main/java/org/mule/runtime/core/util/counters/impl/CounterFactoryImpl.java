@@ -15,142 +15,91 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public final class CounterFactoryImpl
-{
-    private static Map<String, AbstractCounter> counters = new HashMap<String, AbstractCounter>();
-    private static List<AbstractCounter> publicCounters = new ArrayList<AbstractCounter>();
+public final class CounterFactoryImpl {
 
-    /** Do not instanciate. */
-    private CounterFactoryImpl ()
-    {
-        // no-op
-    }
+  private static Map<String, AbstractCounter> counters = new HashMap<String, AbstractCounter>();
+  private static List<AbstractCounter> publicCounters = new ArrayList<AbstractCounter>();
 
-    public static Counter getCounter(String name)
-    {
-        return counters.get(name);
-    }
+  /** Do not instanciate. */
+  private CounterFactoryImpl() {
+    // no-op
+  }
 
-    public static Counter createCounter(String name, String first, String second, Type type, boolean visible)
-    {
-        Counter counter = getCounter(name);
-        if (counter != null)
-        {
-            throw new IllegalStateException();
-        }
-        else
-        {
-            counter = internalCreateCounter(name, first, second, type, visible);
-        }
-        return counter;
-    }
+  public static Counter getCounter(String name) {
+    return counters.get(name);
+  }
 
-    public static Iterator<AbstractCounter> getCounters()
-    {
-        return publicCounters.iterator();
+  public static Counter createCounter(String name, String first, String second, Type type, boolean visible) {
+    Counter counter = getCounter(name);
+    if (counter != null) {
+      throw new IllegalStateException();
+    } else {
+      counter = internalCreateCounter(name, first, second, type, visible);
     }
+    return counter;
+  }
 
-    protected static AbstractCounter internalCreateCounter(String name,
-                                                           String first,
-                                                           String second,
-                                                           Type type,
-                                                           boolean visible)
-    {
-        AbstractCounter counter = null;
-        if (name == null)
-        {
-            throw new IllegalStateException();
+  public static Iterator<AbstractCounter> getCounters() {
+    return publicCounters.iterator();
+  }
+
+  protected static AbstractCounter internalCreateCounter(String name, String first, String second, Type type, boolean visible) {
+    AbstractCounter counter = null;
+    if (name == null) {
+      throw new IllegalStateException();
+    } else if (first == null && second == null) {
+      if (type == Type.NUMBER) {
+        counter = new Number(name);
+      } else {
+        throw new IllegalStateException();
+      }
+    } else if (first != null && second == null) {
+      AbstractCounter b = (AbstractCounter) getCounter(first);
+      if (b == null) {
+        throw new IllegalStateException();
+      }
+      if (type == Type.MIN) {
+        counter = new Min(name, b);
+      } else if (type == Type.MAX) {
+        counter = new Max(name, b);
+      } else if (type == Type.SUM) {
+        counter = new Sum(name, b);
+      } else if (type == Type.AVERAGE) {
+        counter = new Average(name, b);
+      } else if (type == Type.TIME_AVERAGE) {
+        counter = new TimeAverage(name, b);
+      } else if (type == Type.DELTA) {
+        counter = new Delta(name, b);
+      } else if (type == Type.INSTANT_RATE) {
+        counter = new InstantRate(name, b);
+      } else if (type == Type.RATE_PER_SECOND || type == Type.RATE_PER_MINUTE || type == Type.RATE_PER_HOUR) {
+        counter = new RatePerUnit(name, null, type, b);
+      } else {
+        throw new IllegalStateException();
+      }
+    } else if (first != null && second != null) {
+      AbstractCounter b = (AbstractCounter) getCounter(first);
+      if (b == null) {
+        throw new IllegalStateException();
+      }
+      if (type == Type.RATE_PER_SECOND || type == Type.RATE_PER_MINUTE || type == Type.RATE_PER_HOUR) {
+        counter = new RatePerUnit(name, second, type, b);
+      } else if (type == Type.PLUS || type == Type.MINUS || type == Type.MULTIPLY || type == Type.DIVIDE) {
+        AbstractCounter b2 = (AbstractCounter) getCounter(second);
+        if (b2 == null) {
+          throw new IllegalStateException();
         }
-        else if (first == null && second == null)
-        {
-            if (type == Type.NUMBER)
-            {
-                counter = new Number(name);
-            }
-            else
-            {
-                throw new IllegalStateException();
-            }
-        }
-        else if (first != null && second == null)
-        {
-            AbstractCounter b = (AbstractCounter) getCounter(first);
-            if (b == null)
-            {
-                throw new IllegalStateException();
-            }
-            if (type == Type.MIN)
-            {
-                counter = new Min(name, b);
-            }
-            else if (type == Type.MAX)
-            {
-                counter = new Max(name, b);
-            }
-            else if (type == Type.SUM)
-            {
-                counter = new Sum(name, b);
-            }
-            else if (type == Type.AVERAGE)
-            {
-                counter = new Average(name, b);
-            }
-            else if (type == Type.TIME_AVERAGE)
-            {
-                counter = new TimeAverage(name, b);
-            }
-            else if (type == Type.DELTA)
-            {
-                counter = new Delta(name, b);
-            }
-            else if (type == Type.INSTANT_RATE)
-            {
-                counter = new InstantRate(name, b);
-            }
-            else if (type == Type.RATE_PER_SECOND || type == Type.RATE_PER_MINUTE
-                     || type == Type.RATE_PER_HOUR)
-            {
-                counter = new RatePerUnit(name, null, type, b);
-            }
-            else
-            {
-                throw new IllegalStateException();
-            }
-        }
-        else if (first != null && second != null)
-        {
-            AbstractCounter b = (AbstractCounter) getCounter(first);
-            if (b == null)
-            {
-                throw new IllegalStateException();
-            }
-            if (type == Type.RATE_PER_SECOND || type == Type.RATE_PER_MINUTE || type == Type.RATE_PER_HOUR)
-            {
-                counter = new RatePerUnit(name, second, type, b);
-            }
-            else if (type == Type.PLUS || type == Type.MINUS || type == Type.MULTIPLY || type == Type.DIVIDE)
-            {
-                AbstractCounter b2 = (AbstractCounter) getCounter(second);
-                if (b2 == null)
-                {
-                    throw new IllegalStateException();
-                }
-                counter = new Operator(name, b, b2, type);
-            }
-            else
-            {
-                throw new IllegalStateException();
-            }
-        }
-        else
-        {
-            throw new IllegalStateException();
-        }
-        counters.put(name, counter);
-        if (visible)
-        {
-            publicCounters.add(counter);
-        }
-        return counter;
+        counter = new Operator(name, b, b2, type);
+      } else {
+        throw new IllegalStateException();
+      }
+    } else {
+      throw new IllegalStateException();
     }
+    counters.put(name, counter);
+    if (visible) {
+      publicCounters.add(counter);
+    }
+    return counter;
+  }
 }

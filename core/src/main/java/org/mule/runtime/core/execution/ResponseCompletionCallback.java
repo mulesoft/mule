@@ -11,21 +11,20 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * Callback to be used to notify of the result of an asynchronous response writing task.
  */
-public interface ResponseCompletionCallback
-{
+public interface ResponseCompletionCallback {
 
-    /**
-     * Notifies that the response was written successfully
-     */
-    void responseSentSuccessfully();
+  /**
+   * Notifies that the response was written successfully
+   */
+  void responseSentSuccessfully();
 
-    /**
-     * Notifies that the response writing failed
-     *
-     * @param e the exception thrown during response writing
-     * @param event the event that was the source for the response.
-     * @return the event that is the result of the exception strategy.
-     */
-    MuleEvent responseSentWithFailure(Exception e, MuleEvent event);
+  /**
+   * Notifies that the response writing failed
+   *
+   * @param e the exception thrown during response writing
+   * @param event the event that was the source for the response.
+   * @return the event that is the result of the exception strategy.
+   */
+  MuleEvent responseSentWithFailure(Exception e, MuleEvent event);
 
 }

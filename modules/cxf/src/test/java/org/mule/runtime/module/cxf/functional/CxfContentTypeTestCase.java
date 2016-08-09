@@ -19,45 +19,37 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfContentTypeTestCase extends FunctionalTestCase
-{
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+public class CxfContentTypeTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n" + "    <arg0>Hello</arg0>\n"
+      + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "cxf-echo-service-conf-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testCxfService() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String contentType = received.getDataType().getMediaType().toRfcString();
-        assertNotNull(contentType);
-        assertTrue(contentType.contains("charset"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "cxf-echo-service-conf-httpn.xml";
+  }
 
-    @Test
-    public void testCxfClient() throws Exception
-    {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
-        String contentType = received.getOutboundProperty("contentType");
-        assertNotNull(contentType);
-        assertTrue(contentType.contains("charset"));
-    }
+  @Test
+  public void testCxfService() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    String contentType = received.getDataType().getMediaType().toRfcString();
+    assertNotNull(contentType);
+    assertTrue(contentType.contains("charset"));
+  }
+
+  @Test
+  public void testCxfClient() throws Exception {
+    MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
+    String contentType = received.getOutboundProperty("contentType");
+    assertNotNull(contentType);
+    assertTrue(contentType.contains("charset"));
+  }
 
 }

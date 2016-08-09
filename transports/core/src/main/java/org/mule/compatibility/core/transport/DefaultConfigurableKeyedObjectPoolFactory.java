@@ -7,14 +7,12 @@
 package org.mule.compatibility.core.transport;
 
 /**
- * Implements {@link org.mule.compatibility.core.transport.ConfigurableKeyedObjectPoolFactory} creating instances
- * of {@link DefaultConfigurableKeyedObjectPool}.
+ * Implements {@link org.mule.compatibility.core.transport.ConfigurableKeyedObjectPoolFactory} creating instances of
+ * {@link DefaultConfigurableKeyedObjectPool}.
  */
-public class DefaultConfigurableKeyedObjectPoolFactory implements ConfigurableKeyedObjectPoolFactory
-{
+public class DefaultConfigurableKeyedObjectPoolFactory implements ConfigurableKeyedObjectPoolFactory {
 
-    public ConfigurableKeyedObjectPool createObjectPool()
-    {
-        return new DefaultConfigurableKeyedObjectPool();
-    }
+  public ConfigurableKeyedObjectPool createObjectPool() {
+    return new DefaultConfigurableKeyedObjectPool();
+  }
 }

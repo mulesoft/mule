@@ -17,27 +17,24 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @param <T> the generic type of the instances provided
  * @since 3.7.0
  */
-public final class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T>
-{
+public final class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T> {
 
-    private final ConfigurationInstance<T> configuration;
+  private final ConfigurationInstance<T> configuration;
 
-    public StaticConfigurationProvider(String name, RuntimeConfigurationModel model, ConfigurationInstance<T> configuration)
-    {
-        super(name, model);
-        this.configuration = configuration;
-        registerConfiguration(configuration);
-    }
+  public StaticConfigurationProvider(String name, RuntimeConfigurationModel model, ConfigurationInstance<T> configuration) {
+    super(name, model);
+    this.configuration = configuration;
+    registerConfiguration(configuration);
+  }
 
-    /**
-     * Returns {@link #configuration}.
-     *
-     * @param muleEvent the current {@link MuleEvent}
-     * @return {@link #configuration}
-     */
-    @Override
-    public ConfigurationInstance<T> get(Object muleEvent)
-    {
-        return configuration;
-    }
+  /**
+   * Returns {@link #configuration}.
+   *
+   * @param muleEvent the current {@link MuleEvent}
+   * @return {@link #configuration}
+   */
+  @Override
+  public ConfigurationInstance<T> get(Object muleEvent) {
+    return configuration;
+  }
 }

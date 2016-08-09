@@ -17,55 +17,48 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>>
-{
+public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>> {
 
-    private final String name;
-    private final String type;
-    private final Matcher matcher;
+  private final String name;
+  private final String type;
+  private final Matcher matcher;
 
-    public FieldDebugInfoMatcher(String name, Class type, Object value)
-    {
-        this.name = name;
-        this.type = type.getName();
-        this.matcher = equalTo(value);
+  public FieldDebugInfoMatcher(String name, Class type, Object value) {
+    this.name = name;
+    this.type = type.getName();
+    this.matcher = equalTo(value);
+  }
+
+  public FieldDebugInfoMatcher(String name, Class type, Matcher matcher) {
+    this.name = name;
+    this.type = type.getName();
+    this.matcher = matcher;
+  }
+
+  @Override
+  public boolean matchesSafely(FieldDebugInfo<?> item) {
+    boolean sameValue = matcher.matches(item.getValue());
+
+    return name.equals(item.getName()) && sameValue && type.equals(item.getType());
+  }
+
+  public void describeTo(Description description) {
+    description.appendText(format("a %s with name: '%s' type: '%s' and value that is ",
+                                  SimpleFieldDebugInfo.class.getSimpleName(), name, type));
+    matcher.describeTo(description);
+  }
+
+  @Factory
+  public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Object value) {
+    return new FieldDebugInfoMatcher(name, type, value);
+  }
+
+  @Factory
+  public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Matcher matcher) {
+    if (matcher == null) {
+      throw new IllegalArgumentException("Matcher cannot be null");
     }
 
-    public FieldDebugInfoMatcher(String name, Class type, Matcher matcher)
-    {
-        this.name = name;
-        this.type = type.getName();
-        this.matcher = matcher;
-    }
-
-    @Override
-    public boolean matchesSafely(FieldDebugInfo<?> item)
-    {
-        boolean sameValue = matcher.matches(item.getValue());
-
-        return name.equals(item.getName()) && sameValue && type.equals(item.getType());
-    }
-
-    public void describeTo(Description description)
-    {
-        description.appendText(format("a %s with name: '%s' type: '%s' and value that is ", SimpleFieldDebugInfo.class.getSimpleName(), name, type));
-        matcher.describeTo(description);
-    }
-
-    @Factory
-    public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Object value)
-    {
-        return new FieldDebugInfoMatcher(name, type, value);
-    }
-
-    @Factory
-    public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Matcher matcher)
-    {
-        if (matcher == null)
-        {
-            throw new IllegalArgumentException("Matcher cannot be null");
-        }
-
-        return new FieldDebugInfoMatcher(name, type, matcher);
-    }
+    return new FieldDebugInfoMatcher(name, type, matcher);
+  }
 }

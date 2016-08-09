@@ -9,13 +9,11 @@ package org.mule.compatibility.transport.jms.test;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandlerFactory;
 
-public class TestRedeliveryHandlerFactory implements RedeliveryHandlerFactory
-{
+public class TestRedeliveryHandlerFactory implements RedeliveryHandlerFactory {
 
-    public RedeliveryHandler create()
-    {
-        return new TestRedeliveryHandler();
-    }
+  public RedeliveryHandler create() {
+    return new TestRedeliveryHandler();
+  }
 
 }
 

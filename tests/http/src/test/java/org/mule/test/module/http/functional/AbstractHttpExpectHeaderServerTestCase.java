@@ -23,137 +23,115 @@ import java.net.Socket;
 import org.junit.Rule;
 
 /**
- * Abstract class for tests that require a mock HTTP server that handles the "Expect" header. Provides methods
- * for starting mock servers that accept or reject the incoming request.
+ * Abstract class for tests that require a mock HTTP server that handles the "Expect" header. Provides methods for starting mock
+ * servers that accept or reject the incoming request.
  */
-public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHttpTestCase
-{
+public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHttpTestCase {
 
-    private static final String CONTINUE_RESPONSE = "HTTP/1.1 100 Continue\r\n\r\n";
-    private static final String EXPECTATION_FAILED_RESPONSE = "HTTP/1.1 417 Expectation Failed\r\n";
+  private static final String CONTINUE_RESPONSE = "HTTP/1.1 100 Continue\r\n\r\n";
+  private static final String EXPECTATION_FAILED_RESPONSE = "HTTP/1.1 417 Expectation Failed\r\n";
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("httpPort");
 
-    protected String requestBody;
+  protected String requestBody;
 
-    private AbstractMockServer server;
+  private AbstractMockServer server;
 
-    protected void startExpectContinueServer()
-    {
-        server = new ExpectContinueMockServer();
-        server.start();
+  protected void startExpectContinueServer() {
+    server = new ExpectContinueMockServer();
+    server.start();
+  }
+
+  protected void startExpectFailedServer() {
+    server = new ExpectFailedMockServer();
+    server.start();
+  }
+
+  protected void stopServer() {
+    server.stop();
+  }
+
+  private abstract class AbstractMockServer implements Runnable {
+
+    private Latch startedLatch = new Latch();
+    private Latch finishedLatch = new Latch();
+
+    public void start() {
+      try {
+        Thread serverThread = new Thread(this);
+        serverThread.start();
+        startedLatch.await();
+      } catch (InterruptedException e) {
+        throw new RuntimeException("Failed to start mock server", e);
+      }
     }
 
-    protected void startExpectFailedServer()
-    {
-        server = new ExpectFailedMockServer();
-        server.start();
+    public void stop() {
+      try {
+        finishedLatch.await();
+      } catch (InterruptedException e) {
+        throw new RuntimeException("Failed to stop mock server", e);
+      }
     }
 
-    protected void stopServer()
-    {
-        server.stop();
-    }
+    @Override
+    public void run() {
+      try {
+        ServerSocket serverSocket = new ServerSocket(listenPort.getNumber());
+        startedLatch.release();
+        Socket socket = serverSocket.accept();
+        InputStream inputStream = socket.getInputStream();
+        OutputStream outputStream = socket.getOutputStream();
 
-    private abstract class AbstractMockServer implements Runnable
-    {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream), 1);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream), 1);
 
-        private Latch startedLatch = new Latch();
-        private Latch finishedLatch = new Latch();
-
-        public void start()
-        {
-            try
-            {
-                Thread serverThread = new Thread(this);
-                serverThread.start();
-                startedLatch.await();
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Failed to start mock server", e);
-            }
+        while (!reader.readLine().isEmpty()) {
+          // Do nothing, consume headers until blank line.
         }
 
-        public void stop()
-        {
-            try
-            {
-                finishedLatch.await();
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Failed to stop mock server", e);
-            }
-        }
+        process(reader, writer);
 
-        @Override
-        public void run()
-        {
-            try
-            {
-                ServerSocket serverSocket = new ServerSocket(listenPort.getNumber());
-                startedLatch.release();
-                Socket socket = serverSocket.accept();
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream), 1);
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream), 1);
-
-                while (!reader.readLine().isEmpty())
-                {
-                    // Do nothing, consume headers until blank line.
-                }
-
-                process(reader, writer);
-
-                reader.close();
-                writer.close();
-                socket.close();
-                serverSocket.close();
-                finishedLatch.release();
-            }
-            catch (IOException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
-        protected abstract void process(BufferedReader reader, BufferedWriter writer) throws IOException;
+        reader.close();
+        writer.close();
+        socket.close();
+        serverSocket.close();
+        finishedLatch.release();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
+    protected abstract void process(BufferedReader reader, BufferedWriter writer) throws IOException;
+  }
 
-    private class ExpectContinueMockServer extends AbstractMockServer
-    {
 
-        @Override
-        protected void process(BufferedReader reader, BufferedWriter writer) throws IOException
-        {
-            writer.write(CONTINUE_RESPONSE);
-            writer.flush();
+  private class ExpectContinueMockServer extends AbstractMockServer {
 
-            char[] body = new char[TEST_MESSAGE.length()];
-            IOUtils.read(reader, body);
-            requestBody = new String(body);
+    @Override
+    protected void process(BufferedReader reader, BufferedWriter writer) throws IOException {
+      writer.write(CONTINUE_RESPONSE);
+      writer.flush();
 
-            String response = String.format("HTTP/1.1 200 OK\nContent-Length: %d\n\n%s", TEST_MESSAGE.length(), TEST_MESSAGE);
+      char[] body = new char[TEST_MESSAGE.length()];
+      IOUtils.read(reader, body);
+      requestBody = new String(body);
 
-            writer.write(response);
-            writer.flush();
-        }
+      String response = String.format("HTTP/1.1 200 OK\nContent-Length: %d\n\n%s", TEST_MESSAGE.length(), TEST_MESSAGE);
+
+      writer.write(response);
+      writer.flush();
     }
+  }
 
 
-    private class ExpectFailedMockServer extends AbstractMockServer
-    {
+  private class ExpectFailedMockServer extends AbstractMockServer {
 
-        @Override
-        protected void process(BufferedReader reader, BufferedWriter writer) throws IOException
-        {
-            writer.write(EXPECTATION_FAILED_RESPONSE);
-            writer.flush();
-        }
+    @Override
+    protected void process(BufferedReader reader, BufferedWriter writer) throws IOException {
+      writer.write(EXPECTATION_FAILED_RESPONSE);
+      writer.flush();
     }
+  }
 }

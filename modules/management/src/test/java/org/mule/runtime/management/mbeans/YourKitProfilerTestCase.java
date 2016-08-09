@@ -16,24 +16,20 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 
-public class YourKitProfilerTestCase extends AbstractMuleJmxTestCase
-{
+public class YourKitProfilerTestCase extends AbstractMuleJmxTestCase {
 
-    /**
-     * Each method doen't have to be more than 32
-     * There is a need for intergration with HQ
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testMethodLenght() throws Exception
-    {
-        Method[] methods = YourKitProfilerServiceMBean.class.getMethods();
-        for (int i = 0; i < methods.length; i++)
-        {
-            assertTrue(methods[i].getName(),methods[i].getName().length() < 32);
-        }
-
+  /**
+   * Each method doen't have to be more than 32 There is a need for intergration with HQ
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testMethodLenght() throws Exception {
+    Method[] methods = YourKitProfilerServiceMBean.class.getMethods();
+    for (int i = 0; i < methods.length; i++) {
+      assertTrue(methods[i].getName(), methods[i].getName().length() < 32);
     }
+
+  }
 
 }

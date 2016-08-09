@@ -14,12 +14,11 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * Creates a HttpClientMessageDispatcher to make client requests
  */
-public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
-    /** {@inheritDoc} */
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new HttpClientMessageDispatcher(endpoint);
-    }
+public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
+
+  /** {@inheritDoc} */
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new HttpClientMessageDispatcher(endpoint);
+  }
 }

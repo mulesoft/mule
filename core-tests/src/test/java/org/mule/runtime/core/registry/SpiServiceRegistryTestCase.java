@@ -21,31 +21,27 @@ import java.util.Collection;
 import org.junit.Test;
 
 @SmallTest
-public class SpiServiceRegistryTestCase extends AbstractMuleTestCase
-{
+public class SpiServiceRegistryTestCase extends AbstractMuleTestCase {
 
-    private ServiceRegistry serviceRegistry = new SpiServiceRegistry();
+  private ServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
-    @Test
-    public void lookupProviders() throws Exception
-    {
-        Collection<TestDiscoverableObject> discoveredObjects = serviceRegistry.lookupProviders(TestDiscoverableObject.class);
-        assertProvidersFound(discoveredObjects);
-    }
+  @Test
+  public void lookupProviders() throws Exception {
+    Collection<TestDiscoverableObject> discoveredObjects = serviceRegistry.lookupProviders(TestDiscoverableObject.class);
+    assertProvidersFound(discoveredObjects);
+  }
 
-    @Test
-    public void lookupProvidersWithCustomClassLoader() throws Exception
-    {
-        ClassLoader classLoader = mock(ClassLoader.class, RETURNS_DEEP_STUBS);
-        serviceRegistry.lookupProviders(TestDiscoverableObject.class, classLoader);
+  @Test
+  public void lookupProvidersWithCustomClassLoader() throws Exception {
+    ClassLoader classLoader = mock(ClassLoader.class, RETURNS_DEEP_STUBS);
+    serviceRegistry.lookupProviders(TestDiscoverableObject.class, classLoader);
 
-        verify(classLoader).getResources("META-INF/services/" + TestDiscoverableObject.class.getName());
-    }
+    verify(classLoader).getResources("META-INF/services/" + TestDiscoverableObject.class.getName());
+  }
 
-    private void assertProvidersFound(Collection<TestDiscoverableObject> discoveredObjects)
-    {
-        assertThat(discoveredObjects, hasSize(1));
-        assertThat(discoveredObjects.iterator().next(), instanceOf(TestDiscoverableObject.class));
-    }
+  private void assertProvidersFound(Collection<TestDiscoverableObject> discoveredObjects) {
+    assertThat(discoveredObjects, hasSize(1));
+    assertThat(discoveredObjects.iterator().next(), instanceOf(TestDiscoverableObject.class));
+  }
 
 }

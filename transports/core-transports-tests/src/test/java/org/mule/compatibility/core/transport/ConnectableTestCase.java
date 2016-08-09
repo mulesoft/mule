@@ -17,49 +17,42 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class ConnectableTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class ConnectableTestCase extends AbstractMuleContextEndpointTestCase {
 
-    /**
-     * MULE-4531
-     */
-    @Test
-    public void testDoNotConnectIfConnected() throws Exception
-    {
-        Connectable connectable = new TestConnectable(getTestInboundEndpoint("test"), true);
-        connectable.connect();
+  /**
+   * MULE-4531
+   */
+  @Test
+  public void testDoNotConnectIfConnected() throws Exception {
+    Connectable connectable = new TestConnectable(getTestInboundEndpoint("test"), true);
+    connectable.connect();
+  }
+
+  class TestConnectable extends AbstractTransportMessageHandler {
+
+    public TestConnectable(ImmutableEndpoint endpoint, boolean connected) {
+      super(endpoint);
+      this.connected.set(connected);
     }
 
-    class TestConnectable extends AbstractTransportMessageHandler
-    {
-        public TestConnectable(ImmutableEndpoint endpoint, boolean connected)
-        {
-            super(endpoint);
-            this.connected.set(connected);
-        }
-
-        @Override
-        protected ConnectableLifecycleManager createLifecycleManager()
-        {
-            return new ConnectableLifecycleManager("test", this);
-        }
-
-        @Override
-        protected WorkManager getWorkManager()
-        {
-            return null;
-        }
-
-        @Override
-        protected void doConnect() throws Exception
-        {
-            if (connected.get())
-            {
-                fail("Should not attempt connection");
-            }
-            super.doConnect();
-        }
-
+    @Override
+    protected ConnectableLifecycleManager createLifecycleManager() {
+      return new ConnectableLifecycleManager("test", this);
     }
+
+    @Override
+    protected WorkManager getWorkManager() {
+      return null;
+    }
+
+    @Override
+    protected void doConnect() throws Exception {
+      if (connected.get()) {
+        fail("Should not attempt connection");
+      }
+      super.doConnect();
+    }
+
+  }
 
 }

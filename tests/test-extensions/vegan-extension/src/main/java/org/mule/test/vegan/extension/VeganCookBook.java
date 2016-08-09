@@ -15,43 +15,38 @@ import org.mule.runtime.extension.api.annotation.Extensible;
 import java.util.List;
 
 @Extensible
-public class VeganCookBook
-{
-    @Parameter
-    @Optional
-    List<String> recipes;
+public class VeganCookBook {
 
-    @Parameter
-    @Optional
-    Integer numberOfPages;
+  @Parameter
+  @Optional
+  List<String> recipes;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    @Optional(defaultValue = "Enemies of Bondiola")
-    String editorial;
+  @Parameter
+  @Optional
+  Integer numberOfPages;
 
-    public List<String> getRecipes()
-    {
-        return recipes;
-    }
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  @Optional(defaultValue = "Enemies of Bondiola")
+  String editorial;
 
-    public void setRecipes(List<String> recipes)
-    {
-        this.recipes = recipes;
-    }
+  public List<String> getRecipes() {
+    return recipes;
+  }
 
-    public Integer getNumberOfPages()
-    {
-        return numberOfPages;
-    }
+  public void setRecipes(List<String> recipes) {
+    this.recipes = recipes;
+  }
 
-    public void setNumberOfPages(Integer numberOfPages)
-    {
-        this.numberOfPages = numberOfPages;
-    }
+  public Integer getNumberOfPages() {
+    return numberOfPages;
+  }
 
-    public String getEditorial()
-    {
-        return editorial;
-    }
+  public void setNumberOfPages(Integer numberOfPages) {
+    this.numberOfPages = numberOfPages;
+  }
+
+  public String getEditorial() {
+    return editorial;
+  }
 }

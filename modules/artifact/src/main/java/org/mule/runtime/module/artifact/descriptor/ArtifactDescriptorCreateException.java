@@ -8,25 +8,21 @@
 package org.mule.runtime.module.artifact.descriptor;
 
 /**
- * Thrown to indicate any error related to errors in the structure of a plugin
- * file or folder.
+ * Thrown to indicate any error related to errors in the structure of a plugin file or folder.
  */
-public class ArtifactDescriptorCreateException extends RuntimeException
-{
+public class ArtifactDescriptorCreateException extends RuntimeException {
 
-    /**
-     * {@inheritDoc}
-     */
-    public ArtifactDescriptorCreateException(String message)
-    {
-        super(message);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public ArtifactDescriptorCreateException(String message) {
+    super(message);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public ArtifactDescriptorCreateException(String s, Throwable throwable)
-    {
-        super(s, throwable);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public ArtifactDescriptorCreateException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
 }

@@ -20,40 +20,36 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * This really tests the handling of multiple references in
- * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
+ * This really tests the handling of multiple references in {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
  */
-public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/endpoint/multiple-transformer-refs-test.xml";
-    }
+public class MultipleTransformerRefsTestCase extends AbstractEndpointTestCase {
 
-    @Test
-    public void testMultipleRefs() throws MuleException
-    {
-        ImmutableEndpoint endpoint = doTest("many");
-        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
-        assertNotNull(transformers);
-        // this lets us check ordering before size, safely, which is useful on failure
-        assertTrue(transformers.size() > 0);
-        assertEquals("a", ((Transformer) transformers.get(0)).getName());
-        assertTrue(transformers.size() > 1);
-        assertEquals("b", ((Transformer) transformers.get(1)).getName());
-        assertEquals(3, transformers.size());
-        assertEquals("c", ((Transformer) transformers.get(2)).getName());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/endpoint/multiple-transformer-refs-test.xml";
+  }
 
-    @Test
-    public void testSingleRef() throws MuleException
-    {
-        ImmutableEndpoint endpoint = doTest("single");
-        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
-        assertNotNull(transformers);
-        assertEquals(1, transformers.size());
-        assertEquals("a", ((Transformer) transformers.get(0)).getName());
-    }
+  @Test
+  public void testMultipleRefs() throws MuleException {
+    ImmutableEndpoint endpoint = doTest("many");
+    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    assertNotNull(transformers);
+    // this lets us check ordering before size, safely, which is useful on failure
+    assertTrue(transformers.size() > 0);
+    assertEquals("a", ((Transformer) transformers.get(0)).getName());
+    assertTrue(transformers.size() > 1);
+    assertEquals("b", ((Transformer) transformers.get(1)).getName());
+    assertEquals(3, transformers.size());
+    assertEquals("c", ((Transformer) transformers.get(2)).getName());
+  }
+
+  @Test
+  public void testSingleRef() throws MuleException {
+    ImmutableEndpoint endpoint = doTest("single");
+    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    assertNotNull(transformers);
+    assertEquals(1, transformers.size());
+    assertEquals("a", ((Transformer) transformers.get(0)).getName());
+  }
 
 }

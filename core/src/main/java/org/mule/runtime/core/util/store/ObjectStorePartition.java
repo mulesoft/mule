@@ -13,80 +13,67 @@ import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import java.io.Serializable;
 import java.util.List;
 
-public class ObjectStorePartition<T extends Serializable> implements ListableObjectStore<T>
-{
+public class ObjectStorePartition<T extends Serializable> implements ListableObjectStore<T> {
 
-    final String partitionName;
-    final PartitionableObjectStore<T> partitionedObjectStore;
+  final String partitionName;
+  final PartitionableObjectStore<T> partitionedObjectStore;
 
-    public ObjectStorePartition(String partitionName, PartitionableObjectStore<T> partitionedObjectStore)
-    {
-        this.partitionName = partitionName;
-        this.partitionedObjectStore = partitionedObjectStore;
-    }
+  public ObjectStorePartition(String partitionName, PartitionableObjectStore<T> partitionedObjectStore) {
+    this.partitionName = partitionName;
+    this.partitionedObjectStore = partitionedObjectStore;
+  }
 
-    @Override
-    public boolean contains(Serializable key) throws ObjectStoreException
-    {
-        return partitionedObjectStore.contains(key, partitionName);
-    }
+  @Override
+  public boolean contains(Serializable key) throws ObjectStoreException {
+    return partitionedObjectStore.contains(key, partitionName);
+  }
 
-    @Override
-    public void store(Serializable key, T value) throws ObjectStoreException
-    {
-        partitionedObjectStore.store(key, value, partitionName);
-    }
+  @Override
+  public void store(Serializable key, T value) throws ObjectStoreException {
+    partitionedObjectStore.store(key, value, partitionName);
+  }
 
-    @Override
-    public T retrieve(Serializable key) throws ObjectStoreException
-    {
-        return partitionedObjectStore.retrieve(key, partitionName);
-    }
-    
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        this.partitionedObjectStore.clear(this.partitionName);
-    }
+  @Override
+  public T retrieve(Serializable key) throws ObjectStoreException {
+    return partitionedObjectStore.retrieve(key, partitionName);
+  }
 
-    @Override
-    public T remove(Serializable key) throws ObjectStoreException
-    {
-        return partitionedObjectStore.remove(key, partitionName);
-    }
+  @Override
+  public void clear() throws ObjectStoreException {
+    this.partitionedObjectStore.clear(this.partitionName);
+  }
 
-    @Override
-    public boolean isPersistent()
-    {
-        return partitionedObjectStore.isPersistent();
-    }
+  @Override
+  public T remove(Serializable key) throws ObjectStoreException {
+    return partitionedObjectStore.remove(key, partitionName);
+  }
 
-    @Override
-    public void open() throws ObjectStoreException
-    {
-        partitionedObjectStore.open(partitionName);
-    }
+  @Override
+  public boolean isPersistent() {
+    return partitionedObjectStore.isPersistent();
+  }
 
-    @Override
-    public void close() throws ObjectStoreException
-    {
-        partitionedObjectStore.close(partitionName);
-    }
+  @Override
+  public void open() throws ObjectStoreException {
+    partitionedObjectStore.open(partitionName);
+  }
 
-    @Override
-    public List<Serializable> allKeys() throws ObjectStoreException
-    {
-        return partitionedObjectStore.allKeys(partitionName);
-    }
+  @Override
+  public void close() throws ObjectStoreException {
+    partitionedObjectStore.close(partitionName);
+  }
 
-    public PartitionableObjectStore<T> getBaseStore()
-    {
-        return partitionedObjectStore;
-    }
-    
-    public String getPartitionName()
-    {
-        return partitionName;
-    }
-    
+  @Override
+  public List<Serializable> allKeys() throws ObjectStoreException {
+    return partitionedObjectStore.allKeys(partitionName);
+  }
+
+  public PartitionableObjectStore<T> getBaseStore() {
+    return partitionedObjectStore;
+  }
+
+  public String getPartitionName() {
+    return partitionName;
+  }
+
 }

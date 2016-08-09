@@ -13,72 +13,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Split message contains one or more message parts with an endpoint associated with each part. This class is used by
- * the Message Splitter routers ({@link org.mule.compatibility.core.routing.outbound.AbstractRoundRobinMessageSplitter}) to
- * define a mapping between message parts and the endpoint to dispatch on.
+ * A Split message contains one or more message parts with an endpoint associated with each part. This class is used by the
+ * Message Splitter routers ({@link org.mule.compatibility.core.routing.outbound.AbstractRoundRobinMessageSplitter}) to define a
+ * mapping between message parts and the endpoint to dispatch on.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class SplitMessage
-{
-    private List<MessagePart> parts = new ArrayList<MessagePart>();
+public class SplitMessage {
 
-    public void addPart(Object part, OutboundEndpoint endpoint)
-    {
-        parts.add(new MessagePart(endpoint, part));
+  private List<MessagePart> parts = new ArrayList<MessagePart>();
+
+  public void addPart(Object part, OutboundEndpoint endpoint) {
+    parts.add(new MessagePart(endpoint, part));
+  }
+
+  public MessagePart getPart(int i) {
+    return parts.get(i);
+  }
+
+  public int size() {
+    return parts.size();
+  }
+
+  public class MessagePart {
+
+    private Object part;
+    private OutboundEndpoint endpoint;
+
+    public MessagePart(OutboundEndpoint endpoint, Object part) {
+      if (endpoint == null) {
+        throw new IllegalArgumentException(CoreMessages.objectIsNull("splitter endpoint").getMessage());
+      }
+
+      if (part == null) {
+        throw new IllegalArgumentException(CoreMessages.objectIsNull("splitter messagePart").getMessage());
+      }
+      this.endpoint = endpoint;
+      this.part = part;
     }
 
-    public MessagePart getPart(int i)
-    {
-        return parts.get(i);
+    public OutboundEndpoint getEndpoint() {
+      return endpoint;
     }
 
-    public int size()
-    {
-        return parts.size();
+    public Object getPart() {
+      return part;
     }
 
-    public class MessagePart
-    {
-        private Object part;
-        private OutboundEndpoint endpoint;
 
-        public MessagePart(OutboundEndpoint endpoint, Object part)
-        {
-            if (endpoint == null)
-            {
-                throw new IllegalArgumentException(CoreMessages.objectIsNull("splitter endpoint").getMessage());
-            }
-
-            if (part == null)
-            {
-                throw new IllegalArgumentException(CoreMessages.objectIsNull("splitter messagePart").getMessage());
-            }
-            this.endpoint = endpoint;
-            this.part = part;
-        }
-
-        public OutboundEndpoint getEndpoint()
-        {
-            return endpoint;
-        }
-
-        public Object getPart()
-        {
-            return part;
-        }
-
-
-        @Override
-        public String toString()
-        {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("MessagePart");
-            sb.append("{endpoint=").append(endpoint.getName());
-            sb.append(", part=").append(part);
-            sb.append('}');
-            return sb.toString();
-        }
+    @Override
+    public String toString() {
+      final StringBuilder sb = new StringBuilder();
+      sb.append("MessagePart");
+      sb.append("{endpoint=").append(endpoint.getName());
+      sb.append(", part=").append(part);
+      sb.append('}');
+      return sb.toString();
     }
+  }
 }

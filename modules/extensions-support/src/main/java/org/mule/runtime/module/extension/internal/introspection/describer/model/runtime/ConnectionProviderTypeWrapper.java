@@ -19,29 +19,25 @@ import java.util.List;
  *
  * @since 4.0
  */
-class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements ConnectionProviderElement, ParameterizableTypeElement
-{
+class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements ConnectionProviderElement, ParameterizableTypeElement {
 
-    ConnectionProviderTypeWrapper(Class<T> aClass)
-    {
-        super(aClass);
-    }
+  ConnectionProviderTypeWrapper(Class<T> aClass) {
+    super(aClass);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Type> getSuperClassGenerics()
-    {
-        return IntrospectionUtils.getSuperClassGenerics(getDeclaredClass(), ConnectionProvider.class);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Type> getSuperClassGenerics() {
+    return IntrospectionUtils.getSuperClassGenerics(getDeclaredClass(), ConnectionProvider.class);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Class<?>> getInterfaceGenerics(Class clazz)
-    {
-        return IntrospectionUtils.getInterfaceGenerics(getDeclaredClass(), clazz);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Class<?>> getInterfaceGenerics(Class clazz) {
+    return IntrospectionUtils.getInterfaceGenerics(getDeclaredClass(), clazz);
+  }
 }

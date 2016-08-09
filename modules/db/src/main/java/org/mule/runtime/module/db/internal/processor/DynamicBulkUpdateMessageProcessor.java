@@ -33,76 +33,67 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Executes an update dynamic query in bulk mode on a database
- * * <p/>
- * A dynamic update query can be update, insert or delete query or a stored procedure
- * taking input parameters only and returning an update count.
+ * Executes an update dynamic query in bulk mode on a database *
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
- * being processed.
+ * A dynamic update query can be update, insert or delete query or a stored procedure taking input parameters only and returning
+ * an update count.
+ * <p/>
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent} being processed.
  */
-public class DynamicBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor
-{
+public class DynamicBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor {
 
-    public DynamicBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction, List<QueryType> validQueryTypes)
-    {
-        super(dbConfigResolver, transactionalAction, validQueryTypes, queryResolver, bulkUpdateExecutorFactory);
+  public DynamicBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver,
+                                           BulkQueryExecutorFactory bulkUpdateExecutorFactory,
+                                           TransactionalAction transactionalAction, List<QueryType> validQueryTypes) {
+    super(dbConfigResolver, transactionalAction, validQueryTypes, queryResolver, bulkUpdateExecutorFactory);
+  }
+
+  @Override
+  protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException {
+    BulkQuery bulkQuery = resolveBulkQuery(connection, muleEvent);
+    BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
+
+    return bulkUpdateExecutor.execute(connection, bulkQuery);
+  }
+
+  private BulkQuery resolveBulkQuery(DbConnection connection, MuleEvent muleEvent) {
+    final Iterator<Object> paramsIterator = getIterator(muleEvent);
+
+    BulkQuery bulkQuery = new BulkQuery();
+    while (paramsIterator.hasNext()) {
+      MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
+      MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
+      Query query = queryResolver.resolve(connection, itemEvent);
+      bulkQuery.add(query.getQueryTemplate());
+    }
+    return bulkQuery;
+  }
+
+  @Override
+  protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent) {
+    MuleEvent eventToUse = resolveSource(muleEvent);
+    final List<FieldDebugInfo<?>> fields = new ArrayList<>();
+
+    BulkQuery bulkQuery;
+    try {
+      bulkQuery = resolveBulkQuery(connection, eventToUse);
+    } catch (QueryResolutionException e) {
+      fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, e));
+      return fields;
     }
 
-    @Override
-    protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
-    {
-        BulkQuery bulkQuery = resolveBulkQuery(connection, muleEvent);
-        BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
+    final List<FieldDebugInfo<?>> queries = new ArrayList<>();
 
-        return bulkUpdateExecutor.execute(connection, bulkQuery);
+    int queryIndex = 1;
+    for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates()) {
+      final String name = QUERY_DEBUG_FIELD + queryIndex++;
+      final FieldDebugInfo queryFieldDebugInfo = createQueryFieldDebugInfo(name, queryTemplate);
+
+      queries.add(queryFieldDebugInfo);
     }
 
-    private BulkQuery resolveBulkQuery(DbConnection connection, MuleEvent muleEvent)
-    {
-        final Iterator<Object> paramsIterator = getIterator(muleEvent);
+    fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, queries));
 
-        BulkQuery bulkQuery = new BulkQuery();
-        while (paramsIterator.hasNext())
-        {
-            MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
-            MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
-            Query query = queryResolver.resolve(connection, itemEvent);
-            bulkQuery.add(query.getQueryTemplate());
-        }
-        return bulkQuery;
-    }
-
-    @Override
-    protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
-    {
-        MuleEvent eventToUse = resolveSource(muleEvent);
-        final List<FieldDebugInfo<?>> fields = new ArrayList<>();
-
-        BulkQuery bulkQuery;
-        try
-        {
-            bulkQuery = resolveBulkQuery(connection, eventToUse);
-        }
-        catch (QueryResolutionException e)
-        {
-            fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, e));
-            return fields;
-        }
-
-        final List<FieldDebugInfo<?>> queries = new ArrayList<>();
-
-        int queryIndex = 1;
-        for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates())
-        {
-            final String name = QUERY_DEBUG_FIELD + queryIndex++;
-            final FieldDebugInfo queryFieldDebugInfo = createQueryFieldDebugInfo(name, queryTemplate);
-
-            queries.add(queryFieldDebugInfo);
-        }
-
-        fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, queries));
-
-        return fields;
-    }
+    return fields;
+  }
 }

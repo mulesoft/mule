@@ -20,127 +20,105 @@ import javax.naming.spi.InitialContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractJndiNameResolver implements JndiNameResolver
-{
+public abstract class AbstractJndiNameResolver implements JndiNameResolver {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String jndiProviderUrl;
-    private String jndiInitialFactory;
-    private Map jndiProviderProperties;
+  private String jndiProviderUrl;
+  private String jndiInitialFactory;
+  private Map jndiProviderProperties;
 
-    // Default contextFactory
-    private InitialContextFactory contextFactory = new InitialContextFactory()
-    {
-        @Override
-        public Context getInitialContext(Hashtable<?, ?> hashtable) throws NamingException
-        {
-            return new InitialContext(hashtable);
-        }
-    };
+  // Default contextFactory
+  private InitialContextFactory contextFactory = new InitialContextFactory() {
 
-    /**
-     * Creates a JNDI context using the current {@link #contextFactory}
-     *
-     * @return a new {@link Context} instance. Callers must provide concurrent
-     *         access control on the returned value.
-     * @throws NamingException if there is a problem during the context creation.
-     */
-    protected Context createInitialContext() throws NamingException
-    {
-        return contextFactory.getInitialContext(getContextProperties());
+    @Override
+    public Context getInitialContext(Hashtable<?, ?> hashtable) throws NamingException {
+      return new InitialContext(hashtable);
+    }
+  };
+
+  /**
+   * Creates a JNDI context using the current {@link #contextFactory}
+   *
+   * @return a new {@link Context} instance. Callers must provide concurrent access control on the returned value.
+   * @throws NamingException if there is a problem during the context creation.
+   */
+  protected Context createInitialContext() throws NamingException {
+    return contextFactory.getInitialContext(getContextProperties());
+  }
+
+  protected Hashtable getContextProperties() {
+    if ((jndiInitialFactory == null)
+        && (jndiProviderProperties == null || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))) {
+      throw new IllegalArgumentException("Undefined value for jndiInitialFactory property");
     }
 
-    protected Hashtable getContextProperties()
-    {
-        if ((jndiInitialFactory == null) && (jndiProviderProperties == null
-                                             || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)))
-        {
-            throw new IllegalArgumentException("Undefined value for jndiInitialFactory property");
-        }
+    Hashtable<String, Object> props = new Hashtable<String, Object>();
 
-        Hashtable<String, Object> props = new Hashtable<String, Object>();
-
-        if (jndiInitialFactory != null)
-        {
-            props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-        }
-
-        if (jndiProviderUrl != null)
-        {
-            props.put(Context.PROVIDER_URL, jndiProviderUrl);
-        }
-
-        if (jndiProviderProperties != null)
-        {
-            props.putAll(jndiProviderProperties);
-        }
-
-        return props;
+    if (jndiInitialFactory != null) {
+      props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
     }
 
-    public String getJndiProviderUrl()
-    {
-        return jndiProviderUrl;
+    if (jndiProviderUrl != null) {
+      props.put(Context.PROVIDER_URL, jndiProviderUrl);
     }
 
-    public void setJndiProviderUrl(String jndiProviderUrl)
-    {
-        this.jndiProviderUrl = jndiProviderUrl;
+    if (jndiProviderProperties != null) {
+      props.putAll(jndiProviderProperties);
     }
 
-    public String getJndiInitialFactory()
-    {
-        return jndiInitialFactory;
+    return props;
+  }
+
+  public String getJndiProviderUrl() {
+    return jndiProviderUrl;
+  }
+
+  public void setJndiProviderUrl(String jndiProviderUrl) {
+    this.jndiProviderUrl = jndiProviderUrl;
+  }
+
+  public String getJndiInitialFactory() {
+    return jndiInitialFactory;
+  }
+
+  public void setJndiInitialFactory(String jndiInitialFactory) {
+    this.jndiInitialFactory = jndiInitialFactory;
+  }
+
+  public Map getJndiProviderProperties() {
+    return jndiProviderProperties;
+  }
+
+  public void setJndiProviderProperties(Map jndiProviderProperties) {
+    this.jndiProviderProperties = jndiProviderProperties;
+  }
+
+  public InitialContextFactory getContextFactory() {
+    return contextFactory;
+  }
+
+  public void setContextFactory(InitialContextFactory contextFactory) {
+    if (contextFactory == null) {
+      throw new IllegalArgumentException("Context factory cannot be null");
     }
 
-    public void setJndiInitialFactory(String jndiInitialFactory)
-    {
-        this.jndiInitialFactory = jndiInitialFactory;
-    }
+    this.contextFactory = contextFactory;
+  }
 
-    public Map getJndiProviderProperties()
-    {
-        return jndiProviderProperties;
-    }
+  public void dispose() {
+    // Does nothing
+  }
 
-    public void setJndiProviderProperties(Map jndiProviderProperties)
-    {
-        this.jndiProviderProperties = jndiProviderProperties;
-    }
+  public void initialise() throws InitialisationException {
+    // Does nothing
+  }
 
-    public InitialContextFactory getContextFactory()
-    {
-        return contextFactory;
-    }
+  public void start() throws MuleException {
+    // Does nothing
+  }
 
-    public void setContextFactory(InitialContextFactory contextFactory)
-    {
-        if (contextFactory == null)
-        {
-            throw new IllegalArgumentException("Context factory cannot be null");
-        }
-
-        this.contextFactory = contextFactory;
-    }
-
-    public void dispose()
-    {
-        // Does nothing
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        // Does nothing
-    }
-
-    public void start() throws MuleException
-    {
-        // Does nothing
-    }
-
-    public void stop() throws MuleException
-    {
-        // Does nothing
-    }
+  public void stop() throws MuleException {
+    // Does nothing
+  }
 }

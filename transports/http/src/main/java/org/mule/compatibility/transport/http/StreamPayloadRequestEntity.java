@@ -14,40 +14,35 @@ import java.io.OutputStream;
 
 import org.apache.commons.httpclient.methods.RequestEntity;
 
-public class StreamPayloadRequestEntity implements RequestEntity
-{
-    private OutputHandler outputHandler;
-    private MuleEvent event;
+public class StreamPayloadRequestEntity implements RequestEntity {
 
-    public StreamPayloadRequestEntity(OutputHandler outputHandler, MuleEvent event)
-    {
-        this.outputHandler = outputHandler;
-        this.event = event;
-    }
+  private OutputHandler outputHandler;
+  private MuleEvent event;
 
-    @Override
-    public boolean isRepeatable()
-    {
-        return false;
-    }
+  public StreamPayloadRequestEntity(OutputHandler outputHandler, MuleEvent event) {
+    this.outputHandler = outputHandler;
+    this.event = event;
+  }
 
-    @Override
-    public void writeRequest(OutputStream outputStream) throws IOException
-    {
-        outputHandler.write(event, outputStream);
-        outputStream.flush();
-    }
+  @Override
+  public boolean isRepeatable() {
+    return false;
+  }
 
-    @Override
-    public long getContentLength()
-    {
-        return -1L;
-    }
+  @Override
+  public void writeRequest(OutputStream outputStream) throws IOException {
+    outputHandler.write(event, outputStream);
+    outputStream.flush();
+  }
 
-    @Override
-    public String getContentType()
-    {
-        return event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
-    }
+  @Override
+  public long getContentLength() {
+    return -1L;
+  }
+
+  @Override
+  public String getContentType() {
+    return event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
+  }
 }
 

@@ -19,56 +19,49 @@ import java.nio.charset.Charset;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Adds support for converting a {@link javax.servlet.http.HttpServletRequest} into an {@link org.mule.api.transport.OutputHandler}
+ * Adds support for converting a {@link javax.servlet.http.HttpServletRequest} into an
+ * {@link org.mule.api.transport.OutputHandler}
  */
-public class ServletRequestToOutputHandler extends AbstractTransformer implements DiscoverableTransformer
-{
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+public class ServletRequestToOutputHandler extends AbstractTransformer implements DiscoverableTransformer {
 
-    public ServletRequestToOutputHandler()
-    {
-        registerSourceType(DataType.fromType(HttpServletRequest.class));
-        setReturnDataType(DataType.fromType(OutputHandler.class));
-    }
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-    @Override
-    public Object doTransform(final Object src, Charset encoding) throws TransformerException
-    {
-            return (OutputHandler) (event, out) ->
-            {
-                InputStream is = ((HttpServletRequest) src).getInputStream();
-                try
-                {
-                    IOUtils.copyLarge(is, out);
-                }
-                finally
-                {
-                    is.close();
-                }
-            };
-        }
+  public ServletRequestToOutputHandler() {
+    registerSourceType(DataType.fromType(HttpServletRequest.class));
+    setReturnDataType(DataType.fromType(OutputHandler.class));
+  }
 
-    /**
-     * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
-     *
-     * @return the priority weighting for this transformer. This is a value between
-     *         {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
-     */
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
+  @Override
+  public Object doTransform(final Object src, Charset encoding) throws TransformerException {
+    return (OutputHandler) (event, out) -> {
+      InputStream is = ((HttpServletRequest) src).getInputStream();
+      try {
+        IOUtils.copyLarge(is, out);
+      } finally {
+        is.close();
+      }
+    };
+  }
 
-    /**
-     * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
-     *
-     * @param weighting the priority weighting for this transformer. This is a value between
-     *                  {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
-     */
-    @Override
-    public void setPriorityWeighting(int weighting)
-    {
-        priorityWeighting = weighting;
-    }
+  /**
+   * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
+   *
+   * @return the priority weighting for this transformer. This is a value between {@link #MIN_PRIORITY_WEIGHTING} and
+   *         {@link #MAX_PRIORITY_WEIGHTING}.
+   */
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
+
+  /**
+   * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
+   *
+   * @param weighting the priority weighting for this transformer. This is a value between {@link #MIN_PRIORITY_WEIGHTING} and
+   *        {@link #MAX_PRIORITY_WEIGHTING}.
+   */
+  @Override
+  public void setPriorityWeighting(int weighting) {
+    priorityWeighting = weighting;
+  }
 }

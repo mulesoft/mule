@@ -10,40 +10,34 @@ package org.mule.functional.testmodels.services;
  * <code>Address</code> is a Persons address
  */
 
-public class Address
-{
-    private String address;
-    private String postcode;
+public class Address {
 
-    public Address()
-    {
-        super();
-    }
+  private String address;
+  private String postcode;
 
-    public Address(String address, String postcode)
-    {
-        this.address = address;
-        this.postcode = postcode;
-    }
+  public Address() {
+    super();
+  }
 
-    public String getAddress()
-    {
-        return address;
-    }
+  public Address(String address, String postcode) {
+    this.address = address;
+    this.postcode = postcode;
+  }
 
-    public void setAddress(String address)
-    {
-        this.address = address;
-    }
+  public String getAddress() {
+    return address;
+  }
 
-    public String getPostcode()
-    {
-        return postcode;
-    }
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-    public void setPostcode(String postcode)
-    {
-        this.postcode = postcode;
-    }
+  public String getPostcode() {
+    return postcode;
+  }
+
+  public void setPostcode(String postcode) {
+    this.postcode = postcode;
+  }
 
 }

@@ -7,29 +7,28 @@
 package org.mule.runtime.core.api.el;
 
 /**
- * Wraps an expression language engine. Implementations should not wrap expression language engine exceptions,
- * but rather the {@link ExpressionLanguage} implementation should handle them.
+ * Wraps an expression language engine. Implementations should not wrap expression language engine exceptions, but rather the
+ * {@link ExpressionLanguage} implementation should handle them.
  * 
  * @since 3.3
  */
-public interface ExpressionExecutor<T extends ExpressionLanguageContext>
-{
+public interface ExpressionExecutor<T extends ExpressionLanguageContext> {
 
-    /**
-     * Execute an expression using using the provided context.
-     * 
-     * @param expression
-     * @param context
-     * @return
-     * @throws native expression language
-     */
-    public Object execute(String expression, T context);
+  /**
+   * Execute an expression using using the provided context.
+   * 
+   * @param expression
+   * @param context
+   * @return
+   * @throws native expression language
+   */
+  public Object execute(String expression, T context);
 
-    /**
-     * Validate the expression
-     * 
-     * @param expression
-     */
-    public void validate(String expression);
+  /**
+   * Validate the expression
+   * 
+   * @param expression
+   */
+  public void validate(String expression);
 
 }

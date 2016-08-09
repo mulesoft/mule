@@ -13,27 +13,24 @@ import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 /**
  * Creates {@link HttpResponseAttributes} based on an {@HttpResponse} and it's parts.
  */
-public class HttpResponseAttributesBuilder
-{
-    HttpResponse response;
+public class HttpResponseAttributesBuilder {
 
-    public HttpResponseAttributesBuilder setResponse(HttpResponse response)
-    {
-        this.response = response;
-        return this;
+  HttpResponse response;
+
+  public HttpResponseAttributesBuilder setResponse(HttpResponse response) {
+    this.response = response;
+    return this;
+  }
+
+  public HttpResponseAttributes build() {
+    ParameterMap headers = new ParameterMap();
+    for (String headerName : response.getHeaderNames()) {
+      headers.put(headerName, response.getHeaderValues(headerName));
     }
 
-    public HttpResponseAttributes build()
-    {
-        ParameterMap headers = new ParameterMap();
-        for (String headerName : response.getHeaderNames())
-        {
-            headers.put(headerName, response.getHeaderValues(headerName));
-        }
+    int statusCode = response.getStatusCode();
+    String reasonPhrase = response.getReasonPhrase();
 
-        int statusCode = response.getStatusCode();
-        String reasonPhrase = response.getReasonPhrase();
-
-        return new HttpResponseAttributes(statusCode, reasonPhrase, headers);
-    }
+    return new HttpResponseAttributes(statusCode, reasonPhrase, headers);
+  }
 }

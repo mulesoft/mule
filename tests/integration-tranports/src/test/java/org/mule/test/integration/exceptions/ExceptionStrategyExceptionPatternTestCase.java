@@ -29,84 +29,73 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCase
-{
+public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCase {
 
-    public static final String PAYLOAD = "some text";
-    public static final int TIMEOUT = 5000;
-    private Latch exceptionLatch = new Latch();
-    private Latch commitLatch = new Latch();
-    private Latch rollbackLatch = new Latch();
-    private AtomicReference<Exception> exceptionHolder = new AtomicReference<Exception>();
+  public static final String PAYLOAD = "some text";
+  public static final int TIMEOUT = 5000;
+  private Latch exceptionLatch = new Latch();
+  private Latch commitLatch = new Latch();
+  private Latch rollbackLatch = new Latch();
+  private AtomicReference<Exception> exceptionHolder = new AtomicReference<Exception>();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-flow.xml";
+  }
 
-    @Before
-    public void setUp() throws Exception
-    {
-        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-        @Override
-        public void onNotification(ExceptionNotification notification)
-            {
-                exceptionLatch.release();
-            }
-        });
-        FunctionalTestComponent failingFlow = getFunctionalTestComponent("failingFlow");
-        failingFlow.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                throw exceptionHolder.get();
-            }
-        });
-        muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
-            @Override
-            public void onNotification(TransactionNotification notification)
-            {
-                if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED)
-                {
-                    commitLatch.release();    
-                }
-                else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK)
-                {
-                    rollbackLatch.release();                    
-                }
-            }
-        });
-    }
-    
-    @Test
-    public void testThrowExceptionAndCommit() throws Exception
-    {
+  @Before
+  public void setUp() throws Exception {
+    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
 
-        MuleClient client = muleContext.getClient();
-        exceptionHolder.set(new IOException());
-        client.dispatch("jms://in", PAYLOAD,null);
-        if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("exception should be thrown");
+      @Override
+      public void onNotification(ExceptionNotification notification) {
+        exceptionLatch.release();
+      }
+    });
+    FunctionalTestComponent failingFlow = getFunctionalTestComponent("failingFlow");
+    failingFlow.setEventCallback(new EventCallback() {
+
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        throw exceptionHolder.get();
+      }
+    });
+    muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
+
+      @Override
+      public void onNotification(TransactionNotification notification) {
+        if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
+          commitLatch.release();
+        } else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
+          rollbackLatch.release();
         }
-        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
-        assertThat(muleMessage, IsNull.notNullValue());
-    }
+      }
+    });
+  }
 
-    @Test
-    public void testThrowExceptionAndRollback() throws Exception
-    {
+  @Test
+  public void testThrowExceptionAndCommit() throws Exception {
 
-        MuleClient client = muleContext.getClient();
-        exceptionHolder.set(new IllegalArgumentException());
-        client.dispatch("jms://in", PAYLOAD,null);
-        if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("exception should be thrown");
-        }
-        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
-        assertThat(muleMessage, IsNull.nullValue());
+    MuleClient client = muleContext.getClient();
+    exceptionHolder.set(new IOException());
+    client.dispatch("jms://in", PAYLOAD, null);
+    if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("exception should be thrown");
     }
+    MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+    assertThat(muleMessage, IsNull.notNullValue());
+  }
+
+  @Test
+  public void testThrowExceptionAndRollback() throws Exception {
+
+    MuleClient client = muleContext.getClient();
+    exceptionHolder.set(new IllegalArgumentException());
+    client.dispatch("jms://in", PAYLOAD, null);
+    if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("exception should be thrown");
+    }
+    MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+    assertThat(muleMessage, IsNull.nullValue());
+  }
 }

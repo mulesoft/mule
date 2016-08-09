@@ -6,9 +6,8 @@
  */
 
 /**
- * Contains Abstract classes providing common functionality for all <i>Mule</i> providers. Custom providers should use
- * these base classes as they provider almost all the functionality needed by <i>Mule</i> to interact with the
- * underlying technology.
+ * Contains Abstract classes providing common functionality for all <i>Mule</i> providers. Custom providers should use these base
+ * classes as they provider almost all the functionality needed by <i>Mule</i> to interact with the underlying technology.
  */
 @Deprecated
 package org.mule.compatibility.core.transport;

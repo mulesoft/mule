@@ -8,13 +8,12 @@ package org.mule.compatibility.core.transformer.simple;
 
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
-public class ResponseAppendTransformer extends StringAppendTransformer
-{
-    public static String APPEND_STRING = " response";
+public class ResponseAppendTransformer extends StringAppendTransformer {
 
-    public ResponseAppendTransformer()
-    {
-        super(APPEND_STRING);
-    }
+  public static String APPEND_STRING = " response";
+
+  public ResponseAppendTransformer() {
+    super(APPEND_STRING);
+  }
 
 }

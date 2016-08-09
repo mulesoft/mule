@@ -15,34 +15,31 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Serializes objects using XStream. This is equivelent of using the ObjectToXml and
- * XmlToObject except that there is no source or return type checking.
+ * Serializes objects using XStream. This is equivelent of using the ObjectToXml and XmlToObject except that there is no source or
+ * return type checking.
  */
-public class XStreamWireFormat extends TransformerPairWireFormat
-{
-    
-    public XStreamWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException
-    {
-        this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
-    }
+public class XStreamWireFormat extends TransformerPairWireFormat {
 
-    public XStreamWireFormat(String driverClassName, Map aliases, Set converters)
-        throws IllegalAccessException, InstantiationException, ClassNotFoundException
-    {
-        XmlToObject in = new XmlToObject();
-        in.setDriverClass(driverClassName);
-        in.setAliases(aliases);
-        in.setConverters(converters);
-        setInboundTransformer(in);
+  public XStreamWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
+  }
 
-        ObjectToXml out = new ObjectToXml();
-        out.setDriverClass(driverClassName);
-        out.setAliases(aliases);
-        out.setConverters(converters);
-        // TODO This is currently needed as a workaround for MULE-2881, this needs to
-        // be removed is this is not the solution to MULE-2881
-        out.setAcceptMuleMessage(true);
-        setOutboundTransformer(out);
-    }
+  public XStreamWireFormat(String driverClassName, Map aliases, Set converters)
+      throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    XmlToObject in = new XmlToObject();
+    in.setDriverClass(driverClassName);
+    in.setAliases(aliases);
+    in.setConverters(converters);
+    setInboundTransformer(in);
+
+    ObjectToXml out = new ObjectToXml();
+    out.setDriverClass(driverClassName);
+    out.setAliases(aliases);
+    out.setConverters(converters);
+    // TODO This is currently needed as a workaround for MULE-2881, this needs to
+    // be removed is this is not the solution to MULE-2881
+    out.setAcceptMuleMessage(true);
+    setOutboundTransformer(out);
+  }
 
 }

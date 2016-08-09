@@ -41,78 +41,75 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
-{
+public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private JmsConnector mockJmsConnector;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private FlowConstruct mockFlowConstruct;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private InboundEndpoint mockInboundEndpoint;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private JmsConnector mockJmsConnector;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private FlowConstruct mockFlowConstruct;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private InboundEndpoint mockInboundEndpoint;
 
-    @Test
-    public void testTopicReceiverShouldBeStartedOnlyInPrimaryNode() throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(true);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
-        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(false));
+  @Test
+  public void testTopicReceiverShouldBeStartedOnlyInPrimaryNode() throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(true);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    MultiConsumerJmsMessageReceiver messageReceiver =
+        new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(false));
+  }
+
+  @Test
+  public void testQueueReceiverShouldBeStartedInEveryNode() throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    MultiConsumerJmsMessageReceiver messageReceiver =
+        new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(true));
+  }
+
+  @Test
+  public void messageListenerNotSetTwiceOnMessageReceiver() throws Exception {
+    when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
+    when(mockJmsConnector.getNumberOfConsumers()).thenReturn(1);
+
+    MessageConsumer mockMessageConsumer = mock(TestMessageConsumer.class, CALLS_REAL_METHODS);
+    when(mockJmsConnector.getJmsSupport().createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(),
+                                                         anyString(), anyBoolean(), any(InboundEndpoint.class)))
+                                                             .thenReturn(mockMessageConsumer);
+    when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+    when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER))
+        .thenReturn(mock(MessageProcessingManager.class));
+    SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
+    retryPolicyTemplate.setMuleContext(mockJmsConnector.getMuleContext());
+    when(mockInboundEndpoint.getRetryPolicyTemplate()).thenReturn(retryPolicyTemplate);
+    when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY)).thenReturn("false");
+    when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY)).thenReturn(null);
+
+    MultiConsumerJmsMessageReceiver messageReceiver =
+        new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+    messageReceiver.initialise();
+    messageReceiver.doStart();
+    verify(mockMessageConsumer).setMessageListener(any(MessageListener.class));
+    reset(mockMessageConsumer);
+    messageReceiver.startSubReceivers();
+    verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
+  }
+
+  private abstract class TestMessageConsumer implements MessageConsumer {
+
+    private MessageListener messageListener;
+
+    @Override
+    public MessageListener getMessageListener() throws JMSException {
+      return messageListener;
     }
 
-    @Test
-    public void testQueueReceiverShouldBeStartedInEveryNode() throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
-        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        assertThat("receiver must be started only in primary node", messageReceiver.shouldConsumeInEveryNode(), is(true));
+    @Override
+    public void setMessageListener(MessageListener messageListener) throws JMSException {
+      this.messageListener = messageListener;
     }
-
-    @Test
-    public void messageListenerNotSetTwiceOnMessageReceiver() throws Exception
-    {
-        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
-        when(mockJmsConnector.getNumberOfConsumers()).thenReturn(1);
-
-        MessageConsumer mockMessageConsumer = mock(TestMessageConsumer.class, CALLS_REAL_METHODS);
-        when(mockJmsConnector.getJmsSupport()
-                    .createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(), anyBoolean(), any(InboundEndpoint.class)))
-                    .thenReturn(mockMessageConsumer);
-        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
-        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mock(MessageProcessingManager.class));
-        SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
-        retryPolicyTemplate.setMuleContext(mockJmsConnector.getMuleContext());
-        when(mockInboundEndpoint.getRetryPolicyTemplate()).thenReturn(retryPolicyTemplate);
-        when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY)).thenReturn("false");
-        when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY)).thenReturn(null);
-
-        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        messageReceiver.initialise();
-        messageReceiver.doStart();
-        verify(mockMessageConsumer).setMessageListener(any(MessageListener.class));
-        reset(mockMessageConsumer);
-        messageReceiver.startSubReceivers();
-        verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
-    }
-
-    private abstract class TestMessageConsumer implements MessageConsumer
-    {
-
-        private MessageListener messageListener;
-
-        @Override
-        public MessageListener getMessageListener() throws JMSException
-        {
-            return messageListener;
-        }
-
-        @Override
-        public void setMessageListener(MessageListener messageListener) throws JMSException
-        {
-            this.messageListener = messageListener;
-        }
-    }
+  }
 
 
 }

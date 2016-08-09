@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.test.core.context.notification.AbstractNotificationLogger;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 
-public class MessageProcessorNotificationLogger extends AbstractNotificationLogger<MessageProcessorNotification> implements MessageProcessorNotificationListener<MessageProcessorNotification>
-{
+public class MessageProcessorNotificationLogger extends AbstractNotificationLogger<MessageProcessorNotification>
+    implements MessageProcessorNotificationListener<MessageProcessorNotification> {
 
 }

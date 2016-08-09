@@ -11,15 +11,14 @@ import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 /**
  * Handler for sending an http response asynchronously
  */
-public interface HttpResponseReadyCallback
-{
+public interface HttpResponseReadyCallback {
 
-    /**
-     * method to send response to the client
-     *
-     * @param response http response content
-     * @param responseStatusCallback callback to be called if there's a failure while sending the response
-     */
-    void responseReady(HttpResponse response, ResponseStatusCallback responseStatusCallback);
+  /**
+   * method to send response to the client
+   *
+   * @param response http response content
+   * @param responseStatusCallback callback to be called if there's a failure while sending the response
+   */
+  void responseReady(HttpResponse response, ResponseStatusCallback responseStatusCallback);
 
 }

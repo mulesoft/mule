@@ -6,20 +6,19 @@
  */
 package org.mule.test.integration.transaction.xa;
 
-public interface TransactionalTestSetUp
-{
+public interface TransactionalTestSetUp {
 
-    /**
-     * Creates resources required by the test
-     *
-     * @throws Exception
-     */
-    void initialize() throws Exception;
+  /**
+   * Creates resources required by the test
+   *
+   * @throws Exception
+   */
+  void initialize() throws Exception;
 
-    /**
-     * Destroy resources created for the test
-     *
-     * @throws Exception
-     */
-    void finalice() throws Exception;
+  /**
+   * Destroy resources created for the test
+   *
+   * @throws Exception
+   */
+  void finalice() throws Exception;
 }

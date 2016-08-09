@@ -15,41 +15,33 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>FileContentsMuleMessageFactory</code> converts the
- * {@link InputStream}'s content into a <code>byte[]</code> as payload
+ * <code>FileContentsMuleMessageFactory</code> converts the {@link InputStream}'s content into a <code>byte[]</code> as payload
  * for the {@link MuleMessage}.
  */
-public class FileContentsMuleMessageFactory extends FileMuleMessageFactory
-{
+public class FileContentsMuleMessageFactory extends FileMuleMessageFactory {
 
-    @Override
-    protected Class<?>[] getSupportedTransportMessageTypes()
-    {
-        return new Class[]{InputStream.class, File.class};
+  @Override
+  protected Class<?>[] getSupportedTransportMessageTypes() {
+    return new Class[] {InputStream.class, File.class};
+  }
+
+  @Override
+  protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception {
+    InputStream inputStream = convertToInputStream(transportMessage);
+    byte[] payload = IOUtils.toByteArray(inputStream);
+    inputStream.close();
+    return payload;
+  }
+
+  private InputStream convertToInputStream(Object transportMessage) throws Exception {
+    InputStream stream = null;
+
+    if (transportMessage instanceof InputStream) {
+      stream = (InputStream) transportMessage;
+    } else if (transportMessage instanceof File) {
+      stream = new FileInputStream((File) transportMessage);
     }
 
-    @Override
-    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
-    {
-        InputStream inputStream = convertToInputStream(transportMessage);
-        byte[] payload = IOUtils.toByteArray(inputStream);
-        inputStream.close();
-        return payload;
-    }
-
-    private InputStream convertToInputStream(Object transportMessage) throws Exception
-    {
-        InputStream stream = null;
-
-        if (transportMessage instanceof InputStream)
-        {
-            stream = (InputStream) transportMessage;
-        }
-        else if (transportMessage instanceof File)
-        {
-            stream = new FileInputStream((File) transportMessage);
-        }
-
-        return stream;
-    }
+    return stream;
+  }
 }

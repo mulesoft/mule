@@ -11,29 +11,26 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import java.util.Collection;
 
 /**
- * A {@link XmlNamespaceInfoProvider} which provides a fixed set of {@link XmlNamespaceInfo}
- * instances obtained through the constructor
+ * A {@link XmlNamespaceInfoProvider} which provides a fixed set of {@link XmlNamespaceInfo} instances obtained through the
+ * constructor
  *
  * @since 4.0
  */
-public class StaticXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
-{
+public class StaticXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-    private final Collection<XmlNamespaceInfo> namespaceInfos;
+  private final Collection<XmlNamespaceInfo> namespaceInfos;
 
-    /**
-     * Creates a new instance
-     *
-     * @param namespaceInfos the {@link Collection} to be returned by {@link #getXmlNamespacesInfo()}
-     */
-    public StaticXmlNamespaceInfoProvider(Collection<XmlNamespaceInfo> namespaceInfos)
-    {
-        this.namespaceInfos = copyOf(namespaceInfos);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param namespaceInfos the {@link Collection} to be returned by {@link #getXmlNamespacesInfo()}
+   */
+  public StaticXmlNamespaceInfoProvider(Collection<XmlNamespaceInfo> namespaceInfos) {
+    this.namespaceInfos = copyOf(namespaceInfos);
+  }
 
-    @Override
-    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
-    {
-        return namespaceInfos;
-    }
+  @Override
+  public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
+    return namespaceInfos;
+  }
 }

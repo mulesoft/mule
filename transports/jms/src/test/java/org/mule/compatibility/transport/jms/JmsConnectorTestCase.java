@@ -49,267 +49,248 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
-public class JmsConnectorTestCase extends AbstractMuleContextTestCase
-{
-    private static final String CLIENT_ID1 = "client1";
-    private static final String CLIENT_ID2 = "client2";
+public class JmsConnectorTestCase extends AbstractMuleContextTestCase {
+
+  private static final String CLIENT_ID1 = "client1";
+  private static final String CLIENT_ID2 = "client2";
+
+  /**
+   * Tests that client ID is set on the connection if it is originally null.
+   */
+  @Test
+  public void testSetClientIDInConnectorForFirstTime() throws Exception {
+    final Connection connection = mock(Connection.class);
+    when(connection.getClientID()).thenReturn(null);
+
+    JmsSupport jmsSupport = mock(JmsSupport.class);
+    when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
+
+    JmsConnector connector = new JmsConnector(muleContext);
+    connector.setClientId(CLIENT_ID1);
+    connector.setJmsSupport(jmsSupport);
+
+    ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+    connector.setConnectionFactory(mockConnectionFactory);
+    Connection createdConnection = connector.createConnection();
+
+    assertEquals(connection, createdConnection);
+    verify(connection, times(1)).setClientID(Matchers.anyString());
+    verify(connection, times(1)).setClientID(CLIENT_ID1);
+  }
+
+  /**
+   * Tests that client ID is set on the connection if it has a different client ID.
+   */
+  @Test
+  public void testSetClientIDInConnectorForSecondTime() throws Exception {
+    final Connection connection = mock(Connection.class);
+    when(connection.getClientID()).thenReturn(CLIENT_ID1);
+
+    JmsSupport jmsSupport = mock(JmsSupport.class);
+    when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
+
+    JmsConnector connector = new JmsConnector(muleContext);
+    ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+    connector.setConnectionFactory(mockConnectionFactory);
+    connector.setClientId(CLIENT_ID2);
+    connector.setJmsSupport(jmsSupport);
+
+    Connection createdConnection = connector.createConnection();
+
+    assertEquals(connection, createdConnection);
+    verify(connection, times(1)).setClientID(Matchers.anyString());
+    verify(connection, times(1)).setClientID(CLIENT_ID2);
+  }
+
+  /**
+   * Tests that client ID is not set on the connection if it has the same client ID.
+   */
+  @Test
+  public void testSetClientIDInConnectionForFirstTime() throws Exception {
+    final Connection connection = mock(Connection.class);
+    when(connection.getClientID()).thenReturn(CLIENT_ID1);
+
+    JmsSupport jmsSupport = mock(JmsSupport.class);
+    when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
+
+    JmsConnector connector = new JmsConnector(muleContext);
+    connector.setClientId(CLIENT_ID1);
+    connector.setJmsSupport(jmsSupport);
+
+    ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+    connector.setConnectionFactory(mockConnectionFactory);
+    Connection createdConnection = connector.createConnection();
+
+    assertEquals(connection, createdConnection);
+    verify(connection, times(0)).setClientID(Matchers.anyString());
+  }
+
+  @Test
+  public void testClosesSessionIfThereIsNoActiveTransaction() throws Exception {
+    JmsConnector connector = new JmsConnector(muleContext);
+
+    Session session = mock(Session.class);
+    connector.closeSessionIfNoTransactionActive(session);
+    verify(session, times(1)).close();
+  }
+
+  @Test
+  public void testDoNotClosesSessionIfThereIsAnActiveTransaction() throws Exception {
+    Transaction transaction = mock(Transaction.class);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+
+    try {
+      JmsConnector connector = new JmsConnector(muleContext);
+
+      Session session = mock(Session.class);
+      connector.closeSessionIfNoTransactionActive(session);
+      verify(session, never()).close();
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
+    }
+  }
+
+  @Test
+  public void ignoreJmsExceptionOnStop() throws Exception {
+    Connection connection = mock(Connection.class);
+    doThrow(new JMSException("connection unavailable")).when(connection).stop();
+    JmsConnector connector = new JmsConnector(muleContext);
+    JmsConnector spy = spy(connector);
+    doReturn(connection).when(spy).createConnection();
+    spy.doConnect();
+    spy.doStop();
+    verify(connection, times(1)).stop();
+  }
+
+  @Test
+  public void ignoreAmqExceptionOnStop() throws Exception {
+    Connection connection = mock(Connection.class);
+    doThrow(new UndeclaredThrowableException(new Exception("connection unavailable"))).when(connection).stop();
+    JmsConnector connector = new JmsConnector(muleContext);
+    JmsConnector spy = spy(connector);
+    doReturn(connection).when(spy).createConnection();
+    spy.doConnect();
+    spy.doStop();
+    verify(connection, times(1)).stop();
+  }
+
+  @Test
+  public void doNotChangeConnectionFactoryWhenNotUsingXAConnectionFactory() throws Exception {
+    muleContext.setTransactionManager(mock(TransactionManager.class));
+    ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+    JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
+    assertThat(connector.getConnectionFactory(), instanceOf(CustomCachingConnectionFactory.class));
+    assertThat(((CachingConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
+               is(mockConnectionFactory));
+  }
+
+  @Test
+  public void doNotChangeConnectionFactoryWhenNotUsingTransactionManager() throws Exception {
+    ConnectionFactory mockConnectionFactory = mock(TestXAConnectionFactory.class);
+    JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
+    assertThat(connector.getConnectionFactory(), is(mockConnectionFactory));
+  }
+
+  @Test
+  public void createConnectionFactoryWrapperWhenUsingTransactionManager() throws Exception {
+    muleContext.setTransactionManager(mock(TransactionManager.class));
+    JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
+    assertThat(connector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
+  }
+
+  @Test
+  public void changesClassLoaderOnNotification() throws Exception {
+    /**
+     * Fetches a ClusterNodeNotificationListener added to a mock mule context
+     */
+    class NotificationAnswer implements Answer {
+
+      ClusterNodeNotificationListener listener;
+
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        listener = (ClusterNodeNotificationListener) invocation.getArguments()[0];
+        return null;
+      }
+
+      public ClusterNodeNotificationListener getListener() {
+        return listener;
+      }
+    };
 
     /**
-     * Tests that client ID is set on the connection if it is originally null.
+     * Validates the classloader used in connector's connect is the app classloader
      */
-    @Test
-    public void testSetClientIDInConnectorForFirstTime() throws Exception
-    {
-        final Connection connection = mock(Connection.class);
-        when(connection.getClientID()).thenReturn(null);
+    class ConnectClassLoaderCheckAnswer implements Answer {
 
-        JmsSupport jmsSupport = mock(JmsSupport.class);
-        when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
+      ClassLoader expectedClassLoader;
 
-        JmsConnector connector = new JmsConnector(muleContext);
-        connector.setClientId(CLIENT_ID1);
-        connector.setJmsSupport(jmsSupport);
+      public ConnectClassLoaderCheckAnswer(ClassLoader expectedClassLoader) {
+        this.expectedClassLoader = expectedClassLoader;
+      }
 
-        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
-        connector.setConnectionFactory(mockConnectionFactory);
-        Connection createdConnection = connector.createConnection();
-
-        assertEquals(connection, createdConnection);
-        verify(connection, times(1)).setClientID(Matchers.anyString());
-        verify(connection, times(1)).setClientID(CLIENT_ID1);
-    }
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        ClassLoader connectClassLoader = Thread.currentThread().getContextClassLoader();
+        assertThat(connectClassLoader, is(expectedClassLoader));
+        return null;
+      }
+    };
 
     /**
-     * Tests that client ID is set on the connection if it has a different client ID.
+     * On testing the muleContext.getExecutionClassLoader wont be different than the test thread. This is used to check the class
+     * loader is effectively changed when performing the connection
      */
-    @Test
-    public void testSetClientIDInConnectorForSecondTime() throws Exception
-    {
-        final Connection connection = mock(Connection.class);
-        when(connection.getClientID()).thenReturn(CLIENT_ID1);
+    ClassLoader expectedClassLoader = new ClassLoader() {
 
-        JmsSupport jmsSupport = mock(JmsSupport.class);
-        when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
+      String thismakesme = "different";
+    };
 
-        JmsConnector connector = new JmsConnector(muleContext);
-        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
-        connector.setConnectionFactory(mockConnectionFactory);
-        connector.setClientId(CLIENT_ID2);
-        connector.setJmsSupport(jmsSupport);
+    NotificationAnswer notificationAnswer = new NotificationAnswer();
+    MuleContext muleContextSpy = spy(muleContext);
+    doReturn(false).when(muleContextSpy).isPrimaryPollingInstance();
+    doReturn(expectedClassLoader).when(muleContextSpy).getExecutionClassLoader();
+    doAnswer(notificationAnswer).when(muleContextSpy).registerListener(any(ClusterNodeNotificationListener.class));
 
-        Connection createdConnection = connector.createConnection();
+    JmsConnector connectorSpy =
+        spy(createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class), muleContextSpy));
+    connectorSpy.setClientId("MyClientId");
+    connectorSpy.initialise();
+    connectorSpy.connect();
 
-        assertEquals(connection, createdConnection);
-        verify(connection, times(1)).setClientID(Matchers.anyString());
-        verify(connection, times(1)).setClientID(CLIENT_ID2);
-    }
+    // Next time we connect is called will be checked to be using expectedClassLoader
+    doAnswer(new ConnectClassLoaderCheckAnswer(expectedClassLoader)).when(connectorSpy).connect();
 
-    /**
-     * Tests that client ID is not set on the connection if it has the same client
-     * ID.
-     */
-    @Test
-    public void testSetClientIDInConnectionForFirstTime() throws Exception
-    {
-        final Connection connection = mock(Connection.class);
-        when(connection.getClientID()).thenReturn(CLIENT_ID1);
+    ClassLoader preNotificationClassLoader = Thread.currentThread().getContextClassLoader();
+    notificationAnswer.getListener().onNotification(mock(ClusterNodeNotification.class));
+    ClassLoader afterNotificationClassLoader = Thread.currentThread().getContextClassLoader();
 
-        JmsSupport jmsSupport = mock(JmsSupport.class);
-        when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
-        
-        JmsConnector connector = new JmsConnector(muleContext);
-        connector.setClientId(CLIENT_ID1);
-        connector.setJmsSupport(jmsSupport);
+    assertThat(preNotificationClassLoader, is(afterNotificationClassLoader));
+  }
 
-        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
-        connector.setConnectionFactory(mockConnectionFactory);
-        Connection createdConnection = connector.createConnection();
+  private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory)
+      throws JMSException, MuleException {
+    return createConnectionFactoryWhenGettingConnection(mockConnectionFactory, muleContext);
+  }
 
-        assertEquals(connection, createdConnection);
-        verify(connection, times(0)).setClientID(Matchers.anyString());
-    }
+  private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory,
+                                                                    MuleContext muleContext)
+      throws JMSException, MuleException {
+    final Connection connection = mock(Connection.class);
 
-    @Test
-    public void testClosesSessionIfThereIsNoActiveTransaction() throws Exception
-    {
-        JmsConnector connector = new JmsConnector(muleContext);
+    JmsSupport jmsSupport = mock(Jms11Support.class);
+    when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
 
-        Session session = mock(Session.class);
-        connector.closeSessionIfNoTransactionActive(session);
-        verify(session, times(1)).close();
-    }
+    JmsConnector connector = new JmsConnector(muleContext);
+    connector.setJmsSupport(jmsSupport);
 
-    @Test
-    public void testDoNotClosesSessionIfThereIsAnActiveTransaction() throws Exception
-    {
-        Transaction transaction = mock(Transaction.class);
-        TransactionCoordination.getInstance().bindTransaction(transaction);
+    connector.setName("testConnector");
+    connector.setConnectionFactory(mockConnectionFactory);
+    connector.createConnection();
+    return connector;
+  }
 
-        try
-        {
-            JmsConnector connector = new JmsConnector(muleContext);
-
-            Session session = mock(Session.class);
-            connector.closeSessionIfNoTransactionActive(session);
-            verify(session, never()).close();
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
-    }
-
-    @Test
-    public void ignoreJmsExceptionOnStop() throws Exception
-    {
-        Connection connection = mock(Connection.class);
-        doThrow(new JMSException("connection unavailable")).when(connection).stop();
-        JmsConnector connector = new JmsConnector(muleContext);
-        JmsConnector spy = spy(connector);
-        doReturn(connection).when(spy).createConnection();
-        spy.doConnect();
-        spy.doStop();
-        verify(connection, times(1)).stop();
-    }
-
-    @Test
-    public void ignoreAmqExceptionOnStop() throws Exception
-    {
-        Connection connection = mock(Connection.class);
-        doThrow(new UndeclaredThrowableException(new Exception("connection unavailable"))).when(connection).stop();
-        JmsConnector connector = new JmsConnector(muleContext);
-        JmsConnector spy = spy(connector);
-        doReturn(connection).when(spy).createConnection();
-        spy.doConnect();
-        spy.doStop();
-        verify(connection, times(1)).stop();
-    }
-
-    @Test
-    public void doNotChangeConnectionFactoryWhenNotUsingXAConnectionFactory() throws Exception
-    {
-        muleContext.setTransactionManager(mock(TransactionManager.class));
-        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
-        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
-        assertThat(connector.getConnectionFactory(), instanceOf(CustomCachingConnectionFactory.class));
-        assertThat(((CachingConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
-                   is(mockConnectionFactory));
-    }
-
-    @Test
-    public void doNotChangeConnectionFactoryWhenNotUsingTransactionManager() throws Exception
-    {
-        ConnectionFactory mockConnectionFactory = mock(TestXAConnectionFactory.class);
-        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
-        assertThat(connector.getConnectionFactory(), is(mockConnectionFactory));
-    }
-
-    @Test
-    public void createConnectionFactoryWrapperWhenUsingTransactionManager() throws Exception
-    {
-        muleContext.setTransactionManager(mock(TransactionManager.class));
-        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
-        assertThat(connector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
-    }
-    
-    @Test
-    public void changesClassLoaderOnNotification() throws Exception
-    {
-        /**
-         * Fetches a ClusterNodeNotificationListener added to a mock mule context
-         */
-        class NotificationAnswer implements Answer 
-        {
-            ClusterNodeNotificationListener listener;
-            
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable 
-            {
-                listener = (ClusterNodeNotificationListener) invocation.getArguments()[0];
-                return null;
-            }
-            
-            public ClusterNodeNotificationListener getListener()
-            {
-                return listener;
-            }
-        };
-
-        /**
-         * Validates the classloader used in connector's connect is the app classloader
-         */
-        class ConnectClassLoaderCheckAnswer implements Answer
-        {
-            ClassLoader expectedClassLoader;
-            
-            public ConnectClassLoaderCheckAnswer(ClassLoader expectedClassLoader)
-            {
-                  this.expectedClassLoader = expectedClassLoader;
-            }
-            
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                ClassLoader connectClassLoader = Thread.currentThread().getContextClassLoader();
-                assertThat(connectClassLoader, is(expectedClassLoader));
-                return null;
-            }
-        };
-
-        /**
-         * On testing the muleContext.getExecutionClassLoader wont be different than the test thread.
-         * This is used to check the class loader is effectively changed when performing the connection 
-         */
-        ClassLoader expectedClassLoader = new ClassLoader() 
-        {
-            String thismakesme = "different";
-        };
-        
-        NotificationAnswer notificationAnswer = new NotificationAnswer();
-        MuleContext muleContextSpy = spy(muleContext);
-        doReturn(false).when(muleContextSpy).isPrimaryPollingInstance();
-        doReturn(expectedClassLoader).when(muleContextSpy).getExecutionClassLoader();
-        doAnswer(notificationAnswer).when(muleContextSpy).registerListener(any(ClusterNodeNotificationListener.class));
-        
-        JmsConnector connectorSpy = spy(createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class),
-                muleContextSpy));
-        connectorSpy.setClientId("MyClientId");
-        connectorSpy.initialise();
-        connectorSpy.connect();
-
-        // Next time we connect is called will be checked to be using expectedClassLoader
-        doAnswer(new ConnectClassLoaderCheckAnswer(expectedClassLoader)).when(connectorSpy).connect();
-
-        ClassLoader preNotificationClassLoader = Thread.currentThread().getContextClassLoader();
-        notificationAnswer.getListener().onNotification(mock(ClusterNodeNotification.class));
-        ClassLoader afterNotificationClassLoader = Thread.currentThread().getContextClassLoader();
-
-        assertThat(preNotificationClassLoader, is(afterNotificationClassLoader));
-    }
-
-    private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory) throws JMSException, MuleException
-    {
-        return createConnectionFactoryWhenGettingConnection(mockConnectionFactory, muleContext);
-    }
-    
-    private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory, MuleContext muleContext) throws JMSException, MuleException
-    {
-        final Connection connection = mock(Connection.class);
-
-        JmsSupport jmsSupport = mock(Jms11Support.class);
-        when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
-
-        JmsConnector connector = new JmsConnector(muleContext);
-        connector.setJmsSupport(jmsSupport);
-
-        connector.setName("testConnector");
-        connector.setConnectionFactory(mockConnectionFactory);
-        connector.createConnection();
-        return connector;
-    }
-
-    private interface TestXAConnectionFactory extends ConnectionFactory, XAConnectionFactory
-    {
-    }
+  private interface TestXAConnectionFactory extends ConnectionFactory, XAConnectionFactory {
+  }
 
 }

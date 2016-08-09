@@ -17,16 +17,14 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class ExceptionsTestCase extends AbstractMuleContextTestCase
-{
+public class ExceptionsTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public final void testRoutingExceptionNullMessageValidEndpoint() throws Exception
-    {
-        OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
+  @Test
+  public final void testRoutingExceptionNullMessageValidEndpoint() throws Exception {
+    OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
 
-        RoutingException rex = new RoutingException(getTestEvent(""), endpoint);
-        assertSame(endpoint, rex.getRoute());
-    }
+    RoutingException rex = new RoutingException(getTestEvent(""), endpoint);
+    assertSame(endpoint, rex.getRoute());
+  }
 
 }

@@ -17,23 +17,20 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  * @since 4.0
  */
-public final class FtpRenameCommand extends ClassicFtpCommand implements RenameCommand
-{
+public final class FtpRenameCommand extends ClassicFtpCommand implements RenameCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FtpRenameCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
-    {
-        super(fileSystem, client);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FtpRenameCommand(ClassicFtpFileSystem fileSystem, FTPClient client) {
+    super(fileSystem, client);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite)
-    {
-        super.rename(config, filePath, newName, overwrite);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
+    super.rename(config, filePath, newName, overwrite);
+  }
 }

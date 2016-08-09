@@ -32,81 +32,75 @@ import java.util.List;
 
 import org.junit.Test;
 
-public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends FunctionalTestCase
-{
+public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends FunctionalTestCase {
 
-    // use legacy entry point resolver?
-    private boolean legacy;
+  // use legacy entry point resolver?
+  private boolean legacy;
 
-    protected AbstractScriptWithBindingsConfigBuilderTestCase()
-    {
-        this(false);
-    }
+  protected AbstractScriptWithBindingsConfigBuilderTestCase() {
+    this(false);
+  }
 
-    protected AbstractScriptWithBindingsConfigBuilderTestCase(boolean legacy)
-    {
-        this.legacy = legacy;
-    }
+  protected AbstractScriptWithBindingsConfigBuilderTestCase(boolean legacy) {
+    this.legacy = legacy;
+  }
 
-    @Test
-    public void testEndpointConfig() throws MuleException
-    {
-        // test that targets have been resolved on targets
-        ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint(
-                "waterMelonEndpoint");
-        assertNotNull(endpoint);
-        // aliases no longer possible
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+  @Test
+  public void testEndpointConfig() throws MuleException {
+    // test that targets have been resolved on targets
+    ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint("waterMelonEndpoint");
+    assertNotNull(endpoint);
+    // aliases no longer possible
+    assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(0);
-        assertNotNull(ep);
-        final List responseTransformers = ep.getResponseMessageProcessors();
-        assertNotNull(responseTransformers);
-        assertFalse(responseTransformers.isEmpty());
-        final Object responseTransformer = responseTransformers.get(0);
-        assertTrue(responseTransformer instanceof InterceptingChainLifecycleWrapper);
-        assertTrue(((InterceptingChainLifecycleWrapper) responseTransformer).getMessageProcessors().get(0) instanceof TestCompressionTransformer);
-    }
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+    ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(0);
+    assertNotNull(ep);
+    final List responseTransformers = ep.getResponseMessageProcessors();
+    assertNotNull(responseTransformers);
+    assertFalse(responseTransformers.isEmpty());
+    final Object responseTransformer = responseTransformers.get(0);
+    assertTrue(responseTransformer instanceof InterceptingChainLifecycleWrapper);
+    assertTrue(((InterceptingChainLifecycleWrapper) responseTransformer).getMessageProcessors()
+        .get(0) instanceof TestCompressionTransformer);
+  }
 
-    @Test
-    public void testBindingConfig()
-    {
-        // test outbound message router
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        assertNotNull(flow.getMessageProcessors().get(0));
-        assertTrue((flow.getMessageProcessors().get(0) instanceof JavaComponent));
-        List<InterfaceBinding> bindings = ((JavaWithBindingsComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings();
-        assertNotNull(bindings);
+  @Test
+  public void testBindingConfig() {
+    // test outbound message router
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+    assertNotNull(flow.getMessageProcessors().get(0));
+    assertTrue((flow.getMessageProcessors().get(0) instanceof JavaComponent));
+    List<InterfaceBinding> bindings = ((JavaWithBindingsComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings();
+    assertNotNull(bindings);
 
-        assertEquals(2, bindings.size());
-        // check first Router
-        InterfaceBinding route1 = bindings.get(0);
-        assertEquals(FruitCleaner.class, route1.getInterface());
-        assertEquals("wash", route1.getMethod());
-        assertNotNull(route1.getEndpoint());
-        // check second Router
-        InterfaceBinding route2 = bindings.get(1);
-        assertEquals(FruitCleaner.class, route2.getInterface());
-        assertEquals("polish", route2.getMethod());
-        assertNotNull(route1.getEndpoint());
-    }
+    assertEquals(2, bindings.size());
+    // check first Router
+    InterfaceBinding route1 = bindings.get(0);
+    assertEquals(FruitCleaner.class, route1.getInterface());
+    assertEquals("wash", route1.getMethod());
+    assertNotNull(route1.getEndpoint());
+    // check second Router
+    InterfaceBinding route2 = bindings.get(1);
+    assertEquals(FruitCleaner.class, route2.getInterface());
+    assertEquals("polish", route2.getMethod());
+    assertNotNull(route1.getEndpoint());
+  }
 
-    @Test
-    public void testExceptionStrategy()
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        assertNotNull(flow.getExceptionListener());
+  @Test
+  public void testExceptionStrategy() {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+    assertNotNull(flow.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().size() > 0);
-        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().get(0);
+    assertTrue(((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().size() > 0);
+    OutboundEndpoint ep =
+        (OutboundEndpoint) ((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().get(0);
 
-        assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
-    }
+    assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
+  }
 
 
-    private static EndpointFactory getEndpointFactory(MuleContext muleContext)
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  private static EndpointFactory getEndpointFactory(MuleContext muleContext) {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

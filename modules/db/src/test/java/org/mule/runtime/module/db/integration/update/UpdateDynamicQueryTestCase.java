@@ -25,34 +25,29 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateDynamicQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateDynamicQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public UpdateDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-dynamic-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-dynamic-query-config.xml"};
+  }
 
-    @Test
-    public void usesDynamicQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("updateDynamicQuery").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesDynamicQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("updateDynamicQuery").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), equalTo(1));
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), equalTo(1));
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 }

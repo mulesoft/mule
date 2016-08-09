@@ -17,90 +17,77 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates a client socket using the socket address extracted from the endpoint.  Addtional
- * socket parameters will also be set from the connector
+ * Creates a client socket using the socket address extracted from the endpoint. Addtional socket parameters will also be set from
+ * the connector
  */
-public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFactory
-{
+public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFactory {
 
-    /**
-     * logger used by this class
-     */
-    private static final Logger logger = LoggerFactory.getLogger(TcpSocketFactory.class);
+  /**
+   * logger used by this class
+   */
+  private static final Logger logger = LoggerFactory.getLogger(TcpSocketFactory.class);
 
-    private int connectionTimeout = Connector.INT_VALUE_NOT_SET;
+  private int connectionTimeout = Connector.INT_VALUE_NOT_SET;
 
-    @Override
-    public Object makeObject(Object key) throws Exception
-    {
-        TcpSocketKey socketKey = (TcpSocketKey) key;
+  @Override
+  public Object makeObject(Object key) throws Exception {
+    TcpSocketKey socketKey = (TcpSocketKey) key;
 
-        Socket socket = createSocket(socketKey);
-        socket.setReuseAddress(true);
+    Socket socket = createSocket(socketKey);
+    socket.setReuseAddress(true);
 
-        TcpConnector connector = socketKey.getConnector();
-        connector.configureSocket(TcpConnector.CLIENT, socket);
+    TcpConnector connector = socketKey.getConnector();
+    connector.configureSocket(TcpConnector.CLIENT, socket);
 
-        return socket;
+    return socket;
+  }
+
+  protected abstract Socket createSocket(TcpSocketKey key) throws IOException;
+
+  @Override
+  public void destroyObject(Object key, Object object) throws Exception {
+    Socket socket = (Socket) object;
+    if (!socket.isClosed()) {
+      socket.close();
     }
+  }
 
-    protected abstract Socket createSocket(TcpSocketKey key) throws IOException;
+  @Override
+  public boolean validateObject(Object key, Object object) {
+    Socket socket = (Socket) object;
+    return !socket.isClosed();
+  }
 
-    @Override
-    public void destroyObject(Object key, Object object) throws Exception
-    {
-        Socket socket = (Socket) object;
-        if(!socket.isClosed())
-        {
-            socket.close();
+  @Override
+  public void activateObject(Object key, Object object) throws Exception {
+    // cannot really activate a Socket
+  }
+
+  @Override
+  public void passivateObject(Object key, Object object) throws Exception {
+    TcpSocketKey socketKey = (TcpSocketKey) key;
+
+    boolean keepSocketOpen =
+        MapUtils.getBooleanValue(socketKey.getEndpoint().getProperties(), TcpConnector.KEEP_SEND_SOCKET_OPEN_PROPERTY,
+                                 socketKey.getConnector().isKeepSendSocketOpen());
+    Socket socket = (Socket) object;
+
+    if (!keepSocketOpen) {
+      try {
+        if (socket != null) {
+          socket.close();
         }
+      } catch (IOException e) {
+        logger.debug("Failed to close socket after dispatch: " + e.getMessage());
+      }
     }
+  }
 
-    @Override
-    public boolean validateObject(Object key, Object object)
-    {
-        Socket socket = (Socket) object;
-        return !socket.isClosed();
-    }
+  public int getConnectionTimeout() {
+    return connectionTimeout;
+  }
 
-    @Override
-    public void activateObject(Object key, Object object) throws Exception
-    {
-        // cannot really activate a Socket
-    }
-
-    @Override
-    public void passivateObject(Object key, Object object) throws Exception
-    {
-        TcpSocketKey socketKey = (TcpSocketKey) key;
-
-        boolean keepSocketOpen = MapUtils.getBooleanValue(socketKey.getEndpoint().getProperties(),
-            TcpConnector.KEEP_SEND_SOCKET_OPEN_PROPERTY, socketKey.getConnector().isKeepSendSocketOpen());
-        Socket socket = (Socket) object;
-
-        if (!keepSocketOpen)
-        {
-            try
-            {
-                if (socket != null)
-                {
-                    socket.close();
-                }
-            }
-            catch (IOException e)
-            {
-                logger.debug("Failed to close socket after dispatch: " + e.getMessage());
-            }
-        }
-    }
-
-    public int getConnectionTimeout()
-    {
-        return connectionTimeout;
-    }
-
-    public void setConnectionTimeout(int connectionTimeout)
-    {
-        this.connectionTimeout = connectionTimeout;
-    }
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
 }

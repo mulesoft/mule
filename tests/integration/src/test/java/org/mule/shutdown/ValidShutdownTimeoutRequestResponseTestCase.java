@@ -18,72 +18,62 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("See MULE-9200")
-public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
-{
-    @Rule
-    public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
+public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase {
 
-    @Override
-    protected boolean isGracefulShutdown()
-    {
-        return true;
-    }
+  @Rule
+  public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "shutdown-timeout-request-response-config.xml";
-    }
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
 
-    @Test
-    public void testStaticComponent() throws Exception
-    {
-        doShutDownTest("staticComponentResponse", "http://localhost:" + httpPort.getNumber() + "/staticComponent");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "shutdown-timeout-request-response-config.xml";
+  }
 
-    @Test
-    public void testScriptComponent() throws Exception
-    {
-        doShutDownTest("scriptComponentResponse", "http://localhost:" + httpPort.getNumber() + "/scriptComponent");
-    }
+  @Test
+  public void testStaticComponent() throws Exception {
+    doShutDownTest("staticComponentResponse", "http://localhost:" + httpPort.getNumber() + "/staticComponent");
+  }
 
-    @Test
-    public void testExpressionTransformer() throws Exception
-    {
-        doShutDownTest("expressionTransformerResponse", "http://localhost:" + httpPort.getNumber() + "/expressionTransformer");
-    }
+  @Test
+  public void testScriptComponent() throws Exception {
+    doShutDownTest("scriptComponentResponse", "http://localhost:" + httpPort.getNumber() + "/scriptComponent");
+  }
 
-    private void doShutDownTest(final String payload, final String url) throws MuleException, InterruptedException
-    {
-        final MuleClient client = muleContext.getClient();
-        final boolean[] results = new boolean[] {false};
+  @Test
+  public void testExpressionTransformer() throws Exception {
+    doShutDownTest("expressionTransformerResponse", "http://localhost:" + httpPort.getNumber() + "/expressionTransformer");
+  }
 
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
-                    MuleMessage result = client.send(url, muleMessage);
-                    results[0] = payload.equals(getPayloadAsString(result));
-                }
-                catch (Exception e)
-                {
-                    // Ignore
-                }
-            }
-        };
-        t.start();
+  private void doShutDownTest(final String payload, final String url) throws MuleException, InterruptedException {
+    final MuleClient client = muleContext.getClient();
+    final boolean[] results = new boolean[] {false};
 
-        // Make sure to give the request enough time to get to the waiting portion of the feed.
-        waitLatch.await();
+    Thread t = new Thread() {
 
-        muleContext.stop();
+      @Override
+      public void run() {
+        try {
+          MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
+          MuleMessage result = client.send(url, muleMessage);
+          results[0] = payload.equals(getPayloadAsString(result));
+        } catch (Exception e) {
+          // Ignore
+        }
+      }
+    };
+    t.start();
 
-        t.join();
+    // Make sure to give the request enough time to get to the waiting portion of the feed.
+    waitLatch.await();
 
-        assertTrue("Was not able to process message ", results[0]);
-    }
+    muleContext.stop();
+
+    t.join();
+
+    assertTrue("Was not able to process message ", results[0]);
+  }
 }

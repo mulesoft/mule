@@ -18,27 +18,26 @@ import java.util.List;
 /**
  * Executes bulk queries against a database
  */
-public interface BulkExecutor
-{
+public interface BulkExecutor {
 
-    /**
-     * Executes a bulk query
-     *
-     * @param connection connection to the database where the query will be executed. Non null
-     * @param bulkQuery contains a group of non parameterized queries to execute
-     * @return a non null result of the query execution
-     * @throws SQLException if a database access error occurs or this method is called on a closed connection
-     */
-    Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException;
+  /**
+   * Executes a bulk query
+   *
+   * @param connection connection to the database where the query will be executed. Non null
+   * @param bulkQuery contains a group of non parameterized queries to execute
+   * @return a non null result of the query execution
+   * @throws SQLException if a database access error occurs or this method is called on a closed connection
+   */
+  Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException;
 
-    /**
-     * Executes a parameterized query using a bulk of parameter sets
-     *
-     * @param connection connection to the database where the query will be executed. Non null
-     * @param query parameterized query to executed using the sets of parameters
-     * @param paramValues parameters to use to execute the query
-     * @return a non null result of the query execution
-     * @throws SQLException if a database access error occurs or this method is called on a closed connection
-     */
-    Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException;
+  /**
+   * Executes a parameterized query using a bulk of parameter sets
+   *
+   * @param connection connection to the database where the query will be executed. Non null
+   * @param query parameterized query to executed using the sets of parameters
+   * @param paramValues parameters to use to execute the query
+   * @return a non null result of the query execution
+   * @throws SQLException if a database access error occurs or this method is called on a closed connection
+   */
+  Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException;
 }

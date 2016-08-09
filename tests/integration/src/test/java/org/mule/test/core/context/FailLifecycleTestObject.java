@@ -10,38 +10,32 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
-public class FailLifecycleTestObject implements Initialisable, Disposable
-{
+public class FailLifecycleTestObject implements Initialisable, Disposable {
 
-    private static boolean initInvoked = false;
-    private static boolean disposeInvoked = false;
+  private static boolean initInvoked = false;
+  private static boolean disposeInvoked = false;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initInvoked = true;
-        throw new InitialisationException(new RuntimeException(), this);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    initInvoked = true;
+    throw new InitialisationException(new RuntimeException(), this);
+  }
 
-    @Override
-    public void dispose()
-    {
-        disposeInvoked = true;
-    }
+  @Override
+  public void dispose() {
+    disposeInvoked = true;
+  }
 
-    public static boolean isInitInvoked()
-    {
-        return initInvoked;
-    }
+  public static boolean isInitInvoked() {
+    return initInvoked;
+  }
 
-    public static boolean isDisposeInvoked()
-    {
-        return disposeInvoked;
-    }
+  public static boolean isDisposeInvoked() {
+    return disposeInvoked;
+  }
 
-    public static void setup()
-    {
-        initInvoked = false;
-        disposeInvoked = false;
-    }
+  public static void setup() {
+    initInvoked = false;
+    disposeInvoked = false;
+  }
 }

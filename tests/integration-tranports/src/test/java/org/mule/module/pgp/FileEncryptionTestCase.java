@@ -18,51 +18,46 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class FileEncryptionTestCase extends FunctionalTestCase
-{
-    public String testFolder;
+public class FileEncryptionTestCase extends FunctionalTestCase {
 
-    private Prober prober = new PollingProber(30000, 100);
+  public String testFolder;
 
-    public FileEncryptionTestCase()
-    {
-        setStartContext(false);
-    }
+  private Prober prober = new PollingProber(30000, 100);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/pgp/file-encryption-config.xml";
-    }
+  public FileEncryptionTestCase() {
+    setStartContext(false);
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        testFolder = getFileInsideWorkingDirectory("testData").getAbsolutePath();
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/pgp/file-encryption-config.xml";
+  }
 
-    private File createTestFile(String folder) throws IOException
-    {
-        File testFolder = new File(folder);
-        testFolder.mkdirs();
-        prober.check(new FileExists(testFolder));
+  @Override
+  protected void doSetUp() throws Exception {
+    testFolder = getFileInsideWorkingDirectory("testData").getAbsolutePath();
+  }
 
-        File target = File.createTempFile("mule-file-test-", ".txt", testFolder);
-        target.deleteOnExit();
-        FileUtils.writeStringToFile(target, "TEST");
-        prober.check(new FileExists(target));
+  private File createTestFile(String folder) throws IOException {
+    File testFolder = new File(folder);
+    testFolder.mkdirs();
+    prober.check(new FileExists(testFolder));
 
-        return target;
-    }
+    File target = File.createTempFile("mule-file-test-", ".txt", testFolder);
+    target.deleteOnExit();
+    FileUtils.writeStringToFile(target, "TEST");
+    prober.check(new FileExists(target));
 
-    @Test
-    public void testName() throws Exception
-    {
-        final File target = createTestFile(testFolder);
+    return target;
+  }
 
-        // Starts file endpoint polling
-        muleContext.start();
+  @Test
+  public void testName() throws Exception {
+    final File target = createTestFile(testFolder);
 
-        prober.check(new FileDoesNotExists(target));
-    }
+    // Starts file endpoint polling
+    muleContext.start();
+
+    prober.check(new FileDoesNotExists(target));
+  }
 }

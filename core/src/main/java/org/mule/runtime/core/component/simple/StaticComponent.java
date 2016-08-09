@@ -15,92 +15,73 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.IOException;
 
 /**
- * A service that will return a static data object as a result. This is useful for
- * testing with expected results. The data returned can be read from a file or set as
- * a property on this service.
+ * A service that will return a static data object as a result. This is useful for testing with expected results. The data
+ * returned can be read from a file or set as a property on this service.
  */
-public class StaticComponent implements Callable, Initialisable
-{
+public class StaticComponent implements Callable, Initialisable {
 
-    private Object data;
-    private String dataFile;
-    private String prefix;
-    private String postfix;
+  private Object data;
+  private String dataFile;
+  private String prefix;
+  private String postfix;
 
-    public void initialise() throws InitialisationException
-    {
-        if (dataFile != null)
-        {
-            try
-            {
-                data = IOUtils.getResourceAsString(dataFile, getClass());
-            }
-            catch (IOException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
+  public void initialise() throws InitialisationException {
+    if (dataFile != null) {
+      try {
+        data = IOUtils.getResourceAsString(dataFile, getClass());
+      } catch (IOException e) {
+        throw new InitialisationException(e, this);
+      }
+    }
+  }
+
+  public Object getData() {
+    return data;
+  }
+
+  public void setData(Object data) {
+    this.data = data;
+  }
+
+  public String getDataFile() {
+    return dataFile;
+  }
+
+  public void setDataFile(String dataFile) {
+    this.dataFile = dataFile;
+  }
+
+  public String getPrefix() {
+    return prefix;
+  }
+
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
+  }
+
+  public String getPostfix() {
+    return postfix;
+  }
+
+  public void setPostfix(String postfix) {
+    this.postfix = postfix;
+  }
+
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    if (data != null) {
+      return data;
     }
 
-    public Object getData()
-    {
-        return data;
+    String eventData = eventContext.transformMessageToString();
+
+    if (prefix != null) {
+      eventData = prefix + eventData;
     }
 
-    public void setData(Object data)
-    {
-        this.data = data;
+    if (postfix != null) {
+      eventData += postfix;
     }
 
-    public String getDataFile()
-    {
-        return dataFile;
-    }
-
-    public void setDataFile(String dataFile)
-    {
-        this.dataFile = dataFile;
-    }
-
-    public String getPrefix()
-    {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix)
-    {
-        this.prefix = prefix;
-    }
-
-    public String getPostfix()
-    {
-        return postfix;
-    }
-
-    public void setPostfix(String postfix)
-    {
-        this.postfix = postfix;
-    }
-
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        if (data != null)
-        {
-            return data;
-        }
-
-        String eventData = eventContext.transformMessageToString();
-
-        if (prefix != null)
-        {
-            eventData = prefix + eventData;
-        }
-
-        if (postfix != null)
-        {
-            eventData += postfix;
-        }
-
-        return eventData;
-    }
+    return eventData;
+  }
 }

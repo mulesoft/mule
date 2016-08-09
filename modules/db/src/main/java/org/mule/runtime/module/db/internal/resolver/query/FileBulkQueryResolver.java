@@ -16,29 +16,23 @@ import java.io.IOException;
 /**
  * Resolves a bulk query reading the queries from a file
  */
-public class FileBulkQueryResolver extends AbstractBulkQueryResolver
-{
+public class FileBulkQueryResolver extends AbstractBulkQueryResolver {
 
-    private final String file;
-    private final FileReader fileReader;
+  private final String file;
+  private final FileReader fileReader;
 
-    public FileBulkQueryResolver(String file, QueryTemplateParser queryTemplateParser, FileReader fileReader)
-    {
-        super(null, queryTemplateParser);
-        this.file = file;
-        this.fileReader = fileReader;
+  public FileBulkQueryResolver(String file, QueryTemplateParser queryTemplateParser, FileReader fileReader) {
+    super(null, queryTemplateParser);
+    this.file = file;
+    this.fileReader = fileReader;
+  }
+
+  @Override
+  protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
+    try {
+      return fileReader.getResourceAsString(file);
+    } catch (IOException e) {
+      throw new QueryResolutionException("Unable to read bulk query file: " + file);
     }
-
-    @Override
-    protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery)
-    {
-        try
-        {
-            return fileReader.getResourceAsString(file);
-        }
-        catch (IOException e)
-        {
-            throw new QueryResolutionException("Unable to read bulk query file: " + file);
-        }
-    }
+  }
 }

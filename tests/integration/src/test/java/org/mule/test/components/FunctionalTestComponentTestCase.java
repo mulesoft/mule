@@ -18,58 +18,49 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FunctionalTestComponentTestCase extends AbstractMuleTestCase
-{
-    FunctionalTestComponent ftc;
-    
-    @Before
-    public void initFunctionaTestComponent()
-    {
-        ftc = new FunctionalTestComponent();
-        ftc.setThrowException(true);
-    }
-    
-    @Test
-    public void defaultExceptionWithDefaultText() throws Exception
-    {
-        checkExceptionThrown(FunctionalTestException.class, FunctionalTestException.EXCEPTION_MESSAGE);
-    }
-    
-    @Test
-    public void defaultExceptionWithCustomText() throws Exception
-    {
-        String exceptionText = "BOOM";
-        ftc.setExceptionText(exceptionText);
-        
-        checkExceptionThrown(FunctionalTestException.class, exceptionText);
-    }
-    
-    @Test
-    public void customExceptionWithoutText() throws Exception
-    {
-        ftc.setExceptionToThrow(IOException.class);
-        checkExceptionThrown(IOException.class, null);
-    }
+public class FunctionalTestComponentTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void customExceptionWithCustomText() throws Exception
-    {
-        String exceptionText = "BOOM";
-        ftc.setExceptionToThrow(IOException.class);
-        ftc.setExceptionText(exceptionText);
-        checkExceptionThrown(IOException.class, exceptionText);
-    }
+  FunctionalTestComponent ftc;
 
-    private void checkExceptionThrown(Class<? extends Exception> exceptionClass, String expectedMessage)
-    {
-        try
-        {
-            ftc.onCall(null);
-        }
-        catch (Exception e)
-        {
-            assertTrue(e.getClass().isAssignableFrom(exceptionClass));
-            assertEquals(expectedMessage, e.getMessage());
-        }
+  @Before
+  public void initFunctionaTestComponent() {
+    ftc = new FunctionalTestComponent();
+    ftc.setThrowException(true);
+  }
+
+  @Test
+  public void defaultExceptionWithDefaultText() throws Exception {
+    checkExceptionThrown(FunctionalTestException.class, FunctionalTestException.EXCEPTION_MESSAGE);
+  }
+
+  @Test
+  public void defaultExceptionWithCustomText() throws Exception {
+    String exceptionText = "BOOM";
+    ftc.setExceptionText(exceptionText);
+
+    checkExceptionThrown(FunctionalTestException.class, exceptionText);
+  }
+
+  @Test
+  public void customExceptionWithoutText() throws Exception {
+    ftc.setExceptionToThrow(IOException.class);
+    checkExceptionThrown(IOException.class, null);
+  }
+
+  @Test
+  public void customExceptionWithCustomText() throws Exception {
+    String exceptionText = "BOOM";
+    ftc.setExceptionToThrow(IOException.class);
+    ftc.setExceptionText(exceptionText);
+    checkExceptionThrown(IOException.class, exceptionText);
+  }
+
+  private void checkExceptionThrown(Class<? extends Exception> exceptionClass, String expectedMessage) {
+    try {
+      ftc.onCall(null);
+    } catch (Exception e) {
+      assertTrue(e.getClass().isAssignableFrom(exceptionClass));
+      assertEquals(expectedMessage, e.getMessage());
     }
+  }
 }

@@ -36,287 +36,228 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * An event used for outbound routing tests. It is not fully fleshed out, containing only the information
- * needed for routing.
+ * An event used for outbound routing tests. It is not fully fleshed out, containing only the information needed for routing.
  */
-public class OutboundRoutingTestEvent implements MuleEvent
-{
-    private MuleMessage message;
-    private MuleSession session;
-    private String id = UUID.getUUID();
-    private boolean stopFurtherProcessing;
-    int timeout = -1;
-    private InboundEndpoint endpoint;
+public class OutboundRoutingTestEvent implements MuleEvent {
 
-    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext)
-        throws Exception
-    {
-        this.message = message;
-        this.session = session;
-        this.endpoint = MuleEndpointTestUtils.getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                muleContext);
+  private MuleMessage message;
+  private MuleSession session;
+  private String id = UUID.getUUID();
+  private boolean stopFurtherProcessing;
+  int timeout = -1;
+  private InboundEndpoint endpoint;
+
+  public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext) throws Exception {
+    this.message = message;
+    this.session = session;
+    this.endpoint = MuleEndpointTestUtils.getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+  }
+
+  @Override
+  public MuleMessage getMessage() {
+    return message;
+  }
+
+  @Override
+  public MuleSession getSession() {
+    return session;
+  }
+
+  @Override
+  public Credentials getCredentials() {
+    return null;
+  }
+
+  @Override
+  public byte[] getMessageAsBytes() throws MuleException {
+    try {
+      return (byte[]) getMuleContext().getTransformationService().transform(message, DataType.BYTE_ARRAY).getPayload();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
     }
+  }
 
-    @Override
-    public MuleMessage getMessage()
-    {
-        return message;
+  @Override
+  public String getMessageAsString() throws MuleException {
+    try {
+      return (String) getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
     }
+  }
 
-    @Override
-    public MuleSession getSession()
-    {
-        return session;
+  @Override
+  public String getMessageAsString(Charset encoding) throws MuleException {
+    try {
+      return (String) getMuleContext().getTransformationService()
+          .transform(message, DataType.builder().type(String.class).charset(encoding).build()).getPayload();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
     }
+  }
 
-    @Override
-    public Credentials getCredentials()
-    {
-        return null;
+  @Override
+  public <T> T transformMessage(Class<T> outputType) throws TransformerException {
+    return (T) transformMessage(DataType.fromType(outputType));
+  }
+
+  @Override
+  public Object transformMessage(DataType outputType) throws TransformerException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String transformMessageToString() throws TransformerException {
+    return new String((byte[]) transformMessage(DataType.BYTE_ARRAY),
+                      message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
+  }
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public boolean isStopFurtherProcessing() {
+    return stopFurtherProcessing;
+  }
+
+  @Override
+  public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
+    this.stopFurtherProcessing = stopFurtherProcessing;
+  }
+
+  @Override
+  public int getTimeout() {
+    return timeout;
+  }
+
+  @Override
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    return null;
+  }
+
+  @Override
+  public MuleContext getMuleContext() {
+    return null;
+  }
+
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    try {
+      return MuleTestUtils.getTestFlow(endpoint.getMuleContext());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public byte[] getMessageAsBytes() throws MuleException
-    {
-        try
-        {
-            return (byte[]) getMuleContext().getTransformationService().transform(message, DataType.BYTE_ARRAY).getPayload();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
-    }
+  @Override
+  public ProcessingTime getProcessingTime() {
+    return null;
+  }
 
-    @Override
-    public String getMessageAsString() throws MuleException
-    {
-        try
-        {
-            return (String) getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
-    }
+  @Override
+  public MessageExchangePattern getExchangePattern() {
+    return endpoint.getExchangePattern();
+  }
 
-    @Override
-    public String getMessageAsString(Charset encoding) throws MuleException
-    {
-        try
-        {
-            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder().type(String.class).charset(encoding).build()).getPayload();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
-    }
+  @Override
+  public boolean isTransacted() {
+    return false;
+  }
 
-    @Override
-    public <T> T transformMessage(Class<T> outputType) throws TransformerException
-    {
-        return (T) transformMessage(DataType.fromType(outputType));
-    }
+  @Override
+  public URI getMessageSourceURI() {
+    return URI.create("test://test");
+  }
 
-    @Override
-    public Object transformMessage(DataType outputType) throws TransformerException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public String getMessageSourceName() {
+    return "test";
+  }
 
-    @Override
-    public String transformMessageToString() throws TransformerException
-    {
-        return new String((byte[]) transformMessage(DataType.BYTE_ARRAY), message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
-    }
+  @Override
+  public ReplyToHandler getReplyToHandler() {
+    return null;
+  }
 
-    @Override
-    public String getId()
-    {
-        return id;
-    }
+  @Override
+  public Object getReplyToDestination() {
+    return null;
+  }
 
-    @Override
-    public boolean isStopFurtherProcessing()
-    {
-        return stopFurtherProcessing;
-    }
+  @Override
+  public boolean isSynchronous() {
+    return false;
+  }
 
-    @Override
-    public void setStopFurtherProcessing(boolean stopFurtherProcessing)
-    {
-        this.stopFurtherProcessing = stopFurtherProcessing;
-    }
+  @Override
+  public void setMessage(MuleMessage message) {}
 
-    @Override
-    public int getTimeout()
-    {
-        return timeout;
-    }
+  @Override
+  public DataType getFlowVariableDataType(String key) {
+    return null;
+  }
 
-    @Override
-    public void setTimeout(int timeout)
-    {
-        this.timeout = timeout;
-    }
+  @Override
+  public Object getFlowVariable(String key) {
+    return null;
+  }
 
-    @Override
-    public OutputStream getOutputStream()
-    {
-        return null;
-    }
+  @Override
+  public void setFlowVariable(String key, Object value) {}
 
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return null;
-    }
+  @Override
+  public void setFlowVariable(String key, Object value, DataType dataType) {
 
-    @Override
-    public FlowConstruct getFlowConstruct()
-    {
-        try
-        {
-            return MuleTestUtils.getTestFlow(endpoint.getMuleContext());
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+  }
 
-    @Override
-    public ProcessingTime getProcessingTime()
-    {
-        return null;
-    }
+  @Override
+  public void removeFlowVariable(String key) {}
 
-    @Override
-    public MessageExchangePattern getExchangePattern()
-    {
-        return endpoint.getExchangePattern();
-    }
+  @Override
+  public Set<String> getFlowVariableNames() {
+    return new HashSet<>();
+  }
 
-    @Override
-    public boolean isTransacted()
-    {
-        return false;
-    }
+  @Override
+  public void clearFlowVariables() {}
 
-    @Override
-    public URI getMessageSourceURI()
-    {
-        return URI.create("test://test");
-    }
+  @Override
+  public boolean isNotificationsEnabled() {
+    return true;
+  }
 
-    @Override
-    public String getMessageSourceName()
-    {
-        return "test";
-    }
+  @Override
+  public void setEnableNotifications(boolean enabled) {}
 
-    @Override
-    public ReplyToHandler getReplyToHandler()
-    {
-        return null;
-    }
+  @Override
+  public boolean isAllowNonBlocking() {
+    return false;
+  }
 
-    @Override
-    public Object getReplyToDestination()
-    {
-        return null;
-    }
+  @Override
+  public FlowCallStack getFlowCallStack() {
+    return null;
+  }
 
-    @Override
-    public boolean isSynchronous()
-    {
-        return false;
-    }
+  @Override
+  public ProcessorsTrace getProcessorsTrace() {
+    return null;
+  }
 
-    @Override
-    public void setMessage(MuleMessage message)
-    {
-    }
+  @Override
+  public SecurityContext getSecurityContext() {
+    return null;
+  }
 
-    @Override
-    public DataType getFlowVariableDataType(String key)
-    {
-        return null;
-    }
+  @Override
+  public void setSecurityContext(SecurityContext context) {
 
-    @Override
-    public Object getFlowVariable(String key)
-    {
-        return null;
-    }
-
-    @Override
-    public void setFlowVariable(String key, Object value)
-    {
-    }
-
-    @Override
-    public void setFlowVariable(String key, Object value, DataType dataType)
-    {
-
-    }
-
-    @Override
-    public void removeFlowVariable(String key)
-    {
-    }
-
-    @Override
-    public Set<String> getFlowVariableNames()
-    {
-        return new HashSet<>();
-    }
-
-    @Override
-    public void clearFlowVariables()
-    {
-    }
-
-    @Override
-    public boolean isNotificationsEnabled()
-    {
-        return true;
-    }
-
-    @Override
-    public void setEnableNotifications(boolean enabled)
-    {
-    }
-
-    @Override
-    public boolean isAllowNonBlocking()
-    {
-        return false;
-    }
-
-    @Override
-    public FlowCallStack getFlowCallStack()
-    {
-        return null;
-    }
-
-    @Override
-    public ProcessorsTrace getProcessorsTrace()
-    {
-        return null;
-    }
-
-    @Override
-    public SecurityContext getSecurityContext()
-    {
-        return null;
-    }
-
-    @Override
-    public void setSecurityContext(SecurityContext context)
-    {
-
-    }
+  }
 }

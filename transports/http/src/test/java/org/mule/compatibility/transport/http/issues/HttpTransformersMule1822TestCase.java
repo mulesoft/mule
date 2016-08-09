@@ -19,67 +19,60 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpTransformersMule1822TestCase extends FunctionalTestCase
-{
-    public static final String OUTBOUND_MESSAGE = "Test message";
+public class HttpTransformersMule1822TestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  public static final String OUTBOUND_MESSAGE = "Test message";
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-transformers-mule-1822-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    private MuleMessage sendTo(String uri) throws MuleException
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null);
-        assertNotNull(message);
-        return message;
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-transformers-mule-1822-test-flow.xml";
+  }
 
-    /**
-     * With no transformer we expect just the modification from the FTC
-     */
-    @Test
-    public void testBase() throws Exception
-    {
-        assertEquals(OUTBOUND_MESSAGE  + " Received", getPayloadAsString(sendTo("base")));
-    }
+  private MuleMessage sendTo(String uri) throws MuleException {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null);
+    assertNotNull(message);
+    return message;
+  }
 
-    /**
-     * But response transformers on the base model should be applied
-     */
-    @Test
-    public void testResponse() throws Exception
-    {
-        assertEquals(
-                StringAppendTestTransformer.append(" response",
-                        StringAppendTestTransformer.append(" response 2",
-                                        OUTBOUND_MESSAGE + " Received")),
-                getPayloadAsString(sendTo("response")));
-    }
+  /**
+   * With no transformer we expect just the modification from the FTC
+   */
+  @Test
+  public void testBase() throws Exception {
+    assertEquals(OUTBOUND_MESSAGE + " Received", getPayloadAsString(sendTo("base")));
+  }
 
-    /**
-     * Should also work with inbound transformers
-     */
-    @Test
-    public void testBoth() throws Exception
-    {
-        assertEquals(
-            StringAppendTestTransformer.append(" response",
-                StringAppendTestTransformer.append(" response 2",
-                    StringAppendTestTransformer.append(" transformed 2",
-                        StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received")),
-                    getPayloadAsString(sendTo("both")));
-    }
+  /**
+   * But response transformers on the base model should be applied
+   */
+  @Test
+  public void testResponse() throws Exception {
+    assertEquals(StringAppendTestTransformer
+        .append(" response", StringAppendTestTransformer.append(" response 2", OUTBOUND_MESSAGE + " Received")),
+                 getPayloadAsString(sendTo("response")));
+  }
+
+  /**
+   * Should also work with inbound transformers
+   */
+  @Test
+  public void testBoth() throws Exception {
+    assertEquals(StringAppendTestTransformer
+        .append(" response", StringAppendTestTransformer
+            .append(" response 2",
+                    StringAppendTestTransformer
+                        .append(" transformed 2", StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received")),
+                 getPayloadAsString(sendTo("both")));
+  }
 
 }

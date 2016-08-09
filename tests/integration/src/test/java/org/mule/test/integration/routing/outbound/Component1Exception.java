@@ -8,8 +8,7 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 
-public class Component1Exception extends FunctionalTestException
-{
-    // empty
+public class Component1Exception extends FunctionalTestException {
+  // empty
 }
 

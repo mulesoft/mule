@@ -18,16 +18,15 @@ import javax.sql.DataSource;
 /**
  * Database configuration used in the connector
  */
-public interface DbConfig extends NamedObject, AnnotatedObject, Testable, ConnectorMetaDataEnabled
-{
+public interface DbConfig extends NamedObject, AnnotatedObject, Testable, ConnectorMetaDataEnabled {
 
-    /**
-     * @return a non null {@link javax.sql.DataSource} to access the database
-     */
-    DataSource getDataSource();
+  /**
+   * @return a non null {@link javax.sql.DataSource} to access the database
+   */
+  DataSource getDataSource();
 
-    /**
-     * @return a non null {@link DbConnectionFactory} used to create connections for the database
-     */
-    DbConnectionFactory getConnectionFactory();
+  /**
+   * @return a non null {@link DbConnectionFactory} used to create connections for the database
+   */
+  DbConnectionFactory getConnectionFactory();
 }

@@ -14,24 +14,22 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "dynamic-endpoint-with-connector-config.xml";
-    }
+public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testDynamicEndpointAcceptsConnectorRef() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "dynamic-endpoint-with-connector-config.xml";
+  }
 
-        final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("queueName", "test.out").build();
-        MuleMessage test = client.send("vm://input", message);
-        assertNotNull(test);
+  @Test
+  public void testDynamicEndpointAcceptsConnectorRef() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.request("jms://test.out", 5000);
-        assertEquals(TEST_PAYLOAD, response.getPayload());
-    }
+    final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("queueName", "test.out").build();
+    MuleMessage test = client.send("vm://input", message);
+    assertNotNull(test);
+
+    MuleMessage response = client.request("jms://test.out", 5000);
+    assertEquals(TEST_PAYLOAD, response.getPayload());
+  }
 }

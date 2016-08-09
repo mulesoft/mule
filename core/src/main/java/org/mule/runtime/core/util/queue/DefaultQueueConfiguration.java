@@ -6,53 +6,43 @@
  */
 package org.mule.runtime.core.util.queue;
 
-public class DefaultQueueConfiguration implements QueueConfiguration
-{
+public class DefaultQueueConfiguration implements QueueConfiguration {
 
-    private final boolean persistent;
-    private final int capacity;
+  private final boolean persistent;
+  private final int capacity;
 
-    public DefaultQueueConfiguration()
-    {
-        this(QueueConfiguration.MAXIMUM_CAPACITY, false);
+  public DefaultQueueConfiguration() {
+    this(QueueConfiguration.MAXIMUM_CAPACITY, false);
+  }
+
+  public DefaultQueueConfiguration(int capacity, boolean isPersistent) {
+    this.capacity = capacity;
+    this.persistent = isPersistent;
+  }
+
+  @Override
+  public boolean isPersistent() {
+    return persistent;
+  }
+
+  @Override
+  public int getCapacity() {
+    return capacity;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("DefaultQueueConfiguration{" + "persistent=%s, capacity=%s}", persistent, capacity);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
     }
-
-    public DefaultQueueConfiguration(int capacity, boolean isPersistent)
-    {
-        this.capacity = capacity;
-        this.persistent = isPersistent;
+    if (!obj.getClass().equals(this.getClass())) {
+      return false;
     }
-
-    @Override
-    public boolean isPersistent()
-    {
-        return persistent;
-    }
-
-    @Override
-    public int getCapacity()
-    {
-        return capacity;
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("DefaultQueueConfiguration{" +
-               "persistent=%s, capacity=%s}", persistent, capacity);
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-        {
-            return false;
-        }
-        if (!obj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        return persistent == ((DefaultQueueConfiguration)obj).persistent && capacity == ((DefaultQueueConfiguration)obj).capacity;
-    }
+    return persistent == ((DefaultQueueConfiguration) obj).persistent && capacity == ((DefaultQueueConfiguration) obj).capacity;
+  }
 }

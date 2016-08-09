@@ -11,32 +11,27 @@ import com.lmax.disruptor.ExceptionHandler;
 import org.apache.logging.log4j.status.StatusLogger;
 
 /**
- * Implementation of {@link com.lmax.disruptor.ExceptionHandler} to be used
- * when async loggers fail to log their messages. It will log this event
- * using the {@link org.apache.logging.log4j.status.StatusLogger}
+ * Implementation of {@link com.lmax.disruptor.ExceptionHandler} to be used when async loggers fail to log their messages. It will
+ * log this event using the {@link org.apache.logging.log4j.status.StatusLogger}
  *
  * @since 3.6.0
  */
-public class AsyncLoggerExceptionHandler implements ExceptionHandler
-{
+public class AsyncLoggerExceptionHandler implements ExceptionHandler {
 
-    private static final StatusLogger logger = StatusLogger.getLogger();
+  private static final StatusLogger logger = StatusLogger.getLogger();
 
-    @Override
-    public void handleEventException(Throwable ex, long sequence, Object event)
-    {
-        logger.error("Failed to asynchronously log message: " + event, ex);
-    }
+  @Override
+  public void handleEventException(Throwable ex, long sequence, Object event) {
+    logger.error("Failed to asynchronously log message: " + event, ex);
+  }
 
-    @Override
-    public void handleOnStartException(Throwable ex)
-    {
-        logger.error("Failed to start asynchronous logger", ex);
-    }
+  @Override
+  public void handleOnStartException(Throwable ex) {
+    logger.error("Failed to start asynchronous logger", ex);
+  }
 
-    @Override
-    public void handleOnShutdownException(Throwable ex)
-    {
-        logger.error("Failed to stop asynchronous logger", ex);
-    }
+  @Override
+  public void handleOnShutdownException(Throwable ex) {
+    logger.error("Failed to stop asynchronous logger", ex);
+  }
 }

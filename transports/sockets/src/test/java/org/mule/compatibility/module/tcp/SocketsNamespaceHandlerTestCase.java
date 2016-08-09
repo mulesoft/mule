@@ -17,72 +17,67 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class SocketsNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "sockets-namespace-config.xml";
-    }
+public class SocketsNamespaceHandlerTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testDefaultServerSocketProperties()
-    {
-        TcpServerSocketProperties properties = muleContext.getRegistry().get("defaultServerSocketProperties");
+  @Override
+  protected String getConfigFile() {
+    return "sockets-namespace-config.xml";
+  }
 
-        assertThat(properties.getKeepAlive(), is(nullValue()));
-        assertThat(properties.getReceiveBacklog(), is(nullValue()));
-        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
-        assertThat(properties.getReuseAddress(), equalTo(true));
-        assertThat(properties.getSendBufferSize(), is(nullValue()));
-        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getServerTimeout(), equalTo(0));
-        assertThat(properties.getTimeout(), equalTo(0));
-        assertThat(properties.getLinger(), equalTo(-1));
-    }
+  @Test
+  public void testDefaultServerSocketProperties() {
+    TcpServerSocketProperties properties = muleContext.getRegistry().get("defaultServerSocketProperties");
 
-    @Test
-    public void testServerSocketProperties()
-    {
-        TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
+    assertThat(properties.getKeepAlive(), is(nullValue()));
+    assertThat(properties.getReceiveBacklog(), is(nullValue()));
+    assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+    assertThat(properties.getReuseAddress(), equalTo(true));
+    assertThat(properties.getSendBufferSize(), is(nullValue()));
+    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+    assertThat(properties.getServerTimeout(), equalTo(0));
+    assertThat(properties.getTimeout(), equalTo(0));
+    assertThat(properties.getLinger(), equalTo(-1));
+  }
 
-        assertThat(properties.getKeepAlive(), equalTo(true));
-        assertThat(properties.getReceiveBacklog(), equalTo(200));
-        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
-        assertThat(properties.getReuseAddress(), equalTo(true));
-        assertThat(properties.getSendBufferSize(), equalTo(2048));
-        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getServerTimeout(), equalTo(600));
-        assertThat(properties.getTimeout(), equalTo(800));
-        assertThat(properties.getLinger(), equalTo(700));
-    }
+  @Test
+  public void testServerSocketProperties() {
+    TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
 
-    @Test
-    public void testDefaultClientSocketProperties()
-    {
-        TcpClientSocketProperties properties = muleContext.getRegistry().get("defaultClientSocketProperties");
+    assertThat(properties.getKeepAlive(), equalTo(true));
+    assertThat(properties.getReceiveBacklog(), equalTo(200));
+    assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+    assertThat(properties.getReuseAddress(), equalTo(true));
+    assertThat(properties.getSendBufferSize(), equalTo(2048));
+    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+    assertThat(properties.getServerTimeout(), equalTo(600));
+    assertThat(properties.getTimeout(), equalTo(800));
+    assertThat(properties.getLinger(), equalTo(700));
+  }
 
-        assertThat(properties.getKeepAlive(), is(nullValue()));
-        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
-        assertThat(properties.getSendBufferSize(), is(nullValue()));
-        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getTimeout(), equalTo(0));
-        assertThat(properties.getLinger(), equalTo(-1));
-        assertThat(properties.getConnectionTimeout(), equalTo(30000));
-    }
+  @Test
+  public void testDefaultClientSocketProperties() {
+    TcpClientSocketProperties properties = muleContext.getRegistry().get("defaultClientSocketProperties");
 
-    @Test
-    public void testClientSocketProperties()
-    {
-        TcpClientSocketProperties properties = muleContext.getRegistry().get("clientSocketProperties");
+    assertThat(properties.getKeepAlive(), is(nullValue()));
+    assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+    assertThat(properties.getSendBufferSize(), is(nullValue()));
+    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+    assertThat(properties.getTimeout(), equalTo(0));
+    assertThat(properties.getLinger(), equalTo(-1));
+    assertThat(properties.getConnectionTimeout(), equalTo(30000));
+  }
 
-        assertThat(properties.getConnectionTimeout(), equalTo(500));
-        assertThat(properties.getKeepAlive(), equalTo(true));
-        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
-        assertThat(properties.getSendBufferSize(), equalTo(2048));
-        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getTimeout(), equalTo(600));
-        assertThat(properties.getLinger(), equalTo(700));
-    }
+  @Test
+  public void testClientSocketProperties() {
+    TcpClientSocketProperties properties = muleContext.getRegistry().get("clientSocketProperties");
+
+    assertThat(properties.getConnectionTimeout(), equalTo(500));
+    assertThat(properties.getKeepAlive(), equalTo(true));
+    assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+    assertThat(properties.getSendBufferSize(), equalTo(2048));
+    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+    assertThat(properties.getTimeout(), equalTo(600));
+    assertThat(properties.getLinger(), equalTo(700));
+  }
 
 }

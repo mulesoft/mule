@@ -22,32 +22,28 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase
-{
+public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-lax-content-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-lax-content-type-config.xml";
+  }
 
-    @Test
-    public void sendsInvalidContentTypeOnRequest() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
+  @Test
+  public void sendsInvalidContentTypeOnRequest() throws Exception {
+    MuleClient client = muleContext.getClient();
+    final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
 
-        MuleMessage response = client.send(url, TEST_MESSAGE, null);
+    MuleMessage response = client.send(url, TEST_MESSAGE, null);
 
-        assertNoContentTypeProperty(response);
-        assertThat(getPayloadAsString(response), equalTo("invalidMimeType"));
-    }
+    assertNoContentTypeProperty(response);
+    assertThat(getPayloadAsString(response), equalTo("invalidMimeType"));
+  }
 
-    private void assertNoContentTypeProperty(MuleMessage response)
-    {
-        assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
-    }
+  private void assertNoContentTypeProperty(MuleMessage response) {
+    assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
+  }
 }

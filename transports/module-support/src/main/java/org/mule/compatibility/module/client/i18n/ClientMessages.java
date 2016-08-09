@@ -8,11 +8,11 @@ package org.mule.compatibility.module.client.i18n;
 
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class ClientMessages extends MessageFactory
-{
-    private static final ClientMessages factory = new ClientMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath("client");
+public class ClientMessages extends MessageFactory {
+
+  private static final ClientMessages factory = new ClientMessages();
+
+  private static final String BUNDLE_PATH = getBundlePath("client");
 
 }
 

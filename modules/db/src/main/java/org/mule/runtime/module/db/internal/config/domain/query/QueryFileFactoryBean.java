@@ -16,40 +16,32 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * Creates a query text from a file
  */
-public class QueryFileFactoryBean implements FactoryBean<String>
-{
+public class QueryFileFactoryBean implements FactoryBean<String> {
 
-    private final String fileName;
-    private final FileReader fileReader;
+  private final String fileName;
+  private final FileReader fileReader;
 
-    public QueryFileFactoryBean(String fileName, FileReader fileReader)
-    {
-        this.fileName = fileName;
-        this.fileReader = fileReader;
+  public QueryFileFactoryBean(String fileName, FileReader fileReader) {
+    this.fileName = fileName;
+    this.fileReader = fileReader;
+  }
+
+  @Override
+  public String getObject() throws Exception {
+    try {
+      return fileReader.getResourceAsString(fileName);
+    } catch (IOException e) {
+      throw new IllegalStateException("Unable to read query from file: " + fileName);
     }
+  }
 
-    @Override
-    public String getObject() throws Exception
-    {
-        try
-        {
-            return  fileReader.getResourceAsString(fileName);
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException("Unable to read query from file: " + fileName);
-        }
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return String.class;
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return String.class;
-    }
-
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 }

@@ -11,7 +11,6 @@ import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 /**
  * Factory for {@link Domain} artifact creation
  */
-public interface DomainFactory extends ArtifactFactory<Domain>
-{
+public interface DomainFactory extends ArtifactFactory<Domain> {
 
 }

@@ -17,31 +17,26 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 
 
 /**
- * This class is used to control GZIP compression of messages when proxying
- * a web service call.
+ * This class is used to control GZIP compression of messages when proxying a web service call.
  *
- * If the invoking web service returns a compressed response
- * the proxy client will decompress it to work with the raw envelope or body in the flow
- * and the proxy service will compress it again before sending it back to the client.
+ * If the invoking web service returns a compressed response the proxy client will decompress it to work with the raw envelope or
+ * body in the flow and the proxy service will compress it again before sending it back to the client.
  *
- * If the client invokes the service with a compressed request, the proxy service is
- * responsible for decompressing it to work with the raw request and the client
- * will compress it back before invoking the end service.
+ * If the client invokes the service with a compressed request, the proxy service is responsible for decompressing it to work with
+ * the raw request and the client will compress it back before invoking the end service.
  *
- * In each case the property being verified is the Content-Encoding of the request
- * and the response.
+ * In each case the property being verified is the Content-Encoding of the request and the response.
  *
  */
 @NoJSR250Annotations
-public class ProxyGZIPFeature extends AbstractFeature
-{
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus)
-    {
-        provider.getInInterceptors().add(new ProxyGZIPInInterceptor());
-        ProxyGZIPOutInterceptor out = new ProxyGZIPOutInterceptor();
-        provider.getOutInterceptors().add(out);
-        provider.getOutFaultInterceptors().add(out);
-    }
+public class ProxyGZIPFeature extends AbstractFeature {
+
+  @Override
+  protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+    provider.getInInterceptors().add(new ProxyGZIPInInterceptor());
+    ProxyGZIPOutInterceptor out = new ProxyGZIPOutInterceptor();
+    provider.getOutInterceptors().add(out);
+    provider.getOutFaultInterceptors().add(out);
+  }
 
 }

@@ -13,38 +13,32 @@ import org.mule.runtime.core.util.UUID;
 
 import java.util.List;
 
-public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteResolver
-{
+public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteResolver {
 
-    private final DynamicRouteResolver dynamicRouteResolver;
-    private final String id;
+  private final DynamicRouteResolver dynamicRouteResolver;
+  private final String id;
 
-    public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver)
-    {
-        this(dynamicRouteResolver, UUID.getUUID());
+  public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver) {
+    this(dynamicRouteResolver, UUID.getUUID());
+  }
+
+  public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver, final String id) {
+    this.dynamicRouteResolver = dynamicRouteResolver;
+    this.id = id;
+  }
+
+  @Override
+  public String getRouteIdentifier(MuleEvent event) throws MessagingException {
+
+    if (dynamicRouteResolver instanceof IdentifiableDynamicRouteResolver) {
+      return ((IdentifiableDynamicRouteResolver) dynamicRouteResolver).getRouteIdentifier(event);
     }
 
-    public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver, final String id)
-    {
-        this.dynamicRouteResolver = dynamicRouteResolver;
-        this.id = id;
-    }
+    return id;
+  }
 
-    @Override
-    public String getRouteIdentifier(MuleEvent event) throws MessagingException
-    {
-
-        if (dynamicRouteResolver instanceof IdentifiableDynamicRouteResolver)
-        {
-            return ((IdentifiableDynamicRouteResolver) dynamicRouteResolver).getRouteIdentifier(event);
-        }
-
-        return id;
-    }
-
-    @Override
-    public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException
-    {
-        return dynamicRouteResolver.resolveRoutes(event);
-    }
+  @Override
+  public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException {
+    return dynamicRouteResolver.resolveRoutes(event);
+  }
 }

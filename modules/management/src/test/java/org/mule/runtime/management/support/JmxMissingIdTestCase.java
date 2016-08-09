@@ -18,44 +18,39 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class JmxMissingIdTestCase extends AbstractMuleTestCase
-{
-    private MuleContext muleContext;
+public class JmxMissingIdTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testContextIdAndJmxAgentIsOk() throws Exception
-    {
-        DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-        config.setId("MY_SERVER");
-        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-        contextBuilder.setMuleConfiguration(config);
-        muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
+  private MuleContext muleContext;
 
-        muleContext.start();
+  @Test
+  public void testContextIdAndJmxAgentIsOk() throws Exception {
+    DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+    config.setId("MY_SERVER");
+    MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+    contextBuilder.setMuleConfiguration(config);
+    muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
+
+    muleContext.start();
+  }
+
+  @Test
+  public void testNoContextIdAndJmxAgentMustFail() throws Exception {
+    try {
+      DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+      config.setId(null);
+      MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+      contextBuilder.setMuleConfiguration(config);
+      muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
+
+      JmxApplicationAgent jmxAgent = new JmxApplicationAgent();
+      muleContext.getRegistry().registerAgent(jmxAgent);
+
+      muleContext.start();
+
+      fail("Should have failed.");
+    } catch (Exception e) {
+      // this form makes code coverage happier
+      assertTrue(true);
     }
-
-    @Test
-    public void testNoContextIdAndJmxAgentMustFail() throws Exception
-    {
-        try
-        {
-            DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-            config.setId(null);
-            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-            contextBuilder.setMuleConfiguration(config);
-            muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
-
-            JmxApplicationAgent jmxAgent = new JmxApplicationAgent();
-            muleContext.getRegistry().registerAgent(jmxAgent);
-
-            muleContext.start();
-            
-            fail("Should have failed.");
-        }
-        catch (Exception e)
-        {
-            // this form makes code coverage happier
-            assertTrue(true);
-        }
-    }
+  }
 }

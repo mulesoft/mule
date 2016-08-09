@@ -13,17 +13,14 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
-{
+public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/message/http-property-scope.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/message/http-property-scope.xml";
+  }
 
-    protected MuleMessage sendRequest(MuleClient client, MuleMessage message) throws MuleException
-    {
-        return client.send(format("http://localhost:%s/foo", port.getNumber()), message, newOptions().method(POST.name()).build());
-    }
+  protected MuleMessage sendRequest(MuleClient client, MuleMessage message) throws MuleException {
+    return client.send(format("http://localhost:%s/foo", port.getNumber()), message, newOptions().method(POST.name()).build());
+  }
 }

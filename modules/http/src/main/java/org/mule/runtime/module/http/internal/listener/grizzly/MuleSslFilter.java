@@ -25,42 +25,34 @@ import org.slf4j.LoggerFactory;
 /**
  * Custom SSL filter that configures additional properties in the grizzly context.
  */
-public class MuleSslFilter extends SSLFilter
-{
+public class MuleSslFilter extends SSLFilter {
 
-    public static final String SSL_SESSION_ATTRIBUTE_KEY = "muleSslSession";
-    private static final Logger logger = LoggerFactory.getLogger(MuleSslFilter.class);
+  public static final String SSL_SESSION_ATTRIBUTE_KEY = "muleSslSession";
+  private static final Logger logger = LoggerFactory.getLogger(MuleSslFilter.class);
 
-    public MuleSslFilter(SSLEngineConfigurator serverSSLEngineConfigurator, SSLEngineConfigurator clientSSLEngineConfigurator)
-    {
-        super(serverSSLEngineConfigurator, clientSSLEngineConfigurator);
+  public MuleSslFilter(SSLEngineConfigurator serverSSLEngineConfigurator, SSLEngineConfigurator clientSSLEngineConfigurator) {
+    super(serverSSLEngineConfigurator, clientSSLEngineConfigurator);
+  }
+
+  @Override
+  public NextAction handleRead(FilterChainContext ctx) throws IOException {
+    try {
+      ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
+      NextAction nextAction = super.handleRead(ctx);
+      ctx.getAttributes().setAttribute(SSL_SESSION_ATTRIBUTE_KEY, getSslSession(ctx));
+      return nextAction;
+    } catch (SSLHandshakeException e) {
+      logger.error("SSL handshake error: " + e.getMessage());
+      throw e;
     }
+  }
 
-    @Override
-    public NextAction handleRead(FilterChainContext ctx) throws IOException
-    {
-        try
-        {
-            ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
-            NextAction nextAction = super.handleRead(ctx);
-            ctx.getAttributes().setAttribute(SSL_SESSION_ATTRIBUTE_KEY, getSslSession(ctx));
-            return nextAction;
-        }
-        catch (SSLHandshakeException e)
-        {
-            logger.error("SSL handshake error: " + e.getMessage());
-            throw e;
-        }
+  private SSLSession getSslSession(FilterChainContext ctx) throws SSLPeerUnverifiedException {
+    SSLConnectionContext sslConnectionContext = obtainSslConnectionContext(ctx.getConnection());
+    if (sslConnectionContext == null) {
+      return null;
     }
-
-    private SSLSession getSslSession(FilterChainContext ctx) throws SSLPeerUnverifiedException
-    {
-        SSLConnectionContext sslConnectionContext = obtainSslConnectionContext(ctx.getConnection());
-        if (sslConnectionContext == null)
-        {
-            return null;
-        }
-        return sslConnectionContext.getSslEngine().getSession();
-    }
+    return sslConnectionContext.getSslEngine().getSession();
+  }
 
 }

@@ -9,16 +9,13 @@ package org.mule.runtime.core.transaction.constraints;
 import org.mule.runtime.core.api.MuleEvent;
 
 /**
- * <code>ManualConstraint</code> always returns false, meaning that the transaction
- * should be committed manually.
+ * <code>ManualConstraint</code> always returns false, meaning that the transaction should be committed manually.
  */
 // @ThreadSafe
-public class ManualConstraint extends ConstraintFilter
-{
+public class ManualConstraint extends ConstraintFilter {
 
-    public boolean accept(MuleEvent event)
-    {
-        return false;
-    }
+  public boolean accept(MuleEvent event) {
+    return false;
+  }
 
 }

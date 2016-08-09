@@ -16,49 +16,40 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-public class MuleCallbackHandler implements CallbackHandler
-{
-    private Authentication authentication;
-    private String username;
-    private String password;
+public class MuleCallbackHandler implements CallbackHandler {
 
-    /**
-     * @param authentication
-     */
-    public MuleCallbackHandler(Authentication authentication)
-    {
-        this.authentication = authentication;
-        this.username = (String) this.authentication.getPrincipal();
-        this.password = (String) this.authentication.getCredentials();
-    }
+  private Authentication authentication;
+  private String username;
+  private String password;
 
-    /**
-     * The handle() method handles the callbacks to be passed to the Jaas security.
-     * It makes use of two types of callbacks: the NameCallback and the
-     * PasswordCallback.
-     * 
-     * @param callbacks
-     * @throws IOException
-     * @throws UnsupportedCallbackException
-     */
-    public final void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-    {
-        for (int i = 0; i < callbacks.length; i++)
-        {
-            if (callbacks[i] instanceof NameCallback)
-            {
-                NameCallback nameCb = (NameCallback) callbacks[i];
-                nameCb.setName(username);
-            }
-            else if (callbacks[i] instanceof PasswordCallback)
-            {
-                PasswordCallback passCb = (PasswordCallback) callbacks[i];
-                passCb.setPassword(password.toCharArray());
-            }
-            else
-            {
-                throw (new UnsupportedCallbackException(callbacks[i], "Callback class not supported"));
-            }
-        }
+  /**
+   * @param authentication
+   */
+  public MuleCallbackHandler(Authentication authentication) {
+    this.authentication = authentication;
+    this.username = (String) this.authentication.getPrincipal();
+    this.password = (String) this.authentication.getCredentials();
+  }
+
+  /**
+   * The handle() method handles the callbacks to be passed to the Jaas security. It makes use of two types of callbacks: the
+   * NameCallback and the PasswordCallback.
+   * 
+   * @param callbacks
+   * @throws IOException
+   * @throws UnsupportedCallbackException
+   */
+  public final void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    for (int i = 0; i < callbacks.length; i++) {
+      if (callbacks[i] instanceof NameCallback) {
+        NameCallback nameCb = (NameCallback) callbacks[i];
+        nameCb.setName(username);
+      } else if (callbacks[i] instanceof PasswordCallback) {
+        PasswordCallback passCb = (PasswordCallback) callbacks[i];
+        passCb.setPassword(password.toCharArray());
+      } else {
+        throw (new UnsupportedCallbackException(callbacks[i], "Callback class not supported"));
+      }
     }
+  }
 }

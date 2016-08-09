@@ -14,45 +14,38 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase
-{
+public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "for-each-until-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "for-each-until-config.xml";
+  }
 
-    @Test
-    public void flowVariableSyncNoForeach() throws Exception
-    {
-        MuleEvent event = runAndAssert("flowVarSyncNoForEach", 3);
-        assertThat(event.getFlowVariable("until"), is(3));
-    }
+  @Test
+  public void flowVariableSyncNoForeach() throws Exception {
+    MuleEvent event = runAndAssert("flowVarSyncNoForEach", 3);
+    assertThat(event.getFlowVariable("until"), is(3));
+  }
 
-    @Test
-    public void flowVariablesSyncArePropagated() throws Exception
-    {
-        MuleEvent event = runAndAssert("flowVarSync");
-        assertThat(event.getFlowVariable("until"), is(3));
-    }
+  @Test
+  public void flowVariablesSyncArePropagated() throws Exception {
+    MuleEvent event = runAndAssert("flowVarSync");
+    assertThat(event.getFlowVariable("until"), is(3));
+  }
 
-    @Test
-    public void flowVariablesAsyncArePropagated() throws Exception
-    {
-        runAndAssert("flowVarAsync");
-    }
+  @Test
+  public void flowVariablesAsyncArePropagated() throws Exception {
+    runAndAssert("flowVarAsync");
+  }
 
-    private MuleEvent runAndAssert(String flowName) throws Exception
-    {
-         return runAndAssert(flowName, newArrayList(1, 2, 3));
-    }
+  private MuleEvent runAndAssert(String flowName) throws Exception {
+    return runAndAssert(flowName, newArrayList(1, 2, 3));
+  }
 
-    private MuleEvent runAndAssert(String flowName, Object payload) throws Exception
-    {
-        MuleEvent event = flowRunner(flowName).withPayload(payload).run();
-        assertThat(event.getFlowVariable("count"), is(6));
-        assertThat(event.getFlowVariable("current"), is(3));
-        return event;
-    }
+  private MuleEvent runAndAssert(String flowName, Object payload) throws Exception {
+    MuleEvent event = flowRunner(flowName).withPayload(payload).run();
+    assertThat(event.getFlowVariable("count"), is(6));
+    assertThat(event.getFlowVariable("current"), is(3));
+    return event;
+  }
 }

@@ -8,17 +8,14 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
-public class Event1 extends ServerNotification
-{
+public class Event1 extends ServerNotification {
 
-    public Event1()
-    {
-        super("", 0);
-    }
+  public Event1() {
+    super("", 0);
+  }
 
-    public Event1(String id)
-    {
-        super("", 0, id);
-    }
+  public Event1(String id) {
+    super("", 0, id);
+  }
 
 }

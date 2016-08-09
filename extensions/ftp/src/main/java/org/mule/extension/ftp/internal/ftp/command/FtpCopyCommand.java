@@ -28,80 +28,65 @@ import org.apache.commons.net.ftp.FTPFile;
  *
  * @since 4.0
  */
-public final class FtpCopyCommand extends ClassicFtpCommand implements CopyCommand
-{
+public final class FtpCopyCommand extends ClassicFtpCommand implements CopyCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FtpCopyCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
-    {
-        super(fileSystem, client);
+  /**
+   * {@inheritDoc}
+   */
+  public FtpCopyCommand(ClassicFtpFileSystem fileSystem, FTPClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
+                   boolean createParentDirectories, MuleEvent event) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new RegularFtpCopyDelegate(this, fileSystem));
+  }
+
+  private class RegularFtpCopyDelegate extends AbstractFtpCopyDelegate {
+
+    public RegularFtpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem) {
+      super(command, fileSystem);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event)
-    {
-        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new RegularFtpCopyDelegate(this, fileSystem));
+    protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
+                                 FtpFileSystem writerConnection, MuleEvent event) {
+      changeWorkingDirectory(sourcePath);
+      FTPFile[] files;
+      try {
+        files = client.listFiles();
+      } catch (IOException e) {
+        throw exception(format("Could not list contents of directory '%s' while trying to copy it to ", sourcePath, target), e);
+      }
+
+      for (FTPFile file : files) {
+        if (isVirtualDirectory(file.getName())) {
+          continue;
+        }
+
+        FileAttributes fileAttributes = new ClassicFtpFileAttributes(sourcePath.resolve(file.getName()), file);
+
+        if (fileAttributes.isDirectory()) {
+          Path targetPath = target.resolve(fileAttributes.getName());
+          copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
+        } else {
+          copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
+        }
+      }
     }
 
-    private class RegularFtpCopyDelegate extends AbstractFtpCopyDelegate
-    {
-
-        public RegularFtpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem)
-        {
-            super(command, fileSystem);
-        }
-
-        @Override
-        protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
-        {
-            changeWorkingDirectory(sourcePath);
-            FTPFile[] files;
-            try
-            {
-                files = client.listFiles();
-            }
-            catch (IOException e)
-            {
-                throw exception(format("Could not list contents of directory '%s' while trying to copy it to ", sourcePath, target), e);
-            }
-
-            for (FTPFile file : files)
-            {
-                if (isVirtualDirectory(file.getName()))
-                {
-                    continue;
-                }
-
-                FileAttributes fileAttributes = new ClassicFtpFileAttributes(sourcePath.resolve(file.getName()), file);
-
-                if (fileAttributes.isDirectory())
-                {
-                    Path targetPath = target.resolve(fileAttributes.getName());
-                    copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
-                }
-                else
-                {
-                    copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
-                }
-            }
-        }
-
-        @Override
-        protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
-        {
-            try
-            {
-                super.copyFile(config, source, target, overwrite, writerConnection, event);
-            }
-            finally
-            {
-                fileSystem.awaitCommandCompletion();
-            }
-        }
+    @Override
+    protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite,
+                            FtpFileSystem writerConnection, MuleEvent event) {
+      try {
+        super.copyFile(config, source, target, overwrite, writerConnection, event);
+      } finally {
+        fileSystem.awaitCommandCompletion();
+      }
     }
+  }
 }

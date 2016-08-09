@@ -26,78 +26,67 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpSocketsPoolTestCase extends FunctionalTestCase
-{
+public class TcpSocketsPoolTestCase extends FunctionalTestCase {
 
-    protected static String TEST_MESSAGE = "Test TCP Request";
+  protected static String TEST_MESSAGE = "Test TCP Request";
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
+
+  @Override
+  protected String getConfigFile() {
+    return "tcp-sockets-pool-test-flow.xml";
+  }
+
+  @Test
+  public void testExceptionInSendReleasesSocket() throws Exception {
+    TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
+    assertNotNull(tcpConnector);
+    MuleClient client = muleContext.getClient();
+    try {
+      client.send("clientWithExceptionEndpoint", TEST_MESSAGE, null);
+      fail("Dispatch exception was expected");
+    } catch (DispatchException e) {
+      // Expected exception
+    }
+    assertEquals(0, tcpConnector.getSocketsPoolNumActive());
+  }
+
+  @Test
+  public void testSocketsPoolSettings() throws Exception {
+    TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
+    assertEquals(8, tcpConnector.getSocketsPoolMaxActive());
+    assertEquals(1, tcpConnector.getSocketsPoolMaxIdle());
+    assertEquals(3000, tcpConnector.getSocketsPoolMaxWait());
+  }
+
+  @Test
+  public void testSocketsPoolDefaultSettings() throws Exception {
+    TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
+    int maxActive = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsActive();
+    int maxIdle = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsIdle();
+    assertEquals(maxActive, tcpConnector.getSocketsPoolMaxActive());
+    assertEquals(maxIdle, tcpConnector.getSocketsPoolMaxIdle());
+    assertEquals(TcpConnector.DEFAULT_WAIT_TIMEOUT, tcpConnector.getSocketMaxWait());
+  }
+
+  public static class MockTcpProtocol implements TcpProtocol {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "tcp-sockets-pool-test-flow.xml";
+    public ResponseOutputStream createResponse(Socket socket) throws IOException {
+      throw new UnsupportedOperationException("createResponse");
     }
 
-    @Test
-    public void testExceptionInSendReleasesSocket() throws Exception
-    {
-        TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
-        assertNotNull(tcpConnector);
-        MuleClient client = muleContext.getClient();
-        try
-        {
-            client.send("clientWithExceptionEndpoint", TEST_MESSAGE, null);
-            fail("Dispatch exception was expected");
-        }
-        catch(DispatchException e)
-        {
-            // Expected exception
-        }
-        assertEquals(0, tcpConnector.getSocketsPoolNumActive());
+    @Override
+    public Object read(InputStream is) throws IOException {
+      throw new UnsupportedOperationException("read");
     }
 
-    @Test
-    public void testSocketsPoolSettings() throws Exception
-    {
-        TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
-        assertEquals(8, tcpConnector.getSocketsPoolMaxActive());
-        assertEquals(1, tcpConnector.getSocketsPoolMaxIdle());
-        assertEquals(3000, tcpConnector.getSocketsPoolMaxWait());
+    @Override
+    public void write(OutputStream os, Object data) throws IOException {
+      throw new UnsupportedOperationException("write");
     }
-
-    @Test
-    public void testSocketsPoolDefaultSettings() throws Exception
-    {
-        TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
-        int maxActive = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsActive();
-        int maxIdle = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsIdle();
-        assertEquals(maxActive, tcpConnector.getSocketsPoolMaxActive());
-        assertEquals(maxIdle, tcpConnector.getSocketsPoolMaxIdle());
-        assertEquals(TcpConnector.DEFAULT_WAIT_TIMEOUT, tcpConnector.getSocketMaxWait());
-    }
-
-    public static class MockTcpProtocol implements TcpProtocol
-    {
-        @Override
-        public ResponseOutputStream createResponse(Socket socket) throws IOException
-        {
-            throw new UnsupportedOperationException("createResponse");
-        }
-
-        @Override
-        public Object read(InputStream is) throws IOException
-        {
-            throw new UnsupportedOperationException("read");
-        }
-
-        @Override
-        public void write(OutputStream os, Object data) throws IOException
-        {
-            throw new UnsupportedOperationException("write");
-        }
-    }
+  }
 
 }

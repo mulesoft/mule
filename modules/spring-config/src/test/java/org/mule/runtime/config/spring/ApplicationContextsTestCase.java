@@ -32,160 +32,148 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class ApplicationContextsTestCase extends AbstractMuleTestCase
-{
+public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
-    private static final int INIT_WAIT_TIMEOUT_MILLIS = 5000;
-    private MuleContext context;
+  private static final int INIT_WAIT_TIMEOUT_MILLIS = 5000;
+  private MuleContext context;
 
-    @After
-    public void stopContext()
-    {
-        if (context != null && !context.isDisposed())
-        {
-            context.dispose();
-            context = null;
-        }
+  @After
+  public void stopContext() {
+    if (context != null && !context.isDisposed()) {
+      context.dispose();
+      context = null;
     }
+  }
 
-    @Test
-    public void testSanity() throws Exception
-    {
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
+  @Test
+  public void testSanity() throws Exception {
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
 
-        Object orange = appContext.getBean("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
+    Object orange = appContext.getBean("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
 
-        try
-        {
-            appContext.getBean("plum");
-            fail("Bean should not have been found");
-        }
-        catch (NoSuchBeanDefinitionException e)
-        {
-            // expected
-        }
+    try {
+      appContext.getBean("plum");
+      fail("Bean should not have been found");
+    } catch (NoSuchBeanDefinitionException e) {
+      // expected
     }
+  }
 
-    /**
-     * Test that an existing appContext can be added to Mule's internal Registries
-     */
-    @Test
-    public void testSpringConfigurationBuilder() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
+  /**
+   * Test that an existing appContext can be added to Mule's internal Registries
+   */
+  @Test
+  public void testSpringConfigurationBuilder() throws Exception {
+    context = new DefaultMuleContextFactory().createMuleContext();
 
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
+    ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        context.start();
+    context.start();
 
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Pirulo", ((Orange) orange).getBrand());
-    }
+    Object orange = context.getRegistry().lookupObject("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
+    assertEquals("Pirulo", ((Orange) orange).getBrand());
+  }
 
-    @Test
-    public void springConfigurationBuilderCircularRefs() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
+  @Test
+  public void springConfigurationBuilderCircularRefs() throws Exception {
+    context = new DefaultMuleContextFactory().createMuleContext();
 
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-circular-ref.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-circular-ref.xml");
+    ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        context.start();
+    context.start();
 
-        Object seed = context.getRegistry().lookupObject("seed");
-        ((Seed) seed).awaitInitialize(INIT_WAIT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    Object seed = context.getRegistry().lookupObject("seed");
+    ((Seed) seed).awaitInitialize(INIT_WAIT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
-        Object apple = context.getRegistry().lookupObject("apple");
-        assertThat(apple, not(nullValue()));
-        assertThat(apple, instanceOf(Apple.class));
-        assertThat(((Apple) apple).getSeed(), sameInstance(seed));
-    }
+    Object apple = context.getRegistry().lookupObject("apple");
+    assertThat(apple, not(nullValue()));
+    assertThat(apple, instanceOf(Apple.class));
+    assertThat(((Apple) apple).getSeed(), sameInstance(seed));
+  }
 
-    /**
-     * Test that the same bean from the 2nd appContext will have precedence over the 1st appContext
-     */
-    @Test
-    public void testSpringConfigurationBuilderPrecedence() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
+  /**
+   * Test that the same bean from the 2nd appContext will have precedence over the 1st appContext
+   */
+  @Test
+  public void testSpringConfigurationBuilderPrecedence() throws Exception {
+    context = new DefaultMuleContextFactory().createMuleContext();
 
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
+    ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
-        builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
+    builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        context.start();
+    context.start();
 
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Tropicana", ((Orange) orange).getBrand());
-    }
+    Object orange = context.getRegistry().lookupObject("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
+    assertEquals("Tropicana", ((Orange) orange).getBrand());
+  }
 
-    @Test
-    public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
+  @Test
+  public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception {
+    context = new DefaultMuleContextFactory().createMuleContext();
 
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
+    ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        appContext = new ClassPathXmlApplicationContext("application-context.xml");
-        builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
+    appContext = new ClassPathXmlApplicationContext("application-context.xml");
+    builder = new SpringConfigurationBuilder(appContext);
+    builder.configure(context);
 
-        context.start();
+    context.start();
 
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Pirulo", ((Orange) orange).getBrand());
-    }
+    Object orange = context.getRegistry().lookupObject("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
+    assertEquals("Pirulo", ((Orange) orange).getBrand());
+  }
 
-    /**
-     * Test that an existing appContext can be used as a parent AppContext for Mule
-     */
-    @Test
-    public void testParentContext() throws Exception
-    {
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
+  /**
+   * Test that an existing appContext can be used as a parent AppContext for Mule
+   */
+  @Test
+  public void testParentContext() throws Exception {
+    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
 
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
-        builder.setParentContext(appContext);
-        context = new DefaultMuleContextFactory().createMuleContext(builder);
+    SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
+    builder.setParentContext(appContext);
+    context = new DefaultMuleContextFactory().createMuleContext(builder);
 
-        context.start();
+    context.start();
 
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Pirulo", ((Orange) orange).getBrand());
-    }
+    Object orange = context.getRegistry().lookupObject("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
+    assertEquals("Pirulo", ((Orange) orange).getBrand());
+  }
 
-    /**
-     * Test the most common approach: Create the Spring config + Mule config in a single AppContext.
-     */
-    @Test
-    public void testAppContextTogetherWithMuleConfig() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}));
+  /**
+   * Test the most common approach: Create the Spring config + Mule config in a single AppContext.
+   */
+  @Test
+  public void testAppContextTogetherWithMuleConfig() throws Exception {
+    context = new DefaultMuleContextFactory()
+        .createMuleContext(new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}));
 
-        context.start();
+    context.start();
 
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Pirulo", ((Orange) orange).getBrand());
-    }
+    Object orange = context.getRegistry().lookupObject("orange");
+    assertNotNull(orange);
+    assertTrue(orange instanceof Orange);
+    assertEquals("Pirulo", ((Orange) orange).getBrand());
+  }
 }

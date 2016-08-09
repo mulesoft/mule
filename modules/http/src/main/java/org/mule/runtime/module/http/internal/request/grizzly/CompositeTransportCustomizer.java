@@ -14,21 +14,18 @@ import java.util.List;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
-public class CompositeTransportCustomizer implements TransportCustomizer
-{
-    private List<TransportCustomizer> transportCustomizers = new ArrayList<>();
+public class CompositeTransportCustomizer implements TransportCustomizer {
 
-    @Override
-    public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
-    {
-        for (TransportCustomizer transportCustomizer : transportCustomizers)
-        {
-            transportCustomizer.customize(transport, filterChainBuilder);
-        }
-    }
+  private List<TransportCustomizer> transportCustomizers = new ArrayList<>();
 
-    public void addTransportCustomizer(TransportCustomizer transportCustomizer)
-    {
-        transportCustomizers.add(transportCustomizer);
+  @Override
+  public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
+    for (TransportCustomizer transportCustomizer : transportCustomizers) {
+      transportCustomizer.customize(transport, filterChainBuilder);
     }
+  }
+
+  public void addTransportCustomizer(TransportCustomizer transportCustomizer) {
+    transportCustomizers.add(transportCustomizer);
+  }
 }

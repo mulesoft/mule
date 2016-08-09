@@ -25,56 +25,50 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
 
-    @Rule
-    public SystemProperty path = new SystemProperty("path", "path");
+  @Rule
+  public SystemProperty path = new SystemProperty("path", "path");
 
-    private final String method;
-    private final String expectedContent;
+  private final String method;
+  private final String expectedContent;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {{"GET", "GET"}, {"POST", "POST"}, {"OPTIONS", "OPTIONS-DELETE"}, {"DELETE", "OPTIONS-DELETE"}, {"PUT", "ALL"}});
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"GET", "GET"}, {"POST", "POST"}, {"OPTIONS", "OPTIONS-DELETE"},
+        {"DELETE", "OPTIONS-DELETE"}, {"PUT", "ALL"}});
+  }
 
-    public HttpListenerMethodRoutingTestCase(String method, String expectedContent)
-    {
-        this.method = method;
-        this.expectedContent = expectedContent;
-    }
+  public HttpListenerMethodRoutingTestCase(String method, String expectedContent) {
+    this.method = method;
+    this.expectedContent = expectedContent;
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-method-routing-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-method-routing-config.xml";
+  }
 
-    @Test
-    public void callWithMethod() throws Exception
-    {
-        sendRequestAndAssertMethod(TEST_MESSAGE);
-        assertThat(getPayloadAsString(muleContext.getClient().request("test://out", RECEIVE_TIMEOUT)), equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void callWithMethod() throws Exception {
+    sendRequestAndAssertMethod(TEST_MESSAGE);
+    assertThat(getPayloadAsString(muleContext.getClient().request("test://out", RECEIVE_TIMEOUT)), equalTo(TEST_MESSAGE));
+  }
 
-    @Test
-    public void callWithMethodEmptyBody() throws Exception
-    {
-        sendRequestAndAssertMethod("");
-    }
+  @Test
+  public void callWithMethodEmptyBody() throws Exception {
+    sendRequestAndAssertMethod("");
+  }
 
-    private void sendRequestAndAssertMethod(String payload) throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(payload).withFlowVariable("method", method).run();
+  private void sendRequestAndAssertMethod(String payload) throws Exception {
+    MuleEvent event = flowRunner("requestFlow").withPayload(payload).withFlowVariable("method", method).run();
 
-        HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes();
-        assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));
-        assertThat(event.getMessageAsString(), is(expectedContent));
-    }
+    HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes();
+    assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));
+    assertThat(event.getMessageAsString(), is(expectedContent));
+  }
 
 }

@@ -11,40 +11,36 @@ import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 
 /**
- * A simple delegate interface for optionally parsing entities which
- * type is represented by {@code M} and produce a value of type {@code T}.
+ * A simple delegate interface for optionally parsing entities which type is represented by {@code M} and produce a value of type
+ * {@code T}.
  * <p>
- * To know if this delegate is suitable to parse a given entity,
- * call the {@link #accepts(MetadataType)} method. If it returns true,
- * then you can use the {@link #parse(String, MetadataType, DslSyntaxResolver)} to obtain a
- * value (do not call this method if the instance didn't accept the type).
+ * To know if this delegate is suitable to parse a given entity, call the {@link #accepts(MetadataType)} method. If it returns
+ * true, then you can use the {@link #parse(String, MetadataType, DslSyntaxResolver)} to obtain a value (do not call this method
+ * if the instance didn't accept the type).
  *
  * @param <M> the generic type of the accepted {@link MetadataType}s
  * @param <T> the generic type of the produced values
  * @since 4.0
  */
-public interface ParsingDelegate<M extends MetadataType, T>
-{
+public interface ParsingDelegate<M extends MetadataType, T> {
 
-    /**
-     * Verifies that {@code this} instance is capable of handling a
-     * specific type.
-     *
-     * @param metadataType a {@link MetadataType}
-     * @return whether it's safe to call {@link #parse(String, MetadataType, DslSyntaxResolver)} or not
-     */
-    boolean accepts(M metadataType);
+  /**
+   * Verifies that {@code this} instance is capable of handling a specific type.
+   *
+   * @param metadataType a {@link MetadataType}
+   * @return whether it's safe to call {@link #parse(String, MetadataType, DslSyntaxResolver)} or not
+   */
+  boolean accepts(M metadataType);
 
-    /**
-     * Performs the parsing and returns a value.
-     * <p>
-     * This method should only be invoked if {@link #accepts(MetadataType)} returns
-     * {@code true} for the same {@code metadataType}
-     *
-     * @param key          the parsed entity key
-     * @param metadataType a {@link MetadataType}
-     * @param elementDsl the {@link DslElementSyntax} of the parsed element
-     * @return
-     */
-    T parse(String key, M metadataType, DslElementSyntax elementDsl);
+  /**
+   * Performs the parsing and returns a value.
+   * <p>
+   * This method should only be invoked if {@link #accepts(MetadataType)} returns {@code true} for the same {@code metadataType}
+   *
+   * @param key the parsed entity key
+   * @param metadataType a {@link MetadataType}
+   * @param elementDsl the {@link DslElementSyntax} of the parsed element
+   * @return
+   */
+  T parse(String key, M metadataType, DslElementSyntax elementDsl);
 }

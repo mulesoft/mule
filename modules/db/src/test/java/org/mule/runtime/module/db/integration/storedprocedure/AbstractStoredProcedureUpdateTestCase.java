@@ -27,32 +27,28 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class AbstractStoredProcedureUpdateTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractStoredProcedureUpdateTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractStoredProcedureUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractStoredProcedureUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void testRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
-        Map mapPayload = (Map) response.getPayload();
-        int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
-        assertThat(mapPayload.get("updateCount1"), equalTo(expectedUpdateCount));
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(Map.class)));
+    Map mapPayload = (Map) response.getPayload();
+    int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
+    assertThat(mapPayload.get("updateCount1"), equalTo(expectedUpdateCount));
 
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
+  }
 }

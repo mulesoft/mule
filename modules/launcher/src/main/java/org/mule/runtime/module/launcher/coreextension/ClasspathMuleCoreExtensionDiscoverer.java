@@ -24,73 +24,60 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Discovers {@link MuleCoreExtension} classes that are defined in the
- *  classpath using core-extensions.properties files.
+ * Discovers {@link MuleCoreExtension} classes that are defined in the classpath using core-extensions.properties files.
  */
-public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
-{
+public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer {
 
-    public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
+  public static final String CORE_EXTENSION_RESOURCE_NAME =
+      "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
 
-    private static Logger logger = LoggerFactory.getLogger(ClasspathMuleCoreExtensionDiscoverer.class);
-    private final ArtifactClassLoader containerClassLoader;
+  private static Logger logger = LoggerFactory.getLogger(ClasspathMuleCoreExtensionDiscoverer.class);
+  private final ArtifactClassLoader containerClassLoader;
 
-    /**
-     * Creates a new extension discoverer
-     *
-     * @param containerClassLoader classloader where the discovering process will be executed. Non null.
-     */
-    public ClasspathMuleCoreExtensionDiscoverer(ArtifactClassLoader containerClassLoader)
-    {
-        checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
-        this.containerClassLoader = containerClassLoader;
+  /**
+   * Creates a new extension discoverer
+   *
+   * @param containerClassLoader classloader where the discovering process will be executed. Non null.
+   */
+  public ClasspathMuleCoreExtensionDiscoverer(ArtifactClassLoader containerClassLoader) {
+    checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+    this.containerClassLoader = containerClassLoader;
+  }
+
+  @Override
+  public List<MuleCoreExtension> discover() throws DefaultMuleException {
+    List<MuleCoreExtension> result = new LinkedList<>();
+
+    Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass());
+    List<Properties> extensions = new LinkedList<Properties>();
+
+    // load ALL of the extension files first
+    while (e.hasMoreElements()) {
+      try {
+        URL url = (URL) e.nextElement();
+        if (logger.isDebugEnabled()) {
+          logger.debug("Reading extension file: " + url.toString());
+        }
+        extensions.add(loadProperties(url.openStream()));
+      } catch (Exception ex) {
+        throw new DefaultMuleException("Error loading Mule core extensions", ex);
+      }
     }
 
-    @Override
-    public List<MuleCoreExtension> discover() throws DefaultMuleException
-    {
-        List<MuleCoreExtension> result = new LinkedList<>();
-
-        Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass());
-        List<Properties> extensions = new LinkedList<Properties>();
-
-        // load ALL of the extension files first
-        while (e.hasMoreElements())
-        {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading extension file: " + url.toString());
-                }
-                extensions.add(loadProperties(url.openStream()));
-            }
-            catch (Exception ex)
-            {
-                throw new DefaultMuleException("Error loading Mule core extensions", ex);
-            }
+    for (Properties extProps : extensions) {
+      for (Map.Entry entry : extProps.entrySet()) {
+        String extName = (String) entry.getKey();
+        String extClass = (String) entry.getValue();
+        try {
+          MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
+          extension.setContainerClassLoader(containerClassLoader);
+          result.add(extension);
+        } catch (Exception ex) {
+          throw new DefaultMuleException("Error starting Mule core extension " + extName, ex);
         }
-
-        for (Properties extProps : extensions)
-        {
-            for (Map.Entry entry : extProps.entrySet())
-            {
-                String extName = (String) entry.getKey();
-                String extClass = (String) entry.getValue();
-                try
-                {
-                    MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
-                    extension.setContainerClassLoader(containerClassLoader);
-                    result.add(extension);
-                }
-                catch (Exception ex)
-                {
-                    throw new DefaultMuleException("Error starting Mule core extension " + extName, ex);
-                }
-            }
-        }
-
-        return result;
+      }
     }
+
+    return result;
+  }
 }

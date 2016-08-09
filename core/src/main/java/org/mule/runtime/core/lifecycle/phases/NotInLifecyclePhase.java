@@ -9,16 +9,14 @@ package org.mule.runtime.core.lifecycle.phases;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 
 /**
- * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before
- * any other phase has been executed
+ * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before any other phase has been executed
  */
-public class NotInLifecyclePhase extends DefaultLifecyclePhase
-{
-    public static final String PHASE_NAME = "not in lifecycle";
+public class NotInLifecyclePhase extends DefaultLifecyclePhase {
 
-    public NotInLifecyclePhase()
-    {
-        super(PHASE_NAME, NotInLifecyclePhase.class, null);
-        registerSupportedPhase(Initialisable.PHASE_NAME);
-    }
+  public static final String PHASE_NAME = "not in lifecycle";
+
+  public NotInLifecyclePhase() {
+    super(PHASE_NAME, NotInLifecyclePhase.class, null);
+    registerSupportedPhase(Initialisable.PHASE_NAME);
+  }
 }

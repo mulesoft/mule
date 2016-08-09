@@ -27,58 +27,50 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase
-{
+public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
 
-    private static final String PASSWORD = "changeit";
+  private static final String PASSWORD = "changeit";
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data()
-    {
-        return asList(new Object[][] {
-                {"global tls", "globalTls"},
-                {"inline tls", "inlineTls"}});
-    }
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {{"global tls", "globalTls"}, {"inline tls", "inlineTls"}});
+  }
 
-    private String name;
-    private String configName;
+  private String name;
+  private String configName;
 
-    @Rule
-    public SystemProperty systemProperty;
+  @Rule
+  public SystemProperty systemProperty;
 
-    public PetStoreTlsConfigTestCase(String name, String configName)
-    {
-        this.name = name;
-        this.configName = configName;
-        systemProperty = new SystemProperty("config", configName);
-    }
+  public PetStoreTlsConfigTestCase(String name, String configName) {
+    this.name = name;
+    this.configName = configName;
+    systemProperty = new SystemProperty("config", configName);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-tls-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-tls-config.xml";
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnector.class};
+  }
 
-    @Test
-    public void tls() throws Exception
-    {
-        PetStoreConnector connector = getConfigurationFromRegistry(configName, getTestEvent(""));
-        TlsContextFactory tls = connector.getTlsContext();
-        assertThat(tls, is(notNullValue()));
+  @Test
+  public void tls() throws Exception {
+    PetStoreConnector connector = getConfigurationFromRegistry(configName, getTestEvent(""));
+    TlsContextFactory tls = connector.getTlsContext();
+    assertThat(tls, is(notNullValue()));
 
-        TlsContextTrustStoreConfiguration trustStoreConfig = tls.getTrustStoreConfiguration();
-        assertThat(trustStoreConfig.getPath().endsWith("ssltest-cacerts.jks"), is(true));
-        assertThat(trustStoreConfig.getPassword(), equalTo(PASSWORD));
+    TlsContextTrustStoreConfiguration trustStoreConfig = tls.getTrustStoreConfiguration();
+    assertThat(trustStoreConfig.getPath().endsWith("ssltest-cacerts.jks"), is(true));
+    assertThat(trustStoreConfig.getPassword(), equalTo(PASSWORD));
 
-        TlsContextKeyStoreConfiguration keyStoreConfiguration = tls.getKeyStoreConfiguration();
-        assertThat(keyStoreConfiguration.getPath().endsWith("ssltest-keystore.jks"), is(true));
-        assertThat(keyStoreConfiguration.getKeyPassword(), equalTo(PASSWORD));
-        assertThat(keyStoreConfiguration.getPassword(), equalTo(PASSWORD));
-    }
+    TlsContextKeyStoreConfiguration keyStoreConfiguration = tls.getKeyStoreConfiguration();
+    assertThat(keyStoreConfiguration.getPath().endsWith("ssltest-keystore.jks"), is(true));
+    assertThat(keyStoreConfiguration.getKeyPassword(), equalTo(PASSWORD));
+    assertThat(keyStoreConfiguration.getPassword(), equalTo(PASSWORD));
+  }
 }

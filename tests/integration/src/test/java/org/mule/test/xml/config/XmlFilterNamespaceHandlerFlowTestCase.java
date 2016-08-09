@@ -21,31 +21,29 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class XmlFilterNamespaceHandlerFlowTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/xml/xml-filter-functional-test-flow.xml";
-    }
+public class XmlFilterNamespaceHandlerFlowTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testIsXmlFilter() throws Exception
-    {
-        Object flow = muleContext.getRegistry().lookupObject("test for xml");
-        MessageProcessorChain notXmlSubFlow;
-        List<MessageProcessor> outEndpoints = new ArrayList<>(2);
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/xml-filter-functional-test-flow.xml";
+  }
 
-        outEndpoints.add(((Flow) flow).getMessageProcessors().get(0));
-        notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");
-        outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
+  @Test
+  public void testIsXmlFilter() throws Exception {
+    Object flow = muleContext.getRegistry().lookupObject("test for xml");
+    MessageProcessorChain notXmlSubFlow;
+    List<MessageProcessor> outEndpoints = new ArrayList<>(2);
 
-        assertEquals(2, outEndpoints.size());
-        assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);
-        assertTrue(((MessageFilter) outEndpoints.get(0)).getFilter() instanceof IsXmlFilter);
-        assertTrue(outEndpoints.get(1).getClass().getName(), outEndpoints.get(1) instanceof MessageFilter);
-        assertTrue(((MessageFilter) outEndpoints.get(1)).getFilter() instanceof NotFilter);
-        assertTrue(((NotFilter) ((MessageFilter) outEndpoints.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+    outEndpoints.add(((Flow) flow).getMessageProcessors().get(0));
+    notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");
+    outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
 
-    }
+    assertEquals(2, outEndpoints.size());
+    assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);
+    assertTrue(((MessageFilter) outEndpoints.get(0)).getFilter() instanceof IsXmlFilter);
+    assertTrue(outEndpoints.get(1).getClass().getName(), outEndpoints.get(1) instanceof MessageFilter);
+    assertTrue(((MessageFilter) outEndpoints.get(1)).getFilter() instanceof NotFilter);
+    assertTrue(((NotFilter) ((MessageFilter) outEndpoints.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+
+  }
 }

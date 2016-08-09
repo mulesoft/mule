@@ -15,35 +15,30 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class CustomFilterMule2437TestCase extends FunctionalTestCase
-{
+public class CustomFilterMule2437TestCase extends FunctionalTestCase {
 
-    private static final long TIMEOUT = 3000L;
+  private static final long TIMEOUT = 3000L;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "issues/custom-filter-mule-2437-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "issues/custom-filter-mule-2437-test-flow.xml";
+  }
 
-    @Test
-    public void testVowels() throws Exception
-    {
-        doTest("aei", "vm://vowels");
-    }
+  @Test
+  public void testVowels() throws Exception {
+    doTest("aei", "vm://vowels");
+  }
 
-    @Test
-    public void testConsonants() throws Exception
-    {
-        doTest("zyx", "vm://consonants");
-    }
+  @Test
+  public void testConsonants() throws Exception {
+    doTest("zyx", "vm://consonants");
+  }
 
-    protected void doTest(String message, String destination) throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", getTestMuleMessage(message));
-        MuleMessage response = client.request(destination, TIMEOUT);
-        assertNotNull(response);
-        assertEquals(message, getPayloadAsString(response));
-    }
+  protected void doTest(String message, String destination) throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://in", getTestMuleMessage(message));
+    MuleMessage response = client.request(destination, TIMEOUT);
+    assertNotNull(response);
+    assertEquals(message, getPayloadAsString(response));
+  }
 }

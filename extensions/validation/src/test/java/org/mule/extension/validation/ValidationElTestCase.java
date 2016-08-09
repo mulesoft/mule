@@ -25,216 +25,195 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class ValidationElTestCase extends AbstractMuleContextTestCase
-{
+public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
-    private ExpressionLanguage expressionLanguage;
+  private ExpressionLanguage expressionLanguage;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        expressionLanguage = muleContext.getExpressionLanguage();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    expressionLanguage = muleContext.getExpressionLanguage();
+  }
 
-    @Test
-    public void email() throws Exception
-    {
-        final String expression = "#[validator.validateEmail(email)]";
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("email", VALID_EMAIL);
+  @Test
+  public void email() throws Exception {
+    final String expression = "#[validator.validateEmail(email)]";
+    MuleEvent event = getTestEvent("");
+    event.setFlowVariable("email", VALID_EMAIL);
 
-        assertValid(expression, event);
+    assertValid(expression, event);
 
-        event.setFlowVariable("email", INVALID_EMAIL);
-        assertInvalid(expression, event);
-    }
+    event.setFlowVariable("email", INVALID_EMAIL);
+    assertInvalid(expression, event);
+  }
 
-    @Test
-    public void matchesRegex() throws Exception
-    {
-        final String regex = "[tT]rue";
-        final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
+  @Test
+  public void matchesRegex() throws Exception {
+    final String regex = "[tT]rue";
+    final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
 
-        MuleEvent event = getTestEvent("true");
-        event.setFlowVariable("regexp", regex);
-        event.setFlowVariable("caseSensitive", false);
+    MuleEvent event = getTestEvent("true");
+    event.setFlowVariable("regexp", regex);
+    event.setFlowVariable("caseSensitive", false);
 
-        assertValid(expression, event);
+    assertValid(expression, event);
 
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload("TRUE").build());
-        assertValid(expression, event);
+    event.setMessage(MuleMessage.builder(event.getMessage()).payload("TRUE").build());
+    assertValid(expression, event);
 
-        event.setFlowVariable("caseSensitive", true);
-        assertInvalid(expression, event);
+    event.setFlowVariable("caseSensitive", true);
+    assertInvalid(expression, event);
 
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload("tTrue").build());
-        assertInvalid(expression, event);
-    }
+    event.setMessage(MuleMessage.builder(event.getMessage()).payload("tTrue").build());
+    assertInvalid(expression, event);
+  }
 
-    @Test
-    public void isTime() throws Exception
-    {
-        final String time = "12:08 PM";
+  @Test
+  public void isTime() throws Exception {
+    final String time = "12:08 PM";
 
-        MuleEvent event = getTestEvent(time);
-        event.setFlowVariable("validPattern", "h:mm a");
-        event.setFlowVariable("invalidPattern", "yyMMddHHmmssZ");
+    MuleEvent event = getTestEvent(time);
+    event.setFlowVariable("validPattern", "h:mm a");
+    event.setFlowVariable("invalidPattern", "yyMMddHHmmssZ");
 
-        assertValid("#[validator.isTime(payload, validPattern)]", event);
-        assertValid("#[validator.isTime(payload, validPattern, 'US')]", event);
+    assertValid("#[validator.isTime(payload, validPattern)]", event);
+    assertValid("#[validator.isTime(payload, validPattern, 'US')]", event);
 
-        assertInvalid("#[validator.isTime(payload, invalidPattern)]", event);
-        assertInvalid("#[validator.isTime(payload, invalidPattern, 'US')]", event);
-    }
+    assertInvalid("#[validator.isTime(payload, invalidPattern)]", event);
+    assertInvalid("#[validator.isTime(payload, invalidPattern, 'US')]", event);
+  }
 
-    @Test
-    public void isEmpty() throws Exception
-    {
+  @Test
+  public void isEmpty() throws Exception {
 
-        Map<String, String> map = new HashMap<>();
+    Map<String, String> map = new HashMap<>();
 
-        assertEmpty("", true);
-        assertEmpty(ImmutableList.of(), true);
-        assertEmpty(new String[] {}, true);
-        assertEmpty(map, true);
-        assertEmpty("", true);
+    assertEmpty("", true);
+    assertEmpty(ImmutableList.of(), true);
+    assertEmpty(new String[] {}, true);
+    assertEmpty(map, true);
+    assertEmpty("", true);
 
-        map.put("a", "a");
+    map.put("a", "a");
 
-        assertEmpty("a", false);
-        assertEmpty(ImmutableList.of("a"), false);
-        assertEmpty(new String[] {"a"}, false);
-        assertEmpty(new Object[] {new Object()}, false);
-        assertEmpty(new int[] {0}, false);
-    }
+    assertEmpty("a", false);
+    assertEmpty(ImmutableList.of("a"), false);
+    assertEmpty(new String[] {"a"}, false);
+    assertEmpty(new Object[] {new Object()}, false);
+    assertEmpty(new int[] {0}, false);
+  }
 
-    @Test
-    public void notEmpty() throws Exception
-    {
+  @Test
+  public void notEmpty() throws Exception {
 
-        Map<String, String> map = new HashMap<>();
+    Map<String, String> map = new HashMap<>();
 
-        assertNotEmpty("", false);
-        assertNotEmpty(ImmutableList.of(), false);
-        assertNotEmpty(new String[] {}, false);
-        assertNotEmpty(map, false);
-        assertNotEmpty("", false);
+    assertNotEmpty("", false);
+    assertNotEmpty(ImmutableList.of(), false);
+    assertNotEmpty(new String[] {}, false);
+    assertNotEmpty(map, false);
+    assertNotEmpty("", false);
 
-        map.put("a", "a");
+    map.put("a", "a");
 
-        assertNotEmpty("a", true);
-        assertNotEmpty(ImmutableList.of("a"), true);
-        assertNotEmpty(new String[] {"a"}, true);
-        assertNotEmpty(new Object[] {new Object()}, true);
-        assertNotEmpty(new int[] {0}, true);
-    }
+    assertNotEmpty("a", true);
+    assertNotEmpty(ImmutableList.of("a"), true);
+    assertNotEmpty(new String[] {"a"}, true);
+    assertNotEmpty(new Object[] {new Object()}, true);
+    assertNotEmpty(new int[] {0}, true);
+  }
 
-    @Test
-    public void size() throws Exception
-    {
-        assertValid("#[validator.validateSize('John', 0, 4)]", getTestEvent(""));
-        assertInvalid("#[validator.validateSize(payload, 1, 4)]", getTestEvent(ImmutableList.of()));
-    }
+  @Test
+  public void size() throws Exception {
+    assertValid("#[validator.validateSize('John', 0, 4)]", getTestEvent(""));
+    assertInvalid("#[validator.validateSize(payload, 1, 4)]", getTestEvent(ImmutableList.of()));
+  }
 
-    @Test
-    public void notNull() throws Exception
-    {
-        final String expression = "#[validator.isNotNull(payload)]";
-        assertValid(expression, getTestEvent(""));
+  @Test
+  public void notNull() throws Exception {
+    final String expression = "#[validator.isNotNull(payload)]";
+    assertValid(expression, getTestEvent(""));
 
-        assertInvalid(expression, getTestEvent((MuleMessage.builder().nullPayload().build())));
-    }
+    assertInvalid(expression, getTestEvent((MuleMessage.builder().nullPayload().build())));
+  }
 
-    @Test
-    public void isNull() throws Exception
-    {
-        final String expression = "#[validator.isNull(payload)]";
-        assertValid(expression, getTestEvent(MuleMessage.builder().nullPayload().build()));
+  @Test
+  public void isNull() throws Exception {
+    final String expression = "#[validator.isNull(payload)]";
+    assertValid(expression, getTestEvent(MuleMessage.builder().nullPayload().build()));
 
-        assertInvalid(expression, getTestEvent(""));
-    }
+    assertInvalid(expression, getTestEvent(""));
+  }
 
-    @Test
-    public void isNumber() throws Exception
-    {
-        final String expression = "#[validator.isNumber(payload, numberType, minValue, maxValue)]";
-        assertNumberValue(expression, NumberType.LONG, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE, Long.MAX_VALUE);
-        assertNumberValue(expression, NumberType.INTEGER, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+  @Test
+  public void isNumber() throws Exception {
+    final String expression = "#[validator.isNumber(payload, numberType, minValue, maxValue)]";
+    assertNumberValue(expression, NumberType.LONG, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE,
+                      Long.MAX_VALUE);
+    assertNumberValue(expression, NumberType.INTEGER, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1,
+                      Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-        assertNumberValue(expression, NumberType.SHORT, new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(), new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
-        assertNumberValue(expression, NumberType.DOUBLE, 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
-        assertNumberValue(expression, NumberType.FLOAT, 10F, 1F, 10F, 0F, 20F);
-    }
+    assertNumberValue(expression, NumberType.SHORT, new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(),
+                      new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
+    assertNumberValue(expression, NumberType.DOUBLE, 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
+    assertNumberValue(expression, NumberType.FLOAT, 10F, 1F, 10F, 0F, 20F);
+  }
 
-    @Test
-    public void ip() throws Exception
-    {
-        final String expression = "#[validator.validateIp(payload)]";
-        assertValid(expression, getTestEvent("127.0.0.1"));
-        assertInvalid(expression, getTestEvent("ET phone home"));
-    }
+  @Test
+  public void ip() throws Exception {
+    final String expression = "#[validator.validateIp(payload)]";
+    assertValid(expression, getTestEvent("127.0.0.1"));
+    assertInvalid(expression, getTestEvent("ET phone home"));
+  }
 
-    @Test
-    public void url() throws Exception
-    {
-        final String expression = "#[validator.validateUrl(payload)]";
-        assertValid(expression, getTestEvent(VALID_URL));
-        assertInvalid(expression, getTestEvent(INVALID_URL));
-    }
+  @Test
+  public void url() throws Exception {
+    final String expression = "#[validator.validateUrl(payload)]";
+    assertValid(expression, getTestEvent(VALID_URL));
+    assertInvalid(expression, getTestEvent(INVALID_URL));
+  }
 
-    private <T extends Number> void assertNumberValue(String expression,
-                                                      NumberType numberType,
-                                                      T value,
-                                                      T minValue,
-                                                      T maxValue,
-                                                      T lowerBoundaryViolation,
-                                                      T upperBoundaryViolation) throws Exception
-    {
-        assertValid(expression, getNumberValidationEvent(value, numberType, minValue, maxValue));
-        final String invalid = "unparseable";
-        assertInvalid(expression, getNumberValidationEvent(invalid, numberType, minValue, maxValue));
+  private <T extends Number> void assertNumberValue(String expression, NumberType numberType, T value, T minValue, T maxValue,
+                                                    T lowerBoundaryViolation, T upperBoundaryViolation)
+      throws Exception {
+    assertValid(expression, getNumberValidationEvent(value, numberType, minValue, maxValue));
+    final String invalid = "unparseable";
+    assertInvalid(expression, getNumberValidationEvent(invalid, numberType, minValue, maxValue));
 
-        assertInvalid(expression, getNumberValidationEvent(upperBoundaryViolation, numberType, minValue, maxValue));
-        assertInvalid(expression, getNumberValidationEvent(lowerBoundaryViolation, numberType, minValue, maxValue));
-    }
+    assertInvalid(expression, getNumberValidationEvent(upperBoundaryViolation, numberType, minValue, maxValue));
+    assertInvalid(expression, getNumberValidationEvent(lowerBoundaryViolation, numberType, minValue, maxValue));
+  }
 
-    private MuleEvent getNumberValidationEvent(Object value, NumberType numberType, Object minValue, Object maxValue) throws Exception
-    {
-        MuleEvent event = getTestEvent(value);
-        event.setFlowVariable("numberType", numberType);
-        event.setFlowVariable("minValue", minValue);
-        event.setFlowVariable("maxValue", maxValue);
+  private MuleEvent getNumberValidationEvent(Object value, NumberType numberType, Object minValue, Object maxValue)
+      throws Exception {
+    MuleEvent event = getTestEvent(value);
+    event.setFlowVariable("numberType", numberType);
+    event.setFlowVariable("minValue", minValue);
+    event.setFlowVariable("maxValue", maxValue);
 
-        return event;
-    }
+    return event;
+  }
 
-    private void assertEmpty(Object value, boolean expected) throws Exception
-    {
-        testExpression("#[validator.isEmpty(payload)]", getTestEvent(value), expected);
-    }
+  private void assertEmpty(Object value, boolean expected) throws Exception {
+    testExpression("#[validator.isEmpty(payload)]", getTestEvent(value), expected);
+  }
 
-    private void assertNotEmpty(Object value, boolean expected) throws Exception
-    {
-        testExpression("#[validator.notEmpty(payload)]", getTestEvent(value), expected);
-    }
+  private void assertNotEmpty(Object value, boolean expected) throws Exception {
+    testExpression("#[validator.notEmpty(payload)]", getTestEvent(value), expected);
+  }
 
-    private boolean evaluate(String expression, MuleEvent event)
-    {
-        return expressionLanguage.evaluate(expression, event);
-    }
+  private boolean evaluate(String expression, MuleEvent event) {
+    return expressionLanguage.evaluate(expression, event);
+  }
 
-    private void assertValid(String expression, MuleEvent event)
-    {
-        testExpression(expression, event, true);
-    }
+  private void assertValid(String expression, MuleEvent event) {
+    testExpression(expression, event, true);
+  }
 
-    private void assertInvalid(String expression, MuleEvent event)
-    {
-        testExpression(expression, event, false);
-    }
+  private void assertInvalid(String expression, MuleEvent event) {
+    testExpression(expression, event, false);
+  }
 
-    private void testExpression(String expression, MuleEvent event, boolean expected)
-    {
-        assertThat(evaluate(expression, event), is(expected));
-    }
+  private void testExpression(String expression, MuleEvent event, boolean expected) {
+    assertThat(evaluate(expression, event), is(expected));
+  }
 }

@@ -9,16 +9,16 @@ package org.mule.runtime.core.api.client;
 /**
  * Base options for every operation executed by {@link org.mule.runtime.core.api.client.MuleClient}
  *
- * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
+ * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may
+ * be used as key in a map
  */
-public interface OperationOptions
-{
+public interface OperationOptions {
 
-    /**
-     * @return timeout for the operation to execute. May be null if the user didn't configure any.
-     */
-    Long getResponseTimeout();
+  /**
+   * @return timeout for the operation to execute. May be null if the user didn't configure any.
+   */
+  Long getResponseTimeout();
 
-    boolean isOutbound();
+  boolean isOutbound();
 
 }

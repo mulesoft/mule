@@ -17,56 +17,43 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ByteArrayToSerializable</code> converts a serialized object to its object
- * representation
+ * <code>ByteArrayToSerializable</code> converts a serialized object to its object representation
  */
-public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer
-{
+public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer {
 
-    /**
-     * Give core transformers a slightly higher priority
-     */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  /**
+   * Give core transformers a slightly higher priority
+   */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public ByteArrayToSerializable()
-    {
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.INPUT_STREAM);
+  public ByteArrayToSerializable() {
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.INPUT_STREAM);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    ObjectSerializer serializer = muleContext.getObjectSerializer();
+    try {
+      final Object result;
+      if (src instanceof byte[]) {
+        result = serializer.deserialize((byte[]) src);
+      } else {
+        result = serializer.deserialize((InputStream) src);
+      }
+      return result;
+    } catch (Exception e) {
+      throw new TransformerException(CoreMessages.transformFailed("byte[]", "Object"), this, e);
     }
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        ObjectSerializer serializer = muleContext.getObjectSerializer();
-        try
-        {
-            final Object result;
-            if (src instanceof byte[])
-            {
-                result = serializer.deserialize((byte[]) src);
-            }
-            else
-            {
-                result = serializer.deserialize((InputStream) src);
-            }
-            return result;
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(
-                    CoreMessages.transformFailed("byte[]", "Object"), this, e);
-        }
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

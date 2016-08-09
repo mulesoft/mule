@@ -6,39 +6,33 @@
  */
 package org.mule.functional.testmodels.services;
 
-public class PersonResponse
-{
-    private Person person;
-    private long time;
+public class PersonResponse {
 
-    public PersonResponse()
-    {
-        // empty constructor
-    }
+  private Person person;
+  private long time;
 
-    public PersonResponse(Person person)
-    {
-        this.person = person;
-        this.time = System.currentTimeMillis();
-    }
+  public PersonResponse() {
+    // empty constructor
+  }
 
-    public Person getPerson()
-    {
-        return person;
-    }
+  public PersonResponse(Person person) {
+    this.person = person;
+    this.time = System.currentTimeMillis();
+  }
 
-    public void setPerson(Person person)
-    {
-        this.person = person;
-    }
+  public Person getPerson() {
+    return person;
+  }
 
-    public long getTime()
-    {
-        return time;
-    }
+  public void setPerson(Person person) {
+    this.person = person;
+  }
 
-    public void setTime(long time)
-    {
-        this.time = time;
-    }
+  public long getTime() {
+    return time;
+  }
+
+  public void setTime(long time) {
+    this.time = time;
+  }
 }

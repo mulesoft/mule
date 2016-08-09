@@ -11,18 +11,17 @@ import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * The ReversibleValidatingInterceptor is going to allow to reset the Xml Stream Reader once it is consumed
- * by the CheckClosingTagsInterceptor to validate the schema.
+ * The ReversibleValidatingInterceptor is going to allow to reset the Xml Stream Reader once it is consumed by the
+ * CheckClosingTagsInterceptor to validate the schema.
  */
-public class ReversibleValidatingInterceptor extends ReversibleStaxInterceptor
-{
-    public ReversibleValidatingInterceptor()
-    {
-        super(Phase.READ);
-        addAfter(ProxySchemaValidationInInterceptor.class.getName());
-        //this interceptor will read the first element after the body, so we need to capture it
-        addBefore(StartBodyInterceptor.class.getName());
-    }
+public class ReversibleValidatingInterceptor extends ReversibleStaxInterceptor {
+
+  public ReversibleValidatingInterceptor() {
+    super(Phase.READ);
+    addAfter(ProxySchemaValidationInInterceptor.class.getName());
+    // this interceptor will read the first element after the body, so we need to capture it
+    addBefore(StartBodyInterceptor.class.getName());
+  }
 
 
 }

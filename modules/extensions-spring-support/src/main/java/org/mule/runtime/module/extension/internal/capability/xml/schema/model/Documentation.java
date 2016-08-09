@@ -35,10 +35,13 @@ import org.w3c.dom.Element;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -55,114 +58,96 @@ import org.w3c.dom.Element;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-        "content"
-})
+@XmlType(name = "", propOrder = {"content"})
 @XmlRootElement(name = "documentation")
-public class Documentation
-{
+public class Documentation {
 
-    @XmlMixed
-    @XmlAnyElement(lax = true)
-    protected List<Object> content;
-    @XmlAttribute(name = "source")
-    @XmlSchemaType(name = "anyURI")
-    protected String source;
-    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
-    @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+  @XmlMixed
+  @XmlAnyElement(lax = true)
+  protected List<Object> content;
+  @XmlAttribute(name = "source")
+  @XmlSchemaType(name = "anyURI")
+  protected String source;
+  @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
+  protected String lang;
+  @XmlAnyAttribute
+  private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
-    /**
-     * Gets the value of the content property.
-     * <p/>
-     * <p/>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the content property.
-     * <p/>
-     * <p/>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContent().add(newItem);
-     * </pre>
-     * <p/>
-     * <p/>
-     * <p/>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * {@link Element }
-     * {@link Object }
-     */
-    public List<Object> getContent()
-    {
-        if (content == null)
-        {
-            content = new ArrayList<Object>();
-        }
-        return this.content;
+  /**
+   * Gets the value of the content property.
+   * <p/>
+   * <p/>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+   * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the content
+   * property.
+   * <p/>
+   * <p/>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getContent().add(newItem);
+   * </pre>
+   * <p/>
+   * <p/>
+   * <p/>
+   * Objects of the following type(s) are allowed in the list {@link String } {@link Element } {@link Object }
+   */
+  public List<Object> getContent() {
+    if (content == null) {
+      content = new ArrayList<Object>();
     }
+    return this.content;
+  }
 
-    /**
-     * Gets the value of the source property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getSource()
-    {
-        return source;
-    }
+  /**
+   * Gets the value of the source property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getSource() {
+    return source;
+  }
 
-    /**
-     * Sets the value of the source property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setSource(String value)
-    {
-        this.source = value;
-    }
+  /**
+   * Sets the value of the source property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setSource(String value) {
+    this.source = value;
+  }
 
-    /**
-     * Gets the value of the lang property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getLang()
-    {
-        return lang;
-    }
+  /**
+   * Gets the value of the lang property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getLang() {
+    return lang;
+  }
 
-    /**
-     * Sets the value of the lang property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setLang(String value)
-    {
-        this.lang = value;
-    }
+  /**
+   * Sets the value of the lang property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setLang(String value) {
+    this.lang = value;
+  }
 
-    /**
-     * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * <p/>
-     * <p/>
-     * the map is keyed by the name of the attribute and
-     * the value is the string value of the attribute.
-     * <p/>
-     * the map returned by this method is live, and you can add new attribute
-     * by updating the map directly. Because of this design, there's no setter.
-     *
-     * @return always non-null
-     */
-    public Map<QName, String> getOtherAttributes()
-    {
-        return otherAttributes;
-    }
+  /**
+   * Gets a map that contains attributes that aren't bound to any typed property on this class.
+   * <p/>
+   * <p/>
+   * the map is keyed by the name of the attribute and the value is the string value of the attribute.
+   * <p/>
+   * the map returned by this method is live, and you can add new attribute by updating the map directly. Because of this design,
+   * there's no setter.
+   *
+   * @return always non-null
+   */
+  public Map<QName, String> getOtherAttributes() {
+    return otherAttributes;
+  }
 
 }

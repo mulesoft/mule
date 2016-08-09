@@ -11,15 +11,14 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * <code>RegistryServiceMBean</code> JMX Service interface for the Registry
  */
-public interface RegistryServiceMBean
-{
+public interface RegistryServiceMBean {
 
-    void start() throws MuleException;
+  void start() throws MuleException;
 
-    void stop() throws MuleException;
+  void stop() throws MuleException;
 
-    //String getPersistenceMode();
+  // String getPersistenceMode();
 
-    String getName();
+  String getName();
 
 }

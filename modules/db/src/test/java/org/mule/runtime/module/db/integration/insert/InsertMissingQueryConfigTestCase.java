@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.insert;
 
 import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
-public class InsertMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
-{
+public class InsertMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/insert/insert-missing-query-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/insert/insert-missing-query-config.xml";
+  }
 
-    @Override
-    protected String getMessageProcessorElement()
-    {
-        return "insert";
-    }
+  @Override
+  protected String getMessageProcessorElement() {
+    return "insert";
+  }
 }

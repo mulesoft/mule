@@ -16,47 +16,40 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
-public class LifetimeInfo
-{
+public class LifetimeInfo {
 
-    @Optional
-    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 3)
-    private LocalDateTime dateOfConception;
+  @Optional
+  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 3)
+  private LocalDateTime dateOfConception;
 
-    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 4)
-    private Date dateOfBirth;
+  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 4)
+  private Date dateOfBirth;
 
-    @DisplayName("Date of decease")
-    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 5)
-    private Calendar dateOfDeath;
+  @DisplayName("Date of decease")
+  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 5)
+  private Calendar dateOfDeath;
 
-    public Date getDateOfBirth()
-    {
-        return dateOfBirth;
-    }
+  public Date getDateOfBirth() {
+    return dateOfBirth;
+  }
 
-    public void setDateOfBirth(Date dateOfBirth)
-    {
-        this.dateOfBirth = dateOfBirth;
-    }
+  public void setDateOfBirth(Date dateOfBirth) {
+    this.dateOfBirth = dateOfBirth;
+  }
 
-    public Calendar getDateOfDeath()
-    {
-        return dateOfDeath;
-    }
+  public Calendar getDateOfDeath() {
+    return dateOfDeath;
+  }
 
-    public void setDateOfDeath(Calendar dateOfDeath)
-    {
-        this.dateOfDeath = dateOfDeath;
-    }
+  public void setDateOfDeath(Calendar dateOfDeath) {
+    this.dateOfDeath = dateOfDeath;
+  }
 
-    public LocalDateTime getDateOfConception()
-    {
-        return dateOfConception;
-    }
+  public LocalDateTime getDateOfConception() {
+    return dateOfConception;
+  }
 
-    public void setDateOfConception(LocalDateTime dateOfConception)
-    {
-        this.dateOfConception = dateOfConception;
-    }
+  public void setDateOfConception(LocalDateTime dateOfConception) {
+    this.dateOfConception = dateOfConception;
+  }
 }

@@ -40,73 +40,67 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpRequestDispatcherWorkTestCase extends AbstractMuleTestCase
-{
+public class HttpRequestDispatcherWorkTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpConnector mockHttpConnector;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Socket mockSocket;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private HttpMessageReceiver mockHttpMessageReceiver;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Work mockWork;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessContext mockMessageContext;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    NoReceiverForEndpointException mockNoReceiverForEndpointException;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpConnector mockHttpConnector;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Socket mockSocket;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private HttpMessageReceiver mockHttpMessageReceiver;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Work mockWork;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessContext mockMessageContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  NoReceiverForEndpointException mockNoReceiverForEndpointException;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpRequestDispatcherWorkWithNullHttpConnector()
-    {
-        new HttpRequestDispatcherWork(null, mockSocket);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpRequestDispatcherWorkWithNullHttpConnector() {
+    new HttpRequestDispatcherWork(null, mockSocket);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void createHttpRequestDispatcherWorkWithNullServerSocket()
-    {
-        new HttpRequestDispatcherWork(mockHttpConnector, null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void createHttpRequestDispatcherWorkWithNullServerSocket() {
+    new HttpRequestDispatcherWork(mockHttpConnector, null);
+  }
 
-    @Test
-    public void onExceptionCallSystemExceptionHandler() throws Exception
-    {
-        HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
-        setUpSocketMessage();
-        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(Exception.class);
-        httpRequestDispatcherWork.run();
-        verify(mockHttpConnector.getMuleContext().getExceptionListener(), times(1)).handleException(any(Exception.class));
-    }
+  @Test
+  public void onExceptionCallSystemExceptionHandler() throws Exception {
+    HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
+    setUpSocketMessage();
+    when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(Exception.class);
+    httpRequestDispatcherWork.run();
+    verify(mockHttpConnector.getMuleContext().getExceptionListener(), times(1)).handleException(any(Exception.class));
+  }
 
-    @Test
-    public void requestPathWithNoReceiver() throws Exception
-    {
-        HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
-        setUpSocketMessage();
-        when(mockSocket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(0));
-        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(mockNoReceiverForEndpointException);
-        ByteArrayOutputStream socketOutput = new ByteArrayOutputStream();
-        when(mockSocket.getOutputStream()).thenReturn(socketOutput);
-        httpRequestDispatcherWork.run();
-        String response = new String(socketOutput.toByteArray());
-        assertThat(response.startsWith("HTTP/1.0 404 Not Found"), Is.is(true));
-    }
+  @Test
+  public void requestPathWithNoReceiver() throws Exception {
+    HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
+    setUpSocketMessage();
+    when(mockSocket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(0));
+    when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class)))
+        .thenThrow(mockNoReceiverForEndpointException);
+    ByteArrayOutputStream socketOutput = new ByteArrayOutputStream();
+    when(mockSocket.getOutputStream()).thenReturn(socketOutput);
+    httpRequestDispatcherWork.run();
+    String response = new String(socketOutput.toByteArray());
+    assertThat(response.startsWith("HTTP/1.0 404 Not Found"), Is.is(true));
+  }
 
-    @Test
-    public void onValidUriProcessRequest() throws Exception
-    {
-        HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
-        when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(RequestLine.class))).thenReturn(mockHttpMessageReceiver);
-        setUpSocketMessage();
-        when(mockHttpMessageReceiver.createMessageProcessContext()).thenReturn(mockMessageContext);
-        httpRequestDispatcherWork.run();
-        verify(mockHttpMessageReceiver, times(1)).processRequest(isA(HttpServerConnection.class));
-    }
+  @Test
+  public void onValidUriProcessRequest() throws Exception {
+    HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
+    when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(RequestLine.class))).thenReturn(mockHttpMessageReceiver);
+    setUpSocketMessage();
+    when(mockHttpMessageReceiver.createMessageProcessContext()).thenReturn(mockMessageContext);
+    httpRequestDispatcherWork.run();
+    verify(mockHttpMessageReceiver, times(1)).processRequest(isA(HttpServerConnection.class));
+  }
 
-    private void setUpSocketMessage() throws IOException
-    {
-        when(mockHttpConnector.getMuleContext().getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n".getBytes()));
-    }
+  private void setUpSocketMessage() throws IOException {
+    when(mockHttpConnector.getMuleContext().getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
+    when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n".getBytes()));
+  }
 
 }

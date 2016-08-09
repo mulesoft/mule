@@ -28,73 +28,66 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
-{
+public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase {
 
-    private static final String LOCALHOST = "localhost";
+  private static final String LOCALHOST = "localhost";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private HttpListenerConnectionManager mockHttpListenerConnectionManager = mock(HttpListenerConnectionManager.class);
-    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
-    private DefaultHttpListenerConfig listenerConfig;
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private HttpListenerConnectionManager mockHttpListenerConnectionManager = mock(HttpListenerConnectionManager.class);
+  private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
+  private DefaultHttpListenerConfig listenerConfig;
 
-    @Before
-    public void setUp() throws RegistrationException
-    {
-        when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class))).thenReturn(mockHttpListenerConnectionManager);
-        when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
-        listenerConfig = createBaseListener();
-    }
+  @Before
+  public void setUp() throws RegistrationException {
+    when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)))
+        .thenReturn(mockHttpListenerConnectionManager);
+    when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
+    listenerConfig = createBaseListener();
+  }
 
-    @Test
-    public void defaultPortWithDefaultProtocol() throws Exception
-    {
-        listenerConfig.initialise();
-        assertThat(listenerConfig.getPort(), is(HTTP.getDefaultPort()));
-    }
+  @Test
+  public void defaultPortWithDefaultProtocol() throws Exception {
+    listenerConfig.initialise();
+    assertThat(listenerConfig.getPort(), is(HTTP.getDefaultPort()));
+  }
 
-    @Test
-    public void defaultPortWithHttpConfigured() throws Exception
-    {
-        listenerConfig.setProtocol(HTTP);
-        listenerConfig.initialise();
-        assertThat(listenerConfig.getPort(), is(HTTP.getDefaultPort()));
-    }
+  @Test
+  public void defaultPortWithHttpConfigured() throws Exception {
+    listenerConfig.setProtocol(HTTP);
+    listenerConfig.initialise();
+    assertThat(listenerConfig.getPort(), is(HTTP.getDefaultPort()));
+  }
 
-    @Test
-    public void defaultPortWithHttpsConfigured() throws Exception
-    {
-        listenerConfig.setProtocol(HTTPS);
-        listenerConfig.setTlsContext(mockTlsContextFactory);
-        listenerConfig.initialise();
-        assertThat(listenerConfig.getPort(), is(HTTPS.getDefaultPort()));
-    }
+  @Test
+  public void defaultPortWithHttpsConfigured() throws Exception {
+    listenerConfig.setProtocol(HTTPS);
+    listenerConfig.setTlsContext(mockTlsContextFactory);
+    listenerConfig.initialise();
+    assertThat(listenerConfig.getPort(), is(HTTPS.getDefaultPort()));
+  }
 
-    @Test
-    public void validateTlsContextWhenUsingHttps() throws Exception
-    {
-        listenerConfig.setProtocol(HTTPS);
-        expectedException.expect(InitialisationException.class);
-        listenerConfig.initialise();
-    }
+  @Test
+  public void validateTlsContextWhenUsingHttps() throws Exception {
+    listenerConfig.setProtocol(HTTPS);
+    expectedException.expect(InitialisationException.class);
+    listenerConfig.initialise();
+  }
 
-    @Test
-    public void validateTlsContextWithNoKeystoreWhenUsingHttps() throws Exception
-    {
-        when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(false);
-        listenerConfig.setProtocol(HTTPS);
-        expectedException.expect(InitialisationException.class);
-        listenerConfig.initialise();
-    }
+  @Test
+  public void validateTlsContextWithNoKeystoreWhenUsingHttps() throws Exception {
+    when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(false);
+    listenerConfig.setProtocol(HTTPS);
+    expectedException.expect(InitialisationException.class);
+    listenerConfig.initialise();
+  }
 
-    private DefaultHttpListenerConfig createBaseListener()
-    {
-        DefaultHttpListenerConfig listenerConfig = new DefaultHttpListenerConfig(mockHttpListenerConnectionManager);
-        listenerConfig.setHost(LOCALHOST);
-        listenerConfig.setMuleContext(mockMuleContext);
-        return listenerConfig;
-    }
+  private DefaultHttpListenerConfig createBaseListener() {
+    DefaultHttpListenerConfig listenerConfig = new DefaultHttpListenerConfig(mockHttpListenerConnectionManager);
+    listenerConfig.setHost(LOCALHOST);
+    listenerConfig.setMuleContext(mockMuleContext);
+    return listenerConfig;
+  }
 }

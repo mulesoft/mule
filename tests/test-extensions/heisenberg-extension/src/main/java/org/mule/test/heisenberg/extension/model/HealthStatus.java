@@ -6,9 +6,6 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-public enum HealthStatus
-{
-    HEALTHY,
-    CANCER,
-    DEAD
+public enum HealthStatus {
+  HEALTHY, CANCER, DEAD
 }

@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.context.notification;
 
-public class Listener2 extends AbstractListener
-{
+public class Listener2 extends AbstractListener {
 
-    // empty
+  // empty
 
 }

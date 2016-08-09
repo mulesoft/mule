@@ -38,82 +38,73 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectionProviderNameModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class ConnectionProviderNameModelValidatorTestCase extends AbstractMuleTestCase {
 
-    private static final String CUSTOM_NAME = "my name";
-    private static final String EXTENSION_NAME = "my extension";
+  private static final String CUSTOM_NAME = "my name";
+  private static final String EXTENSION_NAME = "my extension";
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    @Before
-    public void before()
-    {
-        when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
-    }
+  @Before
+  public void before() {
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
+  }
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionModel extensionModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionModel extensionModel;
 
-    private ConnectionProviderNameModelValidator validator = new ConnectionProviderNameModelValidator();
+  private ConnectionProviderNameModelValidator validator = new ConnectionProviderNameModelValidator();
 
-    private List<ConnectionProviderModel> mockConnectionProviders(String... names)
-    {
-        return Stream.of(names)
-                .map(name ->
-                     {
-                         ConnectionProviderModel mock = mock(ConnectionProviderModel.class, Mockito.RETURNS_DEEP_STUBS);
-                         when(mock.getName()).thenReturn(name);
+  private List<ConnectionProviderModel> mockConnectionProviders(String... names) {
+    return Stream.of(names).map(name -> {
+      ConnectionProviderModel mock = mock(ConnectionProviderModel.class, Mockito.RETURNS_DEEP_STUBS);
+      when(mock.getName()).thenReturn(name);
 
-                         return mock;
-                     })
-                .collect(toList());
-    }
+      return mock;
+    }).collect(toList());
+  }
 
-    @Test
-    public void valid()
-    {
-        List<ConnectionProviderModel> mockModels = mockConnectionProviders(DEFAULT_CONNECTION_PROVIDER_NAME, CUSTOM_NAME);
-        when(extensionModel.getConnectionProviders()).thenReturn(mockModels);
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void valid() {
+    List<ConnectionProviderModel> mockModels = mockConnectionProviders(DEFAULT_CONNECTION_PROVIDER_NAME, CUSTOM_NAME);
+    when(extensionModel.getConnectionProviders()).thenReturn(mockModels);
+    validator.validate(extensionModel);
+  }
 
-    @Test
-    public void invalid()
-    {
-        List<ConnectionProviderModel> mockModels = mockConnectionProviders(DEFAULT_CONNECTION_PROVIDER_NAME, DEFAULT_CONNECTION_PROVIDER_NAME, CUSTOM_NAME, CUSTOM_NAME, "bleh");
-        when(extensionModel.getConnectionProviders()).thenReturn(mockModels);
-        expectedException.expect(new BaseMatcher<Exception>()
-        {
-            @Override
-            public boolean matches(Object item)
-            {
-                assertThat(item, instanceOf(IllegalModelDefinitionException.class));
-                Exception e = (Exception) item;
+  @Test
+  public void invalid() {
+    List<ConnectionProviderModel> mockModels =
+        mockConnectionProviders(DEFAULT_CONNECTION_PROVIDER_NAME, DEFAULT_CONNECTION_PROVIDER_NAME, CUSTOM_NAME, CUSTOM_NAME,
+                                "bleh");
+    when(extensionModel.getConnectionProviders()).thenReturn(mockModels);
+    expectedException.expect(new BaseMatcher<Exception>() {
 
-                assertThat(e.getMessage(), containsString(EXTENSION_NAME));
-                assertThat(e.getMessage(), containsString(DEFAULT_CONNECTION_PROVIDER_NAME));
-                assertThat(e.getMessage(), containsString(CUSTOM_NAME));
-                assertThat(e.getMessage(), containsString("4"));
+      @Override
+      public boolean matches(Object item) {
+        assertThat(item, instanceOf(IllegalModelDefinitionException.class));
+        Exception e = (Exception) item;
 
-                return true;
-            }
+        assertThat(e.getMessage(), containsString(EXTENSION_NAME));
+        assertThat(e.getMessage(), containsString(DEFAULT_CONNECTION_PROVIDER_NAME));
+        assertThat(e.getMessage(), containsString(CUSTOM_NAME));
+        assertThat(e.getMessage(), containsString("4"));
 
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText("conditions not met");
-            }
-        });
+        return true;
+      }
 
-        validator.validate(extensionModel);
-    }
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("conditions not met");
+      }
+    });
 
-    @Test
-    public void noConnectionProviders()
-    {
-        when(extensionModel.getConnectionProviders()).thenReturn(emptyList());
-        validator.validate(extensionModel);
-    }
+    validator.validate(extensionModel);
+  }
+
+  @Test
+  public void noConnectionProviders() {
+    when(extensionModel.getConnectionProviders()).thenReturn(emptyList());
+    validator.validate(extensionModel);
+  }
 }

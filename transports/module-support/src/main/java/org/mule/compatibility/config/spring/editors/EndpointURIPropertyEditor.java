@@ -16,26 +16,21 @@ import java.beans.PropertyEditorSupport;
  * Translates a connector name property into the corresponding {@link org.mule.compatibility.core.api.transport.Connector}
  * instance.
  */
-public class EndpointURIPropertyEditor extends PropertyEditorSupport
-{
-    private MuleContext muleContext;
+public class EndpointURIPropertyEditor extends PropertyEditorSupport {
 
-    public EndpointURIPropertyEditor(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  private MuleContext muleContext;
 
-    @Override
-    public void setAsText(String text)
-    {
-        try
-        {
-            setValue(new MuleEndpointURI(text, muleContext));
-        }
-        catch (EndpointException e)
-        {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+  public EndpointURIPropertyEditor(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Override
+  public void setAsText(String text) {
+    try {
+      setValue(new MuleEndpointURI(text, muleContext));
+    } catch (EndpointException e) {
+      throw new IllegalArgumentException(e.getMessage());
     }
+  }
 
 }

@@ -9,33 +9,29 @@ package org.mule.runtime.core.object;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase
-{
+public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase {
 
-    @Override
-    public AbstractObjectFactory getUninitialisedObjectFactory()
-    {
-        return new SingletonObjectFactory();
-    }
+  @Override
+  public AbstractObjectFactory getUninitialisedObjectFactory() {
+    return new SingletonObjectFactory();
+  }
 
-    @Override
-    public void testGetObjectClass() throws Exception
-    {
-        SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
-        factory.setObjectClass(Object.class);
-        factory.initialise();
-        
-        assertEquals(Object.class, factory.getObjectClass());
-    }
+  @Override
+  public void testGetObjectClass() throws Exception {
+    SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
+    factory.setObjectClass(Object.class);
+    factory.initialise();
 
-    @Override
-    public void testGet() throws Exception
-    {
-        SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
-        factory.setObjectClass(Object.class);
-        factory.initialise();
-        
-        assertSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
-    }
+    assertEquals(Object.class, factory.getObjectClass());
+  }
+
+  @Override
+  public void testGet() throws Exception {
+    SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
+    factory.setObjectClass(Object.class);
+    factory.initialise();
+
+    assertSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
+  }
 
 }

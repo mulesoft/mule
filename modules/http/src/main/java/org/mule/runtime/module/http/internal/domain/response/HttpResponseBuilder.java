@@ -13,51 +13,43 @@ import java.util.Collection;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
 
-public class HttpResponseBuilder
-{
+public class HttpResponseBuilder {
 
-    private MultiMap headers = new MultiValueMap();
-    private ResponseStatus responseStatus = new ResponseStatus();
-    private HttpEntity body;
+  private MultiMap headers = new MultiValueMap();
+  private ResponseStatus responseStatus = new ResponseStatus();
+  private HttpEntity body;
 
-    public HttpResponseBuilder addHeader(String name, Object value)
-    {
-        headers.put(name, value);
-        return this;
-    }
+  public HttpResponseBuilder addHeader(String name, Object value) {
+    headers.put(name, value);
+    return this;
+  }
 
-    public HttpResponseBuilder setStatusCode(Integer statusCode)
-    {
-        this.responseStatus.setStatusCode(statusCode);
-        return this;
-    }
+  public HttpResponseBuilder setStatusCode(Integer statusCode) {
+    this.responseStatus.setStatusCode(statusCode);
+    return this;
+  }
 
-    public HttpResponseBuilder setReasonPhrase(String reasonPhrase)
-    {
-        this.responseStatus.setReasonPhrase(reasonPhrase);
-        return this;
-    }
+  public HttpResponseBuilder setReasonPhrase(String reasonPhrase) {
+    this.responseStatus.setReasonPhrase(reasonPhrase);
+    return this;
+  }
 
-    public String getFirstHeader(String headerName)
-    {
-        final Object value = headers.get(headerName);
-        return (String) (value == null ? value : ((Collection)value).iterator().next());
-    }
+  public String getFirstHeader(String headerName) {
+    final Object value = headers.get(headerName);
+    return (String) (value == null ? value : ((Collection) value).iterator().next());
+  }
 
-    public Collection<String> getHeader(String headerName)
-    {
-        return (Collection<String>) headers.get(headerName);
-    }
+  public Collection<String> getHeader(String headerName) {
+    return (Collection<String>) headers.get(headerName);
+  }
 
-    public HttpResponseBuilder setEntity(HttpEntity body)
-    {
-        this.body = body;
-        return this;
-    }
+  public HttpResponseBuilder setEntity(HttpEntity body) {
+    this.body = body;
+    return this;
+  }
 
-    public HttpResponse build()
-    {
-        return new DefaultHttpResponse(responseStatus, headers, body);
-    }
+  public HttpResponse build() {
+    return new DefaultHttpResponse(responseStatus, headers, body);
+  }
 
 }

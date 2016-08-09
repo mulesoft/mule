@@ -13,45 +13,41 @@ import org.mule.runtime.core.util.StringUtils;
 /**
  * Defines a bootstrap property for a generic object
  */
-public class ObjectBootstrapProperty extends AbstractBootstrapProperty
-{
+public class ObjectBootstrapProperty extends AbstractBootstrapProperty {
 
-    private final String key;
-    private final String className;
+  private final String key;
+  private final String className;
 
-    /**
-     * Creates a generic bootstrap property
-     *
-     * @param service      service that provides the property. Not null.
-     * @param artifactType defines what is the artifact this bootstrap object applies to
-     * @param optional     indicates whether or not the bootstrap object is optional. When a bootstrap
-     *                     object is optional, any error creating it will be ignored.
-     * @param key          key used to register the object. Not empty.
-     * @param className    className of the bootstrapped object. Not empty.
-     */
-    public ObjectBootstrapProperty(BootstrapService service, ArtifactType artifactType, Boolean optional, String key, String className)
-    {
-        super(service, artifactType, optional);
-        checkArgument(!StringUtils.isEmpty(key), "key cannot be empty");
-        checkArgument(!StringUtils.isEmpty(className), "className cannot be empty");
+  /**
+   * Creates a generic bootstrap property
+   *
+   * @param service service that provides the property. Not null.
+   * @param artifactType defines what is the artifact this bootstrap object applies to
+   * @param optional indicates whether or not the bootstrap object is optional. When a bootstrap object is optional, any error
+   *        creating it will be ignored.
+   * @param key key used to register the object. Not empty.
+   * @param className className of the bootstrapped object. Not empty.
+   */
+  public ObjectBootstrapProperty(BootstrapService service, ArtifactType artifactType, Boolean optional, String key,
+                                 String className) {
+    super(service, artifactType, optional);
+    checkArgument(!StringUtils.isEmpty(key), "key cannot be empty");
+    checkArgument(!StringUtils.isEmpty(className), "className cannot be empty");
 
-        this.key = key;
-        this.className = className;
-    }
+    this.key = key;
+    this.className = className;
+  }
 
-    public String getKey()
-    {
-        return key;
-    }
+  public String getKey() {
+    return key;
+  }
 
-    public String getClassName()
-    {
-        return className;
-    }
+  public String getClassName() {
+    return className;
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format("Object{ %s}", className);
-    }
+  @Override
+  public String toString() {
+    return String.format("Object{ %s}", className);
+  }
 }

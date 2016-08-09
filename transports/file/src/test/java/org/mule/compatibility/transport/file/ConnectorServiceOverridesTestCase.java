@@ -28,82 +28,77 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 import org.junit.Test;
 
-public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "test-connector-config.xml";
-    }
+public class ConnectorServiceOverridesTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testServiceOverrides() throws InterruptedException
-    {
-        FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
-        assertNotNull(c);
-        assertNotNull(c.getServiceOverrides());
-        assertEquals("org.mule.runtime.core.transformer.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
-            "inbound.transformer"));
-        assertNotNull(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null)));
-        assertNotNull(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)));
-        assertThat(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null)), instanceOf(DefaultEndpointAwareTransformer.class));
-        assertThat(((DefaultEndpointAwareTransformer) TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null))).getTransformer(), instanceOf(ByteArrayToSerializable.class));
-        assertThat(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)), instanceOf(DefaultEndpointAwareTransformer.class));
-        assertThat(((DefaultEndpointAwareTransformer) TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null))).getTransformer(), instanceOf(SerializableToByteArray.class));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "test-connector-config.xml";
+  }
 
-    @Test
-    public void testServiceOverrides2() throws InterruptedException
-    {
-        FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector1");
-        assertNotNull(c);
-        assertNull(c.getServiceOverrides());
+  @Test
+  public void testServiceOverrides() throws InterruptedException {
+    FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
+    assertNotNull(c);
+    assertNotNull(c.getServiceOverrides());
+    assertEquals("org.mule.runtime.core.transformer.simple.ByteArrayToSerializable",
+                 c.getServiceOverrides().get("inbound.transformer"));
+    assertNotNull(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null)));
+    assertNotNull(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)));
+    assertThat(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null)),
+               instanceOf(DefaultEndpointAwareTransformer.class));
+    assertThat(((DefaultEndpointAwareTransformer) TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null)))
+        .getTransformer(), instanceOf(ByteArrayToSerializable.class));
+    assertThat(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)),
+               instanceOf(DefaultEndpointAwareTransformer.class));
+    assertThat(((DefaultEndpointAwareTransformer) TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)))
+        .getTransformer(), instanceOf(SerializableToByteArray.class));
+  }
 
-        c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
-        assertNotNull(c);
-        assertNotNull(c.getServiceOverrides());
+  @Test
+  public void testServiceOverrides2() throws InterruptedException {
+    FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector1");
+    assertNotNull(c);
+    assertNull(c.getServiceOverrides());
 
-        c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector3");
-        assertNotNull(c);
-        assertNull(c.getServiceOverrides());
-    }
+    c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
+    assertNotNull(c);
+    assertNotNull(c.getServiceOverrides());
 
-    @Test
-    public void testServiceOverrides3() throws InterruptedException, MuleException
-    {
-        // EndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
-            "file:///temp?connector=fileConnector1");
+    c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector3");
+    assertNotNull(c);
+    assertNull(c.getServiceOverrides());
+  }
 
-        assertNotNull(endpoint);
-        assertNotNull(endpoint.getConnector());
-        assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
+  @Test
+  public void testServiceOverrides3() throws InterruptedException, MuleException {
+    // EndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("file:///temp?connector=fileConnector1");
 
-        FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
-        assertNotNull(c);
-        assertNotNull(c.getServiceOverrides());
+    assertNotNull(endpoint);
+    assertNotNull(endpoint.getConnector());
+    assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1",
-            muleContext);
-        builder.setConnector(c);
-        endpoint = getEndpointFactory().getInboundEndpoint(builder);
-        assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
+    FileConnector c = (FileConnector) muleContext.getRegistry().lookupObject("fileConnector2");
+    assertNotNull(c);
+    assertNotNull(c.getServiceOverrides());
 
-        EndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3",
-            muleContext);
-        builder.setConnector(c);
-        endpoint = getEndpointFactory().getInboundEndpoint(builder2);
-        assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
+    EndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1", muleContext);
+    builder.setConnector(c);
+    endpoint = getEndpointFactory().getInboundEndpoint(builder);
+    assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
-        EndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2",
-            muleContext);
-        builder.setConnector(c);
-        endpoint = getEndpointFactory().getInboundEndpoint(builder3);
-        assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
-    }
+    EndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3", muleContext);
+    builder.setConnector(c);
+    endpoint = getEndpointFactory().getInboundEndpoint(builder2);
+    assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+    EndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2", muleContext);
+    builder.setConnector(c);
+    endpoint = getEndpointFactory().getInboundEndpoint(builder3);
+    assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
+  }
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

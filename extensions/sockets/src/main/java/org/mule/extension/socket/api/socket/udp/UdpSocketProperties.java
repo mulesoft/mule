@@ -18,32 +18,29 @@ import java.net.DatagramSocket;
  *
  * @since 4.0
  */
-public class UdpSocketProperties extends AbstractSocketProperties
-{
+public class UdpSocketProperties extends AbstractSocketProperties {
 
-    // TODO UDP needs to specify a default value for the receiving buffer size but TCP doesn't
-    private static final Integer DEFAULT_UDP_RECEIVE_BUFFER_SIZE = 1024 * 16;
+  // TODO UDP needs to specify a default value for the receiving buffer size but TCP doesn't
+  private static final Integer DEFAULT_UDP_RECEIVE_BUFFER_SIZE = 1024 * 16;
 
-    /**
-     * Enable/disable SO_BROADCAST into the {@link DatagramSocket}
-     */
-    @Parameter
-    @Optional(defaultValue = "false")
-    @Summary("Whether to enable the socket to send broadcast data")
-    protected boolean broadcast = false;
+  /**
+   * Enable/disable SO_BROADCAST into the {@link DatagramSocket}
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Summary("Whether to enable the socket to send broadcast data")
+  protected boolean broadcast = false;
 
-    /**
-     * Whether to enable the socket to write broadcast data
-     */
-    public boolean getBroadcast()
-    {
-        return broadcast;
-    }
+  /**
+   * Whether to enable the socket to write broadcast data
+   */
+  public boolean getBroadcast() {
+    return broadcast;
+  }
 
-    @Override
-    public Integer getReceiveBufferSize()
-    {
-        return receiveBufferSize == null ? DEFAULT_UDP_RECEIVE_BUFFER_SIZE : receiveBufferSize;
-    }
+  @Override
+  public Integer getReceiveBufferSize() {
+    return receiveBufferSize == null ? DEFAULT_UDP_RECEIVE_BUFFER_SIZE : receiveBufferSize;
+  }
 
 }

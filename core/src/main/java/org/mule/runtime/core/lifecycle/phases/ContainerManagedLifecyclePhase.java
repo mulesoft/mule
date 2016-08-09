@@ -7,16 +7,15 @@
 package org.mule.runtime.core.lifecycle.phases;
 
 /**
- * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable
- * tracking of phases even if Mule does not initiate the phase
+ * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable tracking of phases
+ * even if Mule does not initiate the phase
  *
  * @deprecated as of 3.7.0 since it's no longer used
  */
 @Deprecated
-public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
-{
-    public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass, String oppositePhaseName)
-    {
-        super(name, lifecycleClass, oppositePhaseName);
-    }
+public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase {
+
+  public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass, String oppositePhaseName) {
+    super(name, lifecycleClass, oppositePhaseName);
+  }
 }

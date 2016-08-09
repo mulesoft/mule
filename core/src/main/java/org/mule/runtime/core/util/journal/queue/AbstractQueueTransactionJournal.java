@@ -27,115 +27,106 @@ import org.slf4j.LoggerFactory;
  * @param <T> type of transaction identifier
  * @param <K> type of the actual journal entry which must extend {@link org.mule.runtime.core.util.journal.JournalEntry}
  */
-public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<T>>
-{
+public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<T>> {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    private TransactionJournal<T, K> logFile;
+  private TransactionJournal<T, K> logFile;
 
-    public AbstractQueueTransactionJournal(String logFilesDirectory, JournalEntrySerializer journalEntrySerializer, Integer maximumFileSizeInMegabytes)
-    {
-        checkArgument(maximumFileSizeInMegabytes == null || maximumFileSizeInMegabytes > 0, "Maximum tx log file size needs to be greater than zero");
-        this.logFile = new TransactionJournal(logFilesDirectory, new TransactionCompletePredicate()
-        {
-            @Override
-            public boolean isTransactionComplete(JournalEntry journalEntry)
-            {
-                AbstractQueueTxJournalEntry abstractQueueTxJournalEntry = (AbstractQueueTxJournalEntry) journalEntry;
-                return abstractQueueTxJournalEntry.isCommit() || abstractQueueTxJournalEntry.isRollback();
-            }
-        }, journalEntrySerializer, maximumFileSizeInMegabytes);
+  public AbstractQueueTransactionJournal(String logFilesDirectory, JournalEntrySerializer journalEntrySerializer,
+                                         Integer maximumFileSizeInMegabytes) {
+    checkArgument(maximumFileSizeInMegabytes == null || maximumFileSizeInMegabytes > 0,
+                  "Maximum tx log file size needs to be greater than zero");
+    this.logFile = new TransactionJournal(logFilesDirectory, new TransactionCompletePredicate() {
+
+      @Override
+      public boolean isTransactionComplete(JournalEntry journalEntry) {
+        AbstractQueueTxJournalEntry abstractQueueTxJournalEntry = (AbstractQueueTxJournalEntry) journalEntry;
+        return abstractQueueTxJournalEntry.isCommit() || abstractQueueTxJournalEntry.isRollback();
+      }
+    }, journalEntrySerializer, maximumFileSizeInMegabytes);
+  }
+
+  public void logAdd(T txId, QueueStore queue, Serializable value) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Logging queue add operation for tx " + txId);
     }
+    logFile.logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ADD.getByteRepresentation(),
+                                                        queue.getName(), value));
+  }
 
-    public void logAdd(T txId, QueueStore queue, Serializable value)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Logging queue add operation for tx " + txId);
-        }
-        logFile.logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ADD.getByteRepresentation(), queue.getName(), value));
+  public void logAddFirst(T txId, QueueStore queue, Serializable item) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Logging queue add first operation for tx " + txId);
     }
+    logFile.logUpdateOperation(createUpdateJournalEntry(txId,
+                                                        AbstractQueueTxJournalEntry.Operation.ADD_FIRST.getByteRepresentation(),
+                                                        queue.getName(), item));
+  }
 
-    public void logAddFirst(T txId, QueueStore queue, Serializable item)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Logging queue add first operation for tx " + txId);
-        }
-        logFile.logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ADD_FIRST.getByteRepresentation(), queue.getName(), item));
+  public void logRemove(T txId, QueueStore queue, Serializable value) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Logging queue remove operation for tx " + txId);
     }
+    logFile
+        .logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.REMOVE.getByteRepresentation(),
+                                                     queue.getName(), value));
+  }
 
-    public void logRemove(T txId, QueueStore queue, Serializable value)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Logging queue remove operation for tx " + txId);
-        }
-        logFile.logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.REMOVE.getByteRepresentation(), queue.getName(), value));
+  public void logCommit(T txId) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Logging queue commit operation for tx " + txId);
     }
+    logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.COMMIT
+        .getByteRepresentation()));
+  }
 
-    public void logCommit(T txId)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Logging queue commit operation for tx " + txId);
-        }
-        logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.COMMIT.getByteRepresentation()));
+  /**
+   * Creates a {@link org.mule.runtime.core.util.journal.JournalEntry} for an update operation in the queue.
+   *
+   * @param txId transaction identifier
+   * @param operation operation done over the queue
+   * @param queueName queueName of the queue in which the operation has been done
+   * @param serialize value of the operation
+   * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
+   */
+  protected abstract K createUpdateJournalEntry(T txId, byte operation, String queueName, Serializable serialize);
+
+  /**
+   * Creates a checkpoint {@link org.mule.runtime.core.util.journal.JournalEntry}.
+   *
+   * @param txId transaction identifier
+   * @param operation checkpoint operation
+   * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
+   */
+  protected abstract K createCheckpointJournalEntry(T txId, byte operation);
+
+  public void logRollback(T txId) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Logging queue rollback operation for tx " + txId);
     }
+    logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ROLLBACK
+        .getByteRepresentation()));
+  }
 
-    /**
-     * Creates a {@link org.mule.runtime.core.util.journal.JournalEntry} for an update operation in the queue.
-     *
-     * @param txId transaction identifier
-     * @param operation operation done over the queue
-     * @param queueName queueName of the queue in which the operation has been done
-     * @param serialize value of the operation
-     * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
-     */
-    protected abstract K createUpdateJournalEntry(T txId, byte operation, String queueName, Serializable serialize);
+  public synchronized void close() {
+    logFile.close();
+  }
 
-    /**
-     * Creates a checkpoint {@link org.mule.runtime.core.util.journal.JournalEntry}.
-     *
-     * @param txId transaction identifier
-     * @param operation checkpoint operation
-     * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
-     */
-    protected abstract K createCheckpointJournalEntry(T txId, byte operation);
+  public synchronized void clear() {
+    logFile.clear();
+  }
 
-    public void logRollback(T txId)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Logging queue rollback operation for tx " + txId);
-        }
-        logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ROLLBACK.getByteRepresentation()));
-    }
+  public Multimap<T, K> getAllLogEntries() {
+    return logFile.getAllLogEntries();
+  }
 
-    public synchronized void close()
-    {
-        logFile.close();
-    }
+  public Collection<K> getLogEntriesForTx(T txId) {
+    return logFile.getLogEntriesForTx(txId);
+  }
 
-    public synchronized void clear()
-    {
-        logFile.clear();
-    }
-
-    public Multimap<T, K> getAllLogEntries()
-    {
-        return logFile.getAllLogEntries();
-    }
-
-    public Collection<K> getLogEntriesForTx(T txId)
-    {
-        return logFile.getLogEntriesForTx(txId);
-    }
-
-    protected TransactionJournal<T, K> getJournal()
-    {
-        return logFile;
-    }
+  protected TransactionJournal<T, K> getJournal() {
+    return logFile;
+  }
 
 }

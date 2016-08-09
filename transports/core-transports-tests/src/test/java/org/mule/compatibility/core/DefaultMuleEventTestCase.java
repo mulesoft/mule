@@ -26,43 +26,39 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleEventTestCase extends AbstractMuleTestCase
-{
+public class DefaultMuleEventTestCase extends AbstractMuleTestCase {
 
-    private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private final MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private final MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
 
-    @Test
-    public void transactedRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(true));
-    }
+  @Test
+  public void transactedRequestResponse() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(true));
+  }
 
-    @Test
-    public void transactedOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(true));
-    }
+  @Test
+  public void transactedOneWay() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(true));
+  }
 
-    private InboundEndpoint createMockTransactionalInboundEndpoint() throws EndpointException
-    {
-        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
-        TransactionConfig transactionConfig = mock(TransactionConfig.class);
-        when(transactionConfig.isTransacted()).thenReturn(true);
-        when(inboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
-        when(inboundEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
-        return inboundEndpoint;
-    }
+  private InboundEndpoint createMockTransactionalInboundEndpoint() throws EndpointException {
+    InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
+    TransactionConfig transactionConfig = mock(TransactionConfig.class);
+    when(transactionConfig.isTransacted()).thenReturn(true);
+    when(inboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
+    when(inboundEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
+    return inboundEndpoint;
+  }
 }

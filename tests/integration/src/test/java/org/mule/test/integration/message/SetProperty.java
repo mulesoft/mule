@@ -12,14 +12,13 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 
-public class SetProperty extends AbstractTransformer
-{
-    @Override
-    protected Object doTransform(Object obj, Charset encoding) throws TransformerException
-    {
-        RequestContext.getEventContext().getSession().setProperty("foo", "bar");
-        return obj;
-    }
+public class SetProperty extends AbstractTransformer {
+
+  @Override
+  protected Object doTransform(Object obj, Charset encoding) throws TransformerException {
+    RequestContext.getEventContext().getSession().setProperty("foo", "bar");
+    return obj;
+  }
 }
 
 

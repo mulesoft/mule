@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.delete;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class DeleteNamedParamParameterizedQueryTestCase extends DeleteParameterizedQueryTestCase
-{
+public class DeleteNamedParamParameterizedQueryTestCase extends DeleteParameterizedQueryTestCase {
 
-    public DeleteNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-named-param-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-named-param-parameterized-query-config.xml"};
+  }
 }

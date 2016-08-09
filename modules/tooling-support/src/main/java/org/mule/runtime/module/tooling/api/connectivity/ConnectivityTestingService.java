@@ -15,16 +15,16 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
  *
  * @since 4.0
  */
-public interface ConnectivityTestingService
-{
+public interface ConnectivityTestingService {
 
-    /**
-     * Does connection testing over the component registered under the provider identifier
-     *
-     * @param identifier component identifier over the one connectivity testing is done.
-     * @return connectivity testing result.
-     * @throws UnsupportedConnectivityTestingObjectException when it's not possible to do connectivity testing over the mule component.
-     */
-    ConnectionValidationResult testConnection(String identifier);
+  /**
+   * Does connection testing over the component registered under the provider identifier
+   *
+   * @param identifier component identifier over the one connectivity testing is done.
+   * @return connectivity testing result.
+   * @throws UnsupportedConnectivityTestingObjectException when it's not possible to do connectivity testing over the mule
+   *         component.
+   */
+  ConnectionValidationResult testConnection(String identifier);
 
 }

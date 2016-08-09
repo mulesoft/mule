@@ -18,156 +18,124 @@ import org.junit.Test;
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods
  */
-public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase
-{
+public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testNormalBehaviour() throws Exception
-    {
-        JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+  @Test
+  public void testNormalBehaviour() throws Exception {
+    JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
+    muleContext.getRegistry().registerObject("test", tracker);
 
-        muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
+    muleContext.dispose();
+    assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
+  }
+
+  @Test
+  public void testTwoPostConstructAnnotations() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new DupePostConstructJSR250ObjectLifecycleTracker());
+      fail("Object has two @PostConstruct annotations");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testTwoPostConstructAnnotations() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new DupePostConstructJSR250ObjectLifecycleTracker());
-            fail("Object has two @PostConstruct annotations");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  @Test
+  public void testTwoPreDestroyAnnotations() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new DupePreDestroyJSR250ObjectLifecycleTracker());
+      fail("Object has two @PreDestroy annotations");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testTwoPreDestroyAnnotations() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new DupePreDestroyJSR250ObjectLifecycleTracker());
-            fail("Object has two @PreDestroy annotations");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  @Test
+  public void testBadReturnTypePostConstructMethod() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new BadReturnTypePostConstructLifecycleMethodObject());
+      fail("PostContruct Lifecycle method has a non-void return type");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testBadReturnTypePostConstructMethod() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new BadReturnTypePostConstructLifecycleMethodObject());
-            fail("PostContruct Lifecycle method has a non-void return type");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  @Test
+  public void testBadParamPreDestroyMethod() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new BadParamPreDestroyLifecycleMethodObject());
+      fail("PreDestroy Lifecycle method has a parameter");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testBadParamPreDestroyMethod() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new BadParamPreDestroyLifecycleMethodObject());
-            fail("PreDestroy Lifecycle method has a parameter");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  @Test
+  public void testBadStaticPreDestroyMethod() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new BadStaticMethodPostConstructLifecycleMethodObject());
+      fail("PostConstruct Lifecycle method is static");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testBadStaticPreDestroyMethod() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new BadStaticMethodPostConstructLifecycleMethodObject());
-            fail("PostConstruct Lifecycle method is static");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  @Test
+  public void testBadCheckedExceptionPreDestroyMethod() throws Exception {
+    try {
+      muleContext.getRegistry().registerObject("test", new BadCheckedExceptionPreDestroyLifecycleMethodObject());
+      fail("PreDestroy Lifecycle method throws a checked exception");
+    } catch (IllegalArgumentException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testBadCheckedExceptionPreDestroyMethod() throws Exception
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject("test", new BadCheckedExceptionPreDestroyLifecycleMethodObject());
-            fail("PreDestroy Lifecycle method throws a checked exception");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+  public class DupePostConstructJSR250ObjectLifecycleTracker extends JSR250ObjectLifecycleTracker {
+
+    // You cannot have an object with two {@link PostConstruct} annotated methods
+    @PostConstruct
+    public void init2() {
+      getTracker().add("initialise 2");
     }
+  }
 
-    public class DupePostConstructJSR250ObjectLifecycleTracker extends JSR250ObjectLifecycleTracker
-    {
-        //You cannot have an object with two {@link PostConstruct} annotated methods
-        @PostConstruct
-        public void init2()
-        {
-            getTracker().add("initialise 2");
-        }
+  public class DupePreDestroyJSR250ObjectLifecycleTracker extends JSR250ObjectLifecycleTracker {
+
+    // You cannot have an object with two {@link PostConstruct} annotated methods
+    @PreDestroy
+    public void dispose2() {
+      getTracker().add("dispose 2");
     }
+  }
 
-    public class DupePreDestroyJSR250ObjectLifecycleTracker extends JSR250ObjectLifecycleTracker
-    {
-        //You cannot have an object with two {@link PostConstruct} annotated methods
-        @PreDestroy
-        public void dispose2()
-        {
-            getTracker().add("dispose 2");
-        }
+  public class BadReturnTypePostConstructLifecycleMethodObject {
+
+    @PostConstruct
+    public boolean init() {
+      return true;
     }
+  }
 
-    public class BadReturnTypePostConstructLifecycleMethodObject
-    {
-        @PostConstruct
-        public boolean init()
-        {
-            return true;
-        }
+  public class BadParamPreDestroyLifecycleMethodObject {
+
+    @PreDestroy
+    public void destroy(boolean foo) {
+
     }
+  }
 
-    public class BadParamPreDestroyLifecycleMethodObject
-    {
-        @PreDestroy
-        public void destroy(boolean foo)
-        {
+  public static class BadStaticMethodPostConstructLifecycleMethodObject {
 
-        }
+    @PostConstruct
+    public static void init() {
+
     }
+  }
 
-    public static class BadStaticMethodPostConstructLifecycleMethodObject
-    {
-        @PostConstruct
-        public static void init()
-        {
+  public class BadCheckedExceptionPreDestroyLifecycleMethodObject {
 
-        }
+    @PreDestroy
+    public void destroy() throws Exception {
+
     }
-
-    public class BadCheckedExceptionPreDestroyLifecycleMethodObject
-    {
-        @PreDestroy
-        public void destroy() throws Exception
-        {
-
-        }
-    }
+  }
 }

@@ -10,18 +10,18 @@ import org.mule.runtime.core.api.MuleContext;
 
 
 /**
- * <code>ExternalTransactionAwareTransactionFactory</code> creates a transaction, possibly representing a transaction
- * started outside Mule.
+ * <code>ExternalTransactionAwareTransactionFactory</code> creates a transaction, possibly representing a transaction started
+ * outside Mule.
  *
  */
-public interface ExternalTransactionAwareTransactionFactory extends TransactionFactory
-{
-    /**
-     * Create and begins a new transaction
-     *
-     * @return a new Transaction representing an existing external transaction
-     * @throws org.mule.runtime.core.api.transaction.TransactionException if the transaction cannot be created or begun
-     * @param muleContext
-     */
-    Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException;
+public interface ExternalTransactionAwareTransactionFactory extends TransactionFactory {
+
+  /**
+   * Create and begins a new transaction
+   *
+   * @return a new Transaction representing an existing external transaction
+   * @throws org.mule.runtime.core.api.transaction.TransactionException if the transaction cannot be created or begun
+   * @param muleContext
+   */
+  Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException;
 }

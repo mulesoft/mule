@@ -23,93 +23,86 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0
  */
-public abstract class AbstractEmailConnectionProvider<T> implements ConnectionProvider<T>
-{
+public abstract class AbstractEmailConnectionProvider<T> implements ConnectionProvider<T> {
 
-    private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
-    /**
-     * The socket read timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-     * <p>
-     * Defaults to {@code 5}
-     */
-    @Parameter
-    @Optional(defaultValue = "5")
-    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
-    @Summary("Socket read timeout")
-    protected int readTimeout;
+  private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
+  /**
+   * The socket read timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+   * <p>
+   * Defaults to {@code 5}
+   */
+  @Parameter
+  @Optional(defaultValue = "5")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
+  @Summary("Socket read timeout")
+  protected int readTimeout;
 
-    /**
-     * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-     * <p>
-     * Defaults to {@code 5}
-     */
-    @Parameter
-    @Optional(defaultValue = "5")
-    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
-    @Summary("The socket write timeout value")
-    protected int writeTimeout;
+  /**
+   * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+   * <p>
+   * Defaults to {@code 5}
+   */
+  @Parameter
+  @Optional(defaultValue = "5")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
+  @Summary("The socket write timeout value")
+  protected int writeTimeout;
 
-    /**
-     * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}, {@link #writeTimeout} and {@link #readTimeout}
-     * attributes.
-     * <p>
-     * Defaults to {@code SECONDS}
-     */
-    @Parameter
-    @Optional(defaultValue = "SECONDS")
-    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
-    @Summary("Time unit to be used in the Timeout configurations")
-    private TimeUnit timeoutUnit;
+  /**
+   * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}, {@link #writeTimeout} and {@link #readTimeout} attributes.
+   * <p>
+   * Defaults to {@code SECONDS}
+   */
+  @Parameter
+  @Optional(defaultValue = "SECONDS")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
+  @Summary("Time unit to be used in the Timeout configurations")
+  private TimeUnit timeoutUnit;
 
-    /**
-     * The socket connection timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-     * <p>
-     * Defaults to {@code 5}
-     */
-    @Parameter
-    @Optional(defaultValue = "5")
-    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
-    @Summary("Socket connection timeout value")
-    private int connectionTimeout;
+  /**
+   * The socket connection timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+   * <p>
+   * Defaults to {@code 5}
+   */
+  @Parameter
+  @Optional(defaultValue = "5")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
+  @Summary("Socket connection timeout value")
+  private int connectionTimeout;
 
-    /**
-     * An additional custom set of properties to configure the connection
-     * session.
-     */
-    @Parameter
-    @Optional
-    @Placement(tab = ADVANCED, group = GENERAL)
-    private Map<String, String> properties;
+  /**
+   * An additional custom set of properties to configure the connection session.
+   */
+  @Parameter
+  @Optional
+  @Placement(tab = ADVANCED, group = GENERAL)
+  private Map<String, String> properties;
 
-    /**
-     * @return the additional custom properties to configure the session.
-     */
-    protected Map<String, String> getProperties()
-    {
-        return properties;
-    }
+  /**
+   * @return the additional custom properties to configure the session.
+   */
+  protected Map<String, String> getProperties() {
+    return properties;
+  }
 
-    /**
-     * @return the configured client socket connection timeout in milliseconds.
-     */
-    protected long getConnectionTimeout()
-    {
-        return timeoutUnit.toMillis(connectionTimeout);
-    }
+  /**
+   * @return the configured client socket connection timeout in milliseconds.
+   */
+  protected long getConnectionTimeout() {
+    return timeoutUnit.toMillis(connectionTimeout);
+  }
 
-    /**
-     * @return he configured client socket read timeout in milliseconds.
-     */
-    protected long getReadTimeout()
-    {
-        return timeoutUnit.toMillis(readTimeout);
-    }
+  /**
+   * @return he configured client socket read timeout in milliseconds.
+   */
+  protected long getReadTimeout() {
+    return timeoutUnit.toMillis(readTimeout);
+  }
 
-    /**
-     * @return he configured client socket write timeout in milliseconds.
-     */
-    protected long getWriteTimeout()
-    {
-        return timeoutUnit.toMillis(writeTimeout);
-    }
+  /**
+   * @return he configured client socket write timeout in milliseconds.
+   */
+  protected long getWriteTimeout() {
+    return timeoutUnit.toMillis(writeTimeout);
+  }
 }

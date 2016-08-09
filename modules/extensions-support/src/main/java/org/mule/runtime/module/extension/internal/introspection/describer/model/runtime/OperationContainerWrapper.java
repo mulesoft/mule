@@ -21,28 +21,21 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-final class OperationContainerWrapper extends TypeWrapper implements OperationContainerElement
-{
+final class OperationContainerWrapper extends TypeWrapper implements OperationContainerElement {
 
-    private final Class aClass;
+  private final Class aClass;
 
-    OperationContainerWrapper(Class aClass)
-    {
-        super(aClass);
-        this.aClass = aClass;
-    }
+  OperationContainerWrapper(Class aClass) {
+    super(aClass);
+    this.aClass = aClass;
+  }
 
-    /**
-     * @return The list of {@link MethodWrapper} that the this type holds
-     */
-    @Override
-    public List<MethodElement> getOperations()
-    {
-        return Stream
-                .of(aClass)
-                .map(IntrospectionUtils::getOperationMethods)
-                .flatMap(Collection::stream)
-                .map(MethodWrapper::new)
-                .collect(toList());
-    }
+  /**
+   * @return The list of {@link MethodWrapper} that the this type holds
+   */
+  @Override
+  public List<MethodElement> getOperations() {
+    return Stream.of(aClass).map(IntrospectionUtils::getOperationMethods).flatMap(Collection::stream).map(MethodWrapper::new)
+        .collect(toList());
+  }
 }

@@ -29,17 +29,18 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()}
- * with initiate this phase via the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}.
+ * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()} with initiate this phase via the
+ * {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}.
  *
  *
- * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is stopped.  The MuleContext is associated
+ * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is stopped. The MuleContext is associated
  * with one or more registries that inherit the lifecycle of the MuleContext.
  *
- * This phase is responsible for disposing objects. Any object that implements {@link org.mule.runtime.core.api.lifecycle.Stoppable} will
- * have its {@link org.mule.runtime.core.api.lifecycle.Stoppable#stop()} ()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.runtime.core.api.construct.FlowConstruct}, {@link org.mule.runtime.core.api.agent.Agent} followed
- * by any other object that implements {@link org.mule.runtime.core.api.lifecycle.Stoppable}.
+ * This phase is responsible for disposing objects. Any object that implements
+ * {@link org.mule.runtime.core.api.lifecycle.Stoppable} will have its
+ * {@link org.mule.runtime.core.api.lifecycle.Stoppable#stop()} ()} method called. Objects are initialised in the order based on
+ * type: {@link org.mule.runtime.core.api.construct.FlowConstruct}, {@link org.mule.runtime.core.api.agent.Agent} followed by any
+ * other object that implements {@link org.mule.runtime.core.api.lifecycle.Stoppable}.
  *
  * @see org.mule.runtime.core.api.MuleContext
  * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
@@ -47,32 +48,31 @@ import java.util.Set;
  *
  * @since 3.0
  */
-public class MuleContextStopPhase extends DefaultLifecyclePhase
-{
-    public MuleContextStopPhase()
-    {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class, OutboundRouter.class, Service.class});
-    }
+public class MuleContextStopPhase extends DefaultLifecyclePhase {
 
-    public MuleContextStopPhase(Class<?>[] ignorredObjects)
-    {
-        super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
+  public MuleContextStopPhase() {
+    this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
+        OutboundRouter.class, Service.class});
+  }
 
-        Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
-        // Stop in the opposite order to start
-        stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
+  public MuleContextStopPhase(Class<?>[] ignorredObjects) {
+    super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
 
-        setIgnoredObjectTypes(ignorredObjects);
-        setOrderedLifecycleObjects(stopOrderedObjects);
-        //Yuo can initialise and stop
-        registerSupportedPhase(Initialisable.PHASE_NAME);
-        //Stop/Start/Stop
-        registerSupportedPhase(Startable.PHASE_NAME);
-    }
+    Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
+    // Stop in the opposite order to start
+    stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+    stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
+
+    setIgnoredObjectTypes(ignorredObjects);
+    setOrderedLifecycleObjects(stopOrderedObjects);
+    // Yuo can initialise and stop
+    registerSupportedPhase(Initialisable.PHASE_NAME);
+    // Stop/Start/Stop
+    registerSupportedPhase(Startable.PHASE_NAME);
+  }
 }

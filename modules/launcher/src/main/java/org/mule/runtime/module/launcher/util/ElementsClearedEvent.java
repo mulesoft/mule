@@ -10,21 +10,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ElementsClearedEvent extends ElementEvent
-{
-    private List<Object> values = new ArrayList<Object>();
+public class ElementsClearedEvent extends ElementEvent {
 
-    public ElementsClearedEvent(Object source, List<?> values)
-    {
-        super(source, OLDVALUE, NEWVALUE, ElementEvent.CLEARED, 0);
-        if (values != null)
-        {
-            this.values.addAll(values);
-        }
-    }
+  private List<Object> values = new ArrayList<Object>();
 
-    public List<?> getValues()
-    {
-        return Collections.unmodifiableList(values);
+  public ElementsClearedEvent(Object source, List<?> values) {
+    super(source, OLDVALUE, NEWVALUE, ElementEvent.CLEARED, 0);
+    if (values != null) {
+      this.values.addAll(values);
     }
+  }
+
+  public List<?> getValues() {
+    return Collections.unmodifiableList(values);
+  }
 }

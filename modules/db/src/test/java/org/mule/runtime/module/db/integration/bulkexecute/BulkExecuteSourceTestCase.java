@@ -17,32 +17,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkExecuteSourceTestCase extends AbstractBulkExecuteTestCase
-{
+public class BulkExecuteSourceTestCase extends AbstractBulkExecuteTestCase {
 
-    public BulkExecuteSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/bulkexecute/bulk-execute-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-source-config.xml"};
+  }
 
-    @Test
-    public void usesCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("bulkUpdateCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("bulkUpdateCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertBulkModeResult(response.getPayload());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertBulkModeResult(response.getPayload());
+  }
 }

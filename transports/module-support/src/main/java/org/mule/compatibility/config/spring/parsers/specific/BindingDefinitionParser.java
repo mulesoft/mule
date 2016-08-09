@@ -12,25 +12,21 @@ import org.mule.runtime.core.routing.AbstractAggregator;
 /**
  * Binding definition parser for parsing all binding elements configured as part of the service.
  */
-public class BindingDefinitionParser extends ChildDefinitionParser
-{
+public class BindingDefinitionParser extends ChildDefinitionParser {
 
-    public BindingDefinitionParser(String setterMethod, Class clazz)
-    {
-        super(setterMethod, clazz);
-        standardOptions();
-    }
+  public BindingDefinitionParser(String setterMethod, Class clazz) {
+    super(setterMethod, clazz);
+    standardOptions();
+  }
 
-    // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
-    public BindingDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, null, AbstractAggregator.class, true);
-        standardOptions();
-    }
+  // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
+  public BindingDefinitionParser(String setterMethod) {
+    super(setterMethod, null, AbstractAggregator.class, true);
+    standardOptions();
+  }
 
-    protected void standardOptions()
-    {
-        addMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
-    }
+  protected void standardOptions() {
+    addMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
+  }
 
 }

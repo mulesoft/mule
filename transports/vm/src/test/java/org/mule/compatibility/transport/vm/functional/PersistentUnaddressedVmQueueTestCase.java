@@ -15,24 +15,21 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
-{
+public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase {
 
-    private static final int RECEIVE_TIMEOUT = 5000;
+  private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/persistent-unaddressed-vm-queue-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vm/persistent-unaddressed-vm-queue-test-flow.xml";
+  }
 
-    @Test
-    public void testAsynchronousDispatching() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://receiver1?connector=Connector1", "Test", null);
-        MuleMessage result = client.request("vm://out?connector=Connector2", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals(getPayloadAsString(result), "Test");
-    }
+  @Test
+  public void testAsynchronousDispatching() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://receiver1?connector=Connector1", "Test", null);
+    MuleMessage result = client.request("vm://out?connector=Connector2", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertEquals(getPayloadAsString(result), "Test");
+  }
 }

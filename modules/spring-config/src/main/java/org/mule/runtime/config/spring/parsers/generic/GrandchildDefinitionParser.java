@@ -10,47 +10,39 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Same as ChildDefinitionParser but injects the child element into the grandparent object 
- * (2 levels up in the XML tree).
+ * Same as ChildDefinitionParser but injects the child element into the grandparent object (2 levels up in the XML tree).
  */
-public class GrandchildDefinitionParser extends ChildDefinitionParser
-{
-    public GrandchildDefinitionParser(String setterMethod, Class clazz)
-    {
-        super(setterMethod, clazz);
-    }
+public class GrandchildDefinitionParser extends ChildDefinitionParser {
 
-    public GrandchildDefinitionParser(String setterMethod, Class clazz, Class constraint, boolean allowClassAttribute)
-    {
-        super(setterMethod, clazz, constraint, allowClassAttribute);
-    }
+  public GrandchildDefinitionParser(String setterMethod, Class clazz) {
+    super(setterMethod, clazz);
+  }
 
-    @Override
-    protected String getParentBeanName(Element element)
-    {
-        return getGrandparentBeanName(element);
-    }
+  public GrandchildDefinitionParser(String setterMethod, Class clazz, Class constraint, boolean allowClassAttribute) {
+    super(setterMethod, clazz, constraint, allowClassAttribute);
+  }
 
-    protected String getGrandparentBeanName(Element element)
-    {
-        Node parent = element.getParentNode();
-        if (parent == null)
-        {
-            logger.error("No parent node found for element " + element);
-            return null;
-        }
-        Node grandparent = parent.getParentNode();
-        if (grandparent == null)
-        {
-            logger.error("No parent node found for element " + parent);
-            return null;
-        }
-        Node grandparentNameAttribute = grandparent.getAttributes().getNamedItem("name");
-        if (grandparentNameAttribute == null)
-        {
-            logger.error("Grandparent node has no 'name' attribute: " + grandparent);
-            return null;
-        }
-        return grandparentNameAttribute.getNodeValue();
+  @Override
+  protected String getParentBeanName(Element element) {
+    return getGrandparentBeanName(element);
+  }
+
+  protected String getGrandparentBeanName(Element element) {
+    Node parent = element.getParentNode();
+    if (parent == null) {
+      logger.error("No parent node found for element " + element);
+      return null;
     }
+    Node grandparent = parent.getParentNode();
+    if (grandparent == null) {
+      logger.error("No parent node found for element " + parent);
+      return null;
+    }
+    Node grandparentNameAttribute = grandparent.getAttributes().getNamedItem("name");
+    if (grandparentNameAttribute == null) {
+      logger.error("Grandparent node has no 'name' attribute: " + grandparent);
+      return null;
+    }
+    return grandparentNameAttribute.getNodeValue();
+  }
 }

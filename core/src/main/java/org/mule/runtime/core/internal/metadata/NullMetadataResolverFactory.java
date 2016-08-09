@@ -14,52 +14,46 @@ import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFac
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 
 /**
- * Null implementation of a {@link MetadataResolverFactory}, which returns
- * a {@link NullMetadataResolver} for every resolver provided by the factory
+ * Null implementation of a {@link MetadataResolverFactory}, which returns a {@link NullMetadataResolver} for every resolver
+ * provided by the factory
  *
  * @since 4.0
  */
-public class NullMetadataResolverFactory implements MetadataResolverFactory
-{
+public class NullMetadataResolverFactory implements MetadataResolverFactory {
 
-    private final NullMetadataResolver metadataResolver;
+  private final NullMetadataResolver metadataResolver;
 
-    public NullMetadataResolverFactory()
-    {
-        this.metadataResolver = new NullMetadataResolver();
-    }
+  public NullMetadataResolverFactory() {
+    this.metadataResolver = new NullMetadataResolver();
+  }
 
-    /**
-     * @return a {@link NullMetadataResolver} implementation of {@link MetadataKeysResolver}
-     */
-    @Override
-    public MetadataKeysResolver getKeyResolver()
-    {
-        return metadataResolver;
-    }
+  /**
+   * @return a {@link NullMetadataResolver} implementation of {@link MetadataKeysResolver}
+   */
+  @Override
+  public MetadataKeysResolver getKeyResolver() {
+    return metadataResolver;
+  }
 
-    /**
-     * @return a {@link NullMetadataResolver} implementation of {@link MetadataContentResolver}
-     */
-    @Override
-    public <T> MetadataContentResolver<T> getContentResolver()
-    {
-        return (MetadataContentResolver<T>) metadataResolver;
-    }
+  /**
+   * @return a {@link NullMetadataResolver} implementation of {@link MetadataContentResolver}
+   */
+  @Override
+  public <T> MetadataContentResolver<T> getContentResolver() {
+    return (MetadataContentResolver<T>) metadataResolver;
+  }
 
-    /**
-     * @return a {@link NullMetadataResolver} implementation of {@link MetadataOutputResolver}
-     */
-    @Override
-    public <T> MetadataOutputResolver<T> getOutputResolver()
-    {
-        return (MetadataOutputResolver<T>) metadataResolver;
-    }
+  /**
+   * @return a {@link NullMetadataResolver} implementation of {@link MetadataOutputResolver}
+   */
+  @Override
+  public <T> MetadataOutputResolver<T> getOutputResolver() {
+    return (MetadataOutputResolver<T>) metadataResolver;
+  }
 
-    @Override
-    public <T> MetadataAttributesResolver<T> getOutputAttributesResolver()
-    {
-        return (MetadataAttributesResolver<T>) metadataResolver;
-    }
+  @Override
+  public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
+    return (MetadataAttributesResolver<T>) metadataResolver;
+  }
 
 }

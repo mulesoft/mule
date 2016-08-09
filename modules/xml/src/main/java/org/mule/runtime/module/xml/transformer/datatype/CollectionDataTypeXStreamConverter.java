@@ -26,48 +26,42 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * @since 4.0
  */
 
-public class CollectionDataTypeXStreamConverter implements Converter
-{
+public class CollectionDataTypeXStreamConverter implements Converter {
 
-    @Override
-    public boolean canConvert(Class type)
-    {
-        return DefaultCollectionDataType.class.isAssignableFrom(type);
+  @Override
+  public boolean canConvert(Class type) {
+    return DefaultCollectionDataType.class.isAssignableFrom(type);
+  }
+
+  @Override
+  public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+    final DefaultCollectionDataType dataType = (DefaultCollectionDataType) source;
+    writer.addAttribute("type", dataType.getType().getName());
+    writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
+    writer.addAttribute("itemType", dataType.getType().getName());
+    writer.addAttribute("itemMediaType", dataType.getMediaType().toRfcString());
+  }
+
+  @Override
+  public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    Class<? extends Collection> type;
+    Class<?> itemType;
+    try {
+      type = ClassUtils.getClass(reader.getAttribute("type"));
+      itemType = ClassUtils.getClass(reader.getAttribute("itemType"));
+    } catch (ClassNotFoundException e) {
+      throw new MuleRuntimeException(e);
     }
-
-    @Override
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context)
-    {
-        final DefaultCollectionDataType dataType = (DefaultCollectionDataType) source;
-        writer.addAttribute("type", dataType.getType().getName());
-        writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
-        writer.addAttribute("itemType", dataType.getType().getName());
-        writer.addAttribute("itemMediaType", dataType.getMediaType().toRfcString());
-    }
-
-    @Override
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
-    {
-        Class<? extends Collection> type;
-        Class<?> itemType;
-        try
-        {
-            type = ClassUtils.getClass(reader.getAttribute("type"));
-            itemType = ClassUtils.getClass(reader.getAttribute("itemType"));
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-        final String mediaType = reader.getAttribute("mediaType");
-        final String itemMediaType = reader.getAttribute("itemMediaType");
-        return createDataType(type, mediaType, itemType, itemMediaType);
-    }
+    final String mediaType = reader.getAttribute("mediaType");
+    final String itemMediaType = reader.getAttribute("itemMediaType");
+    return createDataType(type, mediaType, itemType, itemMediaType);
+  }
 
 
-    protected CollectionDataType createDataType(Class<? extends Collection> type, String mimeType, Class<?> itemType, String itemMediaType)
-    {
-        return (CollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType).mediaType(mimeType).build();
-    }
+  protected CollectionDataType createDataType(Class<? extends Collection> type, String mimeType, Class<?> itemType,
+                                              String itemMediaType) {
+    return (CollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType)
+        .mediaType(mimeType).build();
+  }
 
 }

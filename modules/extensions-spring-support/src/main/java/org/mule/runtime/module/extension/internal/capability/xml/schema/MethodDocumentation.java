@@ -9,37 +9,31 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import java.util.Map;
 
 /**
- * A summary object to group a method's javadoc combined
- * with the ones of its parameters.
+ * A summary object to group a method's javadoc combined with the ones of its parameters.
  *
  * @since 3.7.0
  */
-final class MethodDocumentation
-{
+final class MethodDocumentation {
 
-    private final String summary;
-    private final Map<String, String> parameters;
+  private final String summary;
+  private final Map<String, String> parameters;
 
-    MethodDocumentation(String summary, Map<String, String> parameters)
-    {
-        this.summary = summary;
-        this.parameters = parameters;
-    }
+  MethodDocumentation(String summary, Map<String, String> parameters) {
+    this.summary = summary;
+    this.parameters = parameters;
+  }
 
-    /**
-     * the method's javadoc block without tags
-     */
-    String getSummary()
-    {
-        return summary;
-    }
+  /**
+   * the method's javadoc block without tags
+   */
+  String getSummary() {
+    return summary;
+  }
 
-    /**
-     * A non {@code null} {@link java.util.Map} with each parameter's
-     * comments
-     */
-    Map<String, String> getParameters()
-    {
-        return parameters;
-    }
+  /**
+   * A non {@code null} {@link java.util.Map} with each parameter's comments
+   */
+  Map<String, String> getParameters() {
+    return parameters;
+  }
 }

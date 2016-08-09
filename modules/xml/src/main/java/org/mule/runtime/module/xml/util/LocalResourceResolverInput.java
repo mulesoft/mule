@@ -11,117 +11,101 @@ import org.w3c.dom.ls.LSInput;
 import java.io.InputStream;
 import java.io.Reader;
 
-public class LocalResourceResolverInput implements LSInput
-{
-    private Reader characterStream;
+public class LocalResourceResolverInput implements LSInput {
 
-    private InputStream byteStream;
+  private Reader characterStream;
 
-    private String stringData;
+  private InputStream byteStream;
 
-    private String systemId;
+  private String stringData;
 
-    private String publicId;
+  private String systemId;
 
-    private String baseURI;
+  private String publicId;
 
-    private String encoding;
+  private String baseURI;
 
-    private boolean certifiedText;
+  private String encoding;
 
-    @Override
-    public Reader getCharacterStream()
-    {
-        return characterStream;
-    }
+  private boolean certifiedText;
 
-    @Override
-    public void setCharacterStream(Reader characterStream)
-    {
-        this.characterStream = characterStream;
-    }
+  @Override
+  public Reader getCharacterStream() {
+    return characterStream;
+  }
 
-    @Override
-    public InputStream getByteStream()
-    {
-        return byteStream;
-    }
+  @Override
+  public void setCharacterStream(Reader characterStream) {
+    this.characterStream = characterStream;
+  }
 
-    @Override
-    public void setByteStream(InputStream byteStream)
-    {
-        this.byteStream = byteStream;
-    }
+  @Override
+  public InputStream getByteStream() {
+    return byteStream;
+  }
 
-    @Override
-    public String getStringData()
-    {
-        return stringData;
-    }
+  @Override
+  public void setByteStream(InputStream byteStream) {
+    this.byteStream = byteStream;
+  }
 
-    @Override
-    public void setStringData(String stringData)
-    {
-        this.stringData = stringData;
-    }
+  @Override
+  public String getStringData() {
+    return stringData;
+  }
 
-    @Override
-    public String getSystemId()
-    {
-        return systemId;
-    }
+  @Override
+  public void setStringData(String stringData) {
+    this.stringData = stringData;
+  }
 
-    @Override
-    public void setSystemId(String systemId)
-    {
-        this.systemId = systemId;
-    }
+  @Override
+  public String getSystemId() {
+    return systemId;
+  }
 
-    @Override
-    public String getPublicId()
-    {
-        return publicId;
-    }
+  @Override
+  public void setSystemId(String systemId) {
+    this.systemId = systemId;
+  }
 
-    @Override
-    public void setPublicId(String publicId)
-    {
-        this.publicId = publicId;
-    }
+  @Override
+  public String getPublicId() {
+    return publicId;
+  }
 
-    @Override
-    public String getBaseURI()
-    {
-        return baseURI;
-    }
+  @Override
+  public void setPublicId(String publicId) {
+    this.publicId = publicId;
+  }
 
-    @Override
-    public void setBaseURI(String baseURI)
-    {
-        this.baseURI = baseURI;
-    }
+  @Override
+  public String getBaseURI() {
+    return baseURI;
+  }
 
-    @Override
-    public String getEncoding()
-    {
-        return encoding;
-    }
+  @Override
+  public void setBaseURI(String baseURI) {
+    this.baseURI = baseURI;
+  }
 
-    @Override
-    public void setEncoding(String encoding)
-    {
-        this.encoding = encoding;
-    }
+  @Override
+  public String getEncoding() {
+    return encoding;
+  }
 
-    @Override
-    public boolean getCertifiedText()
-    {
-        return certifiedText;
-    }
+  @Override
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
 
-    @Override
-    public void setCertifiedText(boolean certifiedText)
-    {
-        this.certifiedText = certifiedText;
-    }
+  @Override
+  public boolean getCertifiedText() {
+    return certifiedText;
+  }
+
+  @Override
+  public void setCertifiedText(boolean certifiedText) {
+    this.certifiedText = certifiedText;
+  }
 }

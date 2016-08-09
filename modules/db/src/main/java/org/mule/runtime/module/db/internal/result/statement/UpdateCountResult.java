@@ -10,27 +10,23 @@ package org.mule.runtime.module.db.internal.result.statement;
 /**
  * Represents an update count after a {@link java.sql.Statement} execution
  */
-public class UpdateCountResult implements StatementResult
-{
+public class UpdateCountResult implements StatementResult {
 
-    private final String name;
-    private final int count;
+  private final String name;
+  private final int count;
 
-    public UpdateCountResult(String name, int count)
-    {
-        this.name = name;
-        this.count = count;
-    }
+  public UpdateCountResult(String name, int count) {
+    this.name = name;
+    this.count = count;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public Object getResult()
-    {
-        return count;
-    }
+  @Override
+  public Object getResult() {
+    return count;
+  }
 }

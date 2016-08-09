@@ -17,62 +17,52 @@ import java.nio.file.WatchEvent.Kind;
  *
  * @since 4.0
  */
-public enum FileEventType
-{
+public enum FileEventType {
 
-    /**
-     * Represents the event of a file being created
-     */
-    CREATE(ENTRY_CREATE),
+  /**
+   * Represents the event of a file being created
+   */
+  CREATE(ENTRY_CREATE),
 
-    /**
-     * Represents the event of a file being updated
-     */
-    UPDATE(ENTRY_MODIFY),
+  /**
+   * Represents the event of a file being updated
+   */
+  UPDATE(ENTRY_MODIFY),
 
-    /**
-     * Represents the event of a file being deleted
-     */
-    DELETE(ENTRY_DELETE);
+  /**
+   * Represents the event of a file being deleted
+   */
+  DELETE(ENTRY_DELETE);
 
-    private final Kind kind;
+  private final Kind kind;
 
-    /**
-     * Returns a {@Link FileEventType} which is equivalent to the given
-     * {@code kind}
-     *
-     * @param kind a Java event {@link Kind}
-     * @return a {@link FileEventType}
-     * @throws IllegalArgumentException if the {@code kind} does not have an equivalent {@link FileEventType}
-     */
-    public static FileEventType of(Kind kind)
-    {
-        if (kind == ENTRY_CREATE)
-        {
-            return CREATE;
-        }
-        else if (kind == ENTRY_MODIFY)
-        {
-            return UPDATE;
-        }
-        else if (kind == ENTRY_DELETE)
-        {
-            return DELETE;
-        }
-
-        throw new IllegalArgumentException("Invalid Event Kind: " + kind.name());
+  /**
+   * Returns a {@Link FileEventType} which is equivalent to the given {@code kind}
+   *
+   * @param kind a Java event {@link Kind}
+   * @return a {@link FileEventType}
+   * @throws IllegalArgumentException if the {@code kind} does not have an equivalent {@link FileEventType}
+   */
+  public static FileEventType of(Kind kind) {
+    if (kind == ENTRY_CREATE) {
+      return CREATE;
+    } else if (kind == ENTRY_MODIFY) {
+      return UPDATE;
+    } else if (kind == ENTRY_DELETE) {
+      return DELETE;
     }
 
-    FileEventType(Kind kind)
-    {
-        this.kind = kind;
-    }
+    throw new IllegalArgumentException("Invalid Event Kind: " + kind.name());
+  }
 
-    /**
-     * @return a {@link Kind} with the same semantic meaning as {@code this} instance
-     */
-    public Kind asEventKind()
-    {
-        return kind;
-    }
+  FileEventType(Kind kind) {
+    this.kind = kind;
+  }
+
+  /**
+   * @return a {@link Kind} with the same semantic meaning as {@code this} instance
+   */
+  public Kind asEventKind() {
+    return kind;
+  }
 }

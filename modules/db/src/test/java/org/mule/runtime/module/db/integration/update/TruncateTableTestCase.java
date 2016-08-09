@@ -18,31 +18,26 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class TruncateTableTestCase extends AbstractDbIntegrationTestCase
-{
+public class TruncateTableTestCase extends AbstractDbIntegrationTestCase {
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    public TruncateTableTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public TruncateTableTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/truncate-table-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/truncate-table-config.xml"};
+  }
 
-    @Test
-    public void truncateTable() throws Exception
-    {
-        runFlow("truncateTable");
-        List<Map<String, String>> result = selectData("select * from PLANET", getDefaultDataSource());
-        assertTrue(result.isEmpty());
-    }
+  @Test
+  public void truncateTable() throws Exception {
+    runFlow("truncateTable");
+    List<Map<String, String>> result = selectData("select * from PLANET", getDefaultDataSource());
+    assertTrue(result.isEmpty());
+  }
 }

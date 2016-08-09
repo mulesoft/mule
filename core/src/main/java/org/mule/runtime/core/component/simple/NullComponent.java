@@ -10,16 +10,14 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 /**
- * <code>NullComponent</code> is a service that is used as a placeholder. This
- * implementation will throw an exception if a message is received for it.
+ * <code>NullComponent</code> is a service that is used as a placeholder. This implementation will throw an exception if a message
+ * is received for it.
  */
-public class NullComponent implements Callable
-{
+public class NullComponent implements Callable {
 
-    public Object onCall(MuleEventContext context) throws Exception
-    {
-        throw new UnsupportedOperationException("This service cannot receive messages. Service is: "
-                                                + context.getFlowConstruct().getName());
-    }
+  public Object onCall(MuleEventContext context) throws Exception {
+    throw new UnsupportedOperationException("This service cannot receive messages. Service is: "
+        + context.getFlowConstruct().getName());
+  }
 
 }

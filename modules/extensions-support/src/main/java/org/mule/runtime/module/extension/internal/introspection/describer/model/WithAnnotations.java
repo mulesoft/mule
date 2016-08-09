@@ -16,32 +16,27 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface WithAnnotations
-{
+public interface WithAnnotations {
 
-    /**
-     * @return the array of annotations that the {@link WithAnnotations} component is annotated with
-     */
-    Annotation[] getAnnotations();
+  /**
+   * @return the array of annotations that the {@link WithAnnotations} component is annotated with
+   */
+  Annotation[] getAnnotations();
 
-    /**
-     * Retrieves an annotation of the {@link WithAnnotations} component
-     *
-     * @param annotationClass Of the annotation to retrieve
-     * @param <A>             The annotation type
-     * @return The {@link Optional} annotation to retrieve
-     */
-    <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass);
+  /**
+   * Retrieves an annotation of the {@link WithAnnotations} component
+   *
+   * @param annotationClass Of the annotation to retrieve
+   * @param <A> The annotation type
+   * @return The {@link Optional} annotation to retrieve
+   */
+  <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass);
 
-    /**
-     * @param annotation The annotation to verify if the, {@link WithAnnotations} is annotated with.
-     * @return A {@code boolean} indicating if the {@link WithAnnotations} element is annotated with the given
-     * {@code annotation}
-     */
-    default boolean isAnnotatedWith(Class<? extends Annotation> annotation)
-    {
-        return stream(getAnnotations())
-                .anyMatch(foundAnnotation -> foundAnnotation.annotationType()
-                        .isAssignableFrom(annotation));
-    }
+  /**
+   * @param annotation The annotation to verify if the, {@link WithAnnotations} is annotated with.
+   * @return A {@code boolean} indicating if the {@link WithAnnotations} element is annotated with the given {@code annotation}
+   */
+  default boolean isAnnotatedWith(Class<? extends Annotation> annotation) {
+    return stream(getAnnotations()).anyMatch(foundAnnotation -> foundAnnotation.annotationType().isAssignableFrom(annotation));
+  }
 }

@@ -13,17 +13,15 @@ import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
 import java.util.Collection;
 
 /**
- * A {@link XmlNamespaceInfoProvider} which provides the information
- * for the {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE} namespace.
+ * A {@link XmlNamespaceInfoProvider} which provides the information for the {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
+ * namespace.
  *
  * @since 4.0
  */
-public class ExtensionsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
-{
+public class ExtensionsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-    @Override
-    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
-    {
-        return asList(new ExtensionXmlNamespaceInfo());
-    }
+  @Override
+  public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
+    return asList(new ExtensionXmlNamespaceInfo());
+  }
 }

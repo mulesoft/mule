@@ -25,36 +25,32 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateOutputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateOutputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public UpdateOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-output-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-output-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsUpdateMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("updateMetadata");
+  @Test
+  public void returnsUpdateMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("updateMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
 
-        SimpleMetaDataModel simpleMetaDataModel = (SimpleMetaDataModel) outputMetaData.get().getPayload();
-        assertThat(simpleMetaDataModel.getDataType(), equalTo(DataType.DOUBLE));
-    }
+    SimpleMetaDataModel simpleMetaDataModel = (SimpleMetaDataModel) outputMetaData.get().getPayload();
+    assertThat(simpleMetaDataModel.getDataType(), equalTo(DataType.DOUBLE));
+  }
 }

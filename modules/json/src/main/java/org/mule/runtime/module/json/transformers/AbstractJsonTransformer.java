@@ -18,50 +18,42 @@ import java.util.Map;
 /**
  * TODO
  */
-public abstract class AbstractJsonTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
-{
-    protected int weighting = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING;
+public abstract class AbstractJsonTransformer extends AbstractMessageTransformer implements DiscoverableTransformer {
 
-    private ObjectMapper mapper;
+  protected int weighting = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING;
 
-    private Map<Class<?>, Class<?>> sharedMixins = new HashMap<Class<?>, Class<?>>();
+  private ObjectMapper mapper;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (mapper == null)
-        {
-            mapper = new ObjectMapper();
-        }
+  private Map<Class<?>, Class<?>> sharedMixins = new HashMap<Class<?>, Class<?>>();
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (mapper == null) {
+      mapper = new ObjectMapper();
     }
+  }
 
-    public ObjectMapper getMapper()
-    {
-        return mapper;
-    }
+  public ObjectMapper getMapper() {
+    return mapper;
+  }
 
-    public void setMapper(ObjectMapper mapper)
-    {
-        this.mapper = mapper;
-    }
+  public void setMapper(ObjectMapper mapper) {
+    this.mapper = mapper;
+  }
 
-    public int getPriorityWeighting()
-    {
-        return weighting;
-    }
+  public int getPriorityWeighting() {
+    return weighting;
+  }
 
-    public void setPriorityWeighting(int weighting)
-    {
-        this.weighting = weighting;
-    }
+  public void setPriorityWeighting(int weighting) {
+    this.weighting = weighting;
+  }
 
-    public Map<Class<?>, Class<?>> getMixins()
-    {
-        return sharedMixins;
-    }
+  public Map<Class<?>, Class<?>> getMixins() {
+    return sharedMixins;
+  }
 
-    public void setMixins(Map<Class<?>, Class<?>> mixins)
-    {
-        this.sharedMixins = mixins;
-    }
+  public void setMixins(Map<Class<?>, Class<?>> mixins) {
+    this.sharedMixins = mixins;
+  }
 }

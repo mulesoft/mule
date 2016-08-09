@@ -18,36 +18,35 @@ import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
  *
  * @param <D> The type of the artifact's descriptor
  */
-public interface DeployableArtifact<D extends DeployableArtifactDescriptor> extends Artifact<D>
-{
+public interface DeployableArtifact<D extends DeployableArtifactDescriptor> extends Artifact<D> {
 
-    /**
-     * Install the artifact. Most commonly this includes the creation of the class loader and validation of resources.
-     */
-    void install() throws InstallException;
+  /**
+   * Install the artifact. Most commonly this includes the creation of the class loader and validation of resources.
+   */
+  void install() throws InstallException;
 
-    /**
-     * Initialise the artifact resources
-     */
-    void init();
+  /**
+   * Initialise the artifact resources
+   */
+  void init();
 
-    /**
-     * Starts the artifact execution
-     */
-    void start() throws DeploymentStartException;
+  /**
+   * Starts the artifact execution
+   */
+  void start() throws DeploymentStartException;
 
-    /**
-     * Stops the artifact execution
-     */
-    void stop();
+  /**
+   * Stops the artifact execution
+   */
+  void stop();
 
-    /**
-     * Dispose the artifact. Most commonly this includes the release of the resources held by the artifact
-     */
-    void dispose();
+  /**
+   * Dispose the artifact. Most commonly this includes the release of the resources held by the artifact
+   */
+  void dispose();
 
-    /**
-     * @return MuleContext created from the artifact configurations files.
-     */
-    MuleContext getMuleContext();
+  /**
+   * @return MuleContext created from the artifact configurations files.
+   */
+  MuleContext getMuleContext();
 }

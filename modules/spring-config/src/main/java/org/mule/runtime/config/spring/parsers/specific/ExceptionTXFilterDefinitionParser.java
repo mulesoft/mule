@@ -12,17 +12,16 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 /**
  * TODO
  */
-public class ExceptionTXFilterDefinitionParser extends ChildDefinitionParser
-{
-    /**
-     * The class will be inferred from the class attribute
-     *
-     * @param setterMethod The target method (where the child will be injected)
-     */
-    public ExceptionTXFilterDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, WildcardFilter.class);
-        addAlias("exception-pattern", "pattern");
+public class ExceptionTXFilterDefinitionParser extends ChildDefinitionParser {
 
-    }
+  /**
+   * The class will be inferred from the class attribute
+   *
+   * @param setterMethod The target method (where the child will be injected)
+   */
+  public ExceptionTXFilterDefinitionParser(String setterMethod) {
+    super(setterMethod, WildcardFilter.class);
+    addAlias("exception-pattern", "pattern");
+
+  }
 }

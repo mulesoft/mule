@@ -55,270 +55,237 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor}
- * and {@link ExtensionMessageSource}.
+ * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
+ * {@link ExtensionMessageSource}.
  * <p>
  * Provides capabilities of Metadata resolution and configuration validation.
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Lifecycle
-{
+public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Lifecycle {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
-    private final TemplateParser expressionParser = createMuleStyleParser();
-    private final RuntimeExtensionModel extensionModel;
-    private final ComponentModel componentModel;
-    private final String configurationProviderName;
-    protected final ExtensionManagerAdapter extensionManager;
+  private final TemplateParser expressionParser = createMuleStyleParser();
+  private final RuntimeExtensionModel extensionModel;
+  private final ComponentModel componentModel;
+  private final String configurationProviderName;
+  protected final ExtensionManagerAdapter extensionManager;
 
-    private MetadataMediator metadataMediator;
-    protected FlowConstruct flowConstruct;
-    protected MuleContext muleContext;
+  private MetadataMediator metadataMediator;
+  protected FlowConstruct flowConstruct;
+  protected MuleContext muleContext;
 
-    @Inject
-    protected ConnectionManagerAdapter connectionManager;
+  @Inject
+  protected ConnectionManagerAdapter connectionManager;
 
-    @Inject
-    private MuleMetadataManager metadataManager;
+  @Inject
+  private MuleMetadataManager metadataManager;
 
-    protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel, String configurationProviderName, ExtensionManagerAdapter extensionManager)
-    {
-        this.extensionModel = extensionModel;
-        this.componentModel = componentModel;
-        this.configurationProviderName = configurationProviderName;
-        this.extensionManager = extensionManager;
-        this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
+  protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel,
+                               String configurationProviderName, ExtensionManagerAdapter extensionManager) {
+    this.extensionModel = extensionModel;
+    this.componentModel = componentModel;
+    this.configurationProviderName = configurationProviderName;
+    this.extensionManager = extensionManager;
+    this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
+  }
+
+  /**
+   * Makes sure that the operation is valid by invoking {@link #validateOperationConfiguration(ConfigurationProvider)} and then
+   * delegates on {@link #doInitialise()} for custom initialisation
+   *
+   * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
+   */
+  @Override
+  public final void initialise() throws InitialisationException {
+    withContextClassLoader(getExtensionClassLoader(), () -> {
+      validateConfigurationProviderIsNotExpression();
+      Optional<ConfigurationProvider<Object>> provider = findConfigurationProvider();
+
+      if (provider.isPresent()) {
+        validateOperationConfiguration(provider.get());
+      }
+
+      doInitialise();
+      return null;
+    }, InitialisationException.class, e -> {
+      throw new InitialisationException(e, this);
+    });
+  }
+
+  /**
+   * Delegates into {@link #doStart()} making sure that it executes using the extension's class loader
+   *
+   * @throws MuleException if the phase couldn't be applied
+   */
+  @Override
+  public final void start() throws MuleException {
+    withContextClassLoader(getExtensionClassLoader(), () -> {
+      doStart();
+      return null;
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    });
+  }
+
+  /**
+   * Delegates into {@link #doStop()} making sure that it executes using the extension's class loader
+   *
+   * @throws MuleException if the phase couldn't be applied
+   */
+  @Override
+  public final void stop() throws MuleException {
+    withContextClassLoader(getExtensionClassLoader(), () -> {
+      doStop();
+      return null;
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    });
+  }
+
+  /**
+   * Delegates into {@link #doDispose()} making sure that it executes using the extension's class loader
+   */
+  @Override
+  public final void dispose() {
+    try {
+      withContextClassLoader(getExtensionClassLoader(), () -> {
+        doDispose();
+        return null;
+      });
+    } catch (Exception e) {
+      LOGGER.warn("Exception found trying to dispose component", e);
+    }
+  }
+
+  /**
+   * Implementors will use this method to perform their own initialisation logic
+   *
+   * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
+   */
+  protected abstract void doInitialise() throws InitialisationException;
+
+  /**
+   * Implementors will use this method to perform their own starting logic
+   *
+   * @throws MuleException if the component could not start
+   */
+  protected abstract void doStart() throws MuleException;
+
+  /**
+   * Implementors will use this method to perform their own stopping logic
+   *
+   * @throws MuleException if the component could not stop
+   */
+  protected abstract void doStop() throws MuleException;
+
+  /**
+   * Implementors will use this method to perform their own disposing logic
+   */
+  protected abstract void doDispose();
+
+  /**
+   * Validates that the configuration returned by the {@code configurationProvider} is compatible with the associated
+   * {@link RuntimeComponentModel}
+   *
+   * @param configurationProvider
+   */
+  protected abstract void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider);
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<Set<MetadataKey>> getMetadataKeys() throws MetadataResolvingException {
+    final MetadataContext metadataContext = getMetadataContext();
+    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException {
+    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException {
+    final MetadataContext metadataContext = getMetadataContext();
+    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(metadataContext, key));
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  private MetadataContext getMetadataContext() throws MetadataResolvingException {
+    MuleEvent fakeEvent = getInitialiserEvent(muleContext);
+    ConfigurationInstance<Object> configuration = getConfiguration(fakeEvent);
+    ConfigurationProvider<Object> configurationProvider = findConfigurationProvider()
+        .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                          FailureCode.INVALID_CONFIGURATION));
+
+    if (configurationProvider instanceof DynamicConfigurationProvider) {
+      throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic",
+                                           FailureCode.INVALID_CONFIGURATION);
     }
 
-    /**
-     * Makes sure that the operation is valid by invoking {@link #validateOperationConfiguration(ConfigurationProvider)}
-     * and then delegates on {@link #doInitialise()} for custom initialisation
-     *
-     * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
-     */
-    @Override
-    public final void initialise() throws InitialisationException
-    {
-        withContextClassLoader(getExtensionClassLoader(), () -> {
-            validateConfigurationProviderIsNotExpression();
-            Optional<ConfigurationProvider<Object>> provider = findConfigurationProvider();
+    String cacheId = configuration.getName();
+    return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId));
+  }
 
-            if (provider.isPresent())
-            {
-                validateOperationConfiguration(provider.get());
-            }
-
-            doInitialise();
-            return null;
-        }, InitialisationException.class, e -> {
-            throw new InitialisationException(e, this);
-        });
+  /**
+   * @param event a {@link MuleEvent}
+   * @return a configuration instance for the current component with a given {@link MuleEvent}
+   */
+  protected ConfigurationInstance<Object> getConfiguration(MuleEvent event) {
+    if (isConfigurationSpecified()) {
+      return getConfigurationProviderByName().map(provider -> provider.get(event))
+          .orElseThrow(() -> new IllegalModelDefinitionException(format("Flow '%s' contains a reference to config '%s' but it doesn't exists",
+                                                                        flowConstruct.getName(), configurationProviderName)));
     }
 
-    /**
-     * Delegates into {@link #doStart()} making sure that it executes
-     * using the extension's class loader
-     *
-     * @throws MuleException if the phase couldn't be applied
-     */
-    @Override
-    public final void start() throws MuleException
-    {
-        withContextClassLoader(getExtensionClassLoader(), () -> {
-            doStart();
-            return null;
-        }, MuleException.class, e -> {
-            throw new DefaultMuleException(e);
-        });
+    return getConfigurationProviderByModel().map(provider -> provider.get(event))
+        .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event));
+  }
+
+  protected ClassLoader getExtensionClassLoader() {
+    return getClassLoader(extensionModel);
+  }
+
+  private Optional<ConfigurationProvider<Object>> findConfigurationProvider() {
+    return isConfigurationSpecified() ? getConfigurationProviderByName() : getConfigurationProviderByModel();
+  }
+
+  private Optional<ConfigurationProvider<Object>> getConfigurationProviderByName() {
+    return extensionManager.getConfigurationProvider(configurationProviderName);
+  }
+
+  private Optional<ConfigurationProvider<Object>> getConfigurationProviderByModel() {
+    return extensionManager.getConfigurationProvider(extensionModel);
+  }
+
+  private boolean isConfigurationSpecified() {
+    return !isBlank(configurationProviderName);
+  }
+
+  private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
+    if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProviderName)) {
+      throw new InitialisationException(createStaticMessage(format("Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+          + "Expressions are not allowed as config references", flowConstruct.getName(), hyphenize(componentModel.getName()),
+                                                                   configurationProviderName)),
+                                        this);
     }
-
-    /**
-     * Delegates into {@link #doStop()} making sure that it executes
-     * using the extension's class loader
-     *
-     * @throws MuleException if the phase couldn't be applied
-     */
-    @Override
-    public final void stop() throws MuleException
-    {
-        withContextClassLoader(getExtensionClassLoader(), () -> {
-            doStop();
-            return null;
-        }, MuleException.class, e -> {
-            throw new DefaultMuleException(e);
-        });
-    }
-
-    /**
-     * Delegates into {@link #doDispose()} making sure that it executes
-     * using the extension's class loader
-     */
-    @Override
-    public final void dispose()
-    {
-        try
-        {
-            withContextClassLoader(getExtensionClassLoader(), () -> {
-                doDispose();
-                return null;
-            });
-        }
-        catch (Exception e)
-        {
-            LOGGER.warn("Exception found trying to dispose component", e);
-        }
-    }
-
-    /**
-     * Implementors will use this method to perform their own initialisation
-     * logic
-     *
-     * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
-     */
-    protected abstract void doInitialise() throws InitialisationException;
-
-    /**
-     * Implementors will use this method to perform their own starting
-     * logic
-     *
-     * @throws MuleException if the component could not start
-     */
-    protected abstract void doStart() throws MuleException;
-
-    /**
-     * Implementors will use this method to perform their own stopping
-     * logic
-     *
-     * @throws MuleException if the component could not stop
-     */
-    protected abstract void doStop() throws MuleException;
-
-    /**
-     * Implementors will use this method to perform their own disposing
-     * logic
-     */
-    protected abstract void doDispose();
-
-    /**
-     * Validates that the configuration returned by the {@code configurationProvider}
-     * is compatible with the associated {@link RuntimeComponentModel}
-     *
-     * @param configurationProvider
-     */
-    protected abstract void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider);
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataResult<Set<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
-    {
-        final MetadataContext metadataContext = getMetadataContext();
-        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException
-    {
-        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException
-    {
-        final MetadataContext metadataContext = getMetadataContext();
-        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(metadataContext, key));
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
-
-    private MetadataContext getMetadataContext() throws MetadataResolvingException
-    {
-        MuleEvent fakeEvent = getInitialiserEvent(muleContext);
-        ConfigurationInstance<Object> configuration = getConfiguration(fakeEvent);
-        ConfigurationProvider<Object> configurationProvider = findConfigurationProvider()
-                .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval", FailureCode.INVALID_CONFIGURATION));
-
-        if (configurationProvider instanceof DynamicConfigurationProvider)
-        {
-            throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION);
-        }
-
-        String cacheId = configuration.getName();
-        return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId));
-    }
-
-    /**
-     * @param event a {@link MuleEvent}
-     * @return a configuration instance for the current component with a given {@link MuleEvent}
-     */
-    protected ConfigurationInstance<Object> getConfiguration(MuleEvent event)
-    {
-        if (isConfigurationSpecified())
-        {
-            return getConfigurationProviderByName()
-                    .map(provider -> provider.get(event))
-                    .orElseThrow(() -> new IllegalModelDefinitionException(format("Flow '%s' contains a reference to config '%s' but it doesn't exists",
-                                                                                  flowConstruct.getName(), configurationProviderName)));
-        }
-
-        return getConfigurationProviderByModel()
-                .map(provider -> provider.get(event))
-                .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event));
-    }
-
-    protected ClassLoader getExtensionClassLoader()
-    {
-        return getClassLoader(extensionModel);
-    }
-
-    private Optional<ConfigurationProvider<Object>> findConfigurationProvider()
-    {
-        return isConfigurationSpecified() ? getConfigurationProviderByName()
-                                          : getConfigurationProviderByModel();
-    }
-
-    private Optional<ConfigurationProvider<Object>> getConfigurationProviderByName()
-    {
-        return extensionManager.getConfigurationProvider(configurationProviderName);
-    }
-
-    private Optional<ConfigurationProvider<Object>> getConfigurationProviderByModel()
-    {
-        return extensionManager.getConfigurationProvider(extensionModel);
-    }
-
-    private boolean isConfigurationSpecified()
-    {
-        return !isBlank(configurationProviderName);
-    }
-
-    private void validateConfigurationProviderIsNotExpression() throws InitialisationException
-    {
-        if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProviderName))
-        {
-            throw new InitialisationException(createStaticMessage(format(
-                    "Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. " +
-                    "Expressions are not allowed as config references",
-                    flowConstruct.getName(), hyphenize(componentModel.getName()), configurationProviderName)), this);
-        }
-    }
+  }
 }

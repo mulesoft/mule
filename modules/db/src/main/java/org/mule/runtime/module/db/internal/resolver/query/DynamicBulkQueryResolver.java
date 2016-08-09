@@ -14,20 +14,18 @@ import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 /**
  * Resolves a bulk query evaluating expression using a given event
  */
-public class DynamicBulkQueryResolver extends AbstractBulkQueryResolver
-{
+public class DynamicBulkQueryResolver extends AbstractBulkQueryResolver {
 
-    private final ExpressionManager expressionManager;
+  private final ExpressionManager expressionManager;
 
-    public DynamicBulkQueryResolver(String bulkQuery, QueryTemplateParser queryTemplateParser, ExpressionManager expressionManager)
-    {
-        super(bulkQuery, queryTemplateParser);
-        this.expressionManager = expressionManager;
-    }
+  public DynamicBulkQueryResolver(String bulkQuery, QueryTemplateParser queryTemplateParser,
+                                  ExpressionManager expressionManager) {
+    super(bulkQuery, queryTemplateParser);
+    this.expressionManager = expressionManager;
+  }
 
-    @Override
-    protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery)
-    {
-        return expressionManager.parse(bulkQuery.trim(), muleEvent);
-    }
+  @Override
+  protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
+    return expressionManager.parse(bulkQuery.trim(), muleEvent);
+  }
 }

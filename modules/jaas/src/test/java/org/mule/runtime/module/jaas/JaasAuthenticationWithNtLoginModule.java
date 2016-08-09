@@ -13,27 +13,24 @@ import org.mule.runtime.core.util.SystemUtils;
 
 import org.junit.Test;
 
-public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase
-{
+public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-conf-with-NTLoginModule.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-conf-with-NTLoginModule.xml";
+  }
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        return SystemUtils.IS_OS_UNIX;
-    }
+  @Override
+  protected boolean isDisabledInThisEnvironment() {
+    return SystemUtils.IS_OS_UNIX;
+  }
 
-    @Test
-    public void testCaseAuthentication() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
-        MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).run().getMessage();
-        assertNotNull(message);
-        assertTrue(getPayloadAsString(message).equals("Test Received"));
-    }
+  @Test
+  public void testCaseAuthentication() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
+    MuleMessage message =
+        flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).run().getMessage();
+    assertNotNull(message);
+    assertTrue(getPayloadAsString(message).equals("Test Received"));
+  }
 }

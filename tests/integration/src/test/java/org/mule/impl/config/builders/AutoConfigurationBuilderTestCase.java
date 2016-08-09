@@ -28,20 +28,21 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
-{
+public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testConfigureSpring() throws ConfigurationException, InitialisationException
-    {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        MuleContext muleContext = muleContextFactory.createMuleContext(Arrays.asList(new SimpleConfigurationBuilder(null), new AutoConfigurationBuilder(
-                "org/mule/test/spring/config1/test-xml-mule2-config.xml", emptyMap(), APP)), new DefaultMuleContextBuilder());
+  @Test
+  public void testConfigureSpring() throws ConfigurationException, InitialisationException {
+    MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    MuleContext muleContext = muleContextFactory.createMuleContext(
+                                                                   Arrays.asList(new SimpleConfigurationBuilder(null),
+                                                                                 new AutoConfigurationBuilder("org/mule/test/spring/config1/test-xml-mule2-config.xml",
+                                                                                                              emptyMap(), APP)),
+                                                                   new DefaultMuleContextBuilder());
 
-        // Just a few of the asserts from AbstractConfigBuilderTestCase
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
-        assertNotNull(flow.getExceptionListener());
-        assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
-    }
+    // Just a few of the asserts from AbstractConfigBuilderTestCase
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
+    assertNotNull(flow.getExceptionListener());
+    assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
+  }
 
 }

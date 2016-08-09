@@ -12,27 +12,22 @@ import org.mule.runtime.api.message.MuleMessage;
 
 import org.junit.Test;
 
-public class TcpSendAndReceivePojoTestCase extends ParameterizedProtocolTestCase
-{
+public class TcpSendAndReceivePojoTestCase extends ParameterizedProtocolTestCase {
 
-    public static final int RESPONSE_AGE = 7;
-    public static final String RESPONSE_NAME = "Ronaldo";
+  public static final int RESPONSE_AGE = 7;
+  public static final String RESPONSE_NAME = "Ronaldo";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-send-and-receive-pojo-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-send-and-receive-pojo-config.xml";
+  }
 
-    @Test
-    public void sendAndReceivePojo() throws Exception
-    {
-        MuleMessage message = flowRunner("tcp-send-and-receive")
-                .withPayload(testPojo)
-                .run().getMessage();
+  @Test
+  public void sendAndReceivePojo() throws Exception {
+    MuleMessage message = flowRunner("tcp-send-and-receive").withPayload(testPojo).run().getMessage();
 
-        TestPojo pojo = (TestPojo) deserializeMessage(message);
-        assertEquals(pojo.getAge(), RESPONSE_AGE);
-        assertEquals(pojo.getName(), RESPONSE_NAME);
-    }
+    TestPojo pojo = (TestPojo) deserializeMessage(message);
+    assertEquals(pojo.getAge(), RESPONSE_AGE);
+    assertEquals(pojo.getName(), RESPONSE_NAME);
+  }
 }

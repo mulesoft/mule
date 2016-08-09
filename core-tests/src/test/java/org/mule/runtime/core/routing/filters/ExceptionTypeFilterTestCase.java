@@ -17,24 +17,22 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
-{
+public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testExceptionTypeFilter()
-    {
-        ExceptionTypeFilter filter = new ExceptionTypeFilter();
-        assertNull(filter.getExpectedType());
-        MuleMessage m = MuleMessage.builder().payload("test").build();
-        assertTrue(!filter.accept(m));
+  @Test
+  public void testExceptionTypeFilter() {
+    ExceptionTypeFilter filter = new ExceptionTypeFilter();
+    assertNull(filter.getExpectedType());
+    MuleMessage m = MuleMessage.builder().payload("test").build();
+    assertTrue(!filter.accept(m));
 
-        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
-        assertTrue(filter.accept(m));
+    m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
+    assertTrue(filter.accept(m));
 
-        filter = new ExceptionTypeFilter(IOException.class);
-        assertTrue(!filter.accept(m));
-        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
-        assertTrue(filter.accept(m));
-    }
+    filter = new ExceptionTypeFilter(IOException.class);
+    assertTrue(!filter.accept(m));
+    m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
+    assertTrue(filter.accept(m));
+  }
 
 }

@@ -20,27 +20,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public abstract class AbstractRegistryTestCase extends AbstractMuleTestCase
-{
+public abstract class AbstractRegistryTestCase extends AbstractMuleTestCase {
 
-    public abstract Registry getRegistry();
+  public abstract Registry getRegistry();
 
-    @Test
-    public void testNotFoundCalls() throws RegistrationException
-    {
-        Registry r = getRegistry();
-        Map<String, IOException> map = r.lookupByType(IOException.class);
-        assertNotNull(map);
-        assertEquals(0, map.size());
+  @Test
+  public void testNotFoundCalls() throws RegistrationException {
+    Registry r = getRegistry();
+    Map<String, IOException> map = r.lookupByType(IOException.class);
+    assertNotNull(map);
+    assertEquals(0, map.size());
 
-        IOException object = r.lookupObject(IOException.class);
-        assertNull(object);
+    IOException object = r.lookupObject(IOException.class);
+    assertNull(object);
 
-        object = r.lookupObject("foooooo");
-        assertNull(object);
+    object = r.lookupObject("foooooo");
+    assertNull(object);
 
-        Collection<IOException> list = r.lookupObjects(IOException.class);
-        assertNotNull(list);
-        assertEquals(0, list.size());
-    }
+    Collection<IOException> list = r.lookupObjects(IOException.class);
+    assertNotNull(list);
+    assertEquals(0, list.size());
+  }
 }

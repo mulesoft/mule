@@ -19,27 +19,21 @@ import org.mule.runtime.core.metadata.TypedValue;
 /**
  * Propagates data type when payload is used as enrichment target
  */
-public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator
-{
+public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
-    @Override
-    protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node)
-    {
-        if (node instanceof Assignment)
-        {
-            String assignmentVar = ((Assignment) node).getAssignmentVar();
+  @Override
+  protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node) {
+    if (node instanceof Assignment) {
+      String assignmentVar = ((Assignment) node).getAssignmentVar();
 
-            if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar))
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage())
-                                            .payload(typedValue.getValue())
-                                            .mediaType(typedValue.getDataType().getMediaType())
-                                            .build());
-                return true;
-            }
+      if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar)) {
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(typedValue.getValue())
+            .mediaType(typedValue.getDataType().getMediaType()).build());
+        return true;
+      }
 
-        }
-        return false;
     }
+    return false;
+  }
 
 }

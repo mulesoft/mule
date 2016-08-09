@@ -30,56 +30,50 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectOutputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectOutputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-output-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-output-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsSelectOutputMetadata() throws Exception
-    {
-        doSelectMetadataTest("selectMetadata", ArrayList.class.getName());
-    }
+  @Test
+  public void returnsSelectOutputMetadata() throws Exception {
+    doSelectMetadataTest("selectMetadata", ArrayList.class.getName());
+  }
 
-    @Test
-    public void returnsSelectStreamingOutputMetadata() throws Exception
-    {
-        doSelectMetadataTest("selectStreamingMetadata", ResultSetIterator.class.getName());
-    }
+  @Test
+  public void returnsSelectStreamingOutputMetadata() throws Exception {
+    doSelectMetadataTest("selectStreamingMetadata", ResultSetIterator.class.getName());
+  }
 
-    private void doSelectMetadataTest(String flowName, String implementationClass)
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+  private void doSelectMetadataTest(String flowName, String implementationClass) {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
-        assertEquals(implementationClass, listMetaDataModel.getImplementationClass());
-        DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
+    DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
+    assertEquals(implementationClass, listMetaDataModel.getImplementationClass());
+    DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
 
-        assertThat(mapDataModel.getKeys().size(), equalTo(3));
-        MetaDataModel id = mapDataModel.getValueMetaDataModel("ID");
-        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldOutputMetaDataType()));
-        MetaDataModel type = mapDataModel.getValueMetaDataModel("POSITION");
-        assertThat(type.getDataType(), equalTo(testDatabase.getPositionFieldOutputMetaDataType()));
-        MetaDataModel data = mapDataModel.getValueMetaDataModel("NAME");
-        assertThat(data.getDataType(), equalTo(DataType.STRING));
-    }
+    assertThat(mapDataModel.getKeys().size(), equalTo(3));
+    MetaDataModel id = mapDataModel.getValueMetaDataModel("ID");
+    assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldOutputMetaDataType()));
+    MetaDataModel type = mapDataModel.getValueMetaDataModel("POSITION");
+    assertThat(type.getDataType(), equalTo(testDatabase.getPositionFieldOutputMetaDataType()));
+    MetaDataModel data = mapDataModel.getValueMetaDataModel("NAME");
+    assertThat(data.getDataType(), equalTo(DataType.STRING));
+  }
 }

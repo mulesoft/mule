@@ -16,18 +16,17 @@ import javax.management.NotCompliantMBeanException;
 /**
  * JMX Agent for Mule Applications
  */
-public class JmxApplicationAgent extends AbstractJmxAgent
-{
+public class JmxApplicationAgent extends AbstractJmxAgent {
 
-    @Override
-    protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
-    {
-        registerWrapperService();
-        registerStatisticsService();
-        registerMuleService();
-        registerConfigurationService();
-        registerFlowConstructServices();
-        registerApplicationServices();
-    }
+  @Override
+  protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException,
+      InstanceAlreadyExistsException, MalformedObjectNameException {
+    registerWrapperService();
+    registerStatisticsService();
+    registerMuleService();
+    registerConfigurationService();
+    registerFlowConstructServices();
+    registerApplicationServices();
+  }
 
 }

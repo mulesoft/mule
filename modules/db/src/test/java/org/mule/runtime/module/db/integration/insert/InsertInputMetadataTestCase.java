@@ -23,58 +23,50 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InsertInputMetadataTestCase extends AbstractUpdateInputMetadataTestCase
-{
+public class InsertInputMetadataTestCase extends AbstractUpdateInputMetadataTestCase {
 
-    public InsertInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-input-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-input-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsNullInsertMetadataUnParameterizedQuery() throws Exception
-    {
-        doUnresolvedMetadataTest("insertMetadataNoParams");
-    }
+  @Test
+  public void returnsNullInsertMetadataUnParameterizedQuery() throws Exception {
+    doUnresolvedMetadataTest("insertMetadataNoParams");
+  }
 
-    @Test
-    public void returnsNullInsertInputMetadataFromNotSupportedParameterizedQuery() throws Exception
-    {
-        doUnresolvedMetadataTest("insertMetadataNotSupportedValueParams");
-    }
+  @Test
+  public void returnsNullInsertInputMetadataFromNotSupportedParameterizedQuery() throws Exception {
+    doUnresolvedMetadataTest("insertMetadataNotSupportedValueParams");
+  }
 
-    @Test
-    public void returnsInsertInputMetadataFromBeanParameterizedQuery() throws Exception
-    {
-        doResolvedMetadataTest("insertMetadataBeanParams");
-    }
+  @Test
+  public void returnsInsertInputMetadataFromBeanParameterizedQuery() throws Exception {
+    doResolvedMetadataTest("insertMetadataBeanParams");
+  }
 
-    @Test
-    public void returnsInsertInputMetadataFromMapParameterizedQuery() throws Exception
-    {
-        doResolvedMetadataTest("insertMetadataMapParams");
-    }
+  @Test
+  public void returnsInsertInputMetadataFromMapParameterizedQuery() throws Exception {
+    doResolvedMetadataTest("insertMetadataMapParams");
+  }
 
-    private void doUnresolvedMetadataTest(String flowName)
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+  private void doUnresolvedMetadataTest(String flowName) {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> inputMetaData = queryMessageProcessor.getInputMetaData();
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> inputMetaData = queryMessageProcessor.getInputMetaData();
 
-        assertThat(inputMetaData, equalTo(null));
-    }
+    assertThat(inputMetaData, equalTo(null));
+  }
 }

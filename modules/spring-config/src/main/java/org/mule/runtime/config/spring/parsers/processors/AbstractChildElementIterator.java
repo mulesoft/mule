@@ -21,75 +21,59 @@ import org.w3c.dom.NodeList;
 
 /**
  * <p>
- * This iterates over child elements, parsing them and calling
- * {@link #insertBean(BeanAssembler, Object, Element, Element)}.
+ * This iterates over child elements, parsing them and calling {@link #insertBean(BeanAssembler, Object, Element, Element)}.
  * </p>
  * <p>
- * There are two ways we can parse a tree of elements - have an external loop or let
- * each parser iterate over its own children. Mule uses the first strategy, but some
- * (most? all?) third party BDPs use the second. This processor lets us use third
- * party beans inside the Mule framework.
+ * There are two ways we can parse a tree of elements - have an external loop or let each parser iterate over its own children.
+ * Mule uses the first strategy, but some (most? all?) third party BDPs use the second. This processor lets us use third party
+ * beans inside the Mule framework.
  * </p>
  * <p>
- * So this is a very specialised parser that should only be used when trying to
- * inter-operate with beans from third party packages which themselves control how
- * their children are parsed.
+ * So this is a very specialised parser that should only be used when trying to inter-operate with beans from third party packages
+ * which themselves control how their children are parsed.
  * </p>
  * <p>
- * Since for Mule beans the iteration over child elements (at least currently) is
- * done via {@link MuleHierarchicalBeanDefinitionParserDelegate} the calling parser
- * needs to set the flag
- * {@link MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE} - this stops
- * the Mule recursion from working.
+ * Since for Mule beans the iteration over child elements (at least currently) is done via
+ * {@link MuleHierarchicalBeanDefinitionParserDelegate} the calling parser needs to set the flag
+ * {@link MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE} - this stops the Mule recursion from working.
  * </p>
  * <p>
- * NOTE - IMHO (ac) the Mule approach was probably a mistake; this processor could be
- * used as a way to slowly migrate the Mule code to the more common approach.
+ * NOTE - IMHO (ac) the Mule approach was probably a mistake; this processor could be used as a way to slowly migrate the Mule
+ * code to the more common approach.
  * </p>
  */
-public abstract class AbstractChildElementIterator implements PostProcessor
-{
+public abstract class AbstractChildElementIterator implements PostProcessor {
 
-    private BeanAssemblerFactory beanAssemblerFactory;
-    private PropertyConfiguration configuration;
+  private BeanAssemblerFactory beanAssemblerFactory;
+  private PropertyConfiguration configuration;
 
-    public AbstractChildElementIterator(BeanAssemblerFactory beanAssemblerFactory, PropertyConfiguration configuration)
-    {
-        this.beanAssemblerFactory = beanAssemblerFactory;
-        this.configuration = configuration;
+  public AbstractChildElementIterator(BeanAssemblerFactory beanAssemblerFactory, PropertyConfiguration configuration) {
+    this.beanAssemblerFactory = beanAssemblerFactory;
+    this.configuration = configuration;
+  }
+
+  public void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    NodeList children = element.getChildNodes();
+    for (int i = 0; i < children.getLength(); ++i) {
+      Node child = children.item(i);
+      if (child.getNodeType() == Node.ELEMENT_NODE) {
+        processChildElement(context, assembler, element, (Element) child);
+      }
     }
+  }
 
-    public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-    {
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); ++i)
-        {
-            Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE)
-            {
-                processChildElement(context, assembler, element, (Element) child);
-            }
-        }
+  protected void processChildElement(ParserContext context, BeanAssembler assembler, Element parent, Element child) {
+    Object childBean = null;
+    if (SpringXMLUtils.isBeansNamespace(child) || SpringXMLUtils.isLocalName(child, BeanDefinitionParserDelegate.REF_ELEMENT)) {
+      childBean = context.getDelegate().parsePropertySubElement(child, null);
+    } else {
+      childBean = context.getDelegate().parseCustomElement(child, assembler.getBean().getBeanDefinition());
     }
+    BeanAssembler targetAssembler =
+        beanAssemblerFactory.newBeanAssembler(null, null, configuration, assembler.getBean().getRawBeanDefinition());
+    insertBean(targetAssembler, childBean, parent, child);
+  }
 
-    protected void processChildElement(ParserContext context, BeanAssembler assembler, Element parent, Element child)
-    {
-        Object childBean = null;
-        if (SpringXMLUtils.isBeansNamespace(child)
-            || SpringXMLUtils.isLocalName(child, BeanDefinitionParserDelegate.REF_ELEMENT))
-        {
-            childBean = context.getDelegate().parsePropertySubElement(child, null);
-        }
-        else
-        {
-            childBean = context.getDelegate().parseCustomElement(child,
-                assembler.getBean().getBeanDefinition());
-        }
-        BeanAssembler targetAssembler = beanAssemblerFactory.newBeanAssembler(null, null, configuration,
-            assembler.getBean().getRawBeanDefinition());
-        insertBean(targetAssembler, childBean, parent, child);
-    }
-
-    protected abstract void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child);
+  protected abstract void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child);
 
 }

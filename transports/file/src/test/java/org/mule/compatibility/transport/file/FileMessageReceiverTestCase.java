@@ -18,34 +18,31 @@ import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 
-public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
-{
-    File read = FileUtils.newFile("testcasedata/read");
-    File move = FileUtils.newFile("testcasedata/move");
+public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
 
-    public void testReceiver() throws Exception
-    {
-        // FIX A bit hard testing receive from a unit simple as we need to reg
-        // listener etc.
-        // file endpoint functions tests for this
-    }
+  File read = FileUtils.newFile("testcasedata/read");
+  File move = FileUtils.newFile("testcasedata/move");
 
-    @Override
-    public MessageReceiver getMessageReceiver() throws Exception
-    {
-        Connector connector = endpoint.getConnector();
-        connector.start();
+  public void testReceiver() throws Exception {
+    // FIX A bit hard testing receive from a unit simple as we need to reg
+    // listener etc.
+    // file endpoint functions tests for this
+  }
 
-        read.deleteOnExit();
-        move.deleteOnExit();
+  @Override
+  public MessageReceiver getMessageReceiver() throws Exception {
+    Connector connector = endpoint.getConnector();
+    connector.start();
 
-        return new FileMessageReceiver(connector, mock(Flow.class), endpoint,
-            read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
-    }
+    read.deleteOnExit();
+    move.deleteOnExit();
 
-    @Override
-    public InboundEndpoint getEndpoint() throws Exception
-    {
-        return getEndpointFactory().getInboundEndpoint("file://./simple");
-    }
+    return new FileMessageReceiver(connector, mock(Flow.class), endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null,
+                                   1000);
+  }
+
+  @Override
+  public InboundEndpoint getEndpoint() throws Exception {
+    return getEndpointFactory().getInboundEndpoint("file://./simple");
+  }
 }

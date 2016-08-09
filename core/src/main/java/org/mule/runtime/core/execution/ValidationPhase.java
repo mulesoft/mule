@@ -9,46 +9,35 @@ package org.mule.runtime.core.execution;
 /**
  * This phase validates the incoming message.
  *
- * To participate of this phase, {@link MessageProcessTemplate} must implement
- * {@link ValidationPhaseTemplate}.
+ * To participate of this phase, {@link MessageProcessTemplate} must implement {@link ValidationPhaseTemplate}.
  */
-public class ValidationPhase implements MessageProcessPhase<ValidationPhaseTemplate>, Comparable<MessageProcessPhase>
-{
+public class ValidationPhase implements MessageProcessPhase<ValidationPhaseTemplate>, Comparable<MessageProcessPhase> {
 
-    @Override
-    public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate)
-    {
-        return messageProcessTemplate instanceof ValidationPhaseTemplate;
-    }
+  @Override
+  public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate) {
+    return messageProcessTemplate instanceof ValidationPhaseTemplate;
+  }
 
-    @Override
-    public void runPhase(ValidationPhaseTemplate validationPhaseTemplate, MessageProcessContext messageProcessContext, PhaseResultNotifier phaseResultNotifier)
-    {
-        try
-        {
-            if (!validationPhaseTemplate.validateMessage())
-            {
-                validationPhaseTemplate.discardInvalidMessage();
-                phaseResultNotifier.phaseConsumedMessage();
-            }
-            else
-            {
-                phaseResultNotifier.phaseSuccessfully();
-            }
-        }
-        catch (Exception e)
-        {
-            phaseResultNotifier.phaseFailure(e);
-        }
+  @Override
+  public void runPhase(ValidationPhaseTemplate validationPhaseTemplate, MessageProcessContext messageProcessContext,
+                       PhaseResultNotifier phaseResultNotifier) {
+    try {
+      if (!validationPhaseTemplate.validateMessage()) {
+        validationPhaseTemplate.discardInvalidMessage();
+        phaseResultNotifier.phaseConsumedMessage();
+      } else {
+        phaseResultNotifier.phaseSuccessfully();
+      }
+    } catch (Exception e) {
+      phaseResultNotifier.phaseFailure(e);
     }
+  }
 
-    @Override
-    public int compareTo(MessageProcessPhase messageProcessPhase)
-    {
-        if (messageProcessPhase instanceof FlowProcessingPhaseTemplate)
-        {
-            return -1;
-        }
-        return 0;
+  @Override
+  public int compareTo(MessageProcessPhase messageProcessPhase) {
+    if (messageProcessPhase instanceof FlowProcessingPhaseTemplate) {
+      return -1;
     }
+    return 0;
+  }
 }

@@ -15,36 +15,31 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * A {@link FactoryBean} which creates instances of {@link Time}
  */
-public class TimeFactoryBean implements FactoryBean<Time>
-{
-    private long frequency;
-    private TimeUnit timeUnit;
+public class TimeFactoryBean implements FactoryBean<Time> {
 
-    @Override
-    public Time getObject() throws Exception
-    {
-        return new Time(frequency, timeUnit);
-    }
+  private long frequency;
+  private TimeUnit timeUnit;
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return Time.class;
-    }
+  @Override
+  public Time getObject() throws Exception {
+    return new Time(frequency, timeUnit);
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return Time.class;
+  }
 
-    public void setFrequency(long frequency)
-    {
-        this.frequency = frequency;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 
-    public void setTimeUnit(TimeUnit timeUnit)
-    {
-        this.timeUnit = timeUnit;
-    }
+  public void setFrequency(long frequency) {
+    this.frequency = frequency;
+  }
+
+  public void setTimeUnit(TimeUnit timeUnit) {
+    this.timeUnit = timeUnit;
+  }
 }

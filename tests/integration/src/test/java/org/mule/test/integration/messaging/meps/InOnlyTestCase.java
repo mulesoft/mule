@@ -18,30 +18,27 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
-public class InOnlyTestCase extends AbstractIntegrationTestCase
-{
-    public static final long TIMEOUT = 3000;
+public class InOnlyTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml";
-    }
+  public static final long TIMEOUT = 3000;
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        final Latch latch = new Latch();
-        muleContext.registerListener(new FunctionalTestNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml";
+  }
 
-        flowRunner("In-Only-Service").withPayload(getTestMuleMessage()).asynchronously().run();
-        assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    }
+  @Test
+  public void testExchange() throws Exception {
+    final Latch latch = new Latch();
+    muleContext.registerListener(new FunctionalTestNotificationListener() {
+
+      @Override
+      public void onNotification(ServerNotification notification) {
+        latch.countDown();
+      }
+    });
+
+    flowRunner("In-Only-Service").withPayload(getTestMuleMessage()).asynchronously().run();
+    assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+  }
 }

@@ -19,32 +19,28 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
-{
+public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testArrayMatch() throws Exception
-    {
-        AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-        InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
-        assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
+  @Test
+  public void testArrayMatch() throws Exception {
+    AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
+    InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[] {new Apple(), new Orange()}));
+    assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
 
-    }
+  }
 
-    @Test
-    public void testArrayMatchGenericFail() throws Exception
-    {
-        AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-        InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Apple(), new Orange()}));
-        assertEquals(ctx.getState(), InvocationResult.State.FAILED);
-    }
+  @Test
+  public void testArrayMatchGenericFail() throws Exception {
+    AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
+    InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[] {new Apple(), new Orange()}));
+    assertEquals(ctx.getState(), InvocationResult.State.FAILED);
+  }
 
 
-    @Test
-    public void testArrayMatchFail() throws Exception
-    {
-        AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-        InvocationResult ctx = resolver.invoke(new Apple(), getTestEventContext(new Object[]{"blah"}));
-        assertEquals(ctx.getState(), InvocationResult.State.FAILED);
-    }
+  @Test
+  public void testArrayMatchFail() throws Exception {
+    AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
+    InvocationResult ctx = resolver.invoke(new Apple(), getTestEventContext(new Object[] {"blah"}));
+    assertEquals(ctx.getState(), InvocationResult.State.FAILED);
+  }
 }

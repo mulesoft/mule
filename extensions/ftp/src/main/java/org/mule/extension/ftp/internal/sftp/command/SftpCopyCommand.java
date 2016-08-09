@@ -24,59 +24,45 @@ import java.nio.file.Paths;
  *
  * @since 4.0
  */
-public class SftpCopyCommand extends SftpCommand implements CopyCommand
-{
+public class SftpCopyCommand extends SftpCommand implements CopyCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpCopyCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
+  /**
+   * {@inheritDoc}
+   */
+  public SftpCopyCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
+                   boolean createParentDirectories, MuleEvent event) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(this, fileSystem));
+  }
+
+  private class SftpCopyDelegate extends AbstractFtpCopyDelegate {
+
+    public SftpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem) {
+      super(command, fileSystem);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void copy(FileConnectorConfig config,
-                     String sourcePath,
-                     String targetPath,
-                     boolean overwrite,
-                     boolean createParentDirectories,
-                     MuleEvent event)
-    {
-        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(this, fileSystem));
-    }
-
-    private class SftpCopyDelegate extends AbstractFtpCopyDelegate
-    {
-
-        public SftpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem)
-        {
-            super(command, fileSystem);
+    protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
+                                 FtpFileSystem writerConnection, MuleEvent event) {
+      for (FileAttributes fileAttributes : client.list(sourcePath.toString())) {
+        if (isVirtualDirectory(fileAttributes.getName())) {
+          continue;
         }
 
-        @Override
-        protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
-        {
-            for (FileAttributes fileAttributes : client.list(sourcePath.toString()))
-            {
-                if (isVirtualDirectory(fileAttributes.getName()))
-                {
-                    continue;
-                }
-
-                if (fileAttributes.isDirectory())
-                {
-                    Path targetPath = target.resolve(fileAttributes.getName());
-                    copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
-                }
-                else
-                {
-                    copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
-                }
-            }
+        if (fileAttributes.isDirectory()) {
+          Path targetPath = target.resolve(fileAttributes.getName());
+          copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
+        } else {
+          copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
         }
+      }
     }
+  }
 }

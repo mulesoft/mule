@@ -7,20 +7,14 @@
 package org.mule.test.core.security;
 
 /**
- * Tests multi-user security against a security provider which holds authentications 
- * for multiple users concurrently.
+ * Tests multi-user security against a security provider which holds authentications for multiple users concurrently.
  * 
  * see EE-979
  */
-public class MultiuserSecurityWithMultiuserProviderTestCase extends MultiuserSecurityTestCase
-{
+public class MultiuserSecurityWithMultiuserProviderTestCase extends MultiuserSecurityTestCase {
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                "multiuser-security-test-flow.xml",
-                "multiuser-security-provider.xml"
-        };
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"multiuser-security-test-flow.xml", "multiuser-security-provider.xml"};
+  }
 }

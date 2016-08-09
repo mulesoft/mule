@@ -21,61 +21,56 @@ import javax.jms.ConnectionFactory;
 import org.junit.Test;
 
 @SmallTest
-public class CachingConnectionFactoryBeanTestCase extends AbstractMuleTestCase
-{
+public class CachingConnectionFactoryBeanTestCase extends AbstractMuleTestCase {
 
-    private final ConnectionFactory connectionFactoryDelegate = mock(ConnectionFactory.class);
-    private final CachingConnectionFactoryFactoryBean factoryBean = new CachingConnectionFactoryFactoryBean();
+  private final ConnectionFactory connectionFactoryDelegate = mock(ConnectionFactory.class);
+  private final CachingConnectionFactoryFactoryBean factoryBean = new CachingConnectionFactoryFactoryBean();
 
-    @Test
-    public void buildsDefaultCachingConnectionFactory() throws Exception
-    {
-        factoryBean.setConnectionFactory(connectionFactoryDelegate);
-        CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
-        assertThat(connectionFactory.getSessionCacheSize(), equalTo(CachingConnectionFactoryFactoryBean.DEFAULT_SESSION_CACHE_SIZE));
-        assertThat(connectionFactory.isCacheProducers(), equalTo(false));
-        assertThat(connectionFactory.isCacheConsumers(), equalTo(false));
-        assertThat(connectionFactory.getUsername(), equalTo(null));
-        assertThat(connectionFactory.getPassword(), equalTo(null));
-    }
+  @Test
+  public void buildsDefaultCachingConnectionFactory() throws Exception {
+    factoryBean.setConnectionFactory(connectionFactoryDelegate);
+    CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
+    assertThat(connectionFactory.getSessionCacheSize(), equalTo(CachingConnectionFactoryFactoryBean.DEFAULT_SESSION_CACHE_SIZE));
+    assertThat(connectionFactory.isCacheProducers(), equalTo(false));
+    assertThat(connectionFactory.isCacheConsumers(), equalTo(false));
+    assertThat(connectionFactory.getUsername(), equalTo(null));
+    assertThat(connectionFactory.getPassword(), equalTo(null));
+  }
 
-    @Test
-    public void usesCustomCacheSize() throws Exception
-    {
-        int customSize = CachingConnectionFactoryFactoryBean.DEFAULT_SESSION_CACHE_SIZE + 5;
-        factoryBean.setConnectionFactory(connectionFactoryDelegate);
-        factoryBean.setSessionCacheSize(customSize);
+  @Test
+  public void usesCustomCacheSize() throws Exception {
+    int customSize = CachingConnectionFactoryFactoryBean.DEFAULT_SESSION_CACHE_SIZE + 5;
+    factoryBean.setConnectionFactory(connectionFactoryDelegate);
+    factoryBean.setSessionCacheSize(customSize);
 
-        CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
+    CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
 
-        assertThat(connectionFactory.getSessionCacheSize(), equalTo(customSize));
-    }
+    assertThat(connectionFactory.getSessionCacheSize(), equalTo(customSize));
+  }
 
-    @Test
-    public void usesCustomCacheProducers() throws Exception
-    {
-        final boolean customCacheProducers = true;
-        factoryBean.setConnectionFactory(connectionFactoryDelegate);
-        factoryBean.setCacheProducers(customCacheProducers);
+  @Test
+  public void usesCustomCacheProducers() throws Exception {
+    final boolean customCacheProducers = true;
+    factoryBean.setConnectionFactory(connectionFactoryDelegate);
+    factoryBean.setCacheProducers(customCacheProducers);
 
-        CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
+    CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
 
-        assertThat(connectionFactory.isCacheProducers(), equalTo(customCacheProducers));
-    }
+    assertThat(connectionFactory.isCacheProducers(), equalTo(customCacheProducers));
+  }
 
-    @Test
-    public void usesCustomUser() throws Exception
-    {
-        final String username = "user";
-        final String password = "password";
+  @Test
+  public void usesCustomUser() throws Exception {
+    final String username = "user";
+    final String password = "password";
 
-        factoryBean.setConnectionFactory(connectionFactoryDelegate);
-        factoryBean.setUsername(username);
-        factoryBean.setPassword(password);
+    factoryBean.setConnectionFactory(connectionFactoryDelegate);
+    factoryBean.setUsername(username);
+    factoryBean.setPassword(password);
 
-        CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
+    CustomCachingConnectionFactory connectionFactory = factoryBean.createInstance();
 
-        assertThat(connectionFactory.getUsername(), equalTo(username));
-        assertThat(connectionFactory.getPassword(), equalTo(password));
-    }
+    assertThat(connectionFactory.getUsername(), equalTo(username));
+    assertThat(connectionFactory.getPassword(), equalTo(password));
+  }
 }

@@ -26,19 +26,17 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 @Configuration(name = "listener-config")
 @Providers({TcpListenerProvider.class, UdpListenerProvider.class})
 @Sources({SocketListener.class})
-public class ListenerConfig extends AbstractSocketConfig
-{
+public class ListenerConfig extends AbstractSocketConfig {
 
-    /**
-     * Used by the {@link SocketListener} for the creation and execution of the {@link SocketWorker}
-     */
-    @Parameter
-    @Optional
-    @Summary("Defines a threading profile configuration")
-    private ThreadingProfile threadingProfile;
+  /**
+   * Used by the {@link SocketListener} for the creation and execution of the {@link SocketWorker}
+   */
+  @Parameter
+  @Optional
+  @Summary("Defines a threading profile configuration")
+  private ThreadingProfile threadingProfile;
 
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
-    }
+  public ThreadingProfile getThreadingProfile() {
+    return threadingProfile;
+  }
 }

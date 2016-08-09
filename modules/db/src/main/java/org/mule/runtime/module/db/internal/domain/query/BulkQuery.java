@@ -14,33 +14,28 @@ import java.util.List;
 /**
  * Defines a bulk of queryTemplates
  */
-public class BulkQuery
-{
+public class BulkQuery {
 
-    private final LinkedList<QueryTemplate> queryTemplates = new LinkedList<QueryTemplate>();
+  private final LinkedList<QueryTemplate> queryTemplates = new LinkedList<QueryTemplate>();
 
-    public List<QueryTemplate> getQueryTemplates()
-    {
-        return Collections.unmodifiableList(queryTemplates);
+  public List<QueryTemplate> getQueryTemplates() {
+    return Collections.unmodifiableList(queryTemplates);
+  }
+
+  /**
+   * Adds a new query template to the bulk
+   *
+   * @param queryTemplate a non parameterized query template
+   */
+  public void add(QueryTemplate queryTemplate) {
+    validateQuery(queryTemplate);
+
+    queryTemplates.add(queryTemplate);
+  }
+
+  private void validateQuery(QueryTemplate queryTemplate) {
+    if (!queryTemplate.getParams().isEmpty()) {
+      throw new IllegalArgumentException("Bulk query cannot contain a parameterized SQL query");
     }
-
-    /**
-     * Adds a new query template to the bulk
-     *
-     * @param queryTemplate a non parameterized query template
-     */
-    public void add(QueryTemplate queryTemplate)
-    {
-        validateQuery(queryTemplate);
-
-        queryTemplates.add(queryTemplate);
-    }
-
-    private void validateQuery(QueryTemplate queryTemplate)
-    {
-        if (!queryTemplate.getParams().isEmpty())
-        {
-            throw new IllegalArgumentException("Bulk query cannot contain a parameterized SQL query");
-        }
-    }
+  }
 }

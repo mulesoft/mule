@@ -18,19 +18,17 @@ import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandl
  * @deprecated Will be removed as soon as MULE-9865 is fixed. Do not use.
  */
 @Deprecated
-public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFactory
-{
+public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFactory {
 
-    static final String GENERATED_FILE_NAME = "spring.handlers";
-    static final String BUNDLE_MASK = "%s=%s\n";
+  static final String GENERATED_FILE_NAME = "spring.handlers";
+  static final String BUNDLE_MASK = "%s=%s\n";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
-    {
-        String content = String.format(BUNDLE_MASK, xmlModelProperty.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
-        return new GeneratedResource(GENERATED_FILE_NAME, escape(content).getBytes());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty) {
+    String content = String.format(BUNDLE_MASK, xmlModelProperty.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
+    return new GeneratedResource(GENERATED_FILE_NAME, escape(content).getBytes());
+  }
 }

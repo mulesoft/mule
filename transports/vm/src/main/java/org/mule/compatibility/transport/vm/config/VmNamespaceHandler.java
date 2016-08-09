@@ -18,17 +18,16 @@ import org.mule.runtime.config.spring.parsers.specific.TransactionDefinitionPars
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.
  *
  */
-public class VmNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
-{
-    @Override
-    public void init()
-    {
-        registerStandardTransportEndpoints(VMConnector.VM, URIBuilder.PATH_ATTRIBUTES);
-        registerConnectorDefinitionParser(VMConnector.class);
-        registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
-        registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(VMTransactionFactory.class));
+public class VmNamespaceHandler extends AbstractMuleTransportsNamespaceHandler {
 
-        // DEPRECATED. Use "queue-profile"
-        registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
-    }
+  @Override
+  public void init() {
+    registerStandardTransportEndpoints(VMConnector.VM, URIBuilder.PATH_ATTRIBUTES);
+    registerConnectorDefinitionParser(VMConnector.class);
+    registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
+    registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(VMTransactionFactory.class));
+
+    // DEPRECATED. Use "queue-profile"
+    registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
+  }
 }

@@ -18,38 +18,34 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 @SmallTest
-public class DomainElementsValidatorTestCase extends AbstractMuleTestCase
-{
+public class DomainElementsValidatorTestCase extends AbstractMuleTestCase {
 
-    public static final String MULE_NAMESPACE = "http://mule.org/mule.xsd";
-    private DomainElementsValidator preProcessor = new DomainElementsValidator();
+  public static final String MULE_NAMESPACE = "http://mule.org/mule.xsd";
+  private DomainElementsValidator preProcessor = new DomainElementsValidator();
 
-    @Test(expected = IllegalStateException.class)
-    public void rejects()
-    {
-        Node parent = mock(Node.class);
-        when(parent.getNamespaceURI()).thenReturn("http://springframework.org/beans.xsd");
-        when(parent.getLocalName()).thenReturn("beans");
-        preProcessor.validate(buildMuleElement(parent));
-    }
+  @Test(expected = IllegalStateException.class)
+  public void rejects() {
+    Node parent = mock(Node.class);
+    when(parent.getNamespaceURI()).thenReturn("http://springframework.org/beans.xsd");
+    when(parent.getLocalName()).thenReturn("beans");
+    preProcessor.validate(buildMuleElement(parent));
+  }
 
-    @Test
-    public void accepts()
-    {
-        preProcessor.validate(buildMuleElement(mock(Node.class)));
-    }
+  @Test
+  public void accepts() {
+    preProcessor.validate(buildMuleElement(mock(Node.class)));
+  }
 
-    private Element buildMuleElement(Node grandParent)
-    {
-        Element element = mock(Element.class, RETURNS_DEEP_STUBS);
-        when(element.getNamespaceURI()).thenReturn(MULE_NAMESPACE);
+  private Element buildMuleElement(Node grandParent) {
+    Element element = mock(Element.class, RETURNS_DEEP_STUBS);
+    when(element.getNamespaceURI()).thenReturn(MULE_NAMESPACE);
 
-        Node parent = mock(Node.class);
-        when(parent.getNamespaceURI()).thenReturn(MULE_NAMESPACE);
+    Node parent = mock(Node.class);
+    when(parent.getNamespaceURI()).thenReturn(MULE_NAMESPACE);
 
-        when(parent.getParentNode()).thenReturn(grandParent);
-        when(element.getParentNode()).thenReturn(parent);
+    when(parent.getParentNode()).thenReturn(grandParent);
+    when(element.getParentNode()).thenReturn(parent);
 
-        return element;
-    }
+    return element;
+  }
 }

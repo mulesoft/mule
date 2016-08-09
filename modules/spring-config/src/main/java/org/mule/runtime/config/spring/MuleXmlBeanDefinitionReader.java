@@ -17,38 +17,34 @@ import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.w3c.dom.Document;
 
 /**
- * Customized version of {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader} in order to hook into spring and use the mule version of
- * {@link org.springframework.beans.factory.xml.BeanDefinitionDocumentReader} which allow us to parse the XML file
- * using the new parsing mechanism.
+ * Customized version of {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader} in order to hook into spring and
+ * use the mule version of {@link org.springframework.beans.factory.xml.BeanDefinitionDocumentReader} which allow us to parse the
+ * XML file using the new parsing mechanism.
  *
  * @since 4.0
  */
-public class MuleXmlBeanDefinitionReader extends XmlBeanDefinitionReader implements BeanDefinitionDocumentReader
-{
+public class MuleXmlBeanDefinitionReader extends XmlBeanDefinitionReader implements BeanDefinitionDocumentReader {
 
-    private final MuleBeanDefinitionDocumentReader beanDefinitionDocumentReader;
+  private final MuleBeanDefinitionDocumentReader beanDefinitionDocumentReader;
 
-    /**
-     * Create new XmlBeanDefinitionReader for the given bean factory.
-     *
-     * @param registry the BeanFactory to load bean definitions into,
-     *                 in the form of a BeanDefinitionRegistry
-     */
-    public MuleXmlBeanDefinitionReader(BeanDefinitionRegistry registry, MuleBeanDefinitionDocumentReader beanDefinitionDocumentReader)
-    {
-        super(registry);
-        this.beanDefinitionDocumentReader = beanDefinitionDocumentReader;;
-    }
+  /**
+   * Create new XmlBeanDefinitionReader for the given bean factory.
+   *
+   * @param registry the BeanFactory to load bean definitions into, in the form of a BeanDefinitionRegistry
+   */
+  public MuleXmlBeanDefinitionReader(BeanDefinitionRegistry registry,
+                                     MuleBeanDefinitionDocumentReader beanDefinitionDocumentReader) {
+    super(registry);
+    this.beanDefinitionDocumentReader = beanDefinitionDocumentReader;;
+  }
 
-    @Override
-    protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader()
-    {
-        return beanDefinitionDocumentReader;
-    }
+  @Override
+  protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader() {
+    return beanDefinitionDocumentReader;
+  }
 
-    @Override
-    public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) throws BeanDefinitionStoreException
-    {
-        beanDefinitionDocumentReader.registerBeanDefinitions(doc, readerContext);
-    }
+  @Override
+  public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) throws BeanDefinitionStoreException {
+    beanDefinitionDocumentReader.registerBeanDefinitions(doc, readerContext);
+  }
 }

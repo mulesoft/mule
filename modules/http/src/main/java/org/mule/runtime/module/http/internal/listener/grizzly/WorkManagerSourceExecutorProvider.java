@@ -16,36 +16,31 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 /**
- * {@link org.mule.runtime.module.http.internal.listener.grizzly.ExecutorProvider} implementation
- * that retrieves an {@link java.util.concurrent.Executor} from a {@link org.mule.runtime.core.api.context.WorkManagerSource}
+ * {@link org.mule.runtime.module.http.internal.listener.grizzly.ExecutorProvider} implementation that retrieves an
+ * {@link java.util.concurrent.Executor} from a {@link org.mule.runtime.core.api.context.WorkManagerSource}
  */
-public class WorkManagerSourceExecutorProvider implements ExecutorProvider
-{
+public class WorkManagerSourceExecutorProvider implements ExecutorProvider {
 
-    private ServerAddressMap<WorkManagerSource> executorPerServerAddress = new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, WorkManagerSource>());
+  private ServerAddressMap<WorkManagerSource> executorPerServerAddress =
+      new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, WorkManagerSource>());
 
-    /**
-     * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to
-     * a {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
-     *
-     * @param serverAddress address to which the executor should be applied to
-     * @param workManagerSource the executor to use when a request is done to the server address
-     */
-    public void addExecutor(final ServerAddress serverAddress, final WorkManagerSource workManagerSource)
-    {
-        executorPerServerAddress.put(serverAddress, workManagerSource);
+  /**
+   * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to a
+   * {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
+   *
+   * @param serverAddress address to which the executor should be applied to
+   * @param workManagerSource the executor to use when a request is done to the server address
+   */
+  public void addExecutor(final ServerAddress serverAddress, final WorkManagerSource workManagerSource) {
+    executorPerServerAddress.put(serverAddress, workManagerSource);
+  }
+
+  @Override
+  public Executor getExecutor(ServerAddress serverAddress) {
+    try {
+      return executorPerServerAddress.get(serverAddress).getWorkManager();
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
     }
-
-    @Override
-    public Executor getExecutor(ServerAddress serverAddress)
-    {
-        try
-        {
-            return executorPerServerAddress.get(serverAddress).getWorkManager();
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
+  }
 }

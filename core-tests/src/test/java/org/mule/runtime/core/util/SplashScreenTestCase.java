@@ -14,26 +14,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SplashScreenTestCase extends AbstractMuleContextTestCase
-{
+public class SplashScreenTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testMuleContextSplashScreenRendering() throws Exception
-    {
-        SplashScreen serverStartupSplashScreen = new ServerStartupSplashScreen();
-        assertNotNull(serverStartupSplashScreen);
-        assertTrue(serverStartupSplashScreen.toString().length() > 0);
-        
-        muleContext.start();
-        muleContext.stop();
-        String initialStartBoilerPlate = serverStartupSplashScreen.toString();
-        
-        muleContext.start();
-        muleContext.stop();
-        String subsequentStartBoilerPlate = serverStartupSplashScreen.toString();
-        
-        // Only lightly validate on size because content changes, e.g. server start time-stamp
-        assertEquals("Splash-screen sizes differ, ", initialStartBoilerPlate.length(), subsequentStartBoilerPlate.length());
-    }
+  @Test
+  public void testMuleContextSplashScreenRendering() throws Exception {
+    SplashScreen serverStartupSplashScreen = new ServerStartupSplashScreen();
+    assertNotNull(serverStartupSplashScreen);
+    assertTrue(serverStartupSplashScreen.toString().length() > 0);
+
+    muleContext.start();
+    muleContext.stop();
+    String initialStartBoilerPlate = serverStartupSplashScreen.toString();
+
+    muleContext.start();
+    muleContext.stop();
+    String subsequentStartBoilerPlate = serverStartupSplashScreen.toString();
+
+    // Only lightly validate on size because content changes, e.g. server start time-stamp
+    assertEquals("Splash-screen sizes differ, ", initialStartBoilerPlate.length(), subsequentStartBoilerPlate.length());
+  }
 
 }

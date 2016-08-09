@@ -10,7 +10,7 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("pooled")
-public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient>
-{
+public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient>
+    implements PoolingConnectionProvider<PetStoreClient> {
 
 }

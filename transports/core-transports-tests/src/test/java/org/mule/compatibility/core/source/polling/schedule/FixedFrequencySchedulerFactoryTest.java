@@ -21,51 +21,46 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class FixedFrequencySchedulerFactoryTest
-{
+public class FixedFrequencySchedulerFactoryTest {
 
-    private AbstractPollingMessageReceiver receiver = mock(AbstractPollingMessageReceiver.class);
+  private AbstractPollingMessageReceiver receiver = mock(AbstractPollingMessageReceiver.class);
 
-    @Test
-    public void testCreatesCorrectInstance()
-    {
-        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
-        factory.setFrequency(300);
-        factory.setStartDelay(400);
-        factory.setTimeUnit(TimeUnit.DAYS);
+  @Test
+  public void testCreatesCorrectInstance() {
+    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+    factory.setFrequency(300);
+    factory.setStartDelay(400);
+    factory.setTimeUnit(TimeUnit.DAYS);
 
-        Scheduler scheduler = factory.doCreate("name", new PollingReceiverWorker(receiver));
+    Scheduler scheduler = factory.doCreate("name", new PollingReceiverWorker(receiver));
 
-        assertTrue(scheduler instanceof FixedFrequencyScheduler);
-        assertEquals(300, ((FixedFrequencyScheduler) scheduler).getFrequency());
-        assertEquals(TimeUnit.DAYS, ((FixedFrequencyScheduler) scheduler).getTimeUnit());
-        assertEquals("name", scheduler.getName());
-    }
+    assertTrue(scheduler instanceof FixedFrequencyScheduler);
+    assertEquals(300, ((FixedFrequencyScheduler) scheduler).getFrequency());
+    assertEquals(TimeUnit.DAYS, ((FixedFrequencyScheduler) scheduler).getTimeUnit());
+    assertEquals("name", scheduler.getName());
+  }
 
-    @Test
-    public void testDefaultValues()
-    {
-        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+  @Test
+  public void testDefaultValues() {
+    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
 
 
-        Scheduler scheduler = factory.doCreate("name", new PollingReceiverWorker(receiver));
+    Scheduler scheduler = factory.doCreate("name", new PollingReceiverWorker(receiver));
 
-        assertTrue(scheduler instanceof FixedFrequencyScheduler);
-        assertEquals(1000, ((FixedFrequencyScheduler) scheduler).getFrequency());
-        assertEquals(TimeUnit.MILLISECONDS, ((FixedFrequencyScheduler) scheduler).getTimeUnit());
-    }
+    assertTrue(scheduler instanceof FixedFrequencyScheduler);
+    assertEquals(1000, ((FixedFrequencyScheduler) scheduler).getFrequency());
+    assertEquals(TimeUnit.MILLISECONDS, ((FixedFrequencyScheduler) scheduler).getTimeUnit());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNegativeFrequency()
-    {
-        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
-        factory.setFrequency(-1);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testNegativeFrequency() {
+    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+    factory.setFrequency(-1);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNegativeStartDelay()
-    {
-        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
-        factory.setStartDelay(-1);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testNegativeStartDelay() {
+    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+    factory.setStartDelay(-1);
+  }
 }

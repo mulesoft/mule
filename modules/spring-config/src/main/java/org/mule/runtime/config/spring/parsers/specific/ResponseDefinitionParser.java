@@ -11,18 +11,13 @@ import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactory
 import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
-public class ResponseDefinitionParser extends ParentContextDefinitionParser
-{
+public class ResponseDefinitionParser extends ParentContextDefinitionParser {
 
-    public ResponseDefinitionParser()
-    {
-        super("endpoint", new ChildDefinitionParser("responseMessageProcessor",
-            MessageProcessorChainFactoryBean.class));
-        and("inbound-endpoint", new ChildDefinitionParser("responseMessageProcessor",
-            MessageProcessorChainFactoryBean.class));
-        and("outbound-endpoint", new ChildDefinitionParser("responseMessageProcessor",
-            MessageProcessorChainFactoryBean.class));
-        otherwise(new ChildDefinitionParser("messageProcessor", ResponseMessageProcessorsFactoryBean.class));
-    }
+  public ResponseDefinitionParser() {
+    super("endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+    and("inbound-endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+    and("outbound-endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+    otherwise(new ChildDefinitionParser("messageProcessor", ResponseMessageProcessorsFactoryBean.class));
+  }
 
 }

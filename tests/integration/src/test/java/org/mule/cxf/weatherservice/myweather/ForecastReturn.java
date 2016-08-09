@@ -13,9 +13,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ForecastReturn complex type.
+ * <p>
+ * Java class for ForecastReturn complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="ForecastReturn">
@@ -37,163 +39,137 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ForecastReturn", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {
-    "success",
-    "responseText",
-    "state",
-    "city",
-    "weatherStationCity",
-    "forecastResult"
-})
+@XmlType(name = "ForecastReturn", namespace = "http://ws.cdyne.com/WeatherWS/",
+    propOrder = {"success", "responseText", "state", "city", "weatherStationCity", "forecastResult"})
 public class ForecastReturn {
 
-    @XmlElement(name = "Success", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected boolean success;
-    @XmlElement(name = "ResponseText", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String responseText;
-    @XmlElement(name = "State", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String state;
-    @XmlElement(name = "City", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String city;
-    @XmlElement(name = "WeatherStationCity", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String weatherStationCity;
-    @XmlElement(name = "ForecastResult", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected ArrayOfForecast forecastResult;
+  @XmlElement(name = "Success", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected boolean success;
+  @XmlElement(name = "ResponseText", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String responseText;
+  @XmlElement(name = "State", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String state;
+  @XmlElement(name = "City", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String city;
+  @XmlElement(name = "WeatherStationCity", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String weatherStationCity;
+  @XmlElement(name = "ForecastResult", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected ArrayOfForecast forecastResult;
 
-    /**
-     * Gets the value of the success property.
-     *
-     */
-    public boolean isSuccess() {
-        return success;
-    }
+  /**
+   * Gets the value of the success property.
+   *
+   */
+  public boolean isSuccess() {
+    return success;
+  }
 
-    /**
-     * Sets the value of the success property.
-     *
-     */
-    public void setSuccess(boolean value) {
-        this.success = value;
-    }
+  /**
+   * Sets the value of the success property.
+   *
+   */
+  public void setSuccess(boolean value) {
+    this.success = value;
+  }
 
-    /**
-     * Gets the value of the responseText property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getResponseText() {
-        return responseText;
-    }
+  /**
+   * Gets the value of the responseText property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getResponseText() {
+    return responseText;
+  }
 
-    /**
-     * Sets the value of the responseText property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setResponseText(String value) {
-        this.responseText = value;
-    }
+  /**
+   * Sets the value of the responseText property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setResponseText(String value) {
+    this.responseText = value;
+  }
 
-    /**
-     * Gets the value of the state property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getState() {
-        return state;
-    }
+  /**
+   * Gets the value of the state property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getState() {
+    return state;
+  }
 
-    /**
-     * Sets the value of the state property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setState(String value) {
-        this.state = value;
-    }
+  /**
+   * Sets the value of the state property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setState(String value) {
+    this.state = value;
+  }
 
-    /**
-     * Gets the value of the city property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getCity() {
-        return city;
-    }
+  /**
+   * Gets the value of the city property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getCity() {
+    return city;
+  }
 
-    /**
-     * Sets the value of the city property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setCity(String value) {
-        this.city = value;
-    }
+  /**
+   * Sets the value of the city property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setCity(String value) {
+    this.city = value;
+  }
 
-    /**
-     * Gets the value of the weatherStationCity property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getWeatherStationCity() {
-        return weatherStationCity;
-    }
+  /**
+   * Gets the value of the weatherStationCity property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getWeatherStationCity() {
+    return weatherStationCity;
+  }
 
-    /**
-     * Sets the value of the weatherStationCity property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setWeatherStationCity(String value) {
-        this.weatherStationCity = value;
-    }
+  /**
+   * Sets the value of the weatherStationCity property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setWeatherStationCity(String value) {
+    this.weatherStationCity = value;
+  }
 
-    /**
-     * Gets the value of the forecastResult property.
-     *
-     * @return
-     *     possible object is
-     *     {@link ArrayOfForecast }
-     *
-     */
-    public ArrayOfForecast getForecastResult() {
-        return forecastResult;
-    }
+  /**
+   * Gets the value of the forecastResult property.
+   *
+   * @return possible object is {@link ArrayOfForecast }
+   *
+   */
+  public ArrayOfForecast getForecastResult() {
+    return forecastResult;
+  }
 
-    /**
-     * Sets the value of the forecastResult property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link ArrayOfForecast }
-     *
-     */
-    public void setForecastResult(ArrayOfForecast value) {
-        this.forecastResult = value;
-    }
+  /**
+   * Sets the value of the forecastResult property.
+   *
+   * @param value allowed object is {@link ArrayOfForecast }
+   *
+   */
+  public void setForecastResult(ArrayOfForecast value) {
+    this.forecastResult = value;
+  }
 
 }

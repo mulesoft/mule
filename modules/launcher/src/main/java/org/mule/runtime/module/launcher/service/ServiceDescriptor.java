@@ -15,22 +15,19 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 /**
  * Describes how to create a {@link Service} instance.
  */
-public class ServiceDescriptor extends ArtifactDescriptor
-{
+public class ServiceDescriptor extends ArtifactDescriptor {
 
-    public static final String SERVICE_PROPERTIES = "service.properties";
+  public static final String SERVICE_PROPERTIES = "service.properties";
 
-    private String serviceProviderClassName;
+  private String serviceProviderClassName;
 
-    public String getServiceProviderClassName()
-    {
-        return serviceProviderClassName;
-    }
+  public String getServiceProviderClassName() {
+    return serviceProviderClassName;
+  }
 
-    public void setServiceProviderClassName(String serviceProviderClassName)
-    {
-        checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
+  public void setServiceProviderClassName(String serviceProviderClassName) {
+    checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
 
-        this.serviceProviderClassName = serviceProviderClassName;
-    }
+    this.serviceProviderClassName = serviceProviderClassName;
+  }
 }

@@ -10,16 +10,13 @@ package org.mule.runtime.module.db.internal.resolver.query;
 /**
  * Thrown to indicate an error during query resolution
  */
-public class QueryResolutionException extends RuntimeException
-{
+public class QueryResolutionException extends RuntimeException {
 
-    public QueryResolutionException(String message)
-    {
-        super(message);
-    }
+  public QueryResolutionException(String message) {
+    super(message);
+  }
 
-    public QueryResolutionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public QueryResolutionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

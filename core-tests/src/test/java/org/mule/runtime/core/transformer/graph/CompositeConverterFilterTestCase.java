@@ -26,86 +26,81 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class CompositeConverterFilterTestCase
-{
+public class CompositeConverterFilterTestCase {
 
-    private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-    private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
+  private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
+  private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
 
-    @Test
-    public void filtersEmptyList() throws ResolverException
-    {
-        List<Converter> transformers = Collections.<Converter>emptyList();
-        ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
-        ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
+  @Test
+  public void filtersEmptyList() throws ResolverException {
+    List<Converter> transformers = Collections.<Converter>emptyList();
+    ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
+    ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
 
-        CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
-        List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
+    CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
+    List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(transformers, filteredTransformers);
-        verify(filter1, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
-        verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
-    }
+    assertEquals(transformers, filteredTransformers);
+    verify(filter1, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
+    verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
+  }
 
-    @Test
-    public void filtersSingletonList() throws Exception
-    {
-        Converter transformer1 = mock(Converter.class);
-        List<Converter> transformers = Collections.singletonList(transformer1);
+  @Test
+  public void filtersSingletonList() throws Exception {
+    Converter transformer1 = mock(Converter.class);
+    List<Converter> transformers = Collections.singletonList(transformer1);
 
-        ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
-        ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
+    ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
+    ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
 
-        CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
-        List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
+    CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
+    List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(transformers, filteredTransformers);
-        verify(filter1, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
-        verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
-    }
+    assertEquals(transformers, filteredTransformers);
+    verify(filter1, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
+    verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
+  }
 
-    @Test
-    public void stopsFilteringWhenGetsOneResult() throws Exception
-    {
-        Converter transformer1 = mock(Converter.class);
-        Converter transformer2 = mock(Converter.class);
+  @Test
+  public void stopsFilteringWhenGetsOneResult() throws Exception {
+    Converter transformer1 = mock(Converter.class);
+    Converter transformer2 = mock(Converter.class);
 
-        List<Converter> transformers = new ArrayList<Converter>();
-        transformers.add(transformer1);
-        transformers.add(transformer2);
+    List<Converter> transformers = new ArrayList<Converter>();
+    transformers.add(transformer1);
+    transformers.add(transformer2);
 
-        ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
-        List<Converter> expectedFilteredTransformers = Collections.singletonList(transformer1);
-        when(filter1.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(expectedFilteredTransformers);
-        ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
+    ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
+    List<Converter> expectedFilteredTransformers = Collections.singletonList(transformer1);
+    when(filter1.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(expectedFilteredTransformers);
+    ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
 
-        CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
-        List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
+    CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
+    List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(expectedFilteredTransformers, filteredTransformers);
-        verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
-    }
+    assertEquals(expectedFilteredTransformers, filteredTransformers);
+    verify(filter2, times(0)).filter(any(List.class), any(DataType.class), any(DataType.class));
+  }
 
-    @Test
-    public void failsWhenFiltersDoNotReduceListToASingleElement() throws Exception
-    {
-        Converter transformer1 = mock(Converter.class);
-        Converter transformer2 = mock(Converter.class);
+  @Test
+  public void failsWhenFiltersDoNotReduceListToASingleElement() throws Exception {
+    Converter transformer1 = mock(Converter.class);
+    Converter transformer2 = mock(Converter.class);
 
-        List<Converter> transformers = new ArrayList<Converter>();
-        transformers.add(transformer1);
-        transformers.add(transformer2);
+    List<Converter> transformers = new ArrayList<Converter>();
+    transformers.add(transformer1);
+    transformers.add(transformer2);
 
-        ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
-        when(filter1.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(transformers);
-        ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
-        when(filter2.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(transformers);
+    ConverterFilter filter1 = Mockito.mock(ConverterFilter.class);
+    when(filter1.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(transformers);
+    ConverterFilter filter2 = Mockito.mock(ConverterFilter.class);
+    when(filter2.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE)).thenReturn(transformers);
 
-        CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
-        List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
+    CompositeConverterFilter compositeConverterFilter = new CompositeConverterFilter(filter1, filter2);
+    List<Converter> filteredTransformers = compositeConverterFilter.filter(transformers, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(transformers, filteredTransformers);
-        verify(filter1, times(1)).filter(any(List.class), any(DataType.class), any(DataType.class));
-        verify(filter2, times(1)).filter(any(List.class), any(DataType.class), any(DataType.class));
-    }
+    assertEquals(transformers, filteredTransformers);
+    verify(filter1, times(1)).filter(any(List.class), any(DataType.class), any(DataType.class));
+    verify(filter2, times(1)).filter(any(List.class), any(DataType.class), any(DataType.class));
+  }
 }

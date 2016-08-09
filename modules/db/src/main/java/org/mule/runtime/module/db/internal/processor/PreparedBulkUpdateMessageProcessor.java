@@ -35,92 +35,83 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Executes an update query in bulk mode on a database
- * * <p/>
- * An update query can be parametrized update, insert or delete query or a stored procedure
- * taking input parameters only and returning an update count.
+ * Executes an update query in bulk mode on a database *
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
- * being processed.
+ * An update query can be parametrized update, insert or delete query or a stored procedure taking input parameters only and
+ * returning an update count.
+ * <p/>
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent} being processed.
  */
-public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor
-{
+public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor {
 
-    private final ParamValueResolver paramValueResolver;
+  private final ParamValueResolver paramValueResolver;
 
-    public PreparedBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction, List<QueryType> validQueryTypes, ParamValueResolver paramValueResolver)
-    {
-        super(dbConfigResolver, transactionalAction, validQueryTypes, queryResolver, bulkUpdateExecutorFactory);
-        this.paramValueResolver = paramValueResolver;
+  public PreparedBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver,
+                                            BulkQueryExecutorFactory bulkUpdateExecutorFactory,
+                                            TransactionalAction transactionalAction, List<QueryType> validQueryTypes,
+                                            ParamValueResolver paramValueResolver) {
+    super(dbConfigResolver, transactionalAction, validQueryTypes, queryResolver, bulkUpdateExecutorFactory);
+    this.paramValueResolver = paramValueResolver;
+  }
+
+  @Override
+  protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException {
+    Query query = queryResolver.resolve(connection, muleEvent);
+
+    validateQueryType(query.getQueryTemplate());
+
+    List<List<QueryParamValue>> paramValues = resolveParamSets(muleEvent, query);
+
+    BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
+    return bulkUpdateExecutor.execute(connection, query, paramValues);
+  }
+
+  private List<List<QueryParamValue>> resolveParamSets(MuleEvent muleEvent, Query query) {
+    final Iterator<Object> paramsIterator = getIterator(muleEvent);
+
+    List<List<QueryParamValue>> result = new LinkedList<>();
+
+    while (paramsIterator.hasNext()) {
+      MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
+      MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
+      List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
+      result.add(queryParamValues);
     }
 
-    @Override
-    protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
-    {
-        Query query = queryResolver.resolve(connection, muleEvent);
+    return result;
+  }
 
-        validateQueryType(query.getQueryTemplate());
+  @Override
+  protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent) {
+    MuleEvent eventToUse = resolveSource(muleEvent);
+    final List<FieldDebugInfo<?>> fields = new ArrayList<>();
 
-        List<List<QueryParamValue>> paramValues = resolveParamSets(muleEvent, query);
+    Query resolvedQuery;
+    try {
+      resolvedQuery = queryResolver.resolve(connection, eventToUse);
+    } catch (QueryResolutionException e) {
+      fields.add(createFieldDebugInfo(QUERY_DEBUG_FIELD, String.class, e));
 
-        BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
-        return bulkUpdateExecutor.execute(connection, query, paramValues);
+      return fields;
     }
 
-    private List<List<QueryParamValue>> resolveParamSets(MuleEvent muleEvent, Query query)
-    {
-        final Iterator<Object> paramsIterator = getIterator(muleEvent);
+    fields.add(DbDebugInfoUtils.createQueryFieldDebugInfo(QUERY_DEBUG_FIELD, resolvedQuery.getQueryTemplate()));
 
-        List<List<QueryParamValue>> result = new LinkedList<>();
+    final List<List<QueryParamValue>> paramSets = resolveParamSets(muleEvent, resolvedQuery);
 
-        while (paramsIterator.hasNext())
-        {
-            MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
-            MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
-            List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
-            result.add(queryParamValues);
-        }
-
-        return result;
+    List<FieldDebugInfo<?>> paramSetInfos = new LinkedList<>();
+    int setIndex = 1;
+    for (List<QueryParamValue> paramSet : paramSets) {
+      final List<FieldDebugInfo<?>> paramFields = new ArrayList<>();
+      int paramIndex = 1;
+      for (QueryParamValue paramValue : paramSet) {
+        final String name = paramValue.getName() == null ? PARAM_DEBUG_FIELD_PREFIX + paramIndex++ : paramValue.getName();
+        paramFields.add(createFieldDebugInfo(name, String.class, paramValue.getValue()));
+      }
+      paramSetInfos.add(createFieldDebugInfo(PARAM_SET_DEBUG_FIELD_PREFIX + setIndex++, List.class, paramFields));
     }
+    fields.add(createFieldDebugInfo(INPUT_PARAMS_DEBUG_FIELD, List.class, paramSetInfos));
 
-    @Override
-    protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
-    {
-        MuleEvent eventToUse = resolveSource(muleEvent);
-        final List<FieldDebugInfo<?>> fields = new ArrayList<>();
-
-        Query resolvedQuery;
-        try
-        {
-            resolvedQuery = queryResolver.resolve(connection, eventToUse);
-        }
-        catch (QueryResolutionException e)
-        {
-            fields.add(createFieldDebugInfo(QUERY_DEBUG_FIELD, String.class, e));
-
-            return fields;
-        }
-
-        fields.add(DbDebugInfoUtils.createQueryFieldDebugInfo(QUERY_DEBUG_FIELD, resolvedQuery.getQueryTemplate()));
-
-        final List<List<QueryParamValue>> paramSets = resolveParamSets(muleEvent, resolvedQuery);
-
-        List<FieldDebugInfo<?>> paramSetInfos = new LinkedList<>();
-        int setIndex = 1;
-        for (List<QueryParamValue> paramSet : paramSets)
-        {
-            final List<FieldDebugInfo<?>> paramFields = new ArrayList<>();
-            int paramIndex = 1;
-            for (QueryParamValue paramValue : paramSet)
-            {
-                final String name = paramValue.getName() == null ? PARAM_DEBUG_FIELD_PREFIX + paramIndex++ : paramValue.getName();
-                paramFields.add(createFieldDebugInfo(name, String.class, paramValue.getValue()));
-            }
-            paramSetInfos.add(createFieldDebugInfo(PARAM_SET_DEBUG_FIELD_PREFIX + setIndex++, List.class, paramFields));
-        }
-        fields.add(createFieldDebugInfo(INPUT_PARAMS_DEBUG_FIELD, List.class, paramSetInfos));
-
-        return fields;
-    }
+    return fields;
+  }
 }

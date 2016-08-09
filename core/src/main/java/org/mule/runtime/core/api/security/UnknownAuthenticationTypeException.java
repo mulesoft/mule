@@ -10,20 +10,18 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * <code>UnknownAuthenticationTypeException</code> is thrown if a security context
- * request is make with an unrecognised Authentication type.
+ * <code>UnknownAuthenticationTypeException</code> is thrown if a security context request is make with an unrecognised
+ * Authentication type.
  */
 
-public class UnknownAuthenticationTypeException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 6275865761357999175L;
+public class UnknownAuthenticationTypeException extends MuleException {
 
-    public UnknownAuthenticationTypeException(Authentication authentication)
-    {
-        super(CoreMessages.authTypeNotRecognised((authentication == null
-                        ? "null" : authentication.getClass().getName())));
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 6275865761357999175L;
+
+  public UnknownAuthenticationTypeException(Authentication authentication) {
+    super(CoreMessages.authTypeNotRecognised((authentication == null ? "null" : authentication.getClass().getName())));
+  }
 }

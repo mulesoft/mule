@@ -20,38 +20,34 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class ConnectExceptionTestCase extends AbstractMuleContextTestCase
-{
+public class ConnectExceptionTestCase extends AbstractMuleContextTestCase {
 
-    private static final String message = "a message";
-    private static final String value = "Hello world!";
+  private static final String message = "a message";
+  private static final String value = "Hello world!";
 
-    @Test
-    public void testSerializableConnectException() throws Exception
-    {
-        TestSerializableConnectable connectable = new TestSerializableConnectable();
-        connectable.setValue(value);
+  @Test
+  public void testSerializableConnectException() throws Exception {
+    TestSerializableConnectable connectable = new TestSerializableConnectable();
+    connectable.setValue(value);
 
-        ConnectException e = new EndpointConnectException(new Exception(message), connectable);
-        e = SerializationTestUtils.testException(e, muleContext);
+    ConnectException e = new EndpointConnectException(new Exception(message), connectable);
+    e = SerializationTestUtils.testException(e, muleContext);
 
-        assertTrue(e.getMessage().contains(message));
-        Connectable failed = e.getFailed();
-        assertNotNull("Connectable was not serialized", failed);
-        assertTrue(failed instanceof TestSerializableConnectable);
+    assertTrue(e.getMessage().contains(message));
+    Connectable failed = e.getFailed();
+    assertNotNull("Connectable was not serialized", failed);
+    assertTrue(failed instanceof TestSerializableConnectable);
 
-        assertEquals(value, ((TestSerializableConnectable) failed).getValue());
-    }
+    assertEquals(value, ((TestSerializableConnectable) failed).getValue());
+  }
 
-    @Test
-    public void testNonSerializableConnectException() throws Exception
-    {
-        ConnectException e = new EndpointConnectException(new Exception(message),
-            new TestNotSerializableConnectable());
-        e = SerializationTestUtils.testException(e, muleContext);
+  @Test
+  public void testNonSerializableConnectException() throws Exception {
+    ConnectException e = new EndpointConnectException(new Exception(message), new TestNotSerializableConnectable());
+    e = SerializationTestUtils.testException(e, muleContext);
 
-        assertTrue(e.getMessage().contains(message));
-        Connectable failed = e.getFailed();
-        assertNull(failed);
-    }
+    assertTrue(e.getMessage().contains(message));
+    Connectable failed = e.getFailed();
+    assertNull(failed);
+  }
 }

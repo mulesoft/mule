@@ -24,72 +24,75 @@ import org.apache.cxf.service.Service;
  * 
  */
 public class StaxFeature extends AbstractFeature {
-    private String xmlInputFactory;
-    private String xmlOutputFactory;
-    
-    @Override
-    public void initialize(Client client, Bus bus) {
-        Service service = client.getEndpoint().getService();
-        
-        setProperties(service);
+
+  private String xmlInputFactory;
+  private String xmlOutputFactory;
+
+  @Override
+  public void initialize(Client client, Bus bus) {
+    Service service = client.getEndpoint().getService();
+
+    setProperties(service);
+  }
+
+  private void setProperties(Service service) {
+    if (xmlInputFactory != null) {
+      service.put(XMLInputFactory.class.getName(), xmlInputFactory);
     }
 
-    private void setProperties(Service service) {
+    if (xmlOutputFactory != null) {
+      service.put(XMLOutputFactory.class.getName(), xmlOutputFactory);
+    }
+  }
+
+  @Override
+  public void initialize(Server server, Bus bus) {
+    Service service = server.getEndpoint().getService();
+
+    setProperties(service);
+  }
+
+  @Override
+  public void initialize(Bus bus) {
+    AbstractPhaseInterceptor<Message> in = new AbstractPhaseInterceptor<Message>(Phase.RECEIVE) {
+
+      public void handleMessage(Message message) throws Fault {
         if (xmlInputFactory != null) {
-            service.put(XMLInputFactory.class.getName(), xmlInputFactory);
+          message.put(XMLInputFactory.class.getName(), xmlInputFactory);
         }
-        
+      }
+    };
+
+    bus.getInInterceptors().add(in);
+    bus.getInFaultInterceptors().add(in);
+
+    AbstractPhaseInterceptor<Message> out = new AbstractPhaseInterceptor<Message>(Phase.SETUP) {
+
+      public void handleMessage(Message message) throws Fault {
         if (xmlOutputFactory != null) {
-            service.put(XMLOutputFactory.class.getName(), xmlOutputFactory);
+          message.put(XMLOutputFactory.class.getName(), xmlOutputFactory);
         }
-    }
+      }
+    };
 
-    @Override
-    public void initialize(Server server, Bus bus) {
-        Service service = server.getEndpoint().getService();
-        
-        setProperties(service);
-    }
+    bus.getOutInterceptors().add(out);
+    bus.getOutFaultInterceptors().add(out);
+  }
 
-    @Override
-    public void initialize(Bus bus) {
-        AbstractPhaseInterceptor<Message> in = new AbstractPhaseInterceptor<Message>(Phase.RECEIVE) {
-            public void handleMessage(Message message) throws Fault {
-                if (xmlInputFactory != null) {
-                    message.put(XMLInputFactory.class.getName(), xmlInputFactory);
-                }
-            }
-        };
-        
-        bus.getInInterceptors().add(in);
-        bus.getInFaultInterceptors().add(in);
-        
-        AbstractPhaseInterceptor<Message> out = new AbstractPhaseInterceptor<Message>(Phase.SETUP) {
-            public void handleMessage(Message message) throws Fault {
-                if (xmlOutputFactory != null) {
-                    message.put(XMLOutputFactory.class.getName(), xmlOutputFactory);
-                }
-            }
-        };
-        
-        bus.getOutInterceptors().add(out);
-        bus.getOutFaultInterceptors().add(out);
-    }
+  public String getXmlInputFactory() {
+    return xmlInputFactory;
+  }
 
-    public String getXmlInputFactory() {
-        return xmlInputFactory;
-    }
+  public void setXmlInputFactory(String xmlInputFactory) {
+    this.xmlInputFactory = xmlInputFactory;
+  }
 
-    public void setXmlInputFactory(String xmlInputFactory) {
-        this.xmlInputFactory = xmlInputFactory;
-    }
+  public String getXmlOutputFactory() {
+    return xmlOutputFactory;
+  }
 
-    public String getXmlOutputFactory() {
-        return xmlOutputFactory;
-    }
-
-    public void setXmlOutputFactory(String xmlOutputFactory) {
-        this.xmlOutputFactory = xmlOutputFactory;
-    }
+  public void setXmlOutputFactory(String xmlOutputFactory) {
+    this.xmlOutputFactory = xmlOutputFactory;
+  }
 
 }

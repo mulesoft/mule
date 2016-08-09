@@ -8,40 +8,34 @@ package org.mule.runtime.core.util;
 
 import java.io.File;
 
-public class FilenameUtils extends org.apache.commons.io.FilenameUtils
-{
-    public static File fileWithPathComponents(String[] pathComponents)
-    {
-        if (pathComponents == null)
-        {
-            return null;
-        }
-        
-        StringBuilder buf = new StringBuilder(64);
-        for (int i = 0; i < pathComponents.length; i++)
-        {
-            String component = pathComponents[i];
-            if (component == null)
-            {
-                continue;
-            }
-            
-            buf.append(component);
-            if (i < pathComponents.length - 1)
-            {
-                buf.append(File.separator);
-            }
-        }
-        return FileUtils.newFile(buf.toString());
+public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
+
+  public static File fileWithPathComponents(String[] pathComponents) {
+    if (pathComponents == null) {
+      return null;
     }
-    
-    /**
-     * Never create instances of this class.
-     */
-    private FilenameUtils()
-    {
-        super();
+
+    StringBuilder buf = new StringBuilder(64);
+    for (int i = 0; i < pathComponents.length; i++) {
+      String component = pathComponents[i];
+      if (component == null) {
+        continue;
+      }
+
+      buf.append(component);
+      if (i < pathComponents.length - 1) {
+        buf.append(File.separator);
+      }
     }
+    return FileUtils.newFile(buf.toString());
+  }
+
+  /**
+   * Never create instances of this class.
+   */
+  private FilenameUtils() {
+    super();
+  }
 }
 
 

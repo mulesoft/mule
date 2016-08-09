@@ -39,338 +39,279 @@ import java.net.CookieManager;
 import javax.inject.Inject;
 
 
-public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
-{
-    public static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
-    private static final int UNLIMITED_CONNECTIONS = -1;
-    private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
-    private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
+public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
+    implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware {
 
-    private HttpConstants.Protocols protocol = HTTP;
-    private String name;
-    private String host;
-    private String port;
-    private String basePath = "/";
-    private String followRedirects = Boolean.toString(true);
-    private String requestStreamingMode = HttpStreamingType.AUTO.name();
-    private String sendBodyMode = HttpSendBodyMode.AUTO.name();
-    private String parseResponse = Boolean.toString(true);
-    private String responseTimeout;
+  public static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
+  private static final int UNLIMITED_CONNECTIONS = -1;
+  private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+  private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
 
-    private HttpAuthentication authentication;
-    private TlsContextFactory tlsContext;
-    private TcpClientSocketProperties clientSocketProperties = new DefaultTcpClientSocketProperties();
-    private RamlApiConfiguration apiConfiguration;
-    private ProxyConfig proxyConfig;
+  private HttpConstants.Protocols protocol = HTTP;
+  private String name;
+  private String host;
+  private String port;
+  private String basePath = "/";
+  private String followRedirects = Boolean.toString(true);
+  private String requestStreamingMode = HttpStreamingType.AUTO.name();
+  private String sendBodyMode = HttpSendBodyMode.AUTO.name();
+  private String parseResponse = Boolean.toString(true);
+  private String responseTimeout;
 
-    private HttpClient httpClient;
+  private HttpAuthentication authentication;
+  private TlsContextFactory tlsContext;
+  private TcpClientSocketProperties clientSocketProperties = new DefaultTcpClientSocketProperties();
+  private RamlApiConfiguration apiConfiguration;
+  private ProxyConfig proxyConfig;
 
-    private int maxConnections = UNLIMITED_CONNECTIONS;
-    private boolean usePersistentConnections = true;
-    private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+  private HttpClient httpClient;
 
-    private boolean enableCookies = false;
-    private CookieManager cookieManager;
+  private int maxConnections = UNLIMITED_CONNECTIONS;
+  private boolean usePersistentConnections = true;
+  private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
-    @Inject
-    @DefaultTlsContextFactoryBuilder
-    private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
+  private boolean enableCookies = false;
+  private CookieManager cookieManager;
 
-    private MuleContext muleContext;
+  @Inject
+  @DefaultTlsContextFactoryBuilder
+  private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        LifecycleUtils.initialiseIfNeeded(authentication);
-        verifyConnectionsParameters();
+  private MuleContext muleContext;
 
-        if (port == null)
-        {
-            port = String.valueOf(protocol.getDefaultPort());
-        }
+  @Override
+  public void initialise() throws InitialisationException {
+    LifecycleUtils.initialiseIfNeeded(authentication);
+    verifyConnectionsParameters();
 
-        if (protocol.equals(HTTP) && tlsContext != null)
-        {
-            throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
-                   "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
-        }
-
-        if (protocol.equals(HTTPS) && tlsContext == null)
-        {
-            tlsContext = defaultTlsContextFactoryBuilder.buildDefault();
-        }
-
-        if (enableCookies)
-        {
-            cookieManager = new CookieManager();
-        }
-
-        String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
-
-        HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-                .setTlsContextFactory(tlsContext)
-                .setProxyConfig(proxyConfig)
-                .setClientSocketProperties(clientSocketProperties)
-                .setMaxConnections(maxConnections)
-                .setUsePersistentConnections(usePersistentConnections)
-                .setConnectionIdleTimeout(connectionIdleTimeout)
-                .setThreadNamePrefix(threadNamePrefix)
-                .setOwnerName(name)
-                .build();
-
-        HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
-        if (httpClientFactory == null)
-        {
-            httpClient = new GrizzlyHttpClient(configuration);
-        }
-        else
-        {
-            httpClient = httpClientFactory.create(configuration);
-        }
-
-        httpClient.initialise();
+    if (port == null) {
+      port = String.valueOf(protocol.getDefaultPort());
     }
 
-    private void verifyConnectionsParameters() throws InitialisationException
-    {
-        if (maxConnections < UNLIMITED_CONNECTIONS || maxConnections == 0)
-        {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."), this);
-        }
-
-        if (!usePersistentConnections)
-        {
-            connectionIdleTimeout = 0;
-        }
+    if (protocol.equals(HTTP) && tlsContext != null) {
+      throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP, "
+          + "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
     }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        httpClient.stop();
-        if (this.authentication instanceof Stoppable)
-        {
-            ((Stoppable) this.authentication).stop();
-        }
+    if (protocol.equals(HTTPS) && tlsContext == null) {
+      tlsContext = defaultTlsContextFactoryBuilder.buildDefault();
     }
 
-    public String getScheme()
-    {
-        if (tlsContext == null)
-        {
-            return "http";
-        }
-        else
-        {
-            return "https";
-        }
+    if (enableCookies) {
+      cookieManager = new CookieManager();
     }
 
-    public HttpClient getHttpClient()
-    {
-        return httpClient;
+    String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
+
+    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContext)
+        .setProxyConfig(proxyConfig).setClientSocketProperties(clientSocketProperties).setMaxConnections(maxConnections)
+        .setUsePersistentConnections(usePersistentConnections).setConnectionIdleTimeout(connectionIdleTimeout)
+        .setThreadNamePrefix(threadNamePrefix).setOwnerName(name).build();
+
+    HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
+    if (httpClientFactory == null) {
+      httpClient = new GrizzlyHttpClient(configuration);
+    } else {
+      httpClient = httpClientFactory.create(configuration);
     }
 
-    public CookieManager getCookieManager()
-    {
-        return cookieManager;
+    httpClient.initialise();
+  }
+
+  private void verifyConnectionsParameters() throws InitialisationException {
+    if (maxConnections < UNLIMITED_CONNECTIONS || maxConnections == 0) {
+      throw new InitialisationException(CoreMessages
+          .createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."),
+                                        this);
     }
 
-    @Override
-    public String getBasePath()
-    {
-        return basePath;
+    if (!usePersistentConnections) {
+      connectionIdleTimeout = 0;
     }
+  }
 
-    public void setBasePath(String basePath)
-    {
-        this.basePath = basePath;
+  @Override
+  public void stop() throws MuleException {
+    httpClient.stop();
+    if (this.authentication instanceof Stoppable) {
+      ((Stoppable) this.authentication).stop();
     }
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
+  public String getScheme() {
+    if (tlsContext == null) {
+      return "http";
+    } else {
+      return "https";
     }
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public HttpClient getHttpClient() {
+    return httpClient;
+  }
 
-    @Override
-    public String getHost()
-    {
-        return host;
-    }
+  public CookieManager getCookieManager() {
+    return cookieManager;
+  }
 
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
+  @Override
+  public String getBasePath() {
+    return basePath;
+  }
 
-    @Override
-    public String getPort()
-    {
-        return port;
-    }
+  public void setBasePath(String basePath) {
+    this.basePath = basePath;
+  }
 
-    public void setPort(String port)
-    {
-        this.port = port;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public HttpAuthentication getAuthentication()
-    {
-        return authentication;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setAuthentication(HttpAuthentication authentication)
-    {
-        this.authentication = authentication;
-    }
+  @Override
+  public String getHost() {
+    return host;
+  }
 
-    @Override
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContext;
-    }
+  public void setHost(String host) {
+    this.host = host;
+  }
 
-    public void setTlsContext(TlsContextFactory tlsContext)
-    {
-        this.tlsContext = tlsContext;
-    }
+  @Override
+  public String getPort() {
+    return port;
+  }
 
-    public RamlApiConfiguration getApiConfiguration()
-    {
-        return apiConfiguration;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 
-    public void setApiConfiguration(RamlApiConfiguration apiConfiguration)
-    {
-        this.apiConfiguration = apiConfiguration;
-    }
+  @Override
+  public HttpAuthentication getAuthentication() {
+    return authentication;
+  }
 
-    @Override
-    public String getFollowRedirects()
-    {
-        return followRedirects;
-    }
+  public void setAuthentication(HttpAuthentication authentication) {
+    this.authentication = authentication;
+  }
 
-    public void setFollowRedirects(String followRedirects)
-    {
-        this.followRedirects = followRedirects;
-    }
+  @Override
+  public TlsContextFactory getTlsContext() {
+    return tlsContext;
+  }
 
-    public TcpClientSocketProperties getClientSocketProperties()
-    {
-        return clientSocketProperties;
-    }
+  public void setTlsContext(TlsContextFactory tlsContext) {
+    this.tlsContext = tlsContext;
+  }
 
-    public void setClientSocketProperties(TcpClientSocketProperties clientSocketProperties)
-    {
-        this.clientSocketProperties = clientSocketProperties;
-    }
+  public RamlApiConfiguration getApiConfiguration() {
+    return apiConfiguration;
+  }
 
-    @Override
-    public ProxyConfig getProxyConfig()
-    {
-        return proxyConfig;
-    }
+  public void setApiConfiguration(RamlApiConfiguration apiConfiguration) {
+    this.apiConfiguration = apiConfiguration;
+  }
 
-    public void setProxyConfig(ProxyConfig proxyConfig)
-    {
-        this.proxyConfig = proxyConfig;
-    }
+  @Override
+  public String getFollowRedirects() {
+    return followRedirects;
+  }
 
-    @Override
-    public String getRequestStreamingMode()
-    {
-        return requestStreamingMode;
-    }
+  public void setFollowRedirects(String followRedirects) {
+    this.followRedirects = followRedirects;
+  }
 
-    public void setRequestStreamingMode(String requestStreamingMode)
-    {
-        this.requestStreamingMode = requestStreamingMode;
-    }
+  public TcpClientSocketProperties getClientSocketProperties() {
+    return clientSocketProperties;
+  }
 
-    @Override
-    public String getSendBodyMode()
-    {
-        return sendBodyMode;
-    }
+  public void setClientSocketProperties(TcpClientSocketProperties clientSocketProperties) {
+    this.clientSocketProperties = clientSocketProperties;
+  }
 
-    public void setSendBodyMode(String sendBodyMode)
-    {
-        this.sendBodyMode = sendBodyMode;
-    }
+  @Override
+  public ProxyConfig getProxyConfig() {
+    return proxyConfig;
+  }
 
-    @Override
-    public String getParseResponse()
-    {
-        return parseResponse;
-    }
+  public void setProxyConfig(ProxyConfig proxyConfig) {
+    this.proxyConfig = proxyConfig;
+  }
 
-    public void setParseResponse(String parseResponse)
-    {
-        this.parseResponse = parseResponse;
-    }
+  @Override
+  public String getRequestStreamingMode() {
+    return requestStreamingMode;
+  }
 
-    @Override
-    public String getResponseTimeout()
-    {
-        return responseTimeout;
-    }
+  public void setRequestStreamingMode(String requestStreamingMode) {
+    this.requestStreamingMode = requestStreamingMode;
+  }
 
-    public void setResponseTimeout(String responseTimeout)
-    {
-        this.responseTimeout = responseTimeout;
-    }
+  @Override
+  public String getSendBodyMode() {
+    return sendBodyMode;
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        if (this.authentication instanceof Startable)
-        {
-            ((Startable) this.authentication).start();
-        }
-    }
+  public void setSendBodyMode(String sendBodyMode) {
+    this.sendBodyMode = sendBodyMode;
+  }
 
-    public void setMaxConnections(int maxConnections)
-    {
-        this.maxConnections = maxConnections;
-    }
+  @Override
+  public String getParseResponse() {
+    return parseResponse;
+  }
 
-    public void setUsePersistentConnections(boolean usePersistentConnections)
-    {
-        this.usePersistentConnections = usePersistentConnections;
-    }
+  public void setParseResponse(String parseResponse) {
+    this.parseResponse = parseResponse;
+  }
 
-    public void setConnectionIdleTimeout(int connectionIdleTimeout)
-    {
-        this.connectionIdleTimeout = connectionIdleTimeout;
-    }
+  @Override
+  public String getResponseTimeout() {
+    return responseTimeout;
+  }
 
-    public boolean isEnableCookies()
-    {
-        return enableCookies;
-    }
+  public void setResponseTimeout(String responseTimeout) {
+    this.responseTimeout = responseTimeout;
+  }
 
-    public void setEnableCookies(boolean enableCookies)
-    {
-        this.enableCookies = enableCookies;
+  @Override
+  public void start() throws MuleException {
+    if (this.authentication instanceof Startable) {
+      ((Startable) this.authentication).start();
     }
+  }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  public void setMaxConnections(int maxConnections) {
+    this.maxConnections = maxConnections;
+  }
 
-    public void setProtocol(HttpConstants.Protocols protocol)
-    {
-        this.protocol = protocol;
-    }
+  public void setUsePersistentConnections(boolean usePersistentConnections) {
+    this.usePersistentConnections = usePersistentConnections;
+  }
+
+  public void setConnectionIdleTimeout(int connectionIdleTimeout) {
+    this.connectionIdleTimeout = connectionIdleTimeout;
+  }
+
+  public boolean isEnableCookies() {
+    return enableCookies;
+  }
+
+  public void setEnableCookies(boolean enableCookies) {
+    this.enableCookies = enableCookies;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  public void setProtocol(HttpConstants.Protocols protocol) {
+    this.protocol = protocol;
+  }
 
 }

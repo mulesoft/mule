@@ -17,27 +17,23 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public class JmsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
-{
+public class JmsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-    public static final String JMS_NAMESPACE = "jms";
+  public static final String JMS_NAMESPACE = "jms";
 
-    @Override
-    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
-    {
-        return asList(new XmlNamespaceInfo()
-        {
-            @Override
-            public String getNamespaceUriPrefix()
-            {
-                return "http://www.mulesoft.org/schema/mule/transport/jms";
-            }
+  @Override
+  public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
+    return asList(new XmlNamespaceInfo() {
 
-            @Override
-            public String getNamespace()
-            {
-                return JMS_NAMESPACE;
-            }
-        });
-    }
+      @Override
+      public String getNamespaceUriPrefix() {
+        return "http://www.mulesoft.org/schema/mule/transport/jms";
+      }
+
+      @Override
+      public String getNamespace() {
+        return JMS_NAMESPACE;
+      }
+    });
+  }
 }

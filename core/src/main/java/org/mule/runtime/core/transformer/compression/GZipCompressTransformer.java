@@ -15,52 +15,38 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /**
- * <code>GZipCompressTransformer</code> is a transformer compressing objects into
- * byte arrays.
+ * <code>GZipCompressTransformer</code> is a transformer compressing objects into byte arrays.
  */
-public class GZipCompressTransformer extends AbstractCompressionTransformer
-{
-    public GZipCompressTransformer()
-    {
-        super();
-        this.setStrategy(new GZipCompression());
-        this.registerSourceType(DataType.fromType(Serializable.class));
-        this.registerSourceType(DataType.BYTE_ARRAY);
-        this.registerSourceType(DataType.INPUT_STREAM);
-        // No type checking for the return type by default. It could either be a byte array or an input stream.
-        this.setReturnDataType(DataType.OBJECT);
-    }
+public class GZipCompressTransformer extends AbstractCompressionTransformer {
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        try
-        {
-            if (src instanceof InputStream)
-            {
-                return getStrategy().compressInputStream((InputStream) src);
-            }
-            else
-            {
-                byte[] data;
-                if (src instanceof byte[])
-                {
-                    data = (byte[]) src;
-                }
-                else if (src instanceof String)
-                {
-                    data = ((String) src).getBytes(outputEncoding);
-                }
-                else
-                {
-                    data = muleContext.getObjectSerializer().serialize(src);
-                }
-                return getStrategy().compressByteArray(data);
-            }
+  public GZipCompressTransformer() {
+    super();
+    this.setStrategy(new GZipCompression());
+    this.registerSourceType(DataType.fromType(Serializable.class));
+    this.registerSourceType(DataType.BYTE_ARRAY);
+    this.registerSourceType(DataType.INPUT_STREAM);
+    // No type checking for the return type by default. It could either be a byte array or an input stream.
+    this.setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    try {
+      if (src instanceof InputStream) {
+        return getStrategy().compressInputStream((InputStream) src);
+      } else {
+        byte[] data;
+        if (src instanceof byte[]) {
+          data = (byte[]) src;
+        } else if (src instanceof String) {
+          data = ((String) src).getBytes(outputEncoding);
+        } else {
+          data = muleContext.getObjectSerializer().serialize(src);
         }
-        catch (Exception ioex)
-        {
-            throw new TransformerException(this, ioex);
-        }
+        return getStrategy().compressByteArray(data);
+      }
+    } catch (Exception ioex) {
+      throw new TransformerException(this, ioex);
     }
+  }
 }

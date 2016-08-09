@@ -16,24 +16,19 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleUrlWithUserPasswordConfigTestCase extends AbstractDatabaseConfigTestCase
-{
+public class OracleUrlWithUserPasswordConfigTestCase extends AbstractDatabaseConfigTestCase {
 
-    public OracleUrlWithUserPasswordConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public OracleUrlWithUserPasswordConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        if (TestDbConfig.getOracleResource().isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            return Collections.singletonList(new Object[] {"integration/config/oracle-url-user-and-password-config.xml", new OracleTestDatabase()});
-        }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    if (TestDbConfig.getOracleResource().isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return Collections
+          .singletonList(new Object[] {"integration/config/oracle-url-user-and-password-config.xml", new OracleTestDatabase()});
     }
+  }
 }

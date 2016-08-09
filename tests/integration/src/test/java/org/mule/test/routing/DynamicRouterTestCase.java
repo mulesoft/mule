@@ -16,38 +16,33 @@ import org.mule.runtime.core.construct.Flow;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class DynamicRouterTestCase extends AbstractIntegrationTestCase
-{
+public abstract class DynamicRouterTestCase extends AbstractIntegrationTestCase {
 
-    protected static final String LETTER_A = "a";
-    protected static final String LETTER_B = "b";
-    protected static final String LETTER_C = "c";
-    protected static final String LETTER_D = "d";
-    protected static final String DOES_NOT_MATTER = "doesnotmatter";
+  protected static final String LETTER_A = "a";
+  protected static final String LETTER_B = "b";
+  protected static final String LETTER_C = "c";
+  protected static final String LETTER_D = "d";
+  protected static final String DOES_NOT_MATTER = "doesnotmatter";
 
-    @Before
-    public void clearRoutes()
-    {
-        CustomRouteResolver.routes.clear();
-    }
+  @Before
+  public void clearRoutes() {
+    CustomRouteResolver.routes.clear();
+  }
 
-    @Test(expected = MessagingException.class)
-    public void noRoutes() throws Exception
-    {
-        flowRunner(getFlowName()).withPayload(TEST_MESSAGE).run();
-    }
+  @Test(expected = MessagingException.class)
+  public void noRoutes() throws Exception {
+    flowRunner(getFlowName()).withPayload(TEST_MESSAGE).run();
+  }
 
-    public abstract String getFlowName();
+  public abstract String getFlowName();
 
-    protected MuleEvent runFlowAndAssertResponse(String flowName, Object expectedMessage) throws Exception
-    {
-        MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
-        assertThat(event.getMessageAsString(), is(expectedMessage));
-        return event;
-    }
+  protected MuleEvent runFlowAndAssertResponse(String flowName, Object expectedMessage) throws Exception {
+    MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
+    assertThat(event.getMessageAsString(), is(expectedMessage));
+    return event;
+  }
 
-    protected Flow getTestFlow(String flow) throws Exception
-    {
-        return (Flow) getFlowConstruct(flow);
-    }
+  protected Flow getTestFlow(String flow) throws Exception {
+    return (Flow) getFlowConstruct(flow);
+  }
 }

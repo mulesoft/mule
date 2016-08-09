@@ -13,22 +13,21 @@ package org.mule.runtime.config.spring.dsl.api.xml;
  *
  * @since 4.0
  */
-public interface XmlNamespaceInfo
-{
+public interface XmlNamespaceInfo {
 
-    /**
-     * A mule extension may support different xml versions. Each version must always have the same prefix
-     * and no other extension can have that prefix. Mule core has http://www.mulesoft.org/schema/mule/core/
-     * as prefix for all the possible versions of the namespace.
-     *
-     *
-     * @return the xml namespace uri prefix for the xml extensions configuration.
-     */
-    String getNamespaceUriPrefix();
+  /**
+   * A mule extension may support different xml versions. Each version must always have the same prefix and no other extension can
+   * have that prefix. Mule core has http://www.mulesoft.org/schema/mule/core/ as prefix for all the possible versions of the
+   * namespace.
+   *
+   *
+   * @return the xml namespace uri prefix for the xml extensions configuration.
+   */
+  String getNamespaceUriPrefix();
 
-    /**
-     * @return the namespace of the extension. This namespace must be unique across every extension.
-     */
-    String getNamespace();
+  /**
+   * @return the namespace of the extension. This namespace must be unique across every extension.
+   */
+  String getNamespace();
 
 }

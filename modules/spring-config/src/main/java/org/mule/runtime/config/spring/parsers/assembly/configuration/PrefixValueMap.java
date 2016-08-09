@@ -6,19 +6,16 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-public class PrefixValueMap implements ValueMap
-{
+public class PrefixValueMap implements ValueMap {
 
-    private String prefix;
+  private String prefix;
 
-    public PrefixValueMap(String prefix)
-    {
-        this.prefix = prefix;
-    }
+  public PrefixValueMap(String prefix) {
+    this.prefix = prefix;
+  }
 
-    public Object rewrite(String value)
-    {
-        return prefix + value;
-    }
+  public Object rewrite(String value) {
+    return prefix + value;
+  }
 
 }

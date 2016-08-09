@@ -14,14 +14,12 @@ import org.mule.runtime.core.config.i18n.Message;
  *
  * @since 4.0
  */
-public class ConnectivityTestingObjectNotFoundException extends MuleRuntimeException
-{
+public class ConnectivityTestingObjectNotFoundException extends MuleRuntimeException {
 
-    /**
-     * {@inheritDoc}
-     */
-    public ConnectivityTestingObjectNotFoundException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public ConnectivityTestingObjectNotFoundException(Message message) {
+    super(message);
+  }
 }

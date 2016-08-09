@@ -8,18 +8,17 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 
-public class TestDocumentedParameterGroup
-{
+public class TestDocumentedParameterGroup {
 
-    /**
-     * Group parameter 1
-     */
-    @Parameter
-    private String value1;
+  /**
+   * Group parameter 1
+   */
+  @Parameter
+  private String value1;
 
-    /**
-     * Group parameter 2
-     */
-    @Parameter
-    private String value2;
+  /**
+   * Group parameter 2
+   */
+  @Parameter
+  private String value2;
 }

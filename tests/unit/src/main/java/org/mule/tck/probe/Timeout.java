@@ -6,21 +6,18 @@
  */
 package org.mule.tck.probe;
 
-public class Timeout
-{
+public class Timeout {
 
-    private final long duration;
-    private final long start;
+  private final long duration;
+  private final long start;
 
-    public Timeout(long duration)
-    {
-        this.duration = duration;
-        this.start = System.currentTimeMillis();
-    }
+  public Timeout(long duration) {
+    this.duration = duration;
+    this.start = System.currentTimeMillis();
+  }
 
-    public boolean hasTimedOut()
-    {
-        final long now = System.currentTimeMillis();
-        return (now - start) > duration;
-    }
+  public boolean hasTimedOut() {
+    final long now = System.currentTimeMillis();
+    return (now - start) > duration;
+  }
 }

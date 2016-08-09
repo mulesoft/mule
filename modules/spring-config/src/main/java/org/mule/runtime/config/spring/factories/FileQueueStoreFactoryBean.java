@@ -8,10 +8,9 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 
-public class FileQueueStoreFactoryBean extends AbstractQueueStoreFactoryBean
-{
-    public FileQueueStoreFactoryBean()
-    {
-        super(MuleProperties.OBJECT_STORE_FILE_NAME);
-    }
+public class FileQueueStoreFactoryBean extends AbstractQueueStoreFactoryBean {
+
+  public FileQueueStoreFactoryBean() {
+    super(MuleProperties.OBJECT_STORE_FILE_NAME);
+  }
 }

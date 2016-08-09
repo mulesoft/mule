@@ -22,54 +22,45 @@ import java.security.cert.Certificate;
 import org.junit.Test;
 
 /**
- * Test {@link Certificate} are present in {@link SocketAttributes}
- * while using SSL.
+ * Test {@link Certificate} are present in {@link SocketAttributes} while using SSL.
  *
  * @since 4.0
  */
-public class SslCertificatesTestCase extends SocketExtensionTestCase
-{
+public class SslCertificatesTestCase extends SocketExtensionTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ssl-certificate-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "ssl-certificate-config.xml";
+  }
+
+  @Test
+  public void testOnce() throws Exception {
+    doTests(1);
+  }
+
+  @Test
+  public void testMany() throws Exception {
+    doTests(REPETITIONS);
+  }
+
+  protected void doTests(int numberOfMessages) throws Exception {
+
+    for (int i = 0; i < numberOfMessages; ++i) {
+      org.mule.runtime.core.api.MuleMessage muleMessage =
+          flowRunner("ssl-send-and-receive").withPayload(TEST_STRING).run().getMessage();
+
+      String payload = IOUtils.toString((InputStream) muleMessage.getPayload());
+      assertThat(payload, is(notNullValue()));
+      SocketAttributes attributes = (SocketAttributes) muleMessage.getAttributes();
+      assertThat(attributes.getLocalCertificates(), is(notNullValue()));
     }
 
-    @Test
-    public void testOnce() throws Exception
-    {
-        doTests(1);
-    }
+  }
 
-    @Test
-    public void testMany() throws Exception
-    {
-        doTests(REPETITIONS);
-    }
-
-    protected void doTests(int numberOfMessages) throws Exception
-    {
-
-        for (int i = 0; i < numberOfMessages; ++i)
-        {
-            org.mule.runtime.core.api.MuleMessage muleMessage = flowRunner("ssl-send-and-receive").
-                    withPayload(TEST_STRING).
-                    run().getMessage();
-
-            String payload = IOUtils.toString((InputStream) muleMessage.getPayload());
-            assertThat(payload, is(notNullValue()));
-            SocketAttributes attributes = (SocketAttributes) muleMessage.getAttributes();
-            assertThat(attributes.getLocalCertificates(), is(notNullValue()));
-        }
-
-    }
-
-    protected void assertCertificate(MuleMessage message) throws Exception
-    {
-        String payload = IOUtils.toString((InputStream) message.getPayload());
-        assertThat(payload, is(notNullValue()));
-        SocketAttributes attributes = (SocketAttributes) message.getAttributes();
-        assertThat(attributes.getLocalCertificates(), is(notNullValue()));
-    }
+  protected void assertCertificate(MuleMessage message) throws Exception {
+    String payload = IOUtils.toString((InputStream) message.getPayload());
+    assertThat(payload, is(notNullValue()));
+    SocketAttributes attributes = (SocketAttributes) message.getAttributes();
+    assertThat(attributes.getLocalCertificates(), is(notNullValue()));
+  }
 }

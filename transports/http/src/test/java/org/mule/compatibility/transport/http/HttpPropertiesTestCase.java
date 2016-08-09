@@ -20,45 +20,43 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPropertiesTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class HttpPropertiesTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-properties-conf.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testPropertiesGetMethod() throws Exception
-    {
-        GetMethod httpGet = new GetMethod("http://localhost:" + dynamicPort.getNumber() + "/resources/client?id=1");
-        new HttpClient().executeMethod(httpGet);
-        String result =  httpGet.getResponseBodyAsString();
-        assertEquals("Retrieving client with id = 1", result);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-properties-conf.xml";
+  }
 
-    @Test
-    public void testPropertiesPostMethod() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void testPropertiesGetMethod() throws Exception {
+    GetMethod httpGet = new GetMethod("http://localhost:" + dynamicPort.getNumber() + "/resources/client?id=1");
+    new HttpClient().executeMethod(httpGet);
+    String result = httpGet.getResponseBodyAsString();
+    assertEquals("Retrieving client with id = 1", result);
+  }
 
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client",
-                MuleMessage.builder().payload("name=John&lastname=Galt").mediaType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).build());
+  @Test
+  public void testPropertiesPostMethod() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        assertNotNull(response);
-        assertEquals("client", response.getInboundProperty("http.relative.path"));
-        assertEquals("http://localhost:" + dynamicPort.getNumber() + "/resources", response.getInboundProperty("http.context.uri"));
-        assertEquals("Storing client with name = John and lastname = Galt", getPayloadAsString(response));
-    }
+    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", MuleMessage.builder()
+        .payload("name=John&lastname=Galt").mediaType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).build());
 
-    @Test
-    public void testRedirectionWithRelativeProperty() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc", getTestMuleMessage(TEST_MESSAGE));
-        assertEquals("Successfully redirected: products?retrieve=all&order=desc", getPayloadAsString(response));
-    }
+    assertNotNull(response);
+    assertEquals("client", response.getInboundProperty("http.relative.path"));
+    assertEquals("http://localhost:" + dynamicPort.getNumber() + "/resources", response.getInboundProperty("http.context.uri"));
+    assertEquals("Storing client with name = John and lastname = Galt", getPayloadAsString(response));
+  }
+
+  @Test
+  public void testRedirectionWithRelativeProperty() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc",
+                    getTestMuleMessage(TEST_MESSAGE));
+    assertEquals("Successfully redirected: products?retrieve=all&order=desc", getPayloadAsString(response));
+  }
 }

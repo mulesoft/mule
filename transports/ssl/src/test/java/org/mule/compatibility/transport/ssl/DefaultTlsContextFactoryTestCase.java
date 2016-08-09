@@ -17,18 +17,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void failIfTrustStoreIsNonexistent() throws Exception
-    {
-        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-        expectedException.expect(IOException.class);
-        expectedException.expectMessage(containsString("Resource non-existent-trust-store could not be found"));
-        tlsContextFactory.setTrustStorePath("non-existent-trust-store");
-    }
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
+  public void failIfTrustStoreIsNonexistent() throws Exception {
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    expectedException.expect(IOException.class);
+    expectedException.expectMessage(containsString("Resource non-existent-trust-store could not be found"));
+    tlsContextFactory.setTrustStorePath("non-existent-trust-store");
+  }
 
 }

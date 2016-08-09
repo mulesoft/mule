@@ -46,170 +46,153 @@ import javax.inject.Inject;
 @Configuration(name = "request-config")
 @Providers(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
-public class HttpRequesterConfig implements Initialisable, Stoppable
-{
+public class HttpRequesterConfig implements Initialisable, Stoppable {
 
-    //TODO: document
-    @Parameter
-    @Optional
-    @Summary("Authentication method to use for the HTTP request")
-    @Placement(tab = AUTHENTICATION)
-    private HttpAuthentication authentication;
+  // TODO: document
+  @Parameter
+  @Optional
+  @Summary("Authentication method to use for the HTTP request")
+  @Placement(tab = AUTHENTICATION)
+  private HttpAuthentication authentication;
 
-    /**
-     * Base path to use for all requests that reference this config.
-     */
-    @Parameter
-    @Optional(defaultValue = "/")
-    @Placement(group = URL_CONFIGURATION, order = 1)
-    private Function<MuleEvent, String> basePath;
+  /**
+   * Base path to use for all requests that reference this config.
+   */
+  @Parameter
+  @Optional(defaultValue = "/")
+  @Placement(group = URL_CONFIGURATION, order = 1)
+  private Function<MuleEvent, String> basePath;
 
-    /**
-     * Specifies whether to follow redirects or not. Default value is true.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Placement(group = OTHER_SETTINGS)
-    private Function<MuleEvent, Boolean> followRedirects;
+  /**
+   * Specifies whether to follow redirects or not. Default value is true.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Placement(group = OTHER_SETTINGS)
+  private Function<MuleEvent, Boolean> followRedirects;
 
-    /**
-     * By default, the response will be parsed (for example, a multipart response will be mapped as a
-     * Mule message with null payload and inbound attachments with each part). If this property is set to false,
-     * no parsing will be done, and the payload will always contain the raw contents of the HTTP response.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Placement(group = OTHER_SETTINGS)
-    @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-    private Function<MuleEvent, Boolean> parseResponse;
+  /**
+   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
+   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
+   * always contain the raw contents of the HTTP response.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Placement(group = OTHER_SETTINGS)
+  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
+  private Function<MuleEvent, Boolean> parseResponse;
 
-    /**
-     * Defines if the request should be sent using streaming or not. If this attribute is not present,
-     * the behavior will depend on the type of the payload (it will stream only for InputStream). If set
-     * to true, it will always stream. If set to false, it will never stream. As streaming is done the request
-     * will be sent user Transfer-Encoding: chunked.
-     */
-    @Parameter
-    @Optional(defaultValue = "AUTO")
-    @Placement(group = OTHER_SETTINGS)
-    @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, " +
-             "the behavior will depend on the type of the payload (it will stream only for InputStream).")
-    private Function<MuleEvent, HttpStreamingType> requestStreamingMode;
+  /**
+   * Defines if the request should be sent using streaming or not. If this attribute is not present, the behavior will depend on
+   * the type of the payload (it will stream only for InputStream). If set to true, it will always stream. If set to false, it
+   * will never stream. As streaming is done the request will be sent user Transfer-Encoding: chunked.
+   */
+  @Parameter
+  @Optional(defaultValue = "AUTO")
+  @Placement(group = OTHER_SETTINGS)
+  @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
+      + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
+  private Function<MuleEvent, HttpStreamingType> requestStreamingMode;
 
-    /**
-     * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET,
-     * HEAD and OPTIONS will not send a body).
-     */
-    @Parameter
-    @Optional(defaultValue = "AUTO")
-    @Placement(group = OTHER_SETTINGS)
-    private Function<MuleEvent, HttpSendBodyMode> sendBodyMode;
+  /**
+   * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
+   * send a body).
+   */
+  @Parameter
+  @Optional(defaultValue = "AUTO")
+  @Placement(group = OTHER_SETTINGS)
+  private Function<MuleEvent, HttpSendBodyMode> sendBodyMode;
 
-    /**
-     * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
-     * If this value is not present, the default response timeout from the Mule configuration will be used.
-     */
-    @Parameter
-    @Optional
-    @Placement(group = OTHER_SETTINGS)
-    private Function<MuleEvent, Integer> responseTimeout;
+  /**
+   * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
+   * not present, the default response timeout from the Mule configuration will be used.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = OTHER_SETTINGS)
+  private Function<MuleEvent, Integer> responseTimeout;
 
-    /**
-     * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    @Expression(NOT_SUPPORTED)
-    @Placement(group = OTHER_SETTINGS)
-    private boolean enableCookies;
+  /**
+   * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  @Placement(group = OTHER_SETTINGS)
+  private boolean enableCookies;
 
-    /**
-     * Specifies a RAML configuration file for the API that is being consumed.
-     */
-    @Parameter
-    @Optional
-    @Expression(NOT_SUPPORTED)
-    @Placement(group = API_CONFIGURATION)
-    private RamlApiConfiguration apiConfiguration;
+  /**
+   * Specifies a RAML configuration file for the API that is being consumed.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @Placement(group = API_CONFIGURATION)
+  private RamlApiConfiguration apiConfiguration;
 
-    @Inject
-    private MuleContext muleContext;
-    private CookieManager cookieManager;
-    private boolean stopped = false;
+  @Inject
+  private MuleContext muleContext;
+  private CookieManager cookieManager;
+  private boolean stopped = false;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (enableCookies)
-        {
-            cookieManager = new CookieManager();
-        }
+  @Override
+  public void initialise() throws InitialisationException {
+    if (enableCookies) {
+      cookieManager = new CookieManager();
     }
+  }
 
-    public Function<MuleEvent, String> getBasePath()
-    {
-        return basePath;
-    }
+  public Function<MuleEvent, String> getBasePath() {
+    return basePath;
+  }
 
-    public Function<MuleEvent, Boolean> getFollowRedirects()
-    {
-        return followRedirects;
-    }
+  public Function<MuleEvent, Boolean> getFollowRedirects() {
+    return followRedirects;
+  }
 
-    public Function<MuleEvent, Boolean> getParseResponse()
-    {
-        return parseResponse;
-    }
+  public Function<MuleEvent, Boolean> getParseResponse() {
+    return parseResponse;
+  }
 
-    public Function<MuleEvent, HttpStreamingType> getRequestStreamingMode()
-    {
-        return requestStreamingMode;
-    }
+  public Function<MuleEvent, HttpStreamingType> getRequestStreamingMode() {
+    return requestStreamingMode;
+  }
 
-    public Function<MuleEvent, HttpSendBodyMode> getSendBodyMode()
-    {
-        return sendBodyMode;
-    }
+  public Function<MuleEvent, HttpSendBodyMode> getSendBodyMode() {
+    return sendBodyMode;
+  }
 
-    public Function<MuleEvent, Integer> getResponseTimeout()
-    {
-        return responseTimeout;
-    }
+  public Function<MuleEvent, Integer> getResponseTimeout() {
+    return responseTimeout;
+  }
 
-    public HttpAuthentication getAuthentication()
-    {
-        return authentication;
-    }
+  public HttpAuthentication getAuthentication() {
+    return authentication;
+  }
 
-    public boolean isEnableCookies()
-    {
-        return enableCookies;
-    }
+  public boolean isEnableCookies() {
+    return enableCookies;
+  }
 
-    public RamlApiConfiguration getApiConfiguration()
-    {
-        return apiConfiguration;
-    }
+  public RamlApiConfiguration getApiConfiguration() {
+    return apiConfiguration;
+  }
 
-    public CookieManager getCookieManager()
-    {
-        return cookieManager;
-    }
+  public CookieManager getCookieManager() {
+    return cookieManager;
+  }
 
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        stopIfNeeded(this.authentication);
-        stopped = true;
-    }
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(this.authentication);
+    stopped = true;
+  }
 
-    public boolean isStopped()
-    {
-        return stopped;
-    }
+  public boolean isStopped() {
+    return stopped;
+  }
 }

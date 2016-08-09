@@ -7,17 +7,15 @@
 package org.mule.runtime.module.http.internal.request;
 
 
-public class RamlApiConfiguration
-{
-    private String location;
+public class RamlApiConfiguration {
 
-    public String getLocation()
-    {
-        return location;
-    }
+  private String location;
 
-    public void setLocation(String location)
-    {
-        this.location = location;
-    }
+  public String getLocation() {
+    return location;
+  }
+
+  public void setLocation(String location) {
+    this.location = location;
+  }
 }

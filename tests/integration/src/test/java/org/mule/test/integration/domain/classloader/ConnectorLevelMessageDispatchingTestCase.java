@@ -24,46 +24,43 @@ import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase
-{
+public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase {
 
-    public static final String HELLO_WORLD_APP = "hello-world";
-    public static final String HELLO_MULE_APP = "hello-mule";
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public SystemProperty endpointScheme = new SystemProperty("scheme", "http");
-    @Rule
-    public UseMuleLog4jContextFactory muleLogging = new UseMuleLog4jContextFactory();
+  public static final String HELLO_WORLD_APP = "hello-world";
+  public static final String HELLO_MULE_APP = "hello-mule";
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public SystemProperty endpointScheme = new SystemProperty("scheme", "http");
+  @Rule
+  public UseMuleLog4jContextFactory muleLogging = new UseMuleLog4jContextFactory();
 
-    @Test
-    public void verifyClassLoaderIsAppClassLoader() throws Exception
-    {
-        muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
-        muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
-        muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
-        muleServer.start();
-        verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_MULE_APP, "http://localhost:%d/service/helloMule");
-        verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_WORLD_APP, "http://localhost:%d/service/helloWorld");
-    }
+  @Test
+  public void verifyClassLoaderIsAppClassLoader() throws Exception {
+    muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
+    muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
+    muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
+    muleServer.start();
+    verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_MULE_APP, "http://localhost:%d/service/helloMule");
+    verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_WORLD_APP, "http://localhost:%d/service/helloWorld");
+  }
 
-    private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl) throws MuleException
-    {
-        MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
-        final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<ClassLoader>();
-        FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
-        flowExecutionListener.addListener(new Callback<MuleEvent>()
-        {
-            @Override
-            public void execute(MuleEvent source)
-            {
-                executionClassLoader.set(Thread.currentThread().getContextClassLoader());
-            }
-        });
-        applicationContext.getClient().send(String.format(requestUrl, dynamicPort.getNumber()), "test-data", null);
-        flowExecutionListener.waitUntilFlowIsComplete();
-        assertThat(executionClassLoader.get(), Is.is(applicationContext.getExecutionClassLoader()));
-    }
+  private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl)
+      throws MuleException {
+    MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
+    final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<ClassLoader>();
+    FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
+    flowExecutionListener.addListener(new Callback<MuleEvent>() {
+
+      @Override
+      public void execute(MuleEvent source) {
+        executionClassLoader.set(Thread.currentThread().getContextClassLoader());
+      }
+    });
+    applicationContext.getClient().send(String.format(requestUrl, dynamicPort.getNumber()), "test-data", null);
+    flowExecutionListener.waitUntilFlowIsComplete();
+    assertThat(executionClassLoader.get(), Is.is(applicationContext.getExecutionClassLoader()));
+  }
 
 
 }

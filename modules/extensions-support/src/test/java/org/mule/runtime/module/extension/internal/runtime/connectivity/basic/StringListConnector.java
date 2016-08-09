@@ -17,41 +17,40 @@ import java.util.List;
 
 @Extension(name = "StringList", description = "List Test connector")
 @Operations(VoidOperations.class)
-public class StringListConnector
-{
+public class StringListConnector {
 
-    @Parameter
-    private List<String> requiredListDefaults;
+  @Parameter
+  private List<String> requiredListDefaults;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    private List<String> requiredListNoExpressions;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  private List<String> requiredListNoExpressions;
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private List<String> requiredListExpressionRequireds;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private List<String> requiredListExpressionRequireds;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    private List<String> requiredListExpressionSupporteds;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  private List<String> requiredListExpressionSupporteds;
 
-    @Parameter
-    @Optional
-    private List<String> optionalListDefaults;
+  @Parameter
+  @Optional
+  private List<String> optionalListDefaults;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    @Optional
-    private List<String> optionalListNoExpressions;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  @Optional
+  private List<String> optionalListNoExpressions;
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    @Optional
-    private List<String> optionalListExpressionRequireds;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  @Optional
+  private List<String> optionalListExpressionRequireds;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Optional
-    private List<String> optionalListExpressionSupporteds;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional
+  private List<String> optionalListExpressionSupporteds;
 
 }

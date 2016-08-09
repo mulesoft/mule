@@ -12,26 +12,22 @@ package org.mule.extension.validation.api;
  * @see Validator
  * @since 3.7.0
  */
-public interface ValidationResult
-{
+public interface ValidationResult {
 
-    /**
-     * Returns a message associated with the execution
-     * of the validation. If the validation failed
-     * (which means that {@link #isError()} is {@code true}),
-     * then it will contain the reason why the error was generated.
-     * Otherwise, it might or might not contain some additional
-     * consideration about the validation result
-     *
-     * @return a {@link String} or {@code null}
-     */
-    String getMessage();
+  /**
+   * Returns a message associated with the execution of the validation. If the validation failed (which means that
+   * {@link #isError()} is {@code true}), then it will contain the reason why the error was generated. Otherwise, it might or
+   * might not contain some additional consideration about the validation result
+   *
+   * @return a {@link String} or {@code null}
+   */
+  String getMessage();
 
-    /**
-     * Whether the validation has failed or not
-     *
-     * @return {code true} if the validation failed. {@code false} otherwise
-     */
-    boolean isError();
+  /**
+   * Whether the validation has failed or not
+   *
+   * @return {code true} if the validation failed. {@code false} otherwise
+   */
+  boolean isError();
 
 }

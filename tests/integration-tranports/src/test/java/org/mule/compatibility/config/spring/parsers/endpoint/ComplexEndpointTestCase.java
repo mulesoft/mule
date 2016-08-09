@@ -14,21 +14,19 @@ import org.mule.runtime.core.api.MuleException;
 
 import org.junit.Test;
 
-public class ComplexEndpointTestCase extends AbstractEndpointTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/endpoint/complex-endpoint-test.xml";
-    }
+public class ComplexEndpointTestCase extends AbstractEndpointTestCase {
 
-    @Test
-    public void testComplex() throws MuleException
-    {
-        ImmutableEndpoint endpoint = doTest("complex");
-        assertNotNull(endpoint.getProperty("foo"));
-        assertEquals(endpoint.getProperty("foo"), "123");
-        assertNotNull(endpoint.getProperty("string"));
-        assertEquals(endpoint.getProperty("string"), "hello world");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/endpoint/complex-endpoint-test.xml";
+  }
+
+  @Test
+  public void testComplex() throws MuleException {
+    ImmutableEndpoint endpoint = doTest("complex");
+    assertNotNull(endpoint.getProperty("foo"));
+    assertEquals(endpoint.getProperty("foo"), "123");
+    assertNotNull(endpoint.getProperty("string"));
+    assertEquals(endpoint.getProperty("string"), "hello world");
+  }
 }

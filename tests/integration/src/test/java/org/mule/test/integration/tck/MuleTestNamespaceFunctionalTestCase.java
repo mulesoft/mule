@@ -20,53 +20,46 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTestCase
-{
+public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/tck/test-namespace-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/tck/test-namespace-config-flow.xml";
+  }
 
-    @Test
-    public void testService1() throws Exception
-    {
-        MuleMessage message = flowRunner("testService1").withPayload("foo").run().getMessage();
+  @Test
+  public void testService1() throws Exception {
+    MuleMessage message = flowRunner("testService1").withPayload("foo").run().getMessage();
 
-        assertNotNull(message);
-        assertNull(message.getExceptionPayload());
-        assertThat(getPayloadAsString(message), is("Foo Bar Car Jar"));
-    }
+    assertNotNull(message);
+    assertNull(message.getExceptionPayload());
+    assertThat(getPayloadAsString(message), is("Foo Bar Car Jar"));
+  }
 
-    @Test
-    public void testService2() throws Exception
-    {
-        MuleMessage message = flowRunner("testService2").withPayload("foo").run().getMessage();
-        assertNotNull(message);
-        assertNull(message.getExceptionPayload());
-        assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
-    }
+  @Test
+  public void testService2() throws Exception {
+    MuleMessage message = flowRunner("testService2").withPayload("foo").run().getMessage();
+    assertNotNull(message);
+    assertNull(message.getExceptionPayload());
+    assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
+  }
 
-    @Test
-    public void testService3() throws Exception
-    {
-        MuleMessage message = flowRunner("testService3").withPayload("foo").run().getMessage();
-        assertNotNull(message);
-        assertNull(message.getExceptionPayload());
-        assertThat(getPayloadAsString(message), is("foo received"));
-    }
+  @Test
+  public void testService3() throws Exception {
+    MuleMessage message = flowRunner("testService3").withPayload("foo").run().getMessage();
+    assertNotNull(message);
+    assertNull(message.getExceptionPayload());
+    assertThat(getPayloadAsString(message), is("foo received"));
+  }
 
-    @Test
-    public void testService4() throws Exception
-    {
-        flowRunner("testService4").withPayload("foo").runExpectingException();
-    }
+  @Test
+  public void testService4() throws Exception {
+    flowRunner("testService4").withPayload("foo").runExpectingException();
+  }
 
-    @Test
-    public void testService5() throws Exception
-    {
-        MessagingException e = flowRunner("testService5").withPayload("foo").runExpectingException();
-        assertTrue(ExceptionUtils.getRootCause(e) instanceof FileNotFoundException);
-    }
+  @Test
+  public void testService5() throws Exception {
+    MessagingException e = flowRunner("testService5").withPayload("foo").runExpectingException();
+    assertTrue(ExceptionUtils.getRootCause(e) instanceof FileNotFoundException);
+  }
 }

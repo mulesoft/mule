@@ -14,14 +14,13 @@ import org.mule.runtime.extension.api.runtime.operation.OperationContext;
  * @param <T> the type of the argument to be resolved
  * @since 3.7.0
  */
-public interface ArgumentResolver<T>
-{
+public interface ArgumentResolver<T> {
 
-    /**
-     * Resolves an argument's value from the given {@code operationContext}
-     *
-     * @param operationContext an {@link OperationContext}
-     * @return a value
-     */
-    T resolve(OperationContext operationContext);
+  /**
+   * Resolves an argument's value from the given {@code operationContext}
+   *
+   * @param operationContext an {@link OperationContext}
+   * @return a value
+   */
+  T resolve(OperationContext operationContext);
 }

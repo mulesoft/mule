@@ -13,37 +13,32 @@ import org.junit.rules.ExternalResource;
 /**
  * Sets up a time zone to use on tests, guarantying that the original default one is reset afterwards.
  */
-public class CustomTimeZone extends ExternalResource
-{
-    private final TimeZone timeZone;
-    private TimeZone savedTimeZone;
+public class CustomTimeZone extends ExternalResource {
 
-    public CustomTimeZone(TimeZone timeZone)
-    {
-        this.timeZone = timeZone;
-    }
+  private final TimeZone timeZone;
+  private TimeZone savedTimeZone;
 
-    public CustomTimeZone(String ID)
-    {
-        this(TimeZone.getTimeZone(ID));
-    }
+  public CustomTimeZone(TimeZone timeZone) {
+    this.timeZone = timeZone;
+  }
 
-    public TimeZone getTimeZone()
-    {
-        return timeZone;
-    }
+  public CustomTimeZone(String ID) {
+    this(TimeZone.getTimeZone(ID));
+  }
 
-    @Override
-    protected void before() throws Throwable
-    {
-        savedTimeZone = TimeZone.getDefault();
-        TimeZone.setDefault(timeZone);
-    }
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
 
-    @Override
-    protected void after()
-    {
-        TimeZone.setDefault(savedTimeZone);
-    }
+  @Override
+  protected void before() throws Throwable {
+    savedTimeZone = TimeZone.getDefault();
+    TimeZone.setDefault(timeZone);
+  }
+
+  @Override
+  protected void after() {
+    TimeZone.setDefault(savedTimeZone);
+  }
 
 }

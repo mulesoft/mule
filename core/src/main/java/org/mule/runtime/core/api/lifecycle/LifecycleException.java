@@ -12,47 +12,42 @@ import org.mule.runtime.core.config.i18n.Message;
 
 /** <code>LifecycleException</code> TODO */
 
-public class LifecycleException extends LocatedMuleException
-{
+public class LifecycleException extends LocatedMuleException {
 
-    /** Serial version */
-    private static final long serialVersionUID = 2909614055858287394L;
+  /** Serial version */
+  private static final long serialVersionUID = 2909614055858287394L;
 
-    private transient Object component;
+  private transient Object component;
 
-    /**
-     * @param message   the exception message
-     * @param component the object that failed during a lifecycle method call
-     */
-    public LifecycleException(Message message, Object component)
-    {
-        super(message, component);
-        this.component = component;
-    }
+  /**
+   * @param message the exception message
+   * @param component the object that failed during a lifecycle method call
+   */
+  public LifecycleException(Message message, Object component) {
+    super(message, component);
+    this.component = component;
+  }
 
-    /**
-     * @param message   the exception message
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public LifecycleException(Message message, Throwable cause, Object component)
-    {
-        super(message, cause, component);
-        this.component = component;
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public LifecycleException(Message message, Throwable cause, Object component) {
+    super(message, cause, component);
+    this.component = component;
+  }
 
-    /**
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public LifecycleException(Throwable cause, Object component)
-    {
-        super(CoreMessages.createStaticMessage(cause.getMessage()), cause, component);
-        this.component = component;
-    }
+  /**
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public LifecycleException(Throwable cause, Object component) {
+    super(CoreMessages.createStaticMessage(cause.getMessage()), cause, component);
+    this.component = component;
+  }
 
-    public Object getComponent()
-    {
-        return component;
-    }
+  public Object getComponent() {
+    return component;
+  }
 }

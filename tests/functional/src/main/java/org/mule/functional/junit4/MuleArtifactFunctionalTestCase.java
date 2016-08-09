@@ -10,12 +10,12 @@ package org.mule.functional.junit4;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 
 /**
- * Base class for mule functional test cases that run the test using class loading isolation.
- * This class will set the default values for testing mule components.
+ * Base class for mule functional test cases that run the test using class loading isolation. This class will set the default
+ * values for testing mule components.
  * <p/>
  * The artifacts that are going to be ALWAYS part of the container should be excluded from application and plugin
- * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
- * Therefore the {@link ArtifactClassLoaderRunnerConfig#exclusions()} is set here with the list of groupIds for those modules.
+ * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}. Therefore the
+ * {@link ArtifactClassLoaderRunnerConfig#exclusions()} is set here with the list of groupIds for those modules.
  * <p/>
  * Whenever a new groupId is created for mule components that would be always added to the container they must be added here.
  * <p/>
@@ -23,15 +23,8 @@ import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
  *
  * @since 4.0
  */
-@ArtifactClassLoaderRunnerConfig(
-        extensionBasePackage = "org.mule.extension",
-        exclusions = "org.mule:*:*," +
-                     "org.mule.modules*:*:*," +
-                     "org.mule.transports:*:*," +
-                     "org.mule.mvel:*:*," +
-                     "org.mule.common:*:*,"
-)
-public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase
-{
+@ArtifactClassLoaderRunnerConfig(extensionBasePackage = "org.mule.extension", exclusions = "org.mule:*:*,"
+    + "org.mule.modules*:*:*," + "org.mule.transports:*:*," + "org.mule.mvel:*:*," + "org.mule.common:*:*,")
+public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
 }

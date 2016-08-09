@@ -12,19 +12,17 @@ import javax.xml.ws.WebFault;
 import org.apache.cxf.frontend.FaultInfoException;
 
 @WebFault
-public class EchoException extends FaultInfoException
-{
-    private EchoFault echoFault;
+public class EchoException extends FaultInfoException {
 
-    public EchoException(String message)
-    {
-        super(message);
-        this.echoFault = new EchoFault();
-        this.echoFault.setText(message);
-    }
+  private EchoFault echoFault;
 
-    public EchoFault getFaultInfo()
-    {
-        return echoFault;
-    }
+  public EchoException(String message) {
+    super(message);
+    this.echoFault = new EchoFault();
+    this.echoFault.setText(message);
+  }
+
+  public EchoFault getFaultInfo() {
+    return echoFault;
+  }
 }

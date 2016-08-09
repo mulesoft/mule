@@ -10,18 +10,15 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * Resets the ReversibleXMLStreamReader so the person receiving it can start back
- * at the beginning of the stream.
+ * Resets the ReversibleXMLStreamReader so the person receiving it can start back at the beginning of the stream.
  */
-public class ReversibleStaxInInterceptor extends ReversibleStaxInterceptor
-{
+public class ReversibleStaxInInterceptor extends ReversibleStaxInterceptor {
 
-    public ReversibleStaxInInterceptor()
-    {
-        super(Phase.POST_STREAM);
-        getAfter().add(StreamClosingInterceptor.class.getName());
-        getAfter().add(StaxInInterceptor.class.getName());
-    }
+  public ReversibleStaxInInterceptor() {
+    super(Phase.POST_STREAM);
+    getAfter().add(StreamClosingInterceptor.class.getName());
+    getAfter().add(StaxInInterceptor.class.getName());
+  }
 
 }
 

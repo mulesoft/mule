@@ -18,96 +18,82 @@ import org.mule.tck.testmodels.fruit.Fruit;
 
 import org.junit.Test;
 
-public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContextTestCase
-{
-    @Test
-    public void testMethodSetPass() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        resolver.addMethod("someBusinessMethod");
-        InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContextTestCase {
+
+  @Test
+  public void testMethodSetPass() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    resolver.addMethod("someBusinessMethod");
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
+    assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+  }
+
+  @Test
+  public void testMethodSetMatchFirst() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    resolver.addMethod("someBusinessMethod");
+    resolver.addMethod("someSetter");
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
+    assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+  }
+
+  @Test
+  public void testMethodNotFound() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    resolver.addMethod("noMethod");
+    resolver.addMethod("noMethod2");
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
+    assertEquals(result.getState(), InvocationResult.State.FAILED);
+  }
+
+  @Test
+  public void testNoMethodSet() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    try {
+      resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
+      fail("method property is not set, this should cause an error");
+    } catch (IllegalStateException e) {
+      // Expected
+    }
+  }
+
+  /**
+   * If a method with correct name is available then it should be used is the parameter type is assignable from the payload type
+   * and not just if there is an exact match. See MULE-3636.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    resolver.addMethod("wash");
+    MuleEventContext ctx = getTestEventContext(new Apple());
+    InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
+    assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+  }
+
+  /**
+   * If a method with correct name is available then it should be used even if one or more parameter types in the payload are
+   * null, as long as the parameter count matches.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testMethodPropertyParameterNull() throws Exception {
+    ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+    resolver.addMethod("someOtherBusinessMethod");
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext(new Object[] {null, "blah"}));
+    assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+  }
+
+  public static class TestFruitCleaner {
+
+    public void wash(Fruit fruit) {
+      // dummy
     }
 
-    @Test
-    public void testMethodSetMatchFirst() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        resolver.addMethod("someBusinessMethod");
-        resolver.addMethod("someSetter");
-        InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
+    public void polish(Fruit fruit) {
+      // dummy
     }
-
-    @Test
-    public void testMethodNotFound() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        resolver.addMethod("noMethod");
-        resolver.addMethod("noMethod2");
-        InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.State.FAILED);
-    }
-
-    @Test
-    public void testNoMethodSet() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        try
-        {
-            resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-            fail("method property is not set, this should cause an error");
-        }
-        catch (IllegalStateException e)
-        {
-            //Expected
-        }
-    }
-
-    /**
-     * If a method with correct name is available then it should be used is the
-     * parameter type is assignable from the payload type and not just if there is an
-     * exact match. See MULE-3636.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testMethodPropertyParameterAssignableFromPayload() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        resolver.addMethod("wash");
-        MuleEventContext ctx = getTestEventContext(new Apple());
-        InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
-        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
-    }
-
-    /**
-     * If a method with correct name is available then it should be used even if one
-     * or more parameter types in the payload are null, as long as the parameter
-     * count matches.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testMethodPropertyParameterNull() throws Exception
-    {
-        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
-        resolver.addMethod("someOtherBusinessMethod");
-        InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
-            getTestEventContext(new Object[]{null, "blah"}));
-        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
-    }
-
-    public static class TestFruitCleaner
-    {
-        public void wash(Fruit fruit)
-        {
-            // dummy
-        }
-
-        public void polish(Fruit fruit)
-        {
-            // dummy
-        }
-    }
+  }
 }

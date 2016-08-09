@@ -19,34 +19,29 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase
-{
+public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase {
 
-    private static final String APP = "app";
+  private static final String APP = "app";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/empty-domain-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/empty-domain-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {
-                new ApplicationConfig(APP, new String[] {"domain/http/http-not-shared-listener-config.xml"})
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(APP, new String[] {"domain/http/http-not-shared-listener-config.xml"})};
+  }
 
-    @Test
-    public void sendMessageToNotSharedConnectorInDomain() throws Exception {
-        String url = format("http://localhost:%d/test", dynamicPort.getNumber());
-        MuleContext muleContext = getMuleContextForApp(APP);
-        muleContext.getClient().send(url, MuleMessage.builder().payload("").build());
+  @Test
+  public void sendMessageToNotSharedConnectorInDomain() throws Exception {
+    String url = format("http://localhost:%d/test", dynamicPort.getNumber());
+    MuleContext muleContext = getMuleContextForApp(APP);
+    muleContext.getClient().send(url, MuleMessage.builder().payload("").build());
 
-        assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
-    }
+    assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
+  }
 }

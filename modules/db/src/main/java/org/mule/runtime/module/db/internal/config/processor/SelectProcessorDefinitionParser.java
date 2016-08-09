@@ -14,37 +14,33 @@ import org.mule.runtime.module.db.internal.processor.SelectMessageProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
-public class SelectProcessorDefinitionParser extends AbstractResultSetHandlerProcessorDefinitionParser
-{
+public class SelectProcessorDefinitionParser extends AbstractResultSetHandlerProcessorDefinitionParser {
 
-    @Override
-    protected Class<?> getBeanClass(Element element)
-    {
-        return SelectMessageProcessor.class;
-    }
+  @Override
+  protected Class<?> getBeanClass(Element element) {
+    return SelectMessageProcessor.class;
+  }
 
-    @Override
-    protected Object createExecutorFactory(Element element)
-    {
-        BeanDefinitionBuilder executorFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(SelectExecutorFactory.class);
+  @Override
+  protected Object createExecutorFactory(Element element) {
+    BeanDefinitionBuilder executorFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(SelectExecutorFactory.class);
 
-        executorFactoryBean.addConstructorArgValue(parseStatementFactory(element));
+    executorFactoryBean.addConstructorArgValue(parseStatementFactory(element));
 
-        executorFactoryBean.addConstructorArgReference(resultSetHandlerBeanName);
+    executorFactoryBean.addConstructorArgReference(resultSetHandlerBeanName);
 
 
-        return executorFactoryBean.getBeanDefinition();
-    }
+    return executorFactoryBean.getBeanDefinition();
+  }
 
-    @Override
-    protected Object getMetadataProvider()
-    {
-        BeanDefinitionBuilder metadataProviderBuilder = BeanDefinitionBuilder.genericBeanDefinition(SelectMetadataProvider.class);
-        metadataProviderBuilder.addConstructorArgValue(dbConfigResolverFactoryBeanDefinition);
-        metadataProviderBuilder.addConstructorArgValue(queryBean);
-        metadataProviderBuilder.addConstructorArgValue(streaming);
+  @Override
+  protected Object getMetadataProvider() {
+    BeanDefinitionBuilder metadataProviderBuilder = BeanDefinitionBuilder.genericBeanDefinition(SelectMetadataProvider.class);
+    metadataProviderBuilder.addConstructorArgValue(dbConfigResolverFactoryBeanDefinition);
+    metadataProviderBuilder.addConstructorArgValue(queryBean);
+    metadataProviderBuilder.addConstructorArgValue(streaming);
 
-        return metadataProviderBuilder.getBeanDefinition();
-    }
+    return metadataProviderBuilder.getBeanDefinition();
+  }
 
 }

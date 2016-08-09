@@ -16,49 +16,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link MessageProcessor} that uses a {@link JsonSchemaValidator}
- * to validate a json in the payload to a given schema
+ * A {@link MessageProcessor} that uses a {@link JsonSchemaValidator} to validate a json in the payload to a given schema
  *
  * @since 3.6.0
  */
-public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable
-{
+public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable {
 
-    private String schemaLocation;
-    private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
-    private Map<String, String> schemaRedirects = new HashMap<>();
+  private String schemaLocation;
+  private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
+  private Map<String, String> schemaRedirects = new HashMap<>();
 
-    private JsonSchemaValidator validator;
+  private JsonSchemaValidator validator;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        validator = JsonSchemaValidator.builder()
-                .setSchemaLocation(schemaLocation)
-                .setDereferencing(dereferencing)
-                .addSchemaRedirects(schemaRedirects)
-                .build();
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    validator = JsonSchemaValidator.builder().setSchemaLocation(schemaLocation).setDereferencing(dereferencing)
+        .addSchemaRedirects(schemaRedirects).build();
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        validator.validate(event);
-        return event;
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    validator.validate(event);
+    return event;
+  }
 
-    public void setSchemaLocation(String schemaLocation)
-    {
-        this.schemaLocation = schemaLocation;
-    }
+  public void setSchemaLocation(String schemaLocation) {
+    this.schemaLocation = schemaLocation;
+  }
 
-    public void setDereferencing(JsonSchemaDereferencing dereferencing)
-    {
-        this.dereferencing = dereferencing;
-    }
+  public void setDereferencing(JsonSchemaDereferencing dereferencing) {
+    this.dereferencing = dereferencing;
+  }
 
-    public void setSchemaRedirects(Map<String, String> schemaRedirects)
-    {
-        this.schemaRedirects = schemaRedirects;
-    }
+  public void setSchemaRedirects(Map<String, String> schemaRedirects) {
+    this.schemaRedirects = schemaRedirects;
+  }
 }

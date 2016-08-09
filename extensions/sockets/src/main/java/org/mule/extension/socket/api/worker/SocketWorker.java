@@ -14,19 +14,16 @@ import java.io.InputStream;
 
 import javax.resource.spi.work.Work;
 
-public abstract class SocketWorker implements Disposable, Work
-{
+public abstract class SocketWorker implements Disposable, Work {
 
-    protected final MessageHandler<InputStream, SocketAttributes> messageHandler;
-    protected String encoding;
+  protected final MessageHandler<InputStream, SocketAttributes> messageHandler;
+  protected String encoding;
 
-    protected SocketWorker(MessageHandler<InputStream, SocketAttributes> messageHandler)
-    {
-        this.messageHandler = messageHandler;
-    }
+  protected SocketWorker(MessageHandler<InputStream, SocketAttributes> messageHandler) {
+    this.messageHandler = messageHandler;
+  }
 
-    public void setEncoding(String encoding)
-    {
-        this.encoding = encoding;
-    }
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
 }

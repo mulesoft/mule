@@ -9,8 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 /**
  * Optional hook, invoked synchronously right before the class loader is disposed and closed.
  */
-public interface ShutdownListener
-{
+public interface ShutdownListener {
 
-    void execute();
+  void execute();
 }

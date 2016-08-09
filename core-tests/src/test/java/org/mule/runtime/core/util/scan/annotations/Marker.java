@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Meta
-public @interface Marker
-{
-    String value();
+public @interface Marker {
+
+  String value();
 }

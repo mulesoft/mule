@@ -10,57 +10,47 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
- * This is a Message receiver worker used by transports that do not have a way for the underlying transport
- * to call back to the receiver when a message is available such as Jms. This worker provides a
- * callback {@link #getNextMessage(Object)} where the receiver can read the next message from the underlying
- * transport.
+ * This is a Message receiver worker used by transports that do not have a way for the underlying transport to call back to the
+ * receiver when a message is available such as Jms. This worker provides a callback {@link #getNextMessage(Object)} where the
+ * receiver can read the next message from the underlying transport.
  */
-public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWorker
-{
-    protected Object resource;
+public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWorker {
 
-    public AbstractReceiverResourceWorker(Object resource, AbstractMessageReceiver receiver)
-    {
-        this(resource, receiver, null);
-    }
+  protected Object resource;
 
-    public AbstractReceiverResourceWorker(Object resource, AbstractMessageReceiver receiver, OutputStream out)
-    {
-        super(new ArrayList<Object>(), receiver, out);
-        this.resource = resource;
-    }
+  public AbstractReceiverResourceWorker(Object resource, AbstractMessageReceiver receiver) {
+    this(resource, receiver, null);
+  }
 
-    @Override
-    public void doRun()
-    {
-        try
-        {
-            Object message;
-            do 
-            {
-                message = getNextMessage(resource);
-                messages.add(message);
-                super.doRun();
-            }
-            while (message != null && hasMoreMessages(message));
-        }
-        catch (Exception e)
-        {
-            endpoint.getMuleContext().getExceptionListener().handleException(e);
-        }
-    }
+  public AbstractReceiverResourceWorker(Object resource, AbstractMessageReceiver receiver, OutputStream out) {
+    super(new ArrayList<Object>(), receiver, out);
+    this.resource = resource;
+  }
 
-    protected boolean hasMoreMessages(Object message)
-    {
-        return true;
+  @Override
+  public void doRun() {
+    try {
+      Object message;
+      do {
+        message = getNextMessage(resource);
+        messages.add(message);
+        super.doRun();
+      } while (message != null && hasMoreMessages(message));
+    } catch (Exception e) {
+      endpoint.getMuleContext().getExceptionListener().handleException(e);
     }
-    
-    /**
-     * The method used to read the next message from the underlying transport.
-     * @param resource the resource to read from, this may be a socket, a directory or some higher level
-     * representation.
-     * @return the message read from the resource.  This can be raw data such as a byte[].
-     * @throws Exception
-     */
-    protected abstract Object getNextMessage(Object resource) throws Exception;
+  }
+
+  protected boolean hasMoreMessages(Object message) {
+    return true;
+  }
+
+  /**
+   * The method used to read the next message from the underlying transport.
+   * 
+   * @param resource the resource to read from, this may be a socket, a directory or some higher level representation.
+   * @return the message read from the resource. This can be raw data such as a byte[].
+   * @throws Exception
+   */
+  protected abstract Object getNextMessage(Object resource) throws Exception;
 }

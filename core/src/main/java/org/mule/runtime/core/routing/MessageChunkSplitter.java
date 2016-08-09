@@ -16,76 +16,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A router that breaks up the current message onto smaller parts and sends them to
- * the same destination. The Destination service needs to have a
- * MessageChunkingAggregator inbound router in order to rebuild the message at the
- * other end.
+ * A router that breaks up the current message onto smaller parts and sends them to the same destination. The Destination service
+ * needs to have a MessageChunkingAggregator inbound router in order to rebuild the message at the other end.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
-public class MessageChunkSplitter extends AbstractSplitter
-{
+public class MessageChunkSplitter extends AbstractSplitter {
 
-    protected int messageSize = 0;
+  protected int messageSize = 0;
 
-    public int getMessageSize()
-    {
-        return messageSize;
+  public int getMessageSize() {
+    return messageSize;
+  }
+
+  public void setMessageSize(int messageSize) {
+    this.messageSize = messageSize;
+  }
+
+  @Override
+  protected boolean isSplitRequired(MuleEvent event) {
+    return messageSize != 0;
+  }
+
+  @Override
+  protected List<MuleEvent> splitMessage(MuleEvent event) throws RoutingException {
+    List<MuleEvent> messageParts = new ArrayList<>();
+    byte[] data;
+    try {
+      data = event.getMessageAsBytes();
+    } catch (Exception e) {
+      throw new RoutingException(CoreMessages.failedToReadPayload(), event, next, e);
     }
 
-    public void setMessageSize(int messageSize)
-    {
-        this.messageSize = messageSize;
+    MuleMessage message = event.getMessage();
+    int parts = data.length / messageSize;
+    if ((parts * messageSize) < data.length) {
+      parts++;
     }
-
-    @Override
-    protected boolean isSplitRequired(MuleEvent event)
-    {
-        return messageSize != 0;
+    int len = messageSize;
+    int count = 0;
+    int pos = 0;
+    byte[] buffer;
+    for (; count < parts; count++) {
+      if ((pos + len) > data.length) {
+        len = data.length - pos;
+      }
+      buffer = new byte[len];
+      System.arraycopy(data, pos, buffer, 0, buffer.length);
+      pos += len;
+      messageParts.add(new DefaultMuleEvent(MuleMessage.builder(message).payload(buffer).correlationId(message.getUniqueId())
+          .correlationGroupSize(parts).correlationSequence(parts).build(), event));
     }
-
-    @Override
-    protected List<MuleEvent> splitMessage(MuleEvent event) throws RoutingException
-    {
-        List<MuleEvent> messageParts = new ArrayList<>();
-        byte[] data;
-        try
-        {
-            data = event.getMessageAsBytes();
-        }
-        catch (Exception e)
-        {
-            throw new RoutingException(CoreMessages.failedToReadPayload(), event, next, e);
-        }
-
-        MuleMessage message = event.getMessage();
-        int parts = data.length / messageSize;
-        if ((parts * messageSize) < data.length)
-        {
-            parts++;
-        }
-        int len = messageSize;
-        int count = 0;
-        int pos = 0;
-        byte[] buffer;
-        for (; count < parts; count++)
-        {
-            if ((pos + len) > data.length)
-            {
-                len = data.length - pos;
-            }
-            buffer = new byte[len];
-            System.arraycopy(data, pos, buffer, 0, buffer.length);
-            pos += len;
-            messageParts.add(new DefaultMuleEvent(MuleMessage.builder(message)
-                                                             .payload(buffer)
-                                                             .correlationId(message.getUniqueId())
-                                                             .correlationGroupSize(parts)
-                                                             .correlationSequence(parts)
-                                                             .build(),
-                    event));
-        }
-        return messageParts;
-    }
+    return messageParts;
+  }
 
 }

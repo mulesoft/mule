@@ -11,86 +11,86 @@ import java.io.IOException;
 import javax.net.ssl.KeyManagerFactory;
 
 /**
- * Configure direct key stores.
- * TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
- * certificate - this interface specifies how a keystore can be used to provide the certificates
- * (and associated private keys) necessary for identification.
+ * Configure direct key stores. TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
+ * certificate - this interface specifies how a keystore can be used to provide the certificates (and associated private keys)
+ * necessary for identification.
  *
- * <p>The information specified in this interface is used to configure a key store directly.
- * For more information see the documentation for the connector or protocol in question.
- * The comments in {@link org.mule.runtime.core.api.security.tls.TlsConfiguration} may also be useful.</p>
+ * <p>
+ * The information specified in this interface is used to configure a key store directly. For more information see the
+ * documentation for the connector or protocol in question. The comments in
+ * {@link org.mule.runtime.core.api.security.tls.TlsConfiguration} may also be useful.
+ * </p>
  */
-public interface TlsDirectKeyStore
-{
-    /**
-     * @return The location (resolved relative to the current classpath and file system, if possible)
-     * of the keystore that contains public certificates and private keys for identification.
-     */
-    String getKeyStore();
+public interface TlsDirectKeyStore {
 
-    /**
-     * @param name The location of the keystore that contains public certificates  and private keys
-     * for identification.
-     * @throws IOException If the location cannot be resolved via the file system or classpath
-     */
-    void setKeyStore(String name) throws IOException;
+  /**
+   * @return The location (resolved relative to the current classpath and file system, if possible) of the keystore that contains
+   *         public certificates and private keys for identification.
+   */
+  String getKeyStore();
 
-    /**
-     * @return The alias of the key from the key store.
-     */
-    String getKeyAlias();
+  /**
+   * @param name The location of the keystore that contains public certificates and private keys for identification.
+   * @throws IOException If the location cannot be resolved via the file system or classpath
+   */
+  void setKeyStore(String name) throws IOException;
 
-    /**
-     * @param alias of the key from the key store.
-     */
-    void setKeyAlias(String alias);
+  /**
+   * @return The alias of the key from the key store.
+   */
+  String getKeyAlias();
 
-    /**
-     * @return The password used to protect the private key(s)
-     */
-    String getKeyPassword();
+  /**
+   * @param alias of the key from the key store.
+   */
+  void setKeyAlias(String alias);
 
-    /**
-     * @param keyPassword The password used to protect the private key(s)
-     */
-    void setKeyPassword(String keyPassword);
+  /**
+   * @return The password used to protect the private key(s)
+   */
+  String getKeyPassword();
 
-    /**
-     * @return The password used to protect the keystore itself
-     */
-    String getKeyStorePassword();
+  /**
+   * @param keyPassword The password used to protect the private key(s)
+   */
+  void setKeyPassword(String keyPassword);
 
-    /**
-     * @param storePassword The password used to protect the keystore itself
-     */
-    void setKeyStorePassword(String storePassword);
+  /**
+   * @return The password used to protect the keystore itself
+   */
+  String getKeyStorePassword();
 
-    /**
-     * @return The type of keystore used in {@link #getKeyStore()}
-     */
-    String getKeyStoreType();
+  /**
+   * @param storePassword The password used to protect the keystore itself
+   */
+  void setKeyStorePassword(String storePassword);
 
-    /**
-     * @param keystoreType The type of keystore used in {@link #setKeyStore(String)}
-     */
-    void setKeyStoreType(String keystoreType);
+  /**
+   * @return The type of keystore used in {@link #getKeyStore()}
+   */
+  String getKeyStoreType();
 
-    /**
-     * @return The algorithm used by the key store.  The default comes from {
-     * @link org.mule.runtime.core.api.security.provider.AutoDiscoverySecurityProviderFactory}
-     */
-    String getKeyManagerAlgorithm();
+  /**
+   * @param keystoreType The type of keystore used in {@link #setKeyStore(String)}
+   */
+  void setKeyStoreType(String keystoreType);
 
-    /**
-     * @param keyManagerAlgorithm The algorithm used by the key store.  The default comes from {
-     * @link org.mule.runtime.core.api.security.provider.AutoDiscoverySecurityProviderFactory}
-     */
-    void setKeyManagerAlgorithm(String keyManagerAlgorithm);
+  /**
+   * @return The algorithm used by the key store. The default comes from {
+   * @link org.mule.runtime.core.api.security.provider.AutoDiscoverySecurityProviderFactory}
+   */
+  String getKeyManagerAlgorithm();
 
-    /**
-     * @return A source of key stores generated from the parameters supplied here.
-     */
-    KeyManagerFactory getKeyManagerFactory();
+  /**
+   * @param keyManagerAlgorithm The algorithm used by the key store. The default comes from {
+   * @link org.mule.runtime.core.api.security.provider.AutoDiscoverySecurityProviderFactory}
+   */
+  void setKeyManagerAlgorithm(String keyManagerAlgorithm);
+
+  /**
+   * @return A source of key stores generated from the parameters supplied here.
+   */
+  KeyManagerFactory getKeyManagerFactory();
 }
 
 

@@ -19,49 +19,44 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SslCertificateTestCase extends FunctionalTestCase
-{
-    private static int NUM_MESSAGES = 100;
+public class SslCertificateTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static int NUM_MESSAGES = 100;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ssl-certificate-test.xml";
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "ssl-certificate-test.xml";
+  }
+
+  @Test
+  public void testOnce() throws Exception {
+    doTests(1);
+  }
+
+  @Test
+  public void testMany() throws Exception {
+    doTests(NUM_MESSAGES);
+  }
+
+  protected void doTests(int n) throws Exception {
+    FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
+    assertNotNull(ftc);
+    assertNotNull(ftc.getEventCallback());
+
+    SaveCertificateCallback callback = (SaveCertificateCallback) ftc.getEventCallback();
+    callback.clear();
+
+    MuleClient client = muleContext.getClient();
+    for (int i = 0; i < n; ++i) {
+      callback.clear();
+      String msg = TEST_MESSAGE + n;
+      MuleMessage result = client.send("in", msg, null);
+      assertTrue(callback.isCalled());
+      assertNotNull("Null certificates", callback.getCertificates());
+      assertEquals(msg + " Received", getPayloadAsString(result));
     }
-
-    @Test
-    public void testOnce() throws Exception
-    {
-        doTests(1);
-    }
-
-    @Test
-    public void testMany() throws Exception
-    {
-        doTests(NUM_MESSAGES);
-    }
-
-    protected void doTests(int n) throws Exception
-    {
-        FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
-        assertNotNull(ftc);
-        assertNotNull(ftc.getEventCallback());
-
-        SaveCertificateCallback callback = (SaveCertificateCallback) ftc.getEventCallback();
-        callback.clear();
-
-        MuleClient client = muleContext.getClient();
-        for (int i = 0; i < n; ++i)
-        {
-            callback.clear();
-            String msg = TEST_MESSAGE + n;
-            MuleMessage result = client.send("in", msg, null);
-            assertTrue(callback.isCalled());
-            assertNotNull("Null certificates", callback.getCertificates());
-            assertEquals(msg + " Received", getPayloadAsString(result));
-        }
-    }
+  }
 }

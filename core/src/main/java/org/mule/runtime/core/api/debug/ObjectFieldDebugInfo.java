@@ -12,25 +12,22 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import java.util.List;
 
 /**
- * Provides debug information for an object's field that contains a value
- * composed of many simple values.
+ * Provides debug information for an object's field that contains a value composed of many simple values.
  *
  * @since 3.8.0
  */
-public class ObjectFieldDebugInfo extends FieldDebugInfo<List<FieldDebugInfo<?>>>
-{
-    /**
-     * Creates debug information for an object
-     *
-     * @param name name of the created field. Must be a not blank {@link String}
-     * @param type   class of the field. Cannot be null.
-     * @param fields a {@link List} containing debug information for the
-     *               object's fields. Non null.
-     */
-    ObjectFieldDebugInfo(String name, String type, List<FieldDebugInfo<?>> fields)
-    {
-        super(name, type, fields);
+public class ObjectFieldDebugInfo extends FieldDebugInfo<List<FieldDebugInfo<?>>> {
 
-        checkArgument(fields != null, "Fields cannot be null");
-    }
+  /**
+   * Creates debug information for an object
+   *
+   * @param name name of the created field. Must be a not blank {@link String}
+   * @param type class of the field. Cannot be null.
+   * @param fields a {@link List} containing debug information for the object's fields. Non null.
+   */
+  ObjectFieldDebugInfo(String name, String type, List<FieldDebugInfo<?>> fields) {
+    super(name, type, fields);
+
+    checkArgument(fields != null, "Fields cannot be null");
+  }
 }

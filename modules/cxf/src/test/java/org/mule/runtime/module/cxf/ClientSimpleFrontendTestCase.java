@@ -16,25 +16,23 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ClientSimpleFrontendTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class ClientSimpleFrontendTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "aegis-conf-flow-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testEchoWsdl() throws Exception
-    {
-        MuleMessage result = flowRunner("PopulateData").withPayload("some payload").run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "aegis-conf-flow-httpn.xml";
+  }
 
-        assertNotNull(result.getPayload());
-        assertEquals("Hello some payload", result.getPayload());
-    }
+  @Test
+  public void testEchoWsdl() throws Exception {
+    MuleMessage result = flowRunner("PopulateData").withPayload("some payload").run().getMessage();
+
+    assertNotNull(result.getPayload());
+    assertEquals("Hello some payload", result.getPayload());
+  }
 }
 
 

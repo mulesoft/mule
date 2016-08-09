@@ -20,67 +20,47 @@ import java.nio.charset.Charset;
 /**
  * <code>GZipCompressTransformer</code> will uncompress a byte[] or InputStream
  */
-public class GZipUncompressTransformer extends AbstractCompressionTransformer
-{
-    public GZipUncompressTransformer()
-    {
-        super();
-        this.setStrategy(new GZipCompression());
-        this.registerSourceType(DataType.BYTE_ARRAY);
-        this.registerSourceType(DataType.INPUT_STREAM);
-        // No type checking for the return type by default. It could either be a byte array, an input stream or an object.
-        this.setReturnDataType(DataType.OBJECT);
-    }
+public class GZipUncompressTransformer extends AbstractCompressionTransformer {
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        try
-        {
-            if (src instanceof InputStream)
-            {
-                return getStrategy().uncompressInputStream((InputStream) src);
-            }
-            else
-            {
-                byte[] buffer = getStrategy().uncompressByteArray((byte[]) src);
-                DataType returnDataType = getReturnDataType();
+  public GZipUncompressTransformer() {
+    super();
+    this.setStrategy(new GZipCompression());
+    this.registerSourceType(DataType.BYTE_ARRAY);
+    this.registerSourceType(DataType.INPUT_STREAM);
+    // No type checking for the return type by default. It could either be a byte array, an input stream or an object.
+    this.setReturnDataType(DataType.OBJECT);
+  }
 
-                // If a return type has been specified, then deserialize the uncompressed byte array.
-                if (DataType.STRING.isCompatibleWith(returnDataType))
-                {
-                    return new String(buffer, outputEncoding);
-                }
-                else if (!DataType.OBJECT.isCompatibleWith(returnDataType) && !DataType.BYTE_ARRAY.isCompatibleWith(returnDataType))
-                {
-                    try
-                    {
-                        return muleContext.getObjectSerializer().deserialize(buffer);
-                    }
-                    catch (SerializationException e)
-                    {
-                        throw new TransformerException(this, e);
-                    }
-                }
-                else
-                {
-                    // First try to deserialize the byte array. If it can be deserialized, then it was originally serialized.
-                    try
-                    {
-                        return muleContext.getObjectSerializer().deserialize(buffer);
-                    }
-                    catch (SerializationException e)
-                    {
-                        // If it fails, ignore it. We assume it was not serialized in the first place and return the buffer as it is.
-                        return buffer;
-                    }
-                }
-            }
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    try {
+      if (src instanceof InputStream) {
+        return getStrategy().uncompressInputStream((InputStream) src);
+      } else {
+        byte[] buffer = getStrategy().uncompressByteArray((byte[]) src);
+        DataType returnDataType = getReturnDataType();
+
+        // If a return type has been specified, then deserialize the uncompressed byte array.
+        if (DataType.STRING.isCompatibleWith(returnDataType)) {
+          return new String(buffer, outputEncoding);
+        } else if (!DataType.OBJECT.isCompatibleWith(returnDataType) && !DataType.BYTE_ARRAY.isCompatibleWith(returnDataType)) {
+          try {
+            return muleContext.getObjectSerializer().deserialize(buffer);
+          } catch (SerializationException e) {
+            throw new TransformerException(this, e);
+          }
+        } else {
+          // First try to deserialize the byte array. If it can be deserialized, then it was originally serialized.
+          try {
+            return muleContext.getObjectSerializer().deserialize(buffer);
+          } catch (SerializationException e) {
+            // If it fails, ignore it. We assume it was not serialized in the first place and return the buffer as it is.
+            return buffer;
+          }
         }
-        catch (IOException e)
-        {
-            throw new TransformerException(
-                    MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
-        }
+      }
+    } catch (IOException e) {
+      throw new TransformerException(MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
     }
+  }
 }

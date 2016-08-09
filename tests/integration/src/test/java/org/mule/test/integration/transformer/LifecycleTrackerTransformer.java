@@ -18,62 +18,52 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LifecycleTrackerTransformer extends AbstractTransformer implements Lifecycle, MuleContextAware
-{
+public class LifecycleTrackerTransformer extends AbstractTransformer implements Lifecycle, MuleContextAware {
 
-    private final List<String> tracker = new ArrayList<>();
+  private final List<String> tracker = new ArrayList<>();
 
-    public List<String> getTracker()
-    {
-        return tracker;
-    }
+  public List<String> getTracker() {
+    return tracker;
+  }
 
-    public void setProperty(final String value)
-    {
-        tracker.add("setProperty");
-    }
+  public void setProperty(final String value) {
+    tracker.add("setProperty");
+  }
 
-    @Override
-    public void setMuleContext(final MuleContext context)
-    {
-        tracker.add("setMuleContext");
-        muleContext = context;
-    }
+  @Override
+  public void setMuleContext(final MuleContext context) {
+    tracker.add("setMuleContext");
+    muleContext = context;
+  }
 
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        tracker.add("initialise");
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    tracker.add("initialise");
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        tracker.add("start");
-    }
+  @Override
+  public void start() throws MuleException {
+    tracker.add("start");
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        tracker.add("stop");
-    }
+  @Override
+  public void stop() throws MuleException {
+    tracker.add("stop");
+  }
 
-    @Override
-    public void dispose()
-    {
-        tracker.add("dispose");
-    }
+  @Override
+  public void dispose() {
+    tracker.add("dispose");
+  }
 
-    @Override
-    protected Object doTransform(final Object src, final Charset encoding)
-            throws TransformerException
-    {
+  @Override
+  protected Object doTransform(final Object src, final Charset encoding) throws TransformerException {
 
-        // dirty trick to get the transformer instance that was used for the
-        // request
-        return this;
-    }
+    // dirty trick to get the transformer instance that was used for the
+    // request
+    return this;
+  }
 
 }
 

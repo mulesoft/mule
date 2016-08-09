@@ -23,62 +23,55 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * A different version of {@link org.mule.compatibility.transport.ssl.SslCertificateTestCase} to see if we can get
- * different timing.
+ * A different version of {@link org.mule.compatibility.transport.ssl.SslCertificateTestCase} to see if we can get different
+ * timing.
  */
-public class SslCertificatesTestCase extends FunctionalTestCase
-{
-    private static int NUM_MESSAGES = 100;
+public class SslCertificatesTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static int NUM_MESSAGES = 100;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ssl-certificates-test-flow.xml";
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "ssl-certificates-test-flow.xml";
+  }
+
+  @Test
+  public void testOnce() throws Exception {
+    doTests(1);
+  }
+
+  @Test
+  public void testMany() throws Exception {
+    doTests(NUM_MESSAGES);
+  }
+
+  protected void doTests(int numberOfMessages) throws Exception {
+    SaveCertificatesCallback callback = setupEventCallback();
+
+    MuleClient client = muleContext.getClient();
+    for (int i = 0; i < numberOfMessages; ++i) {
+      String msg = TEST_MESSAGE + i;
+      MuleMessage result = client.send("in", msg, null);
+      assertEquals(msg + " Received", getPayloadAsString(result));
     }
 
-    @Test
-    public void testOnce() throws Exception
-    {
-        doTests(1);
+    Iterator<Certificate[]> certificates = callback.getCertificates().iterator();
+    for (int i = 0; i < numberOfMessages; ++i) {
+      assertTrue("No cert at " + i, certificates.hasNext());
+      assertNotNull("Null cert at " + i, certificates.next());
     }
+  }
 
-    @Test
-    public void testMany() throws Exception
-    {
-        doTests(NUM_MESSAGES);
-    }
+  private SaveCertificatesCallback setupEventCallback() throws Exception {
+    FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
+    assertNotNull(ftc);
+    assertNotNull(ftc.getEventCallback());
 
-    protected void doTests(int numberOfMessages) throws Exception
-    {
-        SaveCertificatesCallback callback = setupEventCallback();
-
-        MuleClient client = muleContext.getClient();
-        for (int i = 0; i < numberOfMessages; ++i)
-        {
-            String msg = TEST_MESSAGE + i;
-            MuleMessage result = client.send("in", msg, null);
-            assertEquals(msg + " Received", getPayloadAsString(result));
-        }
-
-        Iterator<Certificate[]> certificates = callback.getCertificates().iterator();
-        for (int i = 0; i < numberOfMessages; ++i)
-        {
-            assertTrue("No cert at " + i, certificates.hasNext());
-            assertNotNull("Null cert at " + i, certificates.next());
-        }
-    }
-
-    private SaveCertificatesCallback setupEventCallback() throws Exception
-    {
-        FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
-        assertNotNull(ftc);
-        assertNotNull(ftc.getEventCallback());
-
-        SaveCertificatesCallback callback = (SaveCertificatesCallback) ftc.getEventCallback();
-        callback.clear();
-        return callback;
-    }
+    SaveCertificatesCallback callback = (SaveCertificatesCallback) ftc.getEventCallback();
+    callback.clear();
+    return callback;
+  }
 }

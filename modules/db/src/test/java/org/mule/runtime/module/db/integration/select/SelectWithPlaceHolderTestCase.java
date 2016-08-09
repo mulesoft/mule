@@ -23,56 +23,49 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectWithPlaceHolderTestCase  extends AbstractDbIntegrationTestCase
-{
+public class SelectWithPlaceHolderTestCase extends AbstractDbIntegrationTestCase {
 
-    @Rule
-    public SystemProperty query = new SystemProperty("query", "select * from PLANET order by ID");
+  @Rule
+  public SystemProperty query = new SystemProperty("query", "select * from PLANET order by ID");
 
-    @Rule
-    public SystemProperty param = new SystemProperty("param", "2");
+  @Rule
+  public SystemProperty param = new SystemProperty("param", "2");
 
-    public SelectWithPlaceHolderTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectWithPlaceHolderTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-placeholder-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-placeholder-config.xml"};
+  }
 
-    @Test
-    public void replacesPlaceholderInParameterizedQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("placeholderParameterizedQuery").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void replacesPlaceholderInParameterizedQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("placeholderParameterizedQuery").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 
-    @Test
-    public void replacesPlaceholderInDynamicQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("placeholderDynamicQuery").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void replacesPlaceholderInDynamicQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("placeholderDynamicQuery").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 
-    @Test
-    public void replacesPlaceholderInParameterizedQueryParam() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("placeholderParameterizedQueryParam").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void replacesPlaceholderInParameterizedQueryParam() throws Exception {
+    final MuleEvent responseEvent = flowRunner("placeholderParameterizedQueryParam").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getVenusRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getVenusRecord());
+  }
 }

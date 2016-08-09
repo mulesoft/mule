@@ -13,41 +13,33 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 
 /**
- * An implementation of {@link Injector} which uses a
- * {@link RegistryProvider} to look for {@link Registry}
- * instances which also implement {@link Injector}.
- * The injection operation is then delegated into the
- * first matching registry.
+ * An implementation of {@link Injector} which uses a {@link RegistryProvider} to look for {@link Registry} instances which also
+ * implement {@link Injector}. The injection operation is then delegated into the first matching registry.
  *
- * If no appropriate registry is found, then the injection operation
- * does not take place.
+ * If no appropriate registry is found, then the injection operation does not take place.
  *
  * @since 3.7.0
  */
-public class RegistryDelegatingInjector implements Injector
-{
-    private final RegistryProvider registryProvider;
+public class RegistryDelegatingInjector implements Injector {
 
-    public RegistryDelegatingInjector(RegistryProvider registryProvider)
-    {
-        checkArgument(registryProvider != null, "registryProvider cannot be null");
-        this.registryProvider = registryProvider;
+  private final RegistryProvider registryProvider;
+
+  public RegistryDelegatingInjector(RegistryProvider registryProvider) {
+    checkArgument(registryProvider != null, "registryProvider cannot be null");
+    this.registryProvider = registryProvider;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> T inject(T object) throws MuleException {
+    for (Registry registry : registryProvider.getRegistries()) {
+      if (registry instanceof Injector) {
+        return ((Injector) registry).inject(object);
+      }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> T inject(T object) throws MuleException
-    {
-        for (Registry registry : registryProvider.getRegistries())
-        {
-            if (registry instanceof Injector)
-            {
-                return ((Injector) registry).inject(object);
-            }
-        }
-
-        return object;
-    }
+    return object;
+  }
 }

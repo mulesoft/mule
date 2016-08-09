@@ -9,16 +9,14 @@ package org.mule.runtime.module.tls.internal.config;
 import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 
 
-public class TrustStoreTlsContextDefinitionParser extends ParentDefinitionParser
-{
+public class TrustStoreTlsContextDefinitionParser extends ParentDefinitionParser {
 
-    public TrustStoreTlsContextDefinitionParser()
-    {
-        addAlias("path", "trustStorePath");
-        addAlias("password", "trustStorePassword");
-        addAlias("type", "trustStoreType");
-        addAlias("algorithm", "trustManagerAlgorithm");
-        addAlias("insecure", "trustStoreInsecure");
-    }
+  public TrustStoreTlsContextDefinitionParser() {
+    addAlias("path", "trustStorePath");
+    addAlias("password", "trustStorePassword");
+    addAlias("type", "trustStoreType");
+    addAlias("algorithm", "trustManagerAlgorithm");
+    addAlias("insecure", "trustStoreInsecure");
+  }
 
 }

@@ -16,79 +16,68 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase
-{
+public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase {
 
-    private static final String SOAP_REQUEST_PATTERN = "<soap:Envelope xmlns:soap=\"%s\" xmlns:web=\"http://www.webserviceX.NET/\">\n" +
-                                                       "   <soap:Header/>\n" +
-                                                       "   <soap:Body>\n" +
-                                                       "      <web:GetQuote><web:symbol>TEST</web:symbol></web:GetQuote>\n" +
-                                                       "   </soap:Body>\n" +
-                                                       "</soap:Envelope>";
+  private static final String SOAP_REQUEST_PATTERN =
+      "<soap:Envelope xmlns:soap=\"%s\" xmlns:web=\"http://www.webserviceX.NET/\">\n" + "   <soap:Header/>\n" + "   <soap:Body>\n"
+          + "      <web:GetQuote><web:symbol>TEST</web:symbol></web:GetQuote>\n" + "   </soap:Body>\n" + "</soap:Envelope>";
 
-    private static final String SOAP_11_SCHEMA = "http://schemas.xmlsoap.org/soap/envelope/";
+  private static final String SOAP_11_SCHEMA = "http://schemas.xmlsoap.org/soap/envelope/";
 
-    private static final String SOAP_12_SCHEMA = "http://www.w3.org/2003/05/soap-envelope";
+  private static final String SOAP_12_SCHEMA = "http://www.w3.org/2003/05/soap-envelope";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "proxy-port-matching-soap-version-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "proxy-port-matching-soap-version-config.xml";
+  }
 
-    /*
-     * Proxy service with soapVersion="1.1", no port, and a WSDL that has multiple ports (1.1 and 1.2).
-     * Service should bind to 1.1 port.
-     */
-    @Test
-    public void proxyServiceMultiplePortsSoapVersion11() throws Exception
-    {
-        assertValidRequest("proxy11_multiplePorts", getRequest(SOAP_11_SCHEMA));
-        assertInvalidRequest("proxy11_multiplePorts", getRequest(SOAP_12_SCHEMA));
-    }
+  /*
+   * Proxy service with soapVersion="1.1", no port, and a WSDL that has multiple ports (1.1 and 1.2). Service should bind to 1.1
+   * port.
+   */
+  @Test
+  public void proxyServiceMultiplePortsSoapVersion11() throws Exception {
+    assertValidRequest("proxy11_multiplePorts", getRequest(SOAP_11_SCHEMA));
+    assertInvalidRequest("proxy11_multiplePorts", getRequest(SOAP_12_SCHEMA));
+  }
 
-    /*
-     * Proxy service with soapVersion="1.2", no port, and a WSDL that has multiple ports (1.1 and 1.2).
-     * Service should bind to 1.2 port.
-     */
-    @Test
-    public void proxyServiceMultiplePortsSoapVersion12() throws Exception
-    {
-        assertValidRequest("proxy12_multiplePorts", getRequest(SOAP_12_SCHEMA));
-    }
+  /*
+   * Proxy service with soapVersion="1.2", no port, and a WSDL that has multiple ports (1.1 and 1.2). Service should bind to 1.2
+   * port.
+   */
+  @Test
+  public void proxyServiceMultiplePortsSoapVersion12() throws Exception {
+    assertValidRequest("proxy12_multiplePorts", getRequest(SOAP_12_SCHEMA));
+  }
 
-    /*
-     * Proxy service with soapVersion="1.2", no port, and a WSDL that has a single 1.1 port.
-     * Service should bind to the 1.1 port (to keep previous behaviour).
-     */
-    @Test
-    public void proxyServiceSinglePortSoapVersion12() throws Exception
-    {
-        assertValidRequest("proxy12_singlePort", getRequest(SOAP_11_SCHEMA));
-        assertInvalidRequest("proxy12_singlePort", getRequest(SOAP_12_SCHEMA));
-    }
+  /*
+   * Proxy service with soapVersion="1.2", no port, and a WSDL that has a single 1.1 port. Service should bind to the 1.1 port (to
+   * keep previous behaviour).
+   */
+  @Test
+  public void proxyServiceSinglePortSoapVersion12() throws Exception {
+    assertValidRequest("proxy12_singlePort", getRequest(SOAP_11_SCHEMA));
+    assertInvalidRequest("proxy12_singlePort", getRequest(SOAP_12_SCHEMA));
+  }
 
-    private void assertValidRequest(String flowName, String request) throws Exception
-    {
-        MuleEvent result = flowRunner(flowName).withPayload(request).run();
+  private void assertValidRequest(String flowName, String request) throws Exception {
+    MuleEvent result = flowRunner(flowName).withPayload(request).run();
 
-        // As there is nothing else after the service, if there were no problems the same contents of the request
-        // will be returned.
-        assertEquals(request, getPayloadAsString(result.getMessage()));
-    }
+    // As there is nothing else after the service, if there were no problems the same contents of the request
+    // will be returned.
+    assertEquals(request, getPayloadAsString(result.getMessage()));
+  }
 
-    private void assertInvalidRequest(String flowName, String request) throws Exception
-    {
-        MuleEvent result = flowRunner(flowName).withPayload(request).run();
+  private void assertInvalidRequest(String flowName, String request) throws Exception {
+    MuleEvent result = flowRunner(flowName).withPayload(request).run();
 
-        assertTrue(getPayloadAsString(result.getMessage()).contains("VersionMismatch"));
-    }
+    assertTrue(getPayloadAsString(result.getMessage()).contains("VersionMismatch"));
+  }
 
-    private String getRequest(String schema)
-    {
-        return String.format(SOAP_REQUEST_PATTERN, schema);
-    }
+  private String getRequest(String schema) {
+    return String.format(SOAP_REQUEST_PATTERN, schema);
+  }
 }

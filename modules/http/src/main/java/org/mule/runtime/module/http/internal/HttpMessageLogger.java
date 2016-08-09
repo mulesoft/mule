@@ -15,41 +15,34 @@ import org.slf4j.LoggerFactory;
 /**
  * Logger for plain HTTP request and response.
  */
-public class HttpMessageLogger extends HttpProbe.Adapter
-{
+public class HttpMessageLogger extends HttpProbe.Adapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpMessageLogger.class);
+  private static final Logger logger = LoggerFactory.getLogger(HttpMessageLogger.class);
 
-    private final LoggerType loggerType;
+  private final LoggerType loggerType;
 
-    public enum LoggerType
-    {
-        LISTENER, REQUESTER
+  public enum LoggerType {
+    LISTENER, REQUESTER
+  }
+
+  public HttpMessageLogger(final LoggerType loggerType) {
+    this.loggerType = loggerType;
+  }
+
+  @Override
+  public void onDataReceivedEvent(Connection connection, Buffer buffer) {
+    logBuffer(buffer);
+  }
+
+  @Override
+  public void onDataSentEvent(Connection connection, Buffer buffer) {
+    logBuffer(buffer);
+  }
+
+  private void logBuffer(Buffer buffer) {
+    if (logger.isDebugEnabled()) {
+      logger.debug(loggerType.name() + "\n" + buffer.toStringContent());
     }
-
-    public HttpMessageLogger(final LoggerType loggerType)
-    {
-        this.loggerType = loggerType;
-    }
-
-    @Override
-    public void onDataReceivedEvent(Connection connection, Buffer buffer)
-    {
-        logBuffer(buffer);
-    }
-
-    @Override
-    public void onDataSentEvent(Connection connection, Buffer buffer)
-    {
-        logBuffer(buffer);
-    }
-
-    private void logBuffer(Buffer buffer)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(loggerType.name() + "\n" + buffer.toStringContent());
-        }
-    }
+  }
 
 }

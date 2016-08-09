@@ -25,81 +25,73 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CompositeProducerTestCase
-{
+public class CompositeProducerTestCase {
 
-    private List<String> list1;
-    private List<String> list2;
-    private List<String> list3;
+  private List<String> list1;
+  private List<String> list2;
+  private List<String> list3;
 
-    private List<String> aggregatedList;
+  private List<String> aggregatedList;
 
-    @Mock
-    private Producer<List<String>> producer1;
+  @Mock
+  private Producer<List<String>> producer1;
 
-    @Mock
-    private Producer<List<String>> producer2;
+  @Mock
+  private Producer<List<String>> producer2;
 
-    private CompositeProducer<List<String>> producer;
+  private CompositeProducer<List<String>> producer;
 
-    @SuppressWarnings("unchecked")
-    @Before
-    public void setUp() throws Exception
-    {
-        this.list1 = Arrays.asList("superman", "batman");
-        this.list2 = Arrays.asList("iron man", "hulk");
-        this.list3 = Arrays.asList("paturuzu", "eternauta");
+  @SuppressWarnings("unchecked")
+  @Before
+  public void setUp() throws Exception {
+    this.list1 = Arrays.asList("superman", "batman");
+    this.list2 = Arrays.asList("iron man", "hulk");
+    this.list3 = Arrays.asList("paturuzu", "eternauta");
 
-        this.aggregatedList = new ArrayList<String>();
-        this.aggregatedList.addAll(this.list1);
-        this.aggregatedList.addAll(this.list2);
-        this.aggregatedList.addAll(this.list3);
+    this.aggregatedList = new ArrayList<String>();
+    this.aggregatedList.addAll(this.list1);
+    this.aggregatedList.addAll(this.list2);
+    this.aggregatedList.addAll(this.list3);
 
-        Mockito.when(this.producer1.produce()).thenReturn(this.list1).thenReturn(this.list2).thenReturn(null);
-        Mockito.when(this.producer1.size()).thenReturn(this.list1.size() + this.list2.size());
+    Mockito.when(this.producer1.produce()).thenReturn(this.list1).thenReturn(this.list2).thenReturn(null);
+    Mockito.when(this.producer1.size()).thenReturn(this.list1.size() + this.list2.size());
 
-        Mockito.when(this.producer2.produce()).thenReturn(this.list3).thenReturn(null);
-        Mockito.when(this.producer2.size()).thenReturn(this.list3.size());
+    Mockito.when(this.producer2.produce()).thenReturn(this.list3).thenReturn(null);
+    Mockito.when(this.producer2.size()).thenReturn(this.list3.size());
 
-        this.producer = new CompositeProducer<List<String>>(this.producer1, this.producer2);
-    }
+    this.producer = new CompositeProducer<List<String>>(this.producer1, this.producer2);
+  }
 
-    @Test
-    public void consumeAndClose() throws Exception
-    {
-        List<String> output = new ArrayList<String>();
-        List<String> page = this.producer.produce();
+  @Test
+  public void consumeAndClose() throws Exception {
+    List<String> output = new ArrayList<String>();
+    List<String> page = this.producer.produce();
+    output.addAll(page);
+    while (!CollectionUtils.isEmpty(page)) {
+      page = this.producer.produce();
+      if (page != null) {
         output.addAll(page);
-        while (!CollectionUtils.isEmpty(page))
-        {
-            page = this.producer.produce();
-            if (page != null)
-            {
-                output.addAll(page);
-            }
-        }
-
-        Assert.assertEquals(output.size(), this.aggregatedList.size());
-
-        for (int i = 0; i < this.aggregatedList.size(); i++)
-        {
-            Assert.assertEquals(output.get(i), this.aggregatedList.get(i));
-        }
-
+      }
     }
 
-    @Test
-    public void close() throws Exception
-    {
-        this.producer.close();
+    Assert.assertEquals(output.size(), this.aggregatedList.size());
 
-        Mockito.verify(this.producer1).close();
-        Mockito.verify(this.producer2).close();
+    for (int i = 0; i < this.aggregatedList.size(); i++) {
+      Assert.assertEquals(output.get(i), this.aggregatedList.get(i));
     }
 
-    @Test
-    public void totalAvailable()
-    {
-        Assert.assertEquals(this.aggregatedList.size(), this.producer.size());
-    }
+  }
+
+  @Test
+  public void close() throws Exception {
+    this.producer.close();
+
+    Mockito.verify(this.producer1).close();
+    Mockito.verify(this.producer2).close();
+  }
+
+  @Test
+  public void totalAvailable() {
+    Assert.assertEquals(this.aggregatedList.size(), this.producer.size());
+  }
 }

@@ -7,14 +7,12 @@
 package org.mule.runtime.module.launcher;
 
 /**
- * Manages which {@link org.mule.runtime.module.launcher.DeploymentListener} are listening for domain deployment
- * notifications.
+ * Manages which {@link org.mule.runtime.module.launcher.DeploymentListener} are listening for domain deployment notifications.
  */
-public interface DomainDeploymentListenerManager
-{
+public interface DomainDeploymentListenerManager {
 
-    void addDomainDeploymentListener(DeploymentListener listener);
+  void addDomainDeploymentListener(DeploymentListener listener);
 
-    void removeDomainDeploymentListener(DeploymentListener listener);
+  void removeDomainDeploymentListener(DeploymentListener listener);
 
 }

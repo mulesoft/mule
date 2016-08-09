@@ -13,15 +13,13 @@ import java.util.Set;
 /**
  * Discovers Java packages
  */
-public interface PackageDiscoverer
-{
+public interface PackageDiscoverer {
 
-    /**
-     * Finds the packages defined in a given resource
-     *
-     * @param library folder or JAR file to explore. Non null
-     * @return the packages found on the resource or an empty set if the resource is not
-     * of an expected type.
-     */
-    Set<String> findPackages(URL library);
+  /**
+   * Finds the packages defined in a given resource
+   *
+   * @param library folder or JAR file to explore. Non null
+   * @return the packages found on the resource or an empty set if the resource is not of an expected type.
+   */
+  Set<String> findPackages(URL library);
 }

@@ -32,108 +32,92 @@ import org.w3c.dom.NodeList;
 
 import net.sf.saxon.dom.DocumentBuilderImpl;
 
-public class XQuery3TestCase extends FunctionalTestCase
-{
+public class XQuery3TestCase extends FunctionalTestCase {
 
-    private String input;
+  private String input;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "xquery/xquery3-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "xquery/xquery3-config.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    XMLUnit.setIgnoreWhitespace(true);
+    input = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
+  }
+
+  @Test
+  public void tryCatch() throws Exception {
+    List<Element> elements = (List<Element>) flowRunner("tryCatch").withPayload(input).run().getMessage().getPayload();
+    assertThat(elements, hasSize(1));
+    assertThat(elements.get(0).getTagName(), equalTo("error"));
+    assertThat(elements.get(0).getTextContent(), containsString("Caught error"));
+  }
+
+  @Test
+  public void switchStatement() throws Exception {
+    List<Element> elements = (List<Element>) flowRunner("switch").withPayload(input).run().getMessage().getPayload();
+
+    assertThat(elements, hasSize(1));
+    assertThat(elements.get(0).getTagName(), equalTo("Quack"));
+  }
+
+  @Test
+  public void groupBy() throws Exception {
+    List<Element> elements = (List<Element>) flowRunner("groupBy").withPayload(input).run().getMessage().getPayload();
+
+    assertThat(elements, hasSize(2));
+    assertThat(elements.get(0).getTagName(), equalTo("odd"));
+    assertThat(elements.get(1).getTagName(), equalTo("even"));
+    assertThat(elements.get(0).getTextContent(), equalTo("1 3 5 7 9"));
+    assertThat(elements.get(1).getTextContent(), equalTo("2 4 6 8 10"));
+  }
+
+  @Test
+  public void books() throws Exception {
+    List<Node> nodes = (List<Node>) flowRunner("books").withPayload(getBooks()).run().getMessage().getPayload();
+    assertThat(nodes, hasSize(6));
+    assertThat(nodes.get(0).getLastChild().getTextContent(), equalTo("The Eyre Affair"));
+  }
+
+  @Test
+  public void multipleInputsByPath() throws Exception {
+    URL booksUrl = IOUtils.getResourceAsUrl("books.xml", getClass());
+    URL citiesURL = IOUtils.getResourceAsUrl("cities.xml", getClass());
+
+    assertMultipleInputs("multipleInputsByPath", booksUrl.getPath(), citiesURL.getPath());
+  }
+
+  @Test
+  public void multipleInputsByParam() throws Exception {
+    try (InputStream books = IOUtils.getResourceAsStream("books.xml", getClass());
+        InputStream cities = IOUtils.getResourceAsStream("cities.xml", getClass())) {
+
+      DocumentBuilder documentBuilder = new DocumentBuilderImpl();
+      Document booksDocument = documentBuilder.parse(books);
+      Document citiesDocument = documentBuilder.parse(cities);
+
+      // test both parameters as a document or as a node
+      assertMultipleInputs("multipleInputsByParam", booksDocument, citiesDocument.getFirstChild());
     }
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        XMLUnit.setIgnoreWhitespace(true);
-        input = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
-    }
+  private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception {
+    List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input).withFlowVariable("books", books)
+        .withFlowVariable("cities", cities).run().getMessage().getPayload();
 
-    @Test
-    public void tryCatch() throws Exception
-    {
-        List<Element> elements = (List<Element>) flowRunner("tryCatch").withPayload(input).run().getMessage().getPayload();
-        assertThat(elements, hasSize(1));
-        assertThat(elements.get(0).getTagName(), equalTo("error"));
-        assertThat(elements.get(0).getTextContent(), containsString("Caught error"));
-    }
+    assertThat(elements, hasSize(1));
 
-    @Test
-    public void switchStatement() throws Exception
-    {
-        List<Element> elements = (List<Element>) flowRunner("switch").withPayload(input).run().getMessage().getPayload();
+    NodeList childNodes = elements.get(0).getChildNodes();
+    assertThat(childNodes.getLength(), greaterThan(0));
 
-        assertThat(elements, hasSize(1));
-        assertThat(elements.get(0).getTagName(), equalTo("Quack"));
-    }
+    NamedNodeMap firstChildAttributes = childNodes.item(0).getAttributes();
+    assertThat(firstChildAttributes.getNamedItem("title").getNodeValue(), equalTo("Pride and Prejudice"));
+    assertThat(firstChildAttributes.getNamedItem("city").getNodeValue(), equalTo("milan"));
+  }
 
-    @Test
-    public void groupBy() throws Exception
-    {
-        List<Element> elements = (List<Element>) flowRunner("groupBy").withPayload(input).run().getMessage().getPayload();
-
-        assertThat(elements, hasSize(2));
-        assertThat(elements.get(0).getTagName(), equalTo("odd"));
-        assertThat(elements.get(1).getTagName(), equalTo("even"));
-        assertThat(elements.get(0).getTextContent(), equalTo("1 3 5 7 9"));
-        assertThat(elements.get(1).getTextContent(), equalTo("2 4 6 8 10"));
-    }
-
-    @Test
-    public void books() throws Exception
-    {
-        List<Node> nodes = (List<Node>) flowRunner("books").withPayload(getBooks()).run().getMessage().getPayload();
-        assertThat(nodes, hasSize(6));
-        assertThat(nodes.get(0).getLastChild().getTextContent(), equalTo("The Eyre Affair"));
-    }
-
-    @Test
-    public void multipleInputsByPath() throws Exception
-    {
-        URL booksUrl = IOUtils.getResourceAsUrl("books.xml", getClass());
-        URL citiesURL = IOUtils.getResourceAsUrl("cities.xml", getClass());
-
-        assertMultipleInputs("multipleInputsByPath", booksUrl.getPath(), citiesURL.getPath());
-    }
-
-    @Test
-    public void multipleInputsByParam() throws Exception
-    {
-        try (InputStream books = IOUtils.getResourceAsStream("books.xml", getClass());
-             InputStream cities = IOUtils.getResourceAsStream("cities.xml", getClass()))
-        {
-
-            DocumentBuilder documentBuilder = new DocumentBuilderImpl();
-            Document booksDocument = documentBuilder.parse(books);
-            Document citiesDocument = documentBuilder.parse(cities);
-
-            // test both parameters as a document or as a node
-            assertMultipleInputs("multipleInputsByParam", booksDocument, citiesDocument.getFirstChild());
-        }
-    }
-
-    private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception
-    {
-        List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input)
-                                                                     .withFlowVariable("books", books)
-                                                                     .withFlowVariable("cities", cities)
-                                                                     .run()
-                                                                     .getMessage()
-                                                                     .getPayload();
-
-        assertThat(elements, hasSize(1));
-
-        NodeList childNodes = elements.get(0).getChildNodes();
-        assertThat(childNodes.getLength(), greaterThan(0));
-
-        NamedNodeMap firstChildAttributes = childNodes.item(0).getAttributes();
-        assertThat(firstChildAttributes.getNamedItem("title").getNodeValue(), equalTo("Pride and Prejudice"));
-        assertThat(firstChildAttributes.getNamedItem("city").getNodeValue(), equalTo("milan"));
-    }
-
-    private String getBooks() throws IOException
-    {
-        return IOUtils.getResourceAsString("books.xml", getClass());
-    }
+  private String getBooks() throws IOException {
+    return IOUtils.getResourceAsString("books.xml", getClass());
+  }
 }

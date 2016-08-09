@@ -18,105 +18,87 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-public class DummyMuleContextAware implements MuleContextAware, Transformer
-{
+public class DummyMuleContextAware implements MuleContextAware, Transformer {
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        // empty
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    // empty
+  }
 
-    public boolean isSourceTypeSupported(Class aClass)
-    {
-        return false;
-    }
+  public boolean isSourceTypeSupported(Class aClass) {
+    return false;
+  }
 
-    public List<Class<?>> getSourceTypes()
-    {
-        return null;
-    }
+  public List<Class<?>> getSourceTypes() {
+    return null;
+  }
 
-    @Override
-    public boolean isAcceptNull()
-    {
-        return false;
-    }
+  @Override
+  public boolean isAcceptNull() {
+    return false;
+  }
 
-    @Override
-    public boolean isIgnoreBadInput()
-    {
-        return false;
-    }
+  @Override
+  public boolean isIgnoreBadInput() {
+    return false;
+  }
 
-    @Override
-    public Object transform(Object src, Charset encoding) throws TransformerException
-    {
-        return null;
-    }
+  @Override
+  public Object transform(Object src, Charset encoding) throws TransformerException {
+    return null;
+  }
 
-    @Override
-    public Object transform(Object src) throws TransformerException
-    {
-        return null;
-    }
+  @Override
+  public Object transform(Object src) throws TransformerException {
+    return null;
+  }
 
-    public Class getReturnClass()
-    {
-        return null;
-    }
+  public Class getReturnClass() {
+    return null;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        // empty
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    // empty
+  }
 
-    @Override
-    public void dispose()
-    {
-        // empty
-    }
+  @Override
+  public void dispose() {
+    // empty
+  }
 
-    @Override
-    public void setName(String name)
-    {
-        // empty
-    }
+  @Override
+  public void setName(String name) {
+    // empty
+  }
 
-    @Override
-    public String getName()
-    {
-        return null;
-    }
+  @Override
+  public String getName() {
+    return null;
+  }
 
-    @Override
-    public void setReturnDataType(DataType type)
-    {
-        //empty
-    }
+  @Override
+  public void setReturnDataType(DataType type) {
+    // empty
+  }
 
-    @Override
-    public DataType getReturnDataType()
-    {
-        return null;
-    }
+  @Override
+  public DataType getReturnDataType() {
+    return null;
+  }
 
-    @Override
-    public boolean isSourceDataTypeSupported(DataType dataType)
-    {
-        return false;
-    }
+  @Override
+  public boolean isSourceDataTypeSupported(DataType dataType) {
+    return false;
+  }
 
-    @Override
-    public List<DataType> getSourceDataTypes()
-    {
-        return null;
-    }
+  @Override
+  public List<DataType> getSourceDataTypes() {
+    return null;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return null;
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return null;
+  }
 }

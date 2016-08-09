@@ -26,76 +26,67 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("See MULE-9195")
-public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCase {
+
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/issues/message-root-id.xml";
+  }
+
+  @Test
+  public void testRootIDs() throws Exception {
+    RootIDGatherer.initialize();
+
+    FlowRunner runner = flowRunner("flow1").withPayload("Hello").withOutboundProperty("where", "client");
+
+    RootIDGatherer.process(runner.buildEvent().getMessage());
+    runner.run();
+    Thread.sleep(1000);
+    assertEquals(6, RootIDGatherer.getMessageCount());
+    assertEquals(1, RootIDGatherer.getIds().size());
+  }
+
+  static class RootIDGatherer extends AbstractMessageTransformer {
+
+    static int messageCount;
+    static Map<String, String> idMap;
+    static int counter;
+
+
+    public static void initialize() {
+      idMap = new HashMap<>();
+      messageCount = 0;
+    }
+
+    public static synchronized void process(MuleMessage msg) {
+      String id = msg.getMessageRootId();
+      messageCount++;
+      String where = msg.<String>getOutboundProperty("where");
+      if (where == null) {
+        where = "location_" + counter++;
+      }
+      idMap.put(where, id);
+    }
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/issues/message-root-id.xml";
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+      process(event.getMessage());
+      return event.getMessage().getPayload();
     }
 
-    @Test
-    public void testRootIDs() throws Exception
-    {
-        RootIDGatherer.initialize();
-
-        FlowRunner runner = flowRunner("flow1").withPayload("Hello").withOutboundProperty("where", "client");
-
-        RootIDGatherer.process(runner.buildEvent().getMessage());
-        runner.run();
-        Thread.sleep(1000);
-        assertEquals(6, RootIDGatherer.getMessageCount());
-        assertEquals(1, RootIDGatherer.getIds().size());
+    public static Set<String> getIds() {
+      return new HashSet<>(idMap.values());
     }
 
-    static class RootIDGatherer extends AbstractMessageTransformer
-    {
-        static int messageCount;
-        static Map<String, String>idMap;
-        static int counter;
-
-
-        public static void initialize()
-        {
-            idMap = new HashMap<>();
-            messageCount = 0;
-        }
-
-        public static synchronized void process(MuleMessage msg)
-        {
-            String id = msg.getMessageRootId();
-            messageCount++;
-            String where = msg.<String>getOutboundProperty("where");
-            if (where == null)
-            {
-                where = "location_" + counter++;
-            }
-            idMap.put(where, id);
-        }
-
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding)
-        {
-            process(event.getMessage());
-            return event.getMessage().getPayload();
-        }
-
-        public static Set<String> getIds()
-        {
-            return new HashSet<>(idMap.values());
-        }
-
-        public static int getMessageCount()
-        {
-            return messageCount;
-        }
-
-        public static Map<String, String> getIdMap()
-        {
-            return idMap;
-        }
+    public static int getMessageCount() {
+      return messageCount;
     }
+
+    public static Map<String, String> getIdMap() {
+      return idMap;
+    }
+  }
 }

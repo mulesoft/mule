@@ -19,24 +19,18 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 public interface WeatherSoap {
 
-    @WebResult(name = "GetCityWeatherByZIPResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
-    @WebMethod(operationName = "GetCityWeatherByZIP", action = "http://ws.cdyne.com/WeatherWS/GetCityWeatherByZIP")
-    public GetCityWeatherByZIPResponse getCityWeatherByZIP(
-        @WebParam(partName = "parameters", name = "GetCityWeatherByZIP", targetNamespace = "http://ws.cdyne.com/WeatherWS/")
-        GetCityWeatherByZIP parameters
-    );
+  @WebResult(name = "GetCityWeatherByZIPResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
+  @WebMethod(operationName = "GetCityWeatherByZIP", action = "http://ws.cdyne.com/WeatherWS/GetCityWeatherByZIP")
+  public GetCityWeatherByZIPResponse getCityWeatherByZIP(@WebParam(partName = "parameters", name = "GetCityWeatherByZIP",
+      targetNamespace = "http://ws.cdyne.com/WeatherWS/") GetCityWeatherByZIP parameters);
 
-    @WebResult(name = "GetWeatherInformationResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
-    @WebMethod(operationName = "GetWeatherInformation", action = "http://ws.cdyne.com/WeatherWS/GetWeatherInformation")
-    public GetWeatherInformationResponse getWeatherInformation(
-        @WebParam(partName = "parameters", name = "GetWeatherInformation", targetNamespace = "http://ws.cdyne.com/WeatherWS/")
-        GetWeatherInformation parameters
-    );
+  @WebResult(name = "GetWeatherInformationResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
+  @WebMethod(operationName = "GetWeatherInformation", action = "http://ws.cdyne.com/WeatherWS/GetWeatherInformation")
+  public GetWeatherInformationResponse getWeatherInformation(@WebParam(partName = "parameters", name = "GetWeatherInformation",
+      targetNamespace = "http://ws.cdyne.com/WeatherWS/") GetWeatherInformation parameters);
 
-    @WebResult(name = "GetCityForecastByZIPResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
-    @WebMethod(operationName = "GetCityForecastByZIP", action = "http://ws.cdyne.com/WeatherWS/GetCityForecastByZIP")
-    public GetCityForecastByZIPResponse getCityForecastByZIP(
-        @WebParam(partName = "parameters", name = "GetCityForecastByZIP", targetNamespace = "http://ws.cdyne.com/WeatherWS/")
-        GetCityForecastByZIP parameters
-    );
+  @WebResult(name = "GetCityForecastByZIPResponse", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "parameters")
+  @WebMethod(operationName = "GetCityForecastByZIP", action = "http://ws.cdyne.com/WeatherWS/GetCityForecastByZIP")
+  public GetCityForecastByZIPResponse getCityForecastByZIP(@WebParam(partName = "parameters", name = "GetCityForecastByZIP",
+      targetNamespace = "http://ws.cdyne.com/WeatherWS/") GetCityForecastByZIP parameters);
 }

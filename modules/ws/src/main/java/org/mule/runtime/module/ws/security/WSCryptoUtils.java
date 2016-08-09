@@ -25,51 +25,47 @@ import org.apache.ws.security.components.crypto.Merlin;
 /**
  * Utility class to create objects with the required properties to configure key stores and trust stores for WS-Security.
  */
-public class WSCryptoUtils
-{
+public class WSCryptoUtils {
 
-    /**
-     * Name of the property where the crypto provider is defined.
-     */
-    private static final String WS_CRYPTO_PROVIDER_KEY = "org.apache.ws.security.crypto.provider";
+  /**
+   * Name of the property where the crypto provider is defined.
+   */
+  private static final String WS_CRYPTO_PROVIDER_KEY = "org.apache.ws.security.crypto.provider";
 
-    /**
-     * Creates a {@link java.util.Properties} object with the attributes of a key store.
-     */
-    public static Properties createKeyStoreProperties(TlsContextKeyStoreConfiguration keyStoreConfiguration)
-    {
-        Properties properties = new Properties();
-        properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
-        properties.setProperty(KEYSTORE_TYPE, keyStoreConfiguration.getType());
-        properties.setProperty(KEYSTORE_PASSWORD, keyStoreConfiguration.getPassword());
-        properties.setProperty(KEYSTORE_PRIVATE_PASSWORD, keyStoreConfiguration.getKeyPassword());
-        properties.setProperty(KEYSTORE_ALIAS, keyStoreConfiguration.getAlias());
-        properties.setProperty(KEYSTORE_FILE, keyStoreConfiguration.getPath());
-        return properties;
-    }
+  /**
+   * Creates a {@link java.util.Properties} object with the attributes of a key store.
+   */
+  public static Properties createKeyStoreProperties(TlsContextKeyStoreConfiguration keyStoreConfiguration) {
+    Properties properties = new Properties();
+    properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
+    properties.setProperty(KEYSTORE_TYPE, keyStoreConfiguration.getType());
+    properties.setProperty(KEYSTORE_PASSWORD, keyStoreConfiguration.getPassword());
+    properties.setProperty(KEYSTORE_PRIVATE_PASSWORD, keyStoreConfiguration.getKeyPassword());
+    properties.setProperty(KEYSTORE_ALIAS, keyStoreConfiguration.getAlias());
+    properties.setProperty(KEYSTORE_FILE, keyStoreConfiguration.getPath());
+    return properties;
+  }
 
-    /**
-     * Creates a {@link java.util.Properties} object with the attributes of a trust store.
-     */
-    public static Properties createTrustStoreProperties(TlsContextTrustStoreConfiguration trustStoreConfiguration)
-    {
-        Properties properties = new Properties();
-        properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
-        properties.setProperty(TRUSTSTORE_TYPE, trustStoreConfiguration.getType());
-        properties.setProperty(TRUSTSTORE_PASSWORD, trustStoreConfiguration.getPassword());
-        properties.setProperty(TRUSTSTORE_FILE, trustStoreConfiguration.getPath());
-        return properties;
-    }
+  /**
+   * Creates a {@link java.util.Properties} object with the attributes of a trust store.
+   */
+  public static Properties createTrustStoreProperties(TlsContextTrustStoreConfiguration trustStoreConfiguration) {
+    Properties properties = new Properties();
+    properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
+    properties.setProperty(TRUSTSTORE_TYPE, trustStoreConfiguration.getType());
+    properties.setProperty(TRUSTSTORE_PASSWORD, trustStoreConfiguration.getPassword());
+    properties.setProperty(TRUSTSTORE_FILE, trustStoreConfiguration.getPath());
+    return properties;
+  }
 
-    /**
-     * Creates a {@link java.util.Properties} object configured to use the default trust store.
-     */
-    public static Properties createDefaultTrustStoreProperties()
-    {
-        Properties properties = new Properties();
-        properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
-        properties.setProperty(LOAD_CA_CERTS, String.valueOf(true));
-        return properties;
-    }
+  /**
+   * Creates a {@link java.util.Properties} object configured to use the default trust store.
+   */
+  public static Properties createDefaultTrustStoreProperties() {
+    Properties properties = new Properties();
+    properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
+    properties.setProperty(LOAD_CA_CERTS, String.valueOf(true));
+    return properties;
+  }
 
 }

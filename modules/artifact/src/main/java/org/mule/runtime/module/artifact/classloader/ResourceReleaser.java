@@ -7,15 +7,15 @@
 package org.mule.runtime.module.artifact.classloader;
 
 /**
- * Implementations of this class should take care about resources that may leak memory after application undeployment.
- * Mule ensures to create an instance of this class with the same class loader that loaded the application resources
- * in order to ensure the access to them.
+ * Implementations of this class should take care about resources that may leak memory after application undeployment. Mule
+ * ensures to create an instance of this class with the same class loader that loaded the application resources in order to ensure
+ * the access to them.
  */
-public interface ResourceReleaser
-{
+public interface ResourceReleaser {
 
-    /**
-     * Attempts to release, during an {@link Artifact} undeployment, resources that were not explicitly released and could cause a memory leak.
-     */
-    void release();
+  /**
+   * Attempts to release, during an {@link Artifact} undeployment, resources that were not explicitly released and could cause a
+   * memory leak.
+   */
+  void release();
 }

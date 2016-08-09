@@ -26,62 +26,51 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  *
  * @since 4.0
  */
-public final class DefaultConfigurationProviderFactory implements ConfigurationProviderFactory
-{
+public final class DefaultConfigurationProviderFactory implements ConfigurationProviderFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> ConfigurationProvider<T> createDynamicConfigurationProvider(
-            String name,
-            RuntimeConfigurationModel configurationModel,
-            ResolverSet resolverSet,
-            ValueResolver<ConnectionProvider> connectionProviderResolver,
-            DynamicConfigPolicy dynamicConfigPolicy) throws Exception
-    {
-        configureConnectionProviderResolver(name, connectionProviderResolver);
-        return new DynamicConfigurationProvider<>(name,
-                                                  configurationModel,
-                                                  resolverSet,
-                                                  connectionProviderResolver,
-                                                  dynamicConfigPolicy.getExpirationPolicy());
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> ConfigurationProvider<T> createDynamicConfigurationProvider(String name,
+                                                                         RuntimeConfigurationModel configurationModel,
+                                                                         ResolverSet resolverSet,
+                                                                         ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                         DynamicConfigPolicy dynamicConfigPolicy)
+      throws Exception {
+    configureConnectionProviderResolver(name, connectionProviderResolver);
+    return new DynamicConfigurationProvider<>(name, configurationModel, resolverSet, connectionProviderResolver,
+                                              dynamicConfigPolicy.getExpirationPolicy());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> ConfigurationProvider<T> createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
+                                                                        ResolverSet resolverSet,
+                                                                        ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                        MuleContext muleContext)
+      throws Exception {
+    return withExtensionClassLoader(configurationModel.getExtensionModel(), () -> {
+      configureConnectionProviderResolver(name, connectionProviderResolver);
+      ConfigurationInstance<T> configuration;
+      try {
+        configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet)
+            .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
+      } catch (MuleException e) {
+        throw new ConfigurationException(createStaticMessage(String
+            .format("Could not create configuration '%s' for the '%s'", name, configurationModel.getExtensionModel().getName())),
+                                         e);
+      }
+
+      return new StaticConfigurationProvider<>(name, configurationModel, configuration);
+    });
+  }
+
+  private void configureConnectionProviderResolver(String configName, ValueResolver<ConnectionProvider> resolver) {
+    if (resolver instanceof ConnectionProviderResolver) {
+      ((ConnectionProviderResolver) resolver).setOwnerConfigName(configName);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> ConfigurationProvider<T> createStaticConfigurationProvider(
-            String name,
-            RuntimeConfigurationModel configurationModel,
-            ResolverSet resolverSet,
-            ValueResolver<ConnectionProvider> connectionProviderResolver,
-            MuleContext muleContext) throws Exception
-    {
-        return withExtensionClassLoader(configurationModel.getExtensionModel(), () -> {
-                                            configureConnectionProviderResolver(name, connectionProviderResolver);
-                                            ConfigurationInstance<T> configuration;
-                                            try
-                                            {
-                                                configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet).createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
-                                            }
-                                            catch (MuleException e)
-                                            {
-                                                throw new ConfigurationException(createStaticMessage(String.format("Could not create configuration '%s' for the '%s'",
-                                                                                                                   name, configurationModel.getExtensionModel().getName())), e);
-                                            }
-
-                                            return new StaticConfigurationProvider<>(name, configurationModel, configuration);
-                                        }
-        );
-    }
-
-    private void configureConnectionProviderResolver(String configName, ValueResolver<ConnectionProvider> resolver)
-    {
-        if (resolver instanceof ConnectionProviderResolver)
-        {
-            ((ConnectionProviderResolver) resolver).setOwnerConfigName(configName);
-        }
-    }
+  }
 }

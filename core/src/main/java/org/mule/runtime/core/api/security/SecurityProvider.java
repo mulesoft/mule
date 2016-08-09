@@ -10,14 +10,14 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 
 /**
- * <code>SecurityProvider</code> is a target security provider that actually does the work of authenticating
- * credentials and populating the Authentication object.
+ * <code>SecurityProvider</code> is a target security provider that actually does the work of authenticating credentials and
+ * populating the Authentication object.
  */
-public interface SecurityProvider extends Initialisable, NameableObject
-{
-    Authentication authenticate(Authentication authentication) throws SecurityException;
+public interface SecurityProvider extends Initialisable, NameableObject {
 
-    boolean supports(Class<?> aClass);
+  Authentication authenticate(Authentication authentication) throws SecurityException;
 
-    SecurityContext createSecurityContext(Authentication auth) throws UnknownAuthenticationTypeException;
+  boolean supports(Class<?> aClass);
+
+  SecurityContext createSecurityContext(Authentication auth) throws UnknownAuthenticationTypeException;
 }

@@ -44,156 +44,106 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequestToMuleEvent
-{
+public class HttpRequestToMuleEvent {
 
-    public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
-    {
-        final HttpRequest request = requestContext.getRequest();
-        final Collection<String> headerNames = request.getHeaderNames();
-        Map<String, Serializable> inboundProperties = new HashMap<>();
-        Map<String, Serializable> outboundProperties = new HashMap<>();
-        for (String headerName : headerNames)
-        {
-            // Content-Type was already processed
-            if (!CONTENT_TYPE.equalsIgnoreCase(headerName))
-            {
-                final Collection<String> values = request.getHeaderValues(headerName);
-                if (values.size() == 1)
-                {
-                    inboundProperties.put(headerName, values.iterator().next());
-                }
-                else
-                {
-                    inboundProperties.put(headerName, new ArrayList<>(values));
-                }
-            }
+  public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext,
+                                    final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath)
+      throws HttpRequestParsingException {
+    final HttpRequest request = requestContext.getRequest();
+    final Collection<String> headerNames = request.getHeaderNames();
+    Map<String, Serializable> inboundProperties = new HashMap<>();
+    Map<String, Serializable> outboundProperties = new HashMap<>();
+    for (String headerName : headerNames) {
+      // Content-Type was already processed
+      if (!CONTENT_TYPE.equalsIgnoreCase(headerName)) {
+        final Collection<String> values = request.getHeaderValues(headerName);
+        if (values.size() == 1) {
+          inboundProperties.put(headerName, values.iterator().next());
+        } else {
+          inboundProperties.put(headerName, new ArrayList<>(values));
         }
-
-        new HttpMessagePropertiesResolver().setMethod(request.getMethod())
-                                           .setProtocol(request.getProtocol().asString())
-                                           .setUri(request.getUri())
-                                           .setListenerPath(listenerPath)
-                                           .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
-                                           .setScheme(requestContext.getScheme())
-                                           .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
-                                           .addPropertiesTo(inboundProperties);
-
-        Object payload = null;
-
-        final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
-        if (parseRequest)
-        {
-            final HttpEntity entity = request.getEntity();
-            if (entity != null && !(entity instanceof EmptyHttpEntity))
-            {
-                if (entity instanceof MultipartHttpEntity)
-                {
-                    try
-                    {
-                        payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
-                    }
-                    catch (IOException e)
-                    {
-                        throw new HttpRequestParsingException(e.getMessage(), e);
-                    }
-                }
-                else
-                {
-                    if (mediaType != null)
-                    {
-                        if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
-                        {
-                            try
-                            {
-                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), mediaType.getCharset().get());
-                            }
-                            catch (IllegalArgumentException e)
-                            {
-                                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
-                            }
-                        }
-                        else if (entity instanceof InputStreamHttpEntity)
-                        {
-                            payload = ((InputStreamHttpEntity) entity).getInputStream();
-                        }
-                    }
-                    else if (entity instanceof InputStreamHttpEntity)
-                    {
-                        payload = ((InputStreamHttpEntity) entity).getInputStream();
-                    }
-                }
-            }
-        }
-        else
-        {
-            final InputStreamHttpEntity inputStreamEntity = request.getInputStreamEntity();
-            if (inputStreamEntity != null)
-            {
-                payload = inputStreamEntity.getInputStream();
-            }
-        }
-
-        final MuleMessage message = MuleMessage.builder()
-                                               .payload(payload)
-                                               .mediaType(mediaType)
-                                               .inboundProperties(inboundProperties)
-                                               .outboundProperties(outboundProperties)
-                                               .build();
-        return new DefaultMuleEvent(
-                message,
-                resolveUri(requestContext),
-                REQUEST_RESPONSE,
-                flowConstruct,
-                new DefaultMuleSession());
+      }
     }
 
-    private static URI resolveUri(final HttpRequestContext requestContext)
-    {
-        try
-        {
-            String hostAndPort = resolveTargetHost(requestContext.getRequest());
-            String[] hostAndPortParts = hostAndPort.split(":");
-            String host = hostAndPortParts[0];
-            int port = requestContext.getScheme().equals(HttpConstants.Protocols.HTTP) ? 80 : 4343;
-            if (hostAndPortParts.length > 1)
-            {
-                port = Integer.valueOf(hostAndPortParts[1]);
+    new HttpMessagePropertiesResolver().setMethod(request.getMethod()).setProtocol(request.getProtocol().asString())
+        .setUri(request.getUri()).setListenerPath(listenerPath).setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
+        .setScheme(requestContext.getScheme()).setClientCertificate(requestContext.getClientConnection().getClientCertificate())
+        .addPropertiesTo(inboundProperties);
+
+    Object payload = null;
+
+    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
+    if (parseRequest) {
+      final HttpEntity entity = request.getEntity();
+      if (entity != null && !(entity instanceof EmptyHttpEntity)) {
+        if (entity instanceof MultipartHttpEntity) {
+          try {
+            payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
+          } catch (IOException e) {
+            throw new HttpRequestParsingException(e.getMessage(), e);
+          }
+        } else {
+          if (mediaType != null) {
+            if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)) {
+              try {
+                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
+                                               mediaType.getCharset().get());
+              } catch (IllegalArgumentException e) {
+                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
+              }
+            } else if (entity instanceof InputStreamHttpEntity) {
+              payload = ((InputStreamHttpEntity) entity).getInputStream();
             }
-            return new URI(requestContext.getScheme(), null, host, port, requestContext.getRequest().getPath(), null, null);
+          } else if (entity instanceof InputStreamHttpEntity) {
+            payload = ((InputStreamHttpEntity) entity).getInputStream();
+          }
         }
-        catch (URISyntaxException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+      }
+    } else {
+      final InputStreamHttpEntity inputStreamEntity = request.getInputStreamEntity();
+      if (inputStreamEntity != null) {
+        payload = inputStreamEntity.getInputStream();
+      }
     }
 
-    /**
-     * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
-     * conservation</a>.
-     */
-    private static String resolveTargetHost(HttpRequest request)
-    {
-        String hostHeaderValue = request.getHeaderValueIgnoreCase(HOST);
-        if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol()))
-        {
-            return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
-        }
-        else
-        {
-            if (hostHeaderValue == null)
-            {
-                throw new IllegalArgumentException("Missing 'host' header");
-            }
-            else
-            {
-                return hostHeaderValue;
-            }
-        }
-    }
+    final MuleMessage message = MuleMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
+        .outboundProperties(outboundProperties).build();
+    return new DefaultMuleEvent(message, resolveUri(requestContext), REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
+  }
 
-    private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
-    {
-        return requestContext.getClientConnection().getRemoteHostAddress().toString();
+  private static URI resolveUri(final HttpRequestContext requestContext) {
+    try {
+      String hostAndPort = resolveTargetHost(requestContext.getRequest());
+      String[] hostAndPortParts = hostAndPort.split(":");
+      String host = hostAndPortParts[0];
+      int port = requestContext.getScheme().equals(HttpConstants.Protocols.HTTP) ? 80 : 4343;
+      if (hostAndPortParts.length > 1) {
+        port = Integer.valueOf(hostAndPortParts[1]);
+      }
+      return new URI(requestContext.getScheme(), null, host, port, requestContext.getRequest().getPath(), null, null);
+    } catch (URISyntaxException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
+
+  /**
+   * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
+   * conservation</a>.
+   */
+  private static String resolveTargetHost(HttpRequest request) {
+    String hostHeaderValue = request.getHeaderValueIgnoreCase(HOST);
+    if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol())) {
+      return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
+    } else {
+      if (hostHeaderValue == null) {
+        throw new IllegalArgumentException("Missing 'host' header");
+      } else {
+        return hostHeaderValue;
+      }
+    }
+  }
+
+  private static String resolveRemoteHostAddress(final HttpRequestContext requestContext) {
+    return requestContext.getClientConnection().getRemoteHostAddress().toString();
+  }
 }

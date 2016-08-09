@@ -21,81 +21,73 @@ import org.junit.Test;
 /**
  * Tests how sockets are bound to addresses by the TCP transport. This test is related to MULE-6584.
  */
-public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddressBindingTestCase
-{
-    public TcpSocketToAddressBindingTestCase() throws SocketException
-    {
-        super();
+public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddressBindingTestCase {
+
+  public TcpSocketToAddressBindingTestCase() throws SocketException {
+    super();
+  }
+
+  @Test
+  public void testRequestUsingLoopbackAddressAtLoopbackAddress() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
+
+    // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
+    result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort1.getNumber(), TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
+
+  @Test
+  public void testRequestUsingLocalhostAtLocalhost() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
+
+    // Request using localhost address at endpoint listening at localhost should get an appropiate response.
+    result = client.send(getTransportName() + "://localhost:" + dynamicPort2.getNumber(), TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
+
+  @Test
+  public void testRequestUsingLoopbackAddressAtAllAddresses() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
+
+    // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
+    result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort3.getNumber(), TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
+
+  @Test
+  public void testRequestNotUsingLoopbackAddressAtLoopbackAddress() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
+
+    // Iterate over local addresses.
+    for (InetAddress inetAddress : localInetAddresses) {
+      // Request not using loopback address to endpoint listening at 127.0.0.1 should timeout.
+      try {
+        result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort1.getNumber(),
+                             TEST_MESSAGE, null);
+        assertNull(result);
+      } catch (DispatchException ex) {
+        ex.printStackTrace();
+      }
     }
+  }
 
-    @Test
-    public void testRequestUsingLoopbackAddressAtLoopbackAddress() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
+  @Test
+  public void testRequestNotUsingLoopbackAddressAtAllAddresses() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
 
-        // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
-        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+    // Iterate over local addresses.
+    for (InetAddress inetAddress : localInetAddresses) {
+      /*
+       * Request not using loopback address to endpoint listening at all local addresses should get an appropriate response.
+       */
+      result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort3.getNumber(),
+                           getTestMuleMessage(TEST_MESSAGE));
+      assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
-
-    @Test
-    public void testRequestUsingLocalhostAtLocalhost() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
-
-        // Request using localhost address at endpoint listening at localhost should get an appropiate response.
-        result = client.send(getTransportName()+"://localhost:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
-
-    @Test
-    public void testRequestUsingLoopbackAddressAtAllAddresses() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
-
-        // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
-        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
-
-    @Test
-    public void testRequestNotUsingLoopbackAddressAtLoopbackAddress() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
-
-        // Iterate over local addresses.
-        for (InetAddress inetAddress : localInetAddresses)
-        {
-            // Request not using loopback address to endpoint listening at 127.0.0.1 should timeout.
-            try
-            {
-                result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
-                assertNull(result);
-            }
-            catch (DispatchException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    @Test
-    public void testRequestNotUsingLoopbackAddressAtAllAddresses() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
-
-        // Iterate over local addresses.
-        for (InetAddress inetAddress : localInetAddresses)
-        {
-            /* Request not using loopback address to endpoint listening at all local addresses should get an
-             * appropriate response. */
-            result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), getTestMuleMessage(TEST_MESSAGE));
-            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-        }
-    }
+  }
 }

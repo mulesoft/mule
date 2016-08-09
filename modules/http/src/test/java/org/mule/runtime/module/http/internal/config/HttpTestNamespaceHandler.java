@@ -10,17 +10,16 @@ import org.mule.runtime.module.http.internal.HttpParamType;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
 
 /**
- * Namespace handler for functional tests of this module. It adds the bean definition parser for the header element
- * which is otherwise added by the HttpNamespaceHandler form the HTTP transport (outside tests).
+ * Namespace handler for functional tests of this module. It adds the bean definition parser for the header element which is
+ * otherwise added by the HttpNamespaceHandler form the HTTP transport (outside tests).
  */
-public class HttpTestNamespaceHandler extends HttpNamespaceHandler
-{
+public class HttpTestNamespaceHandler extends HttpNamespaceHandler {
 
-    public void init()
-    {
-        registerBeanDefinitionParser("header", new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.HEADER));
-        registerBeanDefinitionParser("response-builder", new HttpResponseBuilderDefinitionParser("responseBuilder"));
-        registerBeanDefinitionParser("error-response-builder", new HttpResponseBuilderDefinitionParser("errorResponseBuilder"));
-        super.init();
-    }
+  public void init() {
+    registerBeanDefinitionParser("header",
+                                 new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.HEADER));
+    registerBeanDefinitionParser("response-builder", new HttpResponseBuilderDefinitionParser("responseBuilder"));
+    registerBeanDefinitionParser("error-response-builder", new HttpResponseBuilderDefinitionParser("errorResponseBuilder"));
+    super.init();
+  }
 }

@@ -23,28 +23,21 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement
-{
+public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement {
 
-    public ExtensionTypeWrapper(Class<T> aClass)
-    {
-        super(aClass);
-    }
+  public ExtensionTypeWrapper(Class<T> aClass) {
+    super(aClass);
+  }
 
-    /**
-     * @return A list {@link ConfigurationElement} of declared configurations
-     */
-    public List<ConfigurationElement> getConfigurations()
-    {
-        final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
-        if (optionalConfigurations.isPresent())
-        {
-            final Configurations configurations = optionalConfigurations.get();
-            return Stream
-                    .of(configurations.value())
-                    .map(ConfigurationWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
+  /**
+   * @return A list {@link ConfigurationElement} of declared configurations
+   */
+  public List<ConfigurationElement> getConfigurations() {
+    final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
+    if (optionalConfigurations.isPresent()) {
+      final Configurations configurations = optionalConfigurations.get();
+      return Stream.of(configurations.value()).map(ConfigurationWrapper::new).collect(toList());
     }
+    return emptyList();
+  }
 }

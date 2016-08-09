@@ -15,31 +15,26 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 3.7.0
  */
-public class BootstrapObjectFactoryBean implements FactoryBean<Object>
-{
+public class BootstrapObjectFactoryBean implements FactoryBean<Object> {
 
-    private final Object object;
+  private final Object object;
 
-    public BootstrapObjectFactoryBean(BootstrapObjectFactory factory)
-    {
-        object = factory.create();
-    }
+  public BootstrapObjectFactoryBean(BootstrapObjectFactory factory) {
+    object = factory.create();
+  }
 
-    @Override
-    public Object getObject() throws Exception
-    {
-        return object;
-    }
+  @Override
+  public Object getObject() throws Exception {
+    return object;
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return object.getClass();
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return object.getClass();
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 }

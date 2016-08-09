@@ -38,73 +38,69 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestCase
-{
+public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
-    private static final String DOMAIN_NAME = "test-domain";
-    private static final String APP_NAME = "test-app";
+  private static final String DOMAIN_NAME = "test-domain";
+  private static final String APP_NAME = "test-app";
 
-    @Rule
-    public TemporaryFolder tempMuleHome = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder tempMuleHome = new TemporaryFolder();
 
-    private String previousMuleHome;
-    private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
-    private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    private URL classesFolderUrl;
-    private URL appLibraryUrl;
-    private URL perAppLibraryUrl;
+  private String previousMuleHome;
+  private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
+  private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+  private URL classesFolderUrl;
+  private URL appLibraryUrl;
+  private URL perAppLibraryUrl;
 
-    @Before
-    public void createAppClassLoader() throws IOException
-    {
-        // Creates folder structure
-        previousMuleHome = setProperty(MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
+  @Before
+  public void createAppClassLoader() throws IOException {
+    // Creates folder structure
+    previousMuleHome = setProperty(MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
 
-        // Add jar file on application's lib folder
-        File libDir = getAppLibFolder(APP_NAME);
-        assertThat(libDir.mkdirs(), is(true));
-        final File appLibrary = new File(libDir, "appLibrary.jar");
-        stringToFile(appLibrary.getAbsolutePath(), "Some text");
+    // Add jar file on application's lib folder
+    File libDir = getAppLibFolder(APP_NAME);
+    assertThat(libDir.mkdirs(), is(true));
+    final File appLibrary = new File(libDir, "appLibrary.jar");
+    stringToFile(appLibrary.getAbsolutePath(), "Some text");
 
-        // Add jar file on container's per-app folder
-        File perAppLibFolder = getMulePerAppLibFolder();
-        assertThat(perAppLibFolder.mkdirs(), is(true));
-        final File perAppLibrary = new File(perAppLibFolder, "perAppLibrary.jar");
-        stringToFile(perAppLibrary.getAbsolutePath(), "Some text");
+    // Add jar file on container's per-app folder
+    File perAppLibFolder = getMulePerAppLibFolder();
+    assertThat(perAppLibFolder.mkdirs(), is(true));
+    final File perAppLibrary = new File(perAppLibFolder, "perAppLibrary.jar");
+    stringToFile(perAppLibrary.getAbsolutePath(), "Some text");
 
-        when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
-        when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+    when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
+    when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
 
-        classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
-        appLibraryUrl = appLibrary.toURI().toURL();
-        perAppLibraryUrl = perAppLibrary.toURI().toURL();
+    classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
+    appLibraryUrl = appLibrary.toURI().toURL();
+    perAppLibraryUrl = perAppLibrary.toURI().toURL();
+  }
+
+  @After
+  public void cleanUp() {
+    if (previousMuleHome != null) {
+      setProperty(MULE_HOME_DIRECTORY_PROPERTY, previousMuleHome);
     }
+    FileUtils.deleteTree(tempMuleHome.getRoot());
+  }
 
-    @After
-    public void cleanUp()
-    {
-        if (previousMuleHome != null)
-        {
-            setProperty(MULE_HOME_DIRECTORY_PROPERTY, previousMuleHome);
-        }
-        FileUtils.deleteTree(tempMuleHome.getRoot());
-    }
+  @Test
+  public void createsClassLoader() throws Exception {
+    final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
 
-    @Test
-    public void createsClassLoader() throws Exception
-    {
-        final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
+    MuleApplicationClassLoaderFactory classLoaderFactory = new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
 
-        MuleApplicationClassLoaderFactory classLoaderFactory = new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
+    final ApplicationDescriptor descriptor = new ApplicationDescriptor();
+    descriptor.setName(APP_NAME);
+    descriptor.setDomain(DOMAIN_NAME);
 
-        final ApplicationDescriptor descriptor = new ApplicationDescriptor();
-        descriptor.setName(APP_NAME);
-        descriptor.setDomain(DOMAIN_NAME);
+    final MuleApplicationClassLoader artifactClassLoader =
+        (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor, emptyList());
 
-        final MuleApplicationClassLoader artifactClassLoader = (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor, emptyList());
-
-        verify(nativeLibraryFinderFactory).create(APP_NAME);
-        assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
-        assertThat(artifactClassLoader.getURLs(), arrayContaining(classesFolderUrl, appLibraryUrl, perAppLibraryUrl));
-    }
+    verify(nativeLibraryFinderFactory).create(APP_NAME);
+    assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
+    assertThat(artifactClassLoader.getURLs(), arrayContaining(classesFolderUrl, appLibraryUrl, perAppLibraryUrl));
+  }
 }

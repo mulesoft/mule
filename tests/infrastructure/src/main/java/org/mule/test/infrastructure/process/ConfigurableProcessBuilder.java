@@ -6,9 +6,8 @@
  */
 package org.mule.test.infrastructure.process;
 
-public interface ConfigurableProcessBuilder
-{
+public interface ConfigurableProcessBuilder {
 
-    ConfigurableProcessBuilder addConfigurationAttribute(String propertyName, String propertyValue);
+  ConfigurableProcessBuilder addConfigurationAttribute(String propertyName, String propertyValue);
 
 }

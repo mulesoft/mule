@@ -14,34 +14,30 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 
-public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection>
-{
+public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection> {
 
-    public static final String SAUL_OFFICE_NUMBER = "505-503-4455";
+  public static final String SAUL_OFFICE_NUMBER = "505-503-4455";
 
-    @Parameter
-    @Optional(defaultValue = SAUL_OFFICE_NUMBER)
-    private String saulPhoneNumber;
+  @Parameter
+  @Optional(defaultValue = SAUL_OFFICE_NUMBER)
+  private String saulPhoneNumber;
 
-    @Parameter
-    @Optional
-    private TlsContextFactory tlsContextFactory;
+  @Parameter
+  @Optional
+  private TlsContextFactory tlsContextFactory;
 
-    @Override
-    public HeisenbergConnection connect() throws ConnectionException
-    {
-        return new HeisenbergConnection(saulPhoneNumber);
-    }
+  @Override
+  public HeisenbergConnection connect() throws ConnectionException {
+    return new HeisenbergConnection(saulPhoneNumber);
+  }
 
-    @Override
-    public void disconnect(HeisenbergConnection heisenbergConnection)
-    {
+  @Override
+  public void disconnect(HeisenbergConnection heisenbergConnection) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(HeisenbergConnection heisenbergConnection)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(HeisenbergConnection heisenbergConnection) {
+    return ConnectionValidationResult.success();
+  }
 }

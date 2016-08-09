@@ -9,13 +9,12 @@ package org.mule.runtime.core.api.processor;
 /**
  * Identifies Constructs that contain Message Processors configured by the user.
  */
-public interface MessageProcessorContainer
-{
+public interface MessageProcessorContainer {
 
-    /**
-     * Add the child nodes to the path element tree.
-     *
-     * @param pathElement
-     */
-    void addMessageProcessorPathElements(MessageProcessorPathElement pathElement);
+  /**
+   * Add the child nodes to the path element tree.
+   *
+   * @param pathElement
+   */
+  void addMessageProcessorPathElements(MessageProcessorPathElement pathElement);
 }

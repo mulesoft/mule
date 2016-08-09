@@ -14,48 +14,41 @@ package org.mule.runtime.core.retry;
  * <li>exhausted: The policy has run through the actions for the policy</li>
  * </ul>
  *
- * For example, a RetryPolicy may have a RetryCount - how many times the policy can be invoked.
- * Once the retryCount has been reached, the policy is exhausted and cannot be used again.
+ * For example, a RetryPolicy may have a RetryCount - how many times the policy can be invoked. Once the retryCount has been
+ * reached, the policy is exhausted and cannot be used again.
  */
-public class PolicyStatus
-{
-    private boolean exhausted = false;
-    private boolean ok = false;
-    private Throwable throwable;
+public class PolicyStatus {
 
-    public static PolicyStatus policyExhausted(Throwable t)
-    {
-        return new PolicyStatus(true, t);
-    }
+  private boolean exhausted = false;
+  private boolean ok = false;
+  private Throwable throwable;
 
-    public static PolicyStatus policyOk()
-    {
-        return new PolicyStatus();
-    }
+  public static PolicyStatus policyExhausted(Throwable t) {
+    return new PolicyStatus(true, t);
+  }
 
-    protected PolicyStatus()
-    {
-        this.ok = true;
-    }
+  public static PolicyStatus policyOk() {
+    return new PolicyStatus();
+  }
 
-    protected PolicyStatus(boolean exhausted, Throwable throwable)
-    {
-        this.exhausted = exhausted;
-        this.throwable = throwable;
-    }
+  protected PolicyStatus() {
+    this.ok = true;
+  }
 
-    public boolean isExhausted()
-    {
-        return exhausted;
-    }
+  protected PolicyStatus(boolean exhausted, Throwable throwable) {
+    this.exhausted = exhausted;
+    this.throwable = throwable;
+  }
 
-    public boolean isOk()
-    {
-        return ok;
-    }
+  public boolean isExhausted() {
+    return exhausted;
+  }
 
-    public Throwable getThrowable()
-    {
-        return throwable;
-    }
+  public boolean isOk() {
+    return ok;
+  }
+
+  public Throwable getThrowable() {
+    return throwable;
+  }
 }

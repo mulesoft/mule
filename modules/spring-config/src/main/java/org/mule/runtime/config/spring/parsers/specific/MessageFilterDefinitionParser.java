@@ -14,33 +14,29 @@ import org.mule.runtime.core.routing.MessageFilter;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class MessageFilterDefinitionParser extends MessageProcessorDefinitionParser implements PostProcessor
-{
-    private static final String ATTRIBUTE_UNACCEPTED = "onUnaccepted";
+public class MessageFilterDefinitionParser extends MessageProcessorDefinitionParser implements PostProcessor {
 
-    public MessageFilterDefinitionParser()
-    {
-        super(MessageFilter.class);
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addIgnored(ATTRIBUTE_UNACCEPTED);
-        registerPostProcessor(this);
-    }
+  private static final String ATTRIBUTE_UNACCEPTED = "onUnaccepted";
 
-    public MessageFilterDefinitionParser(Class<?> filterClass)
-    {
-        super(filterClass);
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addIgnored(ATTRIBUTE_UNACCEPTED);
-        registerPostProcessor(this);
-    }
+  public MessageFilterDefinitionParser() {
+    super(MessageFilter.class);
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addIgnored(ATTRIBUTE_UNACCEPTED);
+    registerPostProcessor(this);
+  }
 
-    
-    public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-    {
-        String onUnaccepted = element.getAttribute(ATTRIBUTE_UNACCEPTED);
-        if (onUnaccepted != null)
-        {
-            assembler.extendBean("unacceptedMessageProcessor", onUnaccepted, true);
-        }
+  public MessageFilterDefinitionParser(Class<?> filterClass) {
+    super(filterClass);
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addIgnored(ATTRIBUTE_UNACCEPTED);
+    registerPostProcessor(this);
+  }
+
+
+  public void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    String onUnaccepted = element.getAttribute(ATTRIBUTE_UNACCEPTED);
+    if (onUnaccepted != null) {
+      assembler.extendBean("unacceptedMessageProcessor", onUnaccepted, true);
     }
+  }
 }

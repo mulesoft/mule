@@ -11,40 +11,32 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-public class QueueOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter, MuleContextAware
-{
+public class QueueOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter, MuleContextAware {
 
-    private int numberOfMessagesArrived;
-    private MuleClient muleClient;
+  private int numberOfMessagesArrived;
+  private MuleClient muleClient;
 
-    @Override
-    public int numberOfMessagesThatArrived() throws Exception
-    {
-        MuleMessage muleMessage;
-        while (true)
-        {
-            muleMessage = muleClient.request("outboundRequester", 100);
-            if (muleMessage != null)
-            {
-                numberOfMessagesArrived++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return numberOfMessagesArrived;
+  @Override
+  public int numberOfMessagesThatArrived() throws Exception {
+    MuleMessage muleMessage;
+    while (true) {
+      muleMessage = muleClient.request("outboundRequester", 100);
+      if (muleMessage != null) {
+        numberOfMessagesArrived++;
+      } else {
+        break;
+      }
     }
+    return numberOfMessagesArrived;
+  }
 
-    @Override
-    public void close()
-    {
-        numberOfMessagesArrived = 0;
-    }
+  @Override
+  public void close() {
+    numberOfMessagesArrived = 0;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleClient = context.getClient();
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleClient = context.getClient();
+  }
 }

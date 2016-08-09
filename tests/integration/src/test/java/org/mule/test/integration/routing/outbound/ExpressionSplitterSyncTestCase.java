@@ -21,27 +21,24 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ExpressionSplitterSyncTestCase extends AbstractIntegrationTestCase
-{
+public class ExpressionSplitterSyncTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return  "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-flow.xml";
+  }
 
-    @Test
-    public void testRecipientList() throws Exception
-    {
-        FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
-        fruitBowl.addFruit(new Orange());
+  @Test
+  public void testRecipientList() throws Exception {
+    FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
+    fruitBowl.addFruit(new Orange());
 
-        MuleMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
+    MuleMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof List);
-        assertEquals(3, ((List) result.getPayload()).size());
+    assertNotNull(result);
+    assertTrue(result.getPayload() instanceof List);
+    assertEquals(3, ((List) result.getPayload()).size());
 
-        FlowAssert.verify();
-    }
+    FlowAssert.verify();
+  }
 }

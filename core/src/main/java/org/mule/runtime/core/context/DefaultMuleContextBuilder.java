@@ -68,332 +68,255 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext}
- * as the default {@link MuleContext} implementation and builds it with defaults
- * values for {@link MuleConfiguration}, {@link LifecycleManager}, {@link WorkManager}, 
+ * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext} as the default {@link MuleContext}
+ * implementation and builds it with defaults values for {@link MuleConfiguration}, {@link LifecycleManager}, {@link WorkManager},
  * {@link WorkListener} and {@link ServerNotificationManager}.
  */
-public class DefaultMuleContextBuilder implements MuleContextBuilder
-{
+public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
-    public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
+  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
+  public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
 
-    protected MuleConfiguration config;
+  protected MuleConfiguration config;
 
-    protected MuleContextLifecycleManager lifecycleManager;
+  protected MuleContextLifecycleManager lifecycleManager;
 
-    protected WorkManager workManager;
+  protected WorkManager workManager;
 
-    protected WorkListener workListener;
+  protected WorkListener workListener;
 
-    protected ServerNotificationManager notificationManager;
+  protected ServerNotificationManager notificationManager;
 
-    protected SplashScreen startupScreen;
+  protected SplashScreen startupScreen;
 
-    protected SplashScreen shutdownScreen;
+  protected SplashScreen shutdownScreen;
 
-    protected BootstrapServiceDiscoverer bootstrapDiscoverer;
+  protected BootstrapServiceDiscoverer bootstrapDiscoverer;
 
-    protected ClassLoader executionClassLoader;
+  protected ClassLoader executionClassLoader;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MuleContext buildMuleContext()
-    {
-        logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
-        DefaultMuleContext muleContext = createDefaultMuleContext();
-        muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
-        muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
-        muleContext.setworkListener(getWorkListener());
-        muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
-        muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
-        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MuleContext buildMuleContext() {
+    logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
+    DefaultMuleContext muleContext = createDefaultMuleContext();
+    muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
+    muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
+    muleContext.setworkListener(getWorkListener());
+    muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
+    muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
+    muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
 
-        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
-        muleContext.setRegistryBroker(registryBroker);
-        MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
-        muleContext.setMuleRegistry(muleRegistry);
-        muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
+    DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
+    muleContext.setRegistryBroker(registryBroker);
+    MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
+    muleContext.setMuleRegistry(muleRegistry);
+    muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
 
-        muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
-        muleContext.setExceptionListener(createExceptionListener(muleContext));
-        muleContext.setExecutionClassLoader(getExecutionClassLoader());
-        muleContext.setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
+    muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
+    muleContext.setExceptionListener(createExceptionListener(muleContext));
+    muleContext.setExecutionClassLoader(getExecutionClassLoader());
+    muleContext
+        .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
-        JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
-        defaultObjectSerializer.setMuleContext(muleContext);
-        muleContext.setObjectSerializer(defaultObjectSerializer);
+    JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
+    defaultObjectSerializer.setMuleContext(muleContext);
+    muleContext.setObjectSerializer(defaultObjectSerializer);
 
-        return muleContext;
+    return muleContext;
+  }
+
+  protected SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext) {
+    SystemExceptionHandler systemExceptionHandler = muleContext.getRegistry().get("_exceptionListenerFactory");
+    if (systemExceptionHandler == null) {
+      systemExceptionHandler = new DefaultSystemExceptionStrategy();
+    }
+    return systemExceptionHandler;
+  }
+
+  protected DefaultMuleContext createDefaultMuleContext() {
+    return new DefaultMuleContext();
+  }
+
+  @Override
+  public void setMuleConfiguration(MuleConfiguration config) {
+    this.config = config;
+  }
+
+  @Override
+  public void setWorkManager(WorkManager workManager) {
+    this.workManager = workManager;
+  }
+
+  @Override
+  public void setWorkListener(WorkListener workListener) {
+    this.workListener = workListener;
+  }
+
+  @Override
+  public void setNotificationManager(ServerNotificationManager notificationManager) {
+    this.notificationManager = notificationManager;
+  }
+
+  protected MuleConfiguration getMuleConfiguration() {
+    if (config != null) {
+      return config;
+    } else {
+      return createMuleConfiguration();
+    }
+  }
+
+  @Override
+  public void setExecutionClassLoader(ClassLoader executionClassLoader) {
+    this.executionClassLoader = executionClassLoader;
+  }
+
+  protected ClassLoader getExecutionClassLoader() {
+    if (executionClassLoader != null) {
+      return executionClassLoader;
+    } else {
+      return Thread.currentThread().getContextClassLoader();
+    }
+  }
+
+  public <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {
+    if (object instanceof MuleContextAware) {
+      ((MuleContextAware) object).setMuleContext(muleContext);
+    }
+    return object;
+  }
+
+  protected MuleContextLifecycleManager getLifecycleManager() {
+    if (lifecycleManager != null) {
+      return lifecycleManager;
+    } else {
+      return createLifecycleManager();
+    }
+  }
+
+  @Override
+  public void setLifecycleManager(LifecycleManager manager) {
+    if (!(manager instanceof MuleContextLifecycleManager)) {
+      Message msg = MessageFactory.createStaticMessage("lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
+      throw new MuleRuntimeException(msg);
     }
 
-    protected SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext)
-    {
-        SystemExceptionHandler systemExceptionHandler = muleContext.getRegistry().get("_exceptionListenerFactory");
-        if (systemExceptionHandler == null)
-        {
-            systemExceptionHandler = new DefaultSystemExceptionStrategy();
-        }
-        return systemExceptionHandler;
-    }
+    lifecycleManager = (MuleContextLifecycleManager) manager;
+  }
 
-    protected DefaultMuleContext createDefaultMuleContext()
-    {
-        return new DefaultMuleContext();
+  protected WorkManager getWorkManager() {
+    if (workManager != null) {
+      return workManager;
+    } else {
+      return createWorkManager();
     }
+  }
 
-    @Override
-    public void setMuleConfiguration(MuleConfiguration config)
-    {
-        this.config = config;
+  protected WorkListener getWorkListener() {
+    if (workListener != null) {
+      return workListener;
+    } else {
+      return createWorkListener();
     }
+  }
 
-    @Override
-    public void setWorkManager(WorkManager workManager)
-    {
-        this.workManager = workManager;
+  protected ServerNotificationManager getNotificationManager() {
+    if (notificationManager != null) {
+      return notificationManager;
+    } else {
+      return createNotificationManager();
     }
+  }
 
-    @Override
-    public void setWorkListener(WorkListener workListener)
-    {
-        this.workListener = workListener;
+  public SplashScreen getStartupScreen() {
+    return startupScreen;
+  }
+
+  public void setStartupScreen(SplashScreen startupScreen) {
+    this.startupScreen = startupScreen;
+  }
+
+  public SplashScreen getShutdownScreen() {
+    return shutdownScreen;
+  }
+
+  public void setShutdownScreen(SplashScreen shutdownScreen) {
+    this.shutdownScreen = shutdownScreen;
+  }
+
+  public void setBootstrapPropertiesServiceDiscoverer(BootstrapServiceDiscoverer bootstrapDiscoverer) {
+    this.bootstrapDiscoverer = bootstrapDiscoverer;
+  }
+
+  public BootstrapServiceDiscoverer getBootstrapPropertiesServiceDiscoverer() {
+    if (bootstrapDiscoverer != null) {
+      return bootstrapDiscoverer;
+    } else {
+      return createBootstrapDiscoverer();
     }
+  }
 
-    @Override
-    public void setNotificationManager(ServerNotificationManager notificationManager)
-    {
-        this.notificationManager = notificationManager;
-    }
+  protected BootstrapServiceDiscoverer createBootstrapDiscoverer() {
+    return new PropertiesBootstrapServiceDiscoverer(Thread.currentThread().getContextClassLoader());
+  }
 
-    protected MuleConfiguration getMuleConfiguration()
-    {
-        if (config != null)
-        {
-            return config;
-        }
-        else
-        {
-            return createMuleConfiguration();
-        }
-    }
+  protected DefaultMuleConfiguration createMuleConfiguration() {
+    return new DefaultMuleConfiguration();
+  }
 
-    @Override
-    public void setExecutionClassLoader(ClassLoader executionClassLoader)
-    {
-        this.executionClassLoader = executionClassLoader;
-    }
+  protected MuleContextLifecycleManager createLifecycleManager() {
+    return new MuleContextLifecycleManager();
+  }
 
-    protected ClassLoader getExecutionClassLoader()
-    {
-        if (executionClassLoader != null)
-        {
-            return executionClassLoader;
-        }
-        else
-        {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
+  protected MuleWorkManager createWorkManager() {
+    final MuleConfiguration config = getMuleConfiguration();
+    // still can be embedded, but in container mode, e.g. in a WAR
+    final String threadPrefix = config.isContainerMode() ? String.format("[%s].Mule", config.getId()) : "MuleServer";
+    ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
+    return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
+  }
 
-    public <T> T injectMuleContextIfRequired(T object, MuleContext muleContext)
-    {
-        if (object instanceof MuleContextAware)
-        {
-            ((MuleContextAware) object).setMuleContext(muleContext);
-        }
-        return object;
-    }
+  protected ImmutableThreadingProfile createMuleWorkManager() {
+    return new ImmutableThreadingProfile(Integer.valueOf(System
+        .getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
+                                         ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
+                                         ThreadingProfile.DEFAULT_MAX_THREAD_TTL, ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
+                                         ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, ThreadingProfile.DEFAULT_DO_THREADING,
+                                         null, null);
+  }
 
-    protected MuleContextLifecycleManager getLifecycleManager()
-    {
-        if (lifecycleManager != null)
-        {
-            return lifecycleManager;
-        }
-        else
-        {
-            return createLifecycleManager();
-        }
-    }
+  protected DefaultWorkListener createWorkListener() {
+    return new DefaultWorkListener();
+  }
 
-    @Override
-    public void setLifecycleManager(LifecycleManager manager)
-    {
-        if (!(manager instanceof MuleContextLifecycleManager))
-        {
-            Message msg = MessageFactory.createStaticMessage(
-                    "lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
-            throw new MuleRuntimeException(msg);
-        }
+  protected ServerNotificationManager createNotificationManager() {
+    return createDefaultNotificationManager();
+  }
 
-        lifecycleManager = (MuleContextLifecycleManager) manager;
-    }
+  public static ServerNotificationManager createDefaultNotificationManager() {
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.addInterfaceToType(MuleContextNotificationListener.class, MuleContextNotification.class);
+    manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
+    manager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+    manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+    manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
+    manager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
+    manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
+    manager.addInterfaceToType(ExceptionStrategyNotificationListener.class, ExceptionStrategyNotification.class);
+    manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
+    manager.addInterfaceToType(PipelineMessageNotificationListener.class, PipelineMessageNotification.class);
+    manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);
+    manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
+    return manager;
+  }
 
-    protected WorkManager getWorkManager()
-    {
-        if (workManager != null)
-        {
-            return workManager;
-        }
-        else
-        {
-            return createWorkManager();
-        }
-    }
-
-    protected WorkListener getWorkListener()
-    {
-        if (workListener != null)
-        {
-            return workListener;
-        }
-        else
-        {
-            return createWorkListener();
-        }
-    }
-
-    protected ServerNotificationManager getNotificationManager()
-    {
-        if (notificationManager != null)
-        {
-            return notificationManager;
-        }
-        else
-        {
-            return createNotificationManager();
-        }
-    }
-
-    public SplashScreen getStartupScreen()
-    {
-        return startupScreen;
-    }
-
-    public void setStartupScreen(SplashScreen startupScreen)
-    {
-        this.startupScreen = startupScreen;
-    }
-
-    public SplashScreen getShutdownScreen()
-    {
-        return shutdownScreen;
-    }
-
-    public void setShutdownScreen(SplashScreen shutdownScreen)
-    {
-        this.shutdownScreen = shutdownScreen;
-    }
-
-    public void setBootstrapPropertiesServiceDiscoverer(BootstrapServiceDiscoverer bootstrapDiscoverer)
-    {
-        this.bootstrapDiscoverer = bootstrapDiscoverer;
-    }
-
-    public BootstrapServiceDiscoverer getBootstrapPropertiesServiceDiscoverer()
-    {
-        if (bootstrapDiscoverer != null)
-        {
-            return bootstrapDiscoverer;
-        }
-        else
-        {
-            return createBootstrapDiscoverer();
-        }
-    }
-
-    protected BootstrapServiceDiscoverer createBootstrapDiscoverer()
-    {
-        return new PropertiesBootstrapServiceDiscoverer(Thread.currentThread().getContextClassLoader());
-    }
-
-    protected DefaultMuleConfiguration createMuleConfiguration()
-    {
-        return new DefaultMuleConfiguration();
-    }
-
-    protected MuleContextLifecycleManager createLifecycleManager()
-    {
-        return new MuleContextLifecycleManager();
-    }
-
-    protected MuleWorkManager createWorkManager()
-    {
-        final MuleConfiguration config = getMuleConfiguration();
-        // still can be embedded, but in container mode, e.g. in a WAR
-        final String threadPrefix = config.isContainerMode()
-                                    ? String.format("[%s].Mule", config.getId())
-                                    : "MuleServer";
-        ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
-        return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
-    }
-
-    protected ImmutableThreadingProfile createMuleWorkManager()
-    {
-        return new ImmutableThreadingProfile(
-                Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
-                ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
-                ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
-                ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
-                ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
-                ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
-                ThreadingProfile.DEFAULT_DO_THREADING,
-                null,
-                null
-        );
-    }
-
-    protected DefaultWorkListener createWorkListener()
-    {
-        return new DefaultWorkListener();
-    }
-
-    protected ServerNotificationManager createNotificationManager()
-    {
-        return createDefaultNotificationManager();
-    }
-
-    public static ServerNotificationManager createDefaultNotificationManager()
-    {
-        ServerNotificationManager manager = new ServerNotificationManager();
-        manager.addInterfaceToType(MuleContextNotificationListener.class,
-                                   MuleContextNotification.class);
-        manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
-        manager.addInterfaceToType(SecurityNotificationListener.class,
-                                   SecurityNotification.class);
-        manager.addInterfaceToType(ManagementNotificationListener.class,
-                                   ManagementNotification.class);
-        manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-        manager.addInterfaceToType(ConnectionNotificationListener.class,
-                                   ConnectionNotification.class);
-        manager.addInterfaceToType(RegistryNotificationListener.class,
-                                   RegistryNotification.class);
-        manager.addInterfaceToType(ExceptionNotificationListener.class,
-                                   ExceptionNotification.class);
-        manager.addInterfaceToType(ExceptionStrategyNotificationListener.class,
-                                   ExceptionStrategyNotification.class);
-        manager.addInterfaceToType(TransactionNotificationListener.class,
-                                   TransactionNotification.class);
-        manager.addInterfaceToType(PipelineMessageNotificationListener.class,
-                                   PipelineMessageNotification.class);
-        manager.addInterfaceToType(AsyncMessageNotificationListener.class,
-                                   AsyncMessageNotification.class);
-        manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
-        return manager;
-    }
-
-    @Override
-    public String toString()
-    {
-        return ClassUtils.getClassName(getClass()) +
-               "{muleConfiguration=" + config +
-               ", lifecycleManager=" + lifecycleManager +
-               ", workManager=" + workManager +
-               ", workListener=" + workListener +
-               ", notificationManager=" + notificationManager + "}";
-    }
+  @Override
+  public String toString() {
+    return ClassUtils.getClassName(getClass()) + "{muleConfiguration=" + config + ", lifecycleManager=" + lifecycleManager
+        + ", workManager=" + workManager + ", workListener=" + workListener + ", notificationManager=" + notificationManager
+        + "}";
+  }
 }

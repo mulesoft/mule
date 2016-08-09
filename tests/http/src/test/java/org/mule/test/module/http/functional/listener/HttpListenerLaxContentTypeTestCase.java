@@ -27,55 +27,47 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-lax-content-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-lax-content-type-config.xml";
+  }
 
-    @Test
-    public void ignoresInvalidContentTypeWithoutBody() throws Exception
-    {
-        Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
-        testIgnoreInvalidContentType(request, "{ \"key1\" : \"value, \"key2\" : 2 }");
-    }
+  @Test
+  public void ignoresInvalidContentTypeWithoutBody() throws Exception {
+    Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
+    testIgnoreInvalidContentType(request, "{ \"key1\" : \"value, \"key2\" : 2 }");
+  }
 
-    @Test
-    public void returnsInvalidContentTypeInResponse() throws Exception
-    {
-        HttpResponse response = Request.Post(getUrlForInvalid()).execute().returnResponse();
-        assertInvalidContentTypeHeader(response);
-    }
+  @Test
+  public void returnsInvalidContentTypeInResponse() throws Exception {
+    HttpResponse response = Request.Post(getUrlForInvalid()).execute().returnResponse();
+    assertInvalidContentTypeHeader(response);
+  }
 
-    private void testIgnoreInvalidContentType(Request request, String expectedMessage) throws IOException
-    {
-        HttpResponse response = request.execute().returnResponse();
-        StatusLine statusLine = response.getStatusLine();
+  private void testIgnoreInvalidContentType(Request request, String expectedMessage) throws IOException {
+    HttpResponse response = request.execute().returnResponse();
+    StatusLine statusLine = response.getStatusLine();
 
-        assertThat(IOUtils.toString(response.getEntity().getContent()), containsString(expectedMessage));
-        assertThat(statusLine.getStatusCode(), is(OK.getStatusCode()));
-    }
+    assertThat(IOUtils.toString(response.getEntity().getContent()), containsString(expectedMessage));
+    assertThat(statusLine.getStatusCode(), is(OK.getStatusCode()));
+  }
 
-    private String getUrl()
-    {
-        return String.format("http://localhost:%s/testInput", httpPort.getValue());
-    }
+  private String getUrl() {
+    return String.format("http://localhost:%s/testInput", httpPort.getValue());
+  }
 
-    private String getUrlForInvalid()
-    {
-        return String.format("http://localhost:%s/testInputInvalid", httpPort.getValue());
-    }
+  private String getUrlForInvalid() {
+    return String.format("http://localhost:%s/testInputInvalid", httpPort.getValue());
+  }
 
-    private void assertInvalidContentTypeHeader(HttpResponse response)
-    {
-        Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
-        assertThat(contentTypeHeader, is(notNullValue()));
-        assertThat(contentTypeHeader.getValue(), is("invalidMimeType"));
-    }
+  private void assertInvalidContentTypeHeader(HttpResponse response) {
+    Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
+    assertThat(contentTypeHeader, is(notNullValue()));
+    assertThat(contentTypeHeader.getValue(), is("invalidMimeType"));
+  }
 }

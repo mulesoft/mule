@@ -13,30 +13,27 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
 public abstract class AbstractSenderProvider extends AbstractEmailConnectionProvider<SenderConnection>
-        implements PoolingConnectionProvider<SenderConnection>
-{
+    implements PoolingConnectionProvider<SenderConnection> {
 
-    /**
-     * A basic set of parameters for email connections.
-     */
-    @ParameterGroup
-    protected EmailConnectionSettings settings;
+  /**
+   * A basic set of parameters for email connections.
+   */
+  @ParameterGroup
+  protected EmailConnectionSettings settings;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect(SenderConnection connection)
-    {
-        connection.disconnect();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect(SenderConnection connection) {
+    connection.disconnect();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validate(SenderConnection connection)
-    {
-        return connection.validate();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validate(SenderConnection connection) {
+    return connection.validate();
+  }
 }

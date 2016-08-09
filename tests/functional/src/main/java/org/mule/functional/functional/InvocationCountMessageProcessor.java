@@ -19,44 +19,39 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Test message processor to keep count of number of invocations.
  */
-public class InvocationCountMessageProcessor implements MessageProcessor, Initialisable
-{
+public class InvocationCountMessageProcessor implements MessageProcessor, Initialisable {
 
-    private static Map<String, AtomicInteger> invocationCountPerMessageProcessor = new HashMap<String, AtomicInteger>();
-    private final AtomicInteger invocationCount = new AtomicInteger();
-    private String name;
+  private static Map<String, AtomicInteger> invocationCountPerMessageProcessor = new HashMap<String, AtomicInteger>();
+  private final AtomicInteger invocationCount = new AtomicInteger();
+  private String name;
 
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        invocationCount.incrementAndGet();
-        return event;
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    invocationCount.incrementAndGet();
+    return event;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.invocationCount.set(0);
+    this.invocationCountPerMessageProcessor.put(this.name, this.invocationCount);
+  }
+
+  /**
+   * @param componentName name of the message processor in the configuration
+   * @return the number of invocations for the message processor with name componentName
+   */
+  public static int getNumberOfInvocationsFor(String componentName) {
+    AtomicInteger count = invocationCountPerMessageProcessor.get(componentName);
+    if (count == null) {
+      throw new IllegalArgumentException("No invocation-counter component registered under name: " + componentName
+          + " + registered components: " + invocationCountPerMessageProcessor.keySet());
     }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        this.invocationCount.set(0);
-        this.invocationCountPerMessageProcessor.put(this.name, this.invocationCount);
-    }
-
-    /**
-     * @param componentName name of the message processor in the configuration
-     * @return the number of invocations for the message processor with name componentName
-     */
-    public static int getNumberOfInvocationsFor(String componentName)
-    {
-        AtomicInteger count = invocationCountPerMessageProcessor.get(componentName);
-        if (count == null)
-        {
-            throw new IllegalArgumentException("No invocation-counter component registered under name: " + componentName + " + registered components: " + invocationCountPerMessageProcessor.keySet());
-        }
-        return count.get();
-    }
+    return count.get();
+  }
 }

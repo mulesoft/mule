@@ -10,24 +10,21 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * <code>SecurityProviderNotFoundException</code> is thrown by the
- * SecurityManager when an authentication request is made but no suitable security
- * provider can be found to process the authentication
+ * <code>SecurityProviderNotFoundException</code> is thrown by the SecurityManager when an authentication request is made but no
+ * suitable security provider can be found to process the authentication
  */
-public class SecurityProviderNotFoundException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 124630897095610595L;
+public class SecurityProviderNotFoundException extends MuleException {
 
-    public SecurityProviderNotFoundException(String providerName)
-    {
-        super(CoreMessages.authNoSecurityProvider(providerName));
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 124630897095610595L;
 
-    public SecurityProviderNotFoundException(String providerName, Throwable cause)
-    {
-        super(CoreMessages.authNoSecurityProvider(providerName), cause);
-    }
+  public SecurityProviderNotFoundException(String providerName) {
+    super(CoreMessages.authNoSecurityProvider(providerName));
+  }
+
+  public SecurityProviderNotFoundException(String providerName, Throwable cause) {
+    super(CoreMessages.authNoSecurityProvider(providerName), cause);
+  }
 }

@@ -33,89 +33,70 @@ import java.util.Set;
 /**
  * Provides transports support to {@link LocalMuleClient}.
  */
-public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessageProcessorProvider
-{
+public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessageProcessorProvider {
 
-    private EndpointCache endpointCache;
-    private Set<String> supportedUrlSchemas = Collections.synchronizedSet(new HashSet<>());
-    private Set<String> unsupportedUrlSchemas = Collections.synchronizedSet(new HashSet<>());
+  private EndpointCache endpointCache;
+  private Set<String> supportedUrlSchemas = Collections.synchronizedSet(new HashSet<>());
+  private Set<String> unsupportedUrlSchemas = Collections.synchronizedSet(new HashSet<>());
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        this.endpointCache = new SimpleEndpointCache(muleContext);
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    this.endpointCache = new SimpleEndpointCache(muleContext);
+  }
+
+  @Override
+  public boolean supportsUrl(String url) {
+    if (!url.contains(":")) {
+      return true;
+    }
+    final String schema = url.substring(0, url.indexOf(':'));
+
+    if (supportedUrlSchemas.contains(schema)) {
+      return true;
+    } else if (unsupportedUrlSchemas.contains(schema)) {
+      return false;
     }
 
-    @Override
-    public boolean supportsUrl(String url)
-    {
-        if (!url.contains(":"))
-        {
-            return true;
-        }
-        final String schema = url.substring(0, url.indexOf(':'));
+    synchronized (this) {
+      try {
+        lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, schema, null);
+      } catch (ServiceException e) {
+        unsupportedUrlSchemas.add(schema);
+        return false;
+      }
 
-        if (supportedUrlSchemas.contains(schema))
-        {
-            return true;
-        }
-        else if (unsupportedUrlSchemas.contains(schema))
-        {
-            return false;
-        }
-
-        synchronized (this)
-        {
-            try
-            {
-                lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, schema, null);
-            }
-            catch (ServiceException e)
-            {
-                unsupportedUrlSchemas.add(schema);
-                return false;
-            }
-
-            supportedUrlSchemas.add(schema);
-            return true;
-        }
+      supportedUrlSchemas.add(schema);
+      return true;
     }
+  }
 
-    @Override
-    protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException
-    {
-        if (cacheKey.getOperationOptions().isOutbound())
-        {
-            return endpointCache.getOutboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern(), null);
-        }
-        else
-        {
-            final Long timeout = cacheKey.getOperationOptions().getResponseTimeout();
-            return new MessageProcessor()
-            {
-                @Override
-                public MuleEvent process(MuleEvent event) throws MuleException
-                {
-                    final InboundEndpoint inboundEndpoint = endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
-                    MuleMessage message;
-                    try
-                    {
-                        message = inboundEndpoint.request(timeout);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ReceiveException(inboundEndpoint, timeout, e);
-                    }
-                    return message != null ? new DefaultMuleEvent(message, new MuleClientFlowConstruct(muleContext)) : null;
-                }
-            };
-        }
-    }
+  @Override
+  protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
+    if (cacheKey.getOperationOptions().isOutbound()) {
+      return endpointCache.getOutboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern(), null);
+    } else {
+      final Long timeout = cacheKey.getOperationOptions().getResponseTimeout();
+      return new MessageProcessor() {
 
-    @Override
-    public int priority()
-    {
-        return ConnectorConfiguration.useTransportForUris(muleContext) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException {
+          final InboundEndpoint inboundEndpoint =
+              endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
+          MuleMessage message;
+          try {
+            message = inboundEndpoint.request(timeout);
+          } catch (Exception e) {
+            throw new ReceiveException(inboundEndpoint, timeout, e);
+          }
+          return message != null ? new DefaultMuleEvent(message, new MuleClientFlowConstruct(muleContext)) : null;
+        }
+      };
     }
+  }
+
+  @Override
+  public int priority() {
+    return ConnectorConfiguration.useTransportForUris(muleContext) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+  }
 }

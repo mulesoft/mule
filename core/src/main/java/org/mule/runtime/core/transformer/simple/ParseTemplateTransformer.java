@@ -16,58 +16,48 @@ import org.mule.runtime.core.util.IOUtils;
 import java.nio.charset.Charset;
 
 /**
- * Loads a template and parses its content to resolve expressions. The order in which attempts to load the resource is
- * the following: from the file system, from a URL or from the classpath.
+ * Loads a template and parses its content to resolve expressions. The order in which attempts to load the resource is the
+ * following: from the file system, from a URL or from the classpath.
  */
-public class ParseTemplateTransformer extends AbstractMessageTransformer
-{
-    private String location;
-    private String template;
+public class ParseTemplateTransformer extends AbstractMessageTransformer {
 
-    public ParseTemplateTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
+  private String location;
+  private String template;
+
+  public ParseTemplateTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    loadTemplate();
+  }
+
+  private void loadTemplate() throws InitialisationException {
+    try {
+      if (location == null) {
+        throw new IllegalArgumentException("Location cannot be null");
+      }
+      template = IOUtils.getResourceAsString(location, this.getClass());
+
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    if (template == null) {
+      throw new IllegalArgumentException("Template cannot be null");
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        loadTemplate();
-    }
+    return muleContext.getExpressionManager().parse(template, event);
+  }
 
-    private void loadTemplate() throws InitialisationException
-    {
-        try
-        {
-            if(location == null)
-            {
-                throw new IllegalArgumentException("Location cannot be null");
-            }
-            template = IOUtils.getResourceAsString(location, this.getClass());
-
-        }
-        catch(Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
-
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        if(template == null)
-        {
-            throw new IllegalArgumentException("Template cannot be null");
-        }
-
-        return muleContext.getExpressionManager().parse(template, event);
-    }
-
-    public void setLocation(String location)
-    {
-        this.location = location;
-    }
+  public void setLocation(String location) {
+    this.location = location;
+  }
 }

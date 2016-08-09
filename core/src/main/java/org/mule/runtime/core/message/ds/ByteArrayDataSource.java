@@ -16,41 +16,35 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class ByteArrayDataSource implements DataSource
-{
+public class ByteArrayDataSource implements DataSource {
 
-    private final byte[] data;
-    private final MediaType contentType;
-    private final String name;
+  private final byte[] data;
+  private final MediaType contentType;
+  private final String name;
 
-    public ByteArrayDataSource(byte[] data, MediaType contentType, String name)
-    {
-        this.data = data;
-        this.contentType = contentType;
-        this.name = name;
-    }
+  public ByteArrayDataSource(byte[] data, MediaType contentType, String name) {
+    this.data = data;
+    this.contentType = contentType;
+    this.name = name;
+  }
 
-    @Override
-    public InputStream getInputStream() throws IOException
-    {
-        return new ByteArrayInputStream(data);
-    }
+  @Override
+  public InputStream getInputStream() throws IOException {
+    return new ByteArrayInputStream(data);
+  }
 
-    @Override
-    public OutputStream getOutputStream() throws IOException
-    {
-        throw new IOException("Cannot write into a ByteArrayDataSource");
-    }
+  @Override
+  public OutputStream getOutputStream() throws IOException {
+    throw new IOException("Cannot write into a ByteArrayDataSource");
+  }
 
-    @Override
-    public String getContentType()
-    {
-        return contentType.toString();
-    }
+  @Override
+  public String getContentType() {
+    return contentType.toString();
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 }

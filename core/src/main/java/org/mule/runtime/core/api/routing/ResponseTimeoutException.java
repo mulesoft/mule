@@ -11,25 +11,21 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>ResponseTimeoutException</code> is thrown when a response is not received
- * in a given timeout in the Response Router.
+ * <code>ResponseTimeoutException</code> is thrown when a response is not received in a given timeout in the Response Router.
  * 
  */
-public class ResponseTimeoutException extends RoutingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 6882278747922113240L;
+public class ResponseTimeoutException extends RoutingException {
 
-    public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target)
-    {
-        super(message, event, target);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 6882278747922113240L;
 
-    public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target,
-        Throwable cause)
-    {
-        super(message, event, target, cause);
-    }
+  public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target) {
+    super(message, event, target);
+  }
+
+  public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
+    super(message, event, target, cause);
+  }
 }

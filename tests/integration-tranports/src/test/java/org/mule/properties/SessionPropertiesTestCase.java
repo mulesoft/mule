@@ -16,67 +16,57 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class SessionPropertiesTestCase extends FunctionalTestCase
-{
+public class SessionPropertiesTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/properties/session-properties-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/properties/session-properties-config.xml";
+  }
 
-    @Test
-    public void setSessionPropertyUsingAPIGetInFlow() throws Exception
-    {
-        MuleEvent result = flowRunner("A").withPayload("data")
-                                          .withSessionProperty("key", "value")
-                                          .run();
+  @Test
+  public void setSessionPropertyUsingAPIGetInFlow() throws Exception {
+    MuleEvent result = flowRunner("A").withPayload("data").withSessionProperty("key", "value").run();
 
-        assertThat(result.getMessageAsString(), is("value"));
-    }
+    assertThat(result.getMessageAsString(), is("value"));
+  }
 
-    @Test
-    public void setSessionPropertyInFlowGetUsingAPI() throws Exception
-    {
-        MuleEvent result = flowRunner("B").withPayload("data").run();
-        assertThat(result.getSession().getProperty("key"), is("value"));
-    }
+  @Test
+  public void setSessionPropertyInFlowGetUsingAPI() throws Exception {
+    MuleEvent result = flowRunner("B").withPayload("data").run();
+    assertThat(result.getSession().getProperty("key"), is("value"));
+  }
 
-    /**
-     * When invoking a Flow directly session properties are preserved
-     */
-    @Test
-    public void flowRefSessionPropertyPropagation() throws Exception
-    {
-        Object nonSerializable = new Object();
+  /**
+   * When invoking a Flow directly session properties are preserved
+   */
+  @Test
+  public void flowRefSessionPropertyPropagation() throws Exception {
+    Object nonSerializable = new Object();
 
-        FlowRunner runner = flowRunner("FlowRefWithSessionProperties").withPayload("data")
-                                                                    .withSessionProperty("keyNonSerializable", nonSerializable)
-                                                                    .withSessionProperty("key", "value");
-        MuleEvent event = runner.buildEvent();
-        MuleEvent result = runner.run();
+    FlowRunner runner = flowRunner("FlowRefWithSessionProperties").withPayload("data")
+        .withSessionProperty("keyNonSerializable", nonSerializable).withSessionProperty("key", "value");
+    MuleEvent event = runner.buildEvent();
+    MuleEvent result = runner.run();
 
-        assertSame(event.getSession(), result.getSession());
+    assertSame(event.getSession(), result.getSession());
 
-        assertNotNull(result);
-        assertThat(result.getSession().getProperty("key"), is("value"));
-        assertThat(result.getSession().getProperty("key1"), is("value1"));
-        assertThat(result.getSession().getProperty("key2"), is("value2"));
-        assertThat(result.getSession().getProperty("keyNonSerializable"), is(nonSerializable));
-    }
+    assertNotNull(result);
+    assertThat(result.getSession().getProperty("key"), is("value"));
+    assertThat(result.getSession().getProperty("key1"), is("value1"));
+    assertThat(result.getSession().getProperty("key2"), is("value2"));
+    assertThat(result.getSession().getProperty("keyNonSerializable"), is(nonSerializable));
+  }
 
 
 
-    @Test
-    public void defaultExceptionStrategy() throws Exception
-    {
-        flowRunner("defaultExceptionStrategy").asynchronously().run();
-    }
+  @Test
+  public void defaultExceptionStrategy() throws Exception {
+    flowRunner("defaultExceptionStrategy").asynchronously().run();
+  }
 
-    @Test
-    public void catchExceptionStrategy() throws Exception
-    {
-        flowRunner("catchExceptionStrategy").asynchronously().run();
-    }
+  @Test
+  public void catchExceptionStrategy() throws Exception {
+    flowRunner("catchExceptionStrategy").asynchronously().run();
+  }
 
 }

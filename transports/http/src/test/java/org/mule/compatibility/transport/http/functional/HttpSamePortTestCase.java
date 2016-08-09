@@ -17,60 +17,45 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class HttpSamePortTestCase
-{
+public class HttpSamePortTestCase {
 
-    public static final String PATH_PROPERTY = "path";
+  public static final String PATH_PROPERTY = "path";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void twoApplicationCannotUseSamePort() throws Throwable
-    {
-        MuleContext firstMuleContext = null;
-        MuleContext secondMuleContext = null;
-        try
-        {
-            firstMuleContext = buildApp("helloWorld");
-            thrown.expect(BindException.class);
-            secondMuleContext = buildApp("helloMule");
-        }
-        catch (Exception e)
-        {
-            throw ExceptionUtils.getRootCause(e);
-        }
-        finally
-        {
-            disposeQuietly(firstMuleContext);
-            disposeQuietly(secondMuleContext);
-        }
+  @Test
+  public void twoApplicationCannotUseSamePort() throws Throwable {
+    MuleContext firstMuleContext = null;
+    MuleContext secondMuleContext = null;
+    try {
+      firstMuleContext = buildApp("helloWorld");
+      thrown.expect(BindException.class);
+      secondMuleContext = buildApp("helloMule");
+    } catch (Exception e) {
+      throw ExceptionUtils.getRootCause(e);
+    } finally {
+      disposeQuietly(firstMuleContext);
+      disposeQuietly(secondMuleContext);
     }
+  }
 
-    private void disposeQuietly(MuleContext muleContext)
-    {
-        try
-        {
-            muleContext.dispose();
-        }
-        catch (Exception e)
-        {
-            //Nothing to do.
-        }
+  private void disposeQuietly(MuleContext muleContext) {
+    try {
+      muleContext.dispose();
+    } catch (Exception e) {
+      // Nothing to do.
     }
+  }
 
-    private MuleContext buildApp(String path) throws Exception
-    {
-        System.setProperty(PATH_PROPERTY, path);
-        try
-        {
-            return new ApplicationContextBuilder().setApplicationResources(new String[] {"http-same-port-config.xml"}).build();
-        }
-        finally
-        {
-            System.clearProperty(PATH_PROPERTY);
-        }
+  private MuleContext buildApp(String path) throws Exception {
+    System.setProperty(PATH_PROPERTY, path);
+    try {
+      return new ApplicationContextBuilder().setApplicationResources(new String[] {"http-same-port-config.xml"}).build();
+    } finally {
+      System.clearProperty(PATH_PROPERTY);
     }
+  }
 }

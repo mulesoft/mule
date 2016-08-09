@@ -14,55 +14,40 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 
-public class MessageProcessorPollingConnector extends AbstractConnector
-{
+public class MessageProcessorPollingConnector extends AbstractConnector {
 
-    public MessageProcessorPollingConnector(MuleContext context)
-    {
-        super(context);
-    }
+  public MessageProcessorPollingConnector(MuleContext context) {
+    super(context);
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-    }
+  @Override
+  protected void doConnect() throws Exception {}
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-    }
+  @Override
+  protected void doDisconnect() throws Exception {}
 
-    @Override
-    protected void doDispose()
-    {
-    }
+  @Override
+  protected void doDispose() {}
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-    }
+  @Override
+  protected void doInitialise() throws InitialisationException {}
 
-    @Override
-    protected void doStart() throws MuleException
-    {
-    }
+  @Override
+  protected void doStart() throws MuleException {}
 
-    @Override
-    protected void doStop() throws MuleException
-    {
+  @Override
+  protected void doStop() throws MuleException {
 
-    }
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return "polling";
-    }
+  @Override
+  public String getProtocol() {
+    return "polling";
+  }
 
-    @Override
-    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
-    {
-        return flowConstruct.getName() + "~" + endpoint.getEndpointURI().getAddress();
-    }
+  @Override
+  protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint) {
+    return flowConstruct.getName() + "~" + endpoint.getEndpointURI().getAddress();
+  }
 
 }

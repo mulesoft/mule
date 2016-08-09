@@ -26,36 +26,28 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class ConnectionProviderNameModelValidator implements ModelValidator
-{
+public class ConnectionProviderNameModelValidator implements ModelValidator {
 
-    @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
-    {
-        Multiset<String> names = HashMultiset.create();
-        Set<ConnectionProviderModel> models = new HashSet<>();
-        new IdempotentExtensionWalker()
-        {
-            @Override
-            public void onConnectionProvider(ConnectionProviderModel model)
-            {
-                models.add(model);
-                names.add(model.getName());
-            }
-        }.walk(model);
+  @Override
+  public void validate(ExtensionModel model) throws IllegalModelDefinitionException {
+    Multiset<String> names = HashMultiset.create();
+    Set<ConnectionProviderModel> models = new HashSet<>();
+    new IdempotentExtensionWalker() {
 
-        Set<ConnectionProviderModel> repeatedNameModels = models.stream()
-                .filter(cp -> names.count(cp.getName()) > 1)
-                .collect(toSet());
+      @Override
+      public void onConnectionProvider(ConnectionProviderModel model) {
+        models.add(model);
+        names.add(model.getName());
+      }
+    }.walk(model);
 
-        if (!repeatedNameModels.isEmpty())
-        {
-            throw new IllegalModelDefinitionException(format("Extension '%s' defines %d connection providers with repeated names. " +
-                                                             "Offending names are: [%s]",
-                                                             model.getName(), repeatedNameModels.size(),
-                                                             Joiner.on(", ").join(repeatedNameModels.stream()
-                                                                                          .map(Named::getName)
-                                                                                          .collect(toSet()))));
-        }
+    Set<ConnectionProviderModel> repeatedNameModels =
+        models.stream().filter(cp -> names.count(cp.getName()) > 1).collect(toSet());
+
+    if (!repeatedNameModels.isEmpty()) {
+      throw new IllegalModelDefinitionException(format("Extension '%s' defines %d connection providers with repeated names. "
+          + "Offending names are: [%s]", model.getName(), repeatedNameModels
+              .size(), Joiner.on(", ").join(repeatedNameModels.stream().map(Named::getName).collect(toSet()))));
     }
+  }
 }

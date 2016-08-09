@@ -12,24 +12,21 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 
 /**
- * Transaction factory for DelegateTransaction. Used for
- * transactional element since transaction type is not
- * known until the first transactional message processor is executed.
+ * Transaction factory for DelegateTransaction. Used for transactional element since transaction type is not known until the first
+ * transactional message processor is executed.
  */
-public class DelegateTransactionFactory implements TransactionFactory
-{
-    @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
-    {
-        DelegateTransaction delegateTransaction = new DelegateTransaction(muleContext);
-        delegateTransaction.begin();
-        return delegateTransaction;
-    }
+public class DelegateTransactionFactory implements TransactionFactory {
 
-    @Override
-    public boolean isTransacted()
-    {
-        return true;
-    }
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    DelegateTransaction delegateTransaction = new DelegateTransaction(muleContext);
+    delegateTransaction.begin();
+    return delegateTransaction;
+  }
+
+  @Override
+  public boolean isTransacted() {
+    return true;
+  }
 
 }

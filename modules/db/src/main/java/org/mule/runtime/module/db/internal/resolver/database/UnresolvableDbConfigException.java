@@ -12,16 +12,13 @@ import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 /**
  * Thrown to indicate that is not possible to resolve a {@link DbConfig}
  */
-public class UnresolvableDbConfigException extends RuntimeException
-{
+public class UnresolvableDbConfigException extends RuntimeException {
 
-    public UnresolvableDbConfigException(String message)
-    {
-        super(message);
-    }
+  public UnresolvableDbConfigException(String message) {
+    super(message);
+  }
 
-    public UnresolvableDbConfigException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public UnresolvableDbConfigException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

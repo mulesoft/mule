@@ -17,21 +17,19 @@ import java.net.URL;
 /**
  * Creates {@link ArtifactClassLoader} for application or domain plugin descriptors.
  */
-public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor>
-{
+public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
 
-    /**
-     * @param parent parent for the new artifact classloader.
-     * @param descriptor descriptor of the artifact owner of the created classloader
-     * @return an {@link ArtifactClassLoader} for the given {@link ArtifactPluginDescriptor}
-     */
-    @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor)
-    {
-        URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
-        urls[0] = descriptor.getRuntimeClassesDir();
-        System.arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
+  /**
+   * @param parent parent for the new artifact classloader.
+   * @param descriptor descriptor of the artifact owner of the created classloader
+   * @return an {@link ArtifactClassLoader} for the given {@link ArtifactPluginDescriptor}
+   */
+  @Override
+  public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
+    URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
+    urls[0] = descriptor.getRuntimeClassesDir();
+    System.arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
 
-        return new MuleArtifactClassLoader(descriptor.getName(), urls, parent.getClassLoader(), parent.getClassLoaderLookupPolicy());
-    }
+    return new MuleArtifactClassLoader(descriptor.getName(), urls, parent.getClassLoader(), parent.getClassLoaderLookupPolicy());
+  }
 }

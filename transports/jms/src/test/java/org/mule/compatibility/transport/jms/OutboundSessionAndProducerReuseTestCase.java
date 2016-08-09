@@ -64,315 +64,286 @@ import org.springframework.jms.connection.SingleConnectionFactory;
  * Tests that JMS message are correctly sent when caching elements
  */
 @RunWith(MockitoJUnitRunner.class)
-public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextTestCase
-{
+public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextTestCase {
 
-    private static String USERNAME = "username";
-    private static String PASSWORD = "password";
+  private static String USERNAME = "username";
+  private static String PASSWORD = "password";
 
-    private JmsConnector connector;
-    @Mock
-    private ConnectionFactory connectionFactory;
-    @Mock
-    private Connection connection;
-    @Mock
-    private Queue queue;
+  private JmsConnector connector;
+  @Mock
+  private ConnectionFactory connectionFactory;
+  @Mock
+  private Connection connection;
+  @Mock
+  private Queue queue;
 
-    private ExceptionListener connectionExceptionListener;
-    private String connectionClientId;
-    private OutboundEndpoint outboundEndpoint;
-    private CountDownLatch messageSentLatch = new CountDownLatch(1);
-
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        when(connectionFactory.createConnection()).thenReturn(connection);
-        when(connectionFactory.createConnection(anyString(), anyString())).thenReturn(connection);
-        setupMockSession();
-
-        connector = new JmsConnector(muleContext);
-        connector.setConnectionFactory(connectionFactory);
-        SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
-        retryPolicyTemplate.setMuleContext(muleContext);
-        connector.setRetryPolicyTemplate(retryPolicyTemplate);
-        connector.setJmsSupport(new Jms11Support(connector));
-
-        EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
-        epBuilder.setConnector(connector);
-        outboundEndpoint = epBuilder.buildOutboundEndpoint();
-    }
-
-    private void setupMockSession() throws JMSException
-    {
-        when(connection.createSession(false, 1)).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return createSessionMock();
-            }
-        });
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                connectionExceptionListener = (ExceptionListener) invocation.getArguments()[0];
-                return null;
-            }
-        }).when(connection).setExceptionListener(any(ExceptionListener.class));
-        when(connection.getExceptionListener()).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return connectionExceptionListener;
-            }
-        });
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                connectionClientId = (String) invocation.getArguments()[0];
-                return null;
-            }
-        }).when(connection).setClientID(any(String.class));
-        when(connection.getClientID()).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return connectionClientId;
-            }
-        });
-    }
-
-    private QueueSession createSessionMock() throws JMSException
-    {
-        QueueSession mock = mock(QueueSession.class);
-        when(mock.createProducer(any(Destination.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return createProducerMock();
-            }
-        });
-        when(mock.createConsumer(any(Destination.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return mock(MessageConsumer.class);
-            }
-        });
-        when(mock.createTextMessage(anyString())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                ActiveMQTextMessage msg = new ActiveMQTextMessage();
-                msg.setText((String) invocation.getArguments()[0]);
-                return msg;
-            }
-        });
-        return mock;
-    }
-
-    private MessageProducer createProducerMock() throws JMSException
-    {
-        MessageProducer mock = mock(MessageProducer.class);
-        doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                messageSentLatch.countDown();
-                return null;
-            }
-        }).when(mock).send(any(Message.class),anyInt(),anyInt(), anyLong());
-        return mock;
-    }
-
-    @Test
-    public void connectionFactoryWrappedJMS11() throws Exception
-    {
-        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
-        connector.initialise();
-        connector.connect();
-        assertThat(connector.getConnectionFactory(), is(instanceOf(SingleConnectionFactory.class)));
-        assertThat(((SingleConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
-                   is(connectionFactory));
-    }
-
-    @Test
-    public void connectionFactoryNotWrappedJMS102b() throws Exception
-    {
-        connectionFactory = mock(QueueConnectionFactory.class);
-        connector.setConnectionFactory(connectionFactory);
-        connector.setJmsSupport(new Jms102bSupport(connector));
-        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
-        connector.initialise();
-        connector.connect();
-        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
-    }
-
-    @Test
-    public void connectionFactoryNotWrappedCachingDisabled() throws Exception
-    {
-        connectionFactory = mock(QueueConnectionFactory.class);
-        connector.setCacheJmsSessions(false);
-        connector.setConnectionFactory(connectionFactory);
-        connector.setJmsSupport(new Jms102bSupport(connector));
-        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
-        connector.initialise();
-        connector.connect();
-        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
-    }
-
-    @Test
-    public void connection() throws Exception
-    {
-        connector.initialise();
-        connector.connect();
-        assertThat(connector.getConnection(), is(not(equalTo(connection))));
-        verify(connectionFactory, times(1)).createConnection();
-    }
+  private ExceptionListener connectionExceptionListener;
+  private String connectionClientId;
+  private OutboundEndpoint outboundEndpoint;
+  private CountDownLatch messageSentLatch = new CountDownLatch(1);
 
 
-    @Test
-    public void clientId() throws Exception
-    {
-        String clientId = "foo";
-        connector.setClientId(clientId);
-        connector.initialise();
-        connector.connect();
-        assertThat(connector.getConnection().getClientID(), is(clientId));
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-    @Test
-    public void sessionReuse() throws Exception
-    {
-        connector.initialise();
-        connector.connect();
-        Session session1 = connector.createSession(outboundEndpoint);
-        session1.close();
-        Session session2 = connector.createSession(outboundEndpoint);
+    when(connectionFactory.createConnection()).thenReturn(connection);
+    when(connectionFactory.createConnection(anyString(), anyString())).thenReturn(connection);
+    setupMockSession();
 
-        assertThat(session1, equalTo(session2));
-    }
+    connector = new JmsConnector(muleContext);
+    connector.setConnectionFactory(connectionFactory);
+    SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
+    retryPolicyTemplate.setMuleContext(muleContext);
+    connector.setRetryPolicyTemplate(retryPolicyTemplate);
+    connector.setJmsSupport(new Jms11Support(connector));
 
-    @Test
-    public void sessionNotReusedJMS102b() throws Exception
-    {
-        QueueConnectionFactory connectionFactory = mock(QueueConnectionFactory.class);
-        QueueConnection queueConnection = mock(QueueConnection.class);
-        when(connectionFactory.createQueueConnection()).thenReturn(queueConnection);
-        when(queueConnection.createQueueSession(false, 1)).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return createSessionMock();
-            }
-        });
+    EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
+    epBuilder.setConnector(connector);
+    outboundEndpoint = epBuilder.buildOutboundEndpoint();
+  }
 
-        connector.setConnectionFactory(connectionFactory);
-        connector.setJmsSupport(new Jms102bSupport(connector));
-        connector.initialise();
-        connector.connect();
-        Session session1 = connector.createSession(outboundEndpoint);
-        session1.close();
-        Session session2 = connector.createSession(outboundEndpoint);
+  private void setupMockSession() throws JMSException {
+    when(connection.createSession(false, 1)).then(new Answer<Object>() {
 
-        assertThat(session1, not(equalTo(session2)));
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return createSessionMock();
+      }
+    });
+    doAnswer(new Answer() {
 
-    @Test
-    public void sessionNotReusedCachingDisabled() throws Exception
-    {
-        connector.setCacheJmsSessions(false);
-        connector.initialise();
-        connector.connect();
-        Session session1 = connector.createSession(outboundEndpoint);
-        session1.close();
-        Session session2 = connector.createSession(outboundEndpoint);
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        connectionExceptionListener = (ExceptionListener) invocation.getArguments()[0];
+        return null;
+      }
+    }).when(connection).setExceptionListener(any(ExceptionListener.class));
+    when(connection.getExceptionListener()).thenAnswer(new Answer<Object>() {
 
-        assertThat(session1, not(equalTo(session2)));
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return connectionExceptionListener;
+      }
+    });
+    doAnswer(new Answer() {
 
-    @Test
-    public void producersReused() throws Exception
-    {
-        connector.initialise();
-        connector.connect();
-        Session session = connector.createSession(outboundEndpoint);
-        MessageProducer producer1 = session.createProducer(queue);
-        producer1.close();
-        MessageProducer producer2 = session.createProducer(queue);
-        producer2.close();
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        connectionClientId = (String) invocation.getArguments()[0];
+        return null;
+      }
+    }).when(connection).setClientID(any(String.class));
+    when(connection.getClientID()).thenAnswer(new Answer<Object>() {
 
-        assertThat(producer1.toString(), equalTo(producer2.toString()));
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return connectionClientId;
+      }
+    });
+  }
 
-    @Test
-    public void consumersNotReused() throws Exception
-    {
-        connector.initialise();
-        connector.connect();
-        Session session = connector.createSession(outboundEndpoint);
-        MessageConsumer consumer1 = session.createConsumer(queue);
-        consumer1.close();
-        MessageConsumer consumer2 = session.createConsumer(queue);
-        consumer2.close();
+  private QueueSession createSessionMock() throws JMSException {
+    QueueSession mock = mock(QueueSession.class);
+    when(mock.createProducer(any(Destination.class))).then(new Answer<Object>() {
 
-        assertThat(consumer1.toString(), not(equalTo(consumer2.toString())));
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return createProducerMock();
+      }
+    });
+    when(mock.createConsumer(any(Destination.class))).then(new Answer<Object>() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return mock(MessageConsumer.class);
+      }
+    });
+    when(mock.createTextMessage(anyString())).then(new Answer<Object>() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        ActiveMQTextMessage msg = new ActiveMQTextMessage();
+        msg.setText((String) invocation.getArguments()[0]);
+        return msg;
+      }
+    });
+    return mock;
+  }
+
+  private MessageProducer createProducerMock() throws JMSException {
+    MessageProducer mock = mock(MessageProducer.class);
+    doAnswer(new Answer<Object>() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        messageSentLatch.countDown();
+        return null;
+      }
+    }).when(mock).send(any(Message.class), anyInt(), anyInt(), anyLong());
+    return mock;
+  }
+
+  @Test
+  public void connectionFactoryWrappedJMS11() throws Exception {
+    assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+    connector.initialise();
+    connector.connect();
+    assertThat(connector.getConnectionFactory(), is(instanceOf(SingleConnectionFactory.class)));
+    assertThat(((SingleConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(), is(connectionFactory));
+  }
+
+  @Test
+  public void connectionFactoryNotWrappedJMS102b() throws Exception {
+    connectionFactory = mock(QueueConnectionFactory.class);
+    connector.setConnectionFactory(connectionFactory);
+    connector.setJmsSupport(new Jms102bSupport(connector));
+    assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+    connector.initialise();
+    connector.connect();
+    assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+  }
+
+  @Test
+  public void connectionFactoryNotWrappedCachingDisabled() throws Exception {
+    connectionFactory = mock(QueueConnectionFactory.class);
+    connector.setCacheJmsSessions(false);
+    connector.setConnectionFactory(connectionFactory);
+    connector.setJmsSupport(new Jms102bSupport(connector));
+    assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+    connector.initialise();
+    connector.connect();
+    assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+  }
+
+  @Test
+  public void connection() throws Exception {
+    connector.initialise();
+    connector.connect();
+    assertThat(connector.getConnection(), is(not(equalTo(connection))));
+    verify(connectionFactory, times(1)).createConnection();
+  }
 
 
-    @Test
-    public void send() throws Exception
-    {
-        connector.initialise();
-        connector.connect();
-        connector.start();
+  @Test
+  public void clientId() throws Exception {
+    String clientId = "foo";
+    connector.setClientId(clientId);
+    connector.initialise();
+    connector.connect();
+    assertThat(connector.getConnection().getClientID(), is(clientId));
+  }
 
-        reset(connectionFactory);
+  @Test
+  public void sessionReuse() throws Exception {
+    connector.initialise();
+    connector.connect();
+    Session session1 = connector.createSession(outboundEndpoint);
+    session1.close();
+    Session session2 = connector.createSession(outboundEndpoint);
 
-        outboundEndpoint.process(getTestEvent(TEST_MESSAGE));
+    assertThat(session1, equalTo(session2));
+  }
 
-        verify(connectionFactory, times(0)).createConnection();
-        verify(connection, times(1)).createSession(anyBoolean(), anyInt());
+  @Test
+  public void sessionNotReusedJMS102b() throws Exception {
+    QueueConnectionFactory connectionFactory = mock(QueueConnectionFactory.class);
+    QueueConnection queueConnection = mock(QueueConnection.class);
+    when(connectionFactory.createQueueConnection()).thenReturn(queueConnection);
+    when(queueConnection.createQueueSession(false, 1)).then(new Answer<Object>() {
 
-        assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return createSessionMock();
+      }
+    });
 
-    @Test
-    public void usernamePasswordConfiguredViaCachingConnectionFactory() throws Exception
-    {
-        Jms11Support jms11Support = mock(Jms11Support.class);
-        connector.setJmsSupport(jms11Support);
-        connector.setUsername(USERNAME);
-        connector.setPassword(PASSWORD);
-        connector.initialise();
-        connector.connect();
-        verify(jms11Support, times(1)).createConnection(connector.getConnectionFactory());
-    }
+    connector.setConnectionFactory(connectionFactory);
+    connector.setJmsSupport(new Jms102bSupport(connector));
+    connector.initialise();
+    connector.connect();
+    Session session1 = connector.createSession(outboundEndpoint);
+    session1.close();
+    Session session2 = connector.createSession(outboundEndpoint);
 
-    @Test
-    public void usernamePasswordNoCaching() throws Exception
-    {
-        Jms11Support jms11Support = mock(Jms11Support.class);
-        connector.setJmsSupport(jms11Support);
-        connector.setCacheJmsSessions(false);
-        connector.setUsername(USERNAME);
-        connector.setPassword(PASSWORD);
-        connector.initialise();
-        connector.connect();
-        verify(jms11Support, times(1)).createConnection(connectionFactory, USERNAME, PASSWORD);
-    }
+    assertThat(session1, not(equalTo(session2)));
+  }
+
+  @Test
+  public void sessionNotReusedCachingDisabled() throws Exception {
+    connector.setCacheJmsSessions(false);
+    connector.initialise();
+    connector.connect();
+    Session session1 = connector.createSession(outboundEndpoint);
+    session1.close();
+    Session session2 = connector.createSession(outboundEndpoint);
+
+    assertThat(session1, not(equalTo(session2)));
+  }
+
+  @Test
+  public void producersReused() throws Exception {
+    connector.initialise();
+    connector.connect();
+    Session session = connector.createSession(outboundEndpoint);
+    MessageProducer producer1 = session.createProducer(queue);
+    producer1.close();
+    MessageProducer producer2 = session.createProducer(queue);
+    producer2.close();
+
+    assertThat(producer1.toString(), equalTo(producer2.toString()));
+  }
+
+  @Test
+  public void consumersNotReused() throws Exception {
+    connector.initialise();
+    connector.connect();
+    Session session = connector.createSession(outboundEndpoint);
+    MessageConsumer consumer1 = session.createConsumer(queue);
+    consumer1.close();
+    MessageConsumer consumer2 = session.createConsumer(queue);
+    consumer2.close();
+
+    assertThat(consumer1.toString(), not(equalTo(consumer2.toString())));
+  }
+
+
+  @Test
+  public void send() throws Exception {
+    connector.initialise();
+    connector.connect();
+    connector.start();
+
+    reset(connectionFactory);
+
+    outboundEndpoint.process(getTestEvent(TEST_MESSAGE));
+
+    verify(connectionFactory, times(0)).createConnection();
+    verify(connection, times(1)).createSession(anyBoolean(), anyInt());
+
+    assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void usernamePasswordConfiguredViaCachingConnectionFactory() throws Exception {
+    Jms11Support jms11Support = mock(Jms11Support.class);
+    connector.setJmsSupport(jms11Support);
+    connector.setUsername(USERNAME);
+    connector.setPassword(PASSWORD);
+    connector.initialise();
+    connector.connect();
+    verify(jms11Support, times(1)).createConnection(connector.getConnectionFactory());
+  }
+
+  @Test
+  public void usernamePasswordNoCaching() throws Exception {
+    Jms11Support jms11Support = mock(Jms11Support.class);
+    connector.setJmsSupport(jms11Support);
+    connector.setCacheJmsSessions(false);
+    connector.setUsername(USERNAME);
+    connector.setPassword(PASSWORD);
+    connector.initialise();
+    connector.connect();
+    verify(jms11Support, times(1)).createConnection(connectionFactory, USERNAME, PASSWORD);
+  }
 }

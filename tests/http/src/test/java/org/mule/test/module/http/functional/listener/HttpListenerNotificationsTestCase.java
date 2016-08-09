@@ -26,42 +26,38 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
-    @Rule
-    public SystemProperty path = new SystemProperty("path", "path");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public SystemProperty path = new SystemProperty("path", "path");
 
-    @Override
-    protected void configureMuleContext(MuleContextBuilder contextBuilder)
-    {
-        contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
-        super.configureMuleContext(contextBuilder);
-    }
+  @Override
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
+    contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
+    super.configureMuleContext(contextBuilder);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-notifications-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-notifications-config.xml";
+  }
 
-    @Test
-    public void receiveNotification() throws Exception
-    {
-        String listenerUrl = String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
+  @Test
+  public void receiveNotification() throws Exception {
+    String listenerUrl = String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
 
-        CountDownLatch latch = new CountDownLatch(2);
-        //for now use none since we have no way of sending the endpoint
-        TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "none");
-        muleContext.getNotificationManager().addListener(listener);
+    CountDownLatch latch = new CountDownLatch(2);
+    // for now use none since we have no way of sending the endpoint
+    TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "none");
+    muleContext.getNotificationManager().addListener(listener);
 
-        Request.Post(listenerUrl).execute();
+    Request.Post(listenerUrl).execute();
 
-        latch.await(1000, TimeUnit.MILLISECONDS);
+    latch.await(1000, TimeUnit.MILLISECONDS);
 
-        assertThat(listener.getNotificationActionNames(), contains(getActionName(MESSAGE_RECEIVED), getActionName(MESSAGE_RESPONSE)));
-    }
+    assertThat(listener.getNotificationActionNames(), contains(getActionName(MESSAGE_RECEIVED), getActionName(MESSAGE_RESPONSE)));
+  }
 
 }

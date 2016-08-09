@@ -22,88 +22,73 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines a router that sequentially routes a given message to the list of
- * registered endpoints and returns the aggregate responses as the result.
- * Aggregate response is built using the partial responses obtained from
- * synchronous endpoints.
- * The routing process can be stopped after receiving a partial response.
+ * Defines a router that sequentially routes a given message to the list of registered endpoints and returns the aggregate
+ * responses as the result. Aggregate response is built using the partial responses obtained from synchronous endpoints. The
+ * routing process can be stopped after receiving a partial response.
  */
-public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
-{
+public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
 
-    @Override
-    public MuleEvent route(MuleEvent event) throws RoutingException
-    {
-        MuleMessage message = event.getMessage();
+  @Override
+  public MuleEvent route(MuleEvent event) throws RoutingException {
+    MuleMessage message = event.getMessage();
 
-        if (routes == null || routes.size() == 0)
-        {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
-        }
-
-        if (enableCorrelation.doCorrelation(message.getCorrelation()))
-        {
-            // the correlationId will be set by the AbstractOutboundRouter
-            event.setMessage(MuleMessage.builder(message).correlationGroupSize(routes.size()).build());
-        }
-        else
-        {
-            logger.debug("Correlation is " + message.getCorrelation().toString());
-        }
-
-        List<MuleEvent> results = new ArrayList<>(routes.size());
-        try
-        {
-            for (int i = 0; i < routes.size(); i++)
-            {
-                MessageProcessor mp = getRoute(i, event);
-
-                if (!(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message))
-                {
-                    AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
-                    MuleMessage clonedMessage = cloneMessage(event, message);
-
-                    MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
-                    if (result != null && !VoidMuleEvent.getInstance().equals(result))
-                    {
-                        results.add(result);
-                    }
-                    // AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
-                    // MuleMessage clonedMessage = cloneMessage(event, message);
-
-                    if (!continueRoutingMessageAfter(result))
-                    {
-                        break;
-                    }
-                    // MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
-                    // if (result != null && !VoidMuleEvent.getInstance().equals(result))
-                    // {
-                    // results.add(result);
-                    // }
-                    //
-                    // if (!continueRoutingMessageAfter(result))
-                    // {
-                    // break;
-                    // }
-                }
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
-        }
-        return resultsHandler.aggregateResults(results, event);
+    if (routes == null || routes.size() == 0) {
+      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
     }
 
+    if (enableCorrelation.doCorrelation(message.getCorrelation())) {
+      // the correlationId will be set by the AbstractOutboundRouter
+      event.setMessage(MuleMessage.builder(message).correlationGroupSize(routes.size()).build());
+    } else {
+      logger.debug("Correlation is " + message.getCorrelation().toString());
+    }
 
-    /**
-     * Lets subclasses decide if the routing of a given message should continue
-     * or not after receiving a given response from a synchronous endpoint.
-     *
-     * @param response the last received response
-     * @return true if must continue and false otherwise.
-     * @throws MuleException when the router should stop processing throwing an
-     *                       exception without returning any results to the caller.
-     */
-    protected abstract boolean continueRoutingMessageAfter(MuleEvent response) throws MuleException;
+    List<MuleEvent> results = new ArrayList<>(routes.size());
+    try {
+      for (int i = 0; i < routes.size(); i++) {
+        MessageProcessor mp = getRoute(i, event);
+
+        if (!(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message)) {
+          AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
+          MuleMessage clonedMessage = cloneMessage(event, message);
+
+          MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
+          if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+            results.add(result);
+          }
+          // AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
+          // MuleMessage clonedMessage = cloneMessage(event, message);
+
+          if (!continueRoutingMessageAfter(result)) {
+            break;
+          }
+          // MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
+          // if (result != null && !VoidMuleEvent.getInstance().equals(result))
+          // {
+          // results.add(result);
+          // }
+          //
+          // if (!continueRoutingMessageAfter(result))
+          // {
+          // break;
+          // }
+        }
+      }
+    } catch (MuleException e) {
+      throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
+    }
+    return resultsHandler.aggregateResults(results, event);
+  }
+
+
+  /**
+   * Lets subclasses decide if the routing of a given message should continue or not after receiving a given response from a
+   * synchronous endpoint.
+   *
+   * @param response the last received response
+   * @return true if must continue and false otherwise.
+   * @throws MuleException when the router should stop processing throwing an exception without returning any results to the
+   *         caller.
+   */
+  protected abstract boolean continueRoutingMessageAfter(MuleEvent response) throws MuleException;
 }

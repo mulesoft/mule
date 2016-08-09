@@ -10,13 +10,12 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 
 import javax.jms.Message;
 
-public abstract class MessageProcessingCallback<T> implements ExecutionCallback<T>
-{
-    protected final Message message;
+public abstract class MessageProcessingCallback<T> implements ExecutionCallback<T> {
 
-    public MessageProcessingCallback(Message message)
-    {
-        this.message = message;
-    }
+  protected final Message message;
+
+  public MessageProcessingCallback(Message message) {
+    this.message = message;
+  }
 
 }

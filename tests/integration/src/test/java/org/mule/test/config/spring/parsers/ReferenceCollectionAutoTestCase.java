@@ -17,36 +17,31 @@ import org.junit.Test;
 /**
  * Automatic plurals currently do not work for attributes
  */
-public class ReferenceCollectionAutoTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/reference-collection-auto-test.xml";
-    }
+public class ReferenceCollectionAutoTestCase extends AbstractNamespaceTestCase {
 
-    protected void testChildRef(int index, int size)
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
-        assertEquals(size, kids.size());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/reference-collection-auto-test.xml";
+  }
 
-    @Test
-    public void testNamed()
-    {
-        testChildRef(1, 2);
-    }
+  protected void testChildRef(int index, int size) {
+    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+    Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
+    assertEquals(size, kids.size());
+  }
 
-    @Test
-    public void testOrphan()
-    {
-        testChildRef(2, 1);
-    }
+  @Test
+  public void testNamed() {
+    testChildRef(1, 2);
+  }
 
-    @Test
-    public void testParent()
-    {
-        testChildRef(3, 3);
-    }
+  @Test
+  public void testOrphan() {
+    testChildRef(2, 1);
+  }
+
+  @Test
+  public void testParent() {
+    testChildRef(3, 3);
+  }
 }

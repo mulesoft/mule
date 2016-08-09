@@ -11,14 +11,12 @@ package org.mule.runtime.module.repository.api;
  *
  * @since 4.0
  */
-public class RepositoryConnectionException extends RuntimeException
-{
+public class RepositoryConnectionException extends RuntimeException {
 
-    /**
-     * {@inheritDoc}
-     */
-    public RepositoryConnectionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public RepositoryConnectionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -16,58 +16,48 @@ import javax.resource.spi.work.WorkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AsyncWorkListener implements WorkListener
-{
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-    protected MessageProcessor target;
+public class AsyncWorkListener implements WorkListener {
 
-    public AsyncWorkListener(MessageProcessor target)
-    {
-        this.target = target;
+  protected Logger logger = LoggerFactory.getLogger(getClass());
+  protected MessageProcessor target;
+
+  public AsyncWorkListener(MessageProcessor target) {
+    this.target = target;
+  }
+
+  public void workAccepted(WorkEvent event) {
+    this.handleWorkException(event, "workAccepted");
+  }
+
+  public void workRejected(WorkEvent event) {
+    this.handleWorkException(event, "workRejected");
+  }
+
+  public void workStarted(WorkEvent event) {
+    this.handleWorkException(event, "workStarted");
+  }
+
+  public void workCompleted(WorkEvent event) {
+    this.handleWorkException(event, "workCompleted");
+  }
+
+  protected void handleWorkException(WorkEvent event, String type) {
+    if (event == null) {
+      return;
     }
 
-    public void workAccepted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workAccepted");
+    Throwable e = event.getException();
+
+    if (e == null) {
+      return;
     }
 
-    public void workRejected(WorkEvent event)
-    {
-        this.handleWorkException(event, "workRejected");
+    if (e.getCause() != null) {
+      e = e.getCause();
     }
 
-    public void workStarted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workStarted");
-    }
-
-    public void workCompleted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workCompleted");
-    }
-
-    protected void handleWorkException(WorkEvent event, String type)
-    {
-        if (event == null)
-        {
-            return;
-        }
-
-        Throwable e = event.getException();
-
-        if (e == null)
-        {
-            return;
-        }
-
-        if (e.getCause() != null)
-        {
-            e = e.getCause();
-        }
-
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                     + event.getWork().toString());
-        throw new MuleRuntimeException(CoreMessages.errorInvokingMessageProcessorAsynchronously(target), e);
-    }
+    logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+    throw new MuleRuntimeException(CoreMessages.errorInvokingMessageProcessorAsynchronously(target), e);
+  }
 
 }

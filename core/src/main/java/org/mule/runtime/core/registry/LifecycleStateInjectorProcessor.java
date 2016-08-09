@@ -11,28 +11,26 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
 import org.mule.runtime.core.api.registry.InjectProcessor;
 
 /**
- * Injects the MuleContext object for objects stored in the {@link org.mule.runtime.core.registry.TransientRegistry} where the object registered
- * implements {@link org.mule.runtime.core.api.context.MuleContextAware}.
+ * Injects the MuleContext object for objects stored in the {@link org.mule.runtime.core.registry.TransientRegistry} where the
+ * object registered implements {@link org.mule.runtime.core.api.context.MuleContextAware}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also
+ *             deprecated. Use post processors for currently supported registries instead (i.e:
+ *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
-public class LifecycleStateInjectorProcessor implements InjectProcessor
-{
-    private LifecycleState state;
+public class LifecycleStateInjectorProcessor implements InjectProcessor {
 
-    public LifecycleStateInjectorProcessor(LifecycleState state)
-    {
-        this.state = state;
-    }
+  private LifecycleState state;
 
-    public Object process(Object object)
-    {
-        if (object instanceof LifecycleStateAware)
-        {
-            ((LifecycleStateAware)object).setLifecycleState(state);
-        }
-        return object;
+  public LifecycleStateInjectorProcessor(LifecycleState state) {
+    this.state = state;
+  }
+
+  public Object process(Object object) {
+    if (object instanceof LifecycleStateAware) {
+      ((LifecycleStateAware) object).setLifecycleState(state);
     }
+    return object;
+  }
 }

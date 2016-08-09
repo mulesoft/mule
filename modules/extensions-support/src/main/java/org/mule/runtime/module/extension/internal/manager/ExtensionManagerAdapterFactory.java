@@ -13,14 +13,13 @@ import org.mule.runtime.core.api.MuleContext;
  *
  * @since 4.0
  */
-public interface ExtensionManagerAdapterFactory
-{
+public interface ExtensionManagerAdapterFactory {
 
-    /**
-     * Creates a new {@link ExtensionManagerAdapter}
-     *
-     * @param muleContext the owning {@link MuleContext}
-     * @return a non {@code null} {@link ExtensionManagerAdapter}
-     */
-    ExtensionManagerAdapter createExtensionManager(MuleContext muleContext);
+  /**
+   * Creates a new {@link ExtensionManagerAdapter}
+   *
+   * @param muleContext the owning {@link MuleContext}
+   * @return a non {@code null} {@link ExtensionManagerAdapter}
+   */
+  ExtensionManagerAdapter createExtensionManager(MuleContext muleContext);
 }

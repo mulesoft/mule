@@ -11,30 +11,26 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-public class SensingNullCompletionHandler extends BlockingCompletionHandler<MuleEvent, MessagingException, Void>
-{
+public class SensingNullCompletionHandler extends BlockingCompletionHandler<MuleEvent, MessagingException, Void> {
 
-    public MuleEvent event;
-    public Exception exception;
-    public Latch latch = new Latch();
+  public MuleEvent event;
+  public Exception exception;
+  public Latch latch = new Latch();
 
-    @Override
-    protected void doOnCompletion(MuleEvent result)
-    {
-        this.event = result;
-        latch.countDown();
-    }
+  @Override
+  protected void doOnCompletion(MuleEvent result) {
+    this.event = result;
+    latch.countDown();
+  }
 
-    @Override
-    public void onFailure(MessagingException exception)
-    {
-        this.exception = exception;
-        latch.countDown();
-    }
+  @Override
+  public void onFailure(MessagingException exception) {
+    this.exception = exception;
+    latch.countDown();
+  }
 
-    public void clear()
-    {
-        event = null;
-    }
+  public void clear() {
+    event = null;
+  }
 
 }

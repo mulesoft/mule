@@ -22,37 +22,31 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class OracleSelectsLongTransactionTestCase extends AbstractDbIntegrationTestCase
-{
+public class OracleSelectsLongTransactionTestCase extends AbstractDbIntegrationTestCase {
 
-    public OracleSelectsLongTransactionTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public OracleSelectsLongTransactionTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getOracleResource();
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/vendor/oracle/selects-long-transaction-config.xml"};
+  }
+
+  @Test
+  public void longTransaction() throws Exception {
+    List<Integer> sequence = new ArrayList<>();
+    for (int i = 0; i < 500; i++) {
+      sequence.add(i);
     }
+    final MuleEvent responseEvent = flowRunner("longTransaction").withPayload(sequence).run();
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getOracleResource();
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/vendor/oracle/selects-long-transaction-config.xml"};
-    }
-
-    @Test
-    public void longTransaction() throws Exception
-    {
-        List<Integer> sequence = new ArrayList<>();
-        for (int i = 0; i < 500; i++)
-        {
-            sequence.add(i);
-        }
-        final MuleEvent responseEvent = flowRunner("longTransaction").withPayload(sequence).run();
-
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getExceptionPayload(), nullValue());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getExceptionPayload(), nullValue());
+  }
 }

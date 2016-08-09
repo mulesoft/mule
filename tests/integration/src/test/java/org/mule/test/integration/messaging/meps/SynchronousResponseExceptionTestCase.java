@@ -20,33 +20,28 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 /**
  * see MULE-4512
  */
-public class SynchronousResponseExceptionTestCase extends AbstractIntegrationTestCase
-{
+public class SynchronousResponseExceptionTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/synchronous-response-exception-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/synchronous-response-exception-flow.xml";
+  }
 
-    @Test
-    public void testComponentException() throws Exception
-    {
-        MessagingException e = flowRunner("ComponentException").withPayload("request").runExpectingException();
-        assertThat(ExceptionHelper.getRootException(e), instanceOf(FunctionalTestException.class));
-    }
+  @Test
+  public void testComponentException() throws Exception {
+    MessagingException e = flowRunner("ComponentException").withPayload("request").runExpectingException();
+    assertThat(ExceptionHelper.getRootException(e), instanceOf(FunctionalTestException.class));
+  }
 
-    @Test
-    public void testFlowRefInvalidException() throws Exception
-    {
-        MessagingException e = flowRunner("FlowRefInvalidException").withPayload("request").runExpectingException();
-        assertThat(ExceptionHelper.getRootException(e), instanceOf(NoSuchBeanDefinitionException.class));
-    }
+  @Test
+  public void testFlowRefInvalidException() throws Exception {
+    MessagingException e = flowRunner("FlowRefInvalidException").withPayload("request").runExpectingException();
+    assertThat(ExceptionHelper.getRootException(e), instanceOf(NoSuchBeanDefinitionException.class));
+  }
 
-    @Test
-    public void testTransformerException() throws Exception
-    {
-        MessagingException e = flowRunner("TransformerException").withPayload("request").runExpectingException();
-        assertThat(ExceptionHelper.getRootException(e), instanceOf(TransformerException.class));
-    }
+  @Test
+  public void testTransformerException() throws Exception {
+    MessagingException e = flowRunner("TransformerException").withPayload("request").runExpectingException();
+    assertThat(ExceptionHelper.getRootException(e), instanceOf(TransformerException.class));
+  }
 }

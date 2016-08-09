@@ -17,46 +17,36 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import java.lang.reflect.Method;
 
 /**
- * An entry-point resolver that only allows Service objects that implement the
- * Callable interface
+ * An entry-point resolver that only allows Service objects that implement the Callable interface
  *
  * @see org.mule.runtime.core.api.lifecycle.Callable
  */
-public class CallableEntryPointResolver implements EntryPointResolver
-{
-    protected static final Method callableMethod;
+public class CallableEntryPointResolver implements EntryPointResolver {
 
-    static
-    {
-        try
-        {
-            callableMethod = Callable.class.getMethod("onCall", new Class[] {MuleEventContext.class});
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Panic! No onCall(MuleEventContext) method found in the Callable interface."));
-        }
-    }
+  protected static final Method callableMethod;
 
-    public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
-    {
-        if (component instanceof Callable)
-        {
-            Object result = ((Callable) component).onCall(context);
-            return new InvocationResult(this, result, callableMethod);
-        }
-        else
-        {
-            InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
-            result.setErrorMessage(CoreMessages.objectDoesNotImplementInterface(component, Callable.class).toString());
-            return result;
-        }
+  static {
+    try {
+      callableMethod = Callable.class.getMethod("onCall", new Class[] {MuleEventContext.class});
+    } catch (NoSuchMethodException e) {
+      throw new MuleRuntimeException(MessageFactory
+          .createStaticMessage("Panic! No onCall(MuleEventContext) method found in the Callable interface."));
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        return "CallableEntryPointResolver{}";
+  public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+    if (component instanceof Callable) {
+      Object result = ((Callable) component).onCall(context);
+      return new InvocationResult(this, result, callableMethod);
+    } else {
+      InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
+      result.setErrorMessage(CoreMessages.objectDoesNotImplementInterface(component, Callable.class).toString());
+      return result;
     }
+  }
+
+  @Override
+  public String toString() {
+    return "CallableEntryPointResolver{}";
+  }
 }

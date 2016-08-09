@@ -24,71 +24,60 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
- * Sets the correct operation when the binding style is RPC. The processing of the message content
- * is delegated to the StaxDataBindingInterceptor.
+ * Sets the correct operation when the binding style is RPC. The processing of the message content is delegated to the
+ * StaxDataBindingInterceptor.
  *
  */
-public class ProxyRPCInInterceptor extends AbstractInDatabindingInterceptor
-{
-    public ProxyRPCInInterceptor()
-    {
-        super(Phase.UNMARSHAL);
-        addAfter(URIMappingInterceptor.class.getName());
-        addBefore(StaxDataBindingInterceptor.class.getName());
+public class ProxyRPCInInterceptor extends AbstractInDatabindingInterceptor {
+
+  public ProxyRPCInInterceptor() {
+    super(Phase.UNMARSHAL);
+    addAfter(URIMappingInterceptor.class.getName());
+    addBefore(StaxDataBindingInterceptor.class.getName());
+  }
+
+  private BindingOperationInfo getOperation(Message message, QName opName) {
+    BindingOperationInfo bop = ServiceModelUtil.getOperation(message.getExchange(), opName);
+    if (bop == null) {
+      Endpoint ep = message.getExchange().get(Endpoint.class);
+      if (ep == null) {
+        return null;
+      }
+
+      BindingInfo service = ep.getEndpointInfo().getBinding();
+      boolean output = !isRequestor(message);
+      for (BindingOperationInfo info : service.getOperations()) {
+        if (info.getName().getLocalPart().equals(opName.getLocalPart())) {
+          SoapBody body;
+          if (output) {
+            body = info.getOutput().getExtensor(SoapBody.class);
+          } else {
+            body = info.getInput().getExtensor(SoapBody.class);
+          }
+
+          if (body != null && opName.getNamespaceURI().equals(body.getNamespaceURI())) {
+            return info;
+          }
+        }
+      }
+    }
+    return bop;
+  }
+
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
+
+    if (!StaxUtils.toNextElement(xmlReader)) {
+      message.setContent(Exception.class, new RuntimeException("There must be a method name element."));
     }
 
-    private BindingOperationInfo getOperation(Message message, QName opName) {
-        BindingOperationInfo bop = ServiceModelUtil.getOperation(message.getExchange(), opName);
-        if (bop == null)
-        {
-            Endpoint ep = message.getExchange().get(Endpoint.class);
-            if (ep == null)
-            {
-                return null;
-            }
-
-            BindingInfo service = ep.getEndpointInfo().getBinding();
-            boolean output = !isRequestor(message);
-            for (BindingOperationInfo info : service.getOperations())
-            {
-                if (info.getName().getLocalPart().equals(opName.getLocalPart()))
-                {
-                    SoapBody body;
-                    if (output)
-                    {
-                        body = info.getOutput().getExtensor(SoapBody.class);
-                    } else
-                    {
-                        body = info.getInput().getExtensor(SoapBody.class);
-                    }
-
-                    if (body != null && opName.getNamespaceURI().equals(body.getNamespaceURI()))
-                    {
-                        return info;
-                    }
-                }
-            }
-        }
-        return bop;
+    String opName = xmlReader.getLocalName();
+    if (isRequestor(message) && opName.endsWith("Response")) {
+      opName = opName.substring(0, opName.length() - 8);
     }
 
-    @Override
-    public void handleMessage(Message message) throws Fault
-    {
-        DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
-
-        if (!StaxUtils.toNextElement(xmlReader))
-        {
-            message.setContent(Exception.class, new RuntimeException("There must be a method name element."));
-        }
-
-        String opName = xmlReader.getLocalName();
-        if (isRequestor(message) && opName.endsWith("Response"))
-        {
-            opName = opName.substring(0, opName.length() - 8);
-        }
-
-        BindingOperationInfo operation = getOperation(message, new QName(xmlReader.getNamespaceURI(), opName));
-        message.getExchange().put(BindingOperationInfo.class, operation);
-    }
+    BindingOperationInfo operation = getOperation(message, new QName(xmlReader.getNamespaceURI(), opName));
+    message.getExchange().put(BindingOperationInfo.class, operation);
+  }
 }

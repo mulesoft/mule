@@ -23,58 +23,49 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateBulkInputMetadataTestCase extends AbstractBulkUpdateInputMetadataTestCase
-{
+public class UpdateBulkInputMetadataTestCase extends AbstractBulkUpdateInputMetadataTestCase {
 
-    public UpdateBulkInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateBulkInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-bulk-input-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-bulk-input-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsNullUpdateMetadataUnParameterizedQuery() throws Exception
-    {
-        doUnresolvedMetadataTest("updateBulkMetadataNoParams");
-    }
+  @Test
+  public void returnsNullUpdateMetadataUnParameterizedQuery() throws Exception {
+    doUnresolvedMetadataTest("updateBulkMetadataNoParams");
+  }
 
-    @Test
-    public void returnsNullUpdateInputMetadataFromNotSupportedParameterizedQuery() throws Exception
-    {
-        doUnresolvedMetadataTest("updateBulkMetadataNotSupportedValueParams");
-    }
+  @Test
+  public void returnsNullUpdateInputMetadataFromNotSupportedParameterizedQuery() throws Exception {
+    doUnresolvedMetadataTest("updateBulkMetadataNotSupportedValueParams");
+  }
 
-    @Test
-    public void returnsUpdateInputMetadataFromBeanParameterizedQuery() throws Exception
-    {
-        doResolvedMetadataTest("updateBulkMetadataBeanParams");
-    }
+  @Test
+  public void returnsUpdateInputMetadataFromBeanParameterizedQuery() throws Exception {
+    doResolvedMetadataTest("updateBulkMetadataBeanParams");
+  }
 
-    @Test
-    public void returnsUpdateInputMetadataFromMapParameterizedQuery() throws Exception
-    {
-        doResolvedMetadataTest("updateBulkMetadataMapParams");
-    }
+  @Test
+  public void returnsUpdateInputMetadataFromMapParameterizedQuery() throws Exception {
+    doResolvedMetadataTest("updateBulkMetadataMapParams");
+  }
 
-    private void doUnresolvedMetadataTest(String flowName)
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+  private void doUnresolvedMetadataTest(String flowName) {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractDbMessageProcessor queryMessageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> inputMetaData = queryMessageProcessor.getInputMetaData();
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractDbMessageProcessor queryMessageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> inputMetaData = queryMessageProcessor.getInputMetaData();
 
-        assertThat(inputMetaData, equalTo(null));
-    }
+    assertThat(inputMetaData, equalTo(null));
+  }
 }

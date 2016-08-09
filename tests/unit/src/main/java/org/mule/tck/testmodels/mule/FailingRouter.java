@@ -11,11 +11,10 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
-public class FailingRouter extends AbstractFilteringMessageProcessor
-{
-    @Override
-    protected boolean accept(MuleEvent event)
-    {
-        throw new MuleRuntimeException(MessageFactory.createStaticMessage("Failure"));
-    }
+public class FailingRouter extends AbstractFilteringMessageProcessor {
+
+  @Override
+  protected boolean accept(MuleEvent event) {
+    throw new MuleRuntimeException(MessageFactory.createStaticMessage("Failure"));
+  }
 }

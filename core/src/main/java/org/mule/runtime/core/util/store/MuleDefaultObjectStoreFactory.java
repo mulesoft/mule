@@ -11,42 +11,35 @@ import org.mule.runtime.core.api.store.QueueStore;
 
 import java.io.Serializable;
 
-public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
-{
+public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory {
 
-    @Override
-    public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
-    {
-        return new PartitionedInMemoryObjectStore<Serializable>();
-    }
+  @Override
+  public ObjectStore<Serializable> createDefaultInMemoryObjectStore() {
+    return new PartitionedInMemoryObjectStore<Serializable>();
+  }
 
-    @Override
-    public ObjectStore<Serializable> createDefaultPersistentObjectStore()
-    {
-        return new PartitionedPersistentObjectStore<Serializable>();
-    }
+  @Override
+  public ObjectStore<Serializable> createDefaultPersistentObjectStore() {
+    return new PartitionedPersistentObjectStore<Serializable>();
+  }
 
-    @Override
-    public QueueStore<Serializable> createDefaultInMemoryQueueStore()
-    {
-        return new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
-    }
+  @Override
+  public QueueStore<Serializable> createDefaultInMemoryQueueStore() {
+    return new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
+  }
 
-    @Override
-    public QueueStore<Serializable> createDefaultPersistentQueueStore()
-    {
-        return new QueueStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
-    }
+  @Override
+  public QueueStore<Serializable> createDefaultPersistentQueueStore() {
+    return new QueueStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
+  }
 
-    @Override
-    public ObjectStore<Serializable> createDefaultUserObjectStore()
-    {
-        return new PartitionedPersistentObjectStore<Serializable>();
-    }
+  @Override
+  public ObjectStore<Serializable> createDefaultUserObjectStore() {
+    return new PartitionedPersistentObjectStore<Serializable>();
+  }
 
-    @Override
-    public ObjectStore<Serializable> createDefaultUserTransientObjectStore()
-    {
-        return new PartitionedInMemoryObjectStore<Serializable>();
-    }
+  @Override
+  public ObjectStore<Serializable> createDefaultUserTransientObjectStore() {
+    return new PartitionedInMemoryObjectStore<Serializable>();
+  }
 }

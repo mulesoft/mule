@@ -6,6 +6,7 @@
  */
 
 package org.mule.mvel;
+
 public class BarDetails {
 }
 

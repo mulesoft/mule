@@ -25,55 +25,50 @@ import org.junit.Test;
 /**
  * Tests that JMS message are correctly sent when caching elements and use transactions
  */
-public class JmsTransactionalCachingTestCase extends FunctionalTestCase
-{
+public class JmsTransactionalCachingTestCase extends FunctionalTestCase {
 
-    public static final String TEST_MESSAGE_1 = "test1";
-    public static final String TEST_MESSAGE_2 = "test2";
-    public static final String TEST_MESSAGE_3 = "test3";
+  public static final String TEST_MESSAGE_1 = "test1";
+  public static final String TEST_MESSAGE_2 = "test2";
+  public static final String TEST_MESSAGE_3 = "test3";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-transactional-caching-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "jms-transactional-caching-config.xml";
+  }
+
+  @Test
+  public void cachesSession() throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
+    assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
+    response = client.send("vm://testInput", TEST_MESSAGE_2, null);
+    assertThat(response.getPayload(), is(nullValue()));
+    response = client.send("vm://testInput", TEST_MESSAGE_3, null);
+    assertThat(TEST_MESSAGE_3, equalTo(getPayloadAsString(response)));
+
+    Set<String> responses = new HashSet<String>();
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    responses.add(getPayloadAsString(response));
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    responses.add(getPayloadAsString(response));
+
+    assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_3)));
+  }
+
+  public static class AbortMessageOnEventCount {
+
+    private static AtomicInteger counter = new AtomicInteger(0);
+
+    public Object process(Object payload) {
+      final int currentCounter = counter.incrementAndGet();
+
+      if (currentCounter % 2 == 0) {
+        throw new RuntimeException("Expected exception to abort the transaction during the test");
+      }
+
+      return payload;
     }
-
-    @Test
-    public void cachesSession() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
-        assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
-        response = client.send("vm://testInput", TEST_MESSAGE_2, null);
-        assertThat(response.getPayload(), is(nullValue()));
-        response = client.send("vm://testInput", TEST_MESSAGE_3, null);
-        assertThat(TEST_MESSAGE_3, equalTo(getPayloadAsString(response)));
-
-        Set<String> responses = new HashSet<String>();
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(getPayloadAsString(response));
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(getPayloadAsString(response));
-
-        assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_3)));
-    }
-
-    public static class AbortMessageOnEventCount
-    {
-        private static AtomicInteger counter = new AtomicInteger(0);
-
-        public Object process(Object payload)
-        {
-            final int currentCounter = counter.incrementAndGet();
-
-            if (currentCounter % 2 == 0)
-            {
-                throw new RuntimeException("Expected exception to abort the transaction during the test");
-            }
-
-            return payload;
-        }
-    }
+  }
 
 }

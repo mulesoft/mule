@@ -20,53 +20,49 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
 
-public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
-{
-    private static final String MESSAGE_TEXT = "Test JMS Message";
+public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase {
 
-    @Override
-    protected MuleMessageFactory doCreateMuleMessageFactory()
-    {
-        return new JmsMuleMessageFactory();
-    }
+  private static final String MESSAGE_TEXT = "Test JMS Message";
 
-    @Override
-    protected Object getValidTransportMessage() throws Exception
-    {
-        TextMessage textMessage = mock(TextMessage.class);
-        when(textMessage.getText()).thenReturn(MESSAGE_TEXT);
-        when(textMessage.getJMSCorrelationID()).thenReturn(null);
-        when(textMessage.getJMSDeliveryMode()).thenReturn(Integer.valueOf(1));
-        when(textMessage.getJMSDestination()).thenReturn(null);
-        when(textMessage.getJMSExpiration()).thenReturn(Long.valueOf(0));
-        when(textMessage.getJMSMessageID()).thenReturn("1234567890");
-        when(textMessage.getJMSPriority()).thenReturn(Integer.valueOf(4));
-        when(textMessage.getJMSRedelivered()).thenReturn(Boolean.FALSE);
-        when(textMessage.getJMSReplyTo()).thenReturn(null);
-        when(textMessage.getJMSTimestamp()).thenReturn(Long.valueOf(0));
-        when(textMessage.getJMSType()).thenReturn(null);
-        when(textMessage.getPropertyNames()).thenReturn(
-            IteratorUtils.asEnumeration(IteratorUtils.arrayIterator(new Object[] { "foo" })));
-        when(textMessage.getObjectProperty("foo")).thenReturn("bar");
-        return textMessage;
-    }
+  @Override
+  protected MuleMessageFactory doCreateMuleMessageFactory() {
+    return new JmsMuleMessageFactory();
+  }
 
-    @Override
-    protected Object getUnsupportedTransportMessage()
-    {
-        return "this is an invalid transport message for JmsMuleMessageFactory";
-    }
+  @Override
+  protected Object getValidTransportMessage() throws Exception {
+    TextMessage textMessage = mock(TextMessage.class);
+    when(textMessage.getText()).thenReturn(MESSAGE_TEXT);
+    when(textMessage.getJMSCorrelationID()).thenReturn(null);
+    when(textMessage.getJMSDeliveryMode()).thenReturn(Integer.valueOf(1));
+    when(textMessage.getJMSDestination()).thenReturn(null);
+    when(textMessage.getJMSExpiration()).thenReturn(Long.valueOf(0));
+    when(textMessage.getJMSMessageID()).thenReturn("1234567890");
+    when(textMessage.getJMSPriority()).thenReturn(Integer.valueOf(4));
+    when(textMessage.getJMSRedelivered()).thenReturn(Boolean.FALSE);
+    when(textMessage.getJMSReplyTo()).thenReturn(null);
+    when(textMessage.getJMSTimestamp()).thenReturn(Long.valueOf(0));
+    when(textMessage.getJMSType()).thenReturn(null);
+    when(textMessage.getPropertyNames())
+        .thenReturn(IteratorUtils.asEnumeration(IteratorUtils.arrayIterator(new Object[] {"foo"})));
+    when(textMessage.getObjectProperty("foo")).thenReturn("bar");
+    return textMessage;
+  }
 
-    @Override
-    public void testValidPayload() throws Exception
-    {
-        MuleMessageFactory factory = createMuleMessageFactory();
+  @Override
+  protected Object getUnsupportedTransportMessage() {
+    return "this is an invalid transport message for JmsMuleMessageFactory";
+  }
 
-        Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
-        assertNotNull(message);
-        assertEquals(payload, message.getPayload());
-        // message factory populates the inbound scope
-        assertEquals("bar", message.getInboundProperty("foo"));
-    }
+  @Override
+  public void testValidPayload() throws Exception {
+    MuleMessageFactory factory = createMuleMessageFactory();
+
+    Object payload = getValidTransportMessage();
+    MuleMessage message = factory.create(payload, encoding);
+    assertNotNull(message);
+    assertEquals(payload, message.getPayload());
+    // message factory populates the inbound scope
+    assertEquals("bar", message.getInboundProperty("foo"));
+  }
 }

@@ -17,58 +17,42 @@ import java.sql.Statement;
 /**
  * Closes a {@link ResultSet} and related {@link Statement}
  */
-public class SingleResultResultSetCloser extends AbstractStreamingResultSetCloser
-{
+public class SingleResultResultSetCloser extends AbstractStreamingResultSetCloser {
 
-    @Override
-    public void close(DbConnection connection, ResultSet resultSet)
-    {
-        Statement statement = getStatement(resultSet);
+  @Override
+  public void close(DbConnection connection, ResultSet resultSet) {
+    Statement statement = getStatement(resultSet);
 
-        try
-        {
-            super.close(connection, resultSet);
+    try {
+      super.close(connection, resultSet);
+    } finally {
+      closeStatement(statement);
+    }
+  }
+
+  protected void closeStatement(Statement statement) {
+    if (statement != null) {
+      try {
+        statement.close();
+      } catch (SQLException e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error closing statement. Ignored", e);
         }
-        finally
-        {
-            closeStatement(statement);
-        }
+      }
+    }
+  }
+
+  protected Statement getStatement(ResultSet resultSet) {
+    Statement statement = null;
+
+    try {
+      statement = resultSet.getStatement();
+    } catch (SQLException e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Error closing statement. Ignored", e);
+      }
     }
 
-    protected void closeStatement(Statement statement)
-    {
-        if (statement != null)
-        {
-            try
-            {
-                statement.close();
-            }
-            catch (SQLException e)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Error closing statement. Ignored", e);
-                }
-            }
-        }
-    }
-
-    protected Statement getStatement(ResultSet resultSet)
-    {
-        Statement statement = null;
-
-        try
-        {
-            statement = resultSet.getStatement();
-        }
-        catch (SQLException e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Error closing statement. Ignored", e);
-            }
-        }
-
-        return statement;
-    }
+    return statement;
+  }
 }

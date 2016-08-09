@@ -26,68 +26,58 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class InjectDefaultObjectSerializerTestCase extends AbstractIntegrationTestCase
-{
+public class InjectDefaultObjectSerializerTestCase extends AbstractIntegrationTestCase {
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {"Default Serializer", new String[] {}},
-                {"Custom Serializer", new String[] {"custom-object-serializer-config.xml"}}
-        });
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"Default Serializer", new String[] {}},
+        {"Custom Serializer", new String[] {"custom-object-serializer-config.xml"}}});
+  }
+
+  private final String name;
+  private final String[] configFiles;
+
+  public InjectDefaultObjectSerializerTestCase(String name, String[] configFiles) {
+    this.name = name;
+    this.configFiles = configFiles;
+  }
+
+  @Override
+  protected String[] getConfigFiles() {
+    return configFiles;
+  }
+
+  @Test
+  public void injectObjectSerializer() throws Exception {
+    TestObjectSerializerInjectionTarget injectionTarget =
+        muleContext.getInjector().inject(new TestObjectSerializerInjectionTarget());
+    assertThat(muleContext.getObjectSerializer(), is(sameInstance(injectionTarget.getObjectSerializer())));
+    assertThat(injectionTarget.getObjectSerializer(),
+               is(sameInstance(muleContext.getRegistry().get(MuleProperties.OBJECT_SERIALIZER))));
+  }
+
+  public static class TestObjectSerializerInjectionTarget {
+
+    @Inject
+    @DefaultObjectSerializer
+    private ObjectSerializer objectSerializer;
+
+    public ObjectSerializer getObjectSerializer() {
+      return objectSerializer;
     }
+  }
 
-    private final String name;
-    private final String[] configFiles;
+  public static class TestObjectSerializer extends AbstractObjectSerializer {
 
-    public InjectDefaultObjectSerializerTestCase(String name, String[] configFiles)
-    {
-        this.name = name;
-        this.configFiles = configFiles;
+    @Override
+    protected byte[] doSerialize(Object object) throws Exception {
+      return new byte[0];
     }
 
     @Override
-    protected String[] getConfigFiles()
-    {
-        return configFiles;
+    protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
+      return null;
     }
-
-    @Test
-    public void injectObjectSerializer() throws Exception
-    {
-        TestObjectSerializerInjectionTarget injectionTarget = muleContext.getInjector().inject(new TestObjectSerializerInjectionTarget());
-        assertThat(muleContext.getObjectSerializer(), is(sameInstance(injectionTarget.getObjectSerializer())));
-        assertThat(injectionTarget.getObjectSerializer(), is(sameInstance(muleContext.getRegistry().get(MuleProperties.OBJECT_SERIALIZER))));
-    }
-
-    public static class TestObjectSerializerInjectionTarget
-    {
-
-        @Inject
-        @DefaultObjectSerializer
-        private ObjectSerializer objectSerializer;
-
-        public ObjectSerializer getObjectSerializer()
-        {
-            return objectSerializer;
-        }
-    }
-
-    public static class TestObjectSerializer extends AbstractObjectSerializer
-    {
-
-        @Override
-        protected byte[] doSerialize(Object object) throws Exception
-        {
-            return new byte[0];
-        }
-
-        @Override
-        protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception
-        {
-            return null;
-        }
-    }
+  }
 
 }

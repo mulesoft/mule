@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.ws.security;
 
-public enum PasswordType
-{
-    TEXT, DIGEST
+public enum PasswordType {
+  TEXT, DIGEST
 }

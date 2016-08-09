@@ -23,39 +23,33 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectStoredProcedureTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectStoredProcedureTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-stored-procedure-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-stored-procedure-config.xml"};
+  }
 
-    @Test
-    public void selectsFromStoredProcedure() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectStoredProcedure").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void selectsFromStoredProcedure() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectStoredProcedure").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
-        testDatabase.createStoredProcedureGetRecords(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+    testDatabase.createStoredProcedureGetRecords(getDefaultDataSource());
+  }
 }

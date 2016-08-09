@@ -9,67 +9,59 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Ignore;
 
-public class TestDocumentedExtensionOperations
-{
+public class TestDocumentedExtensionOperations {
 
-    /**
-     * Test Operation
-     *
-     * @param value test value
-     */
-    public void operation(String value, @ParameterGroup TestDocumentedParameterGroup group)
-    {
+  /**
+   * Test Operation
+   *
+   * @param value test value
+   */
+  public void operation(String value, @ParameterGroup TestDocumentedParameterGroup group) {
 
-    }
+  }
 
-    /**
-     * This method greets a friend
-     *
-     * @param friend This is one of my friends
-     * @param otherFriend Some other friend
-     */
-    public void greetFriend(String friend, String otherFriend)
-    {
-    }
+  /**
+   * This method greets a friend
+   *
+   * @param friend This is one of my friends
+   * @param otherFriend Some other friend
+   */
+  public void greetFriend(String friend, String otherFriend) {}
 
-    /**
-     * Test Operation with blank parameter description
-     *
-     * @param value
-     */
-    public void operationWithBlankParameterDescription(String value)
-    {
+  /**
+   * Test Operation with blank parameter description
+   *
+   * @param value
+   */
+  public void operationWithBlankParameterDescription(String value) {
 
-    }
+  }
 
-    /**
-     * Operation that returns a {@link String} value
-     *
-     * @param value this is the {@link String} to be returned
-     */
-    public void operationWithJavadocLinkReferences(String value)
-    {
+  /**
+   * Operation that returns a {@link String} value
+   *
+   * @param value this is the {@link String} to be returned
+   */
+  public void operationWithJavadocLinkReferences(String value) {
 
-    }
+  }
 
-    /**
-     * This operation should not be documented
-     *
-     * @param value test value
-     */
-    @Ignore
-    public void ignoreOperationShouldBeIgnored(String value)
-    {
+  /**
+   * This operation should not be documented
+   *
+   * @param value test value
+   */
+  @Ignore
+  public void ignoreOperationShouldBeIgnored(String value) {
 
-    }
+  }
 
-    /**
-     * Private operation should not be documented
-     *
-     * @param value test value
-     */
-    private void privateOperationShouldBeIgnored(String value)
-    {
+  /**
+   * Private operation should not be documented
+   *
+   * @param value test value
+   */
+  private void privateOperationShouldBeIgnored(String value) {
 
-    }
+  }
 }

@@ -24,37 +24,33 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<MessageProcessor> implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject, MessageProcessorContainer
-{
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
+public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<MessageProcessor>
+    implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject, MessageProcessorContainer {
 
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
+  private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
+  public final Object getAnnotation(QName name) {
+    return annotations.get(name);
+  }
 
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
+  public final Map<QName, Object> getAnnotations() {
+    return Collections.unmodifiableMap(annotations);
+  }
 
-    protected List<MessageProcessor> getOwnedObjects()
-    {
-        return getOwnedMessageProcessors();
-    }
+  public synchronized final void setAnnotations(Map<QName, Object> newAnnotations) {
+    annotations.clear();
+    annotations.putAll(newAnnotations);
+  }
 
-    protected abstract List<MessageProcessor> getOwnedMessageProcessors();
+  protected List<MessageProcessor> getOwnedObjects() {
+    return getOwnedMessageProcessors();
+  }
 
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
-    {
-        NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
-    }
+  protected abstract List<MessageProcessor> getOwnedMessageProcessors();
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
+  }
 }
 

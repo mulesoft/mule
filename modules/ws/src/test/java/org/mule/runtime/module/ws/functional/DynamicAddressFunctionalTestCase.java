@@ -11,42 +11,35 @@ import static java.util.Collections.singletonMap;
 
 import org.junit.Test;
 
-public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "dynamic-address-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "dynamic-address-config.xml";
+  }
 
-    @Test
-    public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception
-    {
-        assertValidResponse("clientInboundProperty", ECHO_REQUEST, singletonMap("pathInboundProperty", "services/Test"));
-    }
+  @Test
+  public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception {
+    assertValidResponse("clientInboundProperty", ECHO_REQUEST, singletonMap("pathInboundProperty", "services/Test"));
+  }
 
-    @Test
-    public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception
-    {
-        assertValidResponse("clientOutboundProperty");
-    }
+  @Test
+  public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception {
+    assertValidResponse("clientOutboundProperty");
+  }
 
-    @Test
-    public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception
-    {
-        assertValidResponse("clientFlowVar");
-    }
+  @Test
+  public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception {
+    assertValidResponse("clientFlowVar");
+  }
 
-    @Test
-    public void failsWhenInvalidPathIsProvided() throws Exception
-    {
-        assertSoapFault("clientInboundProperty", ECHO_REQUEST, singletonMap("clientInboundProperty", "invalid"), "Client");
-    }
+  @Test
+  public void failsWhenInvalidPathIsProvided() throws Exception {
+    assertSoapFault("clientInboundProperty", ECHO_REQUEST, singletonMap("clientInboundProperty", "invalid"), "Client");
+  }
 
-    @Test
-    public void failsWhenNoPathIsDefined() throws Exception
-    {
-        assertSoapFault("clientInboundProperty", ECHO_REQUEST, "Client");
-    }
+  @Test
+  public void failsWhenNoPathIsDefined() throws Exception {
+    assertSoapFault("clientInboundProperty", ECHO_REQUEST, "Client");
+  }
 }

@@ -9,21 +9,19 @@ package org.mule.compatibility.transport.jms.integration;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
-    }
+public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    @Ignore("MULE-9628")
-    public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
-    {
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
+  }
+
+  @Test
+  @Ignore("MULE-9628")
+  public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception {
+    send(scenarioCommit);
+    receive(scenarioRollback);
+    receive(scenarioCommit);
+    receive(scenarioNotReceive);
+  }
 }

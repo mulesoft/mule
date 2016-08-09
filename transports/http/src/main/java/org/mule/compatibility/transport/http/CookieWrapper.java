@@ -19,119 +19,100 @@ import java.util.TimeZone;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.NameValuePair;
 
-public class CookieWrapper extends NameValuePair
-{
-    private String domain;
-    private String path;
-    private Object expiryDate;
-    private String maxAge;
-    private String secure;
-    private String version;
+public class CookieWrapper extends NameValuePair {
 
-    public void parse(MuleEvent event, ExpressionManager expressionManager)
-    {
-        setName(parse(getName(), event, expressionManager));
-        setValue(parse(getValue(), event, expressionManager));
-        this.domain = parse(domain, event, expressionManager);
-        this.path = parse(path, event, expressionManager);
-        if(expiryDate != null)
-        {
-            this.expiryDate = evaluateDate(expiryDate, event, expressionManager);
-        }
-        this.maxAge = parse(maxAge, event, expressionManager);
-        this.secure = parse(secure, event, expressionManager);
-        this.version = parse(version, event, expressionManager);
+  private String domain;
+  private String path;
+  private Object expiryDate;
+  private String maxAge;
+  private String secure;
+  private String version;
+
+  public void parse(MuleEvent event, ExpressionManager expressionManager) {
+    setName(parse(getName(), event, expressionManager));
+    setValue(parse(getValue(), event, expressionManager));
+    this.domain = parse(domain, event, expressionManager);
+    this.path = parse(path, event, expressionManager);
+    if (expiryDate != null) {
+      this.expiryDate = evaluateDate(expiryDate, event, expressionManager);
+    }
+    this.maxAge = parse(maxAge, event, expressionManager);
+    this.secure = parse(secure, event, expressionManager);
+    this.version = parse(version, event, expressionManager);
+  }
+
+  private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
+    if (value != null) {
+      return expressionManager.parse(value, event);
+    }
+    return value;
+  }
+
+  private Object evaluateDate(Object date, MuleEvent event, ExpressionManager expressionManager) {
+
+    if (date != null && date instanceof String && expressionManager.isExpression(date.toString())) {
+      return expressionManager.evaluate(date.toString(), event);
+    }
+    return date;
+  }
+
+  public Cookie createCookie() throws ParseException {
+    Cookie cookie = new Cookie();
+    cookie.setName(getName());
+    cookie.setValue(getValue());
+    cookie.setDomain(domain);
+    cookie.setPath(path);
+
+    if (expiryDate != null) {
+      cookie.setExpiryDate(formatExpiryDate(expiryDate));
     }
 
-    private String parse(String value, MuleEvent event, ExpressionManager expressionManager)
-    {
-        if(value != null)
-        {
-            return expressionManager.parse(value, event);
-        }
-        return value;
+    if (maxAge != null && expiryDate == null) {
+      cookie.setExpiryDate(new Date(System.currentTimeMillis() + Integer.valueOf(maxAge) * 1000L));
     }
 
-    private Object evaluateDate(Object date, MuleEvent event, ExpressionManager expressionManager)
-    {
-
-        if(date != null && date instanceof String && expressionManager.isExpression(date.toString()))
-        {
-            return expressionManager.evaluate(date.toString(), event);
-        }
-        return date;
+    if (secure != null) {
+      cookie.setSecure(Boolean.valueOf(secure));
+    }
+    if (version != null) {
+      cookie.setVersion(Integer.valueOf(version));
     }
 
-    public Cookie createCookie() throws ParseException
-    {
-        Cookie cookie = new Cookie();
-        cookie.setName(getName());
-        cookie.setValue(getValue());
-        cookie.setDomain(domain);
-        cookie.setPath(path);
+    return cookie;
+  }
 
-        if(expiryDate != null)
-        {
-            cookie.setExpiryDate(formatExpiryDate(expiryDate));
-        }
-
-        if(maxAge != null && expiryDate == null)
-        {
-            cookie.setExpiryDate(new Date(System.currentTimeMillis() + Integer.valueOf(maxAge) * 1000L));
-        }
-
-        if(secure != null)
-        {
-            cookie.setSecure(Boolean.valueOf(secure));
-        }
-        if(version != null)
-        {
-            cookie.setVersion(Integer.valueOf(version));
-        }
-
-        return cookie;
+  private Date formatExpiryDate(Object expiryDate) throws ParseException {
+    if (expiryDate instanceof String) {
+      SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
+      format.setTimeZone(TimeZone.getTimeZone("GMT"));
+      return format.parse((String) expiryDate);
     }
-
-    private Date formatExpiryDate(Object expiryDate) throws ParseException
-    {
-        if(expiryDate instanceof String)
-        {
-            SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("GMT"));
-            return format.parse((String) expiryDate);
-        }
-        return (Date) expiryDate;
-    }
+    return (Date) expiryDate;
+  }
 
 
-    public void setDomain(String domain)
-    {
-        this.domain = domain;
-    }
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
 
-    public void setPath(String path)
-    {
-        this.path = path;
-    }
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-    public void setExpiryDate(Object expiryDate)
-    {
-        this.expiryDate = expiryDate;
-    }
+  public void setExpiryDate(Object expiryDate) {
+    this.expiryDate = expiryDate;
+  }
 
-    public void setMaxAge(String maxAge)
-    {
-        this.maxAge = maxAge;
-    }
+  public void setMaxAge(String maxAge) {
+    this.maxAge = maxAge;
+  }
 
-    public void setSecure(String secure)
-    {
-        this.secure = secure;
-    }
+  public void setSecure(String secure) {
+    this.secure = secure;
+  }
 
-    public void setVersion(String version)
-    {
-        this.version = version;
-    }
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
 }

@@ -8,23 +8,21 @@
 package org.mule.runtime.config.spring.dsl.api;
 
 /**
- * Interface that must be implemented by those classes that are meant to be used as a factory to
- * create complex domain objects.
+ * Interface that must be implemented by those classes that are meant to be used as a factory to create complex domain objects.
  *
- * This object may have a complex construction with setters and constructor parameters which are going to be
- * defined by the {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} that use them.
+ * This object may have a complex construction with setters and constructor parameters which are going to be defined by the
+ * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} that use them.
  *
  * @param <T> the type of the object to be created.
  *
  * @since 4.0
  */
-public interface ObjectFactory<T>
-{
+public interface ObjectFactory<T> {
 
-    /**
-     * @return the domain object
-     * @throws Exception any failure that may occur building the object
-     */
-    T getObject() throws Exception;
+  /**
+   * @return the domain object
+   * @throws Exception any failure that may occur building the object
+   */
+  T getObject() throws Exception;
 
 }

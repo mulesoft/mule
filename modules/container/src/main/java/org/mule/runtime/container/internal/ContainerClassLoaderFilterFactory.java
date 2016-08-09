@@ -19,137 +19,117 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Creates a {@link ClassLoaderFilter} for the container filter what is exposed to
- * Mule artifacts.
+ * Creates a {@link ClassLoaderFilter} for the container filter what is exposed to Mule artifacts.
  * <p/>
- * Filter is constructed searching for {code}mule-module.properties{code} files in the classpath
- * and then merging the corresponding packages and resources in a new filter.
+ * Filter is constructed searching for {code}mule-module.properties{code} files in the classpath and then merging the
+ * corresponding packages and resources in a new filter.
  */
-public class ContainerClassLoaderFilterFactory
-{
+public class ContainerClassLoaderFilterFactory {
 
-    private static final String EMPTY_PACKAGE = "";
-    private static final char RESOURCE_SEPARATOR = '/';
+  private static final String EMPTY_PACKAGE = "";
+  private static final char RESOURCE_SEPARATOR = '/';
 
-    public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules)
-    {
-        final Set<String> resources = getExportedResourcePaths(muleModules);
-        final Set<String> packages = getModuleExportedPackages(muleModules);
-        final ArtifactClassLoaderFilter artifactClassLoaderFilter = new ArtifactClassLoaderFilter(packages, resources);
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules) {
+    final Set<String> resources = getExportedResourcePaths(muleModules);
+    final Set<String> packages = getModuleExportedPackages(muleModules);
+    final ArtifactClassLoaderFilter artifactClassLoaderFilter = new ArtifactClassLoaderFilter(packages, resources);
 
-        return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
+    return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
+  }
+
+  private Set<String> getExportedResourcePaths(List<MuleModule> muleModules) {
+    Set<String> resources = new HashSet<>();
+    // Adds default SPI resource folder
+    resources.add("/META-INF/services");
+
+    for (MuleModule muleModule : muleModules) {
+      resources.addAll(muleModule.getExportedPaths());
     }
 
-    private Set<String> getExportedResourcePaths(List<MuleModule> muleModules)
-    {
-        Set<String> resources = new HashSet<>();
-        // Adds default SPI resource folder
-        resources.add("/META-INF/services");
+    return resources;
+  }
 
-        for (MuleModule muleModule : muleModules)
-        {
-            resources.addAll(muleModule.getExportedPaths());
-        }
-
-        return resources;
+  private Set<String> getModuleExportedPackages(List<MuleModule> muleModules) {
+    Set<String> packages = new HashSet<>();
+    for (MuleModule muleModule : muleModules) {
+      packages.addAll(muleModule.getExportedPackages());
     }
 
-    private Set<String> getModuleExportedPackages(List<MuleModule> muleModules)
-    {
-        Set<String> packages = new HashSet<>();
-        for (MuleModule muleModule : muleModules)
-        {
-            packages.addAll(muleModule.getExportedPackages());
-        }
+    return packages;
+  }
 
-        return packages;
+  public static class ContainerClassLoaderFilter implements ClassLoaderFilter {
+
+    public static final String CLASS_PACKAGE_SPLIT_REGEX = "\\.";
+    public static final String RESOURCE_PACKAGE_SPLIT_REGEX = "/";
+    private final ClassLoaderFilter moduleClassLoaderFilter;
+    private final Set<String> bootPackages;
+
+    public ContainerClassLoaderFilter(ClassLoaderFilter moduleClassLoaderFilter, Set<String> bootPackages) {
+      this.moduleClassLoaderFilter = moduleClassLoaderFilter;
+      this.bootPackages = bootPackages;
     }
 
-    public static class ContainerClassLoaderFilter implements ClassLoaderFilter
-    {
+    @Override
+    public boolean exportsClass(String name) {
+      boolean exported = moduleClassLoaderFilter.exportsClass(name);
 
-        public static final String CLASS_PACKAGE_SPLIT_REGEX = "\\.";
-        public static final String RESOURCE_PACKAGE_SPLIT_REGEX = "/";
-        private final ClassLoaderFilter moduleClassLoaderFilter;
-        private final Set<String> bootPackages;
-
-        public ContainerClassLoaderFilter(ClassLoaderFilter moduleClassLoaderFilter, Set<String> bootPackages)
-        {
-            this.moduleClassLoaderFilter = moduleClassLoaderFilter;
-            this.bootPackages = bootPackages;
-        }
-
-        @Override
-        public boolean exportsClass(String name)
-        {
-            boolean exported = moduleClassLoaderFilter.exportsClass(name);
-
-            if (!exported)
-            {
-                exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
-            }
-            return exported;
-        }
-
-        @Override
-        public boolean exportsResource(String name)
-        {
-            boolean exported = moduleClassLoaderFilter.exportsResource(name);
-
-            if (!exported)
-            {
-                final String resourceFolder = getResourceFolder(name);
-                exported = moduleClassLoaderFilter.exportsResource(resourceFolder);
-                if (!exported)
-                {
-                    exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
-                }
-            }
-
-            return exported;
-        }
-
-        private String getResourceFolder(String resourceName)
-        {
-            String resourceFolder = "";
-            if (resourceName.length() > 0)
-            {
-                resourceFolder = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
-                resourceFolder = (resourceFolder.lastIndexOf(RESOURCE_SEPARATOR) < 0) ? EMPTY_PACKAGE : resourceFolder.substring(0, resourceFolder.lastIndexOf(RESOURCE_SEPARATOR));
-            }
-            return resourceFolder;
-        }
-
-        private boolean isExportedBooPackage(String name, String splitRegex)
-        {
-            boolean exported = false;
-            final String[] splitName = name.split(splitRegex);
-            final String[] packages = Arrays.copyOf(splitName, splitName.length - 1);
-            String candidatePackage = "";
-
-            for (String currentPackage : packages)
-            {
-                if (candidatePackage.length() != 0)
-                {
-                    candidatePackage += ".";
-                }
-                candidatePackage += currentPackage;
-
-                if (bootPackages.contains(candidatePackage))
-                {
-                    exported = true;
-                    break;
-                }
-
-            }
-            return exported;
-        }
-
-        @Override
-        public String toString()
-        {
-            return reflectionToString(this, MULTI_LINE_STYLE);
-        }
+      if (!exported) {
+        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+      }
+      return exported;
     }
+
+    @Override
+    public boolean exportsResource(String name) {
+      boolean exported = moduleClassLoaderFilter.exportsResource(name);
+
+      if (!exported) {
+        final String resourceFolder = getResourceFolder(name);
+        exported = moduleClassLoaderFilter.exportsResource(resourceFolder);
+        if (!exported) {
+          exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+        }
+      }
+
+      return exported;
+    }
+
+    private String getResourceFolder(String resourceName) {
+      String resourceFolder = "";
+      if (resourceName.length() > 0) {
+        resourceFolder = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
+        resourceFolder = (resourceFolder.lastIndexOf(RESOURCE_SEPARATOR) < 0) ? EMPTY_PACKAGE
+            : resourceFolder.substring(0, resourceFolder.lastIndexOf(RESOURCE_SEPARATOR));
+      }
+      return resourceFolder;
+    }
+
+    private boolean isExportedBooPackage(String name, String splitRegex) {
+      boolean exported = false;
+      final String[] splitName = name.split(splitRegex);
+      final String[] packages = Arrays.copyOf(splitName, splitName.length - 1);
+      String candidatePackage = "";
+
+      for (String currentPackage : packages) {
+        if (candidatePackage.length() != 0) {
+          candidatePackage += ".";
+        }
+        candidatePackage += currentPackage;
+
+        if (bootPackages.contains(candidatePackage)) {
+          exported = true;
+          break;
+        }
+
+      }
+      return exported;
+    }
+
+    @Override
+    public String toString() {
+      return reflectionToString(this, MULTI_LINE_STYLE);
+    }
+  }
 
 }

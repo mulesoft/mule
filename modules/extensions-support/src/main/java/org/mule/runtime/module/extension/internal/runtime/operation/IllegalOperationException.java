@@ -13,16 +13,13 @@ import org.mule.runtime.module.extension.internal.runtime.exception.IllegalCompo
  *
  * @since 4.0
  */
-public class IllegalOperationException extends IllegalComponentException
-{
+public class IllegalOperationException extends IllegalComponentException {
 
-    public IllegalOperationException(String message)
-    {
-        super(message);
-    }
+  public IllegalOperationException(String message) {
+    super(message);
+  }
 
-    public IllegalOperationException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public IllegalOperationException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

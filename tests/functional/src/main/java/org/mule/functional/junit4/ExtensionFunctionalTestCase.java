@@ -30,157 +30,131 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Base test class for {@link FunctionalTestCase}s
- * that make use of components generated through the extensions API.
+ * Base test class for {@link FunctionalTestCase}s that make use of components generated through the extensions API.
  * <p/>
- * The value added by this class in comparison to a traditional
- * {@link FunctionalTestCase} is that before creating
- * the {@link MuleContext}, it creates a {@link ExtensionManager}
- * and automatically registers extensions pointed by the {@link #getDescribers()}
- * or {@link #getAnnotatedExtensionClasses()} methods.
+ * The value added by this class in comparison to a traditional {@link FunctionalTestCase} is that before creating the
+ * {@link MuleContext}, it creates a {@link ExtensionManager} and automatically registers extensions pointed by the
+ * {@link #getDescribers()} or {@link #getAnnotatedExtensionClasses()} methods.
  * <p/>
- * Once extensions are registered, a {@link ResourcesGenerator} is used to automatically
- * generate any backing resources needed (XSD schemas, spring bundles, etc).
+ * Once extensions are registered, a {@link ResourcesGenerator} is used to automatically generate any backing resources needed
+ * (XSD schemas, spring bundles, etc).
  * <p/>
- * In this way, the user experience is greatly simplified when running the test
- * either through an IDE or build tool such as maven or gradle.
+ * In this way, the user experience is greatly simplified when running the test either through an IDE or build tool such as maven
+ * or gradle.
  * <p/>
- * Since this class extends {@link FunctionalTestCase}, a new {@link MuleContext}
- * is created per each test. That also means that a new {@link ExtensionManager}
- * is created per test.
+ * Since this class extends {@link FunctionalTestCase}, a new {@link MuleContext} is created per each test. That also means that a
+ * new {@link ExtensionManager} is created per test.
  *
  * @since 3.7.0
  */
-public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
-{
+public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
 
-    private ExtensionManagerAdapter extensionManager;
+  private ExtensionManagerAdapter extensionManager;
 
-    /**
-     * Implement this method to limit the amount of extensions
-     * initialised by providing the {@link Describer}s for
-     * the extensions that you actually want to use for this test.
-     * Returning a {@code null} or empty array will cause the
-     * {@link #getAnnotatedExtensionClasses()} method to be considered.
-     * Default implementation of this method returns {@code null}
-     */
-    protected Describer[] getDescribers()
-    {
-        return null;
+  /**
+   * Implement this method to limit the amount of extensions initialised by providing the {@link Describer}s for the extensions
+   * that you actually want to use for this test. Returning a {@code null} or empty array will cause the
+   * {@link #getAnnotatedExtensionClasses()} method to be considered. Default implementation of this method returns {@code null}
+   */
+  protected Describer[] getDescribers() {
+    return null;
+  }
+
+  /**
+   * Implement this method to limit the amount of extensions initialised by providing the annotated classes which define the
+   * extensions that you actually want to use for this test. Returning a {@code null} or empty array forces the
+   * {@link ExtensionManager} to perform a full classpath discovery. Default implementation of this method returns {@code null}.
+   * This method will only be considered if {@link #getDescribers()} returns {@code null}
+   */
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return null;
+  }
+
+  /**
+   * Adds a {@link ConfigurationBuilder} that sets the {@link #extensionManager} into the {@link #muleContext}. This
+   * {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
+   *
+   * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
+   */
+  @Override
+  protected final void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(0, new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        createExtensionsManager(muleContext);
+      }
+    });
+  }
+
+  private void createExtensionsManager(MuleContext muleContext) throws Exception {
+    extensionManager = new DefaultExtensionManager();
+    File generatedResourcesDirectory = getGenerationTargetDirectory();
+
+    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+    initialiseIfNeeded(extensionManager, muleContext);
+
+    ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer =
+        new ExtensionsTestInfrastructureDiscoverer(extensionManager, generatedResourcesDirectory);
+    List<GeneratedResource> generatedResources =
+        extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
+    generateResourcesAndAddToClasspath(generatedResourcesDirectory, generatedResources);
+  }
+
+  private void generateResourcesAndAddToClasspath(File generatedResourcesDirectory, List<GeneratedResource> resources)
+      throws Exception {
+    ClassLoader cl = getClass().getClassLoader();
+    Method method = findMethod(cl.getClass(), "addURL", URL.class);
+    method.setAccessible(true);
+
+    for (GeneratedResource resource : resources) {
+      URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
+      method.invoke(cl, generatedResourceURL);
+    }
+  }
+
+  private File getGenerationTargetDirectory() {
+    URL url = getResourceAsUrl(getEffectiveConfigFile(), getClass(), true, true);
+    File targetDirectory = new File(FileUtils.toFile(url).getParentFile(), "META-INF");
+
+    if (!targetDirectory.exists() && !targetDirectory.mkdir()) {
+      throw new RuntimeException("Could not create target directory " + targetDirectory.getAbsolutePath());
     }
 
-    /**
-     * Implement this method to limit the amount of extensions
-     * initialised by providing the annotated classes which define
-     * the extensions that you actually want to use for this test.
-     * Returning a {@code null} or empty array forces the
-     * {@link ExtensionManager} to perform a full classpath discovery.
-     * Default implementation of this method returns {@code null}.
-     * This method will only be considered if {@link #getDescribers()}
-     * returns {@code null}
-     */
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return null;
+    return targetDirectory;
+  }
+
+  private String getEffectiveConfigFile() {
+    String configFile = getConfigFile();
+    if (!isBlank(configFile)) {
+      return configFile;
     }
 
-    /**
-     * Adds a {@link ConfigurationBuilder} that sets the {@link #extensionManager}
-     * into the {@link #muleContext}. This {@link ConfigurationBuilder} is set
-     * as the first element of the {@code builders} {@link List}
-     *
-     * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
-     */
-    @Override
-    protected final void addBuilders(List<ConfigurationBuilder> builders)
-    {
-        super.addBuilders(builders);
-        builders.add(0, new AbstractConfigurationBuilder()
-        {
-            @Override
-            protected void doConfigure(MuleContext muleContext) throws Exception
-            {
-                createExtensionsManager(muleContext);
-            }
-        });
+    configFile = getConfigFileFromSplittable(getConfigurationResources());
+    if (!isBlank(configFile)) {
+      return configFile;
     }
 
-    private void createExtensionsManager(MuleContext muleContext) throws Exception
-    {
-        extensionManager = new DefaultExtensionManager();
-        File generatedResourcesDirectory = getGenerationTargetDirectory();
-
-        ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-        initialiseIfNeeded(extensionManager, muleContext);
-
-        ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer = new ExtensionsTestInfrastructureDiscoverer(extensionManager, generatedResourcesDirectory);
-        List<GeneratedResource> generatedResources = extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
-        generateResourcesAndAddToClasspath(generatedResourcesDirectory, generatedResources);
+    configFile = getConfigFileFromSplittable(getConfigResources());
+    if (!isBlank(configFile)) {
+      return configFile;
     }
 
-    private void generateResourcesAndAddToClasspath(File generatedResourcesDirectory, List<GeneratedResource> resources) throws Exception
-    {
-        ClassLoader cl = getClass().getClassLoader();
-        Method method = findMethod(cl.getClass(), "addURL", URL.class);
-        method.setAccessible(true);
-
-        for (GeneratedResource resource : resources)
-        {
-            URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
-            method.invoke(cl, generatedResourceURL);
-        }
+    String[] configFiles = getConfigFiles();
+    if (!isEmpty(configFiles)) {
+      return configFiles[0].trim();
     }
 
-    private File getGenerationTargetDirectory()
-    {
-        URL url = getResourceAsUrl(getEffectiveConfigFile(), getClass(), true, true);
-        File targetDirectory = new File(FileUtils.toFile(url).getParentFile(), "META-INF");
+    throw new IllegalArgumentException("No valid config file was specified");
+  }
 
-        if (!targetDirectory.exists() && !targetDirectory.mkdir())
-        {
-            throw new RuntimeException("Could not create target directory " + targetDirectory.getAbsolutePath());
-        }
-
-        return targetDirectory;
+  private String getConfigFileFromSplittable(String configFile) {
+    if (!isBlank(configFile)) {
+      return configFile.split(",")[0].trim();
     }
 
-    private String getEffectiveConfigFile()
-    {
-        String configFile = getConfigFile();
-        if (!isBlank(configFile))
-        {
-            return configFile;
-        }
-
-        configFile = getConfigFileFromSplittable(getConfigurationResources());
-        if (!isBlank(configFile))
-        {
-            return configFile;
-        }
-
-        configFile = getConfigFileFromSplittable(getConfigResources());
-        if (!isBlank(configFile))
-        {
-            return configFile;
-        }
-
-        String[] configFiles = getConfigFiles();
-        if (!isEmpty(configFiles))
-        {
-            return configFiles[0].trim();
-        }
-
-        throw new IllegalArgumentException("No valid config file was specified");
-    }
-
-    private String getConfigFileFromSplittable(String configFile)
-    {
-        if (!isBlank(configFile))
-        {
-            return configFile.split(",")[0].trim();
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

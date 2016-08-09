@@ -27,41 +27,35 @@ import java.util.List;
  *
  * @since 4.0
  */
-public final class OperationParametersModelValidator implements ModelValidator
-{
+public final class OperationParametersModelValidator implements ModelValidator {
 
-    private final List<String> reservedWords = ImmutableList.of(TARGET_ATTRIBUTE);
+  private final List<String> reservedWords = ImmutableList.of(TARGET_ATTRIBUTE);
 
-    @Override
-    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
-    {
-        Multimap<String, String> offenses = LinkedHashMultimap.create();
-        new IdempotentExtensionWalker()
-        {
+  @Override
+  public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
+    Multimap<String, String> offenses = LinkedHashMultimap.create();
+    new IdempotentExtensionWalker() {
 
-            @Override
-            protected void onOperation(OperationModel model)
-            {
-                collectOffenses(offenses, model);
-            }
-        }.walk(extensionModel);
+      @Override
+      protected void onOperation(OperationModel model) {
+        collectOffenses(offenses, model);
+      }
+    }.walk(extensionModel);
 
 
-        if (!offenses.isEmpty())
-        {
-            StringBuilder message = new StringBuilder(format("Extension '%s' defines operations which have parameters named after reserved words. Offending operations are:\n"
-                    , extensionModel.getName()));
+    if (!offenses.isEmpty()) {
+      StringBuilder message =
+          new StringBuilder(format("Extension '%s' defines operations which have parameters named after reserved words. Offending operations are:\n",
+                                   extensionModel.getName()));
 
-            offenses.asMap().forEach((key, values) -> message.append(format("%s: [%s]", key, Joiner.on(", ").join(values))));
+      offenses.asMap().forEach((key, values) -> message.append(format("%s: [%s]", key, Joiner.on(", ").join(values))));
 
-            throw new IllegalOperationModelDefinitionException(message.toString());
-        }
+      throw new IllegalOperationModelDefinitionException(message.toString());
     }
+  }
 
-    private void collectOffenses(Multimap<String, String> offenses, OperationModel operationModel)
-    {
-        operationModel.getParameterModels().stream()
-                .filter(parameter -> reservedWords.contains(parameter.getName()))
-                .forEach(parameter -> offenses.put(parameter.getName(), operationModel.getName()));
-    }
+  private void collectOffenses(Multimap<String, String> offenses, OperationModel operationModel) {
+    operationModel.getParameterModels().stream().filter(parameter -> reservedWords.contains(parameter.getName()))
+        .forEach(parameter -> offenses.put(parameter.getName(), operationModel.getName()));
+  }
 }

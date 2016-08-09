@@ -13,21 +13,18 @@ import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser
 /**
  * This allows a queue store to be defined globally, or embedded within a queue profile.
  */
-public class QueueStoreDefinitionParser extends ParentContextDefinitionParser
-{
-    public QueueStoreDefinitionParser(Class<?> queueStoreFactoryBeanClass)
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, 
-            new MuleOrphanDefinitionParser(queueStoreFactoryBeanClass, true));
-        otherwise(new ChildDefinitionParser("queue-store", queueStoreFactoryBeanClass));
-    }
+public class QueueStoreDefinitionParser extends ParentContextDefinitionParser {
 
-    /**
-     * For custom processors
-     */
-    public QueueStoreDefinitionParser()
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(true));
-        otherwise(new ChildDefinitionParser("queue-store"));
-    }
+  public QueueStoreDefinitionParser(Class<?> queueStoreFactoryBeanClass) {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(queueStoreFactoryBeanClass, true));
+    otherwise(new ChildDefinitionParser("queue-store", queueStoreFactoryBeanClass));
+  }
+
+  /**
+   * For custom processors
+   */
+  public QueueStoreDefinitionParser() {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(true));
+    otherwise(new ChildDefinitionParser("queue-store"));
+  }
 }

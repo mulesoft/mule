@@ -12,22 +12,19 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
-public class AuthorizationCodeObjectStoreTestCase extends AuthorizationCodeMinimalConfigTestCase
-{
+public class AuthorizationCodeObjectStoreTestCase extends AuthorizationCodeMinimalConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "authorization-code/authorization-code-object-store-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "authorization-code/authorization-code-object-store-config.xml";
+  }
 
-    @Override
-    public void hitRedirectUrlAndGetToken() throws Exception
-    {
-        super.hitRedirectUrlAndGetToken();
+  @Override
+  public void hitRedirectUrlAndGetToken() throws Exception {
+    super.hitRedirectUrlAndGetToken();
 
-        SimpleMemoryObjectStore configObjectStore = muleContext.getRegistry().get("customObjectStore");
-        assertThat(configObjectStore.allKeys().size(), is(1));
-        assertThat(configObjectStore.retrieve("default"), notNullValue());
-    }
+    SimpleMemoryObjectStore configObjectStore = muleContext.getRegistry().get("customObjectStore");
+    assertThat(configObjectStore.allKeys().size(), is(1));
+    assertThat(configObjectStore.retrieve("default"), notNullValue());
+  }
 }

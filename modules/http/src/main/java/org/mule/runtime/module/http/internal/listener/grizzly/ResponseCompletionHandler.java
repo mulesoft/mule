@@ -31,131 +31,111 @@ import org.glassfish.grizzly.memory.Buffers;
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous response writing
  */
-public class ResponseCompletionHandler
-        extends BaseResponseCompletionHandler
-{
+public class ResponseCompletionHandler extends BaseResponseCompletionHandler {
 
-    private final FilterChainContext ctx;
-    private final HttpResponsePacket httpResponsePacket;
-    private final HttpContent httpResponseContent;
-    private final ResponseStatusCallback responseStatusCallback;
-    private boolean isDone;
-    private boolean contentSend;
+  private final FilterChainContext ctx;
+  private final HttpResponsePacket httpResponsePacket;
+  private final HttpContent httpResponseContent;
+  private final ResponseStatusCallback responseStatusCallback;
+  private boolean isDone;
+  private boolean contentSend;
 
-    public ResponseCompletionHandler(final FilterChainContext ctx, final HttpRequestPacket httpRequestPacket, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
-    {
-        Preconditions.checkArgument((!(httpResponse.getEntity() instanceof InputStreamHttpEntity)), "response entity cannot be input stream");
-        this.ctx = ctx;
-        this.httpResponsePacket = buildHttpResponsePacket(httpRequestPacket, httpResponse);
-        this.httpResponseContent = buildResponseContent(httpResponse);
-        this.responseStatusCallback = responseStatusCallback;
+  public ResponseCompletionHandler(final FilterChainContext ctx, final HttpRequestPacket httpRequestPacket,
+                                   final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback) {
+    Preconditions.checkArgument((!(httpResponse.getEntity() instanceof InputStreamHttpEntity)),
+                                "response entity cannot be input stream");
+    this.ctx = ctx;
+    this.httpResponsePacket = buildHttpResponsePacket(httpRequestPacket, httpResponse);
+    this.httpResponseContent = buildResponseContent(httpResponse);
+    this.responseStatusCallback = responseStatusCallback;
+  }
+
+  public HttpContent buildResponseContent(final HttpResponse httpResponse) {
+    final HttpEntity body = httpResponse.getEntity();
+    Buffer grizzlyBuffer = null;
+    if (body != null && !(body instanceof EmptyHttpEntity)) {
+      if (body instanceof ByteArrayHttpEntity) {
+        grizzlyBuffer = Buffers.wrap(ctx.getMemoryManager(), ((ByteArrayHttpEntity) body).getContent());
+      } else {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("At this point only a ByteArray entity is allowed"));
+      }
     }
-
-    public HttpContent buildResponseContent(final HttpResponse httpResponse)
-    {
-        final HttpEntity body = httpResponse.getEntity();
-        Buffer grizzlyBuffer = null;
-        if (body != null && !(body instanceof EmptyHttpEntity))
-        {
-            if (body instanceof ByteArrayHttpEntity)
-            {
-                grizzlyBuffer = Buffers.wrap(ctx.getMemoryManager(), ((ByteArrayHttpEntity) body).getContent());
-            }
-            else
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage("At this point only a ByteArray entity is allowed"));
-            }
-        }
-        HttpContent.Builder contentBuilder = HttpContent.builder(httpResponsePacket);
-        //For some reason, grizzly tries to send Transfer-Encoding: chunk even if the content-length is set.
-        if (httpResponse.getHeaderValueIgnoreCase(CONTENT_LENGTH) != null)
-        {
-            contentBuilder.last(true);
-        }
-        return contentBuilder.content(grizzlyBuffer).build();
+    HttpContent.Builder contentBuilder = HttpContent.builder(httpResponsePacket);
+    // For some reason, grizzly tries to send Transfer-Encoding: chunk even if the content-length is set.
+    if (httpResponse.getHeaderValueIgnoreCase(CONTENT_LENGTH) != null) {
+      contentBuilder.last(true);
     }
+    return contentBuilder.content(grizzlyBuffer).build();
+  }
 
-    /**
-     * Start the sending the response asynchronously
-     *
-     * @throws java.io.IOException
-     */
-    public void start() throws IOException
-    {
+  /**
+   * Start the sending the response asynchronously
+   *
+   * @throws java.io.IOException
+   */
+  public void start() throws IOException {
+    sendResponse();
+  }
+
+  /**
+   * Send the next part of the response
+   *
+   * @throws java.io.IOException
+   */
+  public void sendResponse() throws IOException {
+    if (!contentSend) {
+      contentSend = true;
+      isDone = !httpResponsePacket.isChunked();
+      ctx.write(httpResponseContent, this);
+      return;
+    }
+    isDone = true;
+    ctx.write(httpResponsePacket.httpTrailerBuilder().build(), this);
+  }
+
+  /**
+   * Method gets called, when the message part was successfully sent.
+   *
+   * @param result the result
+   */
+  @Override
+  public void completed(WriteResult result) {
+    try {
+      if (!isDone) {
         sendResponse();
-    }
-
-    /**
-     * Send the next part of the response
-     *
-     * @throws java.io.IOException
-     */
-    public void sendResponse() throws IOException
-    {
-        if (!contentSend)
-        {
-            contentSend = true;
-            isDone = !httpResponsePacket.isChunked();
-            ctx.write(httpResponseContent, this);
-            return;
-        }
-        isDone = true;
-        ctx.write(httpResponsePacket.httpTrailerBuilder().build(), this);
-    }
-
-    /**
-     * Method gets called, when the message part was successfully sent.
-     *
-     * @param result the result
-     */
-    @Override
-    public void completed(WriteResult result)
-    {
-        try
-        {
-            if (!isDone)
-            {
-                sendResponse();
-            }
-            else
-            {
-                ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
-                resume();
-            }
-        }
-        catch (IOException e)
-        {
-            failed(e);
-        }
-    }
-
-    /**
-     * The method will be called, when http message transferring was canceled
-     */
-    @Override
-    public void cancelled()
-    {
-        responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
+      } else {
+        ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
         resume();
+      }
+    } catch (IOException e) {
+      failed(e);
     }
+  }
 
-    /**
-     * The method will be called, if http message transferring was failed.
-     *
-     * @param throwable the cause
-     */
-    @Override
-    public void failed(Throwable throwable)
-    {
-        responseStatusCallback.responseSendFailure(throwable);
-        resume();
-    }
+  /**
+   * The method will be called, when http message transferring was canceled
+   */
+  @Override
+  public void cancelled() {
+    responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
+    resume();
+  }
 
-    /**
-     * Resume the HttpRequestPacket processing
-     */
-    private void resume()
-    {
-        ctx.resume(ctx.getStopAction());
-    }
+  /**
+   * The method will be called, if http message transferring was failed.
+   *
+   * @param throwable the cause
+   */
+  @Override
+  public void failed(Throwable throwable) {
+    responseStatusCallback.responseSendFailure(throwable);
+    resume();
+  }
+
+  /**
+   * Resume the HttpRequestPacket processing
+   */
+  private void resume() {
+    ctx.resume(ctx.getStopAction());
+  }
 }

@@ -7,8 +7,7 @@
 
 package org.mule.runtime.module.db.performance;
 
-public interface LoadTask
-{
+public interface LoadTask {
 
-    void execute(int messageId) throws Exception;
+  void execute(int messageId) throws Exception;
 }

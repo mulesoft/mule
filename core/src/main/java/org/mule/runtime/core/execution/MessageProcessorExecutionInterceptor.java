@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 /**
  * Intercepts a MessageProcessor execution.
  */
-public interface MessageProcessorExecutionInterceptor
-{
-    public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException;
+public interface MessageProcessorExecutionInterceptor {
+
+  public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException;
 }

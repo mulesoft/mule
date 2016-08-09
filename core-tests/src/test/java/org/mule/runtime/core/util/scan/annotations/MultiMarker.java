@@ -11,9 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Meta
-public @interface MultiMarker
-{
-    String value();
-    String param1();
-    String param2();
+public @interface MultiMarker {
+
+  String value();
+
+  String param1();
+
+  String param2();
 }

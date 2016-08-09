@@ -9,36 +9,29 @@ package org.mule.test.transactional;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
-public class TransactionalOperations
-{
+public class TransactionalOperations {
 
-    public TestTransactionalConnection getConnection(@Connection TestTransactionalConnection connection)
-    {
-        return connection;
-    }
+  public TestTransactionalConnection getConnection(@Connection TestTransactionalConnection connection) {
+    return connection;
+  }
 
-    public void verifyNoTransaction(@Connection TestTransactionalConnection connection)
-    {
-        checkState(!connection.isTransactionBegun(), "transaction begun with no reason");
-    }
+  public void verifyNoTransaction(@Connection TestTransactionalConnection connection) {
+    checkState(!connection.isTransactionBegun(), "transaction begun with no reason");
+  }
 
-    public void verifyTransactionBegun(@Connection TestTransactionalConnection connection)
-    {
-        checkState(connection.isTransactionBegun(), "transaction not begun");
-    }
+  public void verifyTransactionBegun(@Connection TestTransactionalConnection connection) {
+    checkState(connection.isTransactionBegun(), "transaction not begun");
+  }
 
-    public void verifyTransactionCommited(@Connection TestTransactionalConnection connection)
-    {
-        checkState(connection.isTransactionCommited(), "transaction not committed");
-    }
+  public void verifyTransactionCommited(@Connection TestTransactionalConnection connection) {
+    checkState(connection.isTransactionCommited(), "transaction not committed");
+  }
 
-    public void verifyTransactionRolledback(@Connection TestTransactionalConnection connection)
-    {
-        checkState(connection.isTransactionRolledback(), "transaction not rolled back");
-    }
+  public void verifyTransactionRolledback(@Connection TestTransactionalConnection connection) {
+    checkState(connection.isTransactionRolledback(), "transaction not rolled back");
+  }
 
-    public void fail()
-    {
-        throw new RuntimeException("you better rollback!");
-    }
+  public void fail() {
+    throw new RuntimeException("you better rollback!");
+  }
 }

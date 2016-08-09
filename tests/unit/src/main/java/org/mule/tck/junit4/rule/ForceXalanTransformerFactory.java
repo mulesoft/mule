@@ -9,12 +9,10 @@ package org.mule.tck.junit4.rule;
 /**
  * Adds a system property to force the usage of xalan transformer factory
  */
-public class ForceXalanTransformerFactory extends SystemProperty
-{
+public class ForceXalanTransformerFactory extends SystemProperty {
 
-    public ForceXalanTransformerFactory()
-    {
-        super("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
-    }
+  public ForceXalanTransformerFactory() {
+    super("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+  }
 
 }

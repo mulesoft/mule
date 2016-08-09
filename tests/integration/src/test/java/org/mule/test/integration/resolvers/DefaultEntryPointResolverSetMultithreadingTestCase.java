@@ -22,120 +22,95 @@ import java.util.Random;
 
 import org.junit.Test;
 
-public class DefaultEntryPointResolverSetMultithreadingTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/resolvers/default-entry-point-resolver-multithreading-test-config.xml";
+public class DefaultEntryPointResolverSetMultithreadingTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/resolvers/default-entry-point-resolver-multithreading-test-config.xml";
+  }
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 120;
+  }
+
+  @Test
+  public void testMultithreaded() throws Exception {
+    final int numberOfThreads = 50;
+    final int requestCount = 100;
+    ClientRequest[] clients = new ClientRequest[numberOfThreads];
+    for (int i = 0; i < numberOfThreads; i++) {
+      clients[i] = new ClientRequest(requestCount);
+    }
+
+    for (ClientRequest clientRequest : clients) {
+      clientRequest.start();
+      try {
+        Thread.sleep(5);
+      } catch (InterruptedException ie) {
+        // ignore
+      }
+    }
+
+    for (int i = 0; i < numberOfThreads; i++) {
+      try {
+        clients[i].join();
+      } catch (InterruptedException ie) {
+        // ignore
+      }
+    }
+  }
+
+  private class ClientRequest extends Thread {
+
+    final MuleClient client;
+    int requestCount;
+
+    private ClientRequest(final int requestCount) throws MuleException {
+      client = muleContext.getClient();
+      this.requestCount = requestCount;
     }
 
     @Override
-    public int getTestTimeoutSecs()
-    {
-        return 120;
+    public void run() {
+      final byte[] payload = createPayload();
+
+      while (--requestCount >= 0) {
+        try {
+          final MuleMessage outbound = flowRunner("flowTestSync").withPayload(payload).run().getMessage();
+          assertNull(outbound.getExceptionPayload());
+          assertNotNull(outbound.getPayload());
+          byte[] bytes = null;
+          if (outbound.getPayload() instanceof byte[]) {
+            bytes = (byte[]) outbound.getPayload();
+          } else if (outbound.getPayload() instanceof List) {
+            final List<?> list = (List<?>) outbound.getPayload();
+            assertEquals(1, list.size());
+            assertTrue(list.get(0) instanceof byte[]);
+            bytes = (byte[]) list.get(0);
+          } else {
+            fail("unexpected payload type");
+          }
+          assertEquals(Base64.encodeBytes(payload), Base64.encodeBytes(bytes));
+        } catch (Exception e) {
+          fail("failed with exception: " + e);
+        }
+      }
     }
 
-    @Test
-    public void testMultithreaded() throws Exception
-    {
-        final int numberOfThreads = 50;
-        final int requestCount = 100;
-        ClientRequest[] clients = new ClientRequest[numberOfThreads];
-        for (int i = 0; i < numberOfThreads; i++)
-        {
-            clients[i] = new ClientRequest(requestCount);
-        }
-
-        for (ClientRequest clientRequest : clients)
-        {
-            clientRequest.start();
-            try
-            {
-                Thread.sleep(5);
-            }
-            catch (InterruptedException ie)
-            {
-                // ignore
-            }
-        }
-
-        for (int i = 0; i < numberOfThreads; i++)
-        {
-            try
-            {
-                clients[i].join();
-            }
-            catch (InterruptedException ie)
-            {
-                // ignore
-            }
-        }
+    private byte[] createPayload() {
+      Random random = new Random();
+      final int size = 55;
+      byte[] payload = new byte[size];
+      random.nextBytes(payload);
+      return payload;
     }
+  }
 
-    private class ClientRequest extends Thread
-    {
-        final MuleClient client;
-        int requestCount;
+  public static class EchoBytes {
 
-        private ClientRequest(final int requestCount) throws MuleException
-        {
-            client = muleContext.getClient();
-            this.requestCount = requestCount;
-        }
-
-        @Override
-        public void run()
-        {
-            final byte[] payload = createPayload();
-
-            while (--requestCount >= 0)
-            {
-                try
-                {
-                    final MuleMessage outbound = flowRunner("flowTestSync").withPayload(payload).run().getMessage();
-                    assertNull(outbound.getExceptionPayload());
-                    assertNotNull(outbound.getPayload());
-                    byte[] bytes = null;
-                    if (outbound.getPayload() instanceof byte[])
-                    {
-                        bytes = (byte[]) outbound.getPayload();
-                    }
-                    else if (outbound.getPayload() instanceof List)
-                    {
-                        final List<?> list = (List<?>) outbound.getPayload();
-                        assertEquals(1, list.size());
-                        assertTrue(list.get(0) instanceof byte[]);
-                        bytes = (byte[]) list.get(0);
-                    }
-                    else
-                    {
-                        fail("unexpected payload type");
-                    }
-                    assertEquals(Base64.encodeBytes(payload), Base64.encodeBytes(bytes));
-                }
-                catch (Exception e)
-                {
-                    fail("failed with exception: " + e);
-                }
-            }
-        }
-
-        private byte[] createPayload()
-        {
-            Random random = new Random();
-            final int size = 55;
-            byte[] payload = new byte[size];
-            random.nextBytes(payload);
-            return payload;
-        }
+    public byte[] echo(byte[] input) {
+      return input;
     }
-
-    public static class EchoBytes
-    {
-        public byte[] echo(byte[] input)
-        {
-            return input;
-        }
-    }
+  }
 }

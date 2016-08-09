@@ -12,11 +12,11 @@ import java.io.Serializable;
  * <code>Statistics</code> TODO
  * 
  */
-public interface Statistics extends Serializable
-{
-    /**
-     * Are statistics logged
-     */
-    boolean isEnabled();
+public interface Statistics extends Serializable {
+
+  /**
+   * Are statistics logged
+   */
+  boolean isEnabled();
 
 }

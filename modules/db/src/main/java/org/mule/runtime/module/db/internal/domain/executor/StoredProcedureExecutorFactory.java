@@ -13,21 +13,18 @@ import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 /**
  * Creates {@link StoredProcedureExecutor} instances
  */
-public class StoredProcedureExecutorFactory implements QueryExecutorFactory
-{
+public class StoredProcedureExecutorFactory implements QueryExecutorFactory {
 
-    private final StatementFactory statementFactory;
-    private final StatementResultHandler statementResultHandler;
+  private final StatementFactory statementFactory;
+  private final StatementResultHandler statementResultHandler;
 
-    public StoredProcedureExecutorFactory(StatementFactory statementFactory, StatementResultHandler statementResultHandler)
-    {
-        this.statementFactory = statementFactory;
-        this.statementResultHandler = statementResultHandler;
-    }
+  public StoredProcedureExecutorFactory(StatementFactory statementFactory, StatementResultHandler statementResultHandler) {
+    this.statementFactory = statementFactory;
+    this.statementResultHandler = statementResultHandler;
+  }
 
-    @Override
-    public QueryExecutor create()
-    {
-        return new StoredProcedureExecutor(statementFactory, statementResultHandler);
-    }
+  @Override
+  public QueryExecutor create() {
+    return new StoredProcedureExecutor(statementFactory, statementResultHandler);
+  }
 }

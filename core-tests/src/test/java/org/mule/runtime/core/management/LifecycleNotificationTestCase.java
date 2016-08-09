@@ -12,24 +12,22 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class LifecycleNotificationTestCase extends AbstractMuleContextTestCase
-{
+public class LifecycleNotificationTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testManageLifecycle() throws Exception
-    {
-        assertTrue(muleContext.isInitialised());
-//        muleContext.start();
-//        assertTrue(muleContext.isStarted());
-//        muleContext.stop();
-//        assertFalse(muleContext.isStarted());
-//        muleContext.dispose();
-//        assertTrue(muleContext.isDisposed());
-//        muleContext.initialise();
-//        assertTrue(muleContext.isInitialised());
-//        muleContext.start();
-//        assertTrue(muleContext.isStarted());
+  @Test
+  public void testManageLifecycle() throws Exception {
+    assertTrue(muleContext.isInitialised());
+    // muleContext.start();
+    // assertTrue(muleContext.isStarted());
+    // muleContext.stop();
+    // assertFalse(muleContext.isStarted());
+    // muleContext.dispose();
+    // assertTrue(muleContext.isDisposed());
+    // muleContext.initialise();
+    // assertTrue(muleContext.isInitialised());
+    // muleContext.start();
+    // assertTrue(muleContext.isStarted());
 
 
-    }
+  }
 }

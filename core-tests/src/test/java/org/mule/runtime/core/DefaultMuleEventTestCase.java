@@ -35,152 +35,138 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
-{
+public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
-    public static final Charset CUSTOM_ENCODING = UTF_8;
-    public static final String PROPERTY_NAME = "test";
-    public static final String PROPERTY_VALUE = "foo";
+  public static final Charset CUSTOM_ENCODING = UTF_8;
+  public static final String PROPERTY_NAME = "test";
+  public static final String PROPERTY_VALUE = "foo";
 
-    private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
-    private DefaultMuleEvent muleEvent;
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
+  private DefaultMuleEvent muleEvent;
 
-    @Before
-    public void before() throws Exception
-    {
-        muleEvent = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, getTestFlow());
-    }
+  @Before
+  public void before() throws Exception {
+    muleEvent = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, getTestFlow());
+  }
 
-    @Test
-    public void setFlowVariableDefaultDataType() throws Exception
-    {
-        muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE);
+  @Test
+  public void setFlowVariableDefaultDataType() throws Exception {
+    muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE);
 
-        DataType dataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
-        assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
-    }
+    DataType dataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
+    assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
+  }
 
-    @Test
-    public void setFlowVariableCustomDataType() throws Exception
-    {
-        DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
+  @Test
+  public void setFlowVariableCustomDataType() throws Exception {
+    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-        muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
+    muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-        DataType actualDataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
-        assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
-    }
+    DataType actualDataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
+    assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
+  }
 
-    @Test
-    public void setSessionVariableDefaultDataType() throws Exception
-    {
-        muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
+  @Test
+  public void setSessionVariableDefaultDataType() throws Exception {
+    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
 
-        DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-        assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
-    }
+    DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
+    assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
+  }
 
-    @Test
-    public void setSessionVariableCustomDataType() throws Exception
-    {
-        DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
+  @Test
+  public void setSessionVariableCustomDataType() throws Exception {
+    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-        muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
+    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-        DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-        assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
-    }
+    DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
+    assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
+  }
 
-    @Test
-    public void defaultProcessingStrategyRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void defaultProcessingStrategyRequestResponse() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void defaultProcessingStrategyOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
-        assertThat(event.isSynchronous(), equalTo(false));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void defaultProcessingStrategyOneWay() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
+    assertThat(event.isSynchronous(), equalTo(false));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void syncProcessingStrategyRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(true);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void syncProcessingStrategyRequestResponse() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(true);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void syncProcessingStrategyOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(true);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void syncProcessingStrategyOneWay() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(true);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void inboundPropertyForceSyncRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void inboundPropertyForceSyncRequestResponse() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void inboundPropertyForceSyncOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void inboundPropertyForceSyncOneWay() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
+    assertThat(event.isSynchronous(), equalTo(true));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void nonBlockingProcessingStrategyRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
-        assertThat(event.isSynchronous(), equalTo(false));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void nonBlockingProcessingStrategyRequestResponse() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
+    assertThat(event.isSynchronous(), equalTo(false));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 
-    @Test
-    public void nonBlockingProcessingStrategyOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-        when(flow.getMuleContext()).thenReturn(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
-        assertThat(event.isSynchronous(), equalTo(false));
-        assertThat(event.isTransacted(), equalTo(false));
-    }
+  @Test
+  public void nonBlockingProcessingStrategyOneWay() throws Exception {
+    Flow flow = mock(Flow.class);
+    when(flow.isSynchronous()).thenReturn(false);
+    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
+    assertThat(event.isSynchronous(), equalTo(false));
+    assertThat(event.isTransacted(), equalTo(false));
+  }
 }

@@ -10,18 +10,14 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.ExceptionHelper;
 
-public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor
-{
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        try
-        {
-            return processNext(event);
-        }
-        catch (Exception e)
-        {
-            e = (Exception) ExceptionHelper.sanitizeIfNeeded(e);
-            return event.getFlowConstruct().getExceptionListener().handleException(e, event);
-        }
+public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor {
+
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    try {
+      return processNext(event);
+    } catch (Exception e) {
+      e = (Exception) ExceptionHelper.sanitizeIfNeeded(e);
+      return event.getFlowConstruct().getExceptionListener().handleException(e, event);
     }
+  }
 }

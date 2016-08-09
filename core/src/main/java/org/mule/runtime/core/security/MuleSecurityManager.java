@@ -33,166 +33,135 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>MuleSecurityManager</code> is a default implementation security manager
- * for a Mule instance.
+ * <code>MuleSecurityManager</code> is a default implementation security manager for a Mule instance.
  */
 
-public class MuleSecurityManager implements SecurityManager
-{
-    /**
-     * logger used by this class
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(MuleSecurityManager.class);
+public class MuleSecurityManager implements SecurityManager {
 
-    private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
-    private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
+  /**
+   * logger used by this class
+   */
+  protected static final Logger logger = LoggerFactory.getLogger(MuleSecurityManager.class);
 
-    public MuleSecurityManager()
-    {
-        super();
-    }
+  private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
+  private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        List<Initialisable> all = new LinkedList<Initialisable>(providers.values());
-        // ordering: appends
-        all.addAll(cryptoStrategies.values());
-        LifecycleTransitionResult.initialiseAll(all.iterator());
-    }
+  public MuleSecurityManager() {
+    super();
+  }
 
-    @Override
-    public Authentication authenticate(Authentication authentication)
-        throws SecurityException, SecurityProviderNotFoundException
-    {
-        Iterator<SecurityProvider> iter = providers.values().iterator();
-        Class<? extends Authentication> toTest = authentication.getClass();
+  @Override
+  public void initialise() throws InitialisationException {
+    List<Initialisable> all = new LinkedList<Initialisable>(providers.values());
+    // ordering: appends
+    all.addAll(cryptoStrategies.values());
+    LifecycleTransitionResult.initialiseAll(all.iterator());
+  }
 
-        while (iter.hasNext())
-        {
-            SecurityProvider provider = iter.next();
+  @Override
+  public Authentication authenticate(Authentication authentication) throws SecurityException, SecurityProviderNotFoundException {
+    Iterator<SecurityProvider> iter = providers.values().iterator();
+    Class<? extends Authentication> toTest = authentication.getClass();
 
-            if (provider.supports(toTest))
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Authentication attempt using " + provider.getClass().getName());
-                }
+    while (iter.hasNext()) {
+      SecurityProvider provider = iter.next();
 
-                Authentication result = null;
-                try
-                {
-                    result = provider.authenticate(authentication);
-                }
-                catch (Exception e)
-                {
-                    if (!iter.hasNext())
-                    {
-                        throw new UnauthorisedException(CoreMessages.authorizationAttemptFailed(), e);
-                    }
-                }
-
-                if (result != null)
-                {
-                    return result;
-                }
-            }
+      if (provider.supports(toTest)) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Authentication attempt using " + provider.getClass().getName());
         }
 
-        throw new SecurityProviderNotFoundException(toTest.getName());
-    }
-
-    @Override
-    public void addProvider(SecurityProvider provider)
-    {
-        if (getProvider(provider.getName()) != null)
-        {
-            throw new IllegalArgumentException("Provider already registered: " + provider.getName());
+        Authentication result = null;
+        try {
+          result = provider.authenticate(authentication);
+        } catch (Exception e) {
+          if (!iter.hasNext()) {
+            throw new UnauthorisedException(CoreMessages.authorizationAttemptFailed(), e);
+          }
         }
-        providers.put(provider.getName(), provider);
-    }
 
-    @Override
-    public SecurityProvider getProvider(String name)
-    {
-        if (name == null)
-        {
-            throw new IllegalArgumentException("provider Name cannot be null");
+        if (result != null) {
+          return result;
         }
-        return providers.get(name);
+      }
     }
 
-    @Override
-    public SecurityProvider removeProvider(String name)
-    {
-        return providers.remove(name);
-    }
+    throw new SecurityProviderNotFoundException(toTest.getName());
+  }
 
-    @Override
-    public Collection<SecurityProvider> getProviders()
-    {
-        ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
-        return Collections.unmodifiableCollection(providersList);
+  @Override
+  public void addProvider(SecurityProvider provider) {
+    if (getProvider(provider.getName()) != null) {
+      throw new IllegalArgumentException("Provider already registered: " + provider.getName());
     }
+    providers.put(provider.getName(), provider);
+  }
 
-    @Override
-    public void setProviders(Collection<SecurityProvider> providers)
-    {
-        for (SecurityProvider provider : providers)
-        {
-            addProvider(provider);
-        }
+  @Override
+  public SecurityProvider getProvider(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("provider Name cannot be null");
     }
+    return providers.get(name);
+  }
 
-    @Override
-    public SecurityContext createSecurityContext(Authentication authentication)
-        throws UnknownAuthenticationTypeException
-    {
-        Iterator<SecurityProvider> iter = providers.values().iterator();
-        Class<? extends Authentication> toTest = authentication.getClass();
+  @Override
+  public SecurityProvider removeProvider(String name) {
+    return providers.remove(name);
+  }
 
-        while (iter.hasNext())
-        {
-            SecurityProvider provider = iter.next();
-            if (provider.supports(toTest))
-            {
-                return provider.createSecurityContext(authentication);
-            }
-        }
-        throw new UnknownAuthenticationTypeException(authentication);
+  @Override
+  public Collection<SecurityProvider> getProviders() {
+    ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
+    return Collections.unmodifiableCollection(providersList);
+  }
+
+  @Override
+  public void setProviders(Collection<SecurityProvider> providers) {
+    for (SecurityProvider provider : providers) {
+      addProvider(provider);
     }
+  }
 
-    @Override
-    public EncryptionStrategy getEncryptionStrategy(String name)
-    {
-        return cryptoStrategies.get(name);
-    }
+  @Override
+  public SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException {
+    Iterator<SecurityProvider> iter = providers.values().iterator();
+    Class<? extends Authentication> toTest = authentication.getClass();
 
-    @Override
-    public void addEncryptionStrategy(EncryptionStrategy strategy)
-    {
-        cryptoStrategies.put(strategy.getName(), strategy);
+    while (iter.hasNext()) {
+      SecurityProvider provider = iter.next();
+      if (provider.supports(toTest)) {
+        return provider.createSecurityContext(authentication);
+      }
     }
+    throw new UnknownAuthenticationTypeException(authentication);
+  }
 
-    @Override
-    public EncryptionStrategy removeEncryptionStrategy(String name)
-    {
-        return cryptoStrategies.remove(name);
-    }
+  @Override
+  public EncryptionStrategy getEncryptionStrategy(String name) {
+    return cryptoStrategies.get(name);
+  }
 
-    @Override
-    public Collection<EncryptionStrategy> getEncryptionStrategies()
-    {
-        List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
-        return Collections.unmodifiableCollection(allStrategies);
-    }
+  @Override
+  public void addEncryptionStrategy(EncryptionStrategy strategy) {
+    cryptoStrategies.put(strategy.getName(), strategy);
+  }
 
-    @Override
-    public void setEncryptionStrategies(Collection<EncryptionStrategy> strategies)
-    {
-        for (EncryptionStrategy strategy : strategies)
-        {
-            addEncryptionStrategy(strategy);
-        }
+  @Override
+  public EncryptionStrategy removeEncryptionStrategy(String name) {
+    return cryptoStrategies.remove(name);
+  }
+
+  @Override
+  public Collection<EncryptionStrategy> getEncryptionStrategies() {
+    List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
+    return Collections.unmodifiableCollection(allStrategies);
+  }
+
+  @Override
+  public void setEncryptionStrategies(Collection<EncryptionStrategy> strategies) {
+    for (EncryptionStrategy strategy : strategies) {
+      addEncryptionStrategy(strategy);
     }
+  }
 }

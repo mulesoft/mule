@@ -21,109 +21,89 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultThreadPoolFactory extends ThreadPoolFactory
-{
-    // deliberately shadow the superclass' static logger as to avoid log congestion on it
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public class DefaultThreadPoolFactory extends ThreadPoolFactory {
 
-    @Override
-    public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
-    {
-        BlockingQueue buffer;
+  // deliberately shadow the superclass' static logger as to avoid log congestion on it
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-        if (tp.getMaxBufferSize() > 0 && tp.getMaxThreadsActive() > 1)
-        {
-            buffer = new LinkedBlockingDeque(tp.getMaxBufferSize());
-        }
-        else
-        {
-            buffer = new SynchronousQueue();
-        }
+  @Override
+  public ThreadPoolExecutor createPool(String name, ThreadingProfile tp) {
+    BlockingQueue buffer;
 
-        ThreadPoolExecutor pool = internalCreatePool(name, tp, buffer);
-        configureThreadPoolExecutor(name, tp, pool);
-        return pool;
-
+    if (tp.getMaxBufferSize() > 0 && tp.getMaxThreadsActive() > 1) {
+      buffer = new LinkedBlockingDeque(tp.getMaxBufferSize());
+    } else {
+      buffer = new SynchronousQueue();
     }
 
-    private void configureThreadPoolExecutor(String name, ThreadingProfile tp, ThreadPoolExecutor pool)
-    {
-        configureThreadFactory(name, tp, pool);
+    ThreadPoolExecutor pool = internalCreatePool(name, tp, buffer);
+    configureThreadPoolExecutor(name, tp, pool);
+    return pool;
+
+  }
+
+  private void configureThreadPoolExecutor(String name, ThreadingProfile tp, ThreadPoolExecutor pool) {
+    configureThreadFactory(name, tp, pool);
 
 
-        if (tp.getRejectedExecutionHandler() != null)
-        {
-            pool.setRejectedExecutionHandler(tp.getRejectedExecutionHandler());
-        }
-        else
-        {
-            switch (tp.getPoolExhaustedAction())
-            {
-                case ThreadingProfile.WHEN_EXHAUSTED_DISCARD_OLDEST :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
-                    break;
-                case ThreadingProfile.WHEN_EXHAUSTED_RUN :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-                    break;
-                case ThreadingProfile.WHEN_EXHAUSTED_ABORT :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-                    break;
-                case ThreadingProfile.WHEN_EXHAUSTED_DISCARD :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-                    break;
-                default :
-                    // WHEN_EXHAUSTED_WAIT
-                    pool.setRejectedExecutionHandler(new WaitPolicy(tp.getThreadWaitTimeout(), TimeUnit.MILLISECONDS));
-                    break;
-            }
-        }
+    if (tp.getRejectedExecutionHandler() != null) {
+      pool.setRejectedExecutionHandler(tp.getRejectedExecutionHandler());
+    } else {
+      switch (tp.getPoolExhaustedAction()) {
+        case ThreadingProfile.WHEN_EXHAUSTED_DISCARD_OLDEST:
+          pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+          break;
+        case ThreadingProfile.WHEN_EXHAUSTED_RUN:
+          pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+          break;
+        case ThreadingProfile.WHEN_EXHAUSTED_ABORT:
+          pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+          break;
+        case ThreadingProfile.WHEN_EXHAUSTED_DISCARD:
+          pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+          break;
+        default:
+          // WHEN_EXHAUSTED_WAIT
+          pool.setRejectedExecutionHandler(new WaitPolicy(tp.getThreadWaitTimeout(), TimeUnit.MILLISECONDS));
+          break;
+      }
     }
+  }
 
-    @Override
-    public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp)
-    {
-        ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(tp);
-        configureThreadPoolExecutor(name, tp, pool);
-        return pool;
-    }
+  @Override
+  public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp) {
+    ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(tp);
+    configureThreadPoolExecutor(name, tp, pool);
+    return pool;
+  }
 
-    protected void configureThreadFactory(String name, ThreadingProfile tp, ThreadPoolExecutor pool)
-    {
-        // use a custom ThreadFactory if one has been configured
-        if (tp.getThreadFactory() != null)
-        {
-            pool.setThreadFactory(tp.getThreadFactory());
-        }
-        else
-        {
-            // ..else create a "NamedThreadFactory" if a proper name was passed in
-            if (StringUtils.isNotBlank(name))
-            {
-                // Threads must use the MuleApplicationClassLoader related to MuleContext or the
-                // thread context class loader in case of embedding mule.
-                pool.setThreadFactory(new NamedThreadFactory(name, Thread.currentThread().getContextClassLoader()));
-            }
-            else
-            {
-                // let ThreadPoolExecutor create a default ThreadFactory;
-                // see Executors.defaultThreadFactory()
-            }
-        }
+  protected void configureThreadFactory(String name, ThreadingProfile tp, ThreadPoolExecutor pool) {
+    // use a custom ThreadFactory if one has been configured
+    if (tp.getThreadFactory() != null) {
+      pool.setThreadFactory(tp.getThreadFactory());
+    } else {
+      // ..else create a "NamedThreadFactory" if a proper name was passed in
+      if (StringUtils.isNotBlank(name)) {
+        // Threads must use the MuleApplicationClassLoader related to MuleContext or the
+        // thread context class loader in case of embedding mule.
+        pool.setThreadFactory(new NamedThreadFactory(name, Thread.currentThread().getContextClassLoader()));
+      } else {
+        // let ThreadPoolExecutor create a default ThreadFactory;
+        // see Executors.defaultThreadFactory()
+      }
     }
+  }
 
-    protected ThreadPoolExecutor internalCreatePool(String name, ThreadingProfile tp, BlockingQueue buffer)
-    {
-        return new ThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()),
-                                      tp.getMaxThreadsActive(), tp.getThreadTTL(),
-                                      TimeUnit.MILLISECONDS, buffer);
-    }
+  protected ThreadPoolExecutor internalCreatePool(String name, ThreadingProfile tp, BlockingQueue buffer) {
+    return new ThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()), tp.getMaxThreadsActive(),
+                                  tp.getThreadTTL(), TimeUnit.MILLISECONDS, buffer);
+  }
 
-    protected ScheduledThreadPoolExecutor internalCreateScheduledPool(ThreadingProfile tp)
-    {
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(tp.getMaxThreadsIdle());
-        scheduledThreadPoolExecutor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
-        scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
-        scheduledThreadPoolExecutor.setKeepAliveTime(tp.getThreadTTL(), TimeUnit.MILLISECONDS);
-        return scheduledThreadPoolExecutor;
-    }
+  protected ScheduledThreadPoolExecutor internalCreateScheduledPool(ThreadingProfile tp) {
+    ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(tp.getMaxThreadsIdle());
+    scheduledThreadPoolExecutor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+    scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
+    scheduledThreadPoolExecutor.setKeepAliveTime(tp.getThreadTTL(), TimeUnit.MILLISECONDS);
+    return scheduledThreadPoolExecutor;
+  }
 }

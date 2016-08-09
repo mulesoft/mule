@@ -18,82 +18,68 @@ import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
 /**
- * A wrapper for the Apache ftpServer.  This will progress into a provider of its own,
- * but for now is necessary to avoid duplicating code in FTP tests using FTPClient.
+ * A wrapper for the Apache ftpServer. This will progress into a provider of its own, but for now is necessary to avoid
+ * duplicating code in FTP tests using FTPClient.
  */
-public class EmbeddedFtpServer
-{
+public class EmbeddedFtpServer {
 
-    private org.apache.ftpserver.FtpServer server;
-    private final int port;
+  private org.apache.ftpserver.FtpServer server;
+  private final int port;
 
-    /**
-     * Initialize the ftp server on a given port
-     *
-     * @param port The port to start the server on. Note, you need special
-     *             permissions on *nux to open port 22, so we usually choose a very
-     *             high port number.
-     * @throws Exception
-     */
-    public EmbeddedFtpServer(int port) throws Exception
-    {
-        this.port = port;
+  /**
+   * Initialize the ftp server on a given port
+   *
+   * @param port The port to start the server on. Note, you need special permissions on *nux to open port 22, so we usually choose
+   *        a very high port number.
+   * @throws Exception
+   */
+  public EmbeddedFtpServer(int port) throws Exception {
+    this.port = port;
+  }
+
+  private Listener createListener(int port) {
+    ListenerFactory listenerFactory = createListenerFactory(port);
+
+    return listenerFactory.createListener();
+  }
+
+  protected ListenerFactory createListenerFactory(int port) {
+    ListenerFactory listenerFactory = new ListenerFactory();
+
+    listenerFactory.setPort(port);
+    listenerFactory.setIdleTimeout(60000);
+    return listenerFactory;
+  }
+
+  private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException {
+    PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
+    URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
+    if (usersFile == null) {
+      throw new IOException("users.properties file not found in the classpath");
     }
+    userManagerFactory.setFile(new File(usersFile.getFile()));
+    serverFactory.setUserManager(userManagerFactory.createUserManager());
+  }
 
-    private Listener createListener(int port)
-    {
-        ListenerFactory listenerFactory = createListenerFactory(port);
-
-        return listenerFactory.createListener();
+  public void start() {
+    FtpServerFactory serverFactory = new FtpServerFactory();
+    serverFactory.addListener("default", createListener(port));
+    try {
+      setupUserManagerFactory(serverFactory);
+      server = serverFactory.createServer();
+      server.start();
+    } catch (Exception e) {
+      throw new RuntimeException("Could not start server", e);
     }
+  }
 
-    protected ListenerFactory createListenerFactory(int port)
-    {
-        ListenerFactory listenerFactory = new ListenerFactory();
-
-        listenerFactory.setPort(port);
-        listenerFactory.setIdleTimeout(60000);
-        return listenerFactory;
+  /**
+   * Stop the ftp server TODO DZ: we may want to put a port check + wait time in here to make sure that the port is released
+   * before we continue. Windows tends to hold on to ports longer than it should.
+   */
+  public void stop() {
+    if (server != null) {
+      server.stop();
     }
-
-    private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException
-    {
-        PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-        URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
-        if (usersFile == null)
-        {
-            throw new IOException("users.properties file not found in the classpath");
-        }
-        userManagerFactory.setFile(new File(usersFile.getFile()));
-        serverFactory.setUserManager(userManagerFactory.createUserManager());
-    }
-
-    public void start()
-    {
-        FtpServerFactory serverFactory = new FtpServerFactory();
-        serverFactory.addListener("default", createListener(port));
-        try
-        {
-            setupUserManagerFactory(serverFactory);
-            server = serverFactory.createServer();
-            server.start();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Could not start server", e);
-        }
-    }
-
-    /**
-     * Stop the ftp server TODO DZ: we may want to put a port check + wait time in
-     * here to make sure that the port is released before we continue. Windows tends
-     * to hold on to ports longer than it should.
-     */
-    public void stop()
-    {
-        if (server != null)
-        {
-            server.stop();
-        }
-    }
+  }
 }

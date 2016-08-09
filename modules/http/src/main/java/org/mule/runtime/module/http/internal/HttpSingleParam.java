@@ -16,46 +16,39 @@ import org.mule.runtime.module.http.internal.HttpParamType;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
-public class HttpSingleParam extends HttpParam implements Initialisable, MuleContextAware
-{
+public class HttpSingleParam extends HttpParam implements Initialisable, MuleContextAware {
 
-    private AttributeEvaluator name;
-    private AttributeEvaluator value;
+  private AttributeEvaluator name;
+  private AttributeEvaluator value;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    public HttpSingleParam(HttpParamType type)
-    {
-        super(type);
-    }
+  public HttpSingleParam(HttpParamType type) {
+    super(type);
+  }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        name.initialize(muleContext.getExpressionManager());
-        value.initialize(muleContext.getExpressionManager());
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    name.initialize(muleContext.getExpressionManager());
+    value.initialize(muleContext.getExpressionManager());
+  }
 
-    @Override
-    public void resolve(ParameterMap parameterMap, MuleEvent muleEvent)
-    {
-        parameterMap.put(name.resolveStringValue(muleEvent), value.resolveStringValue(muleEvent));
-    }
+  @Override
+  public void resolve(ParameterMap parameterMap, MuleEvent muleEvent) {
+    parameterMap.put(name.resolveStringValue(muleEvent), value.resolveStringValue(muleEvent));
+  }
 
-    public void setName(String name)
-    {
-        this.name = new AttributeEvaluator(name);
-    }
+  public void setName(String name) {
+    this.name = new AttributeEvaluator(name);
+  }
 
-    public void setValue(String value)
-    {
-        this.value = new AttributeEvaluator(value);
-    }
+  public void setValue(String value) {
+    this.value = new AttributeEvaluator(value);
+  }
 
 }

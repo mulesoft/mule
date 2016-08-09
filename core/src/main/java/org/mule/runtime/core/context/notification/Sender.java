@@ -10,39 +10,30 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 /**
- * This does the work necessary to deliver events to a particular listener.  It is generated for a
- * particular {@link Configuration} and stored in a
- * {@link org.mule.runtime.core.context.notification.Policy}.
+ * This does the work necessary to deliver events to a particular listener. It is generated for a particular {@link Configuration}
+ * and stored in a {@link org.mule.runtime.core.context.notification.Policy}.
  */
-class Sender
-{
+class Sender {
 
-    private ListenerSubscriptionPair pair;
-    private WildcardFilter subscriptionFilter;
+  private ListenerSubscriptionPair pair;
+  private WildcardFilter subscriptionFilter;
 
-    Sender(ListenerSubscriptionPair pair)
-    {
-        this.pair = pair;
-        subscriptionFilter = new WildcardFilter(pair.getSubscription());
-        subscriptionFilter.setCaseSensitive(false);
+  Sender(ListenerSubscriptionPair pair) {
+    this.pair = pair;
+    subscriptionFilter = new WildcardFilter(pair.getSubscription());
+    subscriptionFilter.setCaseSensitive(false);
+  }
+
+  public void dispatch(ServerNotification notification) {
+    if (pair.isNullSubscription()
+        || (null != notification.getResourceIdentifier() && subscriptionFilter.accept(notification.getResourceIdentifier()))) {
+      try {
+        pair.getListener().onNotification(notification);
+      } catch (Exception e) {
+        // Exceptions from listeners do not affect the notification processing
+      }
     }
-
-    public void dispatch(ServerNotification notification)
-    {
-        if (pair.isNullSubscription() ||
-                (null != notification.getResourceIdentifier() &&
-                        subscriptionFilter.accept(notification.getResourceIdentifier())))
-        {
-            try
-            {
-                pair.getListener().onNotification(notification);
-            }
-            catch (Exception e)
-            {
-                // Exceptions from listeners do not affect the notification processing
-            }
-        }
-    }
+  }
 
 }
 

@@ -9,25 +9,21 @@ package org.mule.runtime.module.db.internal.domain.param;
 
 import org.mule.runtime.module.db.internal.domain.type.DbType;
 
-public class DefaultInputQueryParam extends AbstractQueryParam implements InputQueryParam
-{
+public class DefaultInputQueryParam extends AbstractQueryParam implements InputQueryParam {
 
-    private final Object value;
+  private final Object value;
 
-    public DefaultInputQueryParam(int index, DbType type, Object value)
-    {
-        this(index, type, value, null);
-    }
+  public DefaultInputQueryParam(int index, DbType type, Object value) {
+    this(index, type, value, null);
+  }
 
-    public DefaultInputQueryParam(int index, DbType type, Object value, String name)
-    {
-        super(index, type, name);
-        this.value = value;
-    }
+  public DefaultInputQueryParam(int index, DbType type, Object value, String name) {
+    super(index, type, name);
+    this.value = value;
+  }
 
-    @Override
-    public Object getValue()
-    {
-        return value;
-    }
+  @Override
+  public Object getValue() {
+    return value;
+  }
 }

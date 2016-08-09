@@ -12,58 +12,45 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name="artist", propOrder = {
-        "artType",
-        "famousWorks",
-        "firstName",
-        "lastName"
-})
+@XmlType(name = "artist", propOrder = {"artType", "famousWorks", "firstName", "lastName"})
 
-public class Artist
-{
-    protected ArtType artType;
-    protected String famousWorks;
-    protected String firstName;
-    protected String lastName;
+public class Artist {
+
+  protected ArtType artType;
+  protected String famousWorks;
+  protected String firstName;
+  protected String lastName;
 
 
-    public ArtType getArtType()
-    {
-        return artType;
-    }
+  public ArtType getArtType() {
+    return artType;
+  }
 
-    public void setArtType(ArtType artType)
-    {
-        this.artType = artType;
-    }
+  public void setArtType(ArtType artType) {
+    this.artType = artType;
+  }
 
-    public String getFamousWorks()
-    {
-        return famousWorks;
-    }
+  public String getFamousWorks() {
+    return famousWorks;
+  }
 
-    public void setFamousWorks(String famousWorks)
-    {
-        this.famousWorks = famousWorks;
-    }
+  public void setFamousWorks(String famousWorks) {
+    this.famousWorks = famousWorks;
+  }
 
-    public String getFirstName()
-    {
-        return firstName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setFirstName(String firstName)
-    {
-        this.firstName = firstName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public String getLastName()
-    {
-        return lastName;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setLastName(String lastName)
-    {
-        this.lastName = lastName;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 }

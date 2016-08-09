@@ -11,51 +11,42 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
 /**
- * <code>EqualsFilter</code> is a filter for comparing two objects using the
- * equals() method.
+ * <code>EqualsFilter</code> is a filter for comparing two objects using the equals() method.
  */
-public class EqualsFilter implements Filter, ObjectFilter
-{
-    private Object pattern;
+public class EqualsFilter implements Filter, ObjectFilter {
 
-    public EqualsFilter()
-    {
-        super();
+  private Object pattern;
+
+  public EqualsFilter() {
+    super();
+  }
+
+  public EqualsFilter(Object compareTo) {
+    this.pattern = compareTo;
+  }
+
+  public boolean accept(MuleMessage message) {
+    return accept((Object) message.getPayload());
+  }
+
+  public boolean accept(Object object) {
+    if (object == null && pattern == null) {
+      return true;
     }
 
-    public EqualsFilter(Object compareTo)
-    {
-        this.pattern = compareTo;
+    if (object == null || pattern == null) {
+      return false;
     }
 
-    public boolean accept(MuleMessage message)
-    {
-        return accept((Object) message.getPayload());
-    }
+    return pattern.equals(object);
+  }
 
-    public boolean accept(Object object)
-    {
-        if (object == null && pattern == null)
-        {
-            return true;
-        }
+  public Object getPattern() {
+    return pattern;
+  }
 
-        if (object == null || pattern == null)
-        {
-            return false;
-        }
-
-        return pattern.equals(object);
-    }
-
-    public Object getPattern()
-    {
-        return pattern;
-    }
-
-    public void setPattern(Object pattern)
-    {
-        this.pattern = pattern;
-    }
+  public void setPattern(Object pattern) {
+    this.pattern = pattern;
+  }
 
 }

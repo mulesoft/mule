@@ -15,33 +15,27 @@ import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 import org.springframework.context.ApplicationContext;
 
 /**
- * Specialization of {@link SelectiveInjectorProcessor} which only considers
- * beans which are defined on a given {@link ApplicationContext}. This is useful
- * to avoid exceptions related to unsatisfied dependencies when using parent context
+ * Specialization of {@link SelectiveInjectorProcessor} which only considers beans which are defined on a given
+ * {@link ApplicationContext}. This is useful to avoid exceptions related to unsatisfied dependencies when using parent context
  * which also define a {@link AutowiredAnnotationBeanPostProcessor}
  *
  * @since 3.7.0
  */
-public final class ContextExclusiveInjectorProcessor extends SelectiveInjectorProcessor
-{
+public final class ContextExclusiveInjectorProcessor extends SelectiveInjectorProcessor {
 
-    private ApplicationContext applicationContext;
+  private ApplicationContext applicationContext;
 
-    public ContextExclusiveInjectorProcessor(ApplicationContext applicationContext)
-    {
-        this.applicationContext = applicationContext;
-    }
+  public ContextExclusiveInjectorProcessor(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
 
-    /**
-     * Only returns {@code true} if {@code beanName} is a key currently registered
-     * in the {@link #applicationContext} or if {@code beanName} equals
-     * the {@code bean} classname, which in spring jargon means that
-     * we're injecting a non registered object (most likely through
-     * {@link Injector#inject(Object)}
-     */
-    @Override
-    protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
-    {
-        return applicationContext.containsBean(beanName) || beanName.equals(bean.getClass().getName());
-    }
+  /**
+   * Only returns {@code true} if {@code beanName} is a key currently registered in the {@link #applicationContext} or if
+   * {@code beanName} equals the {@code bean} classname, which in spring jargon means that we're injecting a non registered object
+   * (most likely through {@link Injector#inject(Object)}
+   */
+  @Override
+  protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
+    return applicationContext.containsBean(beanName) || beanName.equals(bean.getClass().getName());
+  }
 }

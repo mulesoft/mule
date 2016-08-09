@@ -16,34 +16,31 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
-{
+public class PayloadTypeFilterTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testPayloadTypeFilterNoExpectedType()
-    {
-        PayloadTypeFilter filter = new PayloadTypeFilter();
-        assertNull(filter.getExpectedType());
-        assertFalse(filter.accept(MuleMessage.builder().payload("test").build()));
+  @Test
+  public void testPayloadTypeFilterNoExpectedType() {
+    PayloadTypeFilter filter = new PayloadTypeFilter();
+    assertNull(filter.getExpectedType());
+    assertFalse(filter.accept(MuleMessage.builder().payload("test").build()));
 
-        filter.setExpectedType(String.class);
-        assertTrue(filter.accept(MuleMessage.builder().payload("test").build()));
+    filter.setExpectedType(String.class);
+    assertTrue(filter.accept(MuleMessage.builder().payload("test").build()));
 
-        filter.setExpectedType(null);
-        assertFalse(filter.accept(MuleMessage.builder().payload("test").build()));
-    }
+    filter.setExpectedType(null);
+    assertFalse(filter.accept(MuleMessage.builder().payload("test").build()));
+  }
 
-    @Test
-    public void testPayloadTypeFilter()
-    {
-        PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
-        assertNotNull(filter.getExpectedType());
-        assertTrue(filter.accept(MuleMessage.builder().payload(new Exception("test")).build()));
-        assertTrue(!filter.accept(MuleMessage.builder().payload("test").build()));
+  @Test
+  public void testPayloadTypeFilter() {
+    PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
+    assertNotNull(filter.getExpectedType());
+    assertTrue(filter.accept(MuleMessage.builder().payload(new Exception("test")).build()));
+    assertTrue(!filter.accept(MuleMessage.builder().payload("test").build()));
 
-        filter.setExpectedType(String.class);
-        assertTrue(filter.accept(MuleMessage.builder().payload("test").build()));
-        assertTrue(!filter.accept(MuleMessage.builder().payload(new Exception("test")).build()));
-    }
+    filter.setExpectedType(String.class);
+    assertTrue(filter.accept(MuleMessage.builder().payload("test").build()));
+    assertTrue(!filter.accept(MuleMessage.builder().payload(new Exception("test")).build()));
+  }
 
 }

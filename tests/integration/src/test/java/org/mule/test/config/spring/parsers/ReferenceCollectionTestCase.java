@@ -17,37 +17,32 @@ import org.junit.Test;
 /**
  * References to collections in attributes are currently not handled correctly
  */
-public class ReferenceCollectionTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/reference-collection-test.xml";
-    }
+public class ReferenceCollectionTestCase extends AbstractNamespaceTestCase {
 
-    protected void testOffspringRef(int index, int size)
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        Collection<?> offspring = (Collection<?>) assertContentExists(orphan.getOffspring(), Collection.class);
-        assertEquals(size, offspring.size());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/reference-collection-test.xml";
+  }
 
-    @Test
-    public void testNamed()
-    {
-        testOffspringRef(1, 2);
-    }
+  protected void testOffspringRef(int index, int size) {
+    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+    Collection<?> offspring = (Collection<?>) assertContentExists(orphan.getOffspring(), Collection.class);
+    assertEquals(size, offspring.size());
+  }
 
-    @Test
-    public void testOrphan()
-    {
-        testOffspringRef(2, 1);
-    }
+  @Test
+  public void testNamed() {
+    testOffspringRef(1, 2);
+  }
 
-    @Test
-    public void testParent()
-    {
-        testOffspringRef(3, 3);
-    }
+  @Test
+  public void testOrphan() {
+    testOffspringRef(2, 1);
+  }
+
+  @Test
+  public void testParent() {
+    testOffspringRef(3, 3);
+  }
 
 }

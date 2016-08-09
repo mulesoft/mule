@@ -16,12 +16,10 @@ import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import java.util.Arrays;
 import java.util.List;
 
-public class UpdateProcessorBeanDefinitionParser extends AbstractUpdateProcessorBeanDefinitionParser
-{
+public class UpdateProcessorBeanDefinitionParser extends AbstractUpdateProcessorBeanDefinitionParser {
 
-    @Override
-    protected List<QueryType> getQueryType()
-    {
-        return Arrays.asList(UPDATE, STORE_PROCEDURE_CALL, TRUNCATE, MERGE);
-    }
+  @Override
+  protected List<QueryType> getQueryType() {
+    return Arrays.asList(UPDATE, STORE_PROCEDURE_CALL, TRUNCATE, MERGE);
+  }
 }

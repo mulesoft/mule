@@ -20,46 +20,42 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
-{
+public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    private MuleContext domainContext;
-    private MuleContext firstAppContext;
+  private MuleContext domainContext;
+  private MuleContext firstAppContext;
 
-    @After
-    public void after()
-    {
-        if (firstAppContext != null)
-        {
-            firstAppContext.dispose();
-        }
-        if (domainContext != null)
-        {
-            domainContext.dispose();
-        }
+  @After
+  public void after() {
+    if (firstAppContext != null) {
+      firstAppContext.dispose();
     }
-
-    @Test
-    public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
-    {
-        domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
-        firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
-        ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
-
-        expected.expect(instanceOf(InitialisationException.class));
-        secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+    if (domainContext != null) {
+      domainContext.dispose();
     }
+  }
 
-    public SystemProperty getEndpointSchemeSystemProperty()
-    {
-        return new SystemProperty("scheme", "http");
-    }
+  @Test
+  public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception {
+    domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
+    firstAppContext = new ApplicationContextBuilder()
+        .setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+    ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
+
+    expected.expect(instanceOf(InitialisationException.class));
+    secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext)
+        .build();
+  }
+
+  public SystemProperty getEndpointSchemeSystemProperty() {
+    return new SystemProperty("scheme", "http");
+  }
 }

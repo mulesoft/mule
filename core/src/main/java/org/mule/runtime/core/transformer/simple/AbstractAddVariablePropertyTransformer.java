@@ -18,100 +18,85 @@ import org.mule.runtime.core.util.StringUtils;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
-public abstract class AbstractAddVariablePropertyTransformer<T> extends AbstractMessageTransformer
-{
-    private AttributeEvaluator identifierEvaluator;
-    private AttributeEvaluator valueEvaluator;
+public abstract class AbstractAddVariablePropertyTransformer<T> extends AbstractMessageTransformer {
 
-    public AbstractAddVariablePropertyTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
-    }
+  private AttributeEvaluator identifierEvaluator;
+  private AttributeEvaluator valueEvaluator;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        identifierEvaluator.initialize(muleContext.getExpressionManager());
-        valueEvaluator.initialize(muleContext.getExpressionManager());
-    }
+  public AbstractAddVariablePropertyTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Object keyValue = identifierEvaluator.resolveValue(event);
-        String key = (keyValue == null ? null : keyValue.toString());
-        if (key == null)
-        {
-            logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    identifierEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(muleContext.getExpressionManager());
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Object keyValue = identifierEvaluator.resolveValue(event);
+    String key = (keyValue == null ? null : keyValue.toString());
+    if (key == null) {
+      logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+    } else {
+      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
+      if (typedValue.getValue() == null) {
+        removeProperty(event, key);
+
+        if (logger.isDebugEnabled()) {
+          logger.debug(MessageFormat.format(
+                                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
+                                            key, valueEvaluator.getRawValue()));
         }
-        else
-        {
-            TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
-            if (typedValue.getValue() == null)
-            {
-                removeProperty(event, key);
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(MessageFormat.format(
-                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
-                            key, valueEvaluator.getRawValue()));
-                }
-            }
-            else
-            {
-                addProperty(event, key, typedValue.getValue(),
-                        DataType.builder().type(typedValue.getValue().getClass()).mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
-            }
-        }
-        return event.getMessage();
+      } else {
+        addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getValue().getClass())
+            .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
+      }
     }
+    return event.getMessage();
+  }
 
-    /**
-     * Adds the property with its value and dataType to a property or variables scope.
-     *
-     * @param event event to which property is to be added
-     * @param propertyName  name of the property or variable to add
-     * @param value   value of the property or variable to add
-     * @param dataType  data type of the property or variable to add
-     */
-    protected abstract void addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
+  /**
+   * Adds the property with its value and dataType to a property or variables scope.
+   *
+   * @param event event to which property is to be added
+   * @param propertyName name of the property or variable to add
+   * @param value value of the property or variable to add
+   * @param dataType data type of the property or variable to add
+   */
+  protected abstract void addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
 
-    /**
-     * Removes the property from a property or variables scope.
-     *
-     * @param event event to which property is to be removed
-     * @param propertyName name of the property or variable to remove
-     */
-    protected abstract void removeProperty(MuleEvent event, String propertyName);
+  /**
+   * Removes the property from a property or variables scope.
+   *
+   * @param event event to which property is to be removed
+   * @param propertyName name of the property or variable to remove
+   */
+  protected abstract void removeProperty(MuleEvent event, String propertyName);
 
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-        AbstractAddVariablePropertyTransformer clone = (AbstractAddVariablePropertyTransformer) super.clone();
-        clone.setIdentifier(this.identifierEvaluator.getRawValue());
-        clone.setValue(this.valueEvaluator.getRawValue());
-        return clone;
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    AbstractAddVariablePropertyTransformer clone = (AbstractAddVariablePropertyTransformer) super.clone();
+    clone.setIdentifier(this.identifierEvaluator.getRawValue());
+    clone.setValue(this.valueEvaluator.getRawValue());
+    return clone;
+  }
+
+  public void setIdentifier(String identifier) {
+    if (StringUtils.isBlank(identifier)) {
+      throw new IllegalArgumentException("Key cannot be blank");
     }
+    this.identifierEvaluator = new AttributeEvaluator(identifier);
+  }
 
-    public void setIdentifier(String identifier)
-    {
-        if (StringUtils.isBlank(identifier))
-        {
-            throw new IllegalArgumentException("Key cannot be blank");
-        }
-        this.identifierEvaluator = new AttributeEvaluator(identifier);
+  public void setValue(String value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Value must not be null");
     }
-
-    public void setValue(String value)
-    {
-        if (value == null)
-        {
-            throw new IllegalArgumentException("Value must not be null");
-        }
-        this.valueEvaluator = new AttributeEvaluator(value);
-    }
+    this.valueEvaluator = new AttributeEvaluator(value);
+  }
 
 }

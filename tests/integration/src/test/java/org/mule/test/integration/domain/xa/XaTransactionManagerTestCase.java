@@ -23,79 +23,68 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 
-public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
-{
+public class XaTransactionManagerTestCase extends DomainFunctionalTestCase {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  @Override
+  public void setUpMuleContexts() throws Exception {
+    thrown.expect(InitialisationException.class);
+    thrown
+        .expect(hasMessage(containsString("No qualifying bean of type [org.mule.runtime.core.api.transaction.TransactionManagerFactory] is defined: expected single matching bean but found 2:")));
+    thrown.expect(ThrowableRootCauseMatcher
+        .hasRootCause(IsInstanceOf.<ConfigurationException>instanceOf(NoUniqueBeanDefinitionException.class)));
+    super.setUpMuleContexts();
+  }
+
+  public static final String APPLICATION_NAME = "app";
+
+  @Override
+  protected String getDomainConfig() {
+    return "domain/xa/jboss-ts-config.xml";
+  }
+
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {
+        new ApplicationConfig(APPLICATION_NAME, new String[] {"domain/xa/app-with-tx-manager-config.xml"})};
+  }
+
+  @Test
+  public void validateOnlyOneTxManagerCanBeUsed() {
+    // This is never called since the exception is thrown during init.
+    getMuleContextForApp(APPLICATION_NAME).getTransactionManager();
+  }
+
+  public static class ThrowableRootCauseMatcher<T extends Throwable> extends TypeSafeMatcher<T> {
+
+    private final Matcher<T> fMatcher;
+
+    public ThrowableRootCauseMatcher(Matcher<T> matcher) {
+      fMatcher = matcher;
+    }
 
     @Override
-    public void setUpMuleContexts() throws Exception
-    {
-        thrown.expect(InitialisationException.class);
-        thrown.expect(hasMessage(containsString("No qualifying bean of type [org.mule.runtime.core.api.transaction.TransactionManagerFactory] is defined: expected single matching bean but found 2:")));
-        thrown.expect(ThrowableRootCauseMatcher.hasRootCause(IsInstanceOf.<ConfigurationException> instanceOf(NoUniqueBeanDefinitionException.class)));
-        super.setUpMuleContexts();
-    }
-
-    public static final String APPLICATION_NAME = "app";
-
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/xa/jboss-ts-config.xml";
+    public void describeTo(Description description) {
+      description.appendText("exception with root cause ");
+      description.appendDescriptionOf(fMatcher);
     }
 
     @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {
-                new ApplicationConfig(APPLICATION_NAME, new String[] {"domain/xa/app-with-tx-manager-config.xml"})
-        };
+    protected boolean matchesSafely(T item) {
+      return fMatcher.matches(getRootException(item));
     }
 
-    @Test
-    public void validateOnlyOneTxManagerCanBeUsed()
-    {
-        // This is never called since the exception is thrown during init.
-        getMuleContextForApp(APPLICATION_NAME).getTransactionManager();
+    @Override
+    protected void describeMismatchSafely(T item, Description description) {
+      description.appendText("root cause ");
+      fMatcher.describeMismatch(getRootException(item), description);
     }
 
-    public static class ThrowableRootCauseMatcher<T extends Throwable> extends
-        TypeSafeMatcher<T>
-    {
-
-        private final Matcher<T> fMatcher;
-
-        public ThrowableRootCauseMatcher(Matcher<T> matcher)
-        {
-            fMatcher = matcher;
-        }
-
-        @Override
-        public void describeTo(Description description)
-        {
-            description.appendText("exception with root cause ");
-            description.appendDescriptionOf(fMatcher);
-        }
-
-        @Override
-        protected boolean matchesSafely(T item)
-        {
-            return fMatcher.matches(getRootException(item));
-        }
-
-        @Override
-        protected void describeMismatchSafely(T item, Description description)
-        {
-            description.appendText("root cause ");
-            fMatcher.describeMismatch(getRootException(item), description);
-        }
-
-        @Factory
-        public static <T extends Throwable> Matcher<T> hasRootCause(final Matcher<T> matcher)
-        {
-            return new ThrowableRootCauseMatcher<T>(matcher);
-        }
+    @Factory
+    public static <T extends Throwable> Matcher<T> hasRootCause(final Matcher<T> matcher) {
+      return new ThrowableRootCauseMatcher<T>(matcher);
     }
+  }
 }

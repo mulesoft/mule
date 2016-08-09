@@ -31,91 +31,83 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
-{
+public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
-    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+  private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
-    public static class A
-    {
-    }
+  public static class A {
+  }
 
-    public static class B
-    {
-    }
+  public static class B {
+  }
 
-    private DataType dataTypeA = DataType.fromType(A.class);
-    private DataType dataTypeB = DataType.fromType(B.class);
+  private DataType dataTypeA = DataType.fromType(A.class);
+  private DataType dataTypeB = DataType.fromType(B.class);
 
-    @Before
-    public void setUp() throws Exception
-    {
-        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    }
+  @Before
+  public void setUp() throws Exception {
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+  }
 
-    @Test
-    public void doesNotFailIfCannotResolveType() throws ResolverException, TransformerException
-    {
-        MuleRegistry muleRegistry = mock(MuleRegistry.class);
-        when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        ArrayList<Transformer> transformers = new ArrayList<>();
-        when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
-        TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-        resolver.setMuleContext(muleContext);
+  @Test
+  public void doesNotFailIfCannotResolveType() throws ResolverException, TransformerException {
+    MuleRegistry muleRegistry = mock(MuleRegistry.class);
+    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    ArrayList<Transformer> transformers = new ArrayList<>();
+    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
+    TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
+    resolver.setMuleContext(muleContext);
 
-        Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
-        assertNull(resolvedTransformer);
-    }
+    Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
+    assertNull(resolvedTransformer);
+  }
 
-    @Test
-    public void resolvesTypeWithOneMatchingTransformer() throws ResolverException, TransformerException
-    {
-        MuleRegistry muleRegistry = mock(MuleRegistry.class);
-        when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).build();
+  @Test
+  public void resolvesTypeWithOneMatchingTransformer() throws ResolverException, TransformerException {
+    MuleRegistry muleRegistry = mock(MuleRegistry.class);
+    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).build();
 
-        ArrayList<Transformer> transformers = new ArrayList<>();
-        transformers.add(aToBConverter);
-        when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
+    ArrayList<Transformer> transformers = new ArrayList<>();
+    transformers.add(aToBConverter);
+    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
 
 
-        TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-        resolver.setMuleContext(muleContext);
+    TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
+    resolver.setMuleContext(muleContext);
 
-        Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
-        assertEquals(aToBConverter, resolvedTransformer);
-    }
+    Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
+    assertEquals(aToBConverter, resolvedTransformer);
+  }
 
-    @Test
-    public void resolvesTypeWithTwoMatchingTransformer() throws ResolverException, TransformerException
-    {
-        MuleRegistry muleRegistry = mock(MuleRegistry.class);
-        when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(1).build();
-        Transformer betterAToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(2).build();
+  @Test
+  public void resolvesTypeWithTwoMatchingTransformer() throws ResolverException, TransformerException {
+    MuleRegistry muleRegistry = mock(MuleRegistry.class);
+    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(1).build();
+    Transformer betterAToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(2).build();
 
-        ArrayList<Transformer> transformers = new ArrayList<>();
-        transformers.add(aToBConverter);
-        transformers.add(betterAToBConverter);
-        when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
+    ArrayList<Transformer> transformers = new ArrayList<>();
+    transformers.add(aToBConverter);
+    transformers.add(betterAToBConverter);
+    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
 
 
-        TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-        resolver.setMuleContext(muleContext);
+    TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
+    resolver.setMuleContext(muleContext);
 
-        Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
-        assertEquals(betterAToBConverter, resolvedTransformer);
-    }
+    Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
+    assertEquals(betterAToBConverter, resolvedTransformer);
+  }
 
-    @Test
-    public void fallbacksNotRegistered() throws Exception
-    {
-        TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-        resolver.setMuleContext(muleContext);
-        resolver.initialise();
+  @Test
+  public void fallbacksNotRegistered() throws Exception {
+    TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
+    resolver.setMuleContext(muleContext);
+    resolver.initialise();
 
-        verify(muleContext, never()).getRegistry();
-    }
+    verify(muleContext, never()).getRegistry();
+  }
 
 }

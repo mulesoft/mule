@@ -11,18 +11,17 @@ package org.mule.extension.http.api;
  *
  * @since 4.0
  */
-public enum HttpStreamingType
-{
-    /**
-     * Will stream based on the message content.
-     */
-    AUTO,
-    /**
-     * Will always use streaming.
-     */
-    ALWAYS,
-    /**
-     * Will never use streaming.
-     */
-    NEVER
+public enum HttpStreamingType {
+  /**
+   * Will stream based on the message content.
+   */
+  AUTO,
+  /**
+   * Will always use streaming.
+   */
+  ALWAYS,
+  /**
+   * Will never use streaming.
+   */
+  NEVER
 }

@@ -6,28 +6,24 @@
  */
 package org.mule.test.metadata.extension.model.shapes;
 
-public class Rectangle extends Shape
-{
-    private int height;
-    private int width;
+public class Rectangle extends Shape {
 
-    public int getHeight()
-    {
-        return height;
-    }
+  private int height;
+  private int width;
 
-    public void setHeight(int height)
-    {
-        this.height = height;
-    }
+  public int getHeight() {
+    return height;
+  }
 
-    public int getWidth()
-    {
-        return width;
-    }
+  public void setHeight(int height) {
+    this.height = height;
+  }
 
-    public void setWidth(int width)
-    {
-        this.width = width;
-    }
+  public int getWidth() {
+    return width;
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
 }

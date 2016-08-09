@@ -16,36 +16,31 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 
-public class SetCorrelationIdTransformer extends AbstractMessageTransformer
-{
-    private AttributeEvaluator correlationIdEvaluator;
+public class SetCorrelationIdTransformer extends AbstractMessageTransformer {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        correlationIdEvaluator.initialize(muleContext.getExpressionManager());
-    }
+  private AttributeEvaluator correlationIdEvaluator;
 
-    public SetCorrelationIdTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    correlationIdEvaluator.initialize(muleContext.getExpressionManager());
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        final MuleMessage msg = MuleMessage.builder(event.getMessage())
-                                           .correlationId(correlationIdEvaluator.resolveValue(event).toString())
-                                           .build();
-        event.setMessage(msg);
-        return msg;
-    }
+  public SetCorrelationIdTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    final MuleMessage msg =
+        MuleMessage.builder(event.getMessage()).correlationId(correlationIdEvaluator.resolveValue(event).toString()).build();
+    event.setMessage(msg);
+    return msg;
+  }
 
 
-    public void setCorrelationId(String correlationId)
-    {
-        correlationIdEvaluator = new AttributeEvaluator(correlationId);
-    }
+  public void setCorrelationId(String correlationId) {
+    correlationIdEvaluator = new AttributeEvaluator(correlationId);
+  }
 }

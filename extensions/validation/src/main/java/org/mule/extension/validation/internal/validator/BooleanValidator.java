@@ -13,33 +13,28 @@ import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 
 /**
- * An {@link AbstractValidator} which tests a {@link #value}
- * to match a {@link #expected} one
+ * An {@link AbstractValidator} which tests a {@link #value} to match a {@link #expected} one
  *
  * @since 3.7.0
  */
-public class BooleanValidator extends AbstractValidator
-{
+public class BooleanValidator extends AbstractValidator {
 
-    private final boolean value;
-    private final boolean expected;
+  private final boolean value;
+  private final boolean expected;
 
-    public BooleanValidator(boolean value, boolean expected, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
-        this.expected = expected;
-    }
+  public BooleanValidator(boolean value, boolean expected, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+    this.expected = expected;
+  }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        return value == expected ? ok() : fail();
-    }
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    return value == expected ? ok() : fail();
+  }
 
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().failedBooleanValidation(value, expected);
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().failedBooleanValidation(value, expected);
+  }
 }

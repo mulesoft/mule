@@ -24,53 +24,43 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TestNoConfigMetadataResolver
-        implements MetadataKeysResolver, MetadataContentResolver<Object>, MetadataOutputResolver<Object>, MetadataAttributesResolver<Object>
-{
+public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataContentResolver<Object>,
+    MetadataOutputResolver<Object>, MetadataAttributesResolver<Object> {
 
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context)
-    {
-        return Arrays.stream(KeyIds.values())
-                .map(e -> MetadataKeyBuilder.newKey(e.name()).build())
-                .collect(Collectors.toSet());
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) {
+    return Arrays.stream(KeyIds.values()).map(e -> MetadataKeyBuilder.newKey(e.name()).build()).collect(Collectors.toSet());
+  }
+
+  @Override
+  public MetadataType getContentMetadata(MetadataContext context, Object key) {
+    if (key instanceof NullMetadataKey) {
+      return BaseTypeBuilder.create(JAVA).nullType().build();
     }
 
-    @Override
-    public MetadataType getContentMetadata(MetadataContext context, Object key)
-    {
-        if (key instanceof NullMetadataKey)
-        {
-            return BaseTypeBuilder.create(JAVA).nullType().build();
-        }
+    return BaseTypeBuilder.create(JAVA).stringType().build();
+  }
 
-        return BaseTypeBuilder.create(JAVA).stringType().build();
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, Object key) {
+    if (key instanceof NullMetadataKey) {
+      return BaseTypeBuilder.create(JAVA).nullType().build();
     }
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, Object key)
-    {
-        if (key instanceof NullMetadataKey)
-        {
-            return BaseTypeBuilder.create(JAVA).nullType().build();
-        }
+    return BaseTypeBuilder.create(JAVA).booleanType().build();
+  }
 
-        return BaseTypeBuilder.create(JAVA).booleanType().build();
+  @Override
+  public MetadataType getAttributesMetadata(MetadataContext context, Object key)
+      throws MetadataResolvingException, ConnectionException {
+    if (key instanceof NullMetadataKey) {
+      return BaseTypeBuilder.create(JAVA).nullType().build();
     }
 
-    @Override
-    public MetadataType getAttributesMetadata(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException
-    {
-        if (key instanceof NullMetadataKey)
-        {
-            return BaseTypeBuilder.create(JAVA).nullType().build();
-        }
+    return BaseTypeBuilder.create(JAVA).booleanType().build();
+  }
 
-        return BaseTypeBuilder.create(JAVA).booleanType().build();
-    }
-
-    public enum KeyIds
-    {
-        BOOLEAN, STRING
-    }
+  public enum KeyIds {
+    BOOLEAN, STRING
+  }
 }

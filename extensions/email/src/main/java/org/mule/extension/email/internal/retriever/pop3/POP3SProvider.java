@@ -35,51 +35,41 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Alias("pop3s")
 @DisplayName("POP3S Connection")
-public class POP3SProvider extends AbstractRetrieverProvider<RetrieverConnection> implements Initialisable
-{
+public class POP3SProvider extends AbstractRetrieverProvider<RetrieverConnection> implements Initialisable {
 
-    /**
-     * The port number of the mail server. '995' by default.
-     */
-    @Parameter
-    @Optional(defaultValue = POP3S_PORT)
-    @Placement(group = CONNECTION, order = 2)
-    private String port;
+  /**
+   * The port number of the mail server. '995' by default.
+   */
+  @Parameter
+  @Optional(defaultValue = POP3S_PORT)
+  @Placement(group = CONNECTION, order = 2)
+  private String port;
 
-    /**
-     * A factory for TLS contexts. A TLS context is configured with a key store and a trust store.
-     * Allows to create a TLS secured connections.
-     */
-    @Parameter
-    @Summary("TLS Configuration for the secure connection of the POP3S protocol")
-    @Placement(group = CONNECTION, order = 5)
-    @DisplayName(TLS_CONFIGURATION)
-    private TlsContextFactory tlsContextFactory;
+  /**
+   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
+   * connections.
+   */
+  @Parameter
+  @Summary("TLS Configuration for the secure connection of the POP3S protocol")
+  @Placement(group = CONNECTION, order = 5)
+  @DisplayName(TLS_CONFIGURATION)
+  private TlsContextFactory tlsContextFactory;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(tlsContextFactory);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(tlsContextFactory);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RetrieverConnection connect() throws ConnectionException
-    {
-        return new RetrieverConnection(POP3S,
-                                       settings.getUser(),
-                                       settings.getPassword(),
-                                       settings.getHost(),
-                                       port,
-                                       getConnectionTimeout(),
-                                       getReadTimeout(),
-                                       getWriteTimeout(),
-                                       getProperties(),
-                                       tlsContextFactory);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public RetrieverConnection connect() throws ConnectionException {
+    return new RetrieverConnection(POP3S, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                   getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties(),
+                                   tlsContextFactory);
+  }
 }

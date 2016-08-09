@@ -9,54 +9,45 @@ package org.mule.runtime.core.transaction.constraints;
 import org.mule.runtime.core.api.MuleEvent;
 
 /**
- * <code>BatchConstraint</code> is a filter that counts on every execution and
- * returns true when the batch size value equals the execution count.
+ * <code>BatchConstraint</code> is a filter that counts on every execution and returns true when the batch size value equals the
+ * execution count.
  */
 // @ThreadSafe
-public class BatchConstraint extends ConstraintFilter
-{
-    // @GuardedBy(this)
-    private int batchSize = 1;
-    // @GuardedBy(this)
-    private int batchCount = 0;
+public class BatchConstraint extends ConstraintFilter {
 
-    public boolean accept(MuleEvent event)
-    {
-        synchronized (this)
-        {
-            batchCount++;
-            return batchCount == batchSize;
-        }
-    }
+  // @GuardedBy(this)
+  private int batchSize = 1;
+  // @GuardedBy(this)
+  private int batchCount = 0;
 
-    public int getBatchSize()
-    {
-        synchronized (this)
-        {
-            return batchSize;
-        }
+  public boolean accept(MuleEvent event) {
+    synchronized (this) {
+      batchCount++;
+      return batchCount == batchSize;
     }
+  }
 
-    public synchronized void setBatchSize(int batchSize)
-    {
-        synchronized (this)
-        {
-            this.batchSize = batchSize;
-        }
+  public int getBatchSize() {
+    synchronized (this) {
+      return batchSize;
     }
+  }
 
-    public Object clone() throws CloneNotSupportedException
-    {
-        synchronized (this)
-        {
-            BatchConstraint clone = (BatchConstraint) super.clone();
-            clone.setBatchSize(batchSize);
-            for (int i = 0; i < batchCount; i++)
-            {
-                clone.accept(null);
-            }
-            return clone;
-        }
+  public synchronized void setBatchSize(int batchSize) {
+    synchronized (this) {
+      this.batchSize = batchSize;
     }
+  }
+
+  public Object clone() throws CloneNotSupportedException {
+    synchronized (this) {
+      BatchConstraint clone = (BatchConstraint) super.clone();
+      clone.setBatchSize(batchSize);
+      for (int i = 0; i < batchCount; i++) {
+        clone.accept(null);
+      }
+      return clone;
+    }
+  }
 
 }

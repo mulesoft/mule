@@ -7,19 +7,16 @@
 
 package org.mule.runtime.config.spring.parsers.specific;
 
-public class XaTransactionDefinitionParser extends TransactionDefinitionParser
-{
+public class XaTransactionDefinitionParser extends TransactionDefinitionParser {
 
-    private static String[] ignoredAttributes = new String[] {FACTORY_REF, ACTION, INTERACT_WTH_EXTERNAL};
+  private static String[] ignoredAttributes = new String[] {FACTORY_REF, ACTION, INTERACT_WTH_EXTERNAL};
 
-    public XaTransactionDefinitionParser(Class factoryClass)
-    {
-        super(factoryClass);
-    }
+  public XaTransactionDefinitionParser(Class factoryClass) {
+    super(factoryClass);
+  }
 
-    @Override
-    protected String[] getIgnoredAttributes()
-    {
-        return ignoredAttributes;
-    }
+  @Override
+  protected String[] getIgnoredAttributes() {
+    return ignoredAttributes;
+  }
 }

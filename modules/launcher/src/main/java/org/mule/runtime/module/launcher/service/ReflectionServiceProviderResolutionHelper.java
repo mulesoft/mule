@@ -25,61 +25,52 @@ import javax.inject.Inject;
 /**
  * Implements {@link ServiceProviderResolutionHelper} using reflection.
  */
-public class ReflectionServiceProviderResolutionHelper implements ServiceProviderResolutionHelper
-{
+public class ReflectionServiceProviderResolutionHelper implements ServiceProviderResolutionHelper {
 
-    @Override
-    public void injectInstance(ServiceProvider serviceProvider, Collection<ServiceDefinition> resolvedServices) throws ServiceResolutionError
-    {
-        for (Field field : getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class)))
-        {
-            Class<?> dependencyType = field.getType();
-            final Object dependency = lookupService(resolvedServices, dependencyType);
-            if (dependency == null)
-            {
-                throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'", field.getName(), serviceProvider.getClass().getName()));
-            }
-            try
-            {
-                field.setAccessible(true);
-                field.set(serviceProvider, dependency);
-            }
-            catch (Exception e)
-            {
-                throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(), dependencyType.getClass().getName()), e);
-            }
-        }
+  @Override
+  public void injectInstance(ServiceProvider serviceProvider, Collection<ServiceDefinition> resolvedServices)
+      throws ServiceResolutionError {
+    for (Field field : getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class))) {
+      Class<?> dependencyType = field.getType();
+      final Object dependency = lookupService(resolvedServices, dependencyType);
+      if (dependency == null) {
+        throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
+                                                field.getName(), serviceProvider.getClass().getName()));
+      }
+      try {
+        field.setAccessible(true);
+        field.set(serviceProvider, dependency);
+      } catch (Exception e) {
+        throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
+                                                dependencyType.getClass().getName()),
+                                         e);
+      }
+    }
+  }
+
+  private Object lookupService(Collection<ServiceDefinition> muleServices, Class<?> dependencyType) {
+    for (ServiceDefinition muleService : muleServices) {
+      if (muleService.getServiceClass().equals(dependencyType)) {
+        return muleService.getService();
+      }
     }
 
-    private Object lookupService(Collection<ServiceDefinition> muleServices, Class<?> dependencyType)
-    {
-        for (ServiceDefinition muleService : muleServices)
-        {
-            if (muleService.getServiceClass().equals(dependencyType))
-            {
-                return muleService.getService();
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 
-    @Override
-    public List<Class<? extends Service>> findServiceDependencies(ServiceProvider serviceProvider)
-    {
-        final List<Class<? extends Service>> result = getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class)).stream()
-                .map(f -> (Class<? extends Service>) f.getType())
-                .collect(Collectors.toCollection(LinkedList::new));
+  @Override
+  public List<Class<? extends Service>> findServiceDependencies(ServiceProvider serviceProvider) {
+    final List<Class<? extends Service>> result = getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class)).stream()
+        .map(f -> (Class<? extends Service>) f.getType()).collect(Collectors.toCollection(LinkedList::new));
 
-        result.forEach(clazz ->
-                       {
-                           if (!Service.class.isAssignableFrom(clazz))
-                           {
-                               throw new IllegalArgumentException("Service providers can depend on Service instances only, but found " + clazz.getName());
-                           }
-                       });
+    result.forEach(clazz -> {
+      if (!Service.class.isAssignableFrom(clazz)) {
+        throw new IllegalArgumentException("Service providers can depend on Service instances only, but found "
+            + clazz.getName());
+      }
+    });
 
-        return result;
-    }
+    return result;
+  }
 }

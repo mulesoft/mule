@@ -16,60 +16,53 @@ import org.springframework.beans.factory.config.InstantiationAwareBeanPostProces
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
- * A {@link InstantiationAwareBeanPostProcessor} which suspends
- * initialization and population of discarded objects and removes them from the registry
+ * A {@link InstantiationAwareBeanPostProcessor} which suspends initialization and population of discarded objects and removes
+ * them from the registry
  *
  * @since 3.7.0
  */
-public class DiscardedOptionalBeanPostProcessor implements InstantiationAwareBeanPostProcessor
-{
+public class DiscardedOptionalBeanPostProcessor implements InstantiationAwareBeanPostProcessor {
 
-    private final OptionalObjectsController optionalObjectsController;
-    private final DefaultListableBeanFactory beanFactory;
+  private final OptionalObjectsController optionalObjectsController;
+  private final DefaultListableBeanFactory beanFactory;
 
-    public DiscardedOptionalBeanPostProcessor(OptionalObjectsController optionalObjectsController, DefaultListableBeanFactory beanFactory)
-    {
-        this.optionalObjectsController = optionalObjectsController;
-        this.beanFactory = beanFactory;
+  public DiscardedOptionalBeanPostProcessor(OptionalObjectsController optionalObjectsController,
+                                            DefaultListableBeanFactory beanFactory) {
+    this.optionalObjectsController = optionalObjectsController;
+    this.beanFactory = beanFactory;
+  }
+
+  @Override
+  public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+    return null;
+  }
+
+  @Override
+  public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+    return !optionalObjectsController.isDiscarded(beanName);
+  }
+
+  @Override
+  public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
+      throws BeansException {
+    return optionalObjectsController.isDiscarded(beanName) ? null : pvs;
+  }
+
+  @Override
+  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    if (optionalObjectsController.isDiscarded(beanName)) {
+      if (beanFactory.containsBeanDefinition(beanName)) {
+        beanFactory.removeBeanDefinition(beanName);
+      }
+
+      beanFactory.destroySingleton(beanName);
+      return null;
     }
+    return bean;
+  }
 
-    @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException
-    {
-        return null;
-    }
-
-    @Override
-    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException
-    {
-        return !optionalObjectsController.isDiscarded(beanName);
-    }
-
-    @Override
-    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException
-    {
-        return optionalObjectsController.isDiscarded(beanName) ? null : pvs;
-    }
-
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
-    {
-        if (optionalObjectsController.isDiscarded(beanName))
-        {
-            if (beanFactory.containsBeanDefinition(beanName))
-            {
-                beanFactory.removeBeanDefinition(beanName);
-            }
-
-            beanFactory.destroySingleton(beanName);
-            return null;
-        }
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
-    {
-        return bean;
-    }
+  @Override
+  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    return bean;
+  }
 }

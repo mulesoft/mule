@@ -12,38 +12,30 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @see CountingRedeliveryHandler
  */
-public class CountingRedeliveryHandlerFactory implements RedeliveryHandlerFactory
-{
+public class CountingRedeliveryHandlerFactory implements RedeliveryHandlerFactory {
 
-    protected AtomicReference<RedeliveryHandler> handler = new AtomicReference<RedeliveryHandler>(null);
+  protected AtomicReference<RedeliveryHandler> handler = new AtomicReference<RedeliveryHandler>(null);
 
-    public RedeliveryHandler create()
-    {
-        RedeliveryHandler result;
+  public RedeliveryHandler create() {
+    RedeliveryHandler result;
 
-        // initialize, accounting for concurrency
-        if (handler.get() == null)
-        {
-            final CountingRedeliveryHandler newInstance = new CountingRedeliveryHandler();
-            boolean ok = handler.compareAndSet(null, newInstance);
-            if (!ok)
-            {
-                // someone was faster to initialize it, use this ref instead
-                result = handler.get();
-            }
-            else
-            {
-                result = newInstance;
-            }
-        }
-        else
-        {
-            // just re-use existing stateful handler
-            result = handler.get();
-        }
-
-        return result;
+    // initialize, accounting for concurrency
+    if (handler.get() == null) {
+      final CountingRedeliveryHandler newInstance = new CountingRedeliveryHandler();
+      boolean ok = handler.compareAndSet(null, newInstance);
+      if (!ok) {
+        // someone was faster to initialize it, use this ref instead
+        result = handler.get();
+      } else {
+        result = newInstance;
+      }
+    } else {
+      // just re-use existing stateful handler
+      result = handler.get();
     }
+
+    return result;
+  }
 
 }
 

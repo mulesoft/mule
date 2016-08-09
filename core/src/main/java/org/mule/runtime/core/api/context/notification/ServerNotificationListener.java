@@ -7,11 +7,10 @@
 package org.mule.runtime.core.api.context.notification;
 
 /**
- * <code>ServerNotificationListener</code> is an observer interface that ojects
- * can implement and register themselves with the Mule Server to receive
- * notifications when the server, model and components stop, start, initialise, etc.
+ * <code>ServerNotificationListener</code> is an observer interface that ojects can implement and register themselves with the
+ * Mule Server to receive notifications when the server, model and components stop, start, initialise, etc.
  */
-public interface ServerNotificationListener<T extends ServerNotification>
-{
-    void onNotification(T notification);
+public interface ServerNotificationListener<T extends ServerNotification> {
+
+  void onNotification(T notification);
 }

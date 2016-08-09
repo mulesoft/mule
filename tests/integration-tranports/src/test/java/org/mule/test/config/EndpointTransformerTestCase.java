@@ -18,30 +18,24 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class EndpointTransformerTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class EndpointTransformerTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Test
-    public void testTransformerProperty() throws MuleException
-    {
-        muleContext.getRegistry().registerTransformer(new NoActionTransformer());
-        ImmutableEndpoint endpoint = getEndpointFactory().getOutboundEndpoint(
-            "test:///tmp?transformers=NoActionTransformer");
-        assertEquals("NoActionTransformer", ((NameableObject) endpoint.getMessageProcessors().get(0)).getName());
-    }
+  @Test
+  public void testTransformerProperty() throws MuleException {
+    muleContext.getRegistry().registerTransformer(new NoActionTransformer());
+    ImmutableEndpoint endpoint = getEndpointFactory().getOutboundEndpoint("test:///tmp?transformers=NoActionTransformer");
+    assertEquals("NoActionTransformer", ((NameableObject) endpoint.getMessageProcessors().get(0)).getName());
+  }
 
-    @Test
-    public void testResponseTransformerProperty() throws MuleException
-    {
-        muleContext.getRegistry().registerTransformer(new NoActionTransformer());
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
-            "test:///tmp?responseTransformers=NoActionTransformer");
-        assertEquals("NoActionTransformer", ((NameableObject) endpoint.getResponseMessageProcessors().get(0)).getName());
-    }
+  @Test
+  public void testResponseTransformerProperty() throws MuleException {
+    muleContext.getRegistry().registerTransformer(new NoActionTransformer());
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("test:///tmp?responseTransformers=NoActionTransformer");
+    assertEquals("NoActionTransformer", ((NameableObject) endpoint.getResponseMessageProcessors().get(0)).getName());
+  }
 
-    @Override
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  @Override
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

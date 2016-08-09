@@ -23,153 +23,121 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Binds to an existing RMI registry or creates a new one on a defined URI. The
- * default is <code>rmi://localhost:1099</code>
+ * Binds to an existing RMI registry or creates a new one on a defined URI. The default is <code>rmi://localhost:1099</code>
  */
-public class RmiRegistryAgent extends AbstractAgent
-{
-    /**
-     * logger used by this class
-     */
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public class RmiRegistryAgent extends AbstractAgent {
 
-    public static final String DEFAULT_HOSTNAME = "localhost";
-    public static final int DEFAULT_PORT = 1099;
-    private static final String PROTOCOL_PREFIX = "rmi://";
-    public static final String DEFAULT_SERVER_URI = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
-    private Registry rmiRegistry;
-    private String serverUri;
-    private String host;
-    private String port;
-    private boolean createRegistry = true;
+  /**
+   * logger used by this class
+   */
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    public RmiRegistryAgent()
-    {
-        super("rmi-registry");
+  public static final String DEFAULT_HOSTNAME = "localhost";
+  public static final int DEFAULT_PORT = 1099;
+  private static final String PROTOCOL_PREFIX = "rmi://";
+  public static final String DEFAULT_SERVER_URI = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
+  private Registry rmiRegistry;
+  private String serverUri;
+  private String host;
+  private String port;
+  private boolean createRegistry = true;
+
+  public RmiRegistryAgent() {
+    super("rmi-registry");
+  }
+
+  public String getDescription() {
+    return "Rmi Registry: " + serverUri;
+  }
+
+
+  public void start() throws MuleException {
+    if (serverUri == null) {
+      throw new InitialisationException(MessageFactory
+          .createStaticMessage("serverUri has not been set, this agent has not been initialized properly."), this);
     }
 
-    public String getDescription()
-    {
-        return "Rmi Registry: " + serverUri;
+    URI uri;
+    try {
+      uri = new URI(serverUri);
+    } catch (URISyntaxException e) {
+      throw new InitialisationException(e, this);
     }
 
-
-    public void start() throws MuleException
-    {
-        if (serverUri == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("serverUri has not been set, this agent has not been initialized properly."), this);
+    if (rmiRegistry == null) {
+      try {
+        if (createRegistry) {
+          try {
+            rmiRegistry = LocateRegistry.createRegistry(uri.getPort());
+          } catch (ExportException e) {
+            logger.info("Registry on " + serverUri + " already bound. Attempting to use that instead");
+            rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
+          }
+        } else {
+          rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
         }
-        
-        URI uri;
-        try
-        {
-            uri = new URI(serverUri);
-        }
-        catch (URISyntaxException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
-        if (rmiRegistry == null)
-        {
-            try
-            {
-                if (createRegistry)
-                {
-                    try
-                    {
-                        rmiRegistry = LocateRegistry.createRegistry(uri.getPort());
-                    }
-                    catch (ExportException e)
-                    {
-                        logger.info("Registry on " + serverUri
-                                    + " already bound. Attempting to use that instead");
-                        rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
-                    }
-                }
-                else
-                {
-                    rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
-                }
-            }
-            catch (RemoteException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
+      } catch (RemoteException e) {
+        throw new InitialisationException(e, this);
+      }
     }
+  }
 
-    public void stop() throws MuleException
-    {
-        // TODO how do you unbind a registry??
-        rmiRegistry = null;
+  public void stop() throws MuleException {
+    // TODO how do you unbind a registry??
+    rmiRegistry = null;
+  }
+
+  public void dispose() {
+    // nothing to do
+  }
+
+  public void initialise() throws InitialisationException {
+    if (StringUtils.isBlank(serverUri)) {
+      String theHost = StringUtils.defaultIfEmpty(host, DEFAULT_HOSTNAME);
+      String thePort = StringUtils.defaultIfEmpty(port, String.valueOf(DEFAULT_PORT));
+      serverUri = PROTOCOL_PREFIX + theHost + ":" + thePort;
     }
+  }
 
-    public void dispose()
-    {
-        // nothing to do
-    }
+  public Registry getRmiRegistry() {
+    return rmiRegistry;
+  }
 
-    public void initialise() throws InitialisationException
-    {
-        if (StringUtils.isBlank(serverUri))
-        {
-            String theHost = StringUtils.defaultIfEmpty(host, DEFAULT_HOSTNAME);
-            String thePort = StringUtils.defaultIfEmpty(port, String.valueOf(DEFAULT_PORT));
-            serverUri = PROTOCOL_PREFIX + theHost + ":" + thePort;
-        }
-    }
+  public void setRmiRegistry(Registry rmiRegistry) {
+    this.rmiRegistry = rmiRegistry;
+  }
 
-    public Registry getRmiRegistry()
-    {
-        return rmiRegistry;
-    }
+  public String getServerUri() {
+    return serverUri;
+  }
 
-    public void setRmiRegistry(Registry rmiRegistry)
-    {
-        this.rmiRegistry = rmiRegistry;
-    }
+  public void setServerUri(String serverUri) {
+    this.serverUri = serverUri;
+  }
 
-    public String getServerUri()
-    {
-        return serverUri;
-    }
+  public boolean isCreateRegistry() {
+    return createRegistry;
+  }
 
-    public void setServerUri(String serverUri)
-    {
-        this.serverUri = serverUri;
-    }
-
-    public boolean isCreateRegistry()
-    {
-        return createRegistry;
-    }
-
-    public void setCreateRegistry(boolean createRegistry)
-    {
-        this.createRegistry = createRegistry;
-    }
+  public void setCreateRegistry(boolean createRegistry) {
+    this.createRegistry = createRegistry;
+  }
 
 
-    public String getHost()
-    {
-        return host;
-    }
+  public String getHost() {
+    return host;
+  }
 
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
+  public void setHost(String host) {
+    this.host = host;
+  }
 
 
-    public String getPort()
-    {
-        return port;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public void setPort(String port)
-    {
-        this.port = port;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 }

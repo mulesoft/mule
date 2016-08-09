@@ -26,37 +26,32 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectStreamingChunkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectStreamingChunkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-streaming-chunk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-streaming-chunk-config.xml"};
+  }
 
-    @Test
-    public void chunksStreamedRecords() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectStreamingChunks").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void chunksStreamedRecords() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectStreamingChunks").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        List chunks = (List) response.getPayload();
-        assertEquals(2, chunks.size());
-        assertThat(chunks.get(0), is(instanceOf(List.class)));
-        assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());
-        assertThat(chunks.get(1), is(instanceOf(List.class)));
-        assertRecords(chunks.get(1), getMarsRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    List chunks = (List) response.getPayload();
+    assertEquals(2, chunks.size());
+    assertThat(chunks.get(0), is(instanceOf(List.class)));
+    assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());
+    assertThat(chunks.get(1), is(instanceOf(List.class)));
+    assertRecords(chunks.get(1), getMarsRecord());
+  }
 }

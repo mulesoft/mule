@@ -12,24 +12,21 @@ import org.mule.runtime.core.api.security.SecurityContext;
 /**
  * Trivial {@link SecurityContext} implementation which simply holds the {@link Authentication} object.
  */
-public class DefaultSecurityContext implements SecurityContext
-{
-    private static final long serialVersionUID = -3209120471953147538L;
+public class DefaultSecurityContext implements SecurityContext {
 
-    private Authentication authentication;
+  private static final long serialVersionUID = -3209120471953147538L;
 
-    public DefaultSecurityContext(Authentication authentication)
-    {
-        this.authentication = authentication;
-    }
+  private Authentication authentication;
 
-    public final Authentication getAuthentication()
-    {
-        return authentication;
-    }
+  public DefaultSecurityContext(Authentication authentication) {
+    this.authentication = authentication;
+  }
 
-    public final void setAuthentication(Authentication authentication)
-    {
-        this.authentication = authentication;
-    }
+  public final Authentication getAuthentication() {
+    return authentication;
+  }
+
+  public final void setAuthentication(Authentication authentication) {
+    this.authentication = authentication;
+  }
 }

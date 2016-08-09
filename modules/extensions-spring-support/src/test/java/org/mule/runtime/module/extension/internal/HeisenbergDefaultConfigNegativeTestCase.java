@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-public class HeisenbergDefaultConfigNegativeTestCase extends InvalidExtensionConfigTestCase
-{
+public class HeisenbergDefaultConfigNegativeTestCase extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class[] {HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {HeisenbergExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-default-illegal-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "heisenberg-default-illegal-config.xml";
+  }
 }

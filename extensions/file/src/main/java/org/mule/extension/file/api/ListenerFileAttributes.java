@@ -9,34 +9,30 @@ package org.mule.extension.file.api;
 import java.nio.file.Path;
 
 /**
- * A specialization of {@link LocalFileAttributes} which also implements
- * {@link EventedFileAttributes}
+ * A specialization of {@link LocalFileAttributes} which also implements {@link EventedFileAttributes}
  *
  * @since 4.0
  */
-public class ListenerFileAttributes extends LocalFileAttributes implements EventedFileAttributes
-{
+public class ListenerFileAttributes extends LocalFileAttributes implements EventedFileAttributes {
 
-    private final FileEventType eventType;
+  private final FileEventType eventType;
 
-    /**
-     * Creates a new instance
-     *
-     * @param path      a {@link Path} pointing to the represented file
-     * @param eventType the associated {@link FileEventType}
-     */
-    public ListenerFileAttributes(Path path, FileEventType eventType)
-    {
-        super(path);
-        this.eventType = eventType;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param path a {@link Path} pointing to the represented file
+   * @param eventType the associated {@link FileEventType}
+   */
+  public ListenerFileAttributes(Path path, FileEventType eventType) {
+    super(path);
+    this.eventType = eventType;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getEventType()
-    {
-        return eventType.name();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getEventType() {
+    return eventType.name();
+  }
 }

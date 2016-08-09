@@ -10,21 +10,21 @@ package org.mule.runtime.module.launcher.domain;
 /**
  * Tracks {@link Domain} instances deployed on the container
  */
-public interface DomainManager extends DomainRepository
-{
-    /**
-     * Adds a new domain
-     *
-     * @param domain plugin classloader to add. Non null
-     * @throws IllegalArgumentException if there is already a domain with tthe given name.
-     */
-    void addDomain(Domain domain);
+public interface DomainManager extends DomainRepository {
 
-    /**
-     * Removes a domain
-     *
-     * @param name name of the domain to remove. Non empty.
-     */
-    void removeDomain(String name);
+  /**
+   * Adds a new domain
+   *
+   * @param domain plugin classloader to add. Non null
+   * @throws IllegalArgumentException if there is already a domain with tthe given name.
+   */
+  void addDomain(Domain domain);
+
+  /**
+   * Removes a domain
+   *
+   * @param name name of the domain to remove. Non empty.
+   */
+  void removeDomain(String name);
 
 }

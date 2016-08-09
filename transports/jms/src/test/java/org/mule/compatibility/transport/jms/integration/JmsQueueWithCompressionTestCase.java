@@ -15,32 +15,29 @@ import org.junit.Test;
  * Message is sent to and received from simple queue using compression in between
  */
 @Ignore("MULE-9628")
-public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-queue-with-compression.xml";
-    }
+public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    public void testJmsQueue() throws Exception
-    {
-        // Lets test it doesn't blow up with serialized objects
-        dispatchMessage(new Apple());
-        receiveMessage();
-        receive(scenarioNotReceive);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-queue-with-compression.xml";
+  }
 
-    @Test
-    public void testMultipleSend() throws Exception
-    {
-        dispatchMessage();
-        dispatchMessage();
-        dispatchMessage();
-        receiveMessage();
-        receiveMessage();
-        receiveMessage();
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testJmsQueue() throws Exception {
+    // Lets test it doesn't blow up with serialized objects
+    dispatchMessage(new Apple());
+    receiveMessage();
+    receive(scenarioNotReceive);
+  }
+
+  @Test
+  public void testMultipleSend() throws Exception {
+    dispatchMessage();
+    dispatchMessage();
+    dispatchMessage();
+    receiveMessage();
+    receiveMessage();
+    receiveMessage();
+    receive(scenarioNotReceive);
+  }
 }

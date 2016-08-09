@@ -22,43 +22,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteBulkSourceTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteBulkSourceTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-bulk-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-bulk-source-config.xml"};
+  }
 
-    @Test
-    public void deletesInBulkModeFromCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("deleteBulkCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void deletesInBulkModeFromCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("deleteBulkCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertBulkDelete(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertBulkDelete(response);
+  }
 
-    private void assertBulkDelete(MuleMessage response) throws SQLException
-    {
-        assertTrue(response.getPayload() instanceof int[]);
-        int[] counters = (int[]) response.getPayload();
-        assertEquals(2, counters.length);
-        assertExpectedUpdateCount(1, counters[0]);
-        assertExpectedUpdateCount(1, counters[1]);
+  private void assertBulkDelete(MuleMessage response) throws SQLException {
+    assertTrue(response.getPayload() instanceof int[]);
+    int[] counters = (int[]) response.getPayload();
+    assertEquals(2, counters.length);
+    assertExpectedUpdateCount(1, counters[0]);
+    assertExpectedUpdateCount(1, counters[1]);
 
-        assertDeletedPlanetRecords("Pluto", "Venus");
-    }
+    assertDeletedPlanetRecords("Pluto", "Venus");
+  }
 }

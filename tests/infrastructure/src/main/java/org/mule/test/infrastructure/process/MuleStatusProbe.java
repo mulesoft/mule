@@ -8,36 +8,30 @@ package org.mule.test.infrastructure.process;
 
 import org.mule.tck.probe.Probe;
 
-public class MuleStatusProbe implements Probe
-{
+public class MuleStatusProbe implements Probe {
 
-    private MuleProcessController controller;
-    private boolean check;
+  private MuleProcessController controller;
+  private boolean check;
 
-    private MuleStatusProbe(MuleProcessController controller, boolean isRunning)
-    {
-        this.controller = controller;
-        this.check = isRunning;
-    }
+  private MuleStatusProbe(MuleProcessController controller, boolean isRunning) {
+    this.controller = controller;
+    this.check = isRunning;
+  }
 
-    public boolean isSatisfied()
-    {
-        return check == controller.isRunning();
-    }
+  public boolean isSatisfied() {
+    return check == controller.isRunning();
+  }
 
-    public String describeFailure()
-    {
-        return "Mule is " + (check ? "not " : "") + "running";
-    }
+  public String describeFailure() {
+    return "Mule is " + (check ? "not " : "") + "running";
+  }
 
-    public static Probe isRunning(MuleProcessController controller)
-    {
-        return new MuleStatusProbe(controller, true);
-    }
+  public static Probe isRunning(MuleProcessController controller) {
+    return new MuleStatusProbe(controller, true);
+  }
 
-    public static Probe isNotRunning(MuleProcessController controller)
-    {
-        return new MuleStatusProbe(controller, false);
-    }
+  public static Probe isNotRunning(MuleProcessController controller) {
+    return new MuleStatusProbe(controller, false);
+  }
 
 }

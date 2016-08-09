@@ -15,29 +15,25 @@ import java.sql.SQLException;
 /**
  * Defines a structured data type for {@link Array}
  */
-public class ArrayResolvedDbType extends ResolvedDbType
-{
+public class ArrayResolvedDbType extends ResolvedDbType {
 
-    /**
-     * Creates a new instance
-     *
-     * @param id identifier for the type
-     * @param name type name. Non Empty.
-     */
-    public ArrayResolvedDbType(int id, String name)
-    {
-        super(id, name);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param id identifier for the type
+   * @param name type name. Non Empty.
+   */
+  public ArrayResolvedDbType(int id, String name) {
+    super(id, name);
+  }
 
-    @Override
-    public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
-    {
-        statement.setArray(index, (Array) value);
-    }
+  @Override
+  public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
+    statement.setArray(index, (Array) value);
+  }
 
-    @Override
-    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
-    {
-        return statement.getArray(index);
-    }
+  @Override
+  public Object getParameterValue(CallableStatement statement, int index) throws SQLException {
+    return statement.getArray(index);
+  }
 }

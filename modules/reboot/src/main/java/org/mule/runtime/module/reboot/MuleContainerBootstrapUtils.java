@@ -18,259 +18,220 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-public final class MuleContainerBootstrapUtils
-{
-    public static final String MULE_DOMAIN_FOLDER = "domains";
-    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
-    private static final String MULE_APPS_FILENAME = "apps";
-    private static final String MULE_LIB_FILENAME = "lib/mule";
-    private static final String MULE_TMP_FILENAME = "tmp";
-    private static final String MULE_CONF_FILENAME = "conf";
+public final class MuleContainerBootstrapUtils {
 
-    private MuleContainerBootstrapUtils()
-    {
-        // utility class only
+  public static final String MULE_DOMAIN_FOLDER = "domains";
+  public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
+  private static final String MULE_APPS_FILENAME = "apps";
+  private static final String MULE_LIB_FILENAME = "lib/mule";
+  private static final String MULE_TMP_FILENAME = "tmp";
+  private static final String MULE_CONF_FILENAME = "conf";
+
+  private MuleContainerBootstrapUtils() {
+    // utility class only
+  }
+
+  /**
+   * Whether Mule is running embedded or standalone.
+   * 
+   * @return true if running standalone
+   */
+  public static boolean isStandalone() {
+    // when embedded, mule.home var is not set
+    return getMuleHome() != null;
+  }
+
+  /**
+   * @return null if running embedded
+   */
+  public static File getMuleHome() {
+    final String muleHome = System.getProperty("mule.home");
+    return muleHome != null ? new File(muleHome) : null;
+  }
+
+  /**
+   * @return null if running embedded, otherwise the apps dir as a File ref
+   */
+  public static File getMuleAppsDir() {
+    return isStandalone() ? new File(getMuleHome(), MULE_APPS_FILENAME) : null;
+  }
+
+  /**
+   * @param appName name of the application
+   * @return null if running embedded, otherwise the app dir as a File ref
+   */
+  public static File getMuleAppDir(String appName) {
+    return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
+  }
+
+  /**
+   * @param appName name of the application
+   * @return null if running embedded, otherwise the app default configuration file as a File ref
+   */
+  public static File getMuleAppDefaultConfigFile(String appName) {
+    return isStandalone() ? new File(getMuleAppDir(appName), MuleServer.DEFAULT_CONFIGURATION) : null;
+  }
+
+  /**
+   * @return null if running embedded
+   */
+  public static File getMuleLibDir() {
+    return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
+  }
+
+  /**
+   * @return null if running embedded, otherwise the $MULE_HOME/tmp dir reference
+   */
+  public static File getMuleTmpDir() {
+    return isStandalone() ? new File(getMuleHome(), MULE_TMP_FILENAME) : null;
+  }
+
+  public static File getMuleLocalJarFile() {
+    return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
+  }
+
+  public static File getMuleDomainsDir() {
+    return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
+  }
+
+  /**
+   * @return null if running embedded, otherwise the conf dir as a File ref
+   */
+  public static File getMuleConfDir() {
+    return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
+  }
+
+  public static class ProxyInfo {
+
+    String host;
+    String port;
+    String username;
+    String password;
+
+    public ProxyInfo(String host, String port) {
+      this(host, port, null, null);
     }
 
-    /**
-     * Whether Mule is running embedded or standalone.
-     * @return true if running standalone
-     */
-    public static boolean isStandalone()
-    {
-        // when embedded, mule.home var is not set
-        return getMuleHome() != null;
+    public ProxyInfo(String host, String port, String username, String password) {
+      this.host = host;
+      this.port = port;
+      this.username = username;
+      this.password = password;
     }
+  }
 
-    /**
-     * @return null if running embedded
-     */
-    public static File getMuleHome()
-    {
-        final String muleHome = System.getProperty("mule.home");
-        return muleHome != null ? new File(muleHome) : null;
-    }
+  //////////////////////////////////////////////////////////////////////////////////////////
+  // The following methods are intentionally duplicated from org.mule.runtime.core.util so that
+  // mule-module-reboot has no external dependencies at system startup.
+  //////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return null if running embedded, otherwise the apps dir as a File ref
-     */
-    public static File getMuleAppsDir()
-    {
-        return isStandalone() ? new File(getMuleHome(), MULE_APPS_FILENAME) : null;
-    }
+  /**
+   * @see org.mule.runtime.core.util.ClassUtils#getResource
+   */
+  public static URL getResource(final String resourceName, final Class<?> callingClass) {
+    URL url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
 
-    /**
-     * @param appName name of the application
-     * @return null if running embedded, otherwise the app dir as a File ref
-     */
-    public static File getMuleAppDir(String appName)
-    {
-        return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
-    }
+      public URL run() {
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return cl != null ? cl.getResource(resourceName) : null;
+      }
+    });
 
-    /**
-     * @param appName name of the application
-     * @return null if running embedded, otherwise the app default configuration file as a File ref
-     */
-    public static File getMuleAppDefaultConfigFile(String appName)
-    {
-        return isStandalone() ? new File(getMuleAppDir(appName), MuleServer.DEFAULT_CONFIGURATION) : null;
-    }
+    if (url == null) {
+      url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
 
-    /**
-     * @return null if running embedded
-     */
-    public static File getMuleLibDir()
-    {
-        return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
-    }
-
-    /**
-     * @return null if running embedded, otherwise the $MULE_HOME/tmp dir reference
-     */
-    public static File getMuleTmpDir()
-    {
-        return isStandalone() ? new File(getMuleHome(), MULE_TMP_FILENAME) : null;
-    }
-
-    public static File getMuleLocalJarFile()
-    {
-        return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
-    }
-
-    public static File getMuleDomainsDir()
-    {
-        return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
-    }
-
-    /**
-     * @return null if running embedded, otherwise the conf dir as a File ref
-     */
-    public static File getMuleConfDir()
-    {
-        return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
-    }
-
-    public static class ProxyInfo
-    {
-        String host;
-        String port;
-        String username;
-        String password;
-
-        public ProxyInfo(String host, String port)
-        {
-            this(host, port, null, null);
+        public URL run() {
+          return MuleContainerBootstrap.class.getClassLoader().getResource(resourceName);
         }
-
-        public ProxyInfo(String host, String port, String username, String password)
-        {
-            this.host = host;
-            this.port = port;
-            this.username = username;
-            this.password = password;
-        }
+      });
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // The following methods are intentionally duplicated from org.mule.runtime.core.util so that
-    // mule-module-reboot has no external dependencies at system startup.
-    //////////////////////////////////////////////////////////////////////////////////////////
+    if (url == null) {
+      url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
 
-    /**
-     * @see org.mule.runtime.core.util.ClassUtils#getResource
-     */
-    public static URL getResource(final String resourceName, final Class<?> callingClass)
-    {
-        URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-        {
-            public URL run()
-            {
-                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                return cl != null ? cl.getResource(resourceName) : null;
+        public URL run() {
+          return callingClass.getClassLoader().getResource(resourceName);
+        }
+      });
+    }
+
+    return url;
+  }
+
+  /**
+   * @see org.mule.runtime.core.util.FileUtils#renameFile
+   */
+  public static boolean renameFile(File srcFile, File destFile) throws IOException {
+    boolean isRenamed = false;
+    if (srcFile != null && destFile != null) {
+      if (!destFile.exists()) {
+        if (srcFile.isFile()) {
+          isRenamed = srcFile.renameTo(destFile);
+          if (!isRenamed && srcFile.exists()) {
+            isRenamed = renameFileHard(srcFile, destFile);
+          }
+        }
+      }
+    }
+    return isRenamed;
+  }
+
+  /**
+   * @see org.mule.runtime.core.util.FileUtils#renameFileHard
+   */
+  public static boolean renameFileHard(File srcFile, File destFile) throws IOException {
+    boolean isRenamed = false;
+    if (srcFile != null && destFile != null) {
+      if (!destFile.exists()) {
+        if (srcFile.isFile()) {
+          FileInputStream in = null;
+          FileOutputStream out = null;
+          try {
+            in = new FileInputStream(srcFile);
+            out = new FileOutputStream(destFile);
+            out.getChannel().transferFrom(in.getChannel(), 0, srcFile.length());
+            isRenamed = true;
+          } finally {
+            if (in != null) {
+              in.close();
             }
-        });
-
-        if (url == null)
-        {
-            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-            {
-                public URL run()
-                {
-                    return MuleContainerBootstrap.class.getClassLoader().getResource(resourceName);
-                }
-            });
-        }
-
-        if (url == null)
-        {
-            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-            {
-                public URL run()
-                {
-                    return callingClass.getClassLoader().getResource(resourceName);
-                }
-            });
-        }
-
-        return url;
-    }
-
-    /**
-     * @see org.mule.runtime.core.util.FileUtils#renameFile
-     */
-    public static boolean renameFile(File srcFile, File destFile) throws IOException
-    {
-        boolean isRenamed = false;
-        if (srcFile != null && destFile != null)
-        {
-            if (!destFile.exists())
-            {
-                if (srcFile.isFile())
-                {
-                    isRenamed = srcFile.renameTo(destFile);
-                    if (!isRenamed && srcFile.exists())
-                    {
-                        isRenamed = renameFileHard(srcFile, destFile);
-                    }
-                }
+            if (out != null) {
+              out.close();
             }
+          }
+          if (isRenamed) {
+            srcFile.delete();
+          } else {
+            destFile.delete();
+          }
         }
-        return isRenamed;
+      }
     }
+    return isRenamed;
+  }
 
-    /**
-     * @see org.mule.runtime.core.util.FileUtils#renameFileHard
-     */
-    public static boolean renameFileHard(File srcFile, File destFile) throws IOException
-    {
-        boolean isRenamed = false;
-        if (srcFile != null && destFile != null)
-        {
-            if (!destFile.exists())
-            {
-                if (srcFile.isFile())
-                {
-                    FileInputStream in = null;
-                    FileOutputStream out = null;
-                    try
-                    {
-                        in = new FileInputStream(srcFile);
-                        out = new FileOutputStream(destFile);
-                        out.getChannel().transferFrom(in.getChannel(), 0, srcFile.length());
-                        isRenamed = true;
-                    }
-                    finally
-                    {
-                        if (in != null)
-                        {
-                            in.close();
-                        }
-                        if (out != null)
-                        {
-                            out.close();
-                        }
-                    }
-                    if (isRenamed)
-                    {
-                        srcFile.delete();
-                    }
-                    else
-                    {
-                        destFile.delete();
-                    }
-                }
-            }
-        }
-        return isRenamed;
+  /**
+   * @see org.mule.runtime.core.util.IOUtils#copy
+   */
+  public static int copy(InputStream input, OutputStream output) throws IOException {
+    long count = copyLarge(input, output);
+    if (count > Integer.MAX_VALUE) {
+      return -1;
     }
+    return (int) count;
+  }
 
-    /**
-     * @see org.mule.runtime.core.util.IOUtils#copy
-     */
-    public static int copy(InputStream input, OutputStream output) throws IOException
-    {
-        long count = copyLarge(input, output);
-        if (count > Integer.MAX_VALUE)
-        {
-            return -1;
-        }
-        return (int) count;
+  /**
+   * @see org.mule.runtime.core.util.IOUtils#copyLarge
+   */
+  public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+    byte[] buffer = new byte[1024 * 4];
+    long count = 0;
+    int n = 0;
+    while (-1 != (n = input.read(buffer))) {
+      output.write(buffer, 0, n);
+      count += n;
     }
-
-    /**
-     * @see org.mule.runtime.core.util.IOUtils#copyLarge
-     */
-    public static long copyLarge(InputStream input, OutputStream output) throws IOException
-    {
-        byte[] buffer = new byte[1024 * 4];
-        long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer)))
-        {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
+    return count;
+  }
 }

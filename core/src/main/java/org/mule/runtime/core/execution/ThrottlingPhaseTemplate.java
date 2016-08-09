@@ -10,38 +10,39 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Template that a {@link org.mule.runtime.core.api.source.MessageSource} must implement
- * if it wants to participate in the throttling phase when processing a message
+ * Template that a {@link org.mule.runtime.core.api.source.MessageSource} must implement if it wants to participate in the
+ * throttling phase when processing a message
  */
-public interface ThrottlingPhaseTemplate extends MessageProcessTemplate
-{
+public interface ThrottlingPhaseTemplate extends MessageProcessTemplate {
 
-    /**
-     * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
-     */
-    MuleEvent getMuleEvent() throws MuleException;
+  /**
+   * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
+   */
+  MuleEvent getMuleEvent() throws MuleException;
 
-    /**
-     * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.runtime.core.api.source.MessageSource} is exceeded
-     *
-     * @throws MuleException
-     */
-    void discardMessageOnThrottlingExceeded() throws MuleException;
+  /**
+   * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.runtime.core.api.source.MessageSource} is
+   * exceeded
+   *
+   * @throws MuleException
+   */
+  void discardMessageOnThrottlingExceeded() throws MuleException;
 
-    /**
-     * Set up throttling policy state to be used by the {@link org.mule.runtime.core.api.source.MessageSource} for debugging or
-     * information purpose.
-     *
-     * Not all throttling policy supports statistics so this method may not be called
-     *
-     * @param remainingRequestInCurrentPeriod the remaining allowed messages in the current period
-     * @param maximumRequestAllowedPerPeriod the maximum allowed messages in a period
-     * @param timeUntilNextPeriodInMillis time in milliseconds until the next period starts
-     */
-    /*
-       This should no change in the future. The other option was to send the ThrottlingPolicyStatistics object but
-       as CE transports are using this behavior it would involve moving the ThrottlingPolicyStatistics to CE.
-    */
-    void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis);
+  /**
+   * Set up throttling policy state to be used by the {@link org.mule.runtime.core.api.source.MessageSource} for debugging or
+   * information purpose.
+   *
+   * Not all throttling policy supports statistics so this method may not be called
+   *
+   * @param remainingRequestInCurrentPeriod the remaining allowed messages in the current period
+   * @param maximumRequestAllowedPerPeriod the maximum allowed messages in a period
+   * @param timeUntilNextPeriodInMillis time in milliseconds until the next period starts
+   */
+  /*
+   * This should no change in the future. The other option was to send the ThrottlingPolicyStatistics object but as CE transports
+   * are using this behavior it would involve moving the ThrottlingPolicyStatistics to CE.
+   */
+  void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod,
+                                     long timeUntilNextPeriodInMillis);
 
 }

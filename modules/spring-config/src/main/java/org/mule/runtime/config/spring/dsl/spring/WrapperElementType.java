@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.dsl.spring;
 /**
  * Types of wrapper elements in the XML config.
  */
-public enum WrapperElementType
-{
-    SINGLE, COLLECTION, MAP
+public enum WrapperElementType {
+  SINGLE, COLLECTION, MAP
 }

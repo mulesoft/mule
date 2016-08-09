@@ -11,7 +11,7 @@ package org.mule.runtime.module.launcher.util;
 */
 public class ElementRemovedEvent extends ElementEvent {
 
-    public ElementRemovedEvent(Object source, Object newValue, int index) {
-        super(source, null, newValue, index, ElementEvent.REMOVED);
-    }
+  public ElementRemovedEvent(Object source, Object newValue, int index) {
+    super(source, null, newValue, index, ElementEvent.REMOVED);
+  }
 }

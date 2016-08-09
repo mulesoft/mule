@@ -21,23 +21,18 @@ import java.util.List;
  *
  * @since 4.0
  */
-class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElement, ParameterizableTypeElement
-{
+class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElement, ParameterizableTypeElement {
 
-    ConfigurationWrapper(Class aClass)
-    {
-        super(aClass);
-    }
+  ConfigurationWrapper(Class aClass) {
+    super(aClass);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ExtensionParameter> getParameters()
-    {
-        return ImmutableList.<ExtensionParameter>builder()
-                .addAll(getAnnotatedFields(Parameter.class))
-                .addAll(getAnnotatedFields(ParameterGroup.class))
-                .build();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ExtensionParameter> getParameters() {
+    return ImmutableList.<ExtensionParameter>builder().addAll(getAnnotatedFields(Parameter.class))
+        .addAll(getAnnotatedFields(ParameterGroup.class)).build();
+  }
 }

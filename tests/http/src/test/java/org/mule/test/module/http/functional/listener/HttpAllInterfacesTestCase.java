@@ -18,26 +18,23 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpAllInterfacesTestCase extends AbstractHttpTestCase
-{
+public class HttpAllInterfacesTestCase extends AbstractHttpTestCase {
 
-    private static final String PATH = "flowA";
+  private static final String PATH = "flowA";
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-all-interfaces-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-all-interfaces-config.xml";
+  }
 
-    @Test
-    public void testAllInterfaces() throws IOException
-    {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), PATH);
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        assertThat(response.returnContent().asString(), is(PATH));
-    }
+  @Test
+  public void testAllInterfaces() throws IOException {
+    final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), PATH);
+    final Response response = Request.Get(url).connectTimeout(1000).execute();
+    assertThat(response.returnContent().asString(), is(PATH));
+  }
 
 }

@@ -10,64 +10,54 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/properties/mule-session-variables-transformer-test-case.xml";
-    }
+public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testAddVariable() throws Exception
-    {
-        runScenario("addSessionVariableFlow");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/properties/mule-session-variables-transformer-test-case.xml";
+  }
 
-    @Test
-    public void testAddVariableWithExpressionKey() throws Exception
-    {
-        runScenario("addSessionVariableUsingExpressionKeyFlow");
-    }
+  @Test
+  public void testAddVariable() throws Exception {
+    runScenario("addSessionVariableFlow");
+  }
 
-    @Test
-    public void testAddVariableWithParsedStringKey() throws Exception
-    {
-        runScenario("addVariableWithParsedStringKeyFlow");
-    }
-    
-    @Test
-    public void testRemoveVariable() throws Exception
-    {
-        runScenario("removeSessionVariableFlow");
-    }
+  @Test
+  public void testAddVariableWithExpressionKey() throws Exception {
+    runScenario("addSessionVariableUsingExpressionKeyFlow");
+  }
 
-    @Test
-    public void testRemoveVariableUsingExpression() throws Exception
-    {
-        runScenario("removeSessionVariableUsingExpressionFlow");
-    }
+  @Test
+  public void testAddVariableWithParsedStringKey() throws Exception {
+    runScenario("addVariableWithParsedStringKeyFlow");
+  }
 
-    @Test
-    public void testRemoveVariableUsingParsedString() throws Exception
-    {
-        runScenario("removeSessionVariableUsingParsedStringFlow");
-    }
+  @Test
+  public void testRemoveVariable() throws Exception {
+    runScenario("removeSessionVariableFlow");
+  }
 
-    @Test
-    public void testRemoveVariableUsingRegex() throws Exception
-    {
-        runScenario("removeSessionVariableUsingRegexFlow");
-    }
+  @Test
+  public void testRemoveVariableUsingExpression() throws Exception {
+    runScenario("removeSessionVariableUsingExpressionFlow");
+  }
 
-    @Test
-    public void testRemoveAllVariables() throws Exception
-    {
-        runScenario("removeAllSessionVariablesFlow");
-    }
+  @Test
+  public void testRemoveVariableUsingParsedString() throws Exception {
+    runScenario("removeSessionVariableUsingParsedStringFlow");
+  }
 
-    public void runScenario(String flowName) throws Exception
-    {
-        flowRunner(flowName).withPayload("data").run();
-    }
+  @Test
+  public void testRemoveVariableUsingRegex() throws Exception {
+    runScenario("removeSessionVariableUsingRegexFlow");
+  }
+
+  @Test
+  public void testRemoveAllVariables() throws Exception {
+    runScenario("removeAllSessionVariablesFlow");
+  }
+
+  public void runScenario(String flowName) throws Exception {
+    flowRunner(flowName).withPayload("data").run();
+  }
 }

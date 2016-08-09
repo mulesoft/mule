@@ -23,66 +23,61 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SslFunctionalTestCase extends FunctionalTestCase
-{
-    private static int NUM_MESSAGES = 100;
+public class SslFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  private static int NUM_MESSAGES = 100;
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ssl-functional-test.xml";
+  @Rule
+  public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+  @Override
+  protected String getConfigFile() {
+    return "ssl-functional-test.xml";
+  }
+
+  @Test
+  public void testSend() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
+
+  @Test
+  @Ignore
+  public void testSendMany() throws Exception {
+    MuleClient client = muleContext.getClient();
+    for (int i = 0; i < NUM_MESSAGES; ++i) {
+      MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
+      assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
+    Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testComponent2");
+    // assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
+    Object ftc = getComponent(c);
+    assertNotNull("Functional Test Service not found in the model.", ftc);
+    assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
 
-    @Test
-    @Ignore
-    public void testSendMany() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        for (int i = 0; i < NUM_MESSAGES; ++i)
-        {
-            MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
-            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-        }
+    EventCallback cc = ((FunctionalTestComponent) ftc).getEventCallback();
+    assertNotNull("EventCallback is null", cc);
+    assertTrue("EventCallback should be a CounterCallback", cc instanceof CounterCallback);
+    assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
+  }
 
-        Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testComponent2");
-        //assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
-        Object ftc = getComponent(c);
-        assertNotNull("Functional Test Service not found in the model.", ftc);
-        assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
-
-        EventCallback cc = ((FunctionalTestComponent) ftc).getEventCallback();
-        assertNotNull("EventCallback is null", cc);
-        assertTrue("EventCallback should be a CounterCallback", cc instanceof CounterCallback);
-        assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
-    }
-
-    @Test
-    @Ignore("MULE-9628")
-    public void testAsynchronous() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
-        // MULE-2757
-        Thread.sleep(100);
-        MuleMessage response = client.request("asyncEndpoint", 5000);
-        assertNotNull("Response is null", response);
-        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(response));
-    }
+  @Test
+  @Ignore("MULE-9628")
+  public void testAsynchronous() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
+    // MULE-2757
+    Thread.sleep(100);
+    MuleMessage response = client.request("asyncEndpoint", 5000);
+    assertNotNull("Response is null", response);
+    assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(response));
+  }
 }

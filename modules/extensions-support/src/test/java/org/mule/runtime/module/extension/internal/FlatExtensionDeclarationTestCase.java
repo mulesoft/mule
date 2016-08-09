@@ -106,329 +106,304 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
-public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase
-{
+public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase {
 
-    private static final MuleVersion MIN_MULE_VERSION = new MuleVersion("4.0");
-    private final TestWebServiceConsumerDeclarer reference = new TestWebServiceConsumerDeclarer();
+  private static final MuleVersion MIN_MULE_VERSION = new MuleVersion("4.0");
+  private final TestWebServiceConsumerDeclarer reference = new TestWebServiceConsumerDeclarer();
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
-    @Test
-    public void assertExtension()
-    {
-        assertThat(extensionModel.getName(), equalTo(WS_CONSUMER));
-        assertThat(extensionModel.getDescription(), equalTo(WS_CONSUMER_DESCRIPTION));
-        assertThat(extensionModel.getVersion(), equalTo(VERSION));
-        assertThat(extensionModel.getConfigurationModels(), hasSize(1));
-        assertThat(extensionModel.getVendor(), equalTo(MULESOFT));
+  @Test
+  public void assertExtension() {
+    assertThat(extensionModel.getName(), equalTo(WS_CONSUMER));
+    assertThat(extensionModel.getDescription(), equalTo(WS_CONSUMER_DESCRIPTION));
+    assertThat(extensionModel.getVersion(), equalTo(VERSION));
+    assertThat(extensionModel.getConfigurationModels(), hasSize(1));
+    assertThat(extensionModel.getVendor(), equalTo(MULESOFT));
 
-        verify(serviceRegistry).lookupProviders(any(Class.class), any(ClassLoader.class));
+    verify(serviceRegistry).lookupProviders(any(Class.class), any(ClassLoader.class));
+  }
+
+  @Test
+  public void defaultConfiguration() throws Exception {
+    RuntimeConfigurationModel configurationModel =
+        (RuntimeConfigurationModel) extensionModel.getConfigurationModel(CONFIG_NAME).get();
+    assertThat(configurationModel, is(notNullValue()));
+    assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
+    assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
+    assertThat(configurationModel.getExtensionModel(), is(sameInstance(extensionModel)));
+
+    List<ParameterModel> parameterModels = configurationModel.getParameterModels();
+    assertThat(parameterModels, hasSize(4));
+    assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, toMetadataType(String.class),
+                    StringType.class, null);
+    assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, SUPPORTED, true, toMetadataType(String.class), StringType.class,
+                    null);
+    assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, SUPPORTED, true, toMetadataType(String.class),
+                    StringType.class, null);
+    assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, NOT_SUPPORTED, true,
+                    toMetadataType(String.class), StringType.class, null);
+  }
+
+  @Test
+  public void onlyOneConfig() throws Exception {
+    assertThat(extensionModel.getConfigurationModels(), hasSize(1));
+    assertThat(extensionModel.getConfigurationModels().get(0),
+               is(sameInstance(extensionModel.getConfigurationModel(CONFIG_NAME).get())));
+  }
+
+  public void noSuchConfiguration() throws Exception {
+    assertThat(extensionModel.getConfigurationModel("fake").isPresent(), is(false));
+  }
+
+  public void noSuchOperation() throws Exception {
+    assertThat(extensionModel.getOperationModel("fake").isPresent(), is(false));
+  }
+
+  @Test
+  public void operations() throws Exception {
+    List<OperationModel> operationModels = extensionModel.getOperationModels();
+    assertThat(operationModels, hasSize(3));
+    assertConsumeOperation(operationModels);
+    assertBroadcastOperation(operationModels);
+    assertArglessOperation(operationModels);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void badExtensionVersion() {
+    factory.createFrom(new ExtensionDeclarer().named("bad").onVersion("i'm new"), createDescribingContext());
+  }
+
+  @Test
+  public void configurationsOrder() {
+    ConfigurationFactory mockInstantiator = mock(ConfigurationFactory.class);
+
+    final String defaultConfiguration = "default";
+    final String beta = "beta";
+    final String alpha = "alpha";
+
+    ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer().named("test").onVersion("1.0").fromVendor("MuleSoft")
+        .withCategory(COMMUNITY).withMinMuleVersion(MIN_MULE_VERSION);
+
+    extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
+    extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
+    extensionDeclarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
+
+    ExtensionModel extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
+    List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
+    assertThat(configurationModels, hasSize(3));
+    assertThat(configurationModels.get(1).getName(), equalTo(alpha));
+    assertThat(configurationModels.get(2).getName(), equalTo(beta));
+  }
+
+  @Test
+  public void operationsAlphaSorted() {
+    assertThat(extensionModel.getOperationModels(), hasSize(3));
+    assertThat(extensionModel.getOperationModels().get(0).getName(), equalTo(ARG_LESS));
+    assertThat(extensionModel.getOperationModels().get(1).getName(), equalTo(BROADCAST));
+    assertThat(extensionModel.getOperationModels().get(2).getName(), equalTo(CONSUMER));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void nameClashes() {
+    extensionDeclarer.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs("");
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void operationWithParameterNamedName() {
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name")
+        .ofType(toMetadataType(String.class));
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void fixedParameterWithExpressionDefault() {
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter("fixed")
+        .ofType(toMetadataType(String.class)).withExpressionSupport(NOT_SUPPORTED).defaultingTo("#['hello']");
+
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  @Test(expected = IllegalOperationModelDefinitionException.class)
+  public void operationWithParameterNamedTarget() {
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter(TARGET_ATTRIBUTE)
+        .ofType(toMetadataType(String.class));
+
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void expressionParameterWithFixedValue() {
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter("expression")
+        .ofType(toMetadataType(String.class)).withExpressionSupport(REQUIRED).defaultingTo("static");
+
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  @Test
+  public void nullVendor() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage("Extension Vendor cannot be null");
+
+    final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+    baseDeclarer.withCategory(COMMUNITY).withMinMuleVersion(MIN_MULE_VERSION);
+
+    factory.createFrom(baseDeclarer, createDescribingContext());
+  }
+
+  @Test
+  public void nullCategory() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage("Extension Category cannot be null");
+
+    final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+    baseDeclarer.fromVendor("SomeVendor").withMinMuleVersion(MIN_MULE_VERSION);
+
+    factory.createFrom(baseDeclarer, createDescribingContext());
+  }
+
+  @Test
+  public void nullMinMuleVersion() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage("Extension Minimum Mule Version cannot be null");
+
+    final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+    baseDeclarer.fromVendor("SomeVendor").withCategory(COMMUNITY);
+
+    factory.createFrom(baseDeclarer, createDescribingContext());
+  }
+
+  @Test
+  public void configlessDescriptor() {
+    factory.createFrom(new ExtensionDeclarer().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft").withCategory(COMMUNITY)
+        .withMinMuleVersion(MIN_MULE_VERSION), createDescribingContext());
+  }
+
+  @Test
+  public void enrichersInvoked() throws Exception {
+    ModelEnricher modelEnricher1 = mock(ModelEnricher.class);
+    ModelEnricher modelEnricher2 = mock(ModelEnricher.class);
+
+    when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class)))
+        .thenReturn(Arrays.asList(modelEnricher1, modelEnricher2));
+
+    factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
+    factory.createFrom(extensionDeclarer, createDescribingContext());
+
+    assertDescribingContext(modelEnricher1);
+    assertDescribingContext(modelEnricher2);
+  }
+
+  @Test
+  public void executorsAreInterceptable() {
+    for (OperationModel operation : extensionModel.getOperationModels()) {
+      assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(operation),
+                 is(instanceOf(Interceptable.class)));
     }
+  }
 
-    @Test
-    public void defaultConfiguration() throws Exception
-    {
-        RuntimeConfigurationModel configurationModel = (RuntimeConfigurationModel) extensionModel.getConfigurationModel(CONFIG_NAME).get();
-        assertThat(configurationModel, is(notNullValue()));
-        assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
-        assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
-        assertThat(configurationModel.getExtensionModel(), is(sameInstance(extensionModel)));
+  @Test
+  public void connectionProviders() {
+    assertThat(extensionModel.getConnectionProviders(), hasSize(1));
+    RuntimeConnectionProviderModel connectionProvider =
+        (RuntimeConnectionProviderModel) extensionModel.getConnectionProviders().get(0);
+    assertThat(connectionProvider, is(notNullValue()));
+    assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
+    assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
+    assertThat(connectionProvider.getConnectionProviderFactory(), is(sameInstance(reference.getConnectionProviderFactory())));
+    assertThat(connectionProvider.getConnectionType(), is(sameInstance(CONNECTION_PROVIDER_CONNECTOR_TYPE)));
 
-        List<ParameterModel> parameterModels = configurationModel.getParameterModels();
-        assertThat(parameterModels, hasSize(4));
-        assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, NOT_SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-    }
+    List<ParameterModel> parameters = connectionProvider.getParameterModels();
+    assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class),
+                    StringType.class, null);
+    assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class),
+                    StringType.class, null);
+  }
 
-    @Test
-    public void onlyOneConfig() throws Exception
-    {
-        assertThat(extensionModel.getConfigurationModels(), hasSize(1));
-        assertThat(extensionModel.getConfigurationModels().get(0), is(sameInstance(extensionModel.getConfigurationModel(CONFIG_NAME).get())));
-    }
+  @Test
+  public void messageSources() {
+    assertThat(extensionModel.getSourceModels(), hasSize(1));
+    RuntimeSourceModel sourceModel = (RuntimeSourceModel) extensionModel.getSourceModels().get(0);
+    assertThat(sourceModel, is(notNullValue()));
+    assertThat(sourceModel.getName(), is(LISTENER));
+    assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
+    assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
+    assertThat(getType(sourceModel.getOutput().getType()), is(equalTo(InputStream.class)));
+    assertThat(getType(sourceModel.getOutputAttributes().getType()), is(equalTo(Serializable.class)));
 
-    public void noSuchConfiguration() throws Exception
-    {
-        assertThat(extensionModel.getConfigurationModel("fake").isPresent(), is(false));
-    }
+    List<ParameterModel> parameters = sourceModel.getParameterModels();
+    assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class,
+                    null);
+    assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, toMetadataType(Integer.class), NumberType.class,
+                    DEFAULT_PORT);
+  }
 
-    public void noSuchOperation() throws Exception
-    {
-        assertThat(extensionModel.getOperationModel("fake").isPresent(), is(false));
-    }
+  private void assertDescribingContext(ModelEnricher modelEnricher) {
+    ArgumentCaptor<DescribingContext> captor = ArgumentCaptor.forClass(DescribingContext.class);
+    verify(modelEnricher).enrich(captor.capture());
 
-    @Test
-    public void operations() throws Exception
-    {
-        List<OperationModel> operationModels = extensionModel.getOperationModels();
-        assertThat(operationModels, hasSize(3));
-        assertConsumeOperation(operationModels);
-        assertBroadcastOperation(operationModels);
-        assertArglessOperation(operationModels);
-    }
+    DescribingContext ctx = captor.getValue();
+    assertThat(ctx, is(notNullValue()));
+    assertThat(ctx.getExtensionDeclarer(), is(sameInstance(extensionDeclarer)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void badExtensionVersion()
-    {
-        factory.createFrom(new ExtensionDeclarer().named("bad").onVersion("i'm new"), createDescribingContext());
-    }
+  private void assertConsumeOperation(List<OperationModel> operationModels) {
+    OperationModel operationModel = operationModels.get(2);
+    assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(CONSUMER).get())));
+    assertDataType(operationModel.getOutput().getType(), InputStream.class, BinaryType.class);
 
-    @Test
-    public void configurationsOrder()
-    {
-        ConfigurationFactory mockInstantiator = mock(ConfigurationFactory.class);
+    assertThat(operationModel.getName(), equalTo(CONSUMER));
+    assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
 
-        final String defaultConfiguration = "default";
-        final String beta = "beta";
-        final String alpha = "alpha";
+    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    assertThat(parameterModels, hasSize(2));
+    assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, toMetadataType(String.class),
+                    StringType.class, null);
+    assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class),
+                    BooleanType.class, true);
+  }
 
-        ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
-                .named("test")
-                .onVersion("1.0")
-                .fromVendor("MuleSoft")
-                .withCategory(COMMUNITY)
-                .withMinMuleVersion(MIN_MULE_VERSION);
+  private void assertBroadcastOperation(List<OperationModel> operationModels) {
+    OperationModel operationModel = operationModels.get(1);
+    assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST).get())));
+    assertDataType(operationModel.getOutput().getType(), void.class, NullType.class);
 
-        extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
-        extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
-        extensionDeclarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
+    assertThat(operationModel.getName(), equalTo(BROADCAST));
+    assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
 
-        ExtensionModel extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
-        List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
-        assertThat(configurationModels, hasSize(3));
-        assertThat(configurationModels.get(1).getName(), equalTo(alpha));
-        assertThat(configurationModels.get(2).getName(), equalTo(beta));
-    }
+    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    assertThat(parameterModels, hasSize(3));
+    assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true,
+                    arrayOf(List.class, TYPE_BUILDER.stringType().id(String.class.getName())), ArrayType.class, null);
+    assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class),
+                    BooleanType.class, true);
+    assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, REQUIRED, true, toMetadataType(OperationModel.class),
+                    ObjectType.class, null);
+  }
 
-    @Test
-    public void operationsAlphaSorted()
-    {
-        assertThat(extensionModel.getOperationModels(), hasSize(3));
-        assertThat(extensionModel.getOperationModels().get(0).getName(), equalTo(ARG_LESS));
-        assertThat(extensionModel.getOperationModels().get(1).getName(), equalTo(BROADCAST));
-        assertThat(extensionModel.getOperationModels().get(2).getName(), equalTo(CONSUMER));
-    }
+  private void assertArglessOperation(List<OperationModel> operationModels) {
+    OperationModel operationModel = operationModels.get(0);
+    assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS).get())));
+    assertDataType(operationModel.getOutput().getType(), int.class, NumberType.class);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nameClashes()
-    {
-        extensionDeclarer.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs("");
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
+    assertThat(operationModel.getName(), equalTo(ARG_LESS));
+    assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
 
-    @Test(expected = IllegalParameterModelDefinitionException.class)
-    public void operationWithParameterNamedName()
-    {
-        extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name").ofType(toMetadataType(String.class));
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
+    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    assertThat(parameterModels.isEmpty(), is(true));
+  }
 
-    @Test(expected = IllegalParameterModelDefinitionException.class)
-    public void fixedParameterWithExpressionDefault()
-    {
-        extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter("fixed").ofType(toMetadataType(String.class))
-                .withExpressionSupport(NOT_SUPPORTED)
-                .defaultingTo("#['hello']");
+  private ExtensionDeclarer getBaseDeclarer() {
+    final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
+    extensionDeclarer.named("BaseExtension").onVersion("1.2.3").withConfig("default")
+        .createdWith(mock(ConfigurationFactory.class));
+    return extensionDeclarer;
+  }
 
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
-
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void operationWithParameterNamedTarget()
-    {
-        extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter(TARGET_ATTRIBUTE).ofType(toMetadataType(String.class));
-
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
-
-    @Test(expected = IllegalParameterModelDefinitionException.class)
-    public void expressionParameterWithFixedValue()
-    {
-        extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter("expression").ofType(toMetadataType(String.class))
-                .withExpressionSupport(REQUIRED)
-                .defaultingTo("static");
-
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
-
-    @Test
-    public void nullVendor()
-    {
-        exception.expect(IllegalModelDefinitionException.class);
-        exception.expectMessage("Extension Vendor cannot be null");
-
-        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
-        baseDeclarer.withCategory(COMMUNITY).withMinMuleVersion(MIN_MULE_VERSION);
-
-        factory.createFrom(baseDeclarer, createDescribingContext());
-    }
-
-    @Test
-    public void nullCategory()
-    {
-        exception.expect(IllegalModelDefinitionException.class);
-        exception.expectMessage("Extension Category cannot be null");
-
-        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
-        baseDeclarer.fromVendor("SomeVendor").withMinMuleVersion(MIN_MULE_VERSION);
-
-        factory.createFrom(baseDeclarer, createDescribingContext());
-    }
-
-    @Test
-    public void nullMinMuleVersion()
-    {
-        exception.expect(IllegalModelDefinitionException.class);
-        exception.expectMessage("Extension Minimum Mule Version cannot be null");
-
-        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
-        baseDeclarer.fromVendor("SomeVendor").withCategory(COMMUNITY);
-
-        factory.createFrom(baseDeclarer, createDescribingContext());
-    }
-
-    @Test
-    public void configlessDescriptor()
-    {
-        factory.createFrom(new ExtensionDeclarer()
-                                   .named("noConfigs")
-                                   .onVersion("1.0")
-                                   .fromVendor("MuleSoft")
-                                   .withCategory(COMMUNITY)
-                                   .withMinMuleVersion(MIN_MULE_VERSION), createDescribingContext());
-    }
-
-    @Test
-    public void enrichersInvoked() throws Exception
-    {
-        ModelEnricher modelEnricher1 = mock(ModelEnricher.class);
-        ModelEnricher modelEnricher2 = mock(ModelEnricher.class);
-
-        when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class)))
-                .thenReturn(Arrays.asList(modelEnricher1, modelEnricher2));
-
-        factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-
-        assertDescribingContext(modelEnricher1);
-        assertDescribingContext(modelEnricher2);
-    }
-
-    @Test
-    public void executorsAreInterceptable()
-    {
-        for (OperationModel operation : extensionModel.getOperationModels())
-        {
-            assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(operation), is(instanceOf(Interceptable.class)));
-        }
-    }
-
-    @Test
-    public void connectionProviders()
-    {
-        assertThat(extensionModel.getConnectionProviders(), hasSize(1));
-        RuntimeConnectionProviderModel connectionProvider = (RuntimeConnectionProviderModel) extensionModel.getConnectionProviders().get(0);
-        assertThat(connectionProvider, is(notNullValue()));
-        assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
-        assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
-        assertThat(connectionProvider.getConnectionProviderFactory(), is(sameInstance(reference.getConnectionProviderFactory())));
-        assertThat(connectionProvider.getConnectionType(), is(sameInstance(CONNECTION_PROVIDER_CONNECTOR_TYPE)));
-
-        List<ParameterModel> parameters = connectionProvider.getParameterModels();
-        assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-    }
-
-    @Test
-    public void messageSources()
-    {
-        assertThat(extensionModel.getSourceModels(), hasSize(1));
-        RuntimeSourceModel sourceModel = (RuntimeSourceModel) extensionModel.getSourceModels().get(0);
-        assertThat(sourceModel, is(notNullValue()));
-        assertThat(sourceModel.getName(), is(LISTENER));
-        assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
-        assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
-        assertThat(getType(sourceModel.getOutput().getType()), is(equalTo(InputStream.class)));
-        assertThat(getType(sourceModel.getOutputAttributes().getType()), is(equalTo(Serializable.class)));
-
-        List<ParameterModel> parameters = sourceModel.getParameterModels();
-        assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, toMetadataType(Integer.class), NumberType.class, DEFAULT_PORT);
-    }
-
-    private void assertDescribingContext(ModelEnricher modelEnricher)
-    {
-        ArgumentCaptor<DescribingContext> captor = ArgumentCaptor.forClass(DescribingContext.class);
-        verify(modelEnricher).enrich(captor.capture());
-
-        DescribingContext ctx = captor.getValue();
-        assertThat(ctx, is(notNullValue()));
-        assertThat(ctx.getExtensionDeclarer(), is(sameInstance(extensionDeclarer)));
-    }
-
-    private void assertConsumeOperation(List<OperationModel> operationModels)
-    {
-        OperationModel operationModel = operationModels.get(2);
-        assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(CONSUMER).get())));
-        assertDataType(operationModel.getOutput().getType(), InputStream.class, BinaryType.class);
-
-        assertThat(operationModel.getName(), equalTo(CONSUMER));
-        assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
-
-        List<ParameterModel> parameterModels = operationModel.getParameterModels();
-        assertThat(parameterModels, hasSize(2));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class), BooleanType.class, true);
-    }
-
-    private void assertBroadcastOperation(List<OperationModel> operationModels)
-    {
-        OperationModel operationModel = operationModels.get(1);
-        assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST).get())));
-        assertDataType(operationModel.getOutput().getType(), void.class, NullType.class);
-
-        assertThat(operationModel.getName(), equalTo(BROADCAST));
-        assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
-
-        List<ParameterModel> parameterModels = operationModel.getParameterModels();
-        assertThat(parameterModels, hasSize(3));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, arrayOf(List.class, TYPE_BUILDER.stringType().id(String.class.getName())), ArrayType.class, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class), BooleanType.class, true);
-        assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, REQUIRED, true, toMetadataType(OperationModel.class), ObjectType.class, null);
-    }
-
-    private void assertArglessOperation(List<OperationModel> operationModels)
-    {
-        OperationModel operationModel = operationModels.get(0);
-        assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS).get())));
-        assertDataType(operationModel.getOutput().getType(), int.class, NumberType.class);
-
-        assertThat(operationModel.getName(), equalTo(ARG_LESS));
-        assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
-
-        List<ParameterModel> parameterModels = operationModel.getParameterModels();
-        assertThat(parameterModels.isEmpty(), is(true));
-    }
-
-    private ExtensionDeclarer getBaseDeclarer()
-    {
-        final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-        extensionDeclarer.named("BaseExtension")
-                .onVersion("1.2.3").withConfig("default")
-                .createdWith(mock(ConfigurationFactory.class));
-        return extensionDeclarer;
-    }
-
-    @Override
-    protected ExtensionDeclarer createDeclarationDescriptor()
-    {
-        return reference.getExtensionDeclarer();
-    }
+  @Override
+  protected ExtensionDeclarer createDeclarationDescriptor() {
+    return reference.getExtensionDeclarer();
+  }
 }

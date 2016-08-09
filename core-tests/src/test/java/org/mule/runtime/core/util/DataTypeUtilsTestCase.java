@@ -20,24 +20,21 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DataTypeUtilsTestCase extends AbstractMuleTestCase
-{
+public class DataTypeUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void generatesContentTypeWithCharset() throws Exception
-    {
-        final DataType dataType = DataType.builder().type(Object.class).mediaType(APPLICATION_JSON).charset(UTF_8.name()).build();
+  @Test
+  public void generatesContentTypeWithCharset() throws Exception {
+    final DataType dataType = DataType.builder().type(Object.class).mediaType(APPLICATION_JSON).charset(UTF_8.name()).build();
 
-        String contentType = dataType.getMediaType().toRfcString();
-        assertThat(contentType, equalTo("application/json; charset=UTF-8"));
-    }
+    String contentType = dataType.getMediaType().toRfcString();
+    assertThat(contentType, equalTo("application/json; charset=UTF-8"));
+  }
 
-    @Test
-    public void generatesContentTypeWithoutCharset() throws Exception
-    {
-        DataType dataType = DataType.builder().type(Object.class).mediaType(MediaType.APPLICATION_JSON).build();
+  @Test
+  public void generatesContentTypeWithoutCharset() throws Exception {
+    DataType dataType = DataType.builder().type(Object.class).mediaType(MediaType.APPLICATION_JSON).build();
 
-        String contentType = dataType.getMediaType().toRfcString();
-        assertThat(contentType, equalTo("application/json"));
-    }
+    String contentType = dataType.getMediaType().toRfcString();
+    assertThat(contentType, equalTo("application/json"));
+  }
 }

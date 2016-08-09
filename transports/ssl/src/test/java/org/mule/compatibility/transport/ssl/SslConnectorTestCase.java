@@ -18,73 +18,64 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class SslConnectorTestCase extends AbstractConnectorTestCase
-{
-    @Override
-    public Connector createConnector() throws Exception
-    {
-        SslConnector cnn = new SslConnector(muleContext);
-        cnn.setName("SslConnector");
-        cnn.setKeyStore("serverKeystore");
-        cnn.setClientKeyStore("clientKeystore");
-        cnn.setClientKeyStorePassword("mulepassword");
-        cnn.setKeyPassword("mulepassword");
-        cnn.setKeyStorePassword("mulepassword");
-        cnn.setTrustStore("trustStore");
-        cnn.setTrustStorePassword("mulepassword");
-        cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        return cnn;
+public class SslConnectorTestCase extends AbstractConnectorTestCase {
+
+  @Override
+  public Connector createConnector() throws Exception {
+    SslConnector cnn = new SslConnector(muleContext);
+    cnn.setName("SslConnector");
+    cnn.setKeyStore("serverKeystore");
+    cnn.setClientKeyStore("clientKeystore");
+    cnn.setClientKeyStorePassword("mulepassword");
+    cnn.setKeyPassword("mulepassword");
+    cnn.setKeyStorePassword("mulepassword");
+    cnn.setTrustStore("trustStore");
+    cnn.setTrustStorePassword("mulepassword");
+    cnn.getDispatcherThreadingProfile().setDoThreading(false);
+    return cnn;
+  }
+
+  @Test
+  public void testClientConnector() throws Exception {
+    SslConnector cnn = new SslConnector(muleContext);
+    cnn.setClientKeyStore("clientKeystore");
+    cnn.setClientKeyStorePassword("mulepassword");
+    cnn.getDispatcherThreadingProfile().setDoThreading(false);
+  }
+
+  @Override
+  public String getTestEndpointURI() {
+    return "ssl://localhost:56801";
+  }
+
+  @Override
+  public Object getValidMessage() throws Exception {
+    return "Hello".getBytes();
+  }
+
+  @Test
+  public void testValidListener() throws Exception {
+    Connector connector = getConnector();
+
+    InboundEndpoint endpoint2 = getEndpointFactory().getInboundEndpoint("ssl://localhost:30303");
+
+    connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
+    try {
+      connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
+      fail("cannot register on the same endpointUri");
+    } catch (Exception e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testClientConnector() throws Exception
-    {
-        SslConnector cnn = new SslConnector(muleContext);
-        cnn.setClientKeyStore("clientKeystore");
-        cnn.setClientKeyStorePassword("mulepassword");
-        cnn.getDispatcherThreadingProfile().setDoThreading(false);
-    }
+  @Test
+  public void testProperties() throws Exception {
+    SslConnector c = (SslConnector) getConnector();
 
-    @Override
-    public String getTestEndpointURI()
-    {
-        return "ssl://localhost:56801";
-    }
-
-    @Override
-    public Object getValidMessage() throws Exception
-    {
-        return "Hello".getBytes();
-    }
-
-    @Test
-    public void testValidListener() throws Exception
-    {
-        Connector connector = getConnector();
-
-        InboundEndpoint endpoint2 = getEndpointFactory().getInboundEndpoint("ssl://localhost:30303");
-
-        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
-        try
-        {
-            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
-            fail("cannot register on the same endpointUri");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-    }
-
-    @Test
-    public void testProperties() throws Exception
-    {
-        SslConnector c = (SslConnector)getConnector();
-
-        c.setSendBufferSize(1024);
-        assertEquals(1024, c.getSendBufferSize());
-        c.setSendBufferSize(0);
-        assertEquals(SslConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
-    }
+    c.setSendBufferSize(1024);
+    assertEquals(1024, c.getSendBufferSize());
+    c.setSendBufferSize(0);
+    assertEquals(SslConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
+  }
 
 }

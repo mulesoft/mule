@@ -9,13 +9,12 @@ package org.mule.runtime.core.util.queue;
 /**
  * Callback for defining if a certain operation should be executed over certain serialized data.
  */
-interface RawDataSelector
-{
+interface RawDataSelector {
 
-    /**
-     * @param data serialized form data
-     * @return true if this data should be selected for operation
-     */
-    boolean isSelectedData(byte[] data);
+  /**
+   * @param data serialized form data
+   * @return true if this data should be selected for operation
+   */
+  boolean isSelectedData(byte[] data);
 
 }

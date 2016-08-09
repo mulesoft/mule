@@ -11,18 +11,15 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * <code>TestConnector</code> use a mock connector
  */
-public class TestConnector2 extends TestConnector
-{
+public class TestConnector2 extends TestConnector {
 
-    public TestConnector2(MuleContext context)
-    {
-        super(context);
-    }
-    
-    @Override
-    public String getProtocol()
-    {
-        return "test2";
-    }
+  public TestConnector2(MuleContext context) {
+    super(context);
+  }
+
+  @Override
+  public String getProtocol() {
+    return "test2";
+  }
 
 }

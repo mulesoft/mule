@@ -16,29 +16,26 @@ import javax.management.ObjectName;
 /**
  * Support class using JMX 1.2 and newer calls.
  */
-public class JmxModernSupport extends AbstractJmxSupport
-{
+public class JmxModernSupport extends AbstractJmxSupport {
 
-    /** {@inheritDoc} */
-    public String escape(String input)
-    {
-        return ObjectName.quote(input);
-    }
+  /** {@inheritDoc} */
+  public String escape(String input) {
+    return ObjectName.quote(input);
+  }
 
-    /**
-     * For modern JMX implementation just delegate to a standard factory method.
-     * @param name object name
-     * @return ObjectName for MBeanServer
-     * @throws MalformedObjectNameException for invalid names
-     */
-    public ObjectName getObjectName(String name) throws MalformedObjectNameException
-    {
-        return ObjectName.getInstance(name);
-    }
+  /**
+   * For modern JMX implementation just delegate to a standard factory method.
+   * 
+   * @param name object name
+   * @return ObjectName for MBeanServer
+   * @throws MalformedObjectNameException for invalid names
+   */
+  public ObjectName getObjectName(String name) throws MalformedObjectNameException {
+    return ObjectName.getInstance(name);
+  }
 
-    /** {@inheritDoc} */
-    protected Collection getDomains(final MBeanServer server)
-    {
-        return Arrays.asList(server.getDomains());
-    }
+  /** {@inheritDoc} */
+  protected Collection getDomains(final MBeanServer server) {
+    return Arrays.asList(server.getDomains());
+  }
 }

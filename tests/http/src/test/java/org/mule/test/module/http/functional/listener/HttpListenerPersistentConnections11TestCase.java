@@ -16,79 +16,66 @@ import java.io.IOException;
 import org.apache.http.HttpVersion;
 import org.junit.Test;
 
-public class HttpListenerPersistentConnections11TestCase extends HttpListenerPersistentConnectionsTestCase
-{
+public class HttpListenerPersistentConnections11TestCase extends HttpListenerPersistentConnectionsTestCase {
 
-    @Override
-    protected HttpVersion getHttpVersion()
-    {
-        return HttpVersion.HTTP_1_1;
-    }
+  @Override
+  protected HttpVersion getHttpVersion() {
+    return HttpVersion.HTTP_1_1;
+  }
 
-    @Test
-    public void nonPersistentCheckHeader() throws Exception
-    {
-        assertThat(performRequest(nonPersistentPort.getNumber(), getHttpVersion(), false), is(CLOSE));
-    }
+  @Test
+  public void nonPersistentCheckHeader() throws Exception {
+    assertThat(performRequest(nonPersistentPort.getNumber(), getHttpVersion(), false), is(CLOSE));
+  }
 
-    @Test
-    public void persistentCheckHeader() throws Exception
-    {
-        assertThat(performRequest(persistentPort.getNumber(), getHttpVersion(), false), is(nullValue()));
-    }
+  @Test
+  public void persistentCheckHeader() throws Exception {
+    assertThat(performRequest(persistentPort.getNumber(), getHttpVersion(), false), is(nullValue()));
+  }
 
-    @Test
-    public void persistentCloseHeaderCheckHeader() throws Exception
-    {
-        assertThat(performRequest(persistentPortCloseHeader.getNumber(), getHttpVersion(), false), is(CLOSE));
-    }
+  @Test
+  public void persistentCloseHeaderCheckHeader() throws Exception {
+    assertThat(performRequest(persistentPortCloseHeader.getNumber(), getHttpVersion(), false), is(CLOSE));
+  }
 
-    @Test
-    public void persistentClosePropertyCheckHeader() throws Exception
-    {
-        assertThat(performRequest(persistentPortCloseProperty.getNumber(), getHttpVersion(), false), is(nullValue()));
-    }
+  @Test
+  public void persistentClosePropertyCheckHeader() throws Exception {
+    assertThat(performRequest(persistentPortCloseProperty.getNumber(), getHttpVersion(), false), is(nullValue()));
+  }
 
-    @Test
-    public void persistentEchoCheckHeader() throws IOException
-    {
-        assertThat(performRequest(persistentStreamingPort.getNumber(), getHttpVersion(), true), is(nullValue()));
-    }
+  @Test
+  public void persistentEchoCheckHeader() throws IOException {
+    assertThat(performRequest(persistentStreamingPort.getNumber(), getHttpVersion(), true), is(nullValue()));
+  }
 
-    @Test
-    public void persistentStreamingTransformerCheckHeader() throws IOException
-    {
-        assertThat(performRequest(persistentStreamingTransformerPort.getNumber(), getHttpVersion(), true), is(nullValue()));
-    }
+  @Test
+  public void persistentStreamingTransformerCheckHeader() throws IOException {
+    assertThat(performRequest(persistentStreamingTransformerPort.getNumber(), getHttpVersion(), true), is(nullValue()));
+  }
 
-    @Test
-    public void nonPersistentConnectionClosing() throws Exception
-    {
-        assertConnectionClosesAfterSend(nonPersistentPort, getHttpVersion());
-    }
+  @Test
+  public void nonPersistentConnectionClosing() throws Exception {
+    assertConnectionClosesAfterSend(nonPersistentPort, getHttpVersion());
+  }
 
-    @Test
-    public void persistentConnectionClosing() throws Exception
-    {
-        assertConnectionClosesAfterTimeout(persistentPort, getHttpVersion());
-    }
+  @Test
+  public void persistentConnectionClosing() throws Exception {
+    assertConnectionClosesAfterTimeout(persistentPort, getHttpVersion());
+  }
 
-    @Test
-    public void persistentConnectionClosingWithRequestConnectionCloseHeader() throws Exception
-    {
-        assertConnectionClosesWithRequestConnectionCloseHeader(persistentPort, getHttpVersion());
-    }
+  @Test
+  public void persistentConnectionClosingWithRequestConnectionCloseHeader() throws Exception {
+    assertConnectionClosesWithRequestConnectionCloseHeader(persistentPort, getHttpVersion());
+  }
 
-    @Test
-    public void persistentConnectionCloseHeaderClosing() throws Exception
-    {
-        assertConnectionClosesAfterSend(persistentPortCloseHeader, getHttpVersion());
-    }
+  @Test
+  public void persistentConnectionCloseHeaderClosing() throws Exception {
+    assertConnectionClosesAfterSend(persistentPortCloseHeader, getHttpVersion());
+  }
 
-    @Test
-    public void persistentConnectionClosePropertyClosing() throws Exception
-    {
-        assertConnectionClosesAfterTimeout(persistentPortCloseProperty, getHttpVersion());
-    }
+  @Test
+  public void persistentConnectionClosePropertyClosing() throws Exception {
+    assertConnectionClosesAfterTimeout(persistentPortCloseProperty, getHttpVersion());
+  }
 
 }

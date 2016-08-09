@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.basic;
 
-public class TestOperations
-{
+public class TestOperations {
 
-    public void createAccount(Account account)
-    {
+  public void createAccount(Account account) {
 
-    }
+  }
 }

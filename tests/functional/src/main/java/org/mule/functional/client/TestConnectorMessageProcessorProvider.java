@@ -16,23 +16,20 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 /**
  * Provider for operations of the Test Connector.
  */
-public class TestConnectorMessageProcessorProvider extends AbstractConnectorMessageProcessorProvider
-{
+public class TestConnectorMessageProcessorProvider extends AbstractConnectorMessageProcessorProvider {
 
-    public static final String TEST_URL_PREFIX = "test://";
+  public static final String TEST_URL_PREFIX = "test://";
 
-    @Override
-    protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException
-    {
-        final String queueName = cacheKey.getUrl().substring(TEST_URL_PREFIX.length());
-        final OperationOptions operationOptions = cacheKey.getOperationOptions();
+  @Override
+  protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
+    final String queueName = cacheKey.getUrl().substring(TEST_URL_PREFIX.length());
+    final OperationOptions operationOptions = cacheKey.getOperationOptions();
 
-        return new QueueReaderMessageProcessor(muleContext, queueName, operationOptions.getResponseTimeout());
-    }
+    return new QueueReaderMessageProcessor(muleContext, queueName, operationOptions.getResponseTimeout());
+  }
 
-    @Override
-    public boolean supportsUrl(String url)
-    {
-        return url.startsWith(TEST_URL_PREFIX);
-    }
+  @Override
+  public boolean supportsUrl(String url) {
+    return url.startsWith(TEST_URL_PREFIX);
+  }
 }

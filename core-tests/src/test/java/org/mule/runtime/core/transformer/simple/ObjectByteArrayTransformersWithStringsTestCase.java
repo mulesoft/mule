@@ -7,17 +7,15 @@
 package org.mule.runtime.core.transformer.simple;
 
 
-public class ObjectByteArrayTransformersWithStringsTestCase extends ObjectByteArrayTransformersWithObjectsTestCase
-{
-    private String testObject = "test";
+public class ObjectByteArrayTransformersWithStringsTestCase extends ObjectByteArrayTransformersWithObjectsTestCase {
 
-    public Object getTestData()
-    {
-        return testObject;
-    }
+  private String testObject = "test";
 
-    public Object getResultData()
-    {
-        return testObject.getBytes();
-    }
+  public Object getTestData() {
+    return testObject;
+  }
+
+  public Object getResultData() {
+    return testObject.getBytes();
+  }
 }

@@ -18,68 +18,63 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleContextTestCase
-{
-    private CxfOutboundMessageProcessor cxfMP;
-    private CxfConfiguration configuration;
+public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  private CxfOutboundMessageProcessor cxfMP;
+  private CxfConfiguration configuration;
 
-        configuration = new CxfConfiguration();
-        configuration.setMuleContext(muleContext);
-        configuration.initialise();
-        cxfMP = new CxfOutboundMessageProcessor(null);
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-    @Test
-    public void testGetArgs_withObjectAsPayload() throws Exception
-    {
-        Object payload = new Object();
+    configuration = new CxfConfiguration();
+    configuration.setMuleContext(muleContext);
+    configuration.initialise();
+    cxfMP = new CxfOutboundMessageProcessor(null);
+  }
 
-        Object[] args = callGetArgsWithPayload(payload);
+  @Test
+  public void testGetArgs_withObjectAsPayload() throws Exception {
+    Object payload = new Object();
 
-        assertNotNull(args);
-        assertEquals(1, args.length);
-        assertSame(payload, args[0]);
-    }
+    Object[] args = callGetArgsWithPayload(payload);
 
-    @Test
-    public void testGetArgs_withArrayAsPayload() throws Exception
-    {
-        Object[] payload = new Object[4];
+    assertNotNull(args);
+    assertEquals(1, args.length);
+    assertSame(payload, args[0]);
+  }
 
-        Object[] args = callGetArgsWithPayload(payload);
+  @Test
+  public void testGetArgs_withArrayAsPayload() throws Exception {
+    Object[] payload = new Object[4];
 
-        assertSame(payload, args);
-    }
+    Object[] args = callGetArgsWithPayload(payload);
 
-    @Test
-    public void testGetArgs_withNullPayloadAsPayload() throws Exception
-    {
-        Object payload = null;
+    assertSame(payload, args);
+  }
 
-        Object[] args = callGetArgsWithPayload(payload);
+  @Test
+  public void testGetArgs_withNullPayloadAsPayload() throws Exception {
+    Object payload = null;
 
-        assertNotNull(args);
-        assertEquals(1, args.length);
-        assertSame(payload, args[0]);
-    }
+    Object[] args = callGetArgsWithPayload(payload);
 
-    private Object[] callGetArgsWithPayload(Object payload) throws TransformerException
-    {
-        MuleEvent muleEvent = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
+    assertNotNull(args);
+    assertEquals(1, args.length);
+    assertSame(payload, args[0]);
+  }
 
-        when(muleEvent.getMessage()).thenReturn(muleMessage);
-        when(muleEvent.getMessage().getPayload()).thenReturn(payload);
-        when(muleMessage.getPayload()).thenReturn(payload);
+  private Object[] callGetArgsWithPayload(Object payload) throws TransformerException {
+    MuleEvent muleEvent = mock(MuleEvent.class);
+    MuleMessage muleMessage = mock(MuleMessage.class);
 
-        Object[] args = cxfMP.getArgs(muleEvent);
-        return args;
-    }
+    when(muleEvent.getMessage()).thenReturn(muleMessage);
+    when(muleEvent.getMessage().getPayload()).thenReturn(payload);
+    when(muleMessage.getPayload()).thenReturn(payload);
+
+    Object[] args = cxfMP.getArgs(muleEvent);
+    return args;
+  }
 
 }
 

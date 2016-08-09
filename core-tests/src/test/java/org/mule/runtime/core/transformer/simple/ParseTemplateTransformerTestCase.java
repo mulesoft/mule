@@ -27,68 +27,63 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ParseTemplateTransformerTestCase
-{
-    private static final String LOCATION = "error.html";
-    private static final String INVALID_LOCATION = "wrong_error.html";
+public class ParseTemplateTransformerTestCase {
 
-    private ParseTemplateTransformer parseTemplateTransformer;
-    private MuleEvent mockMuleEvent = mock(MuleEvent.class);
-    private MuleMessage mockMuleMessage = mock(MuleMessage.class);
-    private MuleContext mockMuleContext = mock(MuleContext.class);
-    private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private static final String LOCATION = "error.html";
+  private static final String INVALID_LOCATION = "wrong_error.html";
 
-    @Before
-    public void setUp()
-    {
-        parseTemplateTransformer = new ParseTemplateTransformer();
-        parseTemplateTransformer.setMuleContext(mockMuleContext);
+  private ParseTemplateTransformer parseTemplateTransformer;
+  private MuleEvent mockMuleEvent = mock(MuleEvent.class);
+  private MuleMessage mockMuleMessage = mock(MuleMessage.class);
+  private MuleContext mockMuleContext = mock(MuleContext.class);
+  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
 
-        when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
-        when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    }
+  @Before
+  public void setUp() {
+    parseTemplateTransformer = new ParseTemplateTransformer();
+    parseTemplateTransformer.setMuleContext(mockMuleContext);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testParseTemplateNullTemplate() throws TransformerException, InitialisationException
-    {
-        parseTemplateTransformer.setLocation(LOCATION);
-        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
-    }
+    when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
+    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void testParseTemplateNullLocation() throws TransformerException, InitialisationException
-    {
-        parseTemplateTransformer.setLocation(null);
-        parseTemplateTransformer.initialise();
-        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testParseTemplateNullTemplate() throws TransformerException, InitialisationException {
+    parseTemplateTransformer.setLocation(LOCATION);
+    parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void testParseTemplateInvalidLocation() throws TransformerException, InitialisationException
-    {
-        parseTemplateTransformer.setLocation(INVALID_LOCATION);
-        parseTemplateTransformer.initialise();
-        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
-    }
+  @Test(expected = InitialisationException.class)
+  public void testParseTemplateNullLocation() throws TransformerException, InitialisationException {
+    parseTemplateTransformer.setLocation(null);
+    parseTemplateTransformer.initialise();
+    parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
+  }
 
-    @Test
-    public void testParseTemplate() throws TransformerException, InitialisationException, IOException
-    {
-        parseTemplateTransformer.setLocation(LOCATION);
-        parseTemplateTransformer.initialise();
-        when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
-        String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
+  @Test(expected = InitialisationException.class)
+  public void testParseTemplateInvalidLocation() throws TransformerException, InitialisationException {
+    parseTemplateTransformer.setLocation(INVALID_LOCATION);
+    parseTemplateTransformer.initialise();
+    parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
+  }
 
-        when(mockExpressionManager.parse(expectedExpression, mockMuleEvent)).thenReturn("Parsed");
+  @Test
+  public void testParseTemplate() throws TransformerException, InitialisationException, IOException {
+    parseTemplateTransformer.setLocation(LOCATION);
+    parseTemplateTransformer.initialise();
+    when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
+    String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
 
-        Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertNotNull(response);
-        assertEquals("Parsed", response);
+    when(mockExpressionManager.parse(expectedExpression, mockMuleEvent)).thenReturn("Parsed");
 
-        // Call a second time to make sure the template is stored once the transformer has been initialized
-        response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertNotNull(response);
-        assertEquals("Parsed", response);
-    }
+    Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
+    assertNotNull(response);
+    assertEquals("Parsed", response);
+
+    // Call a second time to make sure the template is stored once the transformer has been initialized
+    response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
+    assertNotNull(response);
+    assertEquals("Parsed", response);
+  }
 
 }

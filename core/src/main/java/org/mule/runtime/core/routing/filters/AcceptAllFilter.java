@@ -13,17 +13,15 @@ import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 /**
  * A filter that accepts everything.
  */
-public class AcceptAllFilter implements Filter, ObjectFilter
-{
-    public static final AcceptAllFilter INSTANCE = new AcceptAllFilter();
+public class AcceptAllFilter implements Filter, ObjectFilter {
 
-    public boolean accept(MuleMessage message)
-    {
-        return true;
-    }
+  public static final AcceptAllFilter INSTANCE = new AcceptAllFilter();
 
-    public boolean accept(Object object)
-    {
-        return true;
-    }
+  public boolean accept(MuleMessage message) {
+    return true;
+  }
+
+  public boolean accept(Object object) {
+    return true;
+  }
 }

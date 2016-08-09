@@ -9,18 +9,15 @@ package org.mule.runtime.module.http.internal.domain;
 /**
  * Represents a byte array entity message.
  */
-public class ByteArrayHttpEntity implements HttpEntity
-{
+public class ByteArrayHttpEntity implements HttpEntity {
 
-    private byte[] content;
+  private byte[] content;
 
-    public ByteArrayHttpEntity(byte[] content)
-    {
-        this.content = content;
-    }
+  public ByteArrayHttpEntity(byte[] content) {
+    this.content = content;
+  }
 
-    public byte[] getContent()
-    {
-        return this.content;
-    }
+  public byte[] getContent() {
+    return this.content;
+  }
 }

@@ -41,97 +41,80 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
-public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
-{
+public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
-    private static final String TEST_MESSAGE = "";
+  private static final String TEST_MESSAGE = "";
 
-    @Test
-    public void statusCodeOnFailures() throws Exception
-    {
-        MuleEvent testEvent = createMockEvent();
+  @Test
+  public void statusCodeOnFailures() throws Exception {
+    MuleEvent testEvent = createMockEvent();
 
-        HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
-        ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
-        doNothing().when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
+    HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
+    ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
+    doNothing().when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
 
-        HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(
-                testEvent,
-                mock(MessageProcessor.class),
-                responseReadyCallback,
-                null,
-                HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+    HttpMessageProcessorTemplate httpMessageProcessorTemplate =
+        new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
+                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
 
-        httpMessageProcessorTemplate.sendFailureResponseToClient(
-                new MessagingException(CoreMessages.createStaticMessage(TEST_MESSAGE), testEvent), null);
-        assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+    httpMessageProcessorTemplate
+        .sendFailureResponseToClient(new MessagingException(CoreMessages.createStaticMessage(TEST_MESSAGE), testEvent), null);
+    assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+  }
+
+  @Test
+  public void statusCodeOnExceptionBuildingResponse() throws Exception {
+    MuleEvent testEvent = createMockEvent();
+
+    HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
+    ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
+    doNothing().when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
+
+    HttpMessageProcessorTemplate httpMessageProcessorTemplate =
+        new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
+                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+
+    ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
+    httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
+
+    verify(responseCompletionCallback).responseSentWithFailure(isA(NullPointerException.class), eq(testEvent));
+    assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+  }
+
+  @Test
+  public void statusCodeOnExceptionSendingResponse() throws Exception {
+    MuleEvent testEvent = createMockEvent();
+
+    HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
+    RuntimeException expected = new RuntimeException("Some exception");
+    ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
+    doThrow(expected).when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
+
+    HttpMessageProcessorTemplate httpMessageProcessorTemplate =
+        new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
+                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+
+    ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
+
+    try {
+      httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
+      fail("Expected exception");
+    } catch (RuntimeException e) {
+      assertThat(e, sameInstance(expected));
     }
 
-    @Test
-    public void statusCodeOnExceptionBuildingResponse() throws Exception
-    {
-        MuleEvent testEvent = createMockEvent();
+    verify(responseCompletionCallback, never()).responseSentWithFailure(expected, testEvent);
+    assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+  }
 
-        HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
-        ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
-        doNothing().when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
+  private MuleEvent createMockEvent() throws MuleException {
+    MuleMessage testMessage = MuleMessage.builder().payload("").build();
 
-        HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(
-                testEvent,
-                mock(MessageProcessor.class),
-                responseReadyCallback,
-                null,
-                HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
-
-        ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
-        httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
-
-        verify(responseCompletionCallback).responseSentWithFailure(isA(NullPointerException.class), eq(testEvent));
-        assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
-    }
-
-    @Test
-    public void statusCodeOnExceptionSendingResponse() throws Exception
-    {
-        MuleEvent testEvent = createMockEvent();
-
-        HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
-        RuntimeException expected = new RuntimeException("Some exception");
-        ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
-        doThrow(expected).when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
-
-        HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(
-                testEvent,
-                mock(MessageProcessor.class),
-                responseReadyCallback,
-                null,
-                HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
-
-        ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
-
-        try
-        {
-            httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
-            fail("Expected exception");
-        }
-        catch (RuntimeException e)
-        {
-            assertThat(e, sameInstance(expected));
-        }
-
-        verify(responseCompletionCallback, never()).responseSentWithFailure(expected, testEvent);
-        assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
-    }
-
-    private MuleEvent createMockEvent() throws MuleException
-    {
-        MuleMessage testMessage = MuleMessage.builder().payload("").build();
-
-        MuleEvent testEvent = mock(MuleEvent.class);
-        when(testEvent.getMessage()).thenReturn(testMessage);
-        when(testEvent.getMuleContext()).thenReturn(mock(MuleContext.class, RETURNS_DEEP_STUBS));
-        when(testEvent.getMessageAsBytes()).thenReturn("".getBytes(UTF_8));
-        return testEvent;
-    }
+    MuleEvent testEvent = mock(MuleEvent.class);
+    when(testEvent.getMessage()).thenReturn(testMessage);
+    when(testEvent.getMuleContext()).thenReturn(mock(MuleContext.class, RETURNS_DEEP_STUBS));
+    when(testEvent.getMessageAsBytes()).thenReturn("".getBytes(UTF_8));
+    return testEvent;
+  }
 
 }

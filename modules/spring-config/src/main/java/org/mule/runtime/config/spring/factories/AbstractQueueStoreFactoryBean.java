@@ -13,20 +13,17 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
-{
+public abstract class AbstractQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    public AbstractQueueStoreFactoryBean(String name)
-    {
-        super(name);
-    }
+  public AbstractQueueStoreFactoryBean(String name) {
+    super(name);
+  }
 
-    @Override
-    protected ObjectStore<Serializable> createInstance() throws Exception
-    {
-        logger.warn("Queue stores are deprecated and are going to be removed in Mule 4.0");
-        return super.createInstance();
-    }
+  @Override
+  protected ObjectStore<Serializable> createInstance() throws Exception {
+    logger.warn("Queue stores are deprecated and are going to be removed in Mule 4.0");
+    return super.createInstance();
+  }
 }

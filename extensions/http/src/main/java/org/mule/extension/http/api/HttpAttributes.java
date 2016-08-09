@@ -14,20 +14,18 @@ import org.mule.runtime.module.http.internal.ParameterMap;
  *
  * @since 4.0
  */
-public abstract class HttpAttributes extends BaseAttributes
-{
-    /**
-     * Map of HTTP headers in the message. Former properties.
-     */
-    protected final ParameterMap headers;
+public abstract class HttpAttributes extends BaseAttributes {
 
-    public HttpAttributes(ParameterMap headers)
-    {
-        this.headers = headers.toImmutableParameterMap();
-    }
+  /**
+   * Map of HTTP headers in the message. Former properties.
+   */
+  protected final ParameterMap headers;
 
-    public ParameterMap getHeaders()
-    {
-        return headers;
-    }
+  public HttpAttributes(ParameterMap headers) {
+    this.headers = headers.toImmutableParameterMap();
+  }
+
+  public ParameterMap getHeaders() {
+    return headers;
+  }
 }

@@ -19,64 +19,54 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Attempts to resolve a resource from the file system, from a URL, or from the
- * classpath, in that order.
+ * Attempts to resolve a resource from the file system, from a URL, or from the classpath, in that order.
  */
-public class MuleResourceResolver implements LSResourceResolver
-{
-    final Logger logger = LoggerFactory.getLogger(getClass());
+public class MuleResourceResolver implements LSResourceResolver {
 
-    @Override
-    public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseUri)
-    {
-        try
-        {
-            logger.debug("Resolving resource : " + systemId);
-            return obtainInputStream(type, namespaceURI, publicId, systemId, baseUri);
-        }
-        catch (Exception e)
-        {
-            //  In case of error, suggest the parser to open the resource as URL
-            // by returning a null value.
-            logger.debug("Cannot resolve resource " + systemId + " with LocalResourceResolver");
-            return null;
-        }
+  final Logger logger = LoggerFactory.getLogger(getClass());
+
+  @Override
+  public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseUri) {
+    try {
+      logger.debug("Resolving resource : " + systemId);
+      return obtainInputStream(type, namespaceURI, publicId, systemId, baseUri);
+    } catch (Exception e) {
+      // In case of error, suggest the parser to open the resource as URL
+      // by returning a null value.
+      logger.debug("Cannot resolve resource " + systemId + " with LocalResourceResolver");
+      return null;
+    }
+  }
+
+  private LSInput obtainInputStream(String type, String namespaceURI, String publicId, String systemId, String baseUri)
+      throws URISyntaxException, IOException {
+    String resource = resolveUri(systemId, baseUri);
+
+    LocalResourceResolverInput input = new LocalResourceResolverInput();
+    InputStream stream = IOUtils.getResourceAsStream(resource, getClass());
+    if (stream == null) {
+      return null;
     }
 
-    private LSInput obtainInputStream(String type, String namespaceURI, String publicId, String systemId, String baseUri) throws URISyntaxException, IOException
-    {
-        String resource = resolveUri(systemId, baseUri);
+    input.setPublicId(publicId);
+    input.setSystemId(systemId);
+    input.setBaseURI(baseUri);
+    input.setByteStream(stream);
 
-        LocalResourceResolverInput input = new LocalResourceResolverInput();
-        InputStream stream = IOUtils.getResourceAsStream(resource, getClass());
-        if (stream == null)
-        {
-            return null;
-        }
+    return input;
+  }
 
-        input.setPublicId(publicId);
-        input.setSystemId(systemId);
-        input.setBaseURI(baseUri);
-        input.setByteStream(stream);
+  private String resolveUri(String systemId, String baseURI) throws URISyntaxException {
+    String resource;
 
-        return input;
+    if (StringUtils.isNotBlank(baseURI)) {
+      URI baseUriObject = new URI(baseURI);
+      URI absoluteUri = baseUriObject.resolve(systemId);
+      resource = absoluteUri.toASCIIString();
+    } else {
+      resource = systemId;
     }
 
-    private String resolveUri(String systemId, String baseURI) throws URISyntaxException
-    {
-        String resource;
-
-        if (StringUtils.isNotBlank(baseURI))
-        {
-            URI baseUriObject = new URI(baseURI);
-            URI absoluteUri = baseUriObject.resolve(systemId);
-            resource = absoluteUri.toASCIIString();
-        }
-        else
-        {
-            resource = systemId;
-        }
-
-        return resource;
-    }
+    return resource;
+  }
 }

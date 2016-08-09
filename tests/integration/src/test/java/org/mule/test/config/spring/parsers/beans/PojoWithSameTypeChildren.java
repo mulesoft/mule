@@ -6,29 +6,24 @@
  */
 package org.mule.test.config.spring.parsers.beans;
 
-public class PojoWithSameTypeChildren
-{
+public class PojoWithSameTypeChildren {
 
-    private SimpleCollectionObject elementTypeA;
-    private SimpleCollectionObject anotherElementTypeA;
+  private SimpleCollectionObject elementTypeA;
+  private SimpleCollectionObject anotherElementTypeA;
 
-    public void setElementTypeA(SimpleCollectionObject elementTypeA)
-    {
-        this.elementTypeA = elementTypeA;
-    }
+  public void setElementTypeA(SimpleCollectionObject elementTypeA) {
+    this.elementTypeA = elementTypeA;
+  }
 
-    public void setAnotherElementTypeA(SimpleCollectionObject anotherElementTypeA)
-    {
-        this.anotherElementTypeA = anotherElementTypeA;
-    }
+  public void setAnotherElementTypeA(SimpleCollectionObject anotherElementTypeA) {
+    this.anotherElementTypeA = anotherElementTypeA;
+  }
 
-    public SimpleCollectionObject getAnotherElementTypeA()
-    {
-        return anotherElementTypeA;
-    }
+  public SimpleCollectionObject getAnotherElementTypeA() {
+    return anotherElementTypeA;
+  }
 
-    public SimpleCollectionObject getElementTypeA()
-    {
-        return elementTypeA;
-    }
+  public SimpleCollectionObject getElementTypeA() {
+    return elementTypeA;
+  }
 }

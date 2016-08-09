@@ -12,41 +12,33 @@ import org.mule.runtime.core.util.StringUtils;
 
 import org.w3c.dom.Element;
 
-public class AttributeConcatenation implements PreProcessor
-{
+public class AttributeConcatenation implements PreProcessor {
 
-    private String target;
-    private String separator;
-    private String[] sources;
+  private String target;
+  private String separator;
+  private String[] sources;
 
-    public AttributeConcatenation(String target, String separator, String[] sources)
-    {
-        this.target = target;
-        this.separator = separator;
-        this.sources = sources;
-    }
+  public AttributeConcatenation(String target, String separator, String[] sources) {
+    this.target = target;
+    this.separator = separator;
+    this.sources = sources;
+  }
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        StringBuilder concat = new StringBuilder();
-        boolean first = true;
-        for (int i = 0; i < sources.length; ++i)
-        {
-            String value = config.translateValue(sources[i], element.getAttribute(sources[i])).toString();
-            if (StringUtils.isNotEmpty(value))
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    concat.append(separator);
-                }
-                concat.append(value);
-            }
+  public void preProcess(PropertyConfiguration config, Element element) {
+    StringBuilder concat = new StringBuilder();
+    boolean first = true;
+    for (int i = 0; i < sources.length; ++i) {
+      String value = config.translateValue(sources[i], element.getAttribute(sources[i])).toString();
+      if (StringUtils.isNotEmpty(value)) {
+        if (first) {
+          first = false;
+        } else {
+          concat.append(separator);
         }
-        element.setAttribute(target, concat.toString());
+        concat.append(value);
+      }
     }
+    element.setAttribute(target, concat.toString());
+  }
 
 }

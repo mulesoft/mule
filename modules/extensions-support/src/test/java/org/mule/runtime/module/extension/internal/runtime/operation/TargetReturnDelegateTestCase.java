@@ -23,31 +23,28 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase
-{
+public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
-    private static final String TARGET = "myFlowVar";
+  private static final String TARGET = "myFlowVar";
 
-    @Override
-    protected ReturnDelegate createReturnDelegate()
-    {
-        return new TargetReturnDelegate(TARGET, muleContext);
-    }
+  @Override
+  protected ReturnDelegate createReturnDelegate() {
+    return new TargetReturnDelegate(TARGET, muleContext);
+  }
 
-    @After
-    public void after()
-    {
-        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
-    }
+  @After
+  public void after() {
+    verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
+  }
 
-    @Override
-    protected MuleMessage getOutputMessage()
-    {
-        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
-        verify(event).setFlowVariable(same(TARGET), captor.capture());
-        MuleMessage message = captor.getValue();
+  @Override
+  protected MuleMessage getOutputMessage() {
+    ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor =
+        ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
+    verify(event).setFlowVariable(same(TARGET), captor.capture());
+    MuleMessage message = captor.getValue();
 
-        assertThat(message, is(notNullValue()));
-        return message;
-    }
+    assertThat(message, is(notNullValue()));
+    return message;
+  }
 }

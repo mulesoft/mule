@@ -24,157 +24,128 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Converts a java object to a JSON encoded object that can be consumed by other languages such as
- * Javascript or Ruby.
+ * Converts a java object to a JSON encoded object that can be consumed by other languages such as Javascript or Ruby.
  * <p/>
  * The returnClass for this transformer is always java.lang.String, there is no need to set this.
  */
-public class ObjectToJson extends AbstractJsonTransformer
-{
-    /**
-     * logger used by this class
-     */
-    protected transient final Logger logger = LoggerFactory.getLogger(ObjectToJson.class);
+public class ObjectToJson extends AbstractJsonTransformer {
 
-    private Map<Class<?>, Class<?>> serializationMixins = new HashMap<>();
+  /**
+   * logger used by this class
+   */
+  protected transient final Logger logger = LoggerFactory.getLogger(ObjectToJson.class);
 
-    protected Class<?> sourceClass;
+  private Map<Class<?>, Class<?>> serializationMixins = new HashMap<>();
 
-    private boolean handleException = false;
+  protected Class<?> sourceClass;
 
-    private IsJsonFilter isJsonFilter = new IsJsonFilter();
+  private boolean handleException = false;
 
-    public ObjectToJson()
-    {
-        this.setReturnDataType(DataType.JSON_STRING);
+  private IsJsonFilter isJsonFilter = new IsJsonFilter();
+
+  public ObjectToJson() {
+    this.setReturnDataType(DataType.JSON_STRING);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+
+    // restrict the handled types
+    if (getSourceClass() != null) {
+      sourceTypes.clear();
+      registerSourceType(DataType.fromType(getSourceClass()));
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-
-        //restrict the handled types
-        if (getSourceClass() != null)
-        {
-            sourceTypes.clear();
-            registerSourceType(DataType.fromType(getSourceClass()));
-        }
-
-        //Add shared mixins first
-        for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet())
-        {
-            getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<Class<?>, Class<?>> entry : serializationMixins.entrySet())
-        {
-            getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-        }
+    // Add shared mixins first
+    for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet()) {
+      getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
     }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Object src = event.getMessage().getPayload();
-        if (src instanceof String && isJsonFilter.accept(src))
-        {
-            //Nothing to transform
-            return src;
-        }
+    for (Map.Entry<Class<?>, Class<?>> entry : serializationMixins.entrySet()) {
+      getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
+    }
+  }
 
-        // Checks if there's an exception
-        if (event.getMessage().getExceptionPayload() != null && this.isHandleException())
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Found exception with null payload");
-            }
-            src = this.getException(event.getMessage().getExceptionPayload().getException());
-        }
-
-        StringWriter writer = new StringWriter();
-        try
-        {
-            getMapper().writeValue(writer, src);
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(this, e);
-        }
-        
-        if (byte[].class.equals(getReturnDataType().getType()))
-        {
-            return writer.toString().getBytes(outputEncoding);
-        }
-        else
-        {
-            return writer.toString();
-        }
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Object src = event.getMessage().getPayload();
+    if (src instanceof String && isJsonFilter.accept(src)) {
+      // Nothing to transform
+      return src;
     }
 
-    /**
-     * The reason of having this is because the original exception object is way too
-     * complex and it breaks JSON-lib.
-     */
-    private Exception getException(Throwable t)
-    {
-        Exception returnValue = null;
-        List<Throwable> causeStack = new ArrayList<>();
-
-        for (Throwable tempCause = t; tempCause != null; tempCause = tempCause.getCause())
-        {
-            causeStack.add(tempCause);
-        }
-
-        for (int i = causeStack.size() - 1; i >= 0; i--)
-        {
-            Throwable tempCause = causeStack.get(i);
-
-            // There is no cause at the very root
-            if (i == causeStack.size())
-            {
-                returnValue = new Exception(tempCause.getMessage());
-                returnValue.setStackTrace(tempCause.getStackTrace());
-            }
-            else
-            {
-                returnValue = new Exception(tempCause.getMessage(), returnValue);
-                returnValue.setStackTrace(tempCause.getStackTrace());
-            }
-        }
-
-        return returnValue;
+    // Checks if there's an exception
+    if (event.getMessage().getExceptionPayload() != null && this.isHandleException()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Found exception with null payload");
+      }
+      src = this.getException(event.getMessage().getExceptionPayload().getException());
     }
 
-    public boolean isHandleException()
-    {
-        return this.handleException;
+    StringWriter writer = new StringWriter();
+    try {
+      getMapper().writeValue(writer, src);
+    } catch (IOException e) {
+      throw new TransformerException(this, e);
     }
 
-    public void setHandleException(boolean handleException)
-    {
-        this.handleException = handleException;
+    if (byte[].class.equals(getReturnDataType().getType())) {
+      return writer.toString().getBytes(outputEncoding);
+    } else {
+      return writer.toString();
+    }
+  }
+
+  /**
+   * The reason of having this is because the original exception object is way too complex and it breaks JSON-lib.
+   */
+  private Exception getException(Throwable t) {
+    Exception returnValue = null;
+    List<Throwable> causeStack = new ArrayList<>();
+
+    for (Throwable tempCause = t; tempCause != null; tempCause = tempCause.getCause()) {
+      causeStack.add(tempCause);
     }
 
-    public Class<?> getSourceClass()
-    {
-        return sourceClass;
+    for (int i = causeStack.size() - 1; i >= 0; i--) {
+      Throwable tempCause = causeStack.get(i);
+
+      // There is no cause at the very root
+      if (i == causeStack.size()) {
+        returnValue = new Exception(tempCause.getMessage());
+        returnValue.setStackTrace(tempCause.getStackTrace());
+      } else {
+        returnValue = new Exception(tempCause.getMessage(), returnValue);
+        returnValue.setStackTrace(tempCause.getStackTrace());
+      }
     }
 
-    public void setSourceClass(Class<?> sourceClass)
-    {
-        this.sourceClass = sourceClass;
-    }
+    return returnValue;
+  }
 
-    public Map<Class<?>, Class<?>> getSerializationMixins()
-    {
-        return serializationMixins;
-    }
+  public boolean isHandleException() {
+    return this.handleException;
+  }
 
-    public void setSerializationMixins(Map<Class<?>, Class<?>> serializationMixins)
-    {
-        this.serializationMixins = serializationMixins;
-    }
+  public void setHandleException(boolean handleException) {
+    this.handleException = handleException;
+  }
+
+  public Class<?> getSourceClass() {
+    return sourceClass;
+  }
+
+  public void setSourceClass(Class<?> sourceClass) {
+    this.sourceClass = sourceClass;
+  }
+
+  public Map<Class<?>, Class<?>> getSerializationMixins() {
+    return serializationMixins;
+  }
+
+  public void setSerializationMixins(Map<Class<?>, Class<?>> serializationMixins) {
+    this.serializationMixins = serializationMixins;
+  }
 }
 

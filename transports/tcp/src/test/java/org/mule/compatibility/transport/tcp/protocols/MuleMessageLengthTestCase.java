@@ -16,25 +16,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MuleMessageLengthTestCase extends FunctionalTestCase
-{
+public class MuleMessageLengthTestCase extends FunctionalTestCase {
 
-    protected static String TEST_MESSAGE = "Test TCP Request";
+  protected static String TEST_MESSAGE = "Test TCP Request";
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-mplength-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-mplength-test-flow.xml";
+  }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
+  @Test
+  public void testSend() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
 }

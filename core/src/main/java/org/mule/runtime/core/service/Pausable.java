@@ -9,11 +9,11 @@ package org.mule.runtime.core.service;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Adds a pause lifecycle method to an object.  This should only be used with {@link Resumable}
+ * Adds a pause lifecycle method to an object. This should only be used with {@link Resumable}
  */
-public interface Pausable
-{
-    public static final String PHASE_NAME = "pause";
+public interface Pausable {
 
-    void pause() throws MuleException;
+  public static final String PHASE_NAME = "pause";
+
+  void pause() throws MuleException;
 }

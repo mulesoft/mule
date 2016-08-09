@@ -13,55 +13,54 @@ import org.mule.runtime.core.api.client.OperationOptionsConfig;
  *
  * @param <BuilderType> the builder class
  */
-public interface HttpRequestOperationConfig<BuilderType> extends OperationOptionsConfig<BuilderType>
-{
+public interface HttpRequestOperationConfig<BuilderType> extends OperationOptionsConfig<BuilderType> {
 
-    /**
-     * @param method HTTP method for the HTTP request
-     *
-     * @return the builder
-     */
-    BuilderType method(String method);
+  /**
+   * @param method HTTP method for the HTTP request
+   *
+   * @return the builder
+   */
+  BuilderType method(String method);
 
-    /**
-     * Configures the requester to follows redirects
-     *
-     * @return the builder
-     */
-    BuilderType enableFollowsRedirect();
+  /**
+   * Configures the requester to follows redirects
+   *
+   * @return the builder
+   */
+  BuilderType enableFollowsRedirect();
 
-    /**
-     * Configures the requester to not follow redirects
-     *
-     * @return the builder
-     */
-    BuilderType disableFollowsRedirect();
+  /**
+   * Configures the requester to not follow redirects
+   *
+   * @return the builder
+   */
+  BuilderType disableFollowsRedirect();
 
-    /**
-     * Configures if the HTTP request should do streaming (transfer-encoding chunk).
-     *
-     * @return the builder
-     */
-    BuilderType requestStreamingMode(HttpStreamingType mode);
+  /**
+   * Configures if the HTTP request should do streaming (transfer-encoding chunk).
+   *
+   * @return the builder
+   */
+  BuilderType requestStreamingMode(HttpStreamingType mode);
 
-    /**
-     * @param requestConfig the config to use for the requester
-     * @return the builder
-     */
-    BuilderType requestConfig(HttpRequesterConfig requestConfig);
+  /**
+   * @param requestConfig the config to use for the requester
+   * @return the builder
+   */
+  BuilderType requestConfig(HttpRequesterConfig requestConfig);
 
-    /**
-     * Disables the status code validation for the response
-     *
-     * @return the builder
-     */
-    BuilderType disableStatusCodeValidation();
+  /**
+   * Disables the status code validation for the response
+   *
+   * @return the builder
+   */
+  BuilderType disableStatusCodeValidation();
 
-    /**
-     * Disables the http response parsing
-     *
-     * @return the builder
-     */
-    BuilderType disableParseResponse();
+  /**
+   * Disables the http response parsing
+   *
+   * @return the builder
+   */
+  BuilderType disableParseResponse();
 
 }

@@ -20,41 +20,38 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase
-{
+public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
-    private final ServiceResolver serviceResolver = mock(ServiceResolver.class);
-    private final ServiceProviderDiscoverer serviceProviderDiscoverer = mock(ServiceProviderDiscoverer.class);
-    private final DefaultServiceDiscoverer serviceDiscoverer = new DefaultServiceDiscoverer(serviceProviderDiscoverer, serviceResolver);
+  private final ServiceResolver serviceResolver = mock(ServiceResolver.class);
+  private final ServiceProviderDiscoverer serviceProviderDiscoverer = mock(ServiceProviderDiscoverer.class);
+  private final DefaultServiceDiscoverer serviceDiscoverer =
+      new DefaultServiceDiscoverer(serviceProviderDiscoverer, serviceResolver);
 
-    @Test
-    public void discoversServices() throws Exception
-    {
-        final List<ServiceProvider> serviceProviders = new ArrayList<>();
-        when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
-        final List<Service> expectedServices = new ArrayList<>();
-        when(serviceResolver.resolveServices(serviceProviders)).thenReturn(expectedServices);
+  @Test
+  public void discoversServices() throws Exception {
+    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
+    final List<Service> expectedServices = new ArrayList<>();
+    when(serviceResolver.resolveServices(serviceProviders)).thenReturn(expectedServices);
 
-        final List<Service> services = serviceDiscoverer.discoverServices();
+    final List<Service> services = serviceDiscoverer.discoverServices();
 
-        assertThat(services, is(expectedServices));
-    }
+    assertThat(services, is(expectedServices));
+  }
 
-    @Test(expected = ServiceResolutionError.class)
-    public void propagatesDiscoverErrors() throws Exception
-    {
-        when(serviceProviderDiscoverer.discover()).thenThrow(new ServiceResolutionError("Error"));
+  @Test(expected = ServiceResolutionError.class)
+  public void propagatesDiscoverErrors() throws Exception {
+    when(serviceProviderDiscoverer.discover()).thenThrow(new ServiceResolutionError("Error"));
 
-        serviceDiscoverer.discoverServices();
-    }
+    serviceDiscoverer.discoverServices();
+  }
 
-    @Test(expected = ServiceResolutionError.class)
-    public void propagatesServiceResolutionErrors() throws Exception
-    {
-        final List<ServiceProvider> serviceProviders = new ArrayList<>();
-        when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
-        when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new ServiceResolutionError("Error"));
+  @Test(expected = ServiceResolutionError.class)
+  public void propagatesServiceResolutionErrors() throws Exception {
+    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
+    when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new ServiceResolutionError("Error"));
 
-        serviceDiscoverer.discoverServices();
-    }
+    serviceDiscoverer.discoverServices();
+  }
 }

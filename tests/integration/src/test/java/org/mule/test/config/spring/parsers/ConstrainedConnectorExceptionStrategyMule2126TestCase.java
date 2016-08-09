@@ -8,19 +8,16 @@ package org.mule.test.config.spring.parsers;
 
 import org.junit.Test;
 
-public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends AbstractBadConfigTestCase
-{
+public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends AbstractBadConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml";
+  }
 
-    @Test
-    public void testError() throws Exception
-    {
-        assertErrorContains("Invalid content was found starting with element 'default-connector-exception-strategy'");
-    }
+  @Test
+  public void testError() throws Exception {
+    assertErrorContains("Invalid content was found starting with element 'default-connector-exception-strategy'");
+  }
 
 }

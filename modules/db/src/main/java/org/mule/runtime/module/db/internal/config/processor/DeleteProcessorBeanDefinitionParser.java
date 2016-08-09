@@ -12,16 +12,14 @@ import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeleteProcessorBeanDefinitionParser extends AbstractUpdateProcessorBeanDefinitionParser
-{
+public class DeleteProcessorBeanDefinitionParser extends AbstractUpdateProcessorBeanDefinitionParser {
 
-    @Override
-    protected List<QueryType> getQueryType()
-    {
-        List<QueryType> validQueryTypes = new ArrayList<QueryType>();
-        validQueryTypes.add(QueryType.DELETE);
-        validQueryTypes.add(QueryType.STORE_PROCEDURE_CALL);
-        return validQueryTypes;
-    }
+  @Override
+  protected List<QueryType> getQueryType() {
+    List<QueryType> validQueryTypes = new ArrayList<QueryType>();
+    validQueryTypes.add(QueryType.DELETE);
+    validQueryTypes.add(QueryType.STORE_PROCEDURE_CALL);
+    return validQueryTypes;
+  }
 }
 

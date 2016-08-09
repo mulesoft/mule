@@ -10,48 +10,44 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.registry.Registry;
 
 /**
- * <code>RegistryNotification</code> is fired when an event such as a Registry
- * being started occurs. The payload of this event will always
- * be a reference to the Registry ID.
+ * <code>RegistryNotification</code> is fired when an event such as a Registry being started occurs. The payload of this event
+ * will always be a reference to the Registry ID.
  *
  * @see org.mule.runtime.core.api.registry.Registry
  * @see org.mule.runtime.core.api.MuleContext
  */
-public class RegistryNotification extends ServerNotification
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -3246036188021581121L;
+public class RegistryNotification extends ServerNotification {
 
-    public static final int REGISTRY_INITIALISING = REGISTRY_EVENT_ACTION_START_RANGE + 1;
-    public static final int REGISTRY_INITIALISED = REGISTRY_EVENT_ACTION_START_RANGE + 2;
-    public static final int REGISTRY_DISPOSING = REGISTRY_EVENT_ACTION_START_RANGE + 3;
-    public static final int REGISTRY_DISPOSED = REGISTRY_EVENT_ACTION_START_RANGE + 4;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -3246036188021581121L;
 
-    static {
-        registerAction("registry initialising", REGISTRY_INITIALISING);
-        registerAction("registry initialised", REGISTRY_INITIALISED);
-        registerAction("registry disposing", REGISTRY_DISPOSING);
-        registerAction("registry disposed", REGISTRY_DISPOSED);
-    }
+  public static final int REGISTRY_INITIALISING = REGISTRY_EVENT_ACTION_START_RANGE + 1;
+  public static final int REGISTRY_INITIALISED = REGISTRY_EVENT_ACTION_START_RANGE + 2;
+  public static final int REGISTRY_DISPOSING = REGISTRY_EVENT_ACTION_START_RANGE + 3;
+  public static final int REGISTRY_DISPOSED = REGISTRY_EVENT_ACTION_START_RANGE + 4;
 
-    public RegistryNotification(Registry registry, String action)
-    {
-        this(registry, getActionId(action));
-    }
+  static {
+    registerAction("registry initialising", REGISTRY_INITIALISING);
+    registerAction("registry initialised", REGISTRY_INITIALISED);
+    registerAction("registry disposing", REGISTRY_DISPOSING);
+    registerAction("registry disposed", REGISTRY_DISPOSED);
+  }
 
-    public RegistryNotification(Registry registry, int action)
-    {
-        super(registry.getRegistryId(), action);
-        resourceIdentifier = registry.getRegistryId();
-    }
+  public RegistryNotification(Registry registry, String action) {
+    this(registry, getActionId(action));
+  }
+
+  public RegistryNotification(Registry registry, int action) {
+    super(registry.getRegistryId(), action);
+    resourceIdentifier = registry.getRegistryId();
+  }
 
 
-    @Override
-    public String toString()
-    {
-        return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-                + ", timestamp=" + timestamp + "}";
-    }
+  @Override
+  public String toString() {
+    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier + ", timestamp="
+        + timestamp + "}";
+  }
 }

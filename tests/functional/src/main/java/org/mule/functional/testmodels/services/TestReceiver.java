@@ -14,28 +14,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestReceiver
-{
-    protected static final Logger logger = LoggerFactory.getLogger(TestComponent.class);
+public class TestReceiver {
 
-    protected AtomicInteger count = new AtomicInteger(0);
+  protected static final Logger logger = LoggerFactory.getLogger(TestComponent.class);
 
-    public String receive(String message) throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(StringMessageUtils.getBoilerPlate("Received: " + message + " Number: " + inc()
-                                                           + " in thread: "
-                                                           + Thread.currentThread().getName()));
-            logger.debug("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelation().getId());
-        }
+  protected AtomicInteger count = new AtomicInteger(0);
 
-        return "Received: " + message;
+  public String receive(String message) throws Exception {
+    if (logger.isDebugEnabled()) {
+      logger.debug(StringMessageUtils
+          .getBoilerPlate("Received: " + message + " Number: " + inc() + " in thread: " + Thread.currentThread().getName()));
+      logger.debug("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelation().getId());
     }
 
-    protected int inc()
-    {
-        return count.incrementAndGet();
-    }
+    return "Received: " + message;
+  }
+
+  protected int inc() {
+    return count.incrementAndGet();
+  }
 
 }

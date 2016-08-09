@@ -21,79 +21,63 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * {@link FactoryBean} adapter for the configured {@link TransactionManagerFactory}.
  * <p/>
- * Creates a reference to the TransactionManager configured on the MuleContext. This is useful when you need to inject
- * the TransactionManager into other objects such as XA data Sources.
+ * Creates a reference to the TransactionManager configured on the MuleContext. This is useful when you need to inject the
+ * TransactionManager into other objects such as XA data Sources.
  * <p/>
- * This will first look for a single {@link TransactionManagerFactory} and use it to build the
- * {@link TransactionManager}.
+ * This will first look for a single {@link TransactionManagerFactory} and use it to build the {@link TransactionManager}.
  * <p/>
  * If no {@link TransactionManagerFactory} is found, then it will look for {@link TransactionManager} instances.
  *
  * @since 3.7.4
  */
-public class TransactionManagerFactoryBean implements FactoryBean<TransactionManager>, MuleContextAware
-{
+public class TransactionManagerFactoryBean implements FactoryBean<TransactionManager>, MuleContextAware {
 
-    @Autowired(required = false)
-    private TransactionManagerFactory txManagerFactory;
+  @Autowired(required = false)
+  private TransactionManagerFactory txManagerFactory;
 
-    @Autowired(required = false)
-    private TransactionManager customTxManager;
+  @Autowired(required = false)
+  private TransactionManager customTxManager;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    @Override
-    public TransactionManager getObject() throws Exception
-    {
-        if (muleContext.isDisposing())
-        {
-            // The txManager might be declared, but if it isn't used by the application it won't be created until the
-            // muleContext is disposed.
-            // At that point, there is no need to create the txManager.
-            return null;
-        }
-        else if (txManagerFactory != null)
-        {
-            try
-            {
-                return txManagerFactory.create(muleContext.getConfiguration());
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(failedToCreate("transaction manager"), e);
-            }
-        }
-        else
-        {
-            return customTxManager;
-        }
+  @Override
+  public TransactionManager getObject() throws Exception {
+    if (muleContext.isDisposing()) {
+      // The txManager might be declared, but if it isn't used by the application it won't be created until the
+      // muleContext is disposed.
+      // At that point, there is no need to create the txManager.
+      return null;
+    } else if (txManagerFactory != null) {
+      try {
+        return txManagerFactory.create(muleContext.getConfiguration());
+      } catch (Exception e) {
+        throw new MuleRuntimeException(failedToCreate("transaction manager"), e);
+      }
+    } else {
+      return customTxManager;
     }
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return TransactionManager.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return TransactionManager.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 
-    public void setTxManagerFactory(TransactionManagerFactory txManagerFactory)
-    {
-        this.txManagerFactory = txManagerFactory;
-    }
+  public void setTxManagerFactory(TransactionManagerFactory txManagerFactory) {
+    this.txManagerFactory = txManagerFactory;
+  }
 
-    public void setCustomTxManager(TransactionManager customTxManager)
-    {
-        this.customTxManager = customTxManager;
-    }
+  public void setCustomTxManager(TransactionManager customTxManager) {
+    this.customTxManager = customTxManager;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

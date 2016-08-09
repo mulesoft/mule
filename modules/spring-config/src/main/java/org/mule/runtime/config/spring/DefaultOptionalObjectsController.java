@@ -17,48 +17,41 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-public class DefaultOptionalObjectsController implements OptionalObjectsController
-{
+public class DefaultOptionalObjectsController implements OptionalObjectsController {
 
-    private final Set<String> optionalKeys = new HashSet<>();
-    private final Set<String> discardedKeys = new HashSet<>();
-    private final Object discardedObjectPlaceholder = new Object();
-
+  private final Set<String> optionalKeys = new HashSet<>();
+  private final Set<String> discardedKeys = new HashSet<>();
+  private final Object discardedObjectPlaceholder = new Object();
 
 
-    @Override
-    public void registerOptionalKey(String key)
-    {
-        optionalKeys.add(key);
-    }
 
-    @Override
-    public void discardOptionalObject(String key)
-    {
-        discardedKeys.add(key);
-    }
+  @Override
+  public void registerOptionalKey(String key) {
+    optionalKeys.add(key);
+  }
 
-    @Override
-    public boolean isOptional(String key)
-    {
-        return optionalKeys.contains(key);
-    }
+  @Override
+  public void discardOptionalObject(String key) {
+    discardedKeys.add(key);
+  }
 
-    @Override
-    public boolean isDiscarded(String key)
-    {
-        return discardedKeys.contains(key);
-    }
+  @Override
+  public boolean isOptional(String key) {
+    return optionalKeys.contains(key);
+  }
 
-    @Override
-    public Object getDiscardedObjectPlaceholder()
-    {
-        return discardedObjectPlaceholder;
-    }
+  @Override
+  public boolean isDiscarded(String key) {
+    return discardedKeys.contains(key);
+  }
 
-    @Override
-    public Collection<String> getAllOptionalKeys()
-    {
-        return ImmutableList.copyOf(optionalKeys);
-    }
+  @Override
+  public Object getDiscardedObjectPlaceholder() {
+    return discardedObjectPlaceholder;
+  }
+
+  @Override
+  public Collection<String> getAllOptionalKeys() {
+    return ImmutableList.copyOf(optionalKeys);
+  }
 }

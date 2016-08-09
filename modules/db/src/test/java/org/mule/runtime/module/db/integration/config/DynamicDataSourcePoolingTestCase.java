@@ -9,16 +9,14 @@ package org.mule.runtime.module.db.integration.config;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class DynamicDataSourcePoolingTestCase extends DatasourcePoolingTestCase
-{
+public class DynamicDataSourcePoolingTestCase extends DatasourcePoolingTestCase {
 
-    public DynamicDataSourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DynamicDataSourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/dynamic-derby-pooling-db-config.xml", "integration/config/dynamic-connection-pooling-config.xml"};
-    }
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/dynamic-derby-pooling-db-config.xml",
+        "integration/config/dynamic-connection-pooling-config.xml"};
+  }
 }

@@ -8,6 +8,6 @@ package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 
-public interface ExceptionStrategyNotificationListener<T extends ExceptionStrategyNotification> extends ServerNotificationListener<ExceptionStrategyNotification>
-{
+public interface ExceptionStrategyNotificationListener<T extends ExceptionStrategyNotification>
+    extends ServerNotificationListener<ExceptionStrategyNotification> {
 }

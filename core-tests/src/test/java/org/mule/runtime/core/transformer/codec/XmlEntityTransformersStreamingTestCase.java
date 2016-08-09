@@ -8,21 +8,18 @@ package org.mule.runtime.core.transformer.codec;
 
 import java.io.ByteArrayInputStream;
 
-public class XmlEntityTransformersStreamingTestCase extends XMLEntityTransformersTestCase
-{
+public class XmlEntityTransformersStreamingTestCase extends XMLEntityTransformersTestCase {
 
-    @Override
-    public Object getTestData()
-    {
-        String string = (String)super.getTestData();
-        return new ByteArrayInputStream(string.getBytes());
-    }
+  @Override
+  public Object getTestData() {
+    String string = (String) super.getTestData();
+    return new ByteArrayInputStream(string.getBytes());
+  }
 
-    @Override
-    public Object getResultData()
-    {
-        String string = (String)super.getResultData();
-        return new ByteArrayInputStream(string.getBytes());
-    }
+  @Override
+  public Object getResultData() {
+    String string = (String) super.getResultData();
+    return new ByteArrayInputStream(string.getBytes());
+  }
 
 }

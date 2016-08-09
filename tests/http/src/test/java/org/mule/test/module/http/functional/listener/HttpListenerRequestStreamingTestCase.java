@@ -20,35 +20,33 @@ import org.apache.http.entity.InputStreamEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
 
-    private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);
+  private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
-    private String flowReceivedMessage;
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
+  private String flowReceivedMessage;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-request-streaming-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-request-streaming-config.xml";
+  }
 
-    @Test
-    public void listenerReceivedChunkedRequest() throws Exception
-    {
-        String url = format("http://localhost:%s/", listenPort.getNumber());
-        getFunctionalTestComponent("defaultFlow").setEventCallback((context, component) -> flowReceivedMessage = context.getMessageAsString());
-        testChunkedRequestContentAndResponse(url);
-        //We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
-        testChunkedRequestContentAndResponse(url);
-    }
+  @Test
+  public void listenerReceivedChunkedRequest() throws Exception {
+    String url = format("http://localhost:%s/", listenPort.getNumber());
+    getFunctionalTestComponent("defaultFlow")
+        .setEventCallback((context, component) -> flowReceivedMessage = context.getMessageAsString());
+    testChunkedRequestContentAndResponse(url);
+    // We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
+    testChunkedRequestContentAndResponse(url);
+  }
 
-    private void testChunkedRequestContentAndResponse(String url) throws Exception
-    {
-        Request.Post(url).body(new InputStreamEntity(new ByteArrayInputStream(LARGE_MESSAGE.getBytes()))).connectTimeout(1000).execute();
-        assertThat(flowReceivedMessage, is(LARGE_MESSAGE));
-    }
+  private void testChunkedRequestContentAndResponse(String url) throws Exception {
+    Request.Post(url).body(new InputStreamEntity(new ByteArrayInputStream(LARGE_MESSAGE.getBytes()))).connectTimeout(1000)
+        .execute();
+    assertThat(flowReceivedMessage, is(LARGE_MESSAGE));
+  }
 
 }

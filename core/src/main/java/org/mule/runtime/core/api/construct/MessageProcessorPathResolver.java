@@ -9,9 +9,9 @@ package org.mule.runtime.core.api.construct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
- *  This class handles the resolution of a Processor Path for a given MessageProcessor
+ * This class handles the resolution of a Processor Path for a given MessageProcessor
  */
-public interface MessageProcessorPathResolver
-{
-    String getProcessorPath(MessageProcessor processor);
+public interface MessageProcessorPathResolver {
+
+  String getProcessorPath(MessageProcessor processor);
 }

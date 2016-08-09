@@ -19,46 +19,44 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DynamicBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase
-{
+public class DynamicBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase {
 
-    public static final String DYNAMIC_BULK_QUERY = "#[bulkQuery]";
+  public static final String DYNAMIC_BULK_QUERY = "#[bulkQuery]";
 
-    @Test
-    public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception
-    {
-        DynamicBulkQueryResolver bulkQueryResolver = new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, null, null);
+  @Test
+  public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception {
+    DynamicBulkQueryResolver bulkQueryResolver = new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, null, null);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
 
-        assertThat(resolvedBulkQuery, nullValue());
-    }
+    assertThat(resolvedBulkQuery, nullValue());
+  }
 
-    @Test(expected = QueryResolutionException.class)
-    public void throwsErrorOnEmptyBulkQuery() throws Exception
-    {
-        QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
+  @Test(expected = QueryResolutionException.class)
+  public void throwsErrorOnEmptyBulkQuery() throws Exception {
+    QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
-        ExpressionManager expressionManager = mock(ExpressionManager.class);
-        when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn("");
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn("");
 
-        DynamicBulkQueryResolver bulkQueryResolver = new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);
+    DynamicBulkQueryResolver bulkQueryResolver =
+        new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);
 
-        bulkQueryResolver.resolve(muleEvent);
-    }
+    bulkQueryResolver.resolve(muleEvent);
+  }
 
-    @Test
-    public void resolvesDynamicBulkQuery() throws Exception
-    {
-        QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
+  @Test
+  public void resolvesDynamicBulkQuery() throws Exception {
+    QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
-        ExpressionManager expressionManager = mock(ExpressionManager.class);
-        when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn(BULK_SQL_QUERY);
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn(BULK_SQL_QUERY);
 
-        DynamicBulkQueryResolver bulkQueryResolver = new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);
+    DynamicBulkQueryResolver bulkQueryResolver =
+        new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
 
-        assertResolvedBulkQuery(resolvedBulkQuery);
-    }
+    assertResolvedBulkQuery(resolvedBulkQuery);
+  }
 }

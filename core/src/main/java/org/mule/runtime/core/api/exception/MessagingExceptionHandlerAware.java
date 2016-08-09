@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.exception;
 /**
  * Objects that need access to the messaging exception handler of the execution context should implement this interface.
  */
-public interface MessagingExceptionHandlerAware
-{
-    void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler);
+public interface MessagingExceptionHandlerAware {
+
+  void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler);
 }

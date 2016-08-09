@@ -14,12 +14,11 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
-public class TestOutputNullTypeResolver implements MetadataOutputResolver<String>
-{
+public class TestOutputNullTypeResolver implements MetadataOutputResolver<String> {
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        return BaseTypeBuilder.create(JAVA).nullType().build();
-    }
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return BaseTypeBuilder.create(JAVA).nullType().build();
+  }
 }

@@ -11,10 +11,9 @@ import org.junit.Assert;
 /**
  * Custom assertions for Mule
  */
-public class MuleAssert
-{
-    public static void assertTrue(String message, java.util.concurrent.atomic.AtomicBoolean bool)
-    {
-        Assert.assertTrue(message, bool.get());
-    }
+public class MuleAssert {
+
+  public static void assertTrue(String message, java.util.concurrent.atomic.AtomicBoolean bool) {
+    Assert.assertTrue(message, bool.get());
+  }
 }

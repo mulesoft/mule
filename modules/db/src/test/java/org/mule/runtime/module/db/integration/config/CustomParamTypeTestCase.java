@@ -20,32 +20,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class CustomParamTypeTestCase extends AbstractDbIntegrationTestCase
-{
+public class CustomParamTypeTestCase extends AbstractDbIntegrationTestCase {
 
-    public CustomParamTypeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public CustomParamTypeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/custom-param-type-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/custom-param-type-config.xml"};
+  }
 
-    @Test
-    public void usesCustomType() throws Exception
-    {
-        QueryTemplate parameterizedQueryTemplate = muleContext.getRegistry().lookupObject("parameterizedQuery");
-        QueryParam queryParam = parameterizedQueryTemplate.getParams().get(0);
+  @Test
+  public void usesCustomType() throws Exception {
+    QueryTemplate parameterizedQueryTemplate = muleContext.getRegistry().lookupObject("parameterizedQuery");
+    QueryParam queryParam = parameterizedQueryTemplate.getParams().get(0);
 
-        assertThat(queryParam.getType().getName(), equalTo("CUSTOM_TYPE1"));
-    }
+    assertThat(queryParam.getType().getName(), equalTo("CUSTOM_TYPE1"));
+  }
 }

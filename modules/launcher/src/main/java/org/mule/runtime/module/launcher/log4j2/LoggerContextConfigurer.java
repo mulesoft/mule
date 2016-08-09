@@ -46,16 +46,16 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
 
 /**
- * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file
- * and applies configuration changes to it so that it complies with mule's logging strategy.
+ * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
+ * configuration changes to it so that it complies with mule's logging strategy.
  * <p/>
  * Its basic functions are:
  * <ul>
- * <li>Disable log4j's shutdown hook so that it doesn't collide with mule's {@link ShutdownListener},
- * which would result in a classloader leak.</li>
+ * <li>Disable log4j's shutdown hook so that it doesn't collide with mule's {@link ShutdownListener}, which would result in a
+ * classloader leak.</li>
  * <li>When using a default configuration (one which doesn't come from a config file), the console appender is removed</li>
- * <li>if the classloader is an {@link ArtifactClassLoader}, then it adds a rolling file appender
- * to collect the artifact's logs</li>
+ * <li>if the classloader is an {@link ArtifactClassLoader}, then it adds a rolling file appender to collect the artifact's
+ * logs</li>
  * <li>if the configuration did not include a monitorInterval, then one is set to a default value of 60</li>
  * <li>if the context is standalone, then it adds a rolling file appender associated to the artifact</li>
  * <li>if the context is not standalone, then it just logs to a file named mule-main.log</li>
@@ -63,245 +63,193 @@ import org.apache.logging.log4j.core.util.FileWatcher;
  *
  * @since 3.6.0
  */
-final class LoggerContextConfigurer
-{
+final class LoggerContextConfigurer {
 
-    private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
-    private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
-    private static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
-    private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
-    static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
-    static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
+  private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
+  private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
+  private static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
+  private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
+  static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
+  static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
 
-    protected void configure(MuleLoggerContext context)
-    {
-        disableShutdownHook(context);
-        configureMonitor(context);
+  protected void configure(MuleLoggerContext context) {
+    disableShutdownHook(context);
+    configureMonitor(context);
+  }
+
+  protected void update(MuleLoggerContext context) {
+    boolean forceConsoleLog = System.getProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG) != null;
+
+    if (context.getConfigFile() == null && !forceConsoleLog) {
+      removeConsoleAppender(context);
     }
 
-    protected void update(MuleLoggerContext context)
-    {
-        boolean forceConsoleLog = System.getProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG) != null;
-
-        if (context.getConfigFile() == null && !forceConsoleLog)
-        {
-            removeConsoleAppender(context);
-        }
-
-        if (context.isArtifactClassloader())
-        {
-            addDefaultArtifactContext(context);
-        }
-        else if (!context.isStandlone())
-        {
-            addDefaultAppender(context, "mule-main.log");
-        }
-
-        if (forceConsoleLog && !hasAppender(context, ConsoleAppender.class))
-        {
-            forceConsoleAppender(context);
-        }
+    if (context.isArtifactClassloader()) {
+      addDefaultArtifactContext(context);
+    } else if (!context.isStandlone()) {
+      addDefaultAppender(context, "mule-main.log");
     }
 
-    private void disableShutdownHook(LoggerContext context)
-    {
-        try
-        {
-            ClassUtils.setFieldValue(context.getConfiguration(), "isShutdownHookEnabled", false, true);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
-        }
+    if (forceConsoleLog && !hasAppender(context, ConsoleAppender.class)) {
+      forceConsoleAppender(context);
+    }
+  }
 
+  private void disableShutdownHook(LoggerContext context) {
+    try {
+      ClassUtils.setFieldValue(context.getConfiguration(), "isShutdownHookEnabled", false, true);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(MessageFactory
+          .createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
     }
 
-    private void configureMonitor(MuleLoggerContext context)
-    {
-        Configuration configuration = context.getConfiguration();
-        File configFile = null;
-        if (context.getConfigFile() != null)
-        {
-            configFile = new File(context.getConfigFile().getPath());
-        }
-        else if (!StringUtils.isEmpty(configuration.getName()))
-        {
-            configFile = new File(configuration.getName());
-        }
+  }
 
-        if (configFile != null && configuration instanceof Reconfigurable)
-        {
-            configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
-            FileWatcher watcher = new ConfiguratonFileWatcher((Reconfigurable) configuration, getListeners(configuration));
-            configuration.getWatchManager().watchFile(configFile, watcher);
-        }
+  private void configureMonitor(MuleLoggerContext context) {
+    Configuration configuration = context.getConfiguration();
+    File configFile = null;
+    if (context.getConfigFile() != null) {
+      configFile = new File(context.getConfigFile().getPath());
+    } else if (!StringUtils.isEmpty(configuration.getName())) {
+      configFile = new File(configuration.getName());
     }
 
-    private List<ConfigurationListener> getListeners(Configuration configuration)
-    {
-        try
-        {
-            return ClassUtils.getFieldValue(configuration, "listeners", true);
+    if (configFile != null && configuration instanceof Reconfigurable) {
+      configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
+      FileWatcher watcher = new ConfiguratonFileWatcher((Reconfigurable) configuration, getListeners(configuration));
+      configuration.getWatchManager().watchFile(configFile, watcher);
+    }
+  }
+
+  private List<ConfigurationListener> getListeners(Configuration configuration) {
+    try {
+      return ClassUtils.getFieldValue(configuration, "listeners", true);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not get listeners. Unexpected configuration type"),
+                                     e);
+    }
+  }
+
+  private void addDefaultAppender(MuleLoggerContext context, String logFilePath) {
+    RollingFileAppender appender =
+        createRollingFileAppender(logFilePath, ".%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
+    doAddAppender(context, appender);
+  }
+
+  private void forceConsoleAppender(MuleLoggerContext context) {
+    Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null,
+                                                       FORCED_CONSOLE_APPENDER_NAME, null, null);
+    doAddAppender(context, appender);
+  }
+
+  private void doAddAppender(LoggerContext context, Appender appender) {
+    appender.start();
+    context.getConfiguration().addAppender(appender);
+    getRootLogger(context).addAppender(appender, Level.ALL, null);
+  }
+
+  private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName,
+                                                        Configuration configuration) {
+    TriggeringPolicy triggeringPolicy = TimeBasedTriggeringPolicy.createPolicy("1", "true");
+    RolloverStrategy rolloverStrategy = DefaultRolloverStrategy
+        .createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), null, true, configuration);
+
+    return RollingFileAppender.createAppender(logFilePath, logFilePath + filePattern, "true", appenderName, "true", null, null,
+                                              triggeringPolicy, rolloverStrategy, createLayout(configuration), null, null, null,
+                                              null, configuration);
+  }
+
+  private Layout<? extends Serializable> createLayout(Configuration configuration) {
+    return PatternLayout.createLayout(PATTERN_LAYOUT, null, configuration, null, null, true, false, null, null);
+  }
+
+
+  private void addDefaultArtifactContext(MuleLoggerContext context) {
+    String logFileNameTemplate = getFilenamePattern(context);
+
+    if (logFileNameTemplate == null) {
+      return;
+    }
+
+    String artifactName = context.getArtifactName();
+
+    String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
+    File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
+    File logFile = new File(logDir, logName);
+
+    if (context.getConfigLocation() == null) {
+
+      addDefaultAppender(context, logFile.getAbsolutePath());
+    } else {
+      // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then
+      // configure a default one
+      if (isUrlInsideDirectory(context.getConfigFile(), MuleContainerBootstrapUtils.getMuleConfDir())) {
+        if (!hasFileAppender(context)) {
+          addDefaultAppender(context, logFile.getAbsolutePath());
+          removeConsoleAppender(context);
         }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not get listeners. Unexpected configuration type"), e);
+      }
+    }
+  }
+
+  private void removeConsoleAppender(LoggerContext context) {
+    for (Appender appender : getRootLogger(context).getAppenders().values()) {
+      if (appender instanceof ConsoleAppender) {
+        removeAppender(context, appender);
+        getRootLogger(context).removeAppender(appender.getName());
+      }
+    }
+  }
+
+  private boolean hasFileAppender(LoggerContext context) {
+    return hasAppender(context, FileAppender.class, RollingFileAppender.class, RandomAccessFileAppender.class);
+  }
+
+  private boolean hasAppender(LoggerContext context, Class<? extends Appender>... appenderTypes) {
+    for (Appender appender : getRootLogger(context).getAppenders().values()) {
+      for (Class<? extends Appender> appenderType : appenderTypes) {
+        if (appenderType.isInstance(appender)) {
+          return true;
         }
+      }
     }
 
-    private void addDefaultAppender(MuleLoggerContext context, String logFilePath)
-    {
-        RollingFileAppender appender = createRollingFileAppender(logFilePath, ".%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
-        doAddAppender(context, appender);
+    return false;
+  }
+
+  private boolean isUrlInsideDirectory(URI uri, File directory) {
+    if (uri == null) {
+      return false;
     }
 
-    private void forceConsoleAppender(MuleLoggerContext context)
-    {
-        Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null, FORCED_CONSOLE_APPENDER_NAME, null, null);
-        doAddAppender(context, appender);
+    URL url;
+    try {
+      url = uri.toURL();
+    } catch (MalformedURLException e) {
+      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not locate file " + uri), e);
     }
 
-    private void doAddAppender(LoggerContext context, Appender appender)
-    {
-        appender.start();
-        context.getConfiguration().addAppender(appender);
-        getRootLogger(context).addAppender(appender, Level.ALL, null);
+    if (directory != null && FileUtils.isFile(url)) {
+      File urlFile = new File(url.getFile());
+      return directory.equals(urlFile.getParentFile());
     }
 
-    private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName, Configuration configuration)
-    {
-        TriggeringPolicy triggeringPolicy = TimeBasedTriggeringPolicy.createPolicy("1", "true");
-        RolloverStrategy rolloverStrategy = DefaultRolloverStrategy.createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), null, true, configuration);
+    return false;
+  }
 
-        return RollingFileAppender.createAppender(logFilePath,
-                                                  logFilePath + filePattern,
-                                                  "true",
-                                                  appenderName,
-                                                  "true",
-                                                  null, null,
-                                                  triggeringPolicy,
-                                                  rolloverStrategy,
-                                                  createLayout(configuration),
-                                                  null, null, null, null,
-                                                  configuration);
+  private String getFilenamePattern(MuleLoggerContext context) {
+    if (context.isArtifactClassloader()) {
+      return context.isApplicationClassloader() ? MULE_APP_LOG_FILE_TEMPLATE : MULE_DOMAIN_LOG_FILE_TEMPLATE;
     }
 
-    private Layout<? extends Serializable> createLayout(Configuration configuration)
-    {
-        return PatternLayout.createLayout(PATTERN_LAYOUT, null, configuration, null, null, true, false, null, null);
-    }
+    return null;
+  }
 
+  private LoggerConfig getRootLogger(LoggerContext context) {
+    return ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+  }
 
-    private void addDefaultArtifactContext(MuleLoggerContext context)
-    {
-        String logFileNameTemplate = getFilenamePattern(context);
-
-        if (logFileNameTemplate == null)
-        {
-            return;
-        }
-
-        String artifactName = context.getArtifactName();
-
-        String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
-        File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
-        File logFile = new File(logDir, logName);
-
-        if (context.getConfigLocation() == null)
-        {
-
-            addDefaultAppender(context, logFile.getAbsolutePath());
-        }
-        else
-        {
-            // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then configure a default one
-            if (isUrlInsideDirectory(context.getConfigFile(), MuleContainerBootstrapUtils.getMuleConfDir()))
-            {
-                if (!hasFileAppender(context))
-                {
-                    addDefaultAppender(context, logFile.getAbsolutePath());
-                    removeConsoleAppender(context);
-                }
-            }
-        }
-    }
-
-    private void removeConsoleAppender(LoggerContext context)
-    {
-        for (Appender appender : getRootLogger(context).getAppenders().values())
-        {
-            if (appender instanceof ConsoleAppender)
-            {
-                removeAppender(context, appender);
-                getRootLogger(context).removeAppender(appender.getName());
-            }
-        }
-    }
-
-    private boolean hasFileAppender(LoggerContext context)
-    {
-        return hasAppender(context, FileAppender.class, RollingFileAppender.class, RandomAccessFileAppender.class);
-    }
-
-    private boolean hasAppender(LoggerContext context, Class<? extends Appender>... appenderTypes)
-    {
-        for (Appender appender : getRootLogger(context).getAppenders().values())
-        {
-            for (Class<? extends Appender> appenderType : appenderTypes)
-            {
-                if (appenderType.isInstance(appender))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isUrlInsideDirectory(URI uri, File directory)
-    {
-        if (uri == null)
-        {
-            return false;
-        }
-
-        URL url;
-        try
-        {
-            url = uri.toURL();
-        }
-        catch (MalformedURLException e)
-        {
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not locate file " + uri), e);
-        }
-
-        if (directory != null && FileUtils.isFile(url))
-        {
-            File urlFile = new File(url.getFile());
-            return directory.equals(urlFile.getParentFile());
-        }
-
-        return false;
-    }
-
-    private String getFilenamePattern(MuleLoggerContext context)
-    {
-        if (context.isArtifactClassloader())
-        {
-            return context.isApplicationClassloader() ? MULE_APP_LOG_FILE_TEMPLATE : MULE_DOMAIN_LOG_FILE_TEMPLATE;
-        }
-
-        return null;
-    }
-
-    private LoggerConfig getRootLogger(LoggerContext context)
-    {
-        return ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-    }
-
-    private void removeAppender(LoggerContext context, Appender appender)
-    {
-        ((AbstractConfiguration) context.getConfiguration()).removeAppender(appender.getName());
-    }
+  private void removeAppender(LoggerContext context, Appender appender) {
+    ((AbstractConfiguration) context.getConfiguration()).removeAppender(appender.getName());
+  }
 }

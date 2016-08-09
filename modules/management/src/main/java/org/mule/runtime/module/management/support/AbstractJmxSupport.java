@@ -15,79 +15,70 @@ import java.util.List;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
-public abstract class AbstractJmxSupport implements JmxSupport
-{
+public abstract class AbstractJmxSupport implements JmxSupport {
 
-    /**
-     * Resolve JMX domain clash by adding an incremented number suffix to the name. E.g. if
-     * 'Mule.TradeProcessor' is already registered with the accessible MBeanServer, will return
-     * 'Mule.TradeProcessor.1'. If the latter one is already registered, will return
-     * 'Mule.TradeProcessor.2' and so on.
-     * <p/>
-     * If no clash detected, returns the domain name unmodified.
-     * @param domain domain name causing a conflict
-     * @return resolved non-conflicting domain name
-     */
-    protected String resolveDomainClash(String domain)
-    {
-        List servers = MBeanServerFactory.findMBeanServer(null);
-        if (servers.isEmpty())
-        {
-            throw new IllegalStateException("MBeanServer is not available.");
-        }
-        MBeanServer server = (MBeanServer) servers.get(0);
+  /**
+   * Resolve JMX domain clash by adding an incremented number suffix to the name. E.g. if 'Mule.TradeProcessor' is already
+   * registered with the accessible MBeanServer, will return 'Mule.TradeProcessor.1'. If the latter one is already registered,
+   * will return 'Mule.TradeProcessor.2' and so on.
+   * <p/>
+   * If no clash detected, returns the domain name unmodified.
+   * 
+   * @param domain domain name causing a conflict
+   * @return resolved non-conflicting domain name
+   */
+  protected String resolveDomainClash(String domain) {
+    List servers = MBeanServerFactory.findMBeanServer(null);
+    if (servers.isEmpty()) {
+      throw new IllegalStateException("MBeanServer is not available.");
+    }
+    MBeanServer server = (MBeanServer) servers.get(0);
 
-        Collection registeredDomains = getDomains(server);
-        int counter = 1;
-        // Just append .<n> suffix to the domain for a start
-        if (registeredDomains.contains(domain))
-        {
-            domain += "." + counter;
-        }
-        // recheck in case there were any suffixed domains already
-        while (registeredDomains.contains(domain))
-        {
-            // append .<n> until we succeed
-            domain = domain.substring(0, domain.lastIndexOf(".") + 1) + ++counter;
-        }
-
-        return domain;
+    Collection registeredDomains = getDomains(server);
+    int counter = 1;
+    // Just append .<n> suffix to the domain for a start
+    if (registeredDomains.contains(domain)) {
+      domain += "." + counter;
+    }
+    // recheck in case there were any suffixed domains already
+    while (registeredDomains.contains(domain)) {
+      // append .<n> until we succeed
+      domain = domain.substring(0, domain.lastIndexOf(".") + 1) + ++counter;
     }
 
-    /**
-     * List all domains of this MBean server.
-     * @param server server to contact
-     * @return a collection of unique JMX domains
-     */
-    protected abstract Collection getDomains(MBeanServer server);
+    return domain;
+  }
 
-    /** {@inheritDoc} */
-    public String getDomainName(MuleContext context)
-    {
-        return getDomainName(context, true);
+  /**
+   * List all domains of this MBean server.
+   * 
+   * @param server server to contact
+   * @return a collection of unique JMX domains
+   */
+  protected abstract Collection getDomains(MBeanServer server);
+
+  /** {@inheritDoc} */
+  public String getDomainName(MuleContext context) {
+    return getDomainName(context, true);
+  }
+
+  public String getDomainName(MuleContext context, boolean resolveClash) {
+    String domain = DEFAULT_JMX_DOMAIN_PREFIX;
+    String instanceId = StringUtils.defaultString(context.getConfiguration().getId());
+    if (instanceId.length() > 0) {
+      domain += "." + instanceId;
     }
 
-    public String getDomainName(MuleContext context, boolean resolveClash)
-    {
-        String domain = DEFAULT_JMX_DOMAIN_PREFIX;
-        String instanceId = StringUtils.defaultString(context.getConfiguration().getId());
-        if (instanceId.length() > 0)
-        {
-            domain += "." + instanceId;
-        }
+    JmxRegistrationContext ctx = JmxRegistrationContext.getCurrent(context);
 
-        JmxRegistrationContext ctx = JmxRegistrationContext.getCurrent(context);
-
-        String resolvedDomain = ctx.getResolvedDomain();
-        if (resolveClash)
-        {
-            if (StringUtils.isBlank(resolvedDomain))
-            {
-                domain = resolveDomainClash(domain);
-                ctx.setResolvedDomain(domain);
-            }
-        }
-
-        return domain;
+    String resolvedDomain = ctx.getResolvedDomain();
+    if (resolveClash) {
+      if (StringUtils.isBlank(resolvedDomain)) {
+        domain = resolveDomainClash(domain);
+        ctx.setResolvedDomain(domain);
+      }
     }
+
+    return domain;
+  }
 }

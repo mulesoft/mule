@@ -16,49 +16,40 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 /**
- *  Parses transformers message processors to map data type attributes
- *  to a {@link DataType}
+ * Parses transformers message processors to map data type attributes to a {@link DataType}
  *
- *  @since 4.0.0
+ * @since 4.0.0
  */
-public class TransformerMessageProcessorDefinitionParser extends MessageProcessorWithDataTypeDefinitionParser
-{
+public class TransformerMessageProcessorDefinitionParser extends MessageProcessorWithDataTypeDefinitionParser {
 
-    private static final String RETURN_CLASS = "returnClass";
+  private static final String RETURN_CLASS = "returnClass";
 
-    public TransformerMessageProcessorDefinitionParser(Class messageProcessor)
-    {
-        super(messageProcessor);
+  public TransformerMessageProcessorDefinitionParser(Class messageProcessor) {
+    super(messageProcessor);
+  }
+
+  public TransformerMessageProcessorDefinitionParser() {
+    super();
+  }
+
+  @Override
+  protected void removeDataTypeProperties(MutablePropertyValues props) {
+    props.removePropertyValue(RETURN_CLASS);
+    super.removeDataTypeProperties(props);
+  }
+
+  @Override
+  protected AbstractBeanDefinition parseDataType(PropertyValues sourceProperties) {
+    if (sourceProperties.contains(RETURN_CLASS) || isDataTypeConfigured(sourceProperties)) {
+      return buildDataTypeDefinition(getClassName(sourceProperties), sourceProperties);
+    } else {
+      return null;
     }
+  }
 
-    public TransformerMessageProcessorDefinitionParser()
-    {
-        super();
-    }
-
-    @Override
-    protected void removeDataTypeProperties(MutablePropertyValues props)
-    {
-        props.removePropertyValue(RETURN_CLASS);
-        super.removeDataTypeProperties(props);
-    }
-
-    @Override
-    protected AbstractBeanDefinition parseDataType(PropertyValues sourceProperties)
-    {
-        if (sourceProperties.contains(RETURN_CLASS) || isDataTypeConfigured(sourceProperties))
-        {
-            return buildDataTypeDefinition(getClassName(sourceProperties), sourceProperties);
-        }
-        else
-        {
-             return null;
-        }
-    }
-
-    private String getClassName(PropertyValues sourceProperties)
-    {
-        return (String) (sourceProperties.contains(RETURN_CLASS) ? sourceProperties.getPropertyValue(RETURN_CLASS).getValue() : Object.class.getName());
-    }
+  private String getClassName(PropertyValues sourceProperties) {
+    return (String) (sourceProperties.contains(RETURN_CLASS) ? sourceProperties.getPropertyValue(RETURN_CLASS).getValue()
+        : Object.class.getName());
+  }
 
 }

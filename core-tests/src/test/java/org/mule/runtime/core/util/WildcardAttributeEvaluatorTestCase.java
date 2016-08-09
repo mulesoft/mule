@@ -17,70 +17,61 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
-public class WildcardAttributeEvaluatorTestCase extends AbstractMuleTestCase
-{
-    @Test
-    public void testStartsWithWildcard()
-    {
-        List<String> testValues = Arrays.asList("MULE", "MULEMAN", "EMULE","MULE\\*","\\*MULE");
-        List<String> expectedValues = Arrays.asList("MULE", "MULEMAN","MULE\\*");
-        testScenario("MULE*", testValues,expectedValues);
-    }
+public class WildcardAttributeEvaluatorTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testEndsWithWildcard()
-    {
-        List<String> testValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN","\\*MULE","MULE\\*");
-        List<String> expectedValues = Arrays.asList("MULE", "EMULE","\\*MULE");
-        testScenario("*MULE", testValues,expectedValues);
-    }
+  @Test
+  public void testStartsWithWildcard() {
+    List<String> testValues = Arrays.asList("MULE", "MULEMAN", "EMULE", "MULE\\*", "\\*MULE");
+    List<String> expectedValues = Arrays.asList("MULE", "MULEMAN", "MULE\\*");
+    testScenario("MULE*", testValues, expectedValues);
+  }
 
-    @Test
-    public void testAllWildcard()
-    {
-        List<String> testValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN","\\*MULE","MULE\\*");
-        List<String> expectedValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN","\\*MULE","MULE\\*");
-        testScenario("*", testValues,expectedValues);
-    }
+  @Test
+  public void testEndsWithWildcard() {
+    List<String> testValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN", "\\*MULE", "MULE\\*");
+    List<String> expectedValues = Arrays.asList("MULE", "EMULE", "\\*MULE");
+    testScenario("*MULE", testValues, expectedValues);
+  }
 
-    @Test
-    public void testWithEscapedCharactersOnly()
-    {
-        WildcardAttributeEvaluator wildcardAttributeEvaluator = new WildcardAttributeEvaluator("\\*");
-        Assert.assertThat(wildcardAttributeEvaluator.hasWildcards(),Is.is(false));
-    }
+  @Test
+  public void testAllWildcard() {
+    List<String> testValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN", "\\*MULE", "MULE\\*");
+    List<String> expectedValues = Arrays.asList("MULE", "EMULE", "MAN-MULE-MAN", "\\*MULE", "MULE\\*");
+    testScenario("*", testValues, expectedValues);
+  }
 
-    @Test
-    public void testWithEscapedCharactersAndWildcards()
-    {
-        List<String> testValues = Arrays.asList("\\*MULE", "EMULE", "MAN-MULE-MAN","","MULE\\*","\\*MULE\\*");
-        List<String> expectedValues = Arrays.asList("\\*MULE", "\\*MULE\\*");
-        testScenario("\\*MULE*",testValues, expectedValues);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testCallConstructorWithNull()
-    {
-        new WildcardAttributeEvaluator(null);
-    }
+  @Test
+  public void testWithEscapedCharactersOnly() {
+    WildcardAttributeEvaluator wildcardAttributeEvaluator = new WildcardAttributeEvaluator("\\*");
+    Assert.assertThat(wildcardAttributeEvaluator.hasWildcards(), Is.is(false));
+  }
 
-    private void testScenario(String attributeValue, final List<String> testValues, final List<String> expectedValues)
-    {
-        WildcardAttributeEvaluator wildcardAttributeEvaluator = new WildcardAttributeEvaluator(attributeValue);
-        assertThat(wildcardAttributeEvaluator.hasWildcards(), Is.is(true));
-        final List<String> resultingValues = new ArrayList<String>();
-        wildcardAttributeEvaluator.processValues(testValues, new WildcardAttributeEvaluator.MatchCallback()
-        {
-            @Override
-            public void processMatch(String matchedValue)
-            {
-                resultingValues.add(matchedValue);
-            }
-        });
-        assertThat(expectedValues.size(),Is.is(resultingValues.size()));
-        for (String expectedValue : expectedValues)
-        {
-            assertThat(resultingValues.contains(expectedValue),Is.is(true));
-        }
+  @Test
+  public void testWithEscapedCharactersAndWildcards() {
+    List<String> testValues = Arrays.asList("\\*MULE", "EMULE", "MAN-MULE-MAN", "", "MULE\\*", "\\*MULE\\*");
+    List<String> expectedValues = Arrays.asList("\\*MULE", "\\*MULE\\*");
+    testScenario("\\*MULE*", testValues, expectedValues);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCallConstructorWithNull() {
+    new WildcardAttributeEvaluator(null);
+  }
+
+  private void testScenario(String attributeValue, final List<String> testValues, final List<String> expectedValues) {
+    WildcardAttributeEvaluator wildcardAttributeEvaluator = new WildcardAttributeEvaluator(attributeValue);
+    assertThat(wildcardAttributeEvaluator.hasWildcards(), Is.is(true));
+    final List<String> resultingValues = new ArrayList<String>();
+    wildcardAttributeEvaluator.processValues(testValues, new WildcardAttributeEvaluator.MatchCallback() {
+
+      @Override
+      public void processMatch(String matchedValue) {
+        resultingValues.add(matchedValue);
+      }
+    });
+    assertThat(expectedValues.size(), Is.is(resultingValues.size()));
+    for (String expectedValue : expectedValues) {
+      assertThat(resultingValues.contains(expectedValue), Is.is(true));
     }
+  }
 }

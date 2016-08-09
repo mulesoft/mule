@@ -35,109 +35,108 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class PhaseExecutionEngineTestCase
-{
+public class PhaseExecutionEngineTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SystemExceptionHandler mockExceptionHandler;
-    private List<MessageProcessPhase> phaseList = new ArrayList<MessageProcessPhase>();
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private EndProcessPhase mockEndPhase;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessPhase mockProcessPhase1;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessPhase mockProcessPhase2;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessPhase mockProcessPhase3;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessPhase mockFailingPhase;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private EndPhaseTemplate mockTemplate;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessContext mockContext;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private PhaseResultNotifier mockNotifier;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SystemExceptionHandler mockExceptionHandler;
+  private List<MessageProcessPhase> phaseList = new ArrayList<MessageProcessPhase>();
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private EndProcessPhase mockEndPhase;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessPhase mockProcessPhase1;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessPhase mockProcessPhase2;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessPhase mockProcessPhase3;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessPhase mockFailingPhase;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private EndPhaseTemplate mockTemplate;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessContext mockContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private PhaseResultNotifier mockNotifier;
 
-    @Test
-    public void allPhasesRun() throws Exception
-    {
-        when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(true);
-        verifyAllPhasesAreRun();
-        verify(mockEndPhase, Mockito.times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  @Test
+  public void allPhasesRun() throws Exception {
+    when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(true);
+    verifyAllPhasesAreRun();
+    verify(mockEndPhase, Mockito.times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                                    any(PhaseResultNotifier.class));
+  }
 
-    @Test
-    public void endPhaseDoesNotRun() throws Exception
-    {
-        when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(false);
-        verifyAllPhasesAreRun();
-        verify(mockEndPhase, Mockito.times(0)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  @Test
+  public void endPhaseDoesNotRun() throws Exception {
+    when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(false);
+    verifyAllPhasesAreRun();
+    verify(mockEndPhase, Mockito.times(0)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                                    any(PhaseResultNotifier.class));
+  }
 
-    @Test
-    public void exceptionHandlerIsCalledOnFailure() throws Exception
-    {
-        addSupportedPhase(mockFailingPhase);
-        addSupportedPhase(mockProcessPhase1);
-        when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(true);
-        PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
-        phaseExecutionEngine.process(mockTemplate,mockContext);
-        verify(mockEndPhase,times(1)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  @Test
+  public void exceptionHandlerIsCalledOnFailure() throws Exception {
+    addSupportedPhase(mockFailingPhase);
+    addSupportedPhase(mockProcessPhase1);
+    when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(true);
+    PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
+    phaseExecutionEngine.process(mockTemplate, mockContext);
+    verify(mockEndPhase, times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                            any(PhaseResultNotifier.class));
+  }
 
-    @Test
-    public void phaseItsNoSupportedThenNextPhaseExecutes() throws Exception
-    {
-        addSupportedPhase(mockProcessPhase1);
-        addNotSupportedPhase(mockProcessPhase2);
-        addSupportedPhase(mockProcessPhase3);
-        when(mockProcessPhase2.supportsTemplate(mockTemplate)).thenReturn(false);
-        PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
-        phaseExecutionEngine.process(mockTemplate, mockContext);
-        verify(mockProcessPhase1,times(1)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-        verify(mockProcessPhase2,times(0)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-        verify(mockProcessPhase3,times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  @Test
+  public void phaseItsNoSupportedThenNextPhaseExecutes() throws Exception {
+    addSupportedPhase(mockProcessPhase1);
+    addNotSupportedPhase(mockProcessPhase2);
+    addSupportedPhase(mockProcessPhase3);
+    when(mockProcessPhase2.supportsTemplate(mockTemplate)).thenReturn(false);
+    PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
+    phaseExecutionEngine.process(mockTemplate, mockContext);
+    verify(mockProcessPhase1, times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                                 any(PhaseResultNotifier.class));
+    verify(mockProcessPhase2, times(0)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                                 any(PhaseResultNotifier.class));
+    verify(mockProcessPhase3, times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class),
+                                                 any(PhaseResultNotifier.class));
+  }
 
-    private void verifyAllPhasesAreRun()
-    {
-        PhaseExecutionEngine engine = new PhaseExecutionEngine(phaseList,mockExceptionHandler, mockEndPhase);
-        addAllPhases();
-        engine.process(mockTemplate, mockContext);
-        verify(mockProcessPhase1, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-        verify(mockProcessPhase2, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-        verify(mockProcessPhase3, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  private void verifyAllPhasesAreRun() {
+    PhaseExecutionEngine engine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
+    addAllPhases();
+    engine.process(mockTemplate, mockContext);
+    verify(mockProcessPhase1, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
+                                                         any(PhaseResultNotifier.class));
+    verify(mockProcessPhase2, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
+                                                         any(PhaseResultNotifier.class));
+    verify(mockProcessPhase3, Mockito.times(1)).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
+                                                         any(PhaseResultNotifier.class));
+  }
 
-    private void addAllPhases()
-    {
-        addSupportedPhase(mockProcessPhase1);
-        addSupportedPhase(mockProcessPhase2);
-        addSupportedPhase(mockProcessPhase3);
-    }
+  private void addAllPhases() {
+    addSupportedPhase(mockProcessPhase1);
+    addSupportedPhase(mockProcessPhase2);
+    addSupportedPhase(mockProcessPhase3);
+  }
 
-    private void addSupportedPhase(MessageProcessPhase mockProcessPhase)
-    {
-        addPhase(mockProcessPhase, true);
-    }
+  private void addSupportedPhase(MessageProcessPhase mockProcessPhase) {
+    addPhase(mockProcessPhase, true);
+  }
 
-    private void addNotSupportedPhase(MessageProcessPhase mockProcessPhase)
-    {
-        addPhase(mockProcessPhase, false);
-    }
+  private void addNotSupportedPhase(MessageProcessPhase mockProcessPhase) {
+    addPhase(mockProcessPhase, false);
+  }
 
-    private void addPhase(MessageProcessPhase mockProcessPhase, boolean supportsTemplate)
-    {
-        phaseList.add(mockProcessPhase);
-        when(mockProcessPhase.supportsTemplate(mockTemplate)).thenReturn(supportsTemplate);
-        Mockito.doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                ((PhaseResultNotifier)invocationOnMock.getArguments()[2]).phaseSuccessfully();
-                return null;
-            }
-        }).when(mockProcessPhase).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
-    }
+  private void addPhase(MessageProcessPhase mockProcessPhase, boolean supportsTemplate) {
+    phaseList.add(mockProcessPhase);
+    when(mockProcessPhase.supportsTemplate(mockTemplate)).thenReturn(supportsTemplate);
+    Mockito.doAnswer(new Answer() {
+
+      @Override
+      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+        ((PhaseResultNotifier) invocationOnMock.getArguments()[2]).phaseSuccessfully();
+        return null;
+      }
+    }).when(mockProcessPhase).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
+                                       any(PhaseResultNotifier.class));
+  }
 }

@@ -22,40 +22,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link ModelEnricher} that's only applicable when invoked in the context of an annotations
- * {@link Processor}.
+ * Implementation of {@link ModelEnricher} that's only applicable when invoked in the context of an annotations {@link Processor}.
  * <p/>
- * This post processor uses the APT API to access the AST tree and extract the extensions
- * javadocs which are used to enrich the extension's descriptions.
+ * This post processor uses the APT API to access the AST tree and extract the extensions javadocs which are used to enrich the
+ * extension's descriptions.
  * <p/>
- * For this to be possible, the context should have as custom parameters a {@link ProcessingEnvironment}
- * and the corresponding {@link TypeElement}, which will be fetched in the
- * provided context under the keys {@link ExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
+ * For this to be possible, the context should have as custom parameters a {@link ProcessingEnvironment} and the corresponding
+ * {@link TypeElement}, which will be fetched in the provided context under the keys
+ * {@link ExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
  * {@link ExtensionResourcesGeneratorAnnotationProcessor#EXTENSION_ELEMENT}.
  * <p/>
  * If any of the above requirements is not met, then this enricher will return without side effects
  *
  * @since 3.7.0
  */
-public final class SchemaDocumenterModelEnricher implements ModelEnricher
-{
+public final class SchemaDocumenterModelEnricher implements ModelEnricher {
 
-    private static Logger logger = LoggerFactory.getLogger(SchemaDocumenterModelEnricher.class);
+  private static Logger logger = LoggerFactory.getLogger(SchemaDocumenterModelEnricher.class);
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        ProcessingEnvironment processingEnv = describingContext.getParameter(PROCESSING_ENVIRONMENT, ProcessingEnvironment.class);
-        TypeElement extensionElement = describingContext.getParameter(EXTENSION_ELEMENT, TypeElement.class);
-        RoundEnvironment roundEnvironment = describingContext.getParameter(ROUND_ENVIRONMENT, RoundEnvironment.class);
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    ProcessingEnvironment processingEnv = describingContext.getParameter(PROCESSING_ENVIRONMENT, ProcessingEnvironment.class);
+    TypeElement extensionElement = describingContext.getParameter(EXTENSION_ELEMENT, TypeElement.class);
+    RoundEnvironment roundEnvironment = describingContext.getParameter(ROUND_ENVIRONMENT, RoundEnvironment.class);
 
-        if (processingEnv == null || extensionElement == null)
-        {
-            logger.debug("processing environment or extension element not provided. Skipping");
-            return;
-        }
-
-        new SchemaDocumenter(processingEnv).document(describingContext.getExtensionDeclarer().getDeclaration(), extensionElement, roundEnvironment);
-
+    if (processingEnv == null || extensionElement == null) {
+      logger.debug("processing environment or extension element not provided. Skipping");
+      return;
     }
+
+    new SchemaDocumenter(processingEnv).document(describingContext.getExtensionDeclarer().getDeclaration(), extensionElement,
+                                                 roundEnvironment);
+
+  }
 }

@@ -16,59 +16,48 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ClassOrRefDefinitionParser extends AbstractBeanDefinitionParser
-{
-    private String propertyName;
+public class ClassOrRefDefinitionParser extends AbstractBeanDefinitionParser {
 
-    public ClassOrRefDefinitionParser(String propertyName)
-    {
-        super();
-        
-        if (StringUtils.isEmpty(propertyName))
-        {
-            throw new IllegalArgumentException("propertyName cannot be null");
-        }
-        this.propertyName = propertyName;
+  private String propertyName;
+
+  public ClassOrRefDefinitionParser(String propertyName) {
+    super();
+
+    if (StringUtils.isEmpty(propertyName)) {
+      throw new IllegalArgumentException("propertyName cannot be null");
     }
-    
-    @Override
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        MutablePropertyValues parentProps = parserContext.getContainingBeanDefinition().getPropertyValues();
+    this.propertyName = propertyName;
+  }
 
-        String ref = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-        String className = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
+  @Override
+  protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+    MutablePropertyValues parentProps = parserContext.getContainingBeanDefinition().getPropertyValues();
 
-        if (StringUtils.isBlank(ref) && StringUtils.isBlank(className))
-        {
-            String elementName = element.getLocalName();
-            throw new IllegalArgumentException("Neither ref nor class attribute specified for the "
-                + elementName + " element");
-        }
-        
-        if (StringUtils.isNotBlank(ref))
-        {
-            // add a ref to other bean
-            parentProps.addPropertyValue(propertyName, new RuntimeBeanReference(ref));
-        }
-        else
-        {
-            // class attributed specified, instantiate and set directly
-            Object instance;
-            try
-            {
-                instance = ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, getClass());
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
+    String ref = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+    String className = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
 
-            parentProps.addPropertyValue(propertyName, instance);
-        }
-
-        return null;
+    if (StringUtils.isBlank(ref) && StringUtils.isBlank(className)) {
+      String elementName = element.getLocalName();
+      throw new IllegalArgumentException("Neither ref nor class attribute specified for the " + elementName + " element");
     }
+
+    if (StringUtils.isNotBlank(ref)) {
+      // add a ref to other bean
+      parentProps.addPropertyValue(propertyName, new RuntimeBeanReference(ref));
+    } else {
+      // class attributed specified, instantiate and set directly
+      Object instance;
+      try {
+        instance = ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, getClass());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      parentProps.addPropertyValue(propertyName, instance);
+    }
+
+    return null;
+  }
 }
 
 

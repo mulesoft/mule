@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
  * 
  * @since 3.0
  */
-public interface MessageProcessorBuilder
-{
-    MessageProcessor build() throws MuleException;
+public interface MessageProcessorBuilder {
+
+  MessageProcessor build() throws MuleException;
 }

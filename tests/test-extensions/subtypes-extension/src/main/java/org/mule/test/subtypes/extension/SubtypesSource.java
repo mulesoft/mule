@@ -10,31 +10,24 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.message.StringAttributes;
 
-public class SubtypesSource extends Source<String, StringAttributes>
-{
+public class SubtypesSource extends Source<String, StringAttributes> {
 
-    @Parameter
-    public Door doorParam;
+  @Parameter
+  public Door doorParam;
 
-    @Override
-    public void start()
-    {
-        if (doorParam == null)
-        {
-            throw new RuntimeException("Door was null");
-        }
-        if (!(doorParam instanceof HouseDoor))
-        {
-            throw new RuntimeException("Expected HouseDoor");
-        }
-        if (((HouseDoor)doorParam).isLocked())
-        {
-            throw new RuntimeException("Expected unlocked door");
-        }
+  @Override
+  public void start() {
+    if (doorParam == null) {
+      throw new RuntimeException("Door was null");
     }
-
-    @Override
-    public void stop()
-    {
+    if (!(doorParam instanceof HouseDoor)) {
+      throw new RuntimeException("Expected HouseDoor");
     }
+    if (((HouseDoor) doorParam).isLocked()) {
+      throw new RuntimeException("Expected unlocked door");
+    }
+  }
+
+  @Override
+  public void stop() {}
 }

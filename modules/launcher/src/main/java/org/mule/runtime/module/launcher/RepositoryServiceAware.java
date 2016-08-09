@@ -11,9 +11,8 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 /**
  * Enables {@link RepositoryService} injection.
  */
-public interface RepositoryServiceAware
-{
+public interface RepositoryServiceAware {
 
-    void setRepositoryService(RepositoryService repositoryService);
+  void setRepositoryService(RepositoryService repositoryService);
 
 }

@@ -14,36 +14,31 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-public class CollectionTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/collection-test.xml";
-    }
+public class CollectionTestCase extends AbstractNamespaceTestCase {
 
-    protected void assertKidsExist(int index)
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
-        assertEquals(index + 1, kids.size());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/collection-test.xml";
+  }
 
-    @Test
-    public void testNamed()
-    {
-        assertKidsExist(1);
-    }
+  protected void assertKidsExist(int index) {
+    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+    Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
+    assertEquals(index + 1, kids.size());
+  }
 
-    @Test
-    public void testOrphan()
-    {
-        assertKidsExist(2);
-    }
+  @Test
+  public void testNamed() {
+    assertKidsExist(1);
+  }
 
-    @Test
-    public void testParent()
-    {
-        assertKidsExist(3);
-    }
+  @Test
+  public void testOrphan() {
+    assertKidsExist(2);
+  }
+
+  @Test
+  public void testParent() {
+    assertKidsExist(3);
+  }
 }

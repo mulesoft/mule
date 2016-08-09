@@ -20,74 +20,69 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class MessageFilterTestCase extends AbstractMuleContextTestCase
-{
+public class MessageFilterTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testFilterPass() throws Exception
-    {
-        MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
-        SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
-        mp.setListener(listener);
+  @Test
+  public void testFilterPass() throws Exception {
+    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
+    SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
+    mp.setListener(listener);
 
-        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
 
-        MuleEvent resultEvent = mp.process(inEvent);
+    MuleEvent resultEvent = mp.process(inEvent);
 
-        assertNotNull(listener.event);
-        assertSame(inEvent, listener.event);
-        assertEquals(inEvent, resultEvent);
-    }
+    assertNotNull(listener.event);
+    assertSame(inEvent, listener.event);
+    assertEquals(inEvent, resultEvent);
+  }
 
-    @Test
-    public void testFilterFail() throws Exception
-    {
-        MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, null);
-        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
-        mp.setListener(out);
+  @Test
+  public void testFilterFail() throws Exception {
+    MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, null);
+    SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+    mp.setListener(out);
 
-        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
 
-        MuleEvent resultEvent = mp.process(inEvent);
+    MuleEvent resultEvent = mp.process(inEvent);
 
-        assertNull(out.event);
-        assertNull(resultEvent);
-    }
+    assertNull(out.event);
+    assertNull(resultEvent);
+  }
 
-    @Test
-    public void testFilterPassUnacceptedMP() throws Exception
-    {
-        MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
-        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
-        SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
-        mp.setListener(out);
-        mp.setUnacceptedMessageProcessor(unaccepted);
+  @Test
+  public void testFilterPassUnacceptedMP() throws Exception {
+    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
+    SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+    SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
+    mp.setListener(out);
+    mp.setUnacceptedMessageProcessor(unaccepted);
 
-        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
 
-        MuleEvent resultEvent = mp.process(inEvent);
+    MuleEvent resultEvent = mp.process(inEvent);
 
-        assertNotNull(out.event);
-        assertSame(inEvent, out.event);
-        assertEquals(inEvent, resultEvent);
-        assertNull(unaccepted.event);
-    }
+    assertNotNull(out.event);
+    assertSame(inEvent, out.event);
+    assertEquals(inEvent, resultEvent);
+    assertNull(unaccepted.event);
+  }
 
-    @Test
-    public void testFilterFailUnacceptedMP() throws Exception
-    {
-        SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
-        MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
-        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
-        mp.setListener(out);
+  @Test
+  public void testFilterFailUnacceptedMP() throws Exception {
+    SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
+    MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
+    SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+    mp.setListener(out);
 
-        MuleEvent inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
+    MuleEvent inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
-        MuleEvent resultEvent = mp.process(inEvent);
+    MuleEvent resultEvent = mp.process(inEvent);
 
-        assertNull(out.event);
-        assertSame(VoidMuleEvent.getInstance(), resultEvent);
-        assertNotNull(unaccepted.event);
-        assertSame(inEvent, unaccepted.event);
-    }
+    assertNull(out.event);
+    assertSame(VoidMuleEvent.getInstance(), resultEvent);
+    assertNotNull(unaccepted.event);
+    assertSame(inEvent, unaccepted.event);
+  }
 }

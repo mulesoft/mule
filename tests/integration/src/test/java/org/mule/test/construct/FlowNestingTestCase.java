@@ -24,72 +24,67 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FlowNestingTestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class FlowNestingTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/construct/flow-nesting-config.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testNestingFiltersAccepted() throws Exception
-    {
-        Map<String, Serializable> inboundProperties = new HashMap<>();
-        inboundProperties.put("Currency", "MyCurrency");
-        inboundProperties.put("AcquirerCountry", "MyCountry");
-        inboundProperties.put("Amount", "4999");
-        flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).asynchronously().run();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/construct/flow-nesting-config.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-    }
-    
-    @Test
-    public void testNestingFiltersRejected() throws Exception
-    {
-        Map<String, Serializable> inboundProperties = new HashMap<>();
-        inboundProperties.put("Currency", "MyCurrency");
-        inboundProperties.put("AcquirerCountry", "MyCountry");
-        inboundProperties.put("Amount", "4999");
-        flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+  @Test
+  public void testNestingFiltersAccepted() throws Exception {
+    Map<String, Serializable> inboundProperties = new HashMap<>();
+    inboundProperties.put("Currency", "MyCurrency");
+    inboundProperties.put("AcquirerCountry", "MyCountry");
+    inboundProperties.put("Amount", "4999");
+    flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
-        assertNull(result);
-    }
-    
-    @Test
-    public void testNestingChoiceAccepted() throws Exception
-    {
-        Map<String, Serializable> inboundProperties = new HashMap<>();
-        inboundProperties.put("AcquirerCountry", "MyCountry");
-        inboundProperties.put("Amount", "4999");
-        flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals("ABC", getPayloadAsString(result));
-    }
-    
-    @Test
-    public void testNestingChoiceRejected() throws Exception
-    {
-        Map<String, Serializable> inboundProperties = new HashMap<>();
-        inboundProperties.put("AcquirerCountry", "MyCountry");
-        inboundProperties.put("Amount", "5000");
-        flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+  @Test
+  public void testNestingFiltersRejected() throws Exception {
+    Map<String, Serializable> inboundProperties = new HashMap<>();
+    inboundProperties.put("Currency", "MyCurrency");
+    inboundProperties.put("AcquirerCountry", "MyCountry");
+    inboundProperties.put("Amount", "4999");
+    flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals("AB", getPayloadAsString(result));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
+    assertNull(result);
+  }
+
+  @Test
+  public void testNestingChoiceAccepted() throws Exception {
+    Map<String, Serializable> inboundProperties = new HashMap<>();
+    inboundProperties.put("AcquirerCountry", "MyCountry");
+    inboundProperties.put("Amount", "4999");
+    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertEquals("ABC", getPayloadAsString(result));
+  }
+
+  @Test
+  public void testNestingChoiceRejected() throws Exception {
+    Map<String, Serializable> inboundProperties = new HashMap<>();
+    inboundProperties.put("AcquirerCountry", "MyCountry");
+    inboundProperties.put("Amount", "5000");
+    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertEquals("AB", getPayloadAsString(result));
+  }
 }
 
 

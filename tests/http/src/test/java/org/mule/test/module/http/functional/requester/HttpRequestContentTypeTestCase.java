@@ -16,36 +16,32 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase {
 
-    private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
+  private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
 
-    @Rule
-    public SystemProperty strictContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
+  @Rule
+  public SystemProperty strictContentType =
+      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-content-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-content-type-config.xml";
+  }
 
-    @Test
-    public void sendsContentTypeOnRequest() throws Exception
-    {
-        verifyContentTypeForFlow("requesterContentType");
-    }
+  @Test
+  public void sendsContentTypeOnRequest() throws Exception {
+    verifyContentTypeForFlow("requesterContentType");
+  }
 
-    @Test
-    public void sendsContentTypeOnRequestBuilder() throws Exception
-    {
-        verifyContentTypeForFlow("requesterBuilderContentType");
-    }
+  @Test
+  public void sendsContentTypeOnRequestBuilder() throws Exception {
+    verifyContentTypeForFlow("requesterBuilderContentType");
+  }
 
-    public void verifyContentTypeForFlow(String flowName) throws Exception
-    {
-        flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
+  public void verifyContentTypeForFlow(String flowName) throws Exception {
+    flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
-        assertThat(getFirstReceivedHeader(CONTENT_TYPE.toLowerCase()), equalTo(EXPECTED_CONTENT_TYPE));
-    }
+    assertThat(getFirstReceivedHeader(CONTENT_TYPE.toLowerCase()), equalTo(EXPECTED_CONTENT_TYPE));
+  }
 }

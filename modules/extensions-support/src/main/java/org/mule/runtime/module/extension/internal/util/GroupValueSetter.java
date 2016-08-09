@@ -25,73 +25,65 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An implementation of {@link ValueSetter} for parameter groups.
- * Parameter groups are a set of parameters defined inside a Pojo in order to reference them
- * as a group and avoid code repetition. The parameter groups are defined by applying
- * the {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotation to a field.
+ * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
+ * in order to reference them as a group and avoid code repetition. The parameter groups are defined by applying the
+ * {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotation to a field.
  * <p/>
- * This {@link ValueSetter} knows how to map a {@link ResolverSetResult} to an object
- * which acts as a group. Because group nesting is allowed, this class is a composite
- * with a {@link #childSetters} collection.
+ * This {@link ValueSetter} knows how to map a {@link ResolverSetResult} to an object which acts as a group. Because group nesting
+ * is allowed, this class is a composite with a {@link #childSetters} collection.
  *
  * @since 3.7.0
  */
-public final class GroupValueSetter implements ValueSetter
-{
+public final class GroupValueSetter implements ValueSetter {
 
-    /**
-     * Returns a {@link List} containing one {@link ValueSetter} instance per each
-     * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup} defined in the {@link ParameterGroupModelProperty} extracted
-     * from the given {@code model}. If {@code model} does not contain such model property
-     * then an empty {@link List} is returned
-     *
-     * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
-     * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
-     */
-    public static List<ValueSetter> settersFor(EnrichableModel model)
-    {
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
+  /**
+   * Returns a {@link List} containing one {@link ValueSetter} instance per each
+   * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup} defined in the
+   * {@link ParameterGroupModelProperty} extracted from the given {@code model}. If {@code model} does not contain such model
+   * property then an empty {@link List} is returned
+   *
+   * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
+   * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
+   */
+  public static List<ValueSetter> settersFor(EnrichableModel model) {
+    Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
 
-        if (parameterGroupModelProperty.isPresent())
-        {
-            return parameterGroupModelProperty.get().getGroups().stream()
-                    .map(group -> new GroupValueSetter(group))
-                    .collect(new ImmutableListCollector<>());
-        }
-
-        return ImmutableList.of();
+    if (parameterGroupModelProperty.isPresent()) {
+      return parameterGroupModelProperty.get().getGroups().stream().map(group -> new GroupValueSetter(group))
+          .collect(new ImmutableListCollector<>());
     }
 
-    private final ParameterGroup<Field> group;
-    private final List<ValueSetter> childSetters;
+    return ImmutableList.of();
+  }
 
-    /**
-     * Creates a new instance that can set values defined in the given {@code group}
-     *
-     * @param group a {@link ParameterGroup}
-     */
-    public GroupValueSetter(ParameterGroup group)
-    {
-        this.group = group;
-        childSetters = settersFor(group);
+  private final ParameterGroup<Field> group;
+  private final List<ValueSetter> childSetters;
+
+  /**
+   * Creates a new instance that can set values defined in the given {@code group}
+   *
+   * @param group a {@link ParameterGroup}
+   */
+  public GroupValueSetter(ParameterGroup group) {
+    this.group = group;
+    childSetters = settersFor(group);
+  }
+
+  @Override
+  public void set(Object target, ResolverSetResult result) throws MuleException {
+    ObjectBuilder<?> groupBuilder = new DefaultObjectBuilder<>(group.getType());
+
+    group.getParameters()
+        .forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
+
+    Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
+
+    Field field = group.getContainer();
+    field.setAccessible(true);
+    setField(field, target, groupValue);
+
+    for (ValueSetter childSetter : childSetters) {
+      childSetter.set(groupValue, result);
     }
-
-    @Override
-    public void set(Object target, ResolverSetResult result) throws MuleException
-    {
-        ObjectBuilder<?> groupBuilder = new DefaultObjectBuilder<>(group.getType());
-
-        group.getParameters().forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
-
-        Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
-
-        Field field = group.getContainer();
-        field.setAccessible(true);
-        setField(field, target, groupValue);
-
-        for (ValueSetter childSetter : childSetters)
-        {
-            childSetter.set(groupValue, result);
-        }
-    }
+  }
 }

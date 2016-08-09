@@ -19,15 +19,13 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
- * A {@link Qualifier} annotation for injecting
- * the application's default {@link TlsContextFactoryBuilder}
+ * A {@link Qualifier} annotation for injecting the application's default {@link TlsContextFactoryBuilder}
  *
  * @since 4.0
  */
 @Qualifier
 @Retention(RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, FIELD, PARAMETER})
-public @interface DefaultTlsContextFactoryBuilder
-{
+public @interface DefaultTlsContextFactoryBuilder {
 
 }

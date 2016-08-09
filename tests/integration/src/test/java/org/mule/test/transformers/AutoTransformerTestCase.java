@@ -18,32 +18,29 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class AutoTransformerTestCase extends AbstractIntegrationTestCase
-{
-    private static Latch latch;
+public class AutoTransformerTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transformer/auto-transformer-test-flow.xml";
+  private static Latch latch;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transformer/auto-transformer-test-flow.xml";
+  }
+
+  @Test
+  public void testInboundAutoTransform() throws Exception {
+    latch = new Latch();
+    flowRunner("test").withPayload(new FruitBowl(new Apple(), new Banana())).asynchronously().run();
+
+    assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+  }
+
+  public static class FruitBasketComponent {
+
+    public void process(FruitBasket fb) {
+      assertTrue(fb.hasApple());
+      assertTrue(fb.hasBanana());
+      latch.countDown();
     }
-
-    @Test
-    public void testInboundAutoTransform() throws Exception
-    {
-        latch = new Latch();
-        flowRunner("test").withPayload(new FruitBowl(new Apple(), new Banana())).asynchronously().run();
-
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
-    }
-
-    public static class FruitBasketComponent
-    {
-        public void process(FruitBasket fb)
-        {
-            assertTrue(fb.hasApple());
-            assertTrue(fb.hasBanana());
-            latch.countDown();
-        }
-    }
+  }
 }

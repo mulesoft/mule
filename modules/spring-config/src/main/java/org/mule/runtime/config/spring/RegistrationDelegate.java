@@ -15,14 +15,13 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-interface RegistrationDelegate
-{
+interface RegistrationDelegate {
 
-    void registerObject(String key, Object value) throws RegistrationException;
+  void registerObject(String key, Object value) throws RegistrationException;
 
-    void registerObject(String key, Object value, Object metadata) throws RegistrationException;
+  void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
-    void registerObjects(Map<String, Object> objects) throws RegistrationException;
+  void registerObjects(Map<String, Object> objects) throws RegistrationException;
 
-    Object unregisterObject(String key) throws RegistrationException;
+  Object unregisterObject(String key) throws RegistrationException;
 }

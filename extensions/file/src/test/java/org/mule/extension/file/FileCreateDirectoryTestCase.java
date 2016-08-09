@@ -13,45 +13,40 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-public class FileCreateDirectoryTestCase extends FileConnectorTestCase
-{
+public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
-    private static final String DIRECTORY = "validDirectory";
+  private static final String DIRECTORY = "validDirectory";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-create-directory-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-create-directory-config.xml";
+  }
 
-    @Test
-    public void createDirectory() throws Exception
-    {
-        doCreateDirectory(DIRECTORY);
-        assertExists(true, new File(temporaryFolder.getRoot(), DIRECTORY));
-    }
+  @Test
+  public void createDirectory() throws Exception {
+    doCreateDirectory(DIRECTORY);
+    assertExists(true, new File(temporaryFolder.getRoot(), DIRECTORY));
+  }
 
-    @Test
-    public void createExistingDirectory() throws Exception
-    {
-        final String directory = "washerefirst";
-        temporaryFolder.newFolder(directory);
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+  @Test
+  public void createExistingDirectory() throws Exception {
+    final String directory = "washerefirst";
+    temporaryFolder.newFolder(directory);
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
 
-        doCreateDirectory(directory);
-    }
+    doCreateDirectory(directory);
+  }
 
-    @Test
-    public void createDirectoryWithComplexPath() throws Exception
-    {
-        File folder = temporaryFolder.newFolder();
-        doCreateDirectory(Paths.get(folder.getAbsolutePath()).resolve(DIRECTORY).toAbsolutePath().toString());
+  @Test
+  public void createDirectoryWithComplexPath() throws Exception {
+    File folder = temporaryFolder.newFolder();
+    doCreateDirectory(Paths.get(folder.getAbsolutePath()).resolve(DIRECTORY).toAbsolutePath().toString());
 
-        assertExists(true, new File(folder, DIRECTORY));
-    }
-    private void doCreateDirectory(String directory) throws Exception
-    {
-        flowRunner("createDirectory").withFlowVariable("directory", directory).run();
-    }
+    assertExists(true, new File(folder, DIRECTORY));
+  }
+
+  private void doCreateDirectory(String directory) throws Exception {
+    flowRunner("createDirectory").withFlowVariable("directory", directory).run();
+  }
 
 }

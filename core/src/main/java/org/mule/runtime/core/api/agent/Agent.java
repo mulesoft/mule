@@ -10,16 +10,15 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**
- * <code>Agent</code> is a server plugin that can be initialised, started and
- * destroyed along with the MuleContext itself. Agents can initialise or bind to
- * external services such as a Jmx server.
+ * <code>Agent</code> is a server plugin that can be initialised, started and destroyed along with the MuleContext itself. Agents
+ * can initialise or bind to external services such as a Jmx server.
  */
-public interface Agent extends Lifecycle, NameableObject
-{
-    /**
-     * A description of the agent that gets displayed in the splash
-     * screen when the Mule Context starts up.
-     * @return a 1 line description of the agent.
-     */
-    String getDescription();
+public interface Agent extends Lifecycle, NameableObject {
+
+  /**
+   * A description of the agent that gets displayed in the splash screen when the Mule Context starts up.
+   * 
+   * @return a 1 line description of the agent.
+   */
+  String getDescription();
 }

@@ -19,29 +19,24 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashSet;
 
 @SmallTest
-public class RemoveFlowVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase
-{
+public class RemoveFlowVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase {
 
-    public RemoveFlowVariableTransformerTestCase()
-    {
-        super(new RemoveFlowVariableTransformer());
-    }
+  public RemoveFlowVariableTransformerTestCase() {
+    super(new RemoveFlowVariableTransformer());
+  }
 
-    @Override
-    protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties)
-    {
-        when(mockEvent.getFlowVariableNames()).thenReturn(properties);
-    }
+  @Override
+  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
+    when(mockEvent.getFlowVariableNames()).thenReturn(properties);
+  }
 
-    @Override
-    protected void verifyRemoved(MuleEvent mockEvent, String key)
-    {
-        assertThat(mockEvent.getFlowVariable(key), is(nullValue()));
-    }
+  @Override
+  protected void verifyRemoved(MuleEvent mockEvent, String key) {
+    assertThat(mockEvent.getFlowVariable(key), is(nullValue()));
+  }
 
-    @Override
-    protected void verifyNotRemoved(MuleEvent mockEvent, String key)
-    {
-        assertThat(mockEvent.getFlowVariable(key), not(nullValue()));
-    }
+  @Override
+  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
+    assertThat(mockEvent.getFlowVariable(key), not(nullValue()));
+  }
 }

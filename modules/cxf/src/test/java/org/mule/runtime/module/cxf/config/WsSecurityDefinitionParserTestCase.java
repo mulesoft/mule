@@ -21,129 +21,121 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.validate.NoOpValidator;
 import org.junit.Test;
 
-public class WsSecurityDefinitionParserTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "ws-security-config.xml";
-    }
+public class WsSecurityDefinitionParserTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testWsSecurityConfig()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("config1");
-        assertNotNull(wsSecurity);
+  @Override
+  protected String getConfigFile() {
+    return "ws-security-config.xml";
+  }
 
-        assertNotNull(wsSecurity.getSecurityManager());
-        assertNotNull(wsSecurity.getConfigProperties());
-        assertFalse(wsSecurity.getConfigProperties().isEmpty());
-        Map<String, Object> wsProperties = wsSecurity.getConfigProperties();
-        assertEquals(WSHandlerConstants.USERNAME_TOKEN, wsProperties.get(WSHandlerConstants.ACTION));
-        assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
-        assertEquals("PasswordText", wsProperties.get(WSHandlerConstants.PASSWORD_TYPE));
-        assertEquals("org.mule.runtime.module.cxf.wssec.ClientPasswordCallback", wsProperties.get(WSHandlerConstants.PW_CALLBACK_CLASS));
+  @Test
+  public void testWsSecurityConfig() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("config1");
+    assertNotNull(wsSecurity);
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertNotNull(wsSecurity.getSecurityManager());
+    assertNotNull(wsSecurity.getConfigProperties());
+    assertFalse(wsSecurity.getConfigProperties().isEmpty());
+    Map<String, Object> wsProperties = wsSecurity.getConfigProperties();
+    assertEquals(WSHandlerConstants.USERNAME_TOKEN, wsProperties.get(WSHandlerConstants.ACTION));
+    assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
+    assertEquals("PasswordText", wsProperties.get(WSHandlerConstants.PASSWORD_TYPE));
+    assertEquals("org.mule.runtime.module.cxf.wssec.ClientPasswordCallback",
+                 wsProperties.get(WSHandlerConstants.PW_CALLBACK_CLASS));
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-    }
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof NoOpValidator);
 
-    @Test
-    public void testWsSecurityConfig2()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("config2");
-        assertNotNull(wsSecurity);
+  }
 
-        assertNotNull(wsSecurity.getConfigProperties());
-        assertFalse(wsSecurity.getConfigProperties().isEmpty());
-        Map<String, Object> wsProperties = wsSecurity.getConfigProperties();
-        
-        assertEquals(WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " "
-                + WSHandlerConstants.ENCRYPT, wsProperties.get(WSHandlerConstants.ACTION));
-        assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
-        assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.SIG_PROP_FILE));
-        assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.ENC_PROP_FILE));
-        assertTrue(wsProperties.get(WSHandlerConstants.PW_CALLBACK_REF) instanceof ClientPasswordCallback);
-    }
+  @Test
+  public void testWsSecurityConfig2() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("config2");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomTimestampValidator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customTimestampConfig");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getConfigProperties());
+    assertFalse(wsSecurity.getConfigProperties().isEmpty());
+    Map<String, Object> wsProperties = wsSecurity.getConfigProperties();
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertEquals(WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT,
+                 wsProperties.get(WSHandlerConstants.ACTION));
+    assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
+    assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.SIG_PROP_FILE));
+    assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.ENC_PROP_FILE));
+    assertTrue(wsProperties.get(WSHandlerConstants.PW_CALLBACK_REF) instanceof ClientPasswordCallback);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomTimestampValidator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customTimestampConfig");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomSAML1Validator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSAML1Config");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML1_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomSAML1Validator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSAML1Config");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomSAML2Validator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSAML2Config");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML1_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML2_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomSAML2Validator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSAML2Config");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomSignatureValidator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSignatureConfig");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML2_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomSignatureValidator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customSignatureConfig");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomBSTValidator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customBSTConfig");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.BST_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomBSTValidator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customBSTConfig");
+    assertNotNull(wsSecurity);
 
-    @Test
-    public void testWsSecurityConfigCustomMultipleValidator()
-    {
-        WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customMultipleConfig");
-        assertNotNull(wsSecurity);
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
 
-        assertNotNull(wsSecurity.getCustomValidator());
-        assertFalse(wsSecurity.getCustomValidator().isEmpty());
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.BST_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof NoOpValidator);
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML1_TOKEN_VALIDATOR) instanceof NoOpValidator);
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML2_TOKEN_VALIDATOR) instanceof NoOpValidator);
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR) instanceof NoOpValidator);
-        assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.BST_TOKEN_VALIDATOR) instanceof NoOpValidator);
-    }
+  @Test
+  public void testWsSecurityConfigCustomMultipleValidator() {
+    WsSecurity wsSecurity = muleContext.getRegistry().lookupObject("customMultipleConfig");
+    assertNotNull(wsSecurity);
+
+    assertNotNull(wsSecurity.getCustomValidator());
+    assertFalse(wsSecurity.getCustomValidator().isEmpty());
+
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML1_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SAML2_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR) instanceof NoOpValidator);
+    assertTrue(wsSecurity.getCustomValidator().get(SecurityConstants.BST_TOKEN_VALIDATOR) instanceof NoOpValidator);
+  }
 
 }

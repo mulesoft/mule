@@ -13,28 +13,27 @@ import java.util.List;
 /**
  * Tracks works that are running in behalf of a given component.
  */
-public interface WorkTracker extends Disposable
-{
+public interface WorkTracker extends Disposable {
 
-    /**
-     * Returns a list of works that are not completed.
-     *
-     * @return an immutable list of works
-     */
-    List<Runnable> pendingWorks();
+  /**
+   * Returns a list of works that are not completed.
+   *
+   * @return an immutable list of works
+   */
+  List<Runnable> pendingWorks();
 
-    /**
-     * Adds a work for tracking.
-     *
-     * @param work non null work.
-     */
-    void addWork(Runnable work);
+  /**
+   * Adds a work for tracking.
+   *
+   * @param work non null work.
+   */
+  void addWork(Runnable work);
 
-    /**
-     * Removes a work from tracking.
-     *
-     * @param work non null work
-     */
-    void removeWork(Runnable work);
+  /**
+   * Removes a work from tracking.
+   *
+   * @param work non null work
+   */
+  void removeWork(Runnable work);
 
 }

@@ -24,35 +24,31 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class JreModuleDiscovererTestCase extends AbstractMuleTestCase
-{
+public class JreModuleDiscovererTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    private JreModuleDiscoverer moduleDiscoverer = new JreModuleDiscoverer();;
+  private JreModuleDiscoverer moduleDiscoverer = new JreModuleDiscoverer();;
 
-    @Test
-    public void discoversJreModule() throws Exception
-    {
-        final List<MuleModule> muleModules = moduleDiscoverer.discover();
+  @Test
+  public void discoversJreModule() throws Exception {
+    final List<MuleModule> muleModules = moduleDiscoverer.discover();
 
-        assertThat(muleModules.size(), equalTo(1));
-        final MuleModule muleModule = muleModules.get(0);
-        assertThat(muleModule.getName(), equalTo(JRE_MODULE_NAME));
-        assertThat(muleModule.getExportedPaths(), is(empty()));
-        assertThat(muleModule.getExportedPackages(), is(not(empty())));
-    }
+    assertThat(muleModules.size(), equalTo(1));
+    final MuleModule muleModule = muleModules.get(0);
+    assertThat(muleModule.getName(), equalTo(JRE_MODULE_NAME));
+    assertThat(muleModule.getExportedPaths(), is(empty()));
+    assertThat(muleModule.getExportedPackages(), is(not(empty())));
+  }
 
-    @Test
-    public void cannotDiscoverJreModuleForUnsupportedJre() throws Exception
-    {
-        testWithSystemProperty(JAVA_VERSION_PROPERTY, "1.7", () ->
-        {
-            expected.expect(IllegalStateException.class);
-            expected.expectMessage(UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR);
+  @Test
+  public void cannotDiscoverJreModuleForUnsupportedJre() throws Exception {
+    testWithSystemProperty(JAVA_VERSION_PROPERTY, "1.7", () -> {
+      expected.expect(IllegalStateException.class);
+      expected.expectMessage(UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR);
 
-            moduleDiscoverer.discover();
-        });
-    }
+      moduleDiscoverer.discover();
+    });
+  }
 }

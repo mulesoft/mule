@@ -19,19 +19,19 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public interface ReadCommand
-{
+public interface ReadCommand {
 
-    /**
-     * Reads files under the considerations of {@link FileSystem#read(FileConnectorConfig, MuleMessage, String, boolean)}
-     *
-     * @param config   the config that is parameterizing this operation
-     * @param message  the incoming MuleMessage
-     * @param filePath the path of the file you want to read
-     * @param lock     whether or not to lock the file
-     * @return An {@link OperationResult} with an {@link InputStream} with the file's content as payload
-     * and a {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
-     * @throws IllegalArgumentException if the file at the given path doesn't exists
-     */
-    OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock);
+  /**
+   * Reads files under the considerations of {@link FileSystem#read(FileConnectorConfig, MuleMessage, String, boolean)}
+   *
+   * @param config the config that is parameterizing this operation
+   * @param message the incoming MuleMessage
+   * @param filePath the path of the file you want to read
+   * @param lock whether or not to lock the file
+   * @return An {@link OperationResult} with an {@link InputStream} with the file's content as payload and a
+   *         {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
+   * @throws IllegalArgumentException if the file at the given path doesn't exists
+   */
+  OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+                                                    boolean lock);
 }

@@ -16,119 +16,92 @@ import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotF
 import java.net.URL;
 
 /**
- * Defines a {@link ClassLoader} which enables the control of the class
- * loading lookup mode.
+ * Defines a {@link ClassLoader} which enables the control of the class loading lookup mode.
  * <p/>
- * By using a {@link ClassLoaderLookupPolicy} this classLoader can use
- * parent-first, parent-only or child-first classloading lookup mode per package.
+ * By using a {@link ClassLoaderLookupPolicy} this classLoader can use parent-first, parent-only or child-first classloading
+ * lookup mode per package.
  */
-public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implements ClassLoaderLookupPolicyProvider
-{
-    static
-    {
-        registerAsParallelCapable();
+public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implements ClassLoaderLookupPolicyProvider {
+
+  static {
+    registerAsParallelCapable();
+  }
+
+  private final ClassLoaderLookupPolicy lookupPolicy;
+
+  public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
+    super(urls, parent);
+    checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
+    this.lookupPolicy = lookupPolicy;
+  }
+
+  @Override
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    Class<?> result = findLoadedClass(name);
+
+    if (result != null) {
+      return result;
     }
 
-    private final ClassLoaderLookupPolicy lookupPolicy;
+    final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
 
-    public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
-    {
-        super(urls, parent);
-        checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
-        this.lookupPolicy = lookupPolicy;
+    // Gather information about the exceptions in each of the searched classloaders to provide
+    // troubleshooting information in case of throwing a ClassNotFoundException.
+    ClassNotFoundException firstException = null;
+
+    try {
+      if (lookupStrategy == PARENT_ONLY) {
+        result = findParentClass(name);
+      } else if (lookupStrategy == PARENT_FIRST) {
+        try {
+          result = findParentClass(name);
+        } catch (ClassNotFoundException e) {
+          firstException = e;
+          result = findClass(name);
+        }
+      } else {
+        try {
+          result = findClass(name);
+        } catch (ClassNotFoundException e) {
+          firstException = e;
+          result = findParentClass(name);
+        }
+      }
+    } catch (ClassNotFoundException e) {
+      throw new CompositeClassNotFoundException(name, lookupStrategy,
+                                                firstException != null ? asList(firstException, e) : asList(e));
     }
 
-    @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
-    {
-        Class<?> result = findLoadedClass(name);
+    if (resolve) {
+      resolveClass(result);
+    }
 
-        if (result != null)
-        {
-            return result;
-        }
+    return result;
+  }
 
-        final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
+  protected Class<?> findParentClass(String name) throws ClassNotFoundException {
+    if (getParent() != null) {
+      return getParent().loadClass(name);
+    } else {
+      return findSystemClass(name);
+    }
+  }
 
-        // Gather information about the exceptions in each of the searched classloaders to provide
-        // troubleshooting information in case of throwing a ClassNotFoundException.
-        ClassNotFoundException firstException = null;
+  @Override
+  protected Class<?> findClass(String name) throws ClassNotFoundException {
+    synchronized (getClassLoadingLock(name)) {
+      Class<?> result = findLoadedClass(name);
 
-        try
-        {
-            if (lookupStrategy == PARENT_ONLY)
-            {
-                result = findParentClass(name);
-            }
-            else if (lookupStrategy == PARENT_FIRST)
-            {
-                try
-                {
-                    result = findParentClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    firstException = e;
-                    result = findClass(name);
-                }
-            }
-            else
-            {
-                try
-                {
-                    result = findClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    firstException = e;
-                    result = findParentClass(name);
-                }
-            }
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new CompositeClassNotFoundException(name, lookupStrategy, firstException != null ? asList(firstException, e) : asList(e));
-        }
-
-        if (resolve)
-        {
-            resolveClass(result);
-        }
-
+      if (result != null) {
         return result;
+      }
+
+      return super.findClass(name);
     }
+  }
 
-    protected Class<?> findParentClass(String name) throws ClassNotFoundException
-    {
-        if (getParent() != null)
-        {
-            return getParent().loadClass(name);
-        }
-        else
-        {
-            return findSystemClass(name);
-        }
-    }
-
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException
-    {
-        synchronized (getClassLoadingLock(name))
-        {
-            Class<?> result = findLoadedClass(name);
-
-            if (result != null)
-            {
-                return result;
-            }
-
-            return super.findClass(name);
-        }
-    }
-
-    @Override
-    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
-    {
-        return lookupPolicy;
-    }
+  @Override
+  public ClassLoaderLookupPolicy getClassLoaderLookupPolicy() {
+    return lookupPolicy;
+  }
 }

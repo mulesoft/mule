@@ -17,42 +17,38 @@ import java.util.Set;
 /**
  * Provides module definition information
  */
-public class MuleModule
-{
-    private final String name;
-    private final Set<String> exportedPackages;
-    private final Set<String> exportedPaths;
+public class MuleModule {
+
+  private final String name;
+  private final Set<String> exportedPackages;
+  private final Set<String> exportedPaths;
 
 
-    /**
-     * Creates a new module
-     *
-     * @param name module name. Not empty.
-     * @param exportedPackages java packages exported by this module. Not null.
-     * @param exportedPaths java resources exported by this module. Not null;
-     */
-    public MuleModule(String name, Set<String> exportedPackages, Set<String> exportedPaths)
-    {
-        checkArgument(!StringUtils.isEmpty(name), "Name cannot be empty");
-        checkArgument(exportedPackages != null, "ExportedPackages cannot be null");
-        checkArgument(exportedPaths != null, "ExportedPaths cannot be null");
-        this.name = name;
-        this.exportedPackages = unmodifiableSet(exportedPackages);
-        this.exportedPaths = unmodifiableSet(exportedPaths);
-    }
+  /**
+   * Creates a new module
+   *
+   * @param name module name. Not empty.
+   * @param exportedPackages java packages exported by this module. Not null.
+   * @param exportedPaths java resources exported by this module. Not null;
+   */
+  public MuleModule(String name, Set<String> exportedPackages, Set<String> exportedPaths) {
+    checkArgument(!StringUtils.isEmpty(name), "Name cannot be empty");
+    checkArgument(exportedPackages != null, "ExportedPackages cannot be null");
+    checkArgument(exportedPaths != null, "ExportedPaths cannot be null");
+    this.name = name;
+    this.exportedPackages = unmodifiableSet(exportedPackages);
+    this.exportedPaths = unmodifiableSet(exportedPaths);
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public Set<String> getExportedPackages()
-    {
-        return exportedPackages;
-    }
+  public Set<String> getExportedPackages() {
+    return exportedPackages;
+  }
 
-    public Set<String> getExportedPaths()
-    {
-        return exportedPaths;
-    }
+  public Set<String> getExportedPaths() {
+    return exportedPaths;
+  }
 }

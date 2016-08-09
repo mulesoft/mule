@@ -18,55 +18,48 @@ import org.junit.internal.matchers.TypeSafeMatcher;
 /**
  * Matches a {@link WorkEvent} instances
  */
-public class WorkEventMatcher extends TypeSafeMatcher<WorkEvent>
-{
+public class WorkEventMatcher extends TypeSafeMatcher<WorkEvent> {
 
-    private Object source;
-    private final Work work;
-    private final int type;
-    private final WorkException workException;
-    private final long startDuration;
+  private Object source;
+  private final Work work;
+  private final int type;
+  private final WorkException workException;
+  private final long startDuration;
 
-    public WorkEventMatcher(Object source, Work work, int type, WorkException workException, long startDuration)
-    {
-        this.source = source;
-        this.work = work;
-        this.type = type;
-        this.workException = workException;
-        this.startDuration = startDuration;
-    }
+  public WorkEventMatcher(Object source, Work work, int type, WorkException workException, long startDuration) {
+    this.source = source;
+    this.work = work;
+    this.type = type;
+    this.workException = workException;
+    this.startDuration = startDuration;
+  }
 
-    @Override
-    public boolean matchesSafely(WorkEvent workEvent)
-    {
-        return workEvent.getSource() == source && workEvent.getWork() == work
-               && workEvent.getException() == workException && workEvent.getStartDuration() == startDuration
-               && workEvent.getType() == type;
-    }
+  @Override
+  public boolean matchesSafely(WorkEvent workEvent) {
+    return workEvent.getSource() == source && workEvent.getWork() == work && workEvent.getException() == workException
+        && workEvent.getStartDuration() == startDuration && workEvent.getType() == type;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText(String.format("a WorkEvent for work '%s', type '%s', source '%s', exception '%s' and startDuration '%s'", work, type, source, workException, startDuration));
-    }
+  @Override
+  public void describeTo(Description description) {
+    description
+        .appendText(String.format("a WorkEvent for work '%s', type '%s', source '%s', exception '%s' and startDuration '%s'",
+                                  work, type, source, workException, startDuration));
+  }
 
-    public static WorkEvent anAcceptedWorkEventFor(Object source, Work work, WorkException workException, long startDuration)
-    {
-        return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_ACCEPTED, workException, startDuration));
-    }
+  public static WorkEvent anAcceptedWorkEventFor(Object source, Work work, WorkException workException, long startDuration) {
+    return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_ACCEPTED, workException, startDuration));
+  }
 
-    public static WorkEvent aCompletedWorkEventFor(Object source, Work work, WorkException workException, long startDuration)
-    {
-        return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_COMPLETED, workException, startDuration));
-    }
+  public static WorkEvent aCompletedWorkEventFor(Object source, Work work, WorkException workException, long startDuration) {
+    return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_COMPLETED, workException, startDuration));
+  }
 
-    public static WorkEvent aRejectedWorkEventFor(Object source, Work work, WorkException workException, long startDuration)
-    {
-        return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_REJECTED, workException, startDuration));
-    }
+  public static WorkEvent aRejectedWorkEventFor(Object source, Work work, WorkException workException, long startDuration) {
+    return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_REJECTED, workException, startDuration));
+  }
 
-    public static WorkEvent aStartedWorkEventFor(Object source, Work work, WorkException workException, long startDuration)
-    {
-        return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_STARTED, workException, startDuration));
-    }
+  public static WorkEvent aStartedWorkEventFor(Object source, Work work, WorkException workException, long startDuration) {
+    return argThat(new WorkEventMatcher(source, work, WorkEvent.WORK_STARTED, workException, startDuration));
+  }
 }

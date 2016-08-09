@@ -9,15 +9,14 @@ package org.mule.cxf.weatherservice.mycode;
 import org.mule.cxf.weatherservice.myweather.GetCityWeatherByZIP;
 
 
-public class CreateZipQuery
-{
+public class CreateZipQuery {
 
-    /**
-     * Create a request to query by zip code.
-     */
-    public GetCityWeatherByZIP createRequest(Object input) {
-        GetCityWeatherByZIP request = new GetCityWeatherByZIP();
-        request.setZIP("30075");
-        return request;
-    }
+  /**
+   * Create a request to query by zip code.
+   */
+  public GetCityWeatherByZIP createRequest(Object input) {
+    GetCityWeatherByZIP request = new GetCityWeatherByZIP();
+    request.setZIP("30075");
+    return request;
+  }
 }

@@ -19,55 +19,50 @@ import java.io.File;
 import org.junit.Test;
 
 @SmallTest
-public class PerAppNativeLibraryFinderTestCase extends AbstractNativeLibraryFinderTestCase
-{
+public class PerAppNativeLibraryFinderTestCase extends AbstractNativeLibraryFinderTestCase {
 
-    @Test
-    public void returnsNullWhenLibraryNotFound() throws Exception
-    {
-        PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
+  @Test
+  public void returnsNullWhenLibraryNotFound() throws Exception {
+    PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
 
-        String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
+    String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
 
-        assertThat(testLibPath, is(nullValue()));
-    }
+    assertThat(testLibPath, is(nullValue()));
+  }
 
-    @Test
-    public void returnsParentLocalLibrary() throws Exception
-    {
-        PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
+  @Test
+  public void returnsParentLocalLibrary() throws Exception {
+    PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
 
-        final String parentLibraryPath = "parent library path";
-        String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, parentLibraryPath);
+    final String parentLibraryPath = "parent library path";
+    String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, parentLibraryPath);
 
-        assertThat(testLibPath, equalTo(parentLibraryPath));
-    }
+    assertThat(testLibPath, equalTo(parentLibraryPath));
+  }
 
-    @Test
-    public void findsLocalLibrary() throws Exception
-    {
-        File libraryFile = createDefaultNativeLibraryFile(TEST_LIB_NAME);
+  @Test
+  public void findsLocalLibrary() throws Exception {
+    File libraryFile = createDefaultNativeLibraryFile(TEST_LIB_NAME);
 
-        PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
+    PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
 
-        String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
+    String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
 
-        assertThat(testLibPath, equalTo(libraryFile.getAbsolutePath()));
-    }
+    assertThat(testLibPath, equalTo(libraryFile.getAbsolutePath()));
+  }
 
-    @Test
-    public void findsJnilibInMac() throws Exception
-    {
-        assumeThat(this, new MacOsMatcher());
+  @Test
+  public void findsJnilibInMac() throws Exception {
+    assumeThat(this, new MacOsMatcher());
 
-        String libraryFileName = getJniLibFileName();
+    String libraryFileName = getJniLibFileName();
 
-        File libraryFile = createNativeLibraryFile(libFolder.getRoot(), libraryFileName);
+    File libraryFile = createNativeLibraryFile(libFolder.getRoot(), libraryFileName);
 
-        PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
+    PerAppNativeLibraryFinder nativeLibraryFinder = new PerAppNativeLibraryFinder(libFolder.getRoot());
 
-        String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
+    String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
 
-        assertThat(testLibPath, equalTo(libraryFile.getAbsolutePath()));
-    }
+    assertThat(testLibPath, equalTo(libraryFile.getAbsolutePath()));
+  }
 }

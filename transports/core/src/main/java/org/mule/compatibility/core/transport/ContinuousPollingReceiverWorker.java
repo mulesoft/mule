@@ -8,28 +8,23 @@ package org.mule.compatibility.core.transport;
 
 
 /**
- * Bypass the regular scheduling mechanism in order to minimize latency and maximize
- * throughput for transports which have low or no cost for performing a poll operation 
- * (such as an in-memory queue).
+ * Bypass the regular scheduling mechanism in order to minimize latency and maximize throughput for transports which have low or
+ * no cost for performing a poll operation (such as an in-memory queue).
  */
-public class ContinuousPollingReceiverWorker extends PollingReceiverWorker
-{
-    public ContinuousPollingReceiverWorker(AbstractPollingMessageReceiver pollingMessageReceiver)
-    {
-        super(pollingMessageReceiver);
-    }
+public class ContinuousPollingReceiverWorker extends PollingReceiverWorker {
 
-    @Override
-    protected void poll() throws Exception
-    {
-        /*
-         * We simply run our own polling loop all the time as long as the receiver is started. The
-         * blocking wait defined by Connector.getQueueTimeout() will prevent this worker's receiver
-         * thread from busy-waiting.
-         */
-        while (getReceiver().isStarted() && !getReceiver().isStopping())
-        {
-            super.poll();
-        }
+  public ContinuousPollingReceiverWorker(AbstractPollingMessageReceiver pollingMessageReceiver) {
+    super(pollingMessageReceiver);
+  }
+
+  @Override
+  protected void poll() throws Exception {
+    /*
+     * We simply run our own polling loop all the time as long as the receiver is started. The blocking wait defined by
+     * Connector.getQueueTimeout() will prevent this worker's receiver thread from busy-waiting.
+     */
+    while (getReceiver().isStarted() && !getReceiver().isStopping()) {
+      super.poll();
     }
+  }
 }

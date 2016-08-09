@@ -37,159 +37,125 @@ import org.w3c.dom.NodeList;
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.spring.dsl.processor.ConfigLine}
  * objects.
  * <p>
- * It uses the SPI interface {@link org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider} to locate for
- * all namespace info provided and normalize the namespace from the XML document.
+ * It uses the SPI interface {@link org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider} to locate for all
+ * namespace info provided and normalize the namespace from the XML document.
  *
  * @since 4.0
  */
-public class XmlApplicationParser
-{
+public class XmlApplicationParser {
 
-    private static final String COLON = ":";
-    private static final Map<String, String> predefinedNamespace = new HashMap<>();
-    private static final String UNDEFINED_NAMESPACE = "undefined";
-    private final List<XmlNamespaceInfoProvider> namespaceInfoProviders;
-    private final Cache<String, String> namespaceCache;
+  private static final String COLON = ":";
+  private static final Map<String, String> predefinedNamespace = new HashMap<>();
+  private static final String UNDEFINED_NAMESPACE = "undefined";
+  private final List<XmlNamespaceInfoProvider> namespaceInfoProviders;
+  private final Cache<String, String> namespaceCache;
 
-    static
-    {
-        predefinedNamespace.put("http://www.springframework.org/schema/beans", SPRING_NAMESPACE);
-        predefinedNamespace.put("http://www.springframework.org/schema/context", SPRING_CONTEXT_NAMESPACE);
+  static {
+    predefinedNamespace.put("http://www.springframework.org/schema/beans", SPRING_NAMESPACE);
+    predefinedNamespace.put("http://www.springframework.org/schema/context", SPRING_CONTEXT_NAMESPACE);
+  }
+
+  public XmlApplicationParser(ServiceRegistry serviceRegistry) {
+    namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class));
+    namespaceCache = CacheBuilder.newBuilder().build();
+  }
+
+  private String loadNamespaceFromProviders(String namespaceUri) {
+    if (predefinedNamespace.containsKey(namespaceUri)) {
+      return predefinedNamespace.get(namespaceUri);
     }
-
-    public XmlApplicationParser(ServiceRegistry serviceRegistry)
-    {
-        namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class));
-        namespaceCache = CacheBuilder.newBuilder().build();
+    for (XmlNamespaceInfoProvider namespaceInfoProvider : namespaceInfoProviders) {
+      Optional<XmlNamespaceInfo> matchingXmlNamespaceInfo = namespaceInfoProvider.getXmlNamespacesInfo().stream()
+          .filter(xmlNamespaceInfo -> namespaceUri.startsWith(xmlNamespaceInfo.getNamespaceUriPrefix())).findFirst();
+      if (matchingXmlNamespaceInfo.isPresent()) {
+        return matchingXmlNamespaceInfo.get().getNamespace();
+      }
     }
+    // TODO MULE-9638 for now since just return a fake value since guava cache does not support null values. When done right throw
+    // a configuration exception with a meaningful message if there's no info provider defined
+    return UNDEFINED_NAMESPACE;
+  }
 
-    private String loadNamespaceFromProviders(String namespaceUri)
-    {
-        if (predefinedNamespace.containsKey(namespaceUri))
-        {
-            return predefinedNamespace.get(namespaceUri);
-        }
-        for (XmlNamespaceInfoProvider namespaceInfoProvider : namespaceInfoProviders)
-        {
-            Optional<XmlNamespaceInfo> matchingXmlNamespaceInfo = namespaceInfoProvider
-                    .getXmlNamespacesInfo()
-                    .stream()
-                    .filter(xmlNamespaceInfo -> namespaceUri.startsWith(xmlNamespaceInfo.getNamespaceUriPrefix()))
-                    .findFirst();
-            if (matchingXmlNamespaceInfo.isPresent())
-            {
-                return matchingXmlNamespaceInfo.get().getNamespace();
-            }
-        }
-        //TODO MULE-9638 for now since just return a fake value since guava cache does not support null values. When done right throw a configuration exception with a meaningful message if there's no info provider defined
-        return UNDEFINED_NAMESPACE;
-    }
-
-    public String getNormalizedNamespace(String namespaceUri, String namespacePrefix)
-    {
-        try
-        {
-            return namespaceCache.get(namespaceUri, () -> {
-                String namespace = loadNamespaceFromProviders(namespaceUri);
-                if (namespace == null)
-                {
-                    namespace = namespacePrefix;
-                }
-                return namespace;
-            });
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    public Optional<ConfigLine> parse(Element configElement)
-    {
-        return configLineFromElement(configElement, () -> null);
-    }
-
-    private Optional<ConfigLine> configLineFromElement(Node node, ConfigLineProvider parentProvider)
-    {
-        if (!isValidType(node))
-        {
-            return Optional.empty();
-        }
-
-        String identifier = parseIdentifier(node);
-        String namespace = parseNamespace(node);
-
-        ConfigLine.Builder builder = new ConfigLine.Builder()
-                .setIdentifier(identifier)
-                .setNamespace(namespace)
-                .setNode(node)
-                .setParent(parentProvider);
-        to(builder).addNode(node);
-
-        Element element = (Element) node;
-        NamedNodeMap attributes = element.getAttributes();
-        if (element.hasAttributes())
-        {
-            for (int i = 0; i < attributes.getLength(); i++)
-            {
-                Node attribute = attributes.item(i);
-                Attr attributeNode = element.getAttributeNode(attribute.getNodeName());
-                boolean isFromXsd = !attributeNode.getSpecified();
-                builder.addConfigAttribute(attribute.getNodeName(), attribute.getNodeValue(), isFromXsd);
-            }
-        }
-        if (node.hasChildNodes())
-        {
-            NodeList children = node.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++)
-            {
-                Node child = children.item(i);
-                if (isTextContent(child))
-                {
-                    builder.setTextContent(child.getNodeValue());
-                }
-                else
-                {
-                    configLineFromElement(child, builder::build).ifPresent(builder::addChild);
-                }
-            }
-        }
-        return Optional.of(builder.build());
-    }
-
-    private String parseNamespace(Node node)
-    {
-        String namespace = CORE_NAMESPACE_NAME;
-        if (node.getNodeType() != Node.CDATA_SECTION_NODE)
-        {
-            namespace = getNormalizedNamespace(node.getNamespaceURI(), node.getPrefix());
-            if (namespace.equals(UNDEFINED_NAMESPACE))
-            {
-                namespace = node.getPrefix();
-            }
+  public String getNormalizedNamespace(String namespaceUri, String namespacePrefix) {
+    try {
+      return namespaceCache.get(namespaceUri, () -> {
+        String namespace = loadNamespaceFromProviders(namespaceUri);
+        if (namespace == null) {
+          namespace = namespacePrefix;
         }
         return namespace;
+      });
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  public Optional<ConfigLine> parse(Element configElement) {
+    return configLineFromElement(configElement, () -> null);
+  }
+
+  private Optional<ConfigLine> configLineFromElement(Node node, ConfigLineProvider parentProvider) {
+    if (!isValidType(node)) {
+      return Optional.empty();
     }
 
-    private String parseIdentifier(Node node)
-    {
-        String identifier = node.getNodeName();
-        String[] nameParts = identifier.split(COLON);
-        if (nameParts.length > 1)
-        {
-            identifier = nameParts[1];
+    String identifier = parseIdentifier(node);
+    String namespace = parseNamespace(node);
+
+    ConfigLine.Builder builder =
+        new ConfigLine.Builder().setIdentifier(identifier).setNamespace(namespace).setNode(node).setParent(parentProvider);
+    to(builder).addNode(node);
+
+    Element element = (Element) node;
+    NamedNodeMap attributes = element.getAttributes();
+    if (element.hasAttributes()) {
+      for (int i = 0; i < attributes.getLength(); i++) {
+        Node attribute = attributes.item(i);
+        Attr attributeNode = element.getAttributeNode(attribute.getNodeName());
+        boolean isFromXsd = !attributeNode.getSpecified();
+        builder.addConfigAttribute(attribute.getNodeName(), attribute.getNodeValue(), isFromXsd);
+      }
+    }
+    if (node.hasChildNodes()) {
+      NodeList children = node.getChildNodes();
+      for (int i = 0; i < children.getLength(); i++) {
+        Node child = children.item(i);
+        if (isTextContent(child)) {
+          builder.setTextContent(child.getNodeValue());
+        } else {
+          configLineFromElement(child, builder::build).ifPresent(builder::addChild);
         }
-        return identifier;
+      }
     }
+    return Optional.of(builder.build());
+  }
 
-    private boolean isValidType(Node node)
-    {
-        return node.getNodeType() != Node.TEXT_NODE && node.getNodeType() != Node.COMMENT_NODE;
+  private String parseNamespace(Node node) {
+    String namespace = CORE_NAMESPACE_NAME;
+    if (node.getNodeType() != Node.CDATA_SECTION_NODE) {
+      namespace = getNormalizedNamespace(node.getNamespaceURI(), node.getPrefix());
+      if (namespace.equals(UNDEFINED_NAMESPACE)) {
+        namespace = node.getPrefix();
+      }
     }
+    return namespace;
+  }
 
-    private boolean isTextContent(Node node)
-    {
-        return node.getNodeType() == Node.TEXT_NODE || node.getNodeType() == Node.CDATA_SECTION_NODE;
+  private String parseIdentifier(Node node) {
+    String identifier = node.getNodeName();
+    String[] nameParts = identifier.split(COLON);
+    if (nameParts.length > 1) {
+      identifier = nameParts[1];
     }
+    return identifier;
+  }
+
+  private boolean isValidType(Node node) {
+    return node.getNodeType() != Node.TEXT_NODE && node.getNodeType() != Node.COMMENT_NODE;
+  }
+
+  private boolean isTextContent(Node node) {
+    return node.getNodeType() == Node.TEXT_NODE || node.getNodeType() == Node.CDATA_SECTION_NODE;
+  }
 
 }

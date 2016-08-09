@@ -16,43 +16,38 @@ import org.mule.runtime.module.extension.file.api.FileSystem;
 import javax.inject.Inject;
 
 /**
- * A {@link ConnectionProvider} which provides instances of
- * {@link FileSystem} from instances of {@link FileConnector}
+ * A {@link ConnectionProvider} which provides instances of {@link FileSystem} from instances of {@link FileConnector}
  *
  * @since 4.0
  */
 @DisplayName("Local FileSystem Connection")
-public final class LocalFileConnectionProvider implements CachedConnectionProvider<FileSystem>
-{
-    @Inject
-    private MuleContext muleContext;
+public final class LocalFileConnectionProvider implements CachedConnectionProvider<FileSystem> {
 
-    /**
-     * Creates and returns a new instance of {@link LocalFileSystem}
-     *
-     * @return a {@link LocalFileSystem}
-     */
-    @Override
-    public FileSystem connect()
-    {
-        return new LocalFileSystem(muleContext);
-    }
+  @Inject
+  private MuleContext muleContext;
 
-    /**
-     * Does nothing since {@link LocalFileSystem} instances do not
-     * require disconnecting
-     *
-     * @param localFileSystem a {@link LocalFileSystem} instance
-     */
-    @Override
-    public void disconnect(FileSystem localFileSystem)
-    {
-        // no-op
-    }
+  /**
+   * Creates and returns a new instance of {@link LocalFileSystem}
+   *
+   * @return a {@link LocalFileSystem}
+   */
+  @Override
+  public FileSystem connect() {
+    return new LocalFileSystem(muleContext);
+  }
 
-    @Override
-    public ConnectionValidationResult validate(FileSystem fileSystem)
-    {
-        return ConnectionValidationResult.success();
-    }
+  /**
+   * Does nothing since {@link LocalFileSystem} instances do not require disconnecting
+   *
+   * @param localFileSystem a {@link LocalFileSystem} instance
+   */
+  @Override
+  public void disconnect(FileSystem localFileSystem) {
+    // no-op
+  }
+
+  @Override
+  public ConnectionValidationResult validate(FileSystem fileSystem) {
+    return ConnectionValidationResult.success();
+  }
 }

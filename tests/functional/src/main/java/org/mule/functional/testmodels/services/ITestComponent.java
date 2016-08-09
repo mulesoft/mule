@@ -9,9 +9,9 @@ package org.mule.functional.testmodels.services;
 /**
  * Interface for TestComponent (to make it easier to host the service on Axis)
  */
-public interface ITestComponent
-{
-    public String receive(String message) throws Exception;
+public interface ITestComponent {
 
-    public String throwsException(String message) throws Exception;
+  public String receive(String message) throws Exception;
+
+  public String throwsException(String message) throws Exception;
 }

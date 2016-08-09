@@ -17,31 +17,27 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureReturningStreamingResultsetsTestCase extends AbstractStoredProcedureReturningStreamingResultsetsTestCase
-{
+public class StoredProcedureReturningStreamingResultsetsTestCase
+    extends AbstractStoredProcedureReturningStreamingResultsetsTestCase {
 
-    public StoredProcedureReturningStreamingResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureReturningStreamingResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-streaming-returning-resultsets-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-streaming-returning-resultsets-config.xml"};
+  }
 
-    @Override
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
-        assumeThat(getDefaultDataSource(), new SupportMultipleOpenResults());
-        super.setupStoredProcedure();
-    }
+  @Override
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+    assumeThat(getDefaultDataSource(), new SupportMultipleOpenResults());
+    super.setupStoredProcedure();
+  }
 }

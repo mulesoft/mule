@@ -20,44 +20,36 @@ import java.util.Optional;
 
 
 /**
- * Base implementation of {@link ResourcesGenerator}
- * that takes care of the basic contract except for actually writing the resources to
- * a persistent store. Implementations are only required to provide that piece of logic
- * by using the {@link #write(GeneratedResource)} template method
+ * Base implementation of {@link ResourcesGenerator} that takes care of the basic contract except for actually writing the
+ * resources to a persistent store. Implementations are only required to provide that piece of logic by using the
+ * {@link #write(GeneratedResource)} template method
  *
  * @since 3.7.0
  */
-public abstract class AbstractResourcesGenerator implements ResourcesGenerator
-{
+public abstract class AbstractResourcesGenerator implements ResourcesGenerator {
 
-    private final List<GeneratedResourceFactory> resourceFactories;
+  private final List<GeneratedResourceFactory> resourceFactories;
 
-    public AbstractResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories)
-    {
-        this.resourceFactories = ImmutableList.copyOf(resourceFactories);
-    }
+  public AbstractResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories) {
+    this.resourceFactories = ImmutableList.copyOf(resourceFactories);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<GeneratedResource> generateFor(ExtensionModel extensionModel)
-    {
-        List<GeneratedResource> resources = resourceFactories.stream()
-                .map(factory -> factory.generateResource(extensionModel))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(new ImmutableListCollector<>());
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
+    List<GeneratedResource> resources = resourceFactories.stream().map(factory -> factory.generateResource(extensionModel))
+        .filter(Optional::isPresent).map(Optional::get).collect(new ImmutableListCollector<>());
 
-        resources.forEach(this::write);
-        return resources;
-    }
+    resources.forEach(this::write);
+    return resources;
+  }
 
-    /**
-     * Template method to actually write the given
-     * {@code resource} to a persistent store
-     *
-     * @param resource a non null {@link GeneratedResource}
-     */
-    protected abstract void write(GeneratedResource resource);
+  /**
+   * Template method to actually write the given {@code resource} to a persistent store
+   *
+   * @param resource a non null {@link GeneratedResource}
+   */
+  protected abstract void write(GeneratedResource resource);
 }

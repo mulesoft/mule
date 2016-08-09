@@ -39,263 +39,219 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.junit.Test;
 
 @SmallTest
-public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCase {
 
-    private ModelValidator validator = new ConnectionProviderModelValidator();
-    private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+  private ModelValidator validator = new ConnectionProviderModelValidator();
+  private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
 
-    @Test
-    public void validModel() throws Exception
-    {
-        validate(ValidTestConnector.class);
-    }
+  @Test
+  public void validModel() throws Exception {
+    validate(ValidTestConnector.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidConnectedOperation()
-    {
-        validate(InvalidConfigConnectionProviderTestConnector.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidConnectedOperation() {
+    validate(InvalidConfigConnectionProviderTestConnector.class);
+  }
 
-    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
-    public void invalidConnectionTypeProviderTestConnector()
-    {
-        validate(InvalidConnectionTypeProviderTestConnector.class);
-    }
+  @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
+  public void invalidConnectionTypeProviderTestConnector() {
+    validate(InvalidConnectionTypeProviderTestConnector.class);
+  }
 
-    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
-    public void invalidTransactionalProvider()
-    {
-        validate(InvalidTransactionalProviderConnector.class);
-    }
+  @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
+  public void invalidTransactionalProvider() {
+    validate(InvalidTransactionalProviderConnector.class);
+  }
 
-    @Test
-    public void validTransactionalProvider()
-    {
-        validate(ValidTransactionalProviderConnector.class);
-    }
+  @Test
+  public void validTransactionalProvider() {
+    validate(ValidTransactionalProviderConnector.class);
+  }
 
-    private ExtensionModel modelFor(Class<?> connectorClass)
-    {
-        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-                                                   .describe(context), context);
-    }
+  private ExtensionModel modelFor(Class<?> connectorClass) {
+    DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
+    return extensionFactory
+        .createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+            .describe(context), context);
+  }
 
-    private void validate(Class<?> connectorClass)
-    {
-        validator.validate(modelFor(connectorClass));
-    }
+  private void validate(Class<?> connectorClass) {
+    validator.validate(modelFor(connectorClass));
+  }
 
-    interface Config
-    {
+  interface Config {
 
-    }
+  }
 
-    @Extension(name = "validatorTest")
-    @Configurations({TestConfig.class, TestConfig2.class})
-    @Operations(ValidTestOperations.class)
-    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class})
-    public static class ValidTestConnector
-    {
+  @Extension(name = "validatorTest")
+  @Configurations({TestConfig.class, TestConfig2.class})
+  @Operations(ValidTestOperations.class)
+  @Providers({TestConnectionProvider.class, TestConnectionProvider2.class})
+  public static class ValidTestConnector {
+
+  }
+
+  public static class ValidTestOperations {
+
+    public void foo(@Connection ValidatorTestConnection connection) {
 
     }
 
-    public static class ValidTestOperations
-    {
-
-        public void foo(@Connection ValidatorTestConnection connection)
-        {
-
-        }
-
-        public void bar(@Connection ValidatorTestConnection connection)
-        {
-
-        }
-    }
-
-    @Extension(name = "validatorTest")
-    @Configurations({TestConfig.class, TestConfig2.class})
-    @Operations({ValidTestOperations.class, InvalidConnectionOperation.class})
-    public static class InvalidConnectedOperationTestConnector
-    {
+    public void bar(@Connection ValidatorTestConnection connection) {
 
     }
+  }
 
-    public static class InvalidConnectionOperation
-    {
+  @Extension(name = "validatorTest")
+  @Configurations({TestConfig.class, TestConfig2.class})
+  @Operations({ValidTestOperations.class, InvalidConnectionOperation.class})
+  public static class InvalidConnectedOperationTestConnector {
 
-        public void invalid(@Connection Apple apple)
-        {
-        }
+  }
+
+  public static class InvalidConnectionOperation {
+
+    public void invalid(@Connection Apple apple) {}
+  }
+
+  @Extension(name = "validatorTest")
+  @Configurations({TestConfig.class, TestConfig2.class})
+  @Operations(ValidTestOperations.class)
+  @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidConfigConnectionProvider.class})
+  public static class InvalidConfigConnectionProviderTestConnector {
+
+  }
+
+  @Extension(name = "invalidTransactionalProvider")
+  @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTransactionalProvider.class})
+  public static class InvalidTransactionalProviderConnector {
+
+  }
+
+  @Extension(name = "validTransactionalProvider")
+  @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, ValidTransactionalProvider.class})
+  public static class ValidTransactionalProviderConnector {
+
+  }
+
+  @Extension(name = "validatorTest")
+  @Configurations({TestConfig.class, TestConfig2.class})
+  @Operations(ValidTestOperations.class)
+  @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTypeConnectionProvider.class})
+  public static class InvalidConnectionTypeProviderTestConnector {
+
+  }
+
+  @Configuration(name = "config")
+  public static class TestConfig implements Config {
+
+  }
+
+  @Configuration(name = "config2")
+  public static class TestConfig2 implements Config {
+
+  }
+
+  @Alias("provider1")
+  public static class TestConnectionProvider implements ConnectionProvider<ValidatorTestConnection> {
+
+    @Override
+    public ValidatorTestConnection connect() throws ConnectionException {
+      return new ValidatorTestConnection();
     }
 
-    @Extension(name = "validatorTest")
-    @Configurations({TestConfig.class, TestConfig2.class})
-    @Operations(ValidTestOperations.class)
-    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidConfigConnectionProvider.class})
-    public static class InvalidConfigConnectionProviderTestConnector
-    {
-
-    }
-
-    @Extension(name = "invalidTransactionalProvider")
-    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTransactionalProvider.class})
-    public static class InvalidTransactionalProviderConnector
-    {
-
-    }
-
-    @Extension(name = "validTransactionalProvider")
-    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, ValidTransactionalProvider.class})
-    public static class ValidTransactionalProviderConnector
-    {
-
-    }
-
-    @Extension(name = "validatorTest")
-    @Configurations({TestConfig.class, TestConfig2.class})
-    @Operations(ValidTestOperations.class)
-    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTypeConnectionProvider.class})
-    public static class InvalidConnectionTypeProviderTestConnector
-    {
-
-    }
-
-    @Configuration(name = "config")
-    public static class TestConfig implements Config
-    {
-
-    }
-
-    @Configuration(name = "config2")
-    public static class TestConfig2 implements Config
-    {
+    @Override
+    public void disconnect(ValidatorTestConnection connection) {
 
     }
 
-    @Alias("provider1")
-    public static class TestConnectionProvider implements ConnectionProvider<ValidatorTestConnection>
-    {
+    @Override
+    public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection) {
+      return success();
+    }
+  }
 
-        @Override
-        public ValidatorTestConnection connect() throws ConnectionException
-        {
-            return new ValidatorTestConnection();
-        }
+  @Alias("provider2")
+  public static class TestConnectionProvider2 extends TestConnectionProvider {
 
-        @Override
-        public void disconnect(ValidatorTestConnection connection)
-        {
+  }
 
-        }
+  @Alias("invalidConfig")
+  public static class InvalidConfigConnectionProvider implements ConnectionProvider<Apple> {
 
-        @Override
-        public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection)
-        {
-            return success();
-        }
+    @Override
+    public Apple connect() throws ConnectionException {
+      return new Apple();
     }
 
-    @Alias("provider2")
-    public static class TestConnectionProvider2 extends TestConnectionProvider
-    {
+    @Override
+    public void disconnect(Apple connection) {
 
     }
 
-    @Alias("invalidConfig")
-    public static class InvalidConfigConnectionProvider implements ConnectionProvider<Apple>
-    {
+    @Override
+    public ConnectionValidationResult validate(Apple validatorTestConnection) {
+      return success();
+    }
+  }
 
-        @Override
-        public Apple connect() throws ConnectionException
-        {
-            return new Apple();
-        }
+  @Alias("invalidConnection")
+  public static class InvalidTypeConnectionProvider implements ConnectionProvider<Apple> {
 
-        @Override
-        public void disconnect(Apple connection)
-        {
-
-        }
-
-        @Override
-        public ConnectionValidationResult validate(Apple validatorTestConnection)
-        {
-            return success();
-        }
+    @Override
+    public Apple connect() throws ConnectionException {
+      return new Apple();
     }
 
-    @Alias("invalidConnection")
-    public static class InvalidTypeConnectionProvider implements ConnectionProvider<Apple>
-    {
-
-        @Override
-        public Apple connect() throws ConnectionException
-        {
-            return new Apple();
-        }
-
-        @Override
-        public void disconnect(Apple connection)
-        {
-
-        }
-
-        @Override
-        public ConnectionValidationResult validate(Apple apple)
-        {
-            return success();
-        }
-    }
-
-    public static class ValidTransactionalProvider implements PoolingConnectionProvider<TransactionalConnection>
-    {
-
-        @Override
-        public TransactionalConnection connect() throws ConnectionException
-        {
-            return mock(TransactionalConnection.class);
-        }
-
-        @Override
-        public void disconnect(TransactionalConnection connection)
-        {
-
-        }
-
-        @Override
-        public ConnectionValidationResult validate(TransactionalConnection connection)
-        {
-            return success();
-        }
-    }
-
-    public static class InvalidTransactionalProvider implements CachedConnectionProvider<TransactionalConnection>
-    {
-
-        @Override
-        public TransactionalConnection connect() throws ConnectionException
-        {
-            return mock(TransactionalConnection.class);
-        }
-
-        @Override
-        public void disconnect(TransactionalConnection connection)
-        {
-
-        }
-
-        @Override
-        public ConnectionValidationResult validate(TransactionalConnection connection)
-        {
-            return success();
-        }
-    }
-
-    public static class ValidatorTestConnection
-    {
+    @Override
+    public void disconnect(Apple connection) {
 
     }
+
+    @Override
+    public ConnectionValidationResult validate(Apple apple) {
+      return success();
+    }
+  }
+
+  public static class ValidTransactionalProvider implements PoolingConnectionProvider<TransactionalConnection> {
+
+    @Override
+    public TransactionalConnection connect() throws ConnectionException {
+      return mock(TransactionalConnection.class);
+    }
+
+    @Override
+    public void disconnect(TransactionalConnection connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(TransactionalConnection connection) {
+      return success();
+    }
+  }
+
+  public static class InvalidTransactionalProvider implements CachedConnectionProvider<TransactionalConnection> {
+
+    @Override
+    public TransactionalConnection connect() throws ConnectionException {
+      return mock(TransactionalConnection.class);
+    }
+
+    @Override
+    public void disconnect(TransactionalConnection connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(TransactionalConnection connection) {
+      return success();
+    }
+  }
+
+  public static class ValidatorTestConnection {
+
+  }
 }

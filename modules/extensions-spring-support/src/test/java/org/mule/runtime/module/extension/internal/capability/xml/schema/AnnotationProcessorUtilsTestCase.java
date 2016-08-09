@@ -29,21 +29,19 @@ import javax.lang.model.element.TypeElement;
 import org.junit.Test;
 
 @SmallTest
-public class AnnotationProcessorUtilsTestCase extends AbstractMuleTestCase
-{
+public class AnnotationProcessorUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void getOperationMethodsOnNotAnnotatedClass()
-    {
-        final TypeElement element = mock(TypeElement.class);
+  @Test
+  public void getOperationMethodsOnNotAnnotatedClass() {
+    final TypeElement element = mock(TypeElement.class);
 
-        RoundEnvironment roundEnvironment = mock(RoundEnvironment.class, RETURNS_DEEP_STUBS);
-        when(roundEnvironment.getElementsAnnotatedWith(Extension.class)).thenReturn((Set) ImmutableSet.of(element));
+    RoundEnvironment roundEnvironment = mock(RoundEnvironment.class, RETURNS_DEEP_STUBS);
+    when(roundEnvironment.getElementsAnnotatedWith(Extension.class)).thenReturn((Set) ImmutableSet.of(element));
 
-        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class, RETURNS_DEEP_STUBS);
-        when(processingEnvironment.getElementUtils().getBinaryName(any()).toString()).thenReturn(Object.class.getName());
+    ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class, RETURNS_DEEP_STUBS);
+    when(processingEnvironment.getElementUtils().getBinaryName(any()).toString()).thenReturn(Object.class.getName());
 
-        Map<String, Element> result = AnnotationProcessorUtils.getOperationMethods(roundEnvironment, processingEnvironment);
-        assertThat(result.isEmpty(), is(true));
-    }
+    Map<String, Element> result = AnnotationProcessorUtils.getOperationMethods(roundEnvironment, processingEnvironment);
+    assertThat(result.isEmpty(), is(true));
+  }
 }

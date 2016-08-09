@@ -21,44 +21,41 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationTestCase
-{
+public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-flow.xml";
+  }
 
-    @Test
-    public void testSyncMulticast() throws Exception
-    {
-        Apple apple = new Apple();
-        Banana banana = new Banana();
-        Orange orange = new Orange();
-        FruitBowl fruitBowl = new FruitBowl(apple, banana);
-        fruitBowl.addFruit(orange);
+  @Test
+  public void testSyncMulticast() throws Exception {
+    Apple apple = new Apple();
+    Banana banana = new Banana();
+    Orange orange = new Orange();
+    FruitBowl fruitBowl = new FruitBowl(apple, banana);
+    fruitBowl.addFruit(orange);
 
-        flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
+    flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
 
-        List<Object> results = new ArrayList<Object>(3);
+    List<Object> results = new ArrayList<Object>(3);
 
-        MuleClient client = muleContext.getClient();
-        //We have to wait a lot longer here since groovy takes an age to compile the first time
-        MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add(result.getPayload());
+    MuleClient client = muleContext.getClient();
+    // We have to wait a lot longer here since groovy takes an age to compile the first time
+    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add(result.getPayload());
 
-        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add(result.getPayload());
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add(result.getPayload());
 
-        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add(result.getPayload());
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add(result.getPayload());
 
-        assertTrue(results.contains(apple));
-        assertTrue(results.contains(banana));
-        assertTrue(results.contains(orange));
-    }
+    assertTrue(results.contains(apple));
+    assertTrue(results.contains(banana));
+    assertTrue(results.contains(orange));
+  }
 }

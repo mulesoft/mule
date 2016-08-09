@@ -24,86 +24,69 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import java.util.List;
 
 /**
- * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.MessageProcessor} with a transaction. If
- * the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
+ * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.MessageProcessor} with a transaction. If the
+ * {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  *
  * @since 4.0
  */
-public class TransactionalMessageProcessor extends TransactionalInterceptingMessageProcessor implements Lifecycle, MuleContextAware
-{
+public class TransactionalMessageProcessor extends TransactionalInterceptingMessageProcessor
+    implements Lifecycle, MuleContextAware {
 
-    protected List messageProcessors;
-    protected String action;
-    private MessageProcessorChain delegate;
+  protected List messageProcessors;
+  protected String action;
+  private MessageProcessorChain delegate;
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return delegate.process(event);
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return delegate.process(event);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.setName("'transaction' child processor chain");
+    TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
+    txProcessor.setExceptionListener(this.exceptionListener);
+    MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
+    txProcessor.setTransactionConfig(transactionConfig);
+    transactionConfig.setFactory(getTransactionFactory());
+    builder.chain(txProcessor);
+    for (Object processor : messageProcessors) {
+      if (processor instanceof MessageProcessor) {
+        builder.chain((MessageProcessor) processor);
+      } else if (processor instanceof MessageProcessorBuilder) {
+        builder.chain((MessageProcessorBuilder) processor);
+      } else {
+        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+      }
+      if (processor instanceof MessagingExceptionHandlerAware) {
+        ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
+      }
     }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.setName("'transaction' child processor chain");
-        TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
-        txProcessor.setExceptionListener(this.exceptionListener);
-        MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
-        txProcessor.setTransactionConfig(transactionConfig);
-        transactionConfig.setFactory(getTransactionFactory());
-        builder.chain(txProcessor);
-        for (Object processor : messageProcessors)
-        {
-            if (processor instanceof MessageProcessor)
-            {
-                builder.chain((MessageProcessor) processor);
-            }
-            else if (processor instanceof MessageProcessorBuilder)
-            {
-                builder.chain((MessageProcessorBuilder) processor);
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-            }
-            if (processor instanceof MessagingExceptionHandlerAware)
-            {
-                ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
-            }
-        }
-        try
-        {
-            delegate = builder.build();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        super.initialise();
+    try {
+      delegate = builder.build();
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
     }
+    super.initialise();
+  }
 
-    protected TransactionFactory getTransactionFactory()
-    {
-        return new DelegateTransactionFactory();
-    }
+  protected TransactionFactory getTransactionFactory() {
+    return new DelegateTransactionFactory();
+  }
 
-    protected MuleTransactionConfig createTransactionConfig(String action)
-    {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-        transactionConfig.setActionAsString(action);
-        return transactionConfig;
-    }
+  protected MuleTransactionConfig createTransactionConfig(String action) {
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+    transactionConfig.setActionAsString(action);
+    return transactionConfig;
+  }
 
-    public void setMessageProcessors(List messageProcessors)
-    {
-        this.messageProcessors = messageProcessors;
-    }
+  public void setMessageProcessors(List messageProcessors) {
+    this.messageProcessors = messageProcessors;
+  }
 
-    public void setAction(String action)
-    {
-        this.action = action;
-    }
+  public void setAction(String action) {
+    this.action = action;
+  }
 }

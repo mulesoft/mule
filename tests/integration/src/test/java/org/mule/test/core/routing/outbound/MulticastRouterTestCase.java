@@ -18,49 +18,45 @@ import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
-public class MulticastRouterTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/multicasting-router-config.xml";
-    }
+public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testAll() throws Exception
-    {
-        ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
-        MuleClient client = muleContext.getClient();
-        flowRunner("all").withPayload(bis).asynchronously().run();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/multicasting-router-config.xml";
+  }
 
-        MuleMessage error = client.request("test://errors", 2000);
-        assertRoutingExceptionReceived(error);
-    }
+  @Test
+  public void testAll() throws Exception {
+    ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
+    MuleClient client = muleContext.getClient();
+    flowRunner("all").withPayload(bis).asynchronously().run();
 
-    @Test
-    public void testFirstSuccessful() throws Exception
-    {
-        ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
+    MuleMessage error = client.request("test://errors", 2000);
+    assertRoutingExceptionReceived(error);
+  }
 
-        MuleClient client = muleContext.getClient();
-        flowRunner("first-successful").withPayload(bis).asynchronously().run();
+  @Test
+  public void testFirstSuccessful() throws Exception {
+    ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
 
-        MuleMessage error = client.request("test://errors2", 2000);
-        assertRoutingExceptionReceived(error);
-    }
+    MuleClient client = muleContext.getClient();
+    flowRunner("first-successful").withPayload(bis).asynchronously().run();
 
-    /**
-     * Asserts that a {@link RoutingException} has been received.
-     *
-     * @param message The received message.
-     */
-    private void assertRoutingExceptionReceived(MuleMessage message)
-    {
-        assertNotNull(message);
-        Object payload = message.getPayload();
-        assertNotNull(payload);
-        assertTrue(payload instanceof ExceptionMessage);
-        ExceptionMessage exceptionMessage = (ExceptionMessage) payload;
-        assertTrue(exceptionMessage.getException() instanceof RoutingException);
-    }
+    MuleMessage error = client.request("test://errors2", 2000);
+    assertRoutingExceptionReceived(error);
+  }
+
+  /**
+   * Asserts that a {@link RoutingException} has been received.
+   *
+   * @param message The received message.
+   */
+  private void assertRoutingExceptionReceived(MuleMessage message) {
+    assertNotNull(message);
+    Object payload = message.getPayload();
+    assertNotNull(payload);
+    assertTrue(payload instanceof ExceptionMessage);
+    ExceptionMessage exceptionMessage = (ExceptionMessage) payload;
+    assertTrue(exceptionMessage.getException() instanceof RoutingException);
+  }
 }

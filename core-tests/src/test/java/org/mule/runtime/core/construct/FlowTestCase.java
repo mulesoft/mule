@@ -46,215 +46,193 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 
-public class FlowTestCase extends AbstractFlowConstuctTestCase
-{
+public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
-    private static final String FLOW_NAME = "test-flow";
+  private static final String FLOW_NAME = "test-flow";
 
-    private Flow flow;
-    private DynamicMessageProcessorContainer dynamicProcessorContainer;
-    private SensingNullMessageProcessor sensingMessageProcessor;
+  private Flow flow;
+  private DynamicMessageProcessorContainer dynamicProcessorContainer;
+  private SensingNullMessageProcessor sensingMessageProcessor;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        sensingMessageProcessor = getSensingNullMessageProcessor();
+    sensingMessageProcessor = getSensingNullMessageProcessor();
 
-        flow = new Flow(FLOW_NAME, muleContext);
-        flow.setMessageSource(directInboundMessageSource);
+    flow = new Flow(FLOW_NAME, muleContext);
+    flow.setMessageSource(directInboundMessageSource);
 
-        dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
-        when(dynamicProcessorContainer.process(any(MuleEvent.class))).then(invocation ->
-        {
-            Object[] args = invocation.getArguments();
-            return (MuleEvent) args[0];
-        });
+    dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
+    when(dynamicProcessorContainer.process(any(MuleEvent.class))).then(invocation -> {
+      Object[] args = invocation.getArguments();
+      return (MuleEvent) args[0];
+    });
 
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
-        processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
-        processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
-        processors.add(new StringAppendTransformer("a"));
-        processors.add(new StringAppendTransformer("b"));
-        processors.add(new StringAppendTransformer("c"));
-        processors.add(dynamicProcessorContainer);
-        processors.add(event ->
-        {
-            event.setFlowVariable("thread", Thread.currentThread());
-            return event;
-        });
-        processors.add(sensingMessageProcessor);
-        flow.setMessageProcessors(processors);
+    List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
+    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
+    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
+    processors.add(new StringAppendTransformer("a"));
+    processors.add(new StringAppendTransformer("b"));
+    processors.add(new StringAppendTransformer("c"));
+    processors.add(dynamicProcessorContainer);
+    processors.add(event -> {
+      event.setFlowVariable("thread", Thread.currentThread());
+      return event;
+    });
+    processors.add(sensingMessageProcessor);
+    flow.setMessageProcessors(processors);
+  }
+
+  @Override
+  protected AbstractFlowConstruct getFlowConstruct() throws Exception {
+    return flow;
+  }
+
+  @After
+  public void after() throws MuleException {
+    if (flow.isStarted()) {
+      flow.stop();
     }
 
-    @Override
-    protected AbstractFlowConstruct getFlowConstruct() throws Exception
-    {
-        return flow;
+    if (flow.getLifecycleState().isInitialised()) {
+      flow.dispose();
+    }
+  }
+
+  @Test
+  public void testProcessOneWayEndpoint() throws Exception {
+    flow.initialise();
+    flow.start();
+    MuleEvent event = MuleTestUtils.getTestEvent("hello", MessageExchangePattern.ONE_WAY, muleContext);
+    MuleEvent response = directInboundMessageSource.process(event);
+    Thread.sleep(50);
+
+    // While a SedaService returns null, a Flow echos the request when there is async hand-off
+    assertEquals(event, response);
+
+    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
+    assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+  }
+
+  @Test
+  public void testProcessRequestResponseEndpoint() throws Exception {
+    flow.initialise();
+    flow.start();
+    MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+
+    assertEquals("helloabcdef", response.getMessageAsString());
+    assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
+
+    // Sensed (out) event also is appended with 'def' because it's the same event
+    // instance
+    assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString());
+    assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+
+  }
+
+  @Test
+  public void processorPath() throws MuleException {
+    flow.initialise();
+    flow.start();
+
+    MessageProcessor processorInSubflow = event -> event;
+
+    assertThat(flow.getProcessorPath(sensingMessageProcessor), is("/test-flow/processors/8"));
+    assertThat(flow.getProcessorPath(dynamicProcessorContainer), is("/test-flow/processors/6"));
+    assertThat(flow.getProcessorPath(processorInSubflow), is(nullValue()));
+
+    reset(dynamicProcessorContainer);
+    FlowMap dynamicContainerFlowMap = mock(FlowMap.class);
+    when(dynamicContainerFlowMap.resolvePath(processorInSubflow)).thenReturn("/sub_dyn/subprocessors/0");
+    when(dynamicContainerFlowMap.getFlowMap())
+        .thenReturn(Collections.singletonMap(processorInSubflow, "/sub_dyn/subprocessors/0"));
+    when(dynamicProcessorContainer.buildInnerPaths()).thenReturn(dynamicContainerFlowMap);
+    assertThat(flow.getProcessorPath(processorInSubflow), is("/sub_dyn/subprocessors/0"));
+    verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
+
+    flow.getProcessorPath(processorInSubflow);
+    // No new invocation, the dynamic container reference was initialized and removed from the pending dynamic containers list.
+    verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
+  }
+
+  @Test
+  public void testProcessStopped() throws Exception {
+    flow.initialise();
+
+    try {
+      directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", muleContext));
+      fail("exception expected");
+    } catch (Exception e) {
+    }
+  }
+
+  @Test
+  public void testSequentialStageNames() throws Exception {
+    final int count = 10;
+
+    for (int i = 1; i <= count; i++) {
+      assertTrue(this.flow.getAsyncStageNameSource().getName().endsWith("." + i));
+    }
+  }
+
+  @Test
+  public void testStageNameSourceWithName() throws Exception {
+    final int count = 10;
+    final String stageName = "myStage";
+    final String EXPECTED = String.format("%s.%s", FLOW_NAME, stageName);
+
+    for (int i = 0; i < count; i++) {
+      assertEquals(EXPECTED, this.flow.getAsyncStageNameSource(stageName).getName());
+    }
+  }
+
+  @Test
+  public void testDynamicPipeline() throws Exception {
+    flow.initialise();
+    flow.start();
+
+    MessageProcessor appendPre = new StringAppendTransformer("1");
+    MessageProcessor appendPost2 = new StringAppendTransformer("4");
+
+    String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
+        .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
+    MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    assertEquals("hello12abcdef34", response.getMessageAsString());
+
+    flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
+        .resetAndUpdate();
+    response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    assertEquals("hello2abcdef3", response.getMessageAsString());
+
+    flow.dynamicPipeline(pipelineId).reset();
+    response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    assertEquals("helloabcdef", response.getMessageAsString());
+  }
+
+  @Test
+  public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception {
+    MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    doThrow(new LifecycleException(mock(Message.class), "Error starting component")).when(((Startable) mockMessageSource))
+        .start();
+    flow.setMessageSource(mockMessageSource);
+
+    MessageProcessor mockMessageProcessor =
+        mock(MessageProcessor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    flow.getMessageProcessors().add(mockMessageProcessor);
+
+    flow.initialise();
+    try {
+      flow.start();
+      fail();
+    } catch (LifecycleException e) {
     }
 
-    @After
-    public void after() throws MuleException
-    {
-        if (flow.isStarted())
-        {
-            flow.stop();
-        }
+    verify((Startable) mockMessageProcessor, times(1)).start();
+    verify((Stoppable) mockMessageProcessor, times(1)).stop();
 
-        if (flow.getLifecycleState().isInitialised())
-        {
-            flow.dispose();
-        }
-    }
-
-    @Test
-    public void testProcessOneWayEndpoint() throws Exception
-    {
-        flow.initialise();
-        flow.start();
-        MuleEvent event = MuleTestUtils.getTestEvent("hello",
-                                                     MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent response = directInboundMessageSource.process(event);
-        Thread.sleep(50);
-
-        // While a SedaService returns null, a Flow echos the request when there is async hand-off
-        assertEquals(event, response);
-
-        assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
-        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
-    }
-
-    @Test
-    public void testProcessRequestResponseEndpoint() throws Exception
-    {
-        flow.initialise();
-        flow.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
-            REQUEST_RESPONSE, muleContext));
-
-        assertEquals("helloabcdef", response.getMessageAsString());
-        assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
-
-        // Sensed (out) event also is appended with 'def' because it's the same event
-        // instance
-        assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString());
-        assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
-
-    }
-
-    @Test
-    public void processorPath() throws MuleException
-    {
-        flow.initialise();
-        flow.start();
-
-        MessageProcessor processorInSubflow = event -> event;
-
-        assertThat(flow.getProcessorPath(sensingMessageProcessor), is("/test-flow/processors/8"));
-        assertThat(flow.getProcessorPath(dynamicProcessorContainer), is("/test-flow/processors/6"));
-        assertThat(flow.getProcessorPath(processorInSubflow), is(nullValue()));
-
-        reset(dynamicProcessorContainer);
-        FlowMap dynamicContainerFlowMap = mock(FlowMap.class);
-        when(dynamicContainerFlowMap.resolvePath(processorInSubflow)).thenReturn("/sub_dyn/subprocessors/0");
-        when(dynamicContainerFlowMap.getFlowMap()).thenReturn(Collections.singletonMap(processorInSubflow, "/sub_dyn/subprocessors/0"));
-        when(dynamicProcessorContainer.buildInnerPaths()).thenReturn(dynamicContainerFlowMap);
-        assertThat(flow.getProcessorPath(processorInSubflow), is("/sub_dyn/subprocessors/0"));
-        verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
-
-        flow.getProcessorPath(processorInSubflow);
-        // No new invocation, the dynamic container reference was initialized and removed from the pending dynamic containers list.
-        verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
-    }
-
-    @Test
-    public void testProcessStopped() throws Exception
-    {
-        flow.initialise();
-
-        try
-        {
-            directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", muleContext));
-            fail("exception expected");
-        }
-        catch (Exception e)
-        {
-        }
-    }
-
-    @Test
-    public void testSequentialStageNames() throws Exception
-    {
-        final int count = 10;
-
-        for (int i = 1; i <= count; i++)
-        {
-            assertTrue(this.flow.getAsyncStageNameSource().getName().endsWith("." + i));
-        }
-    }
-
-    @Test
-    public void testStageNameSourceWithName() throws Exception
-    {
-        final int count = 10;
-        final String stageName = "myStage";
-        final String EXPECTED = String.format("%s.%s", FLOW_NAME, stageName);
-
-        for (int i = 0; i < count; i++)
-        {
-            assertEquals(EXPECTED, this.flow.getAsyncStageNameSource(stageName).getName());
-        }
-    }
-
-    @Test
-    public void testDynamicPipeline() throws Exception
-    {
-        flow.initialise();
-        flow.start();
-
-        MessageProcessor appendPre = new StringAppendTransformer("1");
-        MessageProcessor appendPost2 = new StringAppendTransformer("4");
-
-        String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
-                .injectAfter(new StringAppendTransformer("3"), appendPost2)
-                .resetAndUpdate();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-        assertEquals("hello12abcdef34", response.getMessageAsString());
-
-        flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3")).resetAndUpdate();
-        response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-        assertEquals("hello2abcdef3", response.getMessageAsString());
-
-        flow.dynamicPipeline(pipelineId).reset();
-        response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-        assertEquals("helloabcdef", response.getMessageAsString());
-    }
-
-    @Test
-    public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception
-    {
-        MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
-        doThrow(new LifecycleException(mock(Message.class), "Error starting component")).when(((Startable) mockMessageSource)).start();
-        flow.setMessageSource(mockMessageSource);
-
-        MessageProcessor mockMessageProcessor = mock(MessageProcessor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
-        flow.getMessageProcessors().add(mockMessageProcessor);
-
-        flow.initialise();
-        try
-        {
-            flow.start();
-            fail();
-        } catch (LifecycleException e)
-        {
-        }
-
-        verify((Startable) mockMessageProcessor, times(1)).start();
-        verify((Stoppable) mockMessageProcessor, times(1)).stop();
-
-        verify((Startable) mockMessageSource, times(1)).start();
-        verify((Stoppable) mockMessageSource, times(1)).stop();
-    }
+    verify((Startable) mockMessageSource, times(1)).start();
+    verify((Stoppable) mockMessageSource, times(1)).stop();
+  }
 }

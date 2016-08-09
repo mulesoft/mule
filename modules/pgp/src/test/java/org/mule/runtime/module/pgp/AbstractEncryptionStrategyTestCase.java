@@ -13,41 +13,39 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
 
-public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleContextTestCase
-{
-    protected KeyBasedEncryptionStrategy kbStrategy;
-    protected PGPKeyRing keyManager;
+public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        PGPKeyRingImpl keyM = new PGPKeyRingImpl();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+  protected KeyBasedEncryptionStrategy kbStrategy;
+  protected PGPKeyRing keyManager;
 
-        URL url = loader.getResource("./serverPublic.gpg");
-        keyM.setPublicKeyRingFileName(url.getFile());
+  @Override
+  protected void doSetUp() throws Exception {
+    PGPKeyRingImpl keyM = new PGPKeyRingImpl();
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        url = loader.getResource("./serverPrivate.gpg");
-        keyM.setSecretKeyRingFileName(url.getFile());
+    URL url = loader.getResource("./serverPublic.gpg");
+    keyM.setPublicKeyRingFileName(url.getFile());
 
-        keyM.setSecretAliasId("6247672658342245276");
-        keyM.setSecretPassphrase("TestingPassphrase");
-        keyM.initialise();
+    url = loader.getResource("./serverPrivate.gpg");
+    keyM.setSecretKeyRingFileName(url.getFile());
 
-        kbStrategy = new KeyBasedEncryptionStrategy();
-        kbStrategy.setKeyManager(keyM);
-        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
-        kbStrategy.initialise();
+    keyM.setSecretAliasId("6247672658342245276");
+    keyM.setSecretPassphrase("TestingPassphrase");
+    keyM.initialise();
 
-        keyManager = keyM;
-    }
+    kbStrategy = new KeyBasedEncryptionStrategy();
+    kbStrategy.setKeyManager(keyM);
+    kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
+    kbStrategy.initialise();
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        kbStrategy = null;
-        keyManager = null;
-    }
+    keyManager = keyM;
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    kbStrategy = null;
+    keyManager = null;
+  }
 }
 
 

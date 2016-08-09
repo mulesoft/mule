@@ -16,25 +16,21 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class SetPayloadDataTypeTestCase extends AbstractIntegrationTestCase
-{
+public class SetPayloadDataTypeTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "set-payload-data-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "set-payload-data-type-config.xml";
+  }
 
-    @Test
-    public void setsPayloadLocal() throws Exception
-    {
-        doSetPayloadTest("setPayload");
-    }
+  @Test
+  public void setsPayloadLocal() throws Exception {
+    doSetPayloadTest("setPayload");
+  }
 
-    private void doSetPayloadTest(String flowName) throws Exception
-    {
-        MuleMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
+  private void doSetPayloadTest(String flowName) throws Exception {
+    MuleMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
-        assertThat(response.getDataType(), like(String.class, MediaType.XML, UTF_16));
-    }
+    assertThat(response.getDataType(), like(String.class, MediaType.XML, UTF_16));
+  }
 }

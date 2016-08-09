@@ -18,65 +18,54 @@ import java.io.IOException;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
-public class GrizzlyServer implements Server
-{
+public class GrizzlyServer implements Server {
 
-    private final TCPNIOTransport transport;
-    private final ServerAddress serverAddress;
-    private final HttpListenerRegistry listenerRegistry;
-    private TCPNIOServerConnection serverConnection;
-    private boolean stopped = true;
-    private boolean stopping;
+  private final TCPNIOTransport transport;
+  private final ServerAddress serverAddress;
+  private final HttpListenerRegistry listenerRegistry;
+  private TCPNIOServerConnection serverConnection;
+  private boolean stopped = true;
+  private boolean stopping;
 
-    public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry)
-    {
-        this.serverAddress = serverAddress;
-        this.transport = transport;
-        this.listenerRegistry = listenerRegistry;
+  public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry) {
+    this.serverAddress = serverAddress;
+    this.transport = transport;
+    this.listenerRegistry = listenerRegistry;
+  }
+
+  @Override
+  public synchronized void start() throws IOException {
+    serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
+    stopped = false;
+  }
+
+  @Override
+  public synchronized void stop() {
+    stopping = true;
+    try {
+      transport.unbind(serverConnection);
+    } finally {
+      stopping = false;
     }
+  }
 
-    @Override
-    public synchronized void start() throws IOException
-    {
-        serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
-        stopped = false;
-    }
+  @Override
+  public ServerAddress getServerAddress() {
+    return serverAddress;
+  }
 
-    @Override
-    public synchronized void stop()
-    {
-        stopping = true;
-        try
-        {
-            transport.unbind(serverConnection);
-        }
-        finally
-        {
-            stopping = false;
-        }
-    }
+  @Override
+  public boolean isStopping() {
+    return stopping;
+  }
 
-    @Override
-    public ServerAddress getServerAddress()
-    {
-        return serverAddress;
-    }
+  @Override
+  public boolean isStopped() {
+    return stopped;
+  }
 
-    @Override
-    public boolean isStopping()
-    {
-        return stopping;
-    }
-
-    @Override
-    public boolean isStopped()
-    {
-        return stopped;
-    }
-
-    @Override
-    public RequestHandlerManager addRequestHandler(ListenerRequestMatcher listenerRequestMatcher, RequestHandler requestHandler)
-    {
-        return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
-    }
+  @Override
+  public RequestHandlerManager addRequestHandler(ListenerRequestMatcher listenerRequestMatcher, RequestHandler requestHandler) {
+    return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
+  }
 }

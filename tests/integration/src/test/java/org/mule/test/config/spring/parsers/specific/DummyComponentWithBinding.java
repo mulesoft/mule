@@ -6,22 +6,19 @@
  */
 package org.mule.test.config.spring.parsers.specific;
 
-public class DummyComponentWithBinding
-{
-    private DummyBinding binding;
+public class DummyComponentWithBinding {
 
-    public Object process(String data)
-    {
-        return binding.doSomething(data);
-    }
+  private DummyBinding binding;
 
-    public DummyBinding getBinding()
-    {
-        return binding;
-    }
+  public Object process(String data) {
+    return binding.doSomething(data);
+  }
 
-    public void setBinding(DummyBinding binding)
-    {
-        this.binding = binding;
-    }
+  public DummyBinding getBinding() {
+    return binding;
+  }
+
+  public void setBinding(DummyBinding binding) {
+    this.binding = binding;
+  }
 }

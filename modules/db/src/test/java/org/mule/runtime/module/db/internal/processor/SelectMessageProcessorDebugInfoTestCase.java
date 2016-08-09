@@ -11,24 +11,20 @@ import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class SelectMessageProcessorDebugInfoTestCase extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase
-{
+public class SelectMessageProcessorDebugInfoTestCase extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase {
 
-    @Override
-    protected AbstractSingleQueryDbMessageProcessor createMessageProcessor()
-    {
-        return new SelectMessageProcessor(dbConfigResolver, queryResolver, null, null, false);
-    }
+  @Override
+  protected AbstractSingleQueryDbMessageProcessor createMessageProcessor() {
+    return new SelectMessageProcessor(dbConfigResolver, queryResolver, null, null, false);
+  }
 
-    @Override
-    protected String getSqlText()
-    {
-        return "SELECT * FROM PLANET WHERE NAME = ? AND POSITION = ?";
-    }
+  @Override
+  protected String getSqlText() {
+    return "SELECT * FROM PLANET WHERE NAME = ? AND POSITION = ?";
+  }
 
-    @Override
-    protected QueryType getQueryType()
-    {
-        return QueryType.SELECT;
-    }
+  @Override
+  protected QueryType getQueryType() {
+    return QueryType.SELECT;
+  }
 }

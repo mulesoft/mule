@@ -7,38 +7,33 @@
 package org.mule.runtime.config.spring.dsl.api.xml;
 
 /**
- * A {@link XmlNamespaceInfo} which returns fix values obtained through
- * the constructor
+ * A {@link XmlNamespaceInfo} which returns fix values obtained through the constructor
  *
  * @since 4.0
  */
-public class StaticXmlNamespaceInfo implements XmlNamespaceInfo
-{
+public class StaticXmlNamespaceInfo implements XmlNamespaceInfo {
 
-    private final String namespaceUriPrefix;
-    private final String namespace;
+  private final String namespaceUriPrefix;
+  private final String namespace;
 
-    /**
-     * Creates a new instance
-     *
-     * @param namespaceUriPrefix the value to be returned by {@link #getNamespaceUriPrefix()}
-     * @param namespace          the value to be returned by {@link #getNamespace()}
-     */
-    public StaticXmlNamespaceInfo(String namespaceUriPrefix, String namespace)
-    {
-        this.namespaceUriPrefix = namespaceUriPrefix;
-        this.namespace = namespace;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param namespaceUriPrefix the value to be returned by {@link #getNamespaceUriPrefix()}
+   * @param namespace the value to be returned by {@link #getNamespace()}
+   */
+  public StaticXmlNamespaceInfo(String namespaceUriPrefix, String namespace) {
+    this.namespaceUriPrefix = namespaceUriPrefix;
+    this.namespace = namespace;
+  }
 
-    @Override
-    public String getNamespaceUriPrefix()
-    {
-        return namespaceUriPrefix;
-    }
+  @Override
+  public String getNamespaceUriPrefix() {
+    return namespaceUriPrefix;
+  }
 
-    @Override
-    public String getNamespace()
-    {
-        return namespace;
-    }
+  @Override
+  public String getNamespace() {
+    return namespace;
+  }
 }

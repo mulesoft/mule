@@ -22,43 +22,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-default-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-default-config.xml"};
+  }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("defaultDeleteRequestResponse").withPayload(VENUS.getName()).run();
-        final MuleMessage response = responseEvent.getMessage();
+  @Test
+  public void testRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("defaultDeleteRequestResponse").withPayload(VENUS.getName()).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertThat(response.getPayload(), equalTo(1));
-    }
+    assertThat(response.getPayload(), equalTo(1));
+  }
 
-    @Test
-    public void testOneWay() throws Exception
-    {
-        flowRunner("defaultDeleteOneWay").withPayload(VENUS.getName()).asynchronously().run();
+  @Test
+  public void testOneWay() throws Exception {
+    flowRunner("defaultDeleteOneWay").withPayload(VENUS.getName()).asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertThat(response.getPayload(), equalTo(1));
-    }
+    assertThat(response.getPayload(), equalTo(1));
+  }
 }

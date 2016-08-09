@@ -23,35 +23,30 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureInputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class StoredProcedureInputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public StoredProcedureInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsNullStoredProcedureInputMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("storedProcedureMetadata");
+  @Test
+  public void returnsNullStoredProcedureInputMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("storedProcedureMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        StoredProcedureMessageProcessor dbMessageProcessor = (StoredProcedureMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> inputMetaData = dbMessageProcessor.getInputMetaData();
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    StoredProcedureMessageProcessor dbMessageProcessor = (StoredProcedureMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> inputMetaData = dbMessageProcessor.getInputMetaData();
 
-        assertThat(inputMetaData, equalTo(null));
-    }
+    assertThat(inputMetaData, equalTo(null));
+  }
 }

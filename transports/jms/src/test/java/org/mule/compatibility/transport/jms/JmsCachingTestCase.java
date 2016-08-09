@@ -23,35 +23,32 @@ import org.junit.Test;
 /**
  * Tests that JMS message are correctly sent when caching elements
  */
-public class JmsCachingTestCase extends FunctionalTestCase
-{
+public class JmsCachingTestCase extends FunctionalTestCase {
 
-    public static final String TEST_MESSAGE_1 = "test1";
-    public static final String TEST_MESSAGE_2 = "test2";
+  public static final String TEST_MESSAGE_1 = "test1";
+  public static final String TEST_MESSAGE_2 = "test2";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-caching-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "jms-caching-config.xml";
+  }
 
-    @Test
-    public void worksWithCaching() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void worksWithCaching() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
-        assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
-        response = client.send("vm://testInput", TEST_MESSAGE_2, null);
-        assertThat(TEST_MESSAGE_2, equalTo(getPayloadAsString(response)));
+    MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
+    assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
+    response = client.send("vm://testInput", TEST_MESSAGE_2, null);
+    assertThat(TEST_MESSAGE_2, equalTo(getPayloadAsString(response)));
 
-        Set<String> responses = new HashSet<String>();
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(getPayloadAsString(response));
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(getPayloadAsString(response));
+    Set<String> responses = new HashSet<String>();
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    responses.add(getPayloadAsString(response));
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    responses.add(getPayloadAsString(response));
 
-        assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
-    }
+    assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
+  }
 
 }

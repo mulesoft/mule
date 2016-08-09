@@ -13,29 +13,25 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-public class SensingNullReplyToHandler implements NonBlockingReplyToHandler
-{
+public class SensingNullReplyToHandler implements NonBlockingReplyToHandler {
 
-    public MuleEvent event;
-    public Exception exception;
-    public Latch latch = new Latch();
+  public MuleEvent event;
+  public Exception exception;
+  public Latch latch = new Latch();
 
-    @Override
-    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
-    {
-        this.event = event;
-        latch.countDown();
-    }
+  @Override
+  public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    this.event = event;
+    latch.countDown();
+  }
 
-    @Override
-    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-    {
-        this.exception = exception;
-        latch.countDown();
-    }
+  @Override
+  public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+    this.exception = exception;
+    latch.countDown();
+  }
 
-    public void clear()
-    {
-        event = null;
-    }
+  public void clear() {
+    event = null;
+  }
 }

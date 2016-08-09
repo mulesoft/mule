@@ -25,97 +25,87 @@ import java.sql.Driver;
 import org.junit.Test;
 
 @SmallTest
-public class ResourceReleaserTestCase extends AbstractMuleTestCase
-{
+public class ResourceReleaserTestCase extends AbstractMuleTestCase {
 
-    public static final String TEST_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/runtime/module/artifact/classloader/TestResourceReleaser.class";
+  public static final String TEST_RESOURCE_RELEASER_CLASS_LOCATION =
+      "/org/mule/runtime/module/artifact/classloader/TestResourceReleaser.class";
 
-    @Test
-    public void createdByCorrectArtifactClassLoader() throws Exception
-    {
-        ensureResourceReleaserIsCreatedByCorrectClassLoader(new TestArtifactClassLoader(new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader())));
+  @Test
+  public void createdByCorrectArtifactClassLoader() throws Exception {
+    ensureResourceReleaserIsCreatedByCorrectClassLoader(new TestArtifactClassLoader(new TestArtifactClassLoader(Thread
+        .currentThread().getContextClassLoader())));
+  }
+
+  @Test
+  public void createdByCorrectParentArtifactClassLoader() throws Exception {
+    ensureResourceReleaserIsCreatedByCorrectClassLoader(new TestArtifactClassLoader(Thread.currentThread()
+        .getContextClassLoader()));
+  }
+
+  @Test
+  public void notDeregisterJdbcDriversDifferentClassLoaders() throws Exception {
+    Driver jdbcDriver = mock(Driver.class);
+    TestArtifactClassLoader classLoader =
+        new TestArtifactClassLoader(new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader()));
+    try {
+      registerDriver(jdbcDriver);
+
+      assertThat(list(getDrivers()), hasItem(jdbcDriver));
+      classLoader.dispose();
+      assertThat(list(getDrivers()), hasItem(jdbcDriver));
+    } finally {
+      deregisterDriver(jdbcDriver);
+      classLoader.close();
+    }
+  }
+
+  @Test
+  public void deregisterJdbcDriversSameClassLoaders() throws Exception {
+    Driver jdbcDriver = mock(Driver.class);
+    registerDriver(jdbcDriver);
+
+    assertThat(list(getDrivers()), hasItem(jdbcDriver));
+    new DefaultResourceReleaser().release();
+    assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
+  }
+
+  private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception {
+    assertThat(classLoader.getClass().getClassLoader(), is(Thread.currentThread().getContextClassLoader()));
+    classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
+    classLoader.dispose();
+
+    // We must call the getClassLoader method from TestResourceReleaser dynamically in order to not load the
+    // class by the current class loader, if not a java.lang.LinkageError is raised.
+    ResourceReleaser resourceReleaserInstance = ((KeepResourceReleaserInstance) classLoader).getResourceReleaserInstance();
+    Method getClassLoaderMethod = resourceReleaserInstance.getClass().getMethod("getClassLoader");
+    ClassLoader resourceReleaserInstanceClassLoader = (ClassLoader) getClassLoaderMethod.invoke(resourceReleaserInstance);
+
+    assertThat(resourceReleaserInstanceClassLoader, is((ClassLoader) classLoader));
+  }
+
+  private interface KeepResourceReleaserInstance {
+
+    ResourceReleaser getResourceReleaserInstance();
+  }
+
+  private static class TestArtifactClassLoader extends MuleArtifactClassLoader implements KeepResourceReleaserInstance {
+
+    private ResourceReleaser resourceReleaserInstance;
+
+    public TestArtifactClassLoader(ClassLoader parentCl) {
+      super("testArtifact", new URL[0], parentCl, mock(ClassLoaderLookupPolicy.class));
     }
 
-    @Test
-    public void createdByCorrectParentArtifactClassLoader() throws Exception
-    {
-        ensureResourceReleaserIsCreatedByCorrectClassLoader(new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader()));
+    @Override
+    protected ResourceReleaser createResourceReleaserInstance() {
+      resourceReleaserInstance = super.createResourceReleaserInstance();
+      return resourceReleaserInstance;
     }
 
-    @Test
-    public void notDeregisterJdbcDriversDifferentClassLoaders() throws Exception
-    {
-        Driver jdbcDriver = mock(Driver.class);
-        TestArtifactClassLoader classLoader = new TestArtifactClassLoader(new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader()));
-        try
-        {
-            registerDriver(jdbcDriver);
-
-            assertThat(list(getDrivers()), hasItem(jdbcDriver));
-            classLoader.dispose();
-            assertThat(list(getDrivers()), hasItem(jdbcDriver));
-        }
-        finally
-        {
-            deregisterDriver(jdbcDriver);
-            classLoader.close();
-        }
+    @Override
+    public ResourceReleaser getResourceReleaserInstance() {
+      return resourceReleaserInstance;
     }
-
-    @Test
-    public void deregisterJdbcDriversSameClassLoaders() throws Exception
-    {
-        Driver jdbcDriver = mock(Driver.class);
-        registerDriver(jdbcDriver);
-
-        assertThat(list(getDrivers()), hasItem(jdbcDriver));
-        new DefaultResourceReleaser().release();
-        assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
-    }
-
-    private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception
-    {
-        assertThat(classLoader.getClass().getClassLoader(), is(Thread.currentThread().getContextClassLoader()));
-        classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
-        classLoader.dispose();
-
-        // We must call the getClassLoader method from TestResourceReleaser dynamically in order to not load the
-        // class by the current class loader, if not a java.lang.LinkageError is raised.
-        ResourceReleaser resourceReleaserInstance = ((KeepResourceReleaserInstance) classLoader).getResourceReleaserInstance();
-        Method getClassLoaderMethod = resourceReleaserInstance.getClass().getMethod("getClassLoader");
-        ClassLoader resourceReleaserInstanceClassLoader = (ClassLoader) getClassLoaderMethod.invoke(resourceReleaserInstance);
-
-        assertThat(resourceReleaserInstanceClassLoader, is((ClassLoader) classLoader));
-    }
-
-    private interface KeepResourceReleaserInstance
-    {
-
-        ResourceReleaser getResourceReleaserInstance();
-    }
-
-    private static class TestArtifactClassLoader extends MuleArtifactClassLoader implements KeepResourceReleaserInstance
-    {
-
-        private ResourceReleaser resourceReleaserInstance;
-
-        public TestArtifactClassLoader(ClassLoader parentCl)
-        {
-            super("testArtifact", new URL[0], parentCl, mock(ClassLoaderLookupPolicy.class));
-        }
-
-        @Override
-        protected ResourceReleaser createResourceReleaserInstance()
-        {
-            resourceReleaserInstance = super.createResourceReleaserInstance();
-            return resourceReleaserInstance;
-        }
-
-        @Override
-        public ResourceReleaser getResourceReleaserInstance()
-        {
-            return resourceReleaserInstance;
-        }
-    }
+  }
 }
 

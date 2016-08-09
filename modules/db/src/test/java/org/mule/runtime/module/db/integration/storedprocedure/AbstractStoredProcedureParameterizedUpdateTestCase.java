@@ -27,33 +27,29 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class AbstractStoredProcedureParameterizedUpdateTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractStoredProcedureParameterizedUpdateTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractStoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractStoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload("foo").run();
+  @Test
+  public void testRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload("foo").run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
-        Map payload = (Map) response.getPayload();
-        assertThat(payload.size(), equalTo(1));
-        int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
-        assertThat(payload.get("updateCount1"), equalTo(expectedUpdateCount));
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(Map.class)));
+    Map payload = (Map) response.getPayload();
+    assertThat(payload.size(), equalTo(1));
+    int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
+    assertThat(payload.get("updateCount1"), equalTo(expectedUpdateCount));
 
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "foo"), new Field("POSITION", 4)));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "foo"), new Field("POSITION", 4)));
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        testDatabase.createStoredProcedureParameterizedUpdateTestType1(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    testDatabase.createStoredProcedureParameterizedUpdateTestType1(getDefaultDataSource());
+  }
 }

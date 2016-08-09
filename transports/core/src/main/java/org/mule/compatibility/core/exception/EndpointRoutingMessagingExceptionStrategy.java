@@ -10,13 +10,11 @@ import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
-public class EndpointRoutingMessagingExceptionStrategy extends DefaultMessagingExceptionStrategy
-{
+public class EndpointRoutingMessagingExceptionStrategy extends DefaultMessagingExceptionStrategy {
 
-    @Override
-    protected MulticastingRouter buildRouter()
-    {
-        // Create an outbound router with all endpoints configured on the exception strategy
-        return new EndpointMulticastingRouter();
-    }
+  @Override
+  protected MulticastingRouter buildRouter() {
+    // Create an outbound router with all endpoints configured on the exception strategy
+    return new EndpointMulticastingRouter();
+  }
 }

@@ -13,23 +13,19 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 
-public class OutboundEventTimeoutMessageProcessor implements MessageProcessor
-{
+public class OutboundEventTimeoutMessageProcessor implements MessageProcessor {
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        int timeout = event.getMessage().getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
-        if (timeout >= 0)
-        {
-            event.setTimeout(timeout);
-        }
-        return event;
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    int timeout = event.getMessage().getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+    if (timeout >= 0) {
+      event.setTimeout(timeout);
     }
+    return event;
+  }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

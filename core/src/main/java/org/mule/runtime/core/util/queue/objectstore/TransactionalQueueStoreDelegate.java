@@ -14,6 +14,5 @@ import org.mule.runtime.core.util.queue.QueueStoreDelegate;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public interface TransactionalQueueStoreDelegate extends QueueStoreDelegate
-{
+public interface TransactionalQueueStoreDelegate extends QueueStoreDelegate {
 }

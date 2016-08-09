@@ -16,13 +16,11 @@ import java.io.ObjectStreamClass;
 import org.junit.Test;
 
 @SmallTest
-public class MuleExceptionSerializationTestCase extends AbstractMuleTestCase
-{
+public class MuleExceptionSerializationTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void hasCorrectSerialVersionUID()
-    {
-        assertThat(ObjectStreamClass.lookup(MuleException.class).getSerialVersionUID(), is(-4544199933449632546L));
-    }
+  @Test
+  public void hasCorrectSerialVersionUID() {
+    assertThat(ObjectStreamClass.lookup(MuleException.class).getSerialVersionUID(), is(-4544199933449632546L));
+  }
 
 }

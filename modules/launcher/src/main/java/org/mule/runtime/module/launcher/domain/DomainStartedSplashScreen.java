@@ -13,20 +13,17 @@ import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 /**
  * Splash screen specific for {@link Domain} startup.
  */
-public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen<DomainDescriptor>
-{
-    @Override
-    protected void createMessage(DomainDescriptor descriptor)
-    {
-        doBody(String.format("Started domain '%s'", descriptor.getName()));
-        if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
-        {
-            listLibraries(descriptor);
-        }
-    }
+public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen<DomainDescriptor> {
 
-    private void listLibraries(DomainDescriptor descriptor)
-    {
-        listItems(getLibraries(getDomainLibFolder(descriptor.getName())), "Domain libraries: ");
+  @Override
+  protected void createMessage(DomainDescriptor descriptor) {
+    doBody(String.format("Started domain '%s'", descriptor.getName()));
+    if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
+      listLibraries(descriptor);
     }
+  }
+
+  private void listLibraries(DomainDescriptor descriptor) {
+    listItems(getLibraries(getDomainLibFolder(descriptor.getName())), "Domain libraries: ");
+  }
 }

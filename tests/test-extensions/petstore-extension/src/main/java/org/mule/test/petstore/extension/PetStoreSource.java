@@ -12,21 +12,18 @@ import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
 @Alias("pet-source")
-public class PetStoreSource extends Source<String, Attributes>
-{
+public class PetStoreSource extends Source<String, Attributes> {
 
-    @ParameterGroup
-    private ExclusivePetBreeder breeder;
+  @ParameterGroup
+  private ExclusivePetBreeder breeder;
 
-    @Override
-    public void start() throws Exception
-    {
+  @Override
+  public void start() throws Exception {
 
-    }
+  }
 
-    @Override
-    public void stop() throws Exception
-    {
+  @Override
+  public void stop() throws Exception {
 
-    }
+  }
 }

@@ -15,12 +15,11 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias
-{
+public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias {
 
-    /**
-     * @return The represented method
-     */
-    //TODO MULE-10137 - Adapt logic to AST
-    Method getMethod();
+  /**
+   * @return The represented method
+   */
+  // TODO MULE-10137 - Adapt logic to AST
+  Method getMethod();
 }

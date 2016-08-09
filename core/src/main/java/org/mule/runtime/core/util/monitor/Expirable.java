@@ -10,7 +10,7 @@ package org.mule.runtime.core.util.monitor;
  * <code>Expirable</code> implementing classes can be notified when they expire
  */
 
-public interface Expirable
-{
-    void expired();
+public interface Expirable {
+
+  void expired();
 }

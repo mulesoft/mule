@@ -15,71 +15,64 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase
-{
+public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
 
-    public static final String SERVICE_ID = "foo";
+  public static final String SERVICE_ID = "foo";
 
-    private DefaultCustomizationService customizationService = new DefaultCustomizationService();
+  private DefaultCustomizationService customizationService = new DefaultCustomizationService();
 
-    @Test
-    public void overridesDefaultServiceClass() throws Exception
-    {
-        final Class<String> serviceClass = String.class;
+  @Test
+  public void overridesDefaultServiceClass() throws Exception {
+    final Class<String> serviceClass = String.class;
 
-        customizationService.overrideDefaultServiceClass(SERVICE_ID, serviceClass);
+    customizationService.overrideDefaultServiceClass(SERVICE_ID, serviceClass);
 
-        final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
-        assertServiceClass(customService, serviceClass);
-    }
+    final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
+    assertServiceClass(customService, serviceClass);
+  }
 
-    @Test
-    public void overridesDefaultService() throws Exception
-    {
-        final Object service = new Object();
+  @Test
+  public void overridesDefaultService() throws Exception {
+    final Object service = new Object();
 
-        customizationService.overrideDefaultServiceImpl(SERVICE_ID, service);
+    customizationService.overrideDefaultServiceImpl(SERVICE_ID, service);
 
-        final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
-        assertServiceInstance(customService, service);
-    }
+    final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
+    assertServiceInstance(customService, service);
+  }
 
-    @Test
-    public void registersCustomServiceClass() throws Exception
-    {
-        final Class<String> serviceClass = String.class;
+  @Test
+  public void registersCustomServiceClass() throws Exception {
+    final Class<String> serviceClass = String.class;
 
-        customizationService.registerCustomServiceClass(SERVICE_ID, serviceClass);
+    customizationService.registerCustomServiceClass(SERVICE_ID, serviceClass);
 
-        assertThat(customizationService.getCustomServices().size(), equalTo(1));
+    assertThat(customizationService.getCustomServices().size(), equalTo(1));
 
-        final CustomService customService = customizationService.getCustomServices().get(SERVICE_ID);
-        assertServiceClass(customService, serviceClass);
-    }
+    final CustomService customService = customizationService.getCustomServices().get(SERVICE_ID);
+    assertServiceClass(customService, serviceClass);
+  }
 
-    @Test
-    public void registersCustomService() throws Exception
-    {
-        final Object service = new Object();
+  @Test
+  public void registersCustomService() throws Exception {
+    final Object service = new Object();
 
-        customizationService.registerCustomServiceImpl(SERVICE_ID, service);
+    customizationService.registerCustomServiceImpl(SERVICE_ID, service);
 
-        assertThat(customizationService.getCustomServices().size(), equalTo(1));
+    assertThat(customizationService.getCustomServices().size(), equalTo(1));
 
-        final CustomService customService = customizationService.getCustomServices().get(SERVICE_ID);
-        assertServiceInstance(customService, service);
-    }
+    final CustomService customService = customizationService.getCustomServices().get(SERVICE_ID);
+    assertServiceInstance(customService, service);
+  }
 
-    private void assertServiceInstance(CustomService customService, Object service)
-    {
-        assertThat(customService.getServiceImpl().get(), equalTo(service));
-        assertThat(customService.getServiceClass().isPresent(), is(false));
-    }
+  private void assertServiceInstance(CustomService customService, Object service) {
+    assertThat(customService.getServiceImpl().get(), equalTo(service));
+    assertThat(customService.getServiceClass().isPresent(), is(false));
+  }
 
-    private void assertServiceClass(CustomService customService, Class<String> serviceClass)
-    {
-        assertThat(customService.getServiceClass().get(), equalTo(serviceClass));
-        assertThat(customService.getServiceImpl().isPresent(), is(false));
-    }
+  private void assertServiceClass(CustomService customService, Class<String> serviceClass) {
+    assertThat(customService.getServiceClass().get(), equalTo(serviceClass));
+    assertThat(customService.getServiceImpl().isPresent(), is(false));
+  }
 
 }

@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal.config;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.test.vegan.extension.VeganExtension;
 
-public class ConfigLevelSourceNegativeTestCase extends InvalidExtensionConfigTestCase
-{
+public class ConfigLevelSourceNegativeTestCase extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {VeganExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {VeganExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vegan-invalid-config-for-sources.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vegan-invalid-config-for-sources.xml";
+  }
 }

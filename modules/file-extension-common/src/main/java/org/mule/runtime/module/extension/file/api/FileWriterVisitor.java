@@ -16,63 +16,54 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
- * A {@link FileContentVisitor} which writes the received
- * content into an {@link #outputStream}
+ * A {@link FileContentVisitor} which writes the received content into an {@link #outputStream}
  *
  * @since 4.0
  */
-public class FileWriterVisitor implements FileContentVisitor
-{
+public class FileWriterVisitor implements FileContentVisitor {
 
-    private final OutputStream outputStream;
-    private final MuleEvent event;
-    private final String encoding;
+  private final OutputStream outputStream;
+  private final MuleEvent event;
+  private final String encoding;
 
-    /**
-     * Creates a new instance
-     *
-     * @param outputStream the stream to write into
-     * @param event        a {@link MuleEvent} to be used to power the {@link #visit(OutputHandler)} case
-     * @param encoding     the encoding to use when writing a content of type {@link String}
-     */
-    public FileWriterVisitor(OutputStream outputStream, MuleEvent event, String encoding)
-    {
-        this.outputStream = outputStream;
-        this.event = event;
-        this.encoding = encoding;
+  /**
+   * Creates a new instance
+   *
+   * @param outputStream the stream to write into
+   * @param event a {@link MuleEvent} to be used to power the {@link #visit(OutputHandler)} case
+   * @param encoding the encoding to use when writing a content of type {@link String}
+   */
+  public FileWriterVisitor(OutputStream outputStream, MuleEvent event, String encoding) {
+    this.outputStream = outputStream;
+    this.event = event;
+    this.encoding = encoding;
+  }
+
+  @Override
+  public void visit(String content) throws Exception {
+    try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, encoding)) {
+      write(content, writer);
+      writer.flush();
     }
+  }
 
-    @Override
-    public void visit(String content) throws Exception
-    {
-        try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, encoding))
-        {
-            write(content, writer);
-            writer.flush();
-        }
-    }
+  @Override
+  public void visit(byte content) throws Exception {
+    outputStream.write(content);
+  }
 
-    @Override
-    public void visit(byte content) throws Exception
-    {
-        outputStream.write(content);
-    }
+  @Override
+  public void visit(byte[] content) throws Exception {
+    write(content, outputStream);
+  }
 
-    @Override
-    public void visit(byte[] content) throws Exception
-    {
-        write(content, outputStream);
-    }
+  @Override
+  public void visit(OutputHandler handler) throws Exception {
+    handler.write((org.mule.runtime.core.api.MuleEvent) event, outputStream);
+  }
 
-    @Override
-    public void visit(OutputHandler handler) throws Exception
-    {
-        handler.write((org.mule.runtime.core.api.MuleEvent) event, outputStream);
-    }
-
-    @Override
-    public void visit(InputStream content) throws Exception
-    {
-        IOUtils.copy(content, outputStream);
-    }
+  @Override
+  public void visit(InputStream content) throws Exception {
+    IOUtils.copy(content, outputStream);
+  }
 }

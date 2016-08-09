@@ -16,25 +16,21 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 
 /**
- * Test the declaring class to be annotated with {@link Export}, in which
- * case it adds an {@link ExportModelProperty} on the extension level.
+ * Test the declaring class to be annotated with {@link Export}, in which case it adds an {@link ExportModelProperty} on the
+ * extension level.
  *
  * @since 4.0
  */
-public class ExportModelEnricher extends AbstractAnnotatedModelEnricher
-{
+public class ExportModelEnricher extends AbstractAnnotatedModelEnricher {
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        Export exportAnnotation = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Export.class);
-        if (exportAnnotation != null)
-        {
-            final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    Export exportAnnotation = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Export.class);
+    if (exportAnnotation != null) {
+      final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-            describingContext.getExtensionDeclarer().withModelProperty(
-                    new ExportModelProperty(stream(exportAnnotation.classes()).map(typeLoader::load)
-                                                    .collect(new ImmutableListCollector<>()), copyOf(exportAnnotation.resources())));
-        }
+      describingContext.getExtensionDeclarer().withModelProperty(new ExportModelProperty(stream(exportAnnotation.classes())
+          .map(typeLoader::load).collect(new ImmutableListCollector<>()), copyOf(exportAnnotation.resources())));
     }
+  }
 }

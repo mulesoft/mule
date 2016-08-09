@@ -12,13 +12,11 @@ import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
  * @deprecated This was necessary pre Java SE 5.0. It will be ignored and removed in Mule 4
  */
 @Deprecated
-public class ProtocolHandlerDefinitionParser extends ParentDefinitionParser
-{
+public class ProtocolHandlerDefinitionParser extends ParentDefinitionParser {
 
-    public ProtocolHandlerDefinitionParser()
-    {
-        // Property deprecated and ignored since 3.5
-        addIgnored("property");
-    }
+  public ProtocolHandlerDefinitionParser() {
+    // Property deprecated and ignored since 3.5
+    addIgnored("property");
+  }
 
 }

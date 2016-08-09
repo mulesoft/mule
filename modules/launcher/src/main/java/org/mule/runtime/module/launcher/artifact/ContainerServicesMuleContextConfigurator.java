@@ -15,28 +15,26 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.launcher.service.ServiceRepository;
 
 /**
- * Configures available {@link Service} instances in an artifact's {@link MuleContext} in order
- * to resolve injectable dependencies.
+ * Configures available {@link Service} instances in an artifact's {@link MuleContext} in order to resolve injectable
+ * dependencies.
  */
-public class ContainerServicesMuleContextConfigurator implements MuleContextServiceConfigurator
-{
+public class ContainerServicesMuleContextConfigurator implements MuleContextServiceConfigurator {
 
-    private final ServiceRepository serviceRepository;
+  private final ServiceRepository serviceRepository;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param serviceRepository contains available service instances. Non null.
-     */
-    public ContainerServicesMuleContextConfigurator(ServiceRepository serviceRepository)
-    {
-        checkArgument(serviceRepository != null,  "serviceRepository cannot be null");
-        this.serviceRepository = serviceRepository;
-    }
+  /**
+   * Creates a new instance.
+   *
+   * @param serviceRepository contains available service instances. Non null.
+   */
+  public ContainerServicesMuleContextConfigurator(ServiceRepository serviceRepository) {
+    checkArgument(serviceRepository != null, "serviceRepository cannot be null");
+    this.serviceRepository = serviceRepository;
+  }
 
-    @Override
-    public void configure(CustomizationService customizationService)
-    {
-        serviceRepository.getServices().forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
-    }
+  @Override
+  public void configure(CustomizationService customizationService) {
+    serviceRepository.getServices()
+        .forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
+  }
 }

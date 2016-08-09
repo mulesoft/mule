@@ -20,42 +20,38 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * Extends spring's {@link AbstractFactoryBean} by adding annotations. This will then be passed to the built bean.
  */
-public abstract class AnnotatedObjectFactoryBean<B extends AnnotatedObject> extends AbstractFactoryBean<B>implements AnnotatedObject
-{
+public abstract class AnnotatedObjectFactoryBean<B extends AnnotatedObject> extends AbstractFactoryBean<B>
+    implements AnnotatedObject {
 
-    /*
-     * From AbstractAnnotatedObject:
-     */
+  /*
+   * From AbstractAnnotatedObject:
+   */
 
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
+  private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
 
-    @Override
-    public final Object getAnnotation(QName qName)
-    {
-        return annotations.get(qName);
-    }
+  @Override
+  public final Object getAnnotation(QName qName) {
+    return annotations.get(qName);
+  }
 
-    @Override
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
+  @Override
+  public final Map<QName, Object> getAnnotations() {
+    return Collections.unmodifiableMap(annotations);
+  }
 
-    @Override
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
+  @Override
+  public synchronized final void setAnnotations(Map<QName, Object> newAnnotations) {
+    annotations.clear();
+    annotations.putAll(newAnnotations);
+  }
 
-    @Override
-    public B createInstance() throws Exception
-    {
-        B annotatedInstance = doCreateInstance();
-        annotatedInstance.setAnnotations(getAnnotations());
-        return annotatedInstance;
-    }
+  @Override
+  public B createInstance() throws Exception {
+    B annotatedInstance = doCreateInstance();
+    annotatedInstance.setAnnotations(getAnnotations());
+    return annotatedInstance;
+  }
 
-    protected abstract B doCreateInstance() throws Exception;
+  protected abstract B doCreateInstance() throws Exception;
 
 }

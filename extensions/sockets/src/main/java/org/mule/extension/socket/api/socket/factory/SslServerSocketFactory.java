@@ -17,31 +17,27 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
 /**
- * Concrete implementation for {@link SimpleServerSocketFactory}.
- * It provides TCP {@link ServerSocket} that use SSL protocol.
+ * Concrete implementation for {@link SimpleServerSocketFactory}. It provides TCP {@link ServerSocket} that use SSL protocol.
  *
  * @since 4.0
  */
-public class SslServerSocketFactory implements SimpleServerSocketFactory
-{
+public class SslServerSocketFactory implements SimpleServerSocketFactory {
 
-    private final TlsContextFactory tlsContextFactory;
-    private final SSLServerSocketFactory sslServerSocketFactory;
+  private final TlsContextFactory tlsContextFactory;
+  private final SSLServerSocketFactory sslServerSocketFactory;
 
-    public SslServerSocketFactory(TlsContextFactory tlsContextFactory) throws NoSuchAlgorithmException, KeyManagementException
-    {
-        this.tlsContextFactory = tlsContextFactory;
-        sslServerSocketFactory = tlsContextFactory.createSslContext().getServerSocketFactory();
-    }
+  public SslServerSocketFactory(TlsContextFactory tlsContextFactory) throws NoSuchAlgorithmException, KeyManagementException {
+    this.tlsContextFactory = tlsContextFactory;
+    sslServerSocketFactory = tlsContextFactory.createSslContext().getServerSocketFactory();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ServerSocket createServerSocket() throws IOException
-    {
-        SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket();
-        sslServerSocket.setNeedClientAuth(tlsContextFactory.isTrustStoreConfigured());
-        return sslServerSocket;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ServerSocket createServerSocket() throws IOException {
+    SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket();
+    sslServerSocket.setNeedClientAuth(tlsContextFactory.isTrustStoreConfigured());
+    return sslServerSocket;
+  }
 }

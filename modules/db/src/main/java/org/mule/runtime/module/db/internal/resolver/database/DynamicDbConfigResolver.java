@@ -32,85 +32,72 @@ import javax.sql.DataSource;
 /**
  * Resolves a {@link DbConfig} from a dynamic {@link DataSourceConfig}.
  * <p>
- * Resolved {@link DbConfig} are cached and reused every time a
- * configured is resolved to the same static {@link DataSourceConfig}
+ * Resolved {@link DbConfig} are cached and reused every time a configured is resolved to the same static {@link DataSourceConfig}
  * </p>
  */
-public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver
-{
+public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver {
 
-    public static final String TEST_CONNECTION_ERROR = "Cannot test connection on a dynamic DB config";
-    public static final String NO_METADATA_OBTAINED = "No metadata obtained";
+  public static final String TEST_CONNECTION_ERROR = "Cannot test connection on a dynamic DB config";
+  public static final String NO_METADATA_OBTAINED = "No metadata obtained";
 
-    private final String name;
-    private final DbConfigFactory dbConfigFactory;
-    private final DataSourceConfig dataSourceConfig;
-    private final DataSourceFactory dataSourceFactory;
-    private final Map<DataSourceConfig, DbConfig> cache = new HashMap<>();
-    private int instanceCount = 1;
+  private final String name;
+  private final DbConfigFactory dbConfigFactory;
+  private final DataSourceConfig dataSourceConfig;
+  private final DataSourceFactory dataSourceFactory;
+  private final Map<DataSourceConfig, DbConfig> cache = new HashMap<>();
+  private int instanceCount = 1;
 
-    public DynamicDbConfigResolver(String name, DbConfigFactory dbConfigFactory, DataSourceFactory dataSourceFactory, DataSourceConfig dataSourceConfig)
-    {
-        this.name = name;
-        this.dbConfigFactory = dbConfigFactory;
-        this.dataSourceConfig = dataSourceConfig;
-        this.dataSourceFactory = dataSourceFactory;
-    }
+  public DynamicDbConfigResolver(String name, DbConfigFactory dbConfigFactory, DataSourceFactory dataSourceFactory,
+                                 DataSourceConfig dataSourceConfig) {
+    this.name = name;
+    this.dbConfigFactory = dbConfigFactory;
+    this.dataSourceConfig = dataSourceConfig;
+    this.dataSourceFactory = dataSourceFactory;
+  }
 
-    @Override
-    public DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException
-    {
-        DataSourceConfig resolvedDataSourceConfig = this.dataSourceConfig.resolve(muleEvent);
+  @Override
+  public DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException {
+    DataSourceConfig resolvedDataSourceConfig = this.dataSourceConfig.resolve(muleEvent);
 
-        DbConfig dbConfig = cache.get(resolvedDataSourceConfig);
+    DbConfig dbConfig = cache.get(resolvedDataSourceConfig);
 
-        if (dbConfig == null)
-        {
-            synchronized (cache)
-            {
-                dbConfig = cache.get(resolvedDataSourceConfig);
-                if (dbConfig == null)
-                {
-                    try
-                    {
-                        DataSource dynamicDataSource = dataSourceFactory.create(resolvedDataSourceConfig);
-                        dbConfig = dbConfigFactory.create(generateDbConfigName(), getAnnotations(), dynamicDataSource);
-                        dbConfig.setAnnotations(getAnnotations());
-                        cache.put(resolvedDataSourceConfig, dbConfig);
-                    }
-                    catch (SQLException e)
-                    {
-                        throw new UnresolvableDbConfigException("Cannot create dynamic dataSource", e);
-                    }
-                }
-            }
+    if (dbConfig == null) {
+      synchronized (cache) {
+        dbConfig = cache.get(resolvedDataSourceConfig);
+        if (dbConfig == null) {
+          try {
+            DataSource dynamicDataSource = dataSourceFactory.create(resolvedDataSourceConfig);
+            dbConfig = dbConfigFactory.create(generateDbConfigName(), getAnnotations(), dynamicDataSource);
+            dbConfig.setAnnotations(getAnnotations());
+            cache.put(resolvedDataSourceConfig, dbConfig);
+          } catch (SQLException e) {
+            throw new UnresolvableDbConfigException("Cannot create dynamic dataSource", e);
+          }
         }
-
-        return dbConfig;
+      }
     }
 
-    private String generateDbConfigName()
-    {
-        return name + "-dynamic-" + instanceCount++;
-    }
+    return dbConfig;
+  }
 
-    @Override
-    public TestResult test()
-    {
-        return new DefaultTestResult(FAILURE, TEST_CONNECTION_ERROR);
-    }
+  private String generateDbConfigName() {
+    return name + "-dynamic-" + instanceCount++;
+  }
 
-    @Override
-    public Result<List<MetaDataKey>> getMetaDataKeys()
-    {
-        List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
+  @Override
+  public TestResult test() {
+    return new DefaultTestResult(FAILURE, TEST_CONNECTION_ERROR);
+  }
 
-        return new DefaultResult<>(keys, FAILURE, NO_METADATA_OBTAINED);
-    }
+  @Override
+  public Result<List<MetaDataKey>> getMetaDataKeys() {
+    List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
 
-    @Override
-    public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
-    {
-        return new DefaultResult<>(null, FAILURE, NO_METADATA_OBTAINED);
-    }
+    return new DefaultResult<>(keys, FAILURE, NO_METADATA_OBTAINED);
+  }
+
+  @Override
+  public Result<MetaData> getMetaData(MetaDataKey metaDataKey) {
+    return new DefaultResult<>(null, FAILURE, NO_METADATA_OBTAINED);
+  }
 }

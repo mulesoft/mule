@@ -11,111 +11,90 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * A simple configuration object for holding the common Expression evaluator configuration. The
- * {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression information in a
- * format that can be passed into the {@link DefaultExpressionManager}
+ * {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression information in a format that can be
+ * passed into the {@link DefaultExpressionManager}
  */
-public class ExpressionConfig
-{
-    private String unParsedExpression;
-    private String expression;
+public class ExpressionConfig {
 
-    private String fullExpression;
+  private String unParsedExpression;
+  private String expression;
 
-    private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-    private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-    private volatile boolean parsed = false;
+  private String fullExpression;
 
-    public ExpressionConfig()
-    {
-        super();
+  private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+  private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+  private volatile boolean parsed = false;
+
+  public ExpressionConfig() {
+    super();
+  }
+
+  public ExpressionConfig(String expression) {
+    this(expression, ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+
+  }
+
+  public ExpressionConfig(String expression, String expressionPrefix, String expressionPostfix) {
+    setExpression(expression);
+    this.expressionPostfix = expressionPostfix;
+    this.expressionPrefix = expressionPrefix;
+  }
+
+  public void parse(String expressionString) {
+    if (parsed) {
+      return;
     }
 
-    public ExpressionConfig(String expression)
-    {
-        this(expression, ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+    synchronized (this) {
+      if (parsed) {
+        return;
+      }
 
+      doParse(expressionString);
+
+      parsed = true;
     }
+  }
 
-    public ExpressionConfig(String expression,
-                            String expressionPrefix,
-                            String expressionPostfix)
-    {
-        setExpression(expression);
-        this.expressionPostfix = expressionPostfix;
-        this.expressionPrefix = expressionPrefix;
+  private void doParse(String expressionString) {
+    if (expressionString.startsWith(expressionPrefix)) {
+      expressionString = expressionString.substring(expressionPrefix.length());
+      expressionString = expressionString.substring(0, expressionString.length() - expressionPostfix.length());
     }
+    this.expression = expressionString;
+  }
 
-    public void parse(String expressionString)
-    {
-        if (parsed)
-        {
-            return;
-        }
-
-        synchronized (this)
-        {
-            if (parsed)
-            {
-                return;
-            }
-
-            doParse(expressionString);
-
-            parsed = true;
-        }
+  public void validate(ExpressionManager manager) {
+    if (expression == null) {
+      parse(unParsedExpression);
     }
-
-    private void doParse(String expressionString)
-    {
-        if (expressionString.startsWith(expressionPrefix))
-        {
-            expressionString = expressionString.substring(expressionPrefix.length());
-            expressionString = expressionString.substring(0,
-                expressionString.length() - expressionPostfix.length());
-        }
-        this.expression = expressionString;
+    if (expression == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
     }
+  }
 
-    public void validate(ExpressionManager manager)
-    {
-        if (expression == null)
-        {
-            parse(unParsedExpression);
-        }
-        if (expression == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
-        }
+  public String getFullExpression(ExpressionManager manager) {
+    if (fullExpression == null) {
+      if (expression == null) {
+        parse(unParsedExpression);
+      }
+      validate(manager);
+      fullExpression = expressionPrefix + expression + expressionPostfix;
     }
+    return fullExpression;
+  }
 
-    public String getFullExpression(ExpressionManager manager)
-    {
-        if (fullExpression == null)
-        {
-            if (expression == null)
-            {
-                parse(unParsedExpression);
-            }
-            validate(manager);
-            fullExpression = expressionPrefix + expression + expressionPostfix;
-        }
-        return fullExpression;
+  public String getExpression() {
+    if (expression == null) {
+      parse(unParsedExpression);
     }
+    return expression;
+  }
 
-    public String getExpression()
-    {
-        if (expression == null)
-        {
-            parse(unParsedExpression);
-        }
-        return expression;
-    }
-
-    public void setExpression(String expression)
-    {
-        this.unParsedExpression = expression;
-        this.expression = null;
-        this.fullExpression = null;
-        this.parsed = false;
-    }
+  public void setExpression(String expression) {
+    this.unParsedExpression = expression;
+    this.expression = null;
+    this.fullExpression = null;
+    this.parsed = false;
+  }
 }

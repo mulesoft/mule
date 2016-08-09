@@ -12,22 +12,19 @@ package org.mule.runtime.core.streaming;
  * 
  * @since 3.5.0
  */
-public class PagingConfiguration
-{
+public class PagingConfiguration {
 
-    /**
-     * The amount of items to fetch on each invocation to the data source
-     */
-    private int fetchSize;
+  /**
+   * The amount of items to fetch on each invocation to the data source
+   */
+  private int fetchSize;
 
-    public PagingConfiguration(int fetchSize)
-    {
-        this.fetchSize = fetchSize;
-    }
+  public PagingConfiguration(int fetchSize) {
+    this.fetchSize = fetchSize;
+  }
 
-    public int getFetchSize()
-    {
-        return fetchSize;
-    }
+  public int getFetchSize() {
+    return fetchSize;
+  }
 
 }

@@ -18,64 +18,47 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but treats
- * <code>java.lang.String</code> differently by converting to bytes using the
- * <code>String.getBytes()</code> method.
+ * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but treats <code>java.lang.String</code>
+ * differently by converting to bytes using the <code>String.getBytes()</code> method.
  */
-public class ObjectToByteArray extends SerializableToByteArray
-{
-    public ObjectToByteArray()
-    {
-        this.registerSourceType(DataType.INPUT_STREAM);
-        this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.fromType(OutputHandler.class));
-        setReturnDataType(DataType.BYTE_ARRAY);
+public class ObjectToByteArray extends SerializableToByteArray {
+
+  public ObjectToByteArray() {
+    this.registerSourceType(DataType.INPUT_STREAM);
+    this.registerSourceType(DataType.STRING);
+    this.registerSourceType(DataType.fromType(OutputHandler.class));
+    setReturnDataType(DataType.BYTE_ARRAY);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    try {
+      if (src instanceof String) {
+        return src.toString().getBytes(outputEncoding);
+      } else if (src instanceof InputStream) {
+        InputStream is = (InputStream) src;
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+          IOUtils.copyLarge(is, byteOut);
+        } finally {
+          is.close();
+        }
+        return byteOut.toByteArray();
+      } else if (src instanceof OutputHandler) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        try {
+          ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
+
+          return bytes.toByteArray();
+        } catch (IOException e) {
+          throw new TransformerException(this, e);
+        }
+      }
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        try
-        {
-            if (src instanceof String)
-            {
-                return src.toString().getBytes(outputEncoding);
-            }
-            else if (src instanceof InputStream)
-            {
-                InputStream is = (InputStream) src;
-                ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                try
-                {
-                    IOUtils.copyLarge(is, byteOut);
-                }
-                finally
-                {
-                    is.close();
-                }
-                return byteOut.toByteArray();
-            }
-            else if (src instanceof OutputHandler)
-            {
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                
-                try
-                {
-                    ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
-                    
-                    return bytes.toByteArray();
-                }
-                catch (IOException e)
-                {
-                    throw new TransformerException(this, e);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-
-        return super.doTransform(src, outputEncoding);
-    }
+    return super.doTransform(src, outputEncoding);
+  }
 }

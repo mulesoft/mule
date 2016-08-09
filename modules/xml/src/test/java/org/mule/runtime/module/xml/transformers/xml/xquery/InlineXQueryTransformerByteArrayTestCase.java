@@ -12,30 +12,27 @@ import java.io.InputStream;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
-public class InlineXQueryTransformerByteArrayTestCase extends InlineXQueryTransformerTestCase
-{
-    private byte[] srcData;
-    private String resultData;
+public class InlineXQueryTransformerByteArrayTestCase extends InlineXQueryTransformerTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        XMLUnit.setIgnoreWhitespace(true);
-        srcData = IOUtils.toByteArray(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()));
-        
-        InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-result-utf-8.xml", getClass());
-        resultData = new String(IOUtils.toByteArray(resourceStream), "UTF-8");
-    }
+  private byte[] srcData;
+  private String resultData;
 
-    @Override
-    public Object getTestData()
-    {
-        return srcData;
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    XMLUnit.setIgnoreWhitespace(true);
+    srcData = IOUtils.toByteArray(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()));
 
-    @Override
-    public Object getResultData()
-    {
-        return resultData;
-    }
+    InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-result-utf-8.xml", getClass());
+    resultData = new String(IOUtils.toByteArray(resourceStream), "UTF-8");
+  }
+
+  @Override
+  public Object getTestData() {
+    return srcData;
+  }
+
+  @Override
+  public Object getResultData() {
+    return resultData;
+  }
 }

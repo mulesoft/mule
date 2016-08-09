@@ -16,16 +16,14 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DomainMuleContextBuilderTestCase extends AbstractMuleTestCase
-{
+public class DomainMuleContextBuilderTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void createsContainerConfiguration() throws Exception
-    {
-        DomainMuleContextBuilder builder = new DomainMuleContextBuilder("test");
+  @Test
+  public void createsContainerConfiguration() throws Exception {
+    DomainMuleContextBuilder builder = new DomainMuleContextBuilder("test");
 
-        MuleConfiguration muleConfiguration = builder.getMuleConfiguration();
+    MuleConfiguration muleConfiguration = builder.getMuleConfiguration();
 
-        assertThat(muleConfiguration.isContainerMode(), is(true));
-    }
+    assertThat(muleConfiguration.isContainerMode(), is(true));
+  }
 }

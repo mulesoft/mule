@@ -19,67 +19,66 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 /**
  * Configuration required for UntilSuccessful router processing strategy.
  */
-public interface UntilSuccessfulConfiguration
-{
+public interface UntilSuccessfulConfiguration {
 
-    /**
-     * @return threading profile to executes message processing inside until successful. Always returns a not null value.
-     */
-    ThreadingProfile getThreadingProfile();
+  /**
+   * @return threading profile to executes message processing inside until successful. Always returns a not null value.
+   */
+  ThreadingProfile getThreadingProfile();
 
-    /**
-     * @param threadPrefix the prefix for the name of the threads of this executor's pool.
-     * @return an executor responsible for calling the retries for this processing strategy.
-     */
-    ScheduledThreadPoolExecutor createScheduledRetriesPool(final String threadPrefix);
+  /**
+   * @param threadPrefix the prefix for the name of the threads of this executor's pool.
+   * @return an executor responsible for calling the retries for this processing strategy.
+   */
+  ScheduledThreadPoolExecutor createScheduledRetriesPool(final String threadPrefix);
 
-    /**
-     * @return an ObjectStore to store until successful internal data. Always returns a not null value.
-     */
-    ListableObjectStore<MuleEvent> getObjectStore();
+  /**
+   * @return an ObjectStore to store until successful internal data. Always returns a not null value.
+   */
+  ListableObjectStore<MuleEvent> getObjectStore();
 
-    /**
-     * @return ExpressionFilter to determine if the message was processed successfully or not. Always returns a not null value.
-     */
-    ExpressionFilter getFailureExpressionFilter();
+  /**
+   * @return ExpressionFilter to determine if the message was processed successfully or not. Always returns a not null value.
+   */
+  ExpressionFilter getFailureExpressionFilter();
 
-    /**
-     * @return the route to which the message should be routed to. Always returns a not null value.
-     */
-    MessageProcessor getRoute();
+  /**
+   * @return the route to which the message should be routed to. Always returns a not null value.
+   */
+  MessageProcessor getRoute();
 
-    /**
-     * @return the MuleContext within the until-successful router was defined. Always returns a not null value.
-     */
-    MuleContext getMuleContext();
+  /**
+   * @return the MuleContext within the until-successful router was defined. Always returns a not null value.
+   */
+  MuleContext getMuleContext();
 
-    /**
-     * @return the FlowConstruct within the until-successful router was defined. Always returns a not null value.
-     */
-    FlowConstruct getFlowConstruct();
+  /**
+   * @return the FlowConstruct within the until-successful router was defined. Always returns a not null value.
+   */
+  FlowConstruct getFlowConstruct();
 
-    /**
-     * @return the expression that will define the returned payload after the until successful route execution.
-     */
-    String getAckExpression();
+  /**
+   * @return the expression that will define the returned payload after the until successful route execution.
+   */
+  String getAckExpression();
 
-    /**
-     * @return the number of milliseconds between retries. Default value is 60000.
-     */
-    long getMillisBetweenRetries();
+  /**
+   * @return the number of milliseconds between retries. Default value is 60000.
+   */
+  long getMillisBetweenRetries();
 
-    /**
-     * @return the number of retries to process the route when failing. Default value is 5.
-     */
-    int getMaxRetries();
+  /**
+   * @return the number of retries to process the route when failing. Default value is 5.
+   */
+  int getMaxRetries();
 
-    /**
-     * @return the route to which the message must be sent if the processing fails.
-     */
-    MessageProcessor getDlqMP();
+  /**
+   * @return the route to which the message must be sent if the processing fails.
+   */
+  MessageProcessor getDlqMP();
 
-    /**
-     * @return the until sucessful router instance.
-     */
-    MessageProcessor getRouter();
+  /**
+   * @return the until sucessful router instance.
+   */
+  MessageProcessor getRouter();
 }

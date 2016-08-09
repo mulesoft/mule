@@ -12,20 +12,16 @@ import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStra
 import org.mule.runtime.core.util.collection.SplittingStrategy;
 
 /**
- * Splits a message that has a Collection, Iterable, MessageSequence or Iterator
- * payload invoking the next message processor one
+ * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload invoking the next message processor one
  * for each item in it.
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http
- * ://www.eaipatterns.com/Sequencer.html</a>
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http ://www.eaipatterns.com/Sequencer.html</a>
  */
-public class CollectionSplitter extends AbstractMessageSequenceSplitter
-{
-    
-    private SplittingStrategy<MuleEvent, MessageSequence<?>> strategy = new EventToMessageSequenceSplittingStrategy();
-    
-    protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
-    {
-        return this.strategy.split(event);
-    }
+public class CollectionSplitter extends AbstractMessageSequenceSplitter {
+
+  private SplittingStrategy<MuleEvent, MessageSequence<?>> strategy = new EventToMessageSequenceSplittingStrategy();
+
+  protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event) {
+    return this.strategy.split(event);
+  }
 }

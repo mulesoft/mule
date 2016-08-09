@@ -18,17 +18,15 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 @SmallTest
-public class NullPayloadTestCase extends AbstractMuleTestCase
-{
+public class NullPayloadTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testUniqueDeserialization()
-    {
-        byte[] serialized = SerializationUtils.serialize(null);
-        assertNotNull(serialized);
+  @Test
+  public void testUniqueDeserialization() {
+    byte[] serialized = SerializationUtils.serialize(null);
+    assertNotNull(serialized);
 
-        Object deserialized = SerializationUtils.deserialize(serialized);
-        assertThat(deserialized, is(nullValue()));
-    }
+    Object deserialized = SerializationUtils.deserialize(serialized);
+    assertThat(deserialized, is(nullValue()));
+  }
 
 }

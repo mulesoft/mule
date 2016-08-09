@@ -27,29 +27,27 @@ import java.util.Collections;
 import org.junit.Test;
 
 @SmallTest
-public class GenericStatementResultIteratorFactoryTestCase extends AbstractMuleTestCase
-{
+public class GenericStatementResultIteratorFactoryTestCase extends AbstractMuleTestCase {
 
-    private final GenericStatementResultIteratorFactory resultIteratorFactory = new GenericStatementResultIteratorFactory(null);
-    private final Statement statement = mock(CallableStatement.class);
+  private final GenericStatementResultIteratorFactory resultIteratorFactory = new GenericStatementResultIteratorFactory(null);
+  private final Statement statement = mock(CallableStatement.class);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void createsIterator() throws Exception
-    {
-        DbConnection connection = createMockConnection(true);
+  @Test(expected = IllegalArgumentException.class)
+  public void createsIterator() throws Exception {
+    DbConnection connection = createMockConnection(true);
 
-        StatementResultIterator statementResultIterator = resultIteratorFactory.create(connection, statement, new QueryTemplate(null, STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList()), null);
+    StatementResultIterator statementResultIterator = resultIteratorFactory
+        .create(connection, statement, new QueryTemplate(null, STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList()), null);
 
-        assertThat(statementResultIterator, instanceOf(StatementResultIterator.class));
-    }
+    assertThat(statementResultIterator, instanceOf(StatementResultIterator.class));
+  }
 
-    private DbConnection createMockConnection(boolean supportsMultipleOpenResults) throws SQLException
-    {
-        DbConnection connection = mock(DbConnection.class);
-        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
-        when(metaData.supportsMultipleOpenResults()).thenReturn(supportsMultipleOpenResults);
-        when(connection.getMetaData()).thenReturn(metaData);
+  private DbConnection createMockConnection(boolean supportsMultipleOpenResults) throws SQLException {
+    DbConnection connection = mock(DbConnection.class);
+    DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+    when(metaData.supportsMultipleOpenResults()).thenReturn(supportsMultipleOpenResults);
+    when(connection.getMetaData()).thenReturn(metaData);
 
-        return connection;
-    }
+    return connection;
+  }
 }

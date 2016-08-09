@@ -9,22 +9,20 @@ package org.mule.compatibility.transport.tcp.integration;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class EOFEchoStreamTestComponent
-{
-    public Object invoke(final InputStream is) throws IOException
-    {
-        byte[] buf = new byte[is.available()];
-        int n = 0;
-        int total = 0;
-        while (total < 16)
-        {
-            n = is.read(buf);
-            total += n;
-        }
-        is.close();
-        
-        return new String(buf);
+public class EOFEchoStreamTestComponent {
+
+  public Object invoke(final InputStream is) throws IOException {
+    byte[] buf = new byte[is.available()];
+    int n = 0;
+    int total = 0;
+    while (total < 16) {
+      n = is.read(buf);
+      total += n;
     }
+    is.close();
+
+    return new String(buf);
+  }
 }
 
 

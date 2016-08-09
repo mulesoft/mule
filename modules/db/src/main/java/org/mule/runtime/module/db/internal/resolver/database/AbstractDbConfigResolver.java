@@ -19,35 +19,30 @@ import java.util.List;
 /**
  * Provides a base implementation for resolver's metadata related functionality
  */
-public abstract class AbstractDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver
-{
+public abstract class AbstractDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver {
 
-    @Override
-    public TestResult test()
-    {
-        DbConfig dbConfig = resolveDefaultConfig();
+  @Override
+  public TestResult test() {
+    DbConfig dbConfig = resolveDefaultConfig();
 
-        return dbConfig.test();
-    }
+    return dbConfig.test();
+  }
 
-    @Override
-    public Result<List<MetaDataKey>> getMetaDataKeys()
-    {
-        DbConfig dbConfig = resolveDefaultConfig();
+  @Override
+  public Result<List<MetaDataKey>> getMetaDataKeys() {
+    DbConfig dbConfig = resolveDefaultConfig();
 
-        return dbConfig.getMetaDataKeys();
-    }
+    return dbConfig.getMetaDataKeys();
+  }
 
-    @Override
-    public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
-    {
-        DbConfig dbConfig = resolveDefaultConfig();
+  @Override
+  public Result<MetaData> getMetaData(MetaDataKey metaDataKey) {
+    DbConfig dbConfig = resolveDefaultConfig();
 
-        return dbConfig.getMetaData(metaDataKey);
-    }
+    return dbConfig.getMetaData(metaDataKey);
+  }
 
-    protected DbConfig resolveDefaultConfig()
-    {
-        return resolve(null);
-    }
+  protected DbConfig resolveDefaultConfig() {
+    return resolve(null);
+  }
 }

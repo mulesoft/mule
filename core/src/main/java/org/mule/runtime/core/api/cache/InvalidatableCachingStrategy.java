@@ -11,23 +11,22 @@ import java.io.Serializable;
 /**
  * Provides invalidation capability to a {@link CachingStrategy}
  */
-public interface InvalidatableCachingStrategy
-{
+public interface InvalidatableCachingStrategy {
 
-    /**
-     * Invalidates all the entries in the cache
-     *
-     * @throws InvalidateCacheException if there is any error invalidating the cache strategy
-     */
-    void invalidate();
+  /**
+   * Invalidates all the entries in the cache
+   *
+   * @throws InvalidateCacheException if there is any error invalidating the cache strategy
+   */
+  void invalidate();
 
-    /**
-     * Invalidates a given entry from the cache if it exists, otherwise ignores it.
-     *
-     * @param key indicates the cache entry to invalidate. Cannot be null.
-     *
-     * @throws InvalidateCacheException if there is any error invalidating the cache strategy
-     * @throws IllegalArgumentException if key has an invalid value
-     */
-    void invalidate(Serializable key) throws InvalidateCacheException;
+  /**
+   * Invalidates a given entry from the cache if it exists, otherwise ignores it.
+   *
+   * @param key indicates the cache entry to invalidate. Cannot be null.
+   *
+   * @throws InvalidateCacheException if there is any error invalidating the cache strategy
+   * @throws IllegalArgumentException if key has an invalid value
+   */
+  void invalidate(Serializable key) throws InvalidateCacheException;
 }

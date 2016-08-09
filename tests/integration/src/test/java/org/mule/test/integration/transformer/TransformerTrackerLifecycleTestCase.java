@@ -13,28 +13,22 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTestCase
-{
+public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/transformers/transformer-lifecycle-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/transformers/transformer-lifecycle-flow.xml";
+  }
 
-    @Test
-    public void testLifecycle() throws Exception
-    {
-        final MuleMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
+  @Test
+  public void testLifecycle() throws Exception {
+    final MuleMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
 
-        final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
+    final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
 
-        muleContext.dispose();
+    muleContext.dispose();
 
-        assertThat(ltt.getTracker(),
-                contains("setProperty",
-                        "setMuleContext", "setMuleContext",
-                        "initialise", "start",
-                        "stop", "dispose"));
-    }
+    assertThat(ltt.getTracker(),
+               contains("setProperty", "setMuleContext", "setMuleContext", "initialise", "start", "stop", "dispose"));
+  }
 }

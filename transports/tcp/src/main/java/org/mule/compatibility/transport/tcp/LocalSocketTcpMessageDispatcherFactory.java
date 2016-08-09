@@ -16,13 +16,11 @@ import org.mule.runtime.core.api.MuleException;
  * 
  * @since 2.2.6
  */
-public class LocalSocketTcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
+public class LocalSocketTcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
 
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new LocalSocketTcpMessageDispatcher(endpoint);
-    }
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new LocalSocketTcpMessageDispatcher(endpoint);
+  }
 
 }

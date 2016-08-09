@@ -37,252 +37,214 @@ import java.util.Calendar;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
-{
+public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
-    private String a = "hi";
-    private String b = "hi";
+  private String a = "hi";
+  private String b = "hi";
 
-    public ExpressionLanguageExtensionTestCase(Variant variant, String mvelOptimizer)
-    {
-        super(variant, mvelOptimizer);
-    }
+  public ExpressionLanguageExtensionTestCase(Variant variant, String mvelOptimizer) {
+    super(variant, mvelOptimizer);
+  }
+
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    return new DefaultsConfigurationBuilder() {
+
+      @Override
+      public void configure(MuleContext muleContext) throws ConfigurationException {
+        super.configure(muleContext);
+        try {
+          muleContext.getRegistry().registerObject("key1", new TestExtension());
+        } catch (RegistrationException e) {
+          throw new ConfigurationException(e);
+        }
+      }
+    };
+  }
+
+  @Override
+  protected ExpressionLanguage getExpressionLanguage() throws RegistrationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    return mvel;
+  }
+
+  @Test
+  public void importClass() throws RegistrationException, InitialisationException {
+    Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("Calendar"));
+  }
+
+  @Test
+  public void importClassWithName() throws RegistrationException, InitialisationException {
+    Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("CAL"));
+  }
+
+  @Test
+  public void importStaticMethod() throws RegistrationException, InitialisationException {
+    Assert.assertEquals(DateFormat.getInstance(), expressionLanguage.evaluate("dateFormat()"));
+  }
+
+  @Test
+  public void variable() throws RegistrationException, InitialisationException {
+    Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
+  }
+
+  @Test
+  public void assignValueToVariable() throws RegistrationException, InitialisationException {
+    expressionLanguage.evaluate("a='1'");
+  }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void assignValueToFinalVariable() throws RegistrationException, InitialisationException {
+    expressionLanguage.evaluate("final='1'");
+  }
+
+  @Test
+  public void mutableVariable() throws RegistrationException, InitialisationException {
+    Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
+  }
+
+  @Test
+  public void assignValueToMutableVariable() throws RegistrationException, InitialisationException {
+    Assert.assertEquals("hi", expressionLanguage.evaluate("b='1'"));
+    Assert.assertEquals("1", b);
+  }
+
+  @Test
+  public void testShortcutVariable() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    Assert.assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("appShortcut.name"));
+  }
+
+  @Test
+  public void testVariableAlias() throws Exception {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    MuleEvent event = getTestEvent("foo");
+
+    Assert.assertEquals("foo", mvel.evaluate("p", event));
+  }
+
+  @Test
+  public void testAssignValueToVariableAlias() throws Exception {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    MuleEvent event = getTestEvent("");
+
+    mvel.evaluate("p='bar'", event);
+    Assert.assertEquals("bar", event.getMessage().getPayload());
+  }
+
+  @Test
+  public void testMuleMessageAvailableAsVariable() throws Exception {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    MuleEvent event = getTestEvent("");
+    MuleMessage message = event.getMessage();
+    mvel.evaluate("p=m.uniqueId", event);
+    Assert.assertEquals(message.getUniqueId(), event.getMessage().getPayload());
+  }
+
+  @Test
+  public void testFunction() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    Assert.assertEquals("called param[0]=one,param[1]=two,app.name=" + muleContext.getConfiguration().getId(),
+                        mvel.evaluate("f('one','two')"));
+  }
+
+  @Test
+  public void testMuleContextAvailableInFunction() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    Assert.assertEquals(muleContext, mvel.evaluate("muleContext()"));
+  }
+
+  @Test
+  public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+
+    MuleEvent event = mock(MuleEvent.class);
+    MuleMessage message = mock(MuleMessage.class);
+    when(event.getMessage()).thenReturn(message);
+
+    Assert.assertEquals(message, mvel.evaluate("muleMessage()", event));
+  }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testFunctionInvalidParams() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+    mvel.evaluate("f('one')");
+  }
+
+  @Test
+  public void testParserContextThreadLocalCleared() throws RegistrationException, InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    mvel.initialise();
+    // Ensure ParserContext ThreadLocal is cleared after initialization (occurs in deployment thread)
+    assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
+    mvel.evaluate("f('one','two')");
+    // Ensure ParserContext ThreadLocal is cleared after evaluation (occurs in receiver/flow/dispatcher thread)
+    assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
+  }
+
+  class TestExtension implements ExpressionLanguageExtension {
 
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        return new DefaultsConfigurationBuilder()
-        {
-            @Override
-            public void configure(MuleContext muleContext) throws ConfigurationException
-            {
-                super.configure(muleContext);
-                try
-                {
-                    muleContext.getRegistry().registerObject("key1", new TestExtension());
-                }
-                catch (RegistrationException e)
-                {
-                    throw new ConfigurationException(e);
-                }
-            }
-        };
-    }
-
-    @Override
-    protected ExpressionLanguage getExpressionLanguage() throws RegistrationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        return mvel;
-    }
-    
-    @Test
-    public void importClass() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("Calendar"));
-    }
-
-    @Test
-    public void importClassWithName() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("CAL"));
-    }
-
-    @Test
-    public void importStaticMethod() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals(DateFormat.getInstance(), expressionLanguage.evaluate("dateFormat()"));
-    }
-
-    @Test
-    public void variable() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
-    }
-
-    @Test
-    public void assignValueToVariable() throws RegistrationException, InitialisationException
-    {
-        expressionLanguage.evaluate("a='1'");
-    }
-
-    @Test(expected = ExpressionRuntimeException.class)
-    public void assignValueToFinalVariable() throws RegistrationException, InitialisationException
-    {
-        expressionLanguage.evaluate("final='1'");
-    }
-
-    @Test
-    public void mutableVariable() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
-    }
-
-    @Test
-    public void assignValueToMutableVariable() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals("hi", expressionLanguage.evaluate("b='1'"));
-        Assert.assertEquals("1", b);
-    }
-
-    @Test
-    public void testShortcutVariable() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        Assert.assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("appShortcut.name"));
-    }
-
-    @Test
-    public void testVariableAlias() throws Exception
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        MuleEvent event = getTestEvent("foo");
-
-        Assert.assertEquals("foo", mvel.evaluate("p", event));
-    }
-
-    @Test
-    public void testAssignValueToVariableAlias() throws Exception
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        MuleEvent event = getTestEvent("");
-
-        mvel.evaluate("p='bar'", event);
-        Assert.assertEquals("bar", event.getMessage().getPayload());
-    }
-
-    @Test
-    public void testMuleMessageAvailableAsVariable() throws Exception
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
-        mvel.evaluate("p=m.uniqueId", event);
-        Assert.assertEquals(message.getUniqueId(), event.getMessage().getPayload());
-    }
-
-    @Test
-    public void testFunction() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        Assert.assertEquals("called param[0]=one,param[1]=two,app.name="
-                            + muleContext.getConfiguration().getId(), mvel.evaluate("f('one','two')"));
-    }
-
-    @Test
-    public void testMuleContextAvailableInFunction() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        Assert.assertEquals(muleContext, mvel.evaluate("muleContext()"));
-    }
-
-    @Test
-    public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-
-        MuleEvent event = mock(MuleEvent.class);
-        MuleMessage message = mock(MuleMessage.class);
-        when(event.getMessage()).thenReturn(message);
-
-        Assert.assertEquals(message, mvel.evaluate("muleMessage()", event));
-    }
-
-    @Test(expected = ExpressionRuntimeException.class)
-    public void testFunctionInvalidParams() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-        mvel.evaluate("f('one')");
-    }
-
-    @Test
-    public void testParserContextThreadLocalCleared() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        mvel.initialise();
-        // Ensure ParserContext ThreadLocal is cleared after initialization (occurs in deployment thread)
-        assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
-        mvel.evaluate("f('one','two')");
-        // Ensure ParserContext ThreadLocal is cleared after evaluation (occurs in receiver/flow/dispatcher thread)
-        assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
-    }
-
-    class TestExtension implements ExpressionLanguageExtension
-    {
+    public void configureContext(ExpressionLanguageContext context) {
+      context.importClass(Calendar.class);
+      context.importClass("CAL", Calendar.class);
+      try {
+        context.importStaticMethod("dateFormat", DateFormat.class.getMethod("getInstance", new Class[] {}));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      context.addVariable("a", a);
+      context.addVariable("b", b, new VariableAssignmentCallback<String>() {
 
         @Override
-        public void configureContext(ExpressionLanguageContext context)
-        {
-            context.importClass(Calendar.class);
-            context.importClass("CAL", Calendar.class);
-            try
-            {
-                context.importStaticMethod("dateFormat",
-                    DateFormat.class.getMethod("getInstance", new Class[]{}));
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-            context.addVariable("a", a);
-            context.addVariable("b", b, new VariableAssignmentCallback<String>()
-            {
-                @Override
-                public void assignValue(String name, String value, String newValue)
-                {
-                    b = newValue;
-                }
-            });
-            context.addAlias("appShortcut", "app");
-            context.addFinalVariable("final", "final");
-            context.addAlias("p", "message.payload");
-            try
-            {
-                context.addAlias("m","_muleMessage");
-            }
-            catch (Exception e)
-            {
-                //continue - test will fail.
-            }
-            context.declareFunction("f", new ExpressionLanguageFunction()
-            {
-                @Override
-                public Object call(Object[] params, ExpressionLanguageContext context)
-                {
-                    return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
-                           + ((AppContext) context.getVariable("app")).getName();
-                }
-            });
-            context.declareFunction("muleContext", new ExpressionLanguageFunction()
-            {
-                @Override
-                public Object call(Object[] params, ExpressionLanguageContext context)
-                {
-                    return context.getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE);
-                }
-            });
-            context.declareFunction("muleMessage", new ExpressionLanguageFunction()
-            {
-                @Override
-                public Object call(Object[] params, ExpressionLanguageContext context)
-                {
-                    return context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE);
-                }
-            });
+        public void assignValue(String name, String value, String newValue) {
+          b = newValue;
         }
+      });
+      context.addAlias("appShortcut", "app");
+      context.addFinalVariable("final", "final");
+      context.addAlias("p", "message.payload");
+      try {
+        context.addAlias("m", "_muleMessage");
+      } catch (Exception e) {
+        // continue - test will fail.
+      }
+      context.declareFunction("f", new ExpressionLanguageFunction() {
+
+        @Override
+        public Object call(Object[] params, ExpressionLanguageContext context) {
+          return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
+              + ((AppContext) context.getVariable("app")).getName();
+        }
+      });
+      context.declareFunction("muleContext", new ExpressionLanguageFunction() {
+
+        @Override
+        public Object call(Object[] params, ExpressionLanguageContext context) {
+          return context.getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE);
+        }
+      });
+      context.declareFunction("muleMessage", new ExpressionLanguageFunction() {
+
+        @Override
+        public Object call(Object[] params, ExpressionLanguageContext context) {
+          return context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE);
+        }
+      });
     }
+  }
 }

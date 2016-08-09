@@ -20,22 +20,19 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 
-public class DbTestUtil
-{
+public class DbTestUtil {
 
-    public static <T> List<Map<String, T>> selectData(String query, DataSource dataSource) throws SQLException
-    {
-        QueryRunner qr = new QueryRunner(dataSource);
+  public static <T> List<Map<String, T>> selectData(String query, DataSource dataSource) throws SQLException {
+    QueryRunner qr = new QueryRunner(dataSource);
 
-        @SuppressWarnings({"unchecked"})
-        List<Map<String, T>> result = (List<Map<String, T>>) qr.query(query, new MapListHandler());
+    @SuppressWarnings({"unchecked"})
+    List<Map<String, T>> result = (List<Map<String, T>>) qr.query(query, new MapListHandler());
 
-        return result;
-    }
+    return result;
+  }
 
-    public static void assertExpectedUpdateCount(int expected, int actual)
-    {
-        assertTrue(String.format("Update count is neither the expected one %s nor Statement.SUCCESS_NO_INFO", expected),
-                   expected == actual || Statement.SUCCESS_NO_INFO == actual);
-    }
+  public static void assertExpectedUpdateCount(int expected, int actual) {
+    assertTrue(String.format("Update count is neither the expected one %s nor Statement.SUCCESS_NO_INFO", expected),
+               expected == actual || Statement.SUCCESS_NO_INFO == actual);
+  }
 }

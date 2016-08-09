@@ -14,57 +14,46 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-class InboundPropertiesMapContext extends AbstractMapContext<Serializable>
-{
-    private MuleEvent event;
+class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
-    public InboundPropertiesMapContext(MuleEvent event)
-    {
-        this.event = event;
-    }
+  private MuleEvent event;
 
-    @Override
-    public Serializable doGet(String key)
-    {
-        return event.getMessage().getInboundProperty(key);
-    }
+  public InboundPropertiesMapContext(MuleEvent event) {
+    this.event = event;
+  }
 
-    @Override
-    public void doPut(String key, Serializable value)
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
-            .getMessage());
-    }
+  @Override
+  public Serializable doGet(String key) {
+    return event.getMessage().getInboundProperty(key);
+  }
 
-    @Override
-    public void doRemove(String key)
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
-            .getMessage());
-    }
+  @Override
+  public void doPut(String key, Serializable value) {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key).getMessage());
+  }
 
-    @Override
-    public Set<String> keySet()
-    {
-        return event.getMessage().getInboundPropertyNames();
-    }
+  @Override
+  public void doRemove(String key) {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key).getMessage());
+  }
 
-    @Override
-    public void clear()
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable()
-            .getMessage());
-    }
+  @Override
+  public Set<String> keySet() {
+    return event.getMessage().getInboundPropertyNames();
+  }
 
-    @Override
-    public String toString()
-    {
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (String key : event.getMessage().getInboundPropertyNames())
-        {
-            Object value = event.getMessage().getInboundProperty(key);
-            map.put(key, value);
-        }
-        return map.toString();
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable().getMessage());
+  }
+
+  @Override
+  public String toString() {
+    Map<String, Object> map = new HashMap<String, Object>();
+    for (String key : event.getMessage().getInboundPropertyNames()) {
+      Object value = event.getMessage().getInboundProperty(key);
+      map.put(key, value);
     }
+    return map.toString();
+  }
 }

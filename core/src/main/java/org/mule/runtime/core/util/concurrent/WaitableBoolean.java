@@ -7,176 +7,137 @@
 package org.mule.runtime.core.util.concurrent;
 
 // @ThreadSafe
-public class WaitableBoolean extends AbstractSynchronizedVariable
-{
-    // @GuardedBy(lock)
-    private boolean value;
+public class WaitableBoolean extends AbstractSynchronizedVariable {
 
-    public WaitableBoolean(boolean initialValue)
-    {
-        super();
-        synchronized (lock)
-        {
-            value = initialValue;
-        }
+  // @GuardedBy(lock)
+  private boolean value;
+
+  public WaitableBoolean(boolean initialValue) {
+    super();
+    synchronized (lock) {
+      value = initialValue;
     }
+  }
 
-    public WaitableBoolean(boolean initialValue, Object lock)
-    {
-        super(lock);
-        synchronized (this.lock)
-        {
-            value = initialValue;
-        }
+  public WaitableBoolean(boolean initialValue, Object lock) {
+    super(lock);
+    synchronized (this.lock) {
+      value = initialValue;
     }
+  }
 
-    public int compareTo(boolean other)
-    {
-        synchronized (lock)
-        {
-            return (value == other ? 0 : (value ? 1 : -1));
-        }
+  public int compareTo(boolean other) {
+    synchronized (lock) {
+      return (value == other ? 0 : (value ? 1 : -1));
     }
+  }
 
-    public int compareTo(WaitableBoolean other)
-    {
-        return this.compareTo(other.get());
+  public int compareTo(WaitableBoolean other) {
+    return this.compareTo(other.get());
+  }
+
+  public int compareTo(Object other) {
+    return this.compareTo((WaitableBoolean) other);
+  }
+
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    } else if (other instanceof WaitableBoolean) {
+      synchronized (lock) {
+        return (value == ((WaitableBoolean) other).get());
+      }
+    } else {
+      return false;
     }
+  }
 
-    public int compareTo(Object other)
-    {
-        return this.compareTo((WaitableBoolean) other);
+  public int hashCode() {
+    return (this.get() ? 3412688 : 8319343); // entirely arbitrary
+  }
+
+  public String toString() {
+    return Boolean.toString(this.get());
+  }
+
+  public boolean get() {
+    synchronized (lock) {
+      return value;
     }
+  }
 
-    public boolean equals(Object other)
-    {
-        if (other == this)
-        {
-            return true;
-        }
-        else if (other instanceof WaitableBoolean)
-        {
-            synchronized (lock)
-            {
-                return (value == ((WaitableBoolean) other).get());
-            }
-        }
-        else
-        {
-            return false;
-        }
+  public boolean set(boolean newValue) {
+    synchronized (lock) {
+      lock.notifyAll();
+      boolean oldValue = value;
+      value = newValue;
+      return oldValue;
     }
+  }
 
-    public int hashCode()
-    {
-        return (this.get() ? 3412688 : 8319343); // entirely arbitrary
+  public boolean compareAndSet(boolean assumedValue, boolean newValue) {
+    synchronized (lock) {
+      boolean success = (value == assumedValue);
+
+      if (success) {
+        value = newValue;
+        lock.notifyAll();
+      }
+
+      return success;
     }
+  }
 
-    public String toString()
-    {
-        return Boolean.toString(this.get());
+  public boolean complement() {
+    synchronized (lock) {
+      lock.notifyAll();
+      return (value = !value);
     }
+  }
 
-    public boolean get()
-    {
-        synchronized (lock)
-        {
-            return value;
-        }
+  public boolean and(boolean b) {
+    synchronized (lock) {
+      lock.notifyAll();
+      return (value &= b);
     }
+  }
 
-    public boolean set(boolean newValue)
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-            boolean oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
+  public synchronized boolean or(boolean b) {
+    synchronized (lock) {
+      lock.notifyAll();
+      return (value |= b);
     }
+  }
 
-    public boolean compareAndSet(boolean assumedValue, boolean newValue)
-    {
-        synchronized (lock)
-        {
-            boolean success = (value == assumedValue);
-
-            if (success)
-            {
-                value = newValue;
-                lock.notifyAll();
-            }
-
-            return success;
-        }
+  public boolean xor(boolean b) {
+    synchronized (lock) {
+      lock.notifyAll();
+      return (value ^= b);
     }
+  }
 
-    public boolean complement()
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-            return (value = !value);
-        }
+  public void whenTrue(Runnable action) throws InterruptedException {
+    this.whenEqual(true, action);
+  }
+
+  public void whenFalse(Runnable action) throws InterruptedException {
+    this.whenNotEqual(true, action);
+  }
+
+  public void whenEqual(boolean condition, Runnable action) throws InterruptedException {
+    synchronized (lock) {
+      while (value != condition) {
+        lock.wait();
+      }
+
+      if (action != null) {
+        this.execute(action);
+      }
     }
+  }
 
-    public boolean and(boolean b)
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-            return (value &= b);
-        }
-    }
-
-    public synchronized boolean or(boolean b)
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-            return (value |= b);
-        }
-    }
-
-    public boolean xor(boolean b)
-    {
-        synchronized (lock)
-        {
-            lock.notifyAll();
-            return (value ^= b);
-        }
-    }
-
-    public void whenTrue(Runnable action) throws InterruptedException
-    {
-        this.whenEqual(true, action);
-    }
-
-    public void whenFalse(Runnable action) throws InterruptedException
-    {
-        this.whenNotEqual(true, action);
-    }
-
-    public void whenEqual(boolean condition, Runnable action) throws InterruptedException
-    {
-        synchronized (lock)
-        {
-            while (value != condition)
-            {
-                lock.wait();
-            }
-
-            if (action != null)
-            {
-                this.execute(action);
-            }
-        }
-    }
-
-    public void whenNotEqual(boolean condition, Runnable action) throws InterruptedException
-    {
-        this.whenEqual(!condition, action);
-    }
+  public void whenNotEqual(boolean condition, Runnable action) throws InterruptedException {
+    this.whenEqual(!condition, action);
+  }
 
 }

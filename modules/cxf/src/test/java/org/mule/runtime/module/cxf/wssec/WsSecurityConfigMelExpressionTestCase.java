@@ -20,35 +20,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/runtime/module/cxf/wssec/ws-security-config-mel-expression-config-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Test
-    public void testSuccessfulAuthentication() throws Exception
-    {
-        ClientPasswordCallback.setPassword("secret");
-        MuleMessage received = flowRunner("cxfClient").withPayload("PasswordText").run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/runtime/module/cxf/wssec/ws-security-config-mel-expression-config-httpn.xml";
+  }
 
-        assertNotNull(received);
-        assertEquals("Hello PasswordText", getPayloadAsString(received));
-    }
+  @Test
+  public void testSuccessfulAuthentication() throws Exception {
+    ClientPasswordCallback.setPassword("secret");
+    MuleMessage received = flowRunner("cxfClient").withPayload("PasswordText").run().getMessage();
 
-    @Test
-    public void testFailAuthentication() throws Exception
-    {
-        ClientPasswordCallback.setPassword("secret");
-        expectedException.expectCause(instanceOf(SOAPFaultException.class));
-        expectedException.expectMessage("Security exception occurred invoking web service");
-        flowRunner("cxfClient").withPayload("UnknownPasswordEncoding").run().getMessage();
-    }
+    assertNotNull(received);
+    assertEquals("Hello PasswordText", getPayloadAsString(received));
+  }
+
+  @Test
+  public void testFailAuthentication() throws Exception {
+    ClientPasswordCallback.setPassword("secret");
+    expectedException.expectCause(instanceOf(SOAPFaultException.class));
+    expectedException.expectMessage("Security exception occurred invoking web service");
+    flowRunner("cxfClient").withPayload("UnknownPasswordEncoding").run().getMessage();
+  }
 }

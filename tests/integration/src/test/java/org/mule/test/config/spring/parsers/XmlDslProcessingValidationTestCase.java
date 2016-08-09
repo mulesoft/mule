@@ -14,24 +14,24 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class XmlDslProcessingValidationTestCase extends AbstractMuleTestCase
-{
+public class XmlDslProcessingValidationTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    @Test
-    public void parameterAndChildAtOnce() throws Exception
-    {
-        expectedException.expectMessage("Component parsers-test:element-with-attribute-and-child has a child element parsers-test:my-pojo which is used for the same purpose of the configuration parameter myPojo. Only one must be used.");
-        new ApplicationContextBuilder().setApplicationResources(new String[]{"org/mule/config/spring/parsers/dsl-validation-duplicate-pojo-or-list-parameter-config.xml"}).build();
-    }
+  @Test
+  public void parameterAndChildAtOnce() throws Exception {
+    expectedException
+        .expectMessage("Component parsers-test:element-with-attribute-and-child has a child element parsers-test:my-pojo which is used for the same purpose of the configuration parameter myPojo. Only one must be used.");
+    new ApplicationContextBuilder().setApplicationResources(new String[] {
+        "org/mule/config/spring/parsers/dsl-validation-duplicate-pojo-or-list-parameter-config.xml"}).build();
+  }
 
-    @Test
-    public void namelessTopLevelElement() throws Exception
-    {
-        expectedException.expectMessage("Global element parsers-test:parameter-collection-parser does not provide a name attribute.");
-        new ApplicationContextBuilder().setApplicationResources(new String[]{"org/mule/config/spring/parsers/dsl-validation-nameless-top-level-element-config.xml"}).build();
-    }
+  @Test
+  public void namelessTopLevelElement() throws Exception {
+    expectedException.expectMessage("Global element parsers-test:parameter-collection-parser does not provide a name attribute.");
+    new ApplicationContextBuilder().setApplicationResources(new String[] {
+        "org/mule/config/spring/parsers/dsl-validation-nameless-top-level-element-config.xml"}).build();
+  }
 
 }

@@ -39,283 +39,232 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstract implementation of {@link FlowConstruct} that:
  * <ul>
- *  <li>Is constructed with unique name and {@link MuleContext}.
- *  <li>Uses a {@link MessageSource} as the source of messages.
- *  <li>Uses a chain of {@link MessageProcessor}s to process messages.
- *  <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and
- *  {@link MessageProcessor}s in the correct order depending on the lifecycle phase.
- *  <li>Allows an {@link ExceptionListener} to be set.
+ * <li>Is constructed with unique name and {@link MuleContext}.
+ * <li>Uses a {@link MessageSource} as the source of messages.
+ * <li>Uses a chain of {@link MessageProcessor}s to process messages.
+ * <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and {@link MessageProcessor}s in the correct
+ * order depending on the lifecycle phase.
+ * <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
- * Implementations of <code>AbstractFlowConstuct</code> should implement
- * {@link #validateConstruct()} validate the resulting construct. Validation may
- * include validation of the type of attributes of the {@link MessageSource}.
+ * Implementations of <code>AbstractFlowConstuct</code> should implement {@link #validateConstruct()} validate the resulting
+ * construct. Validation may include validation of the type of attributes of the {@link MessageSource}.
  * <p/>
- * Implementations may also implement {@link #doInitialise()}, {@link #doStart()},
- * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
- * lifecycle transitions.
+ * Implementations may also implement {@link #doInitialise()}, {@link #doStart()}, {@link #doStop()} and {@link #doDispose()} if
+ * they need to perform any action on lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct, Lifecycle
-{
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
+public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct, Lifecycle {
 
-    protected String name;
-    protected MessagingExceptionHandler exceptionListener;
-    protected final FlowConstructLifecycleManager lifecycleManager;
-    protected final MuleContext muleContext;
-    protected FlowConstructStatistics statistics;
+  protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
-    /**
-     * The initial states that the flow can be started in
-     */
-    public static final String INITIAL_STATE_STOPPED = "stopped";
-    public static final String INITIAL_STATE_STARTED = "started";
+  protected String name;
+  protected MessagingExceptionHandler exceptionListener;
+  protected final FlowConstructLifecycleManager lifecycleManager;
+  protected final MuleContext muleContext;
+  protected FlowConstructStatistics statistics;
 
-    /**
-     * Determines the initial state of this flow when the mule starts. Can be
-     * 'stopped' or 'started' (default)
-     */
-    protected String initialState = INITIAL_STATE_STARTED;
+  /**
+   * The initial states that the flow can be started in
+   */
+  public static final String INITIAL_STATE_STOPPED = "stopped";
+  public static final String INITIAL_STATE_STARTED = "started";
 
-    public AbstractFlowConstruct(String name, MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-        this.name = name;
-        this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
+  /**
+   * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
+   */
+  protected String initialState = INITIAL_STATE_STARTED;
+
+  public AbstractFlowConstruct(String name, MuleContext muleContext) {
+    this.muleContext = muleContext;
+    this.name = name;
+    this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
+  }
+
+  @Override
+  public final void initialise() throws InitialisationException {
+    try {
+      if (exceptionListener == null) {
+        this.exceptionListener = muleContext.getDefaultExceptionStrategy();
+      }
+      lifecycleManager.fireInitialisePhase((phaseName, object) -> {
+        injectFlowConstructMuleContext(exceptionListener);
+        initialiseIfInitialisable(exceptionListener);
+        validateConstruct();
+        doInitialise();
+      });
+
+    } catch (InitialisationException e) {
+      throw e;
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+  @Override
+  public final void start() throws MuleException {
+    // Check if Initial State is Stopped
+    if (!isStopped() && initialState.equals(INITIAL_STATE_STOPPED)) {
+      lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
+      lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
+
+      LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
+      return;
     }
 
-    @Override
-    public final void initialise() throws InitialisationException
-    {
-        try
-        {
-            if (exceptionListener == null)
-            {
-                this.exceptionListener = muleContext.getDefaultExceptionStrategy();
-            }
-            lifecycleManager.fireInitialisePhase((phaseName, object) ->
-            {
-                injectFlowConstructMuleContext(exceptionListener);
-                initialiseIfInitialisable(exceptionListener);
-                validateConstruct();
-                doInitialise();
-            });
+    lifecycleManager.fireStartPhase((phaseName, object) -> {
+      startIfStartable(exceptionListener);
+      doStart();
+    });
+  }
 
-        }
-        catch (InitialisationException e)
-        {
-            throw e;
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
+  @Override
+  public final void stop() throws MuleException {
+    lifecycleManager.fireStopPhase((phaseName, object) -> {
+      doStop();
+      stopIfStoppable(exceptionListener);
+    });
+  }
+
+  @Override
+  public final void dispose() {
+    try {
+      if (isStarted()) {
+        stop();
+      }
+
+      lifecycleManager.fireDisposePhase((phaseName, object) -> {
+        doDispose();
+        disposeIfDisposable(exceptionListener);
+      });
+    } catch (MuleException e) {
+      LOGGER.error("Failed to stop service: " + name, e);
     }
+  }
 
-    @Override
-    public final void start() throws MuleException
-    {
-        // Check if Initial State is Stopped
-        if(!isStopped() && initialState.equals(INITIAL_STATE_STOPPED))
-        {
-            lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
-            lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
+  public boolean isStarted() {
+    return lifecycleManager.getState().isStarted();
+  }
 
-            LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
-            return;
-        }
+  public boolean isStopped() {
+    return lifecycleManager.getState().isStopped();
+  }
 
-        lifecycleManager.fireStartPhase((phaseName, object) ->
-        {
-            startIfStartable(exceptionListener);
-            doStart();
-        });
+  public boolean isStopping() {
+    return lifecycleManager.getState().isStopping();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public MessagingExceptionHandler getExceptionListener() {
+    return exceptionListener;
+  }
+
+  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
+    this.exceptionListener = exceptionListener;
+  }
+
+  public String getInitialState() {
+    return initialState;
+  }
+
+  public void setInitialState(String initialState) {
+    this.initialState = initialState;
+  }
+
+  @Override
+  public LifecycleState getLifecycleState() {
+    return lifecycleManager.getState();
+  }
+
+  @Override
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
+  @Override
+  public FlowConstructStatistics getStatistics() {
+    return statistics;
+  }
+
+  protected void doInitialise() throws MuleException {
+    configureStatistics();
+  }
+
+  protected void configureStatistics() {
+    statistics = new FlowConstructStatistics(getConstructType(), name);
+    statistics.setEnabled(muleContext.getStatistics().isEnabled());
+    muleContext.getStatistics().add(statistics);
+  }
+
+  protected void doStart() throws MuleException {
+    // Empty template method
+  }
+
+  protected void doStop() throws MuleException {
+    // Empty template method
+  }
+
+  protected void doDispose() {
+    muleContext.getStatistics().remove(statistics);
+  }
+
+  /**
+   * Validates configured flow construct
+   *
+   * @throws FlowConstructInvalidException if the flow construct does not pass validation
+   */
+  protected void validateConstruct() throws FlowConstructInvalidException {
+    if (exceptionListener instanceof MessagingExceptionHandlerAcceptor) {
+      if (!((MessagingExceptionHandlerAcceptor) exceptionListener).acceptsAll()) {
+        throw new FlowConstructInvalidException(CoreMessages
+            .createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request,"
+                + " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),
+                                                this);
+      }
     }
+  }
 
-    @Override
-    public final void stop() throws MuleException
-    {
-        lifecycleManager.fireStopPhase((phaseName, object) ->
-        {
-            doStop();
-            stopIfStoppable(exceptionListener);
-        });
+  protected void injectFlowConstructMuleContext(Object candidate) {
+    if (candidate instanceof FlowConstructAware) {
+      ((FlowConstructAware) candidate).setFlowConstruct(this);
     }
-
-    @Override
-    public final void dispose()
-    {
-        try
-        {
-            if (isStarted())
-            {
-                stop();
-            }
-
-            lifecycleManager.fireDisposePhase((phaseName, object) ->
-            {
-                doDispose();
-                disposeIfDisposable(exceptionListener);
-            });
-        }
-        catch (MuleException e)
-        {
-            LOGGER.error("Failed to stop service: " + name, e);
-        }
+    if (candidate instanceof MuleContextAware) {
+      ((MuleContextAware) candidate).setMuleContext(muleContext);
     }
+  }
 
-    public boolean isStarted()
-    {
-        return lifecycleManager.getState().isStarted();
+  protected void injectExceptionHandler(Object candidate) {
+    if (candidate instanceof MessagingExceptionHandlerAware) {
+      ((MessagingExceptionHandlerAware) candidate).setMessagingExceptionHandler(this.getExceptionListener());
     }
+  }
 
-    public boolean isStopped()
-    {
-        return lifecycleManager.getState().isStopped();
-    }
+  @Override
+  public String toString() {
+    return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+  }
 
-    public boolean isStopping()
-    {
-        return lifecycleManager.getState().isStopping();
-    }
+  protected void initialiseIfInitialisable(Object candidate) throws InitialisationException {
+    initialiseIfNeeded(candidate);
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  protected void startIfStartable(Object candidate) throws MuleException {
+    startIfNeeded(candidate);
+  }
 
-    @Override
-    public MessagingExceptionHandler getExceptionListener()
-    {
-        return exceptionListener;
-    }
+  protected void stopIfStoppable(Object candidate) throws MuleException {
+    stopIfNeeded(candidate);
+  }
 
-    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
-    {
-        this.exceptionListener = exceptionListener;
-    }
+  protected void disposeIfDisposable(Object candidate) {
+    disposeIfNeeded(candidate, LOGGER);
+  }
 
-    public String getInitialState()
-    {
-        return initialState;
-    }
-
-    public void setInitialState(String initialState)
-    {
-        this.initialState = initialState;
-    }
-
-    @Override
-    public LifecycleState getLifecycleState()
-    {
-        return lifecycleManager.getState();
-    }
-
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    @Override
-    public FlowConstructStatistics getStatistics()
-    {
-        return statistics;
-    }
-
-    protected void doInitialise() throws MuleException
-    {
-        configureStatistics();
-    }
-
-    protected void configureStatistics()
-    {
-        statistics = new FlowConstructStatistics(getConstructType(), name);
-        statistics.setEnabled(muleContext.getStatistics().isEnabled());
-        muleContext.getStatistics().add(statistics);
-    }
-
-    protected void doStart() throws MuleException
-    {
-        // Empty template method
-    }
-
-    protected void doStop() throws MuleException
-    {
-        // Empty template method
-    }
-
-    protected void doDispose()
-    {
-        muleContext.getStatistics().remove(statistics);
-    }
-
-    /**
-     * Validates configured flow construct
-     *
-     * @throws FlowConstructInvalidException if the flow construct does not pass
-     *             validation
-     */
-    protected void validateConstruct() throws FlowConstructInvalidException
-    {
-        if (exceptionListener instanceof MessagingExceptionHandlerAcceptor)
-        {
-            if (!((MessagingExceptionHandlerAcceptor)exceptionListener).acceptsAll())
-            {
-                throw new FlowConstructInvalidException(CoreMessages.createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request," +
-                        " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),this);
-            }
-        }
-    }
-
-    protected void injectFlowConstructMuleContext(Object candidate)
-    {
-        if (candidate instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) candidate).setFlowConstruct(this);
-        }
-        if (candidate instanceof MuleContextAware)
-        {
-            ((MuleContextAware) candidate).setMuleContext(muleContext);
-        }
-    }
-
-    protected void injectExceptionHandler(Object candidate)
-    {
-        if (candidate instanceof MessagingExceptionHandlerAware)
-        {
-            ((MessagingExceptionHandlerAware) candidate).setMessagingExceptionHandler(this.getExceptionListener());
-        }
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
-    }
-
-    protected void initialiseIfInitialisable(Object candidate) throws InitialisationException
-    {
-        initialiseIfNeeded(candidate);
-    }
-
-    protected void startIfStartable(Object candidate) throws MuleException
-    {
-        startIfNeeded(candidate);
-    }
-
-    protected void stopIfStoppable(Object candidate) throws MuleException
-    {
-        stopIfNeeded(candidate);
-    }
-
-    protected void disposeIfDisposable(Object candidate)
-    {
-        disposeIfNeeded(candidate, LOGGER);
-    }
-
-    /**
-     * @return the type of construct being created, e.g. "Flow"
-     */
-    public abstract String getConstructType();
+  /**
+   * @return the type of construct being created, e.g. "Flow"
+   */
+  public abstract String getConstructType();
 }

@@ -19,59 +19,51 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Parses the <mule:configuration> element. If this element appears in multiple Xml config files each will its configuration
- * to a single {@link MuleConfiguration} object.
+ * Parses the <mule:configuration> element. If this element appears in multiple Xml config files each will its configuration to a
+ * single {@link MuleConfiguration} object.
  *
  * @see MuleConfiguration
  */
-public class ConfigurationDefinitionParser extends NamedDefinitionParser
-{
+public class ConfigurationDefinitionParser extends NamedDefinitionParser {
 
-    public static final String DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE = "defaultExceptionStrategy-ref";
-    private static final String DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE = "defaultObjectSerializer-ref";
+  public static final String DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE = "defaultExceptionStrategy-ref";
+  private static final String DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE = "defaultObjectSerializer-ref";
 
-    public ConfigurationDefinitionParser()
-    {
-        super(MuleProperties.OBJECT_MULE_CONFIGURATION);
-        addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
-        singleton=true;
+  public ConfigurationDefinitionParser() {
+    super(MuleProperties.OBJECT_MULE_CONFIGURATION);
+    addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
+    singleton = true;
+  }
+
+  protected Class getBeanClass(Element element) {
+    return MuleConfiguration.class;
+  }
+
+  @Override
+  protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+    parseExceptionStrategy(element, builder);
+    parseObjectSerializer(element, builder);
+    ProcessingStrategyUtils.configureProcessingStrategy(element, builder, DEFAULT_PROCESSING_STRATEGY);
+
+    super.doParse(element, context, builder);
+  }
+
+  private void parseExceptionStrategy(Element element, BeanDefinitionBuilder builder) {
+    if (element.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE)) {
+      builder.addPropertyValue("defaultExceptionStrategyName", element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
     }
+  }
 
-    protected Class getBeanClass(Element element)
-    {
-        return MuleConfiguration.class;
+  private void parseObjectSerializer(Element element, BeanDefinitionBuilder builder) {
+    if (element.hasAttribute(DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE)) {
+      builder.addPropertyReference("defaultObjectSerializer", element.getAttribute(DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE));
     }
+  }
 
-    @Override
-    protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
-    {
-        parseExceptionStrategy(element, builder);
-        parseObjectSerializer(element, builder);
-        ProcessingStrategyUtils.configureProcessingStrategy(element, builder, DEFAULT_PROCESSING_STRATEGY);
-
-        super.doParse(element,context,builder);
-    }
-
-    private void parseExceptionStrategy(Element element, BeanDefinitionBuilder builder)
-    {
-        if (element.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE))
-        {
-            builder.addPropertyValue("defaultExceptionStrategyName", element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
-        }
-    }
-
-    private void parseObjectSerializer(Element element, BeanDefinitionBuilder builder)
-    {
-        if (element.hasAttribute(DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE))
-        {
-            builder.addPropertyReference("defaultObjectSerializer", element.getAttribute(DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE));
-        }
-    }
-
-    @Override
-    protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
-    {
-        return MuleProperties.OBJECT_MULE_CONFIGURATION;
-    }
+  @Override
+  protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+      throws BeanDefinitionStoreException {
+    return MuleProperties.OBJECT_MULE_CONFIGURATION;
+  }
 
 }

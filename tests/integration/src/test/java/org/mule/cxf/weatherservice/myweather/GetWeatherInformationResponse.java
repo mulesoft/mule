@@ -14,9 +14,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType>
@@ -33,37 +35,31 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "getWeatherInformationResult"
-})
+@XmlType(name = "", propOrder = {"getWeatherInformationResult"})
 @XmlRootElement(name = "GetWeatherInformationResponse", namespace = "http://ws.cdyne.com/WeatherWS/")
 public class GetWeatherInformationResponse {
 
-    @XmlElement(name = "GetWeatherInformationResult", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected ArrayOfWeatherDescription getWeatherInformationResult;
+  @XmlElement(name = "GetWeatherInformationResult", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected ArrayOfWeatherDescription getWeatherInformationResult;
 
-    /**
-     * Gets the value of the getWeatherInformationResult property.
-     *
-     * @return
-     *     possible object is
-     *     {@link ArrayOfWeatherDescription }
-     *
-     */
-    public ArrayOfWeatherDescription getGetWeatherInformationResult() {
-        return getWeatherInformationResult;
-    }
+  /**
+   * Gets the value of the getWeatherInformationResult property.
+   *
+   * @return possible object is {@link ArrayOfWeatherDescription }
+   *
+   */
+  public ArrayOfWeatherDescription getGetWeatherInformationResult() {
+    return getWeatherInformationResult;
+  }
 
-    /**
-     * Sets the value of the getWeatherInformationResult property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link ArrayOfWeatherDescription }
-     *
-     */
-    public void setGetWeatherInformationResult(ArrayOfWeatherDescription value) {
-        this.getWeatherInformationResult = value;
-    }
+  /**
+   * Sets the value of the getWeatherInformationResult property.
+   *
+   * @param value allowed object is {@link ArrayOfWeatherDescription }
+   *
+   */
+  public void setGetWeatherInformationResult(ArrayOfWeatherDescription value) {
+    this.getWeatherInformationResult = value;
+  }
 
 }

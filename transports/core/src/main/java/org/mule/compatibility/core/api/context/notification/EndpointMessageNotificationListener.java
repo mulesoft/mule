@@ -10,13 +10,13 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 /**
- * <code>EndpointMessageNotificationListener</code> is an observer interface that objects can use to receive
- * notifications about messages being sent and received from endpoints
+ * <code>EndpointMessageNotificationListener</code> is an observer interface that objects can use to receive notifications about
+ * messages being sent and received from endpoints
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface EndpointMessageNotificationListener<T extends EndpointMessageNotification> extends ServerNotificationListener<EndpointMessageNotification>
-{
-    // no methods
+public interface EndpointMessageNotificationListener<T extends EndpointMessageNotification>
+    extends ServerNotificationListener<EndpointMessageNotification> {
+  // no methods
 }

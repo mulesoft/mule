@@ -33,114 +33,119 @@ import org.junit.Test;
 import org.mockito.Answers;
 
 @SmallTest
-public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase
-{
+public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase {
 
-    private static final String PATH_URL = "http://localhost:8080/path";
-    private static final String ANOTHER_PATH = "http://localhost:8080/another";
+  private static final String PATH_URL = "http://localhost:8080/path";
+  private static final String ANOTHER_PATH = "http://localhost:8080/another";
 
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    private DefaultHttpRequesterConfig mockRequestConfig  = mock(DefaultHttpRequesterConfig.class, Answers.RETURNS_DEEP_STUBS.get());
-    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+  private DefaultHttpRequesterConfig mockRequestConfig = mock(DefaultHttpRequesterConfig.class, Answers.RETURNS_DEEP_STUBS.get());
+  private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class, Answers.RETURNS_DEEP_STUBS.get());
 
-    private final HttpConnectorMessageProcessorProvider httpConnectorMessageProcessorProvider = new HttpConnectorMessageProcessorProvider();
+  private final HttpConnectorMessageProcessorProvider httpConnectorMessageProcessorProvider =
+      new HttpConnectorMessageProcessorProvider();
 
-    @Before
-    public void setUpTest()
-    {
-        when(mockMuleContext.getRegistry().get(HttpRequesterBuilder.DEFAULT_HTTP_REQUEST_CONFIG_NAME)).thenReturn(mockRequestConfig);
-        httpConnectorMessageProcessorProvider.setMuleContext(mockMuleContext);
-    }
+  @Before
+  public void setUpTest() {
+    when(mockMuleContext.getRegistry().get(HttpRequesterBuilder.DEFAULT_HTTP_REQUEST_CONFIG_NAME)).thenReturn(mockRequestConfig);
+    httpConnectorMessageProcessorProvider.setMuleContext(mockMuleContext);
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingGenericOptions() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE), is(messageProcessor));
-    }
+  @Test
+  public void sameConfigReturnsSameInstanceUsingGenericOptions() throws Exception {
+    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+        .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(),
+                                                                         REQUEST_RESPONSE),
+               is(messageProcessor));
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingDifferentGenericOptions() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().responseTimeout(1000).build(), REQUEST_RESPONSE), not(is(messageProcessor)));
-    }
+  @Test
+  public void sameConfigReturnsSameInstanceUsingDifferentGenericOptions() throws Exception {
+    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+        .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
+    assertThat(httpConnectorMessageProcessorProvider
+        .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().responseTimeout(1000).build(), REQUEST_RESPONSE),
+               not(is(messageProcessor)));
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingDifferentHttpOptions() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().requestStreamingMode(ALWAYS).build(), REQUEST_RESPONSE);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().disableParseResponse().build(), REQUEST_RESPONSE), not(is(messageProcessor)));
-    }
+  @Test
+  public void sameConfigReturnsSameInstanceUsingDifferentHttpOptions() throws Exception {
+    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+        .getMessageProcessor(PATH_URL, newOptions().requestStreamingMode(ALWAYS).build(), REQUEST_RESPONSE);
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().disableParseResponse().build(),
+                                                                         REQUEST_RESPONSE),
+               not(is(messageProcessor)));
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithConfig() throws Exception
-    {
-        HttpRequestOptions options =  newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
-                .disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).responseTimeout(1000).build();
+  @Test
+  public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithConfig() throws Exception {
+    HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
+        .disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).responseTimeout(1000).build();
 
-        assertSameConfigReturnsSameInstance(options);
-    }
+    assertSameConfigReturnsSameInstance(options);
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithTlsContext() throws Exception
-    {
-        // When specifying a tlsContextFactory instead of a requestConfig, the requester builder creates a new config with an
-        // auto generated unique name. Before doing this, it looks for the generated name in the registry to check that is hasn't
-        // been used yet. We need the following line so that the auto generated name is used.
-        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
+  @Test
+  public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithTlsContext() throws Exception {
+    // When specifying a tlsContextFactory instead of a requestConfig, the requester builder creates a new config with an
+    // auto generated unique name. Before doing this, it looks for the generated name in the registry to check that is hasn't
+    // been used yet. We need the following line so that the auto generated name is used.
+    when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
 
-        HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
-                .disableStatusCodeValidation().method(POST.name()).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
+    HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
+        .disableStatusCodeValidation().method(POST.name()).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
 
-        assertSameConfigReturnsSameInstance(options);
-    }
+    assertSameConfigReturnsSameInstance(options);
+  }
 
-    private void assertSameConfigReturnsSameInstance(HttpRequestOptions requestOptions) throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE), is(messageProcessor));
-    }
+  private void assertSameConfigReturnsSameInstance(HttpRequestOptions requestOptions) throws Exception {
+    final MessageProcessor messageProcessor =
+        httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE);
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE),
+               is(messageProcessor));
+  }
 
-    @Test
-    public void differentPathReturnsDifferentOperations() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(ANOTHER_PATH, newOptions().build(), ONE_WAY), not(is(messageProcessor)));
-    }
+  @Test
+  public void differentPathReturnsDifferentOperations() throws Exception {
+    final MessageProcessor messageProcessor =
+        httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(ANOTHER_PATH, newOptions().build(), ONE_WAY),
+               not(is(messageProcessor)));
+  }
 
-    @Test
-    public void differentExchangePatternsReturnsDifferentOperations() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE), not(is(messageProcessor)));
-    }
+  @Test
+  public void differentExchangePatternsReturnsDifferentOperations() throws Exception {
+    final MessageProcessor messageProcessor =
+        httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE),
+               not(is(messageProcessor)));
+  }
 
-    @Test
-    public void disposeInvalidatesCache() throws Exception
-    {
-        final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        httpConnectorMessageProcessorProvider.dispose();
-        assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE), not(is(messageProcessor)));
-    }
+  @Test
+  public void disposeInvalidatesCache() throws Exception {
+    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+        .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
+    httpConnectorMessageProcessorProvider.dispose();
+    assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(),
+                                                                         REQUEST_RESPONSE),
+               not(is(messageProcessor)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullUrl() throws Exception
-    {
-        httpConnectorMessageProcessorProvider.getMessageProcessor(null, newOptions().build(), ONE_WAY);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullUrl() throws Exception {
+    httpConnectorMessageProcessorProvider.getMessageProcessor(null, newOptions().build(), ONE_WAY);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullOptions() throws Exception
-    {
-        httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, null, ONE_WAY);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullOptions() throws Exception {
+    httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, null, ONE_WAY);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullExchangePattern() throws Exception
-    {
-        httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullExchangePattern() throws Exception {
+    httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), null);
+  }
 
 }

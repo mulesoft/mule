@@ -11,25 +11,23 @@ import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import javax.jms.Session;
 
 /**
- * This class overrides getSession() to return the specified test MuleSession;
- * otherwise we would need a full-fledged JMS connector with dispatchers etc.
+ * This class overrides getSession() to return the specified test MuleSession; otherwise we would need a full-fledged JMS
+ * connector with dispatchers etc.
  * 
  * TODO check if we really need this stateful transformer now
  */
-public class SessionEnabledObjectToJMSMessage extends ObjectToJMSMessage
-{
-    private final Session transformerSession;
+public class SessionEnabledObjectToJMSMessage extends ObjectToJMSMessage {
 
-    public SessionEnabledObjectToJMSMessage(Session session)
-    {
-        super();
-        transformerSession = session;
-    }
+  private final Session transformerSession;
 
-    @Override
-    protected Session getSession()
-    {
-        return transformerSession;
-    }
+  public SessionEnabledObjectToJMSMessage(Session session) {
+    super();
+    transformerSession = session;
+  }
+
+  @Override
+  protected Session getSession() {
+    return transformerSession;
+  }
 }
 

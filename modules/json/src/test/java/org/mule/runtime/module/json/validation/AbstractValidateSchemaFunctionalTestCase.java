@@ -10,21 +10,16 @@ import static junit.framework.TestCase.fail;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-abstract class AbstractValidateSchemaFunctionalTestCase extends FunctionalTestCase
-{
+abstract class AbstractValidateSchemaFunctionalTestCase extends FunctionalTestCase {
 
-    protected static final String VALIDATE_FLOW = "validate";
+  protected static final String VALIDATE_FLOW = "validate";
 
-    protected void runAndExpectFailure(Object payload) throws Throwable
-    {
-        try
-        {
-            flowRunner(VALIDATE_FLOW).withPayload(payload).run();
-            fail("was expecting a failure");
-        }
-        catch (MessagingException e)
-        {
-            throw e.getCause();
-        }
+  protected void runAndExpectFailure(Object payload) throws Throwable {
+    try {
+      flowRunner(VALIDATE_FLOW).withPayload(payload).run();
+      fail("was expecting a failure");
+    } catch (MessagingException e) {
+      throw e.getCause();
     }
+  }
 }

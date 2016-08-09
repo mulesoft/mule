@@ -21,25 +21,22 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class EmbeddedMuleTestCase extends AbstractMuleTestCase
-{
+public class EmbeddedMuleTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testStartup() throws Exception
-    {
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(
-                "org/mule/test/spring/mule-root-test.xml");
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        MuleContext context = muleContextFactory.createMuleContext(builder);
-        // MuleContext must be started explicitly after MULE-1988
-        assertFalse(context.isStarted());
-        context.start();
-        assertTrue(context.isStarted());
+  @Test
+  public void testStartup() throws Exception {
+    SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("org/mule/test/spring/mule-root-test.xml");
+    MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    MuleContext context = muleContextFactory.createMuleContext(builder);
+    // MuleContext must be started explicitly after MULE-1988
+    assertFalse(context.isStarted());
+    context.start();
+    assertTrue(context.isStarted());
 
-        final EndpointBuilder endpoint = lookupEndpointBuilder(context.getRegistry(), "endpoint");
-        assertNotNull(endpoint);
-        assertEquals("test://value", endpoint.buildInboundEndpoint().getEndpointURI().toString());
+    final EndpointBuilder endpoint = lookupEndpointBuilder(context.getRegistry(), "endpoint");
+    assertNotNull(endpoint);
+    assertEquals("test://value", endpoint.buildInboundEndpoint().getEndpointURI().toString());
 
-        context.dispose();
-    }
+    context.dispose();
+  }
 }

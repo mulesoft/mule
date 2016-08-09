@@ -8,13 +8,12 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.CustomSecManagerHttpFilterFunctionalTestCase;
 
-public class SSCustomSecManagerHttpFilterFunctionalTestCase extends CustomSecManagerHttpFilterFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "spring-security/custom-security-manager-test.xml";
-    }
+public class SSCustomSecManagerHttpFilterFunctionalTestCase extends CustomSecManagerHttpFilterFunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "spring-security/custom-security-manager-test.xml";
+  }
 
 }
 

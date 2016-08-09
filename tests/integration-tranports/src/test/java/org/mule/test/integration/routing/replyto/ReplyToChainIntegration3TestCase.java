@@ -20,34 +20,32 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
-{
+public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-3.xml";
+  }
+
+  @Test
+  public void testReplyToChain() throws Exception {
+    String message = "test";
+
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://pojo1", message, null);
+    MuleMessage result = client.request("jms://response", 10000);
+    assertNotNull(result);
+    assertEquals("Received: " + message, result.getPayload());
+  }
+
+  public static class SetReplyTo extends AbstractMessageTransformer {
+
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-3.xml";
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+      final MuleMessage message =
+          MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
+      event.setMessage(message);
+      return message;
     }
-
-    @Test
-    public void testReplyToChain() throws Exception
-    {
-        String message = "test";
-
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://pojo1", message, null);
-        MuleMessage result = client.request("jms://response", 10000);
-        assertNotNull(result);
-        assertEquals("Received: " + message, result.getPayload());
-    }
-
-    public static class SetReplyTo extends AbstractMessageTransformer
-    {
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-        {
-            final MuleMessage message = MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
-            event.setMessage(message);
-            return message;
-        }
-    }
+  }
 }

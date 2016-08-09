@@ -10,17 +10,14 @@ package org.mule.runtime.module.db.integration.select;
 import org.mule.runtime.module.db.integration.AbstractQueryTimeoutTestCase;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class SelectTimeoutTestCase extends AbstractQueryTimeoutTestCase
-{
+public class SelectTimeoutTestCase extends AbstractQueryTimeoutTestCase {
 
-    public SelectTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-timeout-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-timeout-config.xml"};
+  }
 }

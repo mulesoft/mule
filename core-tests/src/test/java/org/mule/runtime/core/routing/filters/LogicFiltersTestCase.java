@@ -21,95 +21,91 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
-public class LogicFiltersTestCase extends AbstractMuleTestCase
-{
+public class LogicFiltersTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testAndFilter()
-    {
-        AndFilter filter = new AndFilter();
-        assertEquals(0, filter.getFilters().size());
+  @Test
+  public void testAndFilter() {
+    AndFilter filter = new AndFilter();
+    assertEquals(0, filter.getFilters().size());
 
-        // both null
-        assertFalse(filter.accept("foo"));
+    // both null
+    assertFalse(filter.accept("foo"));
 
-        // only one filter set
-        filter.getFilters().add(new EqualsFilter("foo"));
-        assertTrue(filter.accept("foo"));
+    // only one filter set
+    filter.getFilters().add(new EqualsFilter("foo"));
+    assertTrue(filter.accept("foo"));
 
-        // another one set too, but does not accept
-        filter.getFilters().add(new EqualsFilter("foo"));
-        assertFalse(filter.accept("bar"));
+    // another one set too, but does not accept
+    filter.getFilters().add(new EqualsFilter("foo"));
+    assertFalse(filter.accept("bar"));
 
-        // both accept
-        assertTrue(filter.accept("foo"));
+    // both accept
+    assertTrue(filter.accept("foo"));
 
-        WildcardFilter left = new WildcardFilter("blah.blah.*");
-        WildcardFilter right = new WildcardFilter("blah.*");
-        filter = new AndFilter(left, right);
-        assertEquals(2,filter.getFilters().size());
+    WildcardFilter left = new WildcardFilter("blah.blah.*");
+    WildcardFilter right = new WildcardFilter("blah.*");
+    filter = new AndFilter(left, right);
+    assertEquals(2, filter.getFilters().size());
 
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(right.accept("blah.blah"));
-        assertTrue(!left.accept("blah.blah"));
-        assertTrue(!filter.accept("blah.blah"));
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(right.accept("blah.blah"));
+    assertTrue(!left.accept("blah.blah"));
+    assertTrue(!filter.accept("blah.blah"));
 
-        filter = new AndFilter();
-        filter.getFilters().add(left);
-        filter.getFilters().add(right);
+    filter = new AndFilter();
+    filter.getFilters().add(left);
+    filter.getFilters().add(right);
 
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(!filter.accept("blah.blah"));
-    }
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(!filter.accept("blah.blah"));
+  }
 
-    @Test
-    public void testOrFilter()
-    {
-        OrFilter filter = new OrFilter();
-        assertEquals(0, filter.getFilters().size());
-        assertFalse(filter.accept("foo"));
+  @Test
+  public void testOrFilter() {
+    OrFilter filter = new OrFilter();
+    assertEquals(0, filter.getFilters().size());
+    assertFalse(filter.accept("foo"));
 
-        WildcardFilter left = new WildcardFilter("blah.blah.*");
-        WildcardFilter right = new WildcardFilter("blah.b*");
-        filter = new OrFilter(left, right);
-        assertEquals(2, filter.getFilters().size());
+    WildcardFilter left = new WildcardFilter("blah.blah.*");
+    WildcardFilter right = new WildcardFilter("blah.b*");
+    filter = new OrFilter(left, right);
+    assertEquals(2, filter.getFilters().size());
 
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(right.accept("blah.blah"));
-        assertTrue(!left.accept("blah.blah"));
-        assertTrue(filter.accept("blah.blah"));
-        assertTrue(!filter.accept("blah.x.blah"));
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(right.accept("blah.blah"));
+    assertTrue(!left.accept("blah.blah"));
+    assertTrue(filter.accept("blah.blah"));
+    assertTrue(!filter.accept("blah.x.blah"));
 
-        filter = new OrFilter();
-        LinkedList filters = new LinkedList();
-        filters.addLast(left);
-        filters.addLast(right);
-        filter.setFilters(filters);
+    filter = new OrFilter();
+    LinkedList filters = new LinkedList();
+    filters.addLast(left);
+    filters.addLast(right);
+    filter.setFilters(filters);
 
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(filter.accept("blah.blah"));
-        assertTrue(!filter.accept("blah.x.blah"));
-    }
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(filter.accept("blah.blah"));
+    assertTrue(!filter.accept("blah.x.blah"));
+  }
 
-    @Test
-    public void testNotFilter()
-    {
-        NotFilter notFilter = new NotFilter();
-        assertNull(notFilter.getFilter());
-        assertFalse(notFilter.accept("foo"));
-        assertFalse(notFilter.accept((Object) null));
+  @Test
+  public void testNotFilter() {
+    NotFilter notFilter = new NotFilter();
+    assertNull(notFilter.getFilter());
+    assertFalse(notFilter.accept("foo"));
+    assertFalse(notFilter.accept((Object) null));
 
-        WildcardFilter filter = new WildcardFilter("blah.blah.*");
-        notFilter = new NotFilter(filter);
-        assertNotNull(notFilter.getFilter());
+    WildcardFilter filter = new WildcardFilter("blah.blah.*");
+    notFilter = new NotFilter(filter);
+    assertNotNull(notFilter.getFilter());
 
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(!notFilter.accept("blah.blah.blah"));
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(!notFilter.accept("blah.blah.blah"));
 
-        notFilter = new NotFilter();
-        notFilter.setFilter(filter);
-        assertTrue(filter.accept("blah.blah.blah"));
-        assertTrue(!notFilter.accept("blah.blah.blah"));
-    }
+    notFilter = new NotFilter();
+    notFilter.setFilter(filter);
+    assertTrue(filter.accept("blah.blah.blah"));
+    assertTrue(!notFilter.accept("blah.blah.blah"));
+  }
 
 }

@@ -14,57 +14,46 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /**
- * <code>NullLifecycleAdapter</code> is a lifecycle adaptor implementation that
- * performs no Mule lifecycle propagation to Mule service component implementations.
- * This can be used when the service component implementation is looked up from a
- * container and therefore has it's own lifecycle management.
+ * <code>NullLifecycleAdapter</code> is a lifecycle adaptor implementation that performs no Mule lifecycle propagation to Mule
+ * service component implementations. This can be used when the service component implementation is looked up from a container and
+ * therefore has it's own lifecycle management.
  */
-public class NullLifecycleAdapter extends DefaultComponentLifecycleAdapter
-{
+public class NullLifecycleAdapter extends DefaultComponentLifecycleAdapter {
 
-    public NullLifecycleAdapter(Object componentObject,
-                                JavaComponent component,
-                                FlowConstruct flowConstruct,
-                                EntryPointResolverSet entryPointResolver,
-                                MuleContext muleContext) throws MuleException
-    {
-        super(componentObject, component, flowConstruct, entryPointResolver, muleContext);
-    }
+  public NullLifecycleAdapter(Object componentObject, JavaComponent component, FlowConstruct flowConstruct,
+                              EntryPointResolverSet entryPointResolver, MuleContext muleContext)
+      throws MuleException {
+    super(componentObject, component, flowConstruct, entryPointResolver, muleContext);
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        // no-op
-    }
+  @Override
+  public void start() throws MuleException {
+    // no-op
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        // no-op
-    }
+  @Override
+  public void stop() throws MuleException {
+    // no-op
+  }
 
-    @Override
-    public void dispose()
-    {
-        // no-op
-    }
+  @Override
+  public void dispose() {
+    // no-op
+  }
 
-    @Override
-    public boolean isStarted()
-    {
-        return true;
-    }
+  @Override
+  public boolean isStarted() {
+    return true;
+  }
 
-    @Override
-    public boolean isDisposed()
-    {
-        return false;
-    }
+  @Override
+  public boolean isDisposed() {
+    return false;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        // no-op
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    // no-op
+  }
 
 }

@@ -13,16 +13,13 @@ import org.mule.runtime.module.extension.internal.runtime.exception.IllegalCompo
  *
  * @since 4.0
  */
-public class IllegalSourceException extends IllegalComponentException
-{
+public class IllegalSourceException extends IllegalComponentException {
 
-    public IllegalSourceException(String message)
-    {
-        super(message);
-    }
+  public IllegalSourceException(String message) {
+    super(message);
+  }
 
-    public IllegalSourceException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public IllegalSourceException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

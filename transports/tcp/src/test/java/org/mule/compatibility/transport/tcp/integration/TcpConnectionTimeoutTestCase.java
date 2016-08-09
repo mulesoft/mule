@@ -21,32 +21,26 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 
-public class TcpConnectionTimeoutTestCase extends FunctionalTestCase
-{
+public class TcpConnectionTimeoutTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-connection-timeout-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "tcp-connection-timeout-config.xml";
+  }
+
+  @Test
+  public void usesConnectionTimeout() throws Exception {
+    final MuleClient client = new MuleClient(muleContext);
+    FutureMessageResult result = client.sendAsync("vm://testInput", TEST_MESSAGE, null);
+
+    MuleMessage message = null;
+    try {
+      message = result.getMessage(1000);
+    } catch (TimeoutException e) {
+      fail("Connection timeout not honored.");
     }
 
-    @Test
-    public void usesConnectionTimeout() throws Exception
-    {
-        final MuleClient client = new MuleClient(muleContext);
-        FutureMessageResult result = client.sendAsync("vm://testInput", TEST_MESSAGE, null);
-
-        MuleMessage message = null;
-        try
-        {
-            message = result.getMessage(1000);
-        }
-        catch (TimeoutException e)
-        {
-            fail("Connection timeout not honored.");
-        }
-
-        assertThat(message.getPayload(), is(nullValue()));
-        assertNotNull(message.getExceptionPayload());
-    }
+    assertThat(message.getPayload(), is(nullValue()));
+    assertNotNull(message.getExceptionPayload());
+  }
 }

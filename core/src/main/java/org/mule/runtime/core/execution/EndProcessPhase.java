@@ -7,24 +7,21 @@
 package org.mule.runtime.core.execution;
 
 /**
- * This phase notifies to the {@link MessageProcessTemplate} that the message processing
- * has ended.
+ * This phase notifies to the {@link MessageProcessTemplate} that the message processing has ended.
  *
  * To participate on this phase {@link MessageProcessTemplate} must implement {@link EndPhaseTemplate}.
  */
-public class EndProcessPhase implements MessageProcessPhase<EndPhaseTemplate>
-{
+public class EndProcessPhase implements MessageProcessPhase<EndPhaseTemplate> {
 
-    @Override
-    public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate)
-    {
-        return messageProcessTemplate instanceof EndPhaseTemplate;
-    }
+  @Override
+  public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate) {
+    return messageProcessTemplate instanceof EndPhaseTemplate;
+  }
 
-    @Override
-    public void runPhase(EndPhaseTemplate messageProcessTemplate, MessageProcessContext messageProcessContext, PhaseResultNotifier phaseResultNotifier)
-    {
-        messageProcessTemplate.messageProcessingEnded();
-    }
+  @Override
+  public void runPhase(EndPhaseTemplate messageProcessTemplate, MessageProcessContext messageProcessContext,
+                       PhaseResultNotifier phaseResultNotifier) {
+    messageProcessTemplate.messageProcessingEnded();
+  }
 
 }

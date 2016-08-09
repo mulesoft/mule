@@ -10,16 +10,14 @@ package org.mule.runtime.config.spring;
 import org.mule.runtime.core.api.CustomizationService;
 
 /**
- * Enables to customize a {@link org.mule.runtime.core.api.MuleContext} by using the
- * corresponding {@link CustomizationService}
+ * Enables to customize a {@link org.mule.runtime.core.api.MuleContext} by using the corresponding {@link CustomizationService}
  */
-public interface MuleContextServiceConfigurator
-{
+public interface MuleContextServiceConfigurator {
 
-    /**
-     * Configures services for the associated {@link org.mule.runtime.core.api.MuleContext}.
-     *
-     * @param customizationService used to configure the provided services. Non null.
-     */
-    void configure(CustomizationService customizationService);
+  /**
+   * Configures services for the associated {@link org.mule.runtime.core.api.MuleContext}.
+   *
+   * @param customizationService used to configure the provided services. Non null.
+   */
+  void configure(CustomizationService customizationService);
 }

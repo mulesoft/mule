@@ -17,42 +17,35 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 
-public class EncryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class EncryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "encrypt-security-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "encrypt-security-config.xml";
+  }
+
+  @Test
+  public void requestEncryptedWithValidKeyReturnsExpectedResult() throws Exception {
+    assertValidResponse("requestEncryptedWithValidKey");
+  }
+
+  @Test
+  public void requestEncryptedWithInvalidKeyFails() throws Exception {
+    assertSoapFault("requestEncryptedWithInvalidKey", "Client");
+  }
+
+  @Test
+  public void requestNotEncryptedFails() throws Exception {
+    assertSoapFault("requestNotEncrypted", "InvalidSecurity");
+  }
+
+
+  public static class ServerPasswordCallback implements CallbackHandler {
+
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+      WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+      pc.setPassword("changeit");
     }
-
-    @Test
-    public void requestEncryptedWithValidKeyReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("requestEncryptedWithValidKey");
-    }
-
-    @Test
-    public void requestEncryptedWithInvalidKeyFails() throws Exception
-    {
-        assertSoapFault("requestEncryptedWithInvalidKey", "Client");
-    }
-
-    @Test
-    public void requestNotEncryptedFails() throws Exception
-    {
-        assertSoapFault("requestNotEncrypted", "InvalidSecurity");
-    }
-
-
-    public static class ServerPasswordCallback implements CallbackHandler
-    {
-
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-        {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-            pc.setPassword("changeit");
-        }
-    }
+  }
 
 }

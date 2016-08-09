@@ -14,37 +14,31 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 
 import java.util.List;
 
-public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesConnectorConnection>
-{
+public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesConnectorConnection> {
 
-    @Parameter
-    private ParentShape abstractShape;
+  @Parameter
+  private ParentShape abstractShape;
 
-    @Parameter
-    private Door doorInterface;
+  @Parameter
+  private Door doorInterface;
 
-    @Parameter
-    private List<Door> doors;
+  @Parameter
+  private List<Door> doors;
 
-    public List<Door> getDoors()
-    {
-        return doors;
-    }
+  public List<Door> getDoors() {
+    return doors;
+  }
 
-    @Override
-    public SubTypesConnectorConnection connect() throws ConnectionException
-    {
-        return new SubTypesConnectorConnection(abstractShape, doorInterface);
-    }
+  @Override
+  public SubTypesConnectorConnection connect() throws ConnectionException {
+    return new SubTypesConnectorConnection(abstractShape, doorInterface);
+  }
 
-    @Override
-    public void disconnect(SubTypesConnectorConnection subtypesConnectorConnection)
-    {
-    }
+  @Override
+  public void disconnect(SubTypesConnectorConnection subtypesConnectorConnection) {}
 
-    @Override
-    public ConnectionValidationResult validate(SubTypesConnectorConnection subtypesConnectorConnection)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(SubTypesConnectorConnection subtypesConnectorConnection) {
+    return ConnectionValidationResult.success();
+  }
 }

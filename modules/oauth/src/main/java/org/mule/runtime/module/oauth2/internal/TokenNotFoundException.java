@@ -11,25 +11,21 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * It was not possible to retrieve the access token or the refresh token from the token URL response
  */
-public class TokenNotFoundException extends Exception
-{
+public class TokenNotFoundException extends Exception {
 
-    private final TokenResponseProcessor tokenResponseProcessor;
-    private final MuleEvent tokenUrlResponse;
+  private final TokenResponseProcessor tokenResponseProcessor;
+  private final MuleEvent tokenUrlResponse;
 
-    public TokenNotFoundException(MuleEvent tokenUrlResponse, TokenResponseProcessor tokenResponseProcessor)
-    {
-        this.tokenUrlResponse = tokenUrlResponse;
-        this.tokenResponseProcessor = tokenResponseProcessor;
-    }
+  public TokenNotFoundException(MuleEvent tokenUrlResponse, TokenResponseProcessor tokenResponseProcessor) {
+    this.tokenUrlResponse = tokenUrlResponse;
+    this.tokenResponseProcessor = tokenResponseProcessor;
+  }
 
-    public TokenResponseProcessor getTokenResponseProcessor()
-    {
-        return tokenResponseProcessor;
-    }
+  public TokenResponseProcessor getTokenResponseProcessor() {
+    return tokenResponseProcessor;
+  }
 
-    public MuleEvent getTokenUrlResponse()
-    {
-        return tokenUrlResponse;
-    }
+  public MuleEvent getTokenUrlResponse() {
+    return tokenUrlResponse;
+  }
 }

@@ -14,37 +14,29 @@ import java.util.Collection;
 import java.util.ServiceLoader;
 
 /**
- * Implementation of {@link ServiceRegistry}
- * that uses standard {@link java.util.ServiceLoader} to get
- * the providers
+ * Implementation of {@link ServiceRegistry} that uses standard {@link java.util.ServiceLoader} to get the providers
  *
  * @since 3.7.0
  */
-public class SpiServiceRegistry implements ServiceRegistry
-{
+public class SpiServiceRegistry implements ServiceRegistry {
 
-    /**
-     * If {@code classLoader} is {@code null}, then the current {@link Thread#getContextClassLoader()}
-     * will be used
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader classLoader)
-    {
-        if (classLoader == null)
-        {
-            classLoader = Thread.currentThread().getContextClassLoader();
-        }
-
-        return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
+  /**
+   * If {@code classLoader} is {@code null}, then the current {@link Thread#getContextClassLoader()} will be used {@inheritDoc}
+   */
+  @Override
+  public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader classLoader) {
+    if (classLoader == null) {
+      classLoader = Thread.currentThread().getContextClassLoader();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass)
-    {
-        return ImmutableList.copyOf(ServiceLoader.load(providerClass).iterator());
-    }
+    return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> Collection<T> lookupProviders(Class<T> providerClass) {
+    return ImmutableList.copyOf(ServiceLoader.load(providerClass).iterator());
+  }
 }

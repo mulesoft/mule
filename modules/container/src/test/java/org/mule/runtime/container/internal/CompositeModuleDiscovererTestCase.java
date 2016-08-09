@@ -20,27 +20,25 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CompositeModuleDiscovererTestCase extends AbstractMuleTestCase
-{
+public class CompositeModuleDiscovererTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void delegatesToComposedDiscovers() throws Exception
-    {
-        final ModuleDiscoverer discoverer1 = mock(ModuleDiscoverer.class);
-        MuleModule module1 = new MuleModule("module1", emptySet(), emptySet());
-        final List<MuleModule> modules1 = new ArrayList<>();
-        modules1.add(module1);
-        when(discoverer1.discover()).thenReturn(modules1);
-        MuleModule module2 = new MuleModule("module1", emptySet(), emptySet());
-        final List<MuleModule> modules2 = new ArrayList<>();
-        modules2.add(module2);
-        final ModuleDiscoverer discoverer2 = mock(ModuleDiscoverer.class);
-        when(discoverer2.discover()).thenReturn(modules2);
+  @Test
+  public void delegatesToComposedDiscovers() throws Exception {
+    final ModuleDiscoverer discoverer1 = mock(ModuleDiscoverer.class);
+    MuleModule module1 = new MuleModule("module1", emptySet(), emptySet());
+    final List<MuleModule> modules1 = new ArrayList<>();
+    modules1.add(module1);
+    when(discoverer1.discover()).thenReturn(modules1);
+    MuleModule module2 = new MuleModule("module1", emptySet(), emptySet());
+    final List<MuleModule> modules2 = new ArrayList<>();
+    modules2.add(module2);
+    final ModuleDiscoverer discoverer2 = mock(ModuleDiscoverer.class);
+    when(discoverer2.discover()).thenReturn(modules2);
 
-        final CompositeModuleDiscoverer composite = new CompositeModuleDiscoverer(discoverer1, discoverer2);
-        final List<MuleModule> discovered = composite.discover();
+    final CompositeModuleDiscoverer composite = new CompositeModuleDiscoverer(discoverer1, discoverer2);
+    final List<MuleModule> discovered = composite.discover();
 
-        assertThat(discovered.size(), equalTo(2));
-        assertThat(discovered, contains(module1, module2));
-    }
+    assertThat(discovered.size(), equalTo(2));
+    assertThat(discovered, contains(module1, module2));
+  }
 }

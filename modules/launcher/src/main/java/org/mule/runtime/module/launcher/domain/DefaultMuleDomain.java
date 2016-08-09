@@ -40,248 +40,195 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMuleDomain implements Domain
-{
+public class DefaultMuleDomain implements Domain {
 
-    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-    protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
+  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
 
-    private final DomainDescriptor descriptor;
-    private MuleContext muleContext;
-    private DeploymentListener deploymentListener;
-    private ArtifactClassLoader deploymentClassLoader;
+  private final DomainDescriptor descriptor;
+  private MuleContext muleContext;
+  private DeploymentListener deploymentListener;
+  private ArtifactClassLoader deploymentClassLoader;
 
-    private File configResourceFile;
+  private File configResourceFile;
 
-    public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader)
-    {
-        this.deploymentClassLoader = deploymentClassLoader;
-        this.deploymentListener = new NullDeploymentListener();
-        this.descriptor = descriptor;
-        refreshClassLoaderAndLoadConfigResourceFile();
+  public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader) {
+    this.deploymentClassLoader = deploymentClassLoader;
+    this.deploymentListener = new NullDeploymentListener();
+    this.descriptor = descriptor;
+    refreshClassLoaderAndLoadConfigResourceFile();
+  }
+
+  private void refreshClassLoaderAndLoadConfigResourceFile() {
+    URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
+    if (resource != null) {
+      try {
+        this.configResourceFile = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException("Unable to find config resource file: " + resource.getFile());
+      }
+    }
+  }
+
+  public void setDeploymentListener(DeploymentListener deploymentListener) {
+    this.deploymentListener = deploymentListener;
+  }
+
+  public String getName() {
+    return descriptor.getName();
+  }
+
+  @Override
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
+  @Override
+  public void install() {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
+    }
+    refreshClassLoaderAndLoadConfigResourceFile();
+  }
+
+
+  @Override
+  public void init() {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(String.format("Initializing domain '%s'", getArtifactName())));
     }
 
-    private void refreshClassLoaderAndLoadConfigResourceFile(){
-        URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
-        if (resource != null)
-        {
-            try
-            {
-                this.configResourceFile = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new RuntimeException("Unable to find config resource file: " + resource.getFile());
-            }
+    try {
+      if (this.configResourceFile != null) {
+        validateConfigurationFileDoNotUsesCoreNamespace();
+
+        ArtifactMuleContextBuilder artifactBuilder = new ArtifactMuleContextBuilder().setArtifactName(getArtifactName())
+            .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+            .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
+            .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN);
+
+        if (deploymentListener != null) {
+          artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
         }
+        muleContext = artifactBuilder.build();
+      }
+    } catch (Exception e) {
+      // log it here so it ends up in app log, sys log will only log a message without stacktrace
+      logger.error(null, ExceptionUtils.getRootCause(e));
+      throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
     }
+  }
 
-    public void setDeploymentListener(DeploymentListener deploymentListener)
-    {
-        this.deploymentListener = deploymentListener;
-    }
-
-    public String getName()
-    {
-        return descriptor.getName();
-    }
-
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    @Override
-    public void install()
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
+  private void validateConfigurationFileDoNotUsesCoreNamespace() throws FileNotFoundException {
+    Scanner scanner = null;
+    try {
+      scanner = new Scanner(configResourceFile);
+      while (scanner.hasNextLine()) {
+        final String lineFromFile = scanner.nextLine();
+        if (lineFromFile.contains("<mule ")) {
+          throw new MuleRuntimeException(CoreMessages
+              .createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
         }
-        refreshClassLoaderAndLoadConfigResourceFile();
+      }
+    } finally {
+      if (scanner != null) {
+        scanner.close();
+      }
     }
+  }
 
-
-    @Override
-    public void init()
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Initializing domain '%s'", getArtifactName())));
-        }
-
-        try
-        {
-            if (this.configResourceFile != null)
-            {
-                validateConfigurationFileDoNotUsesCoreNamespace();
-
-                ArtifactMuleContextBuilder artifactBuilder = new ArtifactMuleContextBuilder()
-                        .setArtifactName(getArtifactName())
-                        .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-                        .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
-                        .setConfigurationFiles(new String[]{this.configResourceFile.getAbsolutePath()})
-                        .setArtifactType(DOMAIN);
-
-                if (deploymentListener != null)
-                {
-                    artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
-                }
-                muleContext = artifactBuilder.build();
-            }
-        }
-        catch (Exception e)
-        {
-            // log it here so it ends up in app log, sys log will only log a message without stacktrace
-            logger.error(null, ExceptionUtils.getRootCause(e));
-            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
-        }
+  private ConfigurationBuilder createConfigurationBuilder() {
+    try {
+      return (ConfigurationBuilder) ClassUtils
+          .instanciateClass("org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder",
+                            new Object[] {getResourceFiles()[0].getName()}, deploymentClassLoader.getClassLoader());
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    private void validateConfigurationFileDoNotUsesCoreNamespace() throws FileNotFoundException
-    {
-        Scanner scanner = null;
-        try
-        {
-            scanner = new Scanner(configResourceFile);
-            while (scanner.hasNextLine())
-            {
-                final String lineFromFile = scanner.nextLine();
-                if (lineFromFile.contains("<mule "))
-                {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
-                }
-            }
+  @Override
+  public void start() {
+    try {
+      if (this.muleContext != null) {
+        try {
+          this.muleContext.start();
+        } catch (MuleException e) {
+          logger.error(null, ExceptionUtils.getRootCause(e));
+          throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
-        finally
-        {
-            if (scanner != null)
-            {
-                scanner.close();
-            }
-        }
+      }
+      // null CCL ensures we log at 'system' level
+      // TODO create a more usable wrapper for any logger to be logged at sys level
+      withContextClassLoader(null, () -> {
+        DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
+        splashScreen.createMessage(descriptor);
+        deployLogger.info(splashScreen.toString());
+      });
+    } catch (Exception e) {
+      throw new DeploymentStartException(CoreMessages.createStaticMessage("Failure trying to start domain " + getArtifactName()),
+                                         e);
     }
+  }
 
-    private ConfigurationBuilder createConfigurationBuilder()
-    {
-        try
-        {
-            return (ConfigurationBuilder) ClassUtils.instanciateClass("org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder",
-                                                                      new Object[] {getResourceFiles()[0].getName()}, deploymentClassLoader.getClassLoader());
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+  @Override
+  public void stop() {
+    try {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(String.format("Stopping domain '%s'", getArtifactName())));
+      }
+      if (this.muleContext != null) {
+        this.muleContext.stop();
+      }
+    } catch (Exception e) {
+      throw new DeploymentStopException(CoreMessages.createStaticMessage("Failure trying to stop domain " + getArtifactName()),
+                                        e);
     }
+  }
 
-    @Override
-    public void start()
-    {
-        try
-        {
-            if (this.muleContext != null)
-            {
-                try
-                {
-                    this.muleContext.start();
-                }
-                catch (MuleException e)
-                {
-                    logger.error(null, ExceptionUtils.getRootCause(e));
-                    throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
-                }
-            }
-            // null CCL ensures we log at 'system' level
-            // TODO create a more usable wrapper for any logger to be logged at sys level
-            withContextClassLoader(null, () -> {
-                DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
-                splashScreen.createMessage(descriptor);
-                deployLogger.info(splashScreen.toString());
-            });
-        }
-        catch (Exception e)
-        {
-            throw new DeploymentStartException(CoreMessages.createStaticMessage("Failure trying to start domain " + getArtifactName()), e);
-        }
+  @Override
+  public void dispose() {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
     }
+    if (this.muleContext != null) {
+      this.muleContext.dispose();
+    }
+    this.deploymentClassLoader.dispose();
+  }
 
-    @Override
-    public void stop()
-    {
-        try
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info(miniSplash(String.format("Stopping domain '%s'", getArtifactName())));
-            }
-            if (this.muleContext != null)
-            {
-                this.muleContext.stop();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new DeploymentStopException(CoreMessages.createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
-        }
-    }
+  @Override
+  public String getArtifactName() {
+    return descriptor.getName();
+  }
 
-    @Override
-    public void dispose()
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
-        }
-        if (this.muleContext != null)
-        {
-            this.muleContext.dispose();
-        }
-        this.deploymentClassLoader.dispose();
-    }
+  @Override
+  public DomainDescriptor getDescriptor() {
+    return descriptor;
+  }
 
-    @Override
-    public String getArtifactName()
-    {
-        return descriptor.getName();
-    }
+  @Override
+  public File[] getResourceFiles() {
+    return configResourceFile == null ? new File[0] : new File[] {configResourceFile};
+  }
 
-    @Override
-    public DomainDescriptor getDescriptor()
-    {
-        return descriptor;
-    }
+  @Override
+  public ArtifactClassLoader getArtifactClassLoader() {
+    return deploymentClassLoader;
+  }
 
-    @Override
-    public File[] getResourceFiles()
-    {
-        return configResourceFile == null ? new File[0] : new File[] {configResourceFile};
+  public void initialise() {
+    try {
+      if (this.muleContext != null) {
+        this.muleContext.initialise();
+      }
+    } catch (InitialisationException e) {
+      throw new DeploymentInitException(CoreMessages
+          .createStaticMessage("Failure trying to initialise domain " + getArtifactName()), e);
     }
+  }
 
-    @Override
-    public ArtifactClassLoader getArtifactClassLoader()
-    {
-        return deploymentClassLoader;
-    }
-
-    public void initialise()
-    {
-        try
-        {
-            if (this.muleContext != null)
-            {
-                this.muleContext.initialise();
-            }
-        }
-        catch (InitialisationException e)
-        {
-            throw new DeploymentInitException(CoreMessages.createStaticMessage("Failure trying to initialise domain " + getArtifactName()), e);
-        }
-    }
-
-    public boolean containsSharedResources()
-    {
-        return this.muleContext != null;
-    }
+  public boolean containsSharedResources() {
+    return this.muleContext != null;
+  }
 }

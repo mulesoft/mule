@@ -9,22 +9,19 @@ package org.mule.compatibility.transport.jms.test;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.api.MuleContext;
 
-public class GenericTestJmsConnector extends JmsConnector
-{
-    private String providerProperty = "NOT_SET";
-    
-    public GenericTestJmsConnector(MuleContext context)
-    {
-        super(context);
-    }
+public class GenericTestJmsConnector extends JmsConnector {
 
-    public String getProviderProperty()
-    {
-        return providerProperty;
-    }
+  private String providerProperty = "NOT_SET";
 
-    public void setProviderProperty(String providerProperty)
-    {
-        this.providerProperty = providerProperty;
-    }
+  public GenericTestJmsConnector(MuleContext context) {
+    super(context);
+  }
+
+  public String getProviderProperty() {
+    return providerProperty;
+  }
+
+  public void setProviderProperty(String providerProperty) {
+    this.providerProperty = providerProperty;
+  }
 }

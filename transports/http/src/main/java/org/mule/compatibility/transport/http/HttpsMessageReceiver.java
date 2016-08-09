@@ -15,33 +15,28 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.util.StringUtils;
 
-public class HttpsMessageReceiver extends HttpMessageReceiver
-{
-    public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
-    {
-        super(connector, flow, endpoint);
-    }
+public class HttpsMessageReceiver extends HttpMessageReceiver {
 
-    @Override
-    protected void doConnect() throws ConnectException
-    {
-        checkKeyStore();
-        super.doConnect();
-    }
+  public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException {
+    super(connector, flow, endpoint);
+  }
 
-    protected void checkKeyStore() throws ConnectException
-    {
-        HttpsConnector httpsConnector = (HttpsConnector) connector;
-        String keyStore = httpsConnector.getKeyStore();
-        if (StringUtils.isBlank(keyStore))
-        {
-            throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
-        }
-    }
+  @Override
+  protected void doConnect() throws ConnectException {
+    checkKeyStore();
+    super.doConnect();
+  }
 
-    @Override
-    HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection)
-    {
-        return new HttpsMessageProcessTemplate(this, httpServerConnection,getWorkManager());
+  protected void checkKeyStore() throws ConnectException {
+    HttpsConnector httpsConnector = (HttpsConnector) connector;
+    String keyStore = httpsConnector.getKeyStore();
+    if (StringUtils.isBlank(keyStore)) {
+      throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
     }
+  }
+
+  @Override
+  HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection) {
+    return new HttpsMessageProcessTemplate(this, httpServerConnection, getWorkManager());
+  }
 }

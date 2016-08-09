@@ -48,237 +48,209 @@ import org.mockito.stubbing.Answer;
 
 import junit.framework.Assert;
 
-public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
-{
+public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
-    public static final String STRING_MESSAGE = "message";
-    public static final int MAX_REDELIVERY_COUNT = 0;
-    private static final String UTF_8 = "utf-8";
-    private static ObjectSerializer serializer;
+  public static final String STRING_MESSAGE = "message";
+  public static final int MAX_REDELIVERY_COUNT = 0;
+  private static final String UTF_8 = "utf-8";
+  private static ObjectSerializer serializer;
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MessageProcessor mockFailingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MessageProcessor mockWaitingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MessageProcessor mockDlqMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MuleMessage message = mock(MuleMessage.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MuleEvent event = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
-    private Latch waitLatch = new Latch();
-    private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
-    private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
+  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+  private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MessageProcessor mockFailingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MessageProcessor mockWaitingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MessageProcessor mockDlqMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleMessage message = mock(MuleMessage.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleEvent event = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Latch waitLatch = new Latch();
+  private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
+  private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
 
-    @Before
-    @SuppressWarnings("rawtypes")
-    public void setUpTest() throws MuleException
-    {
-        when(mockFailingMessageProcessor.process(any(MuleEvent.class))).thenThrow(new RuntimeException("failing"));
-        when(mockWaitingMessageProcessor.process(event)).thenAnswer(new Answer<MuleEvent>()
-        {
-            @Override
-            public MuleEvent answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                waitingMessageProcessorExecutionLatch.countDown();
-                waitLatch.await(2000, TimeUnit.MILLISECONDS);
-                return mockFailingMessageProcessor.process((MuleEvent) invocationOnMock.getArguments()[0]);
-            }
+  @Before
+  @SuppressWarnings("rawtypes")
+  public void setUpTest() throws MuleException {
+    when(mockFailingMessageProcessor.process(any(MuleEvent.class))).thenThrow(new RuntimeException("failing"));
+    when(mockWaitingMessageProcessor.process(event)).thenAnswer(new Answer<MuleEvent>() {
+
+      @Override
+      public MuleEvent answer(InvocationOnMock invocationOnMock) throws Throwable {
+        waitingMessageProcessorExecutionLatch.countDown();
+        waitLatch.await(2000, TimeUnit.MILLISECONDS);
+        return mockFailingMessageProcessor.process((MuleEvent) invocationOnMock.getArguments()[0]);
+      }
+    });
+    MuleLockFactory muleLockFactory = new MuleLockFactory();
+    muleLockFactory.setMuleContext(mockMuleContext);
+    when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
+    muleLockFactory.initialise();
+    when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
+    when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);
+    when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
+    final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
+    when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
+        .thenAnswer(new Answer<ObjectStore>() {
+
+          @Override
+          public ObjectStore answer(InvocationOnMock invocation) throws Throwable {
+            return inMemoryObjectStore;
+          }
         });
-        MuleLockFactory muleLockFactory = new MuleLockFactory();
-        muleLockFactory.setMuleContext(mockMuleContext);
-        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
-        muleLockFactory.initialise();
-        when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
-        when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);
-        when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
-        final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
-        when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
-        {
-            @Override
-            public ObjectStore answer(InvocationOnMock invocation) throws Throwable
-            {
-                return inMemoryObjectStore;
-            }
+    when(event.getMessage()).thenReturn(message);
+
+    IdempotentRedeliveryPolicyTestCase.serializer = SerializationTestUtils.getJavaSerializerWithMockContext();
+
+    irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
+    irp.setUseSecureHash(true);
+    irp.setFlowConstruct(mock(FlowConstruct.class));
+    irp.setMuleContext(mockMuleContext);
+    irp.setListener(mockFailingMessageProcessor);
+    irp.setMessageProcessor(mockDlqMessageProcessor);
+
+  }
+
+  @Test
+  public void messageDigestFailure() throws Exception {
+    when(message.getPayload()).thenReturn(new Object());
+    irp.initialise();
+    MuleEvent process = irp.process(event);
+    Assert.assertNull(process);
+  }
+
+  @Test
+  public void testMessageRedeliveryUsingMemory() throws Exception {
+    when(message.getPayload()).thenReturn(STRING_MESSAGE);
+    irp.initialise();
+    processUntilFailure();
+    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+  }
+
+  @Test
+  public void testMessageRedeliveryUsingSerializationStore() throws Exception {
+    when(message.getPayload()).thenReturn(STRING_MESSAGE);
+    reset(mockObjectStoreManager);
+    final ObjectStore serializationObjectStore = new SerializationObjectStore();
+    when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
+        .thenAnswer(new Answer<ObjectStore>() {
+
+          @Override
+          public ObjectStore answer(InvocationOnMock invocation) throws Throwable {
+            return serializationObjectStore;
+          }
         });
-        when(event.getMessage()).thenReturn(message);
+    irp.initialise();
+    processUntilFailure();
+    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+  }
 
-        IdempotentRedeliveryPolicyTestCase.serializer = SerializationTestUtils.getJavaSerializerWithMockContext();
+  @Test
+  public void testThreadSafeObjectStoreUsage() throws Exception {
+    when(message.getPayload()).thenReturn(STRING_MESSAGE);
+    irp.setListener(mockWaitingMessageProcessor);
+    irp.initialise();
+    ExecuteIrpThread firstIrpExecutionThread = new ExecuteIrpThread();
+    firstIrpExecutionThread.start();
+    ExecuteIrpThread threadCausingRedeliveryException = new ExecuteIrpThread();
+    threadCausingRedeliveryException.start();
+    waitingMessageProcessorExecutionLatch.await(5000, TimeUnit.MILLISECONDS);
+    waitLatch.release();
+    firstIrpExecutionThread.join();
+    threadCausingRedeliveryException.join();
+    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+  }
 
-        irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
-        irp.setUseSecureHash(true);
-        irp.setFlowConstruct(mock(FlowConstruct.class));
-        irp.setMuleContext(mockMuleContext);
-        irp.setListener(mockFailingMessageProcessor);
-        irp.setMessageProcessor(mockDlqMessageProcessor);
+  private void processUntilFailure() {
+    for (int i = 0; i < MAX_REDELIVERY_COUNT + 2; i++) {
+      try {
+        irp.process(event);
+      } catch (Exception e) {
+        // ignore exception
+      }
+    }
+  }
 
+  public class ExecuteIrpThread extends Thread {
+
+    public Exception exception;
+
+    @Override
+    public void run() {
+      try {
+        irp.process(event);
+      } catch (Exception e) {
+        exception = e;
+      }
+    }
+  }
+
+  public static class SerializationObjectStore implements ObjectStore<AtomicInteger> {
+
+    private Map<Serializable, Serializable> store = new HashMap<Serializable, Serializable>();
+
+    @Override
+    public boolean contains(Serializable key) throws ObjectStoreException {
+      return store.containsKey(key);
     }
 
-    @Test
-    public void messageDigestFailure() throws Exception
-    {
-        when(message.getPayload()).thenReturn(new Object());
-        irp.initialise();
-        MuleEvent process = irp.process(event);
-        Assert.assertNull(process);
+    @Override
+    public void store(Serializable key, AtomicInteger value) throws ObjectStoreException {
+      store.put(key, serializer.serialize(value));
     }
 
-    @Test
-    public void testMessageRedeliveryUsingMemory() throws Exception
-    {
-        when(message.getPayload()).thenReturn(STRING_MESSAGE);
-        irp.initialise();
-        processUntilFailure();
-        verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    @Override
+    public AtomicInteger retrieve(Serializable key) throws ObjectStoreException {
+      Serializable serializable = store.get(key);
+      return serializer.deserialize((byte[]) serializable);
     }
 
-    @Test
-    public void testMessageRedeliveryUsingSerializationStore() throws Exception
-    {
-        when(message.getPayload()).thenReturn(STRING_MESSAGE);
-        reset(mockObjectStoreManager);
-        final ObjectStore serializationObjectStore = new SerializationObjectStore();
-        when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
-        {
-            @Override
-            public ObjectStore answer(InvocationOnMock invocation) throws Throwable
-            {
-                return serializationObjectStore;
-            }
-        });
-        irp.initialise();
-        processUntilFailure();
-        verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    @Override
+    public AtomicInteger remove(Serializable key) throws ObjectStoreException {
+      Serializable serializable = store.remove(key);
+      return serializer.deserialize((byte[]) serializable);
     }
 
-    @Test
-    public void testThreadSafeObjectStoreUsage() throws Exception
-    {
-        when(message.getPayload()).thenReturn(STRING_MESSAGE);
-        irp.setListener(mockWaitingMessageProcessor);
-        irp.initialise();
-        ExecuteIrpThread firstIrpExecutionThread = new ExecuteIrpThread();
-        firstIrpExecutionThread.start();
-        ExecuteIrpThread threadCausingRedeliveryException = new ExecuteIrpThread();
-        threadCausingRedeliveryException.start();
-        waitingMessageProcessorExecutionLatch.await(5000, TimeUnit.MILLISECONDS);
-        waitLatch.release();
-        firstIrpExecutionThread.join();
-        threadCausingRedeliveryException.join();
-        verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    @Override
+    public boolean isPersistent() {
+      return false;
     }
 
-    private void processUntilFailure()
-    {
-        for (int i = 0; i < MAX_REDELIVERY_COUNT + 2; i++)
-        {
-            try
-            {
-                irp.process(event);
-            }
-            catch (Exception e)
-            {
-                // ignore exception
-            }
-        }
+    @Override
+    public void clear() throws ObjectStoreException {
+      this.store.clear();
+    }
+  }
+
+  public static class InMemoryObjectStore implements ObjectStore<AtomicInteger> {
+
+    private Map<Serializable, AtomicInteger> store = new HashMap<Serializable, AtomicInteger>();
+
+    @Override
+    public boolean contains(Serializable key) throws ObjectStoreException {
+      return store.containsKey(key);
     }
 
-    public class ExecuteIrpThread extends Thread
-    {
-        public Exception exception;
-
-        @Override
-        public void run()
-        {
-            try
-            {
-                irp.process(event);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-        }
+    @Override
+    public void store(Serializable key, AtomicInteger value) throws ObjectStoreException {
+      store.put(key, value);
     }
 
-    public static class SerializationObjectStore implements ObjectStore<AtomicInteger>
-    {
-        private Map<Serializable,Serializable> store = new HashMap<Serializable,Serializable>();
-
-        @Override
-        public boolean contains(Serializable key) throws ObjectStoreException
-        {
-            return store.containsKey(key);
-        }
-
-        @Override
-        public void store(Serializable key, AtomicInteger value) throws ObjectStoreException
-        {
-            store.put(key, serializer.serialize(value));
-        }
-
-        @Override
-        public AtomicInteger retrieve(Serializable key) throws ObjectStoreException
-        {
-            Serializable serializable = store.get(key);
-            return serializer.deserialize((byte[]) serializable);
-        }
-
-        @Override
-        public AtomicInteger remove(Serializable key) throws ObjectStoreException
-        {
-            Serializable serializable = store.remove(key);
-            return serializer.deserialize((byte[]) serializable);
-        }
-
-        @Override
-        public boolean isPersistent()
-        {
-            return false;
-        }
-
-        @Override
-        public void clear() throws ObjectStoreException
-        {
-            this.store.clear();
-        }
+    @Override
+    public AtomicInteger retrieve(Serializable key) throws ObjectStoreException {
+      return store.get(key);
     }
 
-    public static class InMemoryObjectStore implements ObjectStore<AtomicInteger>
-    {
-        private Map<Serializable,AtomicInteger> store = new HashMap<Serializable,AtomicInteger>();
-
-        @Override
-        public boolean contains(Serializable key) throws ObjectStoreException
-        {
-            return store.containsKey(key);
-        }
-
-        @Override
-        public void store(Serializable key, AtomicInteger value) throws ObjectStoreException
-        {
-            store.put(key,value);
-        }
-
-        @Override
-        public AtomicInteger retrieve(Serializable key) throws ObjectStoreException
-        {
-            return store.get(key);
-        }
-
-        @Override
-        public AtomicInteger remove(Serializable key) throws ObjectStoreException
-        {
-            return store.remove(key);
-        }
-
-        @Override
-        public void clear() throws ObjectStoreException
-        {
-            this.store.clear();
-        }
-
-        @Override
-        public boolean isPersistent()
-        {
-            return false;
-        }
+    @Override
+    public AtomicInteger remove(Serializable key) throws ObjectStoreException {
+      return store.remove(key);
     }
+
+    @Override
+    public void clear() throws ObjectStoreException {
+      this.store.clear();
+    }
+
+    @Override
+    public boolean isPersistent() {
+      return false;
+    }
+  }
 }

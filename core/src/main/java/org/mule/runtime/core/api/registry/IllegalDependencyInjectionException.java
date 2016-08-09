@@ -8,14 +8,11 @@
 package org.mule.runtime.core.api.registry;
 
 /**
- * Thrown to indicate that an object has an illegal dependency injection reference
- * against another object
+ * Thrown to indicate that an object has an illegal dependency injection reference against another object
  */
-public class IllegalDependencyInjectionException extends RuntimeException
-{
+public class IllegalDependencyInjectionException extends RuntimeException {
 
-    public IllegalDependencyInjectionException(String message)
-    {
-        super(message);
-    }
+  public IllegalDependencyInjectionException(String message) {
+    super(message);
+  }
 }

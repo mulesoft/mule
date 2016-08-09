@@ -26,43 +26,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateStructArrayUdtTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateStructArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
-    public UpdateStructArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public UpdateStructArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    List<Object[]> params = new LinkedList<>();
+
+    if (!getOracleResource().isEmpty()) {
+      params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
     }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        List<Object[]> params = new LinkedList<>();
+    return params;
+  }
 
-        if (!getOracleResource().isEmpty())
-        {
-            params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
-        }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-udt-array-config.xml"};
+  }
 
-        return params;
-    }
+  @Test
+  public void returnsStructArray() throws Exception {
+    final MuleEvent responseEvent = flowRunner("updatesStructArray").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-udt-array-config.xml"};
-    }
-
-    @Test
-    public void returnsStructArray() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("updatesStructArray").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
-
-        assertThat(response.getPayload(), instanceOf(Object[].class));
-        final Object[] arrayPayload = (Object[]) response.getPayload();
-        assertThat(arrayPayload.length, equalTo(1));
-        assertThat(arrayPayload[0], instanceOf(Struct.class));
-        assertThat(((Struct) arrayPayload[0]).getAttributes(), equalTo(CONTACT2.getDetailsAsObjectArray()[0]));
-    }
+    assertThat(response.getPayload(), instanceOf(Object[].class));
+    final Object[] arrayPayload = (Object[]) response.getPayload();
+    assertThat(arrayPayload.length, equalTo(1));
+    assertThat(arrayPayload[0], instanceOf(Struct.class));
+    assertThat(((Struct) arrayPayload[0]).getAttributes(), equalTo(CONTACT2.getDetailsAsObjectArray()[0]));
+  }
 }

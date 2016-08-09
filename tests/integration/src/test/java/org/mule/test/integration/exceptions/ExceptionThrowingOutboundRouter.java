@@ -12,12 +12,11 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
-public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter
-{
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        throw new RoutingException(MessageFactory.createStaticMessage("dummyException"), event, null);
-    }
+public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter {
+
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    throw new RoutingException(MessageFactory.createStaticMessage("dummyException"), event, null);
+  }
 }
 
 

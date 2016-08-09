@@ -28,119 +28,100 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * Creates {@link QueryTemplate} for parameterized queries
  */
-public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryTemplate>
-{
+public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryTemplate> {
 
-    private final String sqlText;
-    private final List<QueryParam> queryParams;
-    private final QueryTemplateParser queryParser;
+  private final String sqlText;
+  private final List<QueryParam> queryParams;
+  private final QueryTemplateParser queryParser;
 
-    public ParameterizedQueryTemplateFactoryBean(String sqlText, List<QueryParam> queryParams, QueryTemplateParser queryParser)
-    {
-        this.sqlText = sqlText;
-        this.queryParams = queryParams;
-        this.queryParser = queryParser;
+  public ParameterizedQueryTemplateFactoryBean(String sqlText, List<QueryParam> queryParams, QueryTemplateParser queryParser) {
+    this.sqlText = sqlText;
+    this.queryParams = queryParams;
+    this.queryParser = queryParser;
+  }
+
+  @Override
+  public QueryTemplate getObject() throws Exception {
+    QueryTemplate queryTemplate = queryParser.parse(sqlText);
+
+    List<QueryParam> resolvedParams = new LinkedList<QueryParam>();
+    List<QueryParam> unresolvedQueryParams = new LinkedList<>(queryParams);
+
+    for (QueryParam templateParam : queryTemplate.getParams()) {
+      QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
+
+      if (param == null) {
+        resolvedParams.add(templateParam);
+      } else {
+        unresolvedQueryParams.remove(param);
+        resolvedParams.add(overrideParam(templateParam, param));
+      }
     }
 
-    @Override
-    public QueryTemplate getObject() throws Exception
-    {
-        QueryTemplate queryTemplate = queryParser.parse(sqlText);
-
-        List<QueryParam> resolvedParams = new LinkedList<QueryParam>();
-        List<QueryParam> unresolvedQueryParams = new LinkedList<>(queryParams);
-
-        for (QueryParam templateParam : queryTemplate.getParams())
-        {
-            QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
-
-            if (param == null)
-            {
-                resolvedParams.add(templateParam);
-            }
-            else
-            {
-                unresolvedQueryParams.remove(param);
-                resolvedParams.add(overrideParam(templateParam, param));
-            }
-        }
-
-        if (!unresolvedQueryParams.isEmpty())
-        {
-            throw new IllegalStateException(buildUnresolvedParamErrorMsg(unresolvedQueryParams));
-        }
-
-        return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), resolvedParams);
+    if (!unresolvedQueryParams.isEmpty()) {
+      throw new IllegalStateException(buildUnresolvedParamErrorMsg(unresolvedQueryParams));
     }
 
-    private String buildUnresolvedParamErrorMsg(List<QueryParam> unresolvedQueryParams)
-    {
-        StringBuilder errorMsgBuilder = new StringBuilder();
+    return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), resolvedParams);
+  }
 
-        for (QueryParam queryParam : unresolvedQueryParams)
-        {
-            if (errorMsgBuilder.length() > 0)
-            {
-                errorMsgBuilder.append(", ");
-            }
-            errorMsgBuilder.append("'").append(queryParam.getName()).append("'");
-        }
-        errorMsgBuilder.insert(0, "There is at least a query parameter that does not match the name of any parameter defined in the query text. Unresolved parameters: ");
+  private String buildUnresolvedParamErrorMsg(List<QueryParam> unresolvedQueryParams) {
+    StringBuilder errorMsgBuilder = new StringBuilder();
 
-        return errorMsgBuilder.toString();
+    for (QueryParam queryParam : unresolvedQueryParams) {
+      if (errorMsgBuilder.length() > 0) {
+        errorMsgBuilder.append(", ");
+      }
+      errorMsgBuilder.append("'").append(queryParam.getName()).append("'");
+    }
+    errorMsgBuilder
+        .insert(0,
+                "There is at least a query parameter that does not match the name of any parameter defined in the query text. Unresolved parameters: ");
+
+    return errorMsgBuilder.toString();
+  }
+
+  private QueryParam overrideParam(QueryParam templateParam, QueryParam queryParam) {
+    QueryParam overriddenParam;
+    DbType paramType = templateParam.getType();
+    if (!(queryParam.getType() instanceof UnknownDbType)) {
+      paramType = queryParam.getType();
     }
 
-    private QueryParam overrideParam(QueryParam templateParam, QueryParam queryParam)
-    {
-        QueryParam overriddenParam;
-        DbType paramType = templateParam.getType();
-        if (!(queryParam.getType() instanceof UnknownDbType))
-        {
-           paramType = queryParam.getType();
-        }
-
-        if (queryParam instanceof InOutQueryParam)
-        {
-            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), ((InOutQueryParam) queryParam).getValue());
-        }
-        else if (queryParam instanceof InputQueryParam)
-        {
-            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, ((InputQueryParam) queryParam).getValue(), templateParam.getName());
-        }
-        else
-        {
-            overriddenParam = new DefaultOutputQueryParam(templateParam.getIndex(), paramType, templateParam.getName());
-        }
-
-        return overriddenParam;
+    if (queryParam instanceof InOutQueryParam) {
+      overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(),
+                                                   ((InOutQueryParam) queryParam).getValue());
+    } else if (queryParam instanceof InputQueryParam) {
+      overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, ((InputQueryParam) queryParam).getValue(),
+                                                   templateParam.getName());
+    } else {
+      overriddenParam = new DefaultOutputQueryParam(templateParam.getIndex(), paramType, templateParam.getName());
     }
 
-    private QueryParam findOverriddenParam(final String name, List<QueryParam> queryParams)
-    {
-        if (name != null)
-        {
-            return (QueryParam) find(queryParams, new Predicate()
-            {
-                @Override
-                public boolean evaluate(Object object)
-                {
-                    return name.equals(((QueryParam) object).getName());
-                }
-            });
+    return overriddenParam;
+  }
+
+  private QueryParam findOverriddenParam(final String name, List<QueryParam> queryParams) {
+    if (name != null) {
+      return (QueryParam) find(queryParams, new Predicate() {
+
+        @Override
+        public boolean evaluate(Object object) {
+          return name.equals(((QueryParam) object).getName());
         }
-
-        return null;
+      });
     }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return QueryTemplate.class;
-    }
+    return null;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return QueryTemplate.class;
+  }
+
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 }

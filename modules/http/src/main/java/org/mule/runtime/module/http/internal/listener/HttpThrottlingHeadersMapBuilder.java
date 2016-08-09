@@ -12,35 +12,34 @@ import java.util.Map;
 /**
  * Creates the corresponding http headers based on the throttling statistics.
  */
-public class HttpThrottlingHeadersMapBuilder
-{
+public class HttpThrottlingHeadersMapBuilder {
 
-    private Long remainingRequestInCurrentPeriod;
-    private Long maximumRequestAllowedPerPeriod;
-    private Long timeUntilNextPeriodInMillis;
+  private Long remainingRequestInCurrentPeriod;
+  private Long maximumRequestAllowedPerPeriod;
+  private Long timeUntilNextPeriodInMillis;
 
-    public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis)
-    {
-        this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
-        this.maximumRequestAllowedPerPeriod = maximumRequestAllowedPerPeriod;
-        this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+  public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod,
+                                            long timeUntilNextPeriodInMillis) {
+    this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
+    this.maximumRequestAllowedPerPeriod = maximumRequestAllowedPerPeriod;
+    this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+  }
+
+  public Map<String, String> build() {
+    Map<String, String> throttlingHeaders = new HashMap<String, String>();
+    addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_LIMIT_HEADER,
+                      this.maximumRequestAllowedPerPeriod);
+    addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_REMAINING_HEADER,
+                      this.remainingRequestInCurrentPeriod);
+    addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_RESET_HEADER,
+                      this.timeUntilNextPeriodInMillis);
+    return throttlingHeaders;
+  }
+
+  private void addToMapIfNotNull(Map<String, String> map, String key, Long value) {
+    if (value != null) {
+      map.put(key, String.valueOf(value));
     }
-
-    public Map<String, String> build()
-    {
-        Map<String, String> throttlingHeaders = new HashMap<String, String>();
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_LIMIT_HEADER, this.maximumRequestAllowedPerPeriod);
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_REMAINING_HEADER, this.remainingRequestInCurrentPeriod);
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_RESET_HEADER, this.timeUntilNextPeriodInMillis);
-        return throttlingHeaders;
-    }
-
-    private void addToMapIfNotNull(Map<String, String> map, String key, Long value)
-    {
-        if (value != null)
-        {
-            map.put(key, String.valueOf(value));
-        }
-    }
+  }
 
 }

@@ -23,36 +23,33 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MulticastSyncWithTransformersTestCase extends AbstractIntegrationTestCase
-{
+public class MulticastSyncWithTransformersTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-flow.xml";
+  }
 
-    @Test
-    public void testSyncMulticast() throws Exception
-    {
-        Apple apple = new Apple();
-        Banana banana = new Banana();
-        Orange orange = new Orange();
-        FruitBowl fruitBowl = new FruitBowl(apple, banana);
-        fruitBowl.addFruit(orange);
+  @Test
+  public void testSyncMulticast() throws Exception {
+    Apple apple = new Apple();
+    Banana banana = new Banana();
+    Orange orange = new Orange();
+    FruitBowl fruitBowl = new FruitBowl(apple, banana);
+    fruitBowl.addFruit(orange);
 
-        MuleMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
+    MuleMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof List);
-        List<Fruit> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload
-                ()).collect(toList());
-        assertEquals(3, results.size());
+    assertNotNull(result);
+    assertTrue(result.getPayload() instanceof List);
+    List<Fruit> results =
+        ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    assertEquals(3, results.size());
 
-        assertTrue(results.contains(apple));
-        assertTrue(results.contains(banana));
-        assertTrue(results.contains(orange));
+    assertTrue(results.contains(apple));
+    assertTrue(results.contains(banana));
+    assertTrue(results.contains(orange));
 
-        FlowAssert.verify();
-    }
+    FlowAssert.verify();
+  }
 }

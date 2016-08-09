@@ -7,7 +7,6 @@
 package org.mule.runtime.core.config.bootstrap;
 
 
-public final class FakeTransactionResource
-{
+public final class FakeTransactionResource {
 
 }

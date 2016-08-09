@@ -22,66 +22,62 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class NameTransformerFilterTestCase extends AbstractMuleTestCase
-{
-    private NameConverterFilter filter = new NameConverterFilter();
-    private static final DataType UNUSED_DATA_TYPE = null;
+public class NameTransformerFilterTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void filtersEmptyList() throws ResolverException
-    {
-        List<Converter> availableConverters = new ArrayList<>();
+  private NameConverterFilter filter = new NameConverterFilter();
+  private static final DataType UNUSED_DATA_TYPE = null;
 
-        List<Converter> converters = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
+  @Test
+  public void filtersEmptyList() throws ResolverException {
+    List<Converter> availableConverters = new ArrayList<>();
 
-        assertEquals(0, converters.size());
-    }
+    List<Converter> converters = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
 
-    @Test
-    public void filtersEqualName() throws ResolverException
-    {
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
+    assertEquals(0, converters.size());
+  }
 
-        List<Converter> availableConverters = new ArrayList<>();
-        availableConverters.add(xmlToString);
-        availableConverters.add(xmlToString);
+  @Test
+  public void filtersEqualName() throws ResolverException {
+    Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
 
-        List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<>();
+    availableConverters.add(xmlToString);
+    availableConverters.add(xmlToString);
 
-        assertEquals(2, transformers.size());
-        assertEquals(xmlToString, transformers.get(0));
-        assertEquals(xmlToString, transformers.get(1));
-    }
+    List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
 
-    @Test
-    public void filtersDifferentNameWithBetterTransformerFist() throws ResolverException
-    {
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
-        Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
+    assertEquals(2, transformers.size());
+    assertEquals(xmlToString, transformers.get(0));
+    assertEquals(xmlToString, transformers.get(1));
+  }
 
-        List<Converter> availableConverters = new ArrayList<>();
-        availableConverters.add(stringToJson);
-        availableConverters.add(xmlToString);
+  @Test
+  public void filtersDifferentNameWithBetterTransformerFist() throws ResolverException {
+    Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
+    Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
 
-        List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<>();
+    availableConverters.add(stringToJson);
+    availableConverters.add(xmlToString);
 
-        assertEquals(1, transformers.size());
-        assertTrue(transformers.contains(stringToJson));
-    }
+    List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
 
-    @Test
-    public void filtersDifferentNameWithBetterTransformerLast() throws ResolverException
-    {
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
-        Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
+    assertEquals(1, transformers.size());
+    assertTrue(transformers.contains(stringToJson));
+  }
 
-        List<Converter> availableConverters = new ArrayList<>();
-        availableConverters.add(xmlToString);
-        availableConverters.add(stringToJson);
+  @Test
+  public void filtersDifferentNameWithBetterTransformerLast() throws ResolverException {
+    Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
+    Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
 
-        List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<>();
+    availableConverters.add(xmlToString);
+    availableConverters.add(stringToJson);
 
-        assertEquals(1, transformers.size());
-        assertTrue(transformers.contains(stringToJson));
-    }
+    List<Converter> transformers = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
+
+    assertEquals(1, transformers.size());
+    assertTrue(transformers.contains(stringToJson));
+  }
 }

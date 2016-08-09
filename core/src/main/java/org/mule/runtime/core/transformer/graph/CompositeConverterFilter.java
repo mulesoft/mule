@@ -15,32 +15,27 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompositeConverterFilter implements ConverterFilter
-{
+public class CompositeConverterFilter implements ConverterFilter {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private final ConverterFilter[] filters;
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  private final ConverterFilter[] filters;
 
-    public CompositeConverterFilter(ConverterFilter... filters)
-    {
-        this.filters = filters;
+  public CompositeConverterFilter(ConverterFilter... filters) {
+    this.filters = filters;
+  }
+
+  @Override
+  public List<Converter> filter(List<Converter> converters, DataType source, DataType result) {
+    List<Converter> filteredTransformers = new LinkedList<>(converters);
+
+    for (ConverterFilter filter : filters) {
+      if (filteredTransformers.size() <= 1) {
+        break;
+      }
+
+      filteredTransformers = filter.filter(filteredTransformers, source, result);
     }
 
-    @Override
-    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
-    {
-        List<Converter> filteredTransformers = new LinkedList<>(converters);
-
-        for (ConverterFilter filter : filters)
-        {
-            if (filteredTransformers.size() <= 1)
-            {
-                break;
-            }
-
-            filteredTransformers = filter.filter(filteredTransformers, source, result);
-        }
-
-        return filteredTransformers;
-    }
+    return filteredTransformers;
+  }
 }

@@ -8,24 +8,21 @@
 package org.mule.runtime.core.api.processor;
 
 /**
- * Adds to a pipeline the ability to dynamically inject a sequence
- * of message processors after initialization.
+ * Adds to a pipeline the ability to dynamically inject a sequence of message processors after initialization.
  *
- * The injected message processors are executed before (pre) of after (post)
- * the ones defined in the flow in the specified order.
+ * The injected message processors are executed before (pre) of after (post) the ones defined in the flow in the specified order.
  *
  */
-public interface DynamicPipeline
-{
+public interface DynamicPipeline {
 
-    /**
-     * Provide access to a {@link DynamicPipelineBuilder} that allows modifying
-     * the dynamic pipeline injecting message processors and resetting the pipeline
-     *
-     * @param id dynamic pipeline ID
-     * @return a DynamicPipelineBuilder that allows modifying the dynamic pipeline
-     * @throws DynamicPipelineException if the pipeline ID is not valid
-     */
-    DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException;
+  /**
+   * Provide access to a {@link DynamicPipelineBuilder} that allows modifying the dynamic pipeline injecting message processors
+   * and resetting the pipeline
+   *
+   * @param id dynamic pipeline ID
+   * @return a DynamicPipelineBuilder that allows modifying the dynamic pipeline
+   * @throws DynamicPipelineException if the pipeline ID is not valid
+   */
+  DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException;
 
 }

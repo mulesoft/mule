@@ -12,13 +12,12 @@ import java.util.List;
 /**
  * Discovers available mule modules.
  */
-public interface ModuleDiscoverer
-{
+public interface ModuleDiscoverer {
 
-    /**
-     * Discovers available mule modules.
-     *
-     * @return a non null {@linl List} containing all {@link MuleModule} found in the container.
-     */
-    List<MuleModule> discover();
+  /**
+   * Discovers available mule modules.
+   *
+   * @return a non null {@linl List} containing all {@link MuleModule} found in the container.
+   */
+  List<MuleModule> discover();
 }

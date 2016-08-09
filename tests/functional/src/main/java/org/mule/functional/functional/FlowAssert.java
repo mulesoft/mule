@@ -11,47 +11,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class FlowAssert
-{
+public class FlowAssert {
 
-    private static Map<String, List<AssertionMessageProcessor>> assertions = new TreeMap<String, List<AssertionMessageProcessor>>();
+  private static Map<String, List<AssertionMessageProcessor>> assertions = new TreeMap<String, List<AssertionMessageProcessor>>();
 
-    public static void verify() throws Exception
-    {
-        for (List<AssertionMessageProcessor> flowAssertions : assertions.values())
-        {
-            for (AssertionMessageProcessor assertion : flowAssertions)
-            {
-                assertion.verify();
-            }
-        }
+  public static void verify() throws Exception {
+    for (List<AssertionMessageProcessor> flowAssertions : assertions.values()) {
+      for (AssertionMessageProcessor assertion : flowAssertions) {
+        assertion.verify();
+      }
     }
+  }
 
-    public static void verify(String flowName) throws Exception
-    {
+  public static void verify(String flowName) throws Exception {
 
-        List<AssertionMessageProcessor> flowAssertions = assertions.get(flowName);
-        if (flowAssertions != null)
-        {
-            for (AssertionMessageProcessor assertion : flowAssertions)
-            {
-                assertion.verify();
-            }
-        }
+    List<AssertionMessageProcessor> flowAssertions = assertions.get(flowName);
+    if (flowAssertions != null) {
+      for (AssertionMessageProcessor assertion : flowAssertions) {
+        assertion.verify();
+      }
     }
+  }
 
-    static void addAssertion(String flowName, AssertionMessageProcessor assertion)
-    {
-        if (assertions.get(flowName) == null)
-        {
-            assertions.put(flowName, new ArrayList<AssertionMessageProcessor>());
-        }
-        assertions.get(flowName).add(assertion);
+  static void addAssertion(String flowName, AssertionMessageProcessor assertion) {
+    if (assertions.get(flowName) == null) {
+      assertions.put(flowName, new ArrayList<AssertionMessageProcessor>());
     }
+    assertions.get(flowName).add(assertion);
+  }
 
-    public static void reset()
-    {
-        assertions = new TreeMap<String, List<AssertionMessageProcessor>>();
-    }
+  public static void reset() {
+    assertions = new TreeMap<String, List<AssertionMessageProcessor>>();
+  }
 
 }

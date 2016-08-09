@@ -14,14 +14,13 @@ import org.mule.runtime.module.db.internal.domain.query.BulkQuery;
 /**
  * Resolves a {@link BulkQuery} for a given {@link MuleEvent}
  */
-public interface BulkQueryResolver
-{
+public interface BulkQueryResolver {
 
-    /**
-     * Resolves a bulk query in the context of a given Mule event.
-     *
-     * @param muleEvent used to resolve any Mule expression
-     * @return bulk query resolved for the given event, null if event is null.
-     */
-    BulkQuery resolve(MuleEvent muleEvent);
+  /**
+   * Resolves a bulk query in the context of a given Mule event.
+   *
+   * @param muleEvent used to resolve any Mule expression
+   * @return bulk query resolved for the given event, null if event is null.
+   */
+  BulkQuery resolve(MuleEvent muleEvent);
 }

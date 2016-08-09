@@ -22,15 +22,14 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class PgpNamespaceHandler extends NamespaceHandlerSupport
-{
+public class PgpNamespaceHandler extends NamespaceHandlerSupport {
 
-    public void init()
-    {
-        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
-        registerBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
-        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
-        registerBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
-    }
+  public void init() {
+    registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
+    registerBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
+    registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
+    registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
+    registerBeanDefinitionParser("keybased-encryption-strategy",
+                                 new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
+  }
 }

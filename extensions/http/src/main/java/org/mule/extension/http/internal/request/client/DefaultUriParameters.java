@@ -17,35 +17,31 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public class DefaultUriParameters implements UriParameters
-{
-    private final Protocols scheme;
-    private final Function<MuleEvent, String> host;
-    private final Function<MuleEvent, Integer> port;
+public class DefaultUriParameters implements UriParameters {
+
+  private final Protocols scheme;
+  private final Function<MuleEvent, String> host;
+  private final Function<MuleEvent, Integer> port;
 
 
-    public DefaultUriParameters(Protocols protocol, Function<MuleEvent, String> host, Function<MuleEvent, Integer> port)
-    {
-        this.scheme = protocol;
-        this.host = host;
-        this.port = port;
-    }
+  public DefaultUriParameters(Protocols protocol, Function<MuleEvent, String> host, Function<MuleEvent, Integer> port) {
+    this.scheme = protocol;
+    this.host = host;
+    this.port = port;
+  }
 
-    @Override
-    public Protocols getScheme()
-    {
-        return scheme;
-    }
+  @Override
+  public Protocols getScheme() {
+    return scheme;
+  }
 
-    @Override
-    public Function<MuleEvent, String> getHost()
-    {
-        return host;
-    }
+  @Override
+  public Function<MuleEvent, String> getHost() {
+    return host;
+  }
 
-    @Override
-    public Function<MuleEvent, Integer> getPort()
-    {
-        return port;
-    }
+  @Override
+  public Function<MuleEvent, Integer> getPort() {
+    return port;
+  }
 }

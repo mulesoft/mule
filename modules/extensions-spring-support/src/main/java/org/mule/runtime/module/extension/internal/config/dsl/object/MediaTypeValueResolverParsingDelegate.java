@@ -19,18 +19,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  *
  * @since 4.0
  */
-public class MediaTypeValueResolverParsingDelegate implements ValueResolverParsingDelegate
-{
+public class MediaTypeValueResolverParsingDelegate implements ValueResolverParsingDelegate {
 
-    @Override
-    public boolean accepts(MetadataType metadataType)
-    {
-        return MediaType.class.equals(getType(metadataType));
-    }
+  @Override
+  public boolean accepts(MetadataType metadataType) {
+    return MediaType.class.equals(getType(metadataType));
+  }
 
-    @Override
-    public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl)
-    {
-        return new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType());
-    }
+  @Override
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
+    return new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType());
+  }
 }

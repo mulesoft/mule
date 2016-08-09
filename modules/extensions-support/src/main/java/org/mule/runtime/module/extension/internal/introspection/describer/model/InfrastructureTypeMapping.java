@@ -17,21 +17,17 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the
- * {@link String} name of it.
+ * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the {@link String} name
+ * of it.
  *
  * @since 4.0
  */
-public class InfrastructureTypeMapping
-{
+public class InfrastructureTypeMapping {
 
-    private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
-            .put(TlsContextFactory.class, TLS_ATTRIBUTE_NAME)
-            .put(ThreadingProfile.class, THREADING_PROFILE_ATTRIBUTE_NAME)
-            .build();
+  private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
+      .put(TlsContextFactory.class, TLS_ATTRIBUTE_NAME).put(ThreadingProfile.class, THREADING_PROFILE_ATTRIBUTE_NAME).build();
 
-    public static Map<Class<?>, String> getMap()
-    {
-        return mapping;
-    }
+  public static Map<Class<?>, String> getMap() {
+    return mapping;
+  }
 }

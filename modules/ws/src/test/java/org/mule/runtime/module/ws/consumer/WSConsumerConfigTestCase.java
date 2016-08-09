@@ -14,44 +14,39 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
-public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
-{
+public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase {
 
-    private static final String SERVICE_ADDRESS = "http://localhost";
+  private static final String SERVICE_ADDRESS = "http://localhost";
 
-    @Ignore("See MULE-9210")
-    @Test(expected = MuleException.class)
-    public void failToCreateOutboundEndpointWithUnsupportedProtocol() throws MuleException
-    {
-        WSConsumerConfig config = createConsumerConfig();
-        config.setServiceAddress("unsupported://test");
-        config.createOutboundMessageProcessor();
-    }
+  @Ignore("See MULE-9210")
+  @Test(expected = MuleException.class)
+  public void failToCreateOutboundEndpointWithUnsupportedProtocol() throws MuleException {
+    WSConsumerConfig config = createConsumerConfig();
+    config.setServiceAddress("unsupported://test");
+    config.createOutboundMessageProcessor();
+  }
 
-    @Ignore("See MULE-9210")
-    @Test(expected = IllegalStateException.class)
-    public void failToCreateOutboundEndpointWithWrongConnector() throws MuleException
-    {
-        //TODO implement test case once MULE-9210 is solved
-    }
+  @Ignore("See MULE-9210")
+  @Test(expected = IllegalStateException.class)
+  public void failToCreateOutboundEndpointWithWrongConnector() throws MuleException {
+    // TODO implement test case once MULE-9210 is solved
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void failToCreateOutboundEndpointWithEmptyServiceAddress() throws MuleException
-    {
-        WSConsumerConfig config = createConsumerConfig();
-        config.setServiceAddress(null);
-        config.createOutboundMessageProcessor();
-    }
+  @Test(expected = IllegalStateException.class)
+  public void failToCreateOutboundEndpointWithEmptyServiceAddress() throws MuleException {
+    WSConsumerConfig config = createConsumerConfig();
+    config.setServiceAddress(null);
+    config.createOutboundMessageProcessor();
+  }
 
-    private WSConsumerConfig createConsumerConfig()
-    {
-        WSConsumerConfig config = new WSConsumerConfig();
-        config.setMuleContext(muleContext);
-        config.setWsdlLocation("TestWsdlLocation");
-        config.setServiceAddress(SERVICE_ADDRESS);
-        config.setService("TestService");
-        config.setPort("TestPort");
-        return config;
-    }
+  private WSConsumerConfig createConsumerConfig() {
+    WSConsumerConfig config = new WSConsumerConfig();
+    config.setMuleContext(muleContext);
+    config.setWsdlLocation("TestWsdlLocation");
+    config.setServiceAddress(SERVICE_ADDRESS);
+    config.setService("TestService");
+    config.setPort("TestPort");
+    return config;
+  }
 
 }

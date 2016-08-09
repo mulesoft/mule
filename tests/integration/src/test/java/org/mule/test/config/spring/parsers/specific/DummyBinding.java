@@ -6,7 +6,7 @@
  */
 package org.mule.test.config.spring.parsers.specific;
 
-public interface DummyBinding
-{
-    String doSomething(String foo);
+public interface DummyBinding {
+
+  String doSomething(String foo);
 }

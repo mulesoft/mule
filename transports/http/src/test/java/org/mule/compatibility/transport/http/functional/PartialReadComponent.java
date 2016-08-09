@@ -12,14 +12,13 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.io.InputStream;
 
-public class PartialReadComponent implements Callable
-{
-    @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        InputStream stream = (InputStream) eventContext.getMuleContext().getTransformationService().transform(eventContext.getMessage(),
-                DataType.INPUT_STREAM).getPayload();
-        stream.read();
-        return "Hello";
-    }
+public class PartialReadComponent implements Callable {
+
+  @Override
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    InputStream stream = (InputStream) eventContext.getMuleContext().getTransformationService()
+        .transform(eventContext.getMessage(), DataType.INPUT_STREAM).getPayload();
+    stream.read();
+    return "Hello";
+  }
 }

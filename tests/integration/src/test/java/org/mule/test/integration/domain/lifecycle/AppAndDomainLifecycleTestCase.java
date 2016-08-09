@@ -22,58 +22,52 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
-{
+public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
-    @Test
-    public void appShutdownDoesNotStopsDomainConnector() throws Exception
-    {
-        MuleContext domainContext = null;
-        MuleContext firstAppContext = null;
-        MuleContext secondAppContext = null;
-        try
-        {
-            domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
-            firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
-            ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
-            secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/http-hello-world-app.xml"}).setDomainContext(domainContext).build();
-            firstAppContext.stop();
-            MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", MuleMessage.builder().payload("test").build());
-            assertThat(response, notNullValue());
-            assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload(), is("hello world"));
-            assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
-        }
-        finally
-        {
-            closeQuietly(domainContext);
-            closeQuietly(firstAppContext);
-            closeQuietly(secondAppContext);
-        }
+  @Test
+  public void appShutdownDoesNotStopsDomainConnector() throws Exception {
+    MuleContext domainContext = null;
+    MuleContext firstAppContext = null;
+    MuleContext secondAppContext = null;
+    try {
+      domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
+      firstAppContext = new ApplicationContextBuilder()
+          .setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+      ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
+      secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/http-hello-world-app.xml"})
+          .setDomainContext(domainContext).build();
+      firstAppContext.stop();
+      MuleMessage response =
+          secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld",
+                                            MuleMessage.builder().payload("test").build());
+      assertThat(response, notNullValue());
+      assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload(),
+                 is("hello world"));
+      assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
+    } finally {
+      closeQuietly(domainContext);
+      closeQuietly(firstAppContext);
+      closeQuietly(secondAppContext);
     }
+  }
 
-    private void closeQuietly(MuleContext context)
-    {
-        if (context != null)
-        {
-            try
-            {
-                context.dispose();
-            }
-            catch (Exception e)
-            {
-                //Do nothing
-            }
-        }
+  private void closeQuietly(MuleContext context) {
+    if (context != null) {
+      try {
+        context.dispose();
+      } catch (Exception e) {
+        // Do nothing
+      }
     }
+  }
 
-    public SystemProperty getEndpointSchemeSystemProperty()
-    {
-        return new SystemProperty("scheme", "http");
-    }
+  public SystemProperty getEndpointSchemeSystemProperty() {
+    return new SystemProperty("scheme", "http");
+  }
 
 }

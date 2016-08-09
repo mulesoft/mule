@@ -27,72 +27,64 @@ import org.junit.Test;
 /**
  * Tests for all object stores that can be configured on an {@link org.mule.routing.IdempotentMessageFilter}.
  */
-public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    public RedeliveryPolicyNamespaceHandlerTestCase()
-    {
-        // we just test the wiring of the objects, no need to start the MuleContext
-        setStartContext(false);
+public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase {
+
+  public RedeliveryPolicyNamespaceHandlerTestCase() {
+    // we just test the wiring of the objects, no need to start the MuleContext
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/config/redelivery-policy-config.xml";
+  }
+
+  @Test
+  public void testInMemoryObjectStore() throws Exception {
+    IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("inMemoryStore");
+
+    assertNotNull(filter.getTheFailedMessageProcessor());
+    assertEquals(12, filter.getMaxRedeliveryCount());
+    assertNull(filter.getIdExpression());
+  }
+
+  @Test
+  public void testSimpleTextFileStore() throws Exception {
+    IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("simpleTextFileStore");
+    assertEquals("#[message:id]", filter.getIdExpression());
+    assertNotNull(filter.getTheFailedMessageProcessor());
+    assertEquals(5, filter.getMaxRedeliveryCount());
+  }
+
+  @Test
+  public void testCustomObjectStore() throws Exception {
+    IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("customObjectStore");
+    assertNotNull(filter.getTheFailedMessageProcessor());
+    assertEquals(5, filter.getMaxRedeliveryCount());
+    assertNull(filter.getIdExpression());
+  }
+
+  private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception {
+    FlowConstruct flow = getFlowConstruct(flowName);
+    assertTrue(flow instanceof Flow);
+
+    MessageSource source = ((Flow) flow).getMessageSource();
+    assertTrue(source instanceof InboundEndpoint);
+    AbstractRedeliveryPolicy redeliveryPolicy = ((InboundEndpoint) source).getRedeliveryPolicy();
+    assertTrue(redeliveryPolicy instanceof IdempotentRedeliveryPolicy);
+    return (IdempotentRedeliveryPolicy) redeliveryPolicy;
+  }
+
+  public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable> {
+
+    private String customProperty;
+
+    public String getCustomProperty() {
+      return customProperty;
     }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/config/redelivery-policy-config.xml";
+    public void setCustomProperty(String value) {
+      customProperty = value;
     }
-
-    @Test
-    public void testInMemoryObjectStore() throws Exception
-    {
-        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("inMemoryStore");
-
-        assertNotNull(filter.getTheFailedMessageProcessor());
-        assertEquals(12, filter.getMaxRedeliveryCount());
-        assertNull(filter.getIdExpression());
-    }
-
-    @Test
-    public void testSimpleTextFileStore() throws Exception
-    {
-        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("simpleTextFileStore");
-        assertEquals("#[message:id]", filter.getIdExpression());
-        assertNotNull(filter.getTheFailedMessageProcessor());
-        assertEquals(5, filter.getMaxRedeliveryCount());
-    }
-
-    @Test
-    public void testCustomObjectStore() throws Exception
-    {
-        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("customObjectStore");
-        assertNotNull(filter.getTheFailedMessageProcessor());
-        assertEquals(5, filter.getMaxRedeliveryCount());
-        assertNull(filter.getIdExpression());
-    }
-
-    private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception
-    {
-        FlowConstruct flow = getFlowConstruct(flowName);
-        assertTrue(flow instanceof Flow);
-
-        MessageSource source = ((Flow) flow).getMessageSource();
-        assertTrue(source instanceof InboundEndpoint);
-        AbstractRedeliveryPolicy redeliveryPolicy = ((InboundEndpoint)source).getRedeliveryPolicy();
-        assertTrue(redeliveryPolicy instanceof IdempotentRedeliveryPolicy);
-        return (IdempotentRedeliveryPolicy) redeliveryPolicy;
-    }
-
-    public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable>
-    {
-        private String customProperty;
-
-        public String getCustomProperty()
-        {
-            return customProperty;
-        }
-
-        public void setCustomProperty(String value)
-        {
-            customProperty = value;
-        }
-    }
+  }
 }

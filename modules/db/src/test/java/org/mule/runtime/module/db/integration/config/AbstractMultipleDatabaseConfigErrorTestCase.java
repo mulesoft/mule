@@ -17,23 +17,19 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public abstract class AbstractMultipleDatabaseConfigErrorTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractMultipleDatabaseConfigErrorTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractMultipleDatabaseConfigErrorTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractMultipleDatabaseConfigErrorTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Test(expected = MessagingException.class)
-    public void returnsErrorWhenMultipleJdbcConfigDefined() throws Exception
-    {
-        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
-    }
+  @Test(expected = MessagingException.class)
+  public void returnsErrorWhenMultipleJdbcConfigDefined() throws Exception {
+    flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
+  }
 }

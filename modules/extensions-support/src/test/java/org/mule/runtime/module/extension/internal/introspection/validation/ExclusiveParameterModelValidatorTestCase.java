@@ -30,202 +30,179 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCase {
 
-    private ModelValidator validator = new ExclusiveParameterModelValidator();
-    private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+  private ModelValidator validator = new ExclusiveParameterModelValidator();
+  private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
 
-    @Test
-    public void validParameterTypes() throws Exception
-    {
-        validate(ValidExtension.class);
-    }
+  @Test
+  public void validParameterTypes() throws Exception {
+    validate(ValidExtension.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidExclusionWithNestedPojo() throws Exception
-    {
-        validate(InvalidExtensionWithNestedPojo.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidExclusionWithNestedPojo() throws Exception {
+    validate(InvalidExtensionWithNestedPojo.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidExclusionWithNestedGroup() throws Exception
-    {
-        validate(InvalidExtensionWithNestedGroup.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidExclusionWithNestedGroup() throws Exception {
+    validate(InvalidExtensionWithNestedGroup.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidExclusionWithOneOptionalParameter() throws Exception
-    {
-        validate(InvalidExtensionWithoOneOptionalParameters.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidExclusionWithOneOptionalParameter() throws Exception {
+    validate(InvalidExtensionWithoOneOptionalParameters.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidExclusionWithNestedCollection() throws Exception
-    {
-        validate(InvalidExtensionWithNestedCollection.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidExclusionWithNestedCollection() throws Exception {
+    validate(InvalidExtensionWithNestedCollection.class);
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidExclusionOperationParameter() throws Exception
-    {
-        validate(InvalidOperationExtension.class);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidExclusionOperationParameter() throws Exception {
+    validate(InvalidOperationExtension.class);
+  }
 
-    @Extension(name = "InvalidExtensionWithNestedCollection")
-    public static class InvalidExtensionWithNestedCollection
-    {
+  @Extension(name = "InvalidExtensionWithNestedCollection")
+  public static class InvalidExtensionWithNestedCollection {
 
-        @ParameterGroup
-        private ExclusionWithNestedCollection group;
-    }
+    @ParameterGroup
+    private ExclusionWithNestedCollection group;
+  }
 
-    @Extension(name = "InvalidExtensionWithoOneOptionalParameters")
-    public static class InvalidExtensionWithoOneOptionalParameters
-    {
+  @Extension(name = "InvalidExtensionWithoOneOptionalParameters")
+  public static class InvalidExtensionWithoOneOptionalParameters {
 
-        @ParameterGroup
-        private ExclusionWithoutOneOptionalParameters group;
-    }
+    @ParameterGroup
+    private ExclusionWithoutOneOptionalParameters group;
+  }
 
-    @Extension(name = "InvalidExtensionWithNestedPojo")
-    public static class InvalidExtensionWithNestedPojo
-    {
+  @Extension(name = "InvalidExtensionWithNestedPojo")
+  public static class InvalidExtensionWithNestedPojo {
 
-        @ParameterGroup
-        private ExclusionWithNestedPojo group;
-    }
+    @ParameterGroup
+    private ExclusionWithNestedPojo group;
+  }
 
-    @Extension(name = "InvalidExtensionWithNestedGroup")
-    public static class InvalidExtensionWithNestedGroup
-    {
+  @Extension(name = "InvalidExtensionWithNestedGroup")
+  public static class InvalidExtensionWithNestedGroup {
 
-        @ParameterGroup
-        private ExclusionWithNestedParameterGroup group;
-    }
+    @ParameterGroup
+    private ExclusionWithNestedParameterGroup group;
+  }
 
-    @Extension(name = "InvalidOperationExtension")
-    @Operations({InvalidOperation.class})
-    public static class InvalidOperationExtension
-    {
+  @Extension(name = "InvalidOperationExtension")
+  @Operations({InvalidOperation.class})
+  public static class InvalidOperationExtension {
 
-    }
+  }
 
 
-    @Extension(name = "ValidExtension")
-    @Operations({ValidOperation.class})
-    public static class ValidExtension
-    {
+  @Extension(name = "ValidExtension")
+  @Operations({ValidOperation.class})
+  public static class ValidExtension {
 
-        @ParameterGroup
-        private ValidExclusion group;
-    }
+    @ParameterGroup
+    private ValidExclusion group;
+  }
 
 
 
-    @ExclusiveOptionals
-    public static class ValidExclusion
-    {
+  @ExclusiveOptionals
+  public static class ValidExclusion {
 
-        @Parameter
-        @Optional
-        private String validType;
+    @Parameter
+    @Optional
+    private String validType;
 
-        @Parameter
-        @Optional
-        private String anotherValidType;
-    }
+    @Parameter
+    @Optional
+    private String anotherValidType;
+  }
 
-    @ExclusiveOptionals
-    public static class ExclusionWithNestedCollection
-    {
+  @ExclusiveOptionals
+  public static class ExclusionWithNestedCollection {
 
-        @Parameter
-        private String validType;
+    @Parameter
+    private String validType;
 
-        @Parameter
-        private List<String> complexType;
-    }
+    @Parameter
+    private List<String> complexType;
+  }
 
-    @ExclusiveOptionals
-    public static class ExclusionWithNestedPojo
-    {
+  @ExclusiveOptionals
+  public static class ExclusionWithNestedPojo {
 
-        @Parameter
-        @Optional
-        private String validType;
+    @Parameter
+    @Optional
+    private String validType;
 
-        @Parameter
-        @Optional
-        private SimplePojo complexField;
+    @Parameter
+    @Optional
+    private SimplePojo complexField;
 
-        // Required parameters should be ignored
-        @Parameter
-        private SimplePojo requiredPojo;
-    }
+    // Required parameters should be ignored
+    @Parameter
+    private SimplePojo requiredPojo;
+  }
 
-    @ExclusiveOptionals
-    public static class ExclusionWithNestedParameterGroup
-    {
+  @ExclusiveOptionals
+  public static class ExclusionWithNestedParameterGroup {
 
-        @Parameter
-        @Optional
-        private String validType;
+    @Parameter
+    @Optional
+    private String validType;
 
-        @Parameter
-        @Optional
-        private Integer otherValidType;
+    @Parameter
+    @Optional
+    private Integer otherValidType;
 
-        @ParameterGroup
-        private SimplePojo nesterGroup;
-    }
+    @ParameterGroup
+    private SimplePojo nesterGroup;
+  }
 
-    @ExclusiveOptionals
-    public static class ExclusionWithoutOneOptionalParameters
-    {
-        @Parameter
-        private String requiredParameter;
+  @ExclusiveOptionals
+  public static class ExclusionWithoutOneOptionalParameters {
 
-        @Parameter
-        @Optional
-        private Integer lonelyOptional;
-    }
+    @Parameter
+    private String requiredParameter;
 
-    public static class SimplePojo
-    {
+    @Parameter
+    @Optional
+    private Integer lonelyOptional;
+  }
 
-        @Parameter
-        private Integer number;
+  public static class SimplePojo {
+
+    @Parameter
+    private Integer number;
+
+  }
+
+  public static class ValidOperation {
+
+    public void validOperationWithExclusion(@ParameterGroup ValidExclusion exclusiveParameter) {
 
     }
+  }
 
-    public static class ValidOperation
-    {
+  public static class InvalidOperation {
 
-        public void validOperationWithExclusion(@ParameterGroup ValidExclusion exclusiveParameter)
-        {
+    public void invalidOperationWithExclusion(@ParameterGroup ExclusionWithoutOneOptionalParameters invalidExclusionParameter) {
 
-        }
     }
+  }
 
-    public static class InvalidOperation
-    {
+  private ExtensionModel modelFor(Class<?> connectorClass) {
+    DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
+    return extensionFactory
+        .createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+            .describe(context), context);
+  }
 
-        public void invalidOperationWithExclusion(@ParameterGroup ExclusionWithoutOneOptionalParameters invalidExclusionParameter)
-        {
-
-        }
-    }
-
-    private ExtensionModel modelFor(Class<?> connectorClass)
-    {
-        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-                                                   .describe(context), context);
-    }
-
-    private void validate(Class<?> connectorClass)
-    {
-        validator.validate(modelFor(connectorClass));
-    }
+  private void validate(Class<?> connectorClass) {
+    validator.validate(modelFor(connectorClass));
+  }
 }

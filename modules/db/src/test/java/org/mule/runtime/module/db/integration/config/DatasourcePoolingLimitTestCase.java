@@ -18,36 +18,30 @@ import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import org.junit.Test;
 
-public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTestCase
-{
+public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTestCase {
 
-    public DatasourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public DatasourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/derby-minimum-pooling-db-config.xml",
+        "integration/config/connection-pooling-config.xml"};
+  }
+
+  @Test
+  public void limitsConnections() throws Exception {
+    try {
+      flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
+      flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
+
+      MuleClient client = muleContext.getClient();
+      MuleMessage response = client.request("test://connectionError", RECEIVE_TIMEOUT);
+
+      assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));
+    } finally {
+      connectionLatch.countDown();
     }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/derby-minimum-pooling-db-config.xml", "integration/config/connection-pooling-config.xml"};
-    }
-
-    @Test
-    public void limitsConnections() throws Exception
-    {
-        try
-        {
-            flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
-            flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
-
-            MuleClient client = muleContext.getClient();
-            MuleMessage response = client.request("test://connectionError", RECEIVE_TIMEOUT);
-
-            assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));
-        }
-        finally
-        {
-            connectionLatch.countDown();
-        }
-    }
+  }
 }

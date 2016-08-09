@@ -12,20 +12,20 @@ package org.mule.runtime.core.api.debug;
  * @see Debuggeable#enableDebug(DebuggerCallback)
  * @since 3.8.0
  */
-public interface DebuggingSession
-{
-    /**
-     * Returns the breakpoint manager for this session
-     *
-     * @return The breakpoint manager
-     */
-    BreakpointManager getBreakpointManager();
+public interface DebuggingSession {
 
-    /**
-     * Returns the execution handler
-     *
-     * @return The Execution Manager
-     */
-    ExecutionManager getExecutionManager();
+  /**
+   * Returns the breakpoint manager for this session
+   *
+   * @return The breakpoint manager
+   */
+  BreakpointManager getBreakpointManager();
+
+  /**
+   * Returns the execution handler
+   *
+   * @return The Execution Manager
+   */
+  ExecutionManager getExecutionManager();
 
 }

@@ -9,12 +9,10 @@ package org.mule.test.integration.streaming;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
-public class ExceptionThrowingFilter implements Filter
-{
+public class ExceptionThrowingFilter implements Filter {
 
-    public boolean accept(MuleMessage message)
-    {
-        throw new RuntimeException();
-    }
+  public boolean accept(MuleMessage message) {
+    throw new RuntimeException();
+  }
 
 }

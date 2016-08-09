@@ -14,26 +14,22 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
 
-public class AddAttribute implements PreProcessor, PostProcessor
-{
+public class AddAttribute implements PreProcessor, PostProcessor {
 
-    private String name;
-    private String value;
+  private String name;
+  private String value;
 
-    public AddAttribute(String name, String value)
-    {
-        this.name = name;
-        this.value = value;
-    }
+  public AddAttribute(String name, String value) {
+    this.name = name;
+    this.value = value;
+  }
 
-    public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
-    {
-        element.setAttribute(name, value);
-    }
+  public void postProcess(ParserContext unused, BeanAssembler assembler, Element element) {
+    element.setAttribute(name, value);
+  }
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        element.setAttribute(name, value);
-    }
+  public void preProcess(PropertyConfiguration config, Element element) {
+    element.setAttribute(name, value);
+  }
 
 }

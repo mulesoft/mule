@@ -9,41 +9,36 @@ package org.mule.runtime.module.http.internal.domain.request;
 /**
  * Holds the input from an http request.
  */
-public class HttpRequestContext
-{
+public class HttpRequestContext {
 
-    private final ClientConnection clientConnection;
-    private HttpRequest request;
-    private String scheme;
+  private final ClientConnection clientConnection;
+  private HttpRequest request;
+  private String scheme;
 
-    public HttpRequestContext(HttpRequest httpRequest, ClientConnection clientConnection, String scheme)
-    {
-        this.request = httpRequest;
-        this.clientConnection = clientConnection;
-        this.scheme = scheme;
-    }
+  public HttpRequestContext(HttpRequest httpRequest, ClientConnection clientConnection, String scheme) {
+    this.request = httpRequest;
+    this.clientConnection = clientConnection;
+    this.scheme = scheme;
+  }
 
-    /**
-     * @return the http request content
-     */
-    public HttpRequest getRequest()
-    {
-        return this.request;
-    }
+  /**
+   * @return the http request content
+   */
+  public HttpRequest getRequest() {
+    return this.request;
+  }
 
-    /**
-     * @return client connection descriptor
-     */
-    public ClientConnection getClientConnection()
-    {
-        return clientConnection;
-    }
+  /**
+   * @return client connection descriptor
+   */
+  public ClientConnection getClientConnection() {
+    return clientConnection;
+  }
 
-    /**
-     * @return The scheme of the HTTP request URL (http or https)
-     */
-    public String getScheme()
-    {
-        return scheme;
-    }
+  /**
+   * @return The scheme of the HTTP request URL (http or https)
+   */
+  public String getScheme() {
+    return scheme;
+  }
 }

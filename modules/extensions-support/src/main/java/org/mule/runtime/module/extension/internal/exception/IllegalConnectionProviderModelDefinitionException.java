@@ -15,38 +15,34 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
  *
  * @since 4.0
  */
-public class IllegalConnectionProviderModelDefinitionException extends IllegalModelDefinitionException
-{
+public class IllegalConnectionProviderModelDefinitionException extends IllegalModelDefinitionException {
 
-    /**
-     * Creates a new instance
-     *
-     * @param message the detail message
-     */
-    public IllegalConnectionProviderModelDefinitionException(String message)
-    {
-        super(message);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param message the detail message
+   */
+  public IllegalConnectionProviderModelDefinitionException(String message) {
+    super(message);
+  }
 
-    /**
-     * Creates a new instance
-     *
-     * @param message the detail message
-     * @param cause   the cause
-     */
-    public IllegalConnectionProviderModelDefinitionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param message the detail message
+   * @param cause the cause
+   */
+  public IllegalConnectionProviderModelDefinitionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    /**
-     * Creates a new instance
-     *
-     * @param cause the cause
-     */
-    public IllegalConnectionProviderModelDefinitionException(Throwable cause)
-    {
-        super(cause);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param cause the cause
+   */
+  public IllegalConnectionProviderModelDefinitionException(Throwable cause) {
+    super(cause);
+  }
 }
 

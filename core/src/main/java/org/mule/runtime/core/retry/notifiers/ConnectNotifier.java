@@ -17,40 +17,34 @@ import org.slf4j.LoggerFactory;
 /**
  * Fires a {@link ConnectionNotification} each time a retry attempt is made.
  */
-public class ConnectNotifier implements RetryNotifier
-{
-    protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
+public class ConnectNotifier implements RetryNotifier {
 
-    public void onSuccess(RetryContext context)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Successfully connected to " + context.getDescription());
-        }
+  protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
 
-        fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription(), context);
+  public void onSuccess(RetryContext context) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Successfully connected to " + context.getDescription());
     }
 
-    public void onFailure(RetryContext context, Throwable e)
-    {
-        fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription(), context);
+    fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription(), context);
+  }
 
-        if (logger.isErrorEnabled())
-        {
-            StringBuilder msg = new StringBuilder(512);
-            msg.append("Failed to connect/reconnect: ").append(context.getDescription());
-            Throwable t = ExceptionHelper.getRootException(e);
-            msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
-            if (logger.isTraceEnabled())
-            {
-                t.printStackTrace();
-            }
-            logger.error(msg.toString());
-        }
-    }
+  public void onFailure(RetryContext context, Throwable e) {
+    fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription(), context);
 
-    protected void fireConnectNotification(int action, String description, RetryContext context)
-    {
-        context.getMuleContext().fireNotification(new ConnectionNotification(null, description, action));
+    if (logger.isErrorEnabled()) {
+      StringBuilder msg = new StringBuilder(512);
+      msg.append("Failed to connect/reconnect: ").append(context.getDescription());
+      Throwable t = ExceptionHelper.getRootException(e);
+      msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
+      if (logger.isTraceEnabled()) {
+        t.printStackTrace();
+      }
+      logger.error(msg.toString());
     }
+  }
+
+  protected void fireConnectNotification(int action, String description, RetryContext context) {
+    context.getMuleContext().fireNotification(new ConnectionNotification(null, description, action));
+  }
 }

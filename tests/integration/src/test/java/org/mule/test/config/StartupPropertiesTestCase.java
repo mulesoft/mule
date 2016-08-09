@@ -14,36 +14,33 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-public class StartupPropertiesTestCase extends AbstractIntegrationTestCase
-{
-    private String STARTUP_PROPERTY_1_KEY = "startupProperty1";
-    private String STARTUP_PROPERTY_2_KEY = "startupProperty2";
-    private String STARTUP_PROPERTY_1_VALUE = "startupProperty1Value";
-    private String STARTUP_PROPERTY_2_VALUE = "startupProperty2Value";
+public class StartupPropertiesTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/config/startup-properties-test.xml";
-    }
+  private String STARTUP_PROPERTY_1_KEY = "startupProperty1";
+  private String STARTUP_PROPERTY_2_KEY = "startupProperty2";
+  private String STARTUP_PROPERTY_1_VALUE = "startupProperty1Value";
+  private String STARTUP_PROPERTY_2_VALUE = "startupProperty2Value";
 
-    @Override
-    protected Properties getStartUpProperties()
-    {
-        Properties p = new Properties();
-        p.setProperty(STARTUP_PROPERTY_1_KEY, STARTUP_PROPERTY_1_VALUE);
-        p.setProperty(STARTUP_PROPERTY_2_KEY, STARTUP_PROPERTY_2_VALUE);
-        return p;
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/config/startup-properties-test.xml";
+  }
 
-    @Test
-    public void testStartProperties()
-    {
-        Object property1 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);
-        Object property2 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_2_KEY);
-        assertNotNull(property1);
-        assertNotNull(property2);
-        assertEquals(STARTUP_PROPERTY_1_VALUE, property1);
-        assertEquals(STARTUP_PROPERTY_2_VALUE, property2);
-    }
+  @Override
+  protected Properties getStartUpProperties() {
+    Properties p = new Properties();
+    p.setProperty(STARTUP_PROPERTY_1_KEY, STARTUP_PROPERTY_1_VALUE);
+    p.setProperty(STARTUP_PROPERTY_2_KEY, STARTUP_PROPERTY_2_VALUE);
+    return p;
+  }
+
+  @Test
+  public void testStartProperties() {
+    Object property1 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);
+    Object property2 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_2_KEY);
+    assertNotNull(property1);
+    assertNotNull(property2);
+    assertEquals(STARTUP_PROPERTY_1_VALUE, property1);
+    assertEquals(STARTUP_PROPERTY_2_VALUE, property2);
+  }
 }

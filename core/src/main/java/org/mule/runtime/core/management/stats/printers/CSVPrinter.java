@@ -13,55 +13,44 @@ import java.util.Collection;
 /**
  * <code>CSVPrinter</code> prints service stats in CSV format
  */
-public class CSVPrinter extends AbstractTablePrinter
-{
-    private String delim = ",";
-    private boolean printHeaders = true;
+public class CSVPrinter extends AbstractTablePrinter {
 
-    public CSVPrinter(Writer out)
-    {
-        super(out);
-    }
+  private String delim = ",";
+  private boolean printHeaders = true;
 
-    public CSVPrinter(OutputStream out)
-    {
-        super(out);
-    }
+  public CSVPrinter(Writer out) {
+    super(out);
+  }
 
-    public void print(Collection stats)
-    {
-        try
-        {
-            String[][] table = getTable(stats);
-            int i = (printHeaders ? 0 : 1);
-            for (; i < table.length; i++)
-            {
-                for (int j = 0; j < table[0].length; j++)
-                {
-                    print(table[i][j]);
-                    if (j + 1 != table[i].length)
-                    {
-                        print(delim);
-                    }
-                }
-                println();
-            }
+  public CSVPrinter(OutputStream out) {
+    super(out);
+  }
+
+  public void print(Collection stats) {
+    try {
+      String[][] table = getTable(stats);
+      int i = (printHeaders ? 0 : 1);
+      for (; i < table.length; i++) {
+        for (int j = 0; j < table[0].length; j++) {
+          print(table[i][j]);
+          if (j + 1 != table[i].length) {
+            print(delim);
+          }
         }
-        catch (Throwable e)
-        {
-            // TODO MULE-863: Unlikely to be sufficient
-            // (and nothing explicitly thrown above)
-            e.printStackTrace();
-        }
+        println();
+      }
+    } catch (Throwable e) {
+      // TODO MULE-863: Unlikely to be sufficient
+      // (and nothing explicitly thrown above)
+      e.printStackTrace();
     }
+  }
 
-    public boolean isPrintHeaders()
-    {
-        return printHeaders;
-    }
+  public boolean isPrintHeaders() {
+    return printHeaders;
+  }
 
-    public void setPrintHeaders(boolean printHeaders)
-    {
-        this.printHeaders = printHeaders;
-    }
+  public void setPrintHeaders(boolean printHeaders) {
+    this.printHeaders = printHeaders;
+  }
 }

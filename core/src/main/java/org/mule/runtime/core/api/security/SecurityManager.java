@@ -12,37 +12,33 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import java.util.Collection;
 
 /**
- * <code>SecurityManager</code> is responsible for managing one or more
- * security providers.
+ * <code>SecurityManager</code> is responsible for managing one or more security providers.
  */
 
-public interface SecurityManager extends Initialisable
-{
-    
-    Authentication authenticate(Authentication authentication)
-        throws SecurityException, SecurityProviderNotFoundException;
+public interface SecurityManager extends Initialisable {
 
-    void addProvider(SecurityProvider provider);
+  Authentication authenticate(Authentication authentication) throws SecurityException, SecurityProviderNotFoundException;
 
-    SecurityProvider getProvider(String name);
+  void addProvider(SecurityProvider provider);
 
-    SecurityProvider removeProvider(String name);
+  SecurityProvider getProvider(String name);
 
-    Collection<SecurityProvider> getProviders();
+  SecurityProvider removeProvider(String name);
 
-    void setProviders(Collection<SecurityProvider> providers);
+  Collection<SecurityProvider> getProviders();
 
-    SecurityContext createSecurityContext(Authentication authentication)
-        throws UnknownAuthenticationTypeException;
+  void setProviders(Collection<SecurityProvider> providers);
 
-    EncryptionStrategy getEncryptionStrategy(String name);
+  SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException;
 
-    void addEncryptionStrategy(EncryptionStrategy strategy);
+  EncryptionStrategy getEncryptionStrategy(String name);
 
-    EncryptionStrategy removeEncryptionStrategy(String name);
+  void addEncryptionStrategy(EncryptionStrategy strategy);
 
-    Collection<EncryptionStrategy> getEncryptionStrategies();
+  EncryptionStrategy removeEncryptionStrategy(String name);
 
-    void setEncryptionStrategies(Collection<EncryptionStrategy> strategies);
+  Collection<EncryptionStrategy> getEncryptionStrategies();
+
+  void setEncryptionStrategies(Collection<EncryptionStrategy> strategies);
 
 }

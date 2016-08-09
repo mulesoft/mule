@@ -16,53 +16,48 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "groovy-component-config.xml";
-    }
+public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testInlineScript() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("inlineScript").withPayload("Important Message").asynchronously().run();
-        MuleMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertEquals("Important Message Received", getPayloadAsString(response));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "groovy-component-config.xml";
+  }
 
-    @Ignore("MULE-6926: flaky test")
-    @Test
-    public void testFileBasedScript() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("fileBasedScript").withPayload("Important Message").asynchronously().run();
-        MuleMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertEquals("Important Message Received", getPayloadAsString(response));
-    }
+  @Test
+  public void testInlineScript() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("inlineScript").withPayload("Important Message").asynchronously().run();
+    MuleMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
+  }
 
-    @Test
-    public void testReferencedScript() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("referencedScript").withPayload("Important Message").asynchronously().run();
-        MuleMessage response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertEquals("Important Message Received", getPayloadAsString(response));
-    }
+  @Ignore("MULE-6926: flaky test")
+  @Test
+  public void testFileBasedScript() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("fileBasedScript").withPayload("Important Message").asynchronously().run();
+    MuleMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
+  }
 
-    @Ignore("MULE-6926: flaky test")
-    @Test
-    public void testScriptVariables() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("scriptVariables").withPayload("Important Message").asynchronously().run();
-        MuleMessage response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertEquals("Important Message Received A-OK", getPayloadAsString(response));
-    }
+  @Test
+  public void testReferencedScript() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("referencedScript").withPayload("Important Message").asynchronously().run();
+    MuleMessage response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
+  }
+
+  @Ignore("MULE-6926: flaky test")
+  @Test
+  public void testScriptVariables() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("scriptVariables").withPayload("Important Message").asynchronously().run();
+    MuleMessage response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertEquals("Important Message Received A-OK", getPayloadAsString(response));
+  }
 }

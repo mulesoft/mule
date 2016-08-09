@@ -10,37 +10,31 @@ package org.mule.runtime.module.db.test.util;
 /**
  * Defines a column for testing purposes
  */
-public class ColumnMetadata
-{
+public class ColumnMetadata {
 
-    private final String name;
-    private final String label;
-    private final int index;
+  private final String name;
+  private final String label;
+  private final int index;
 
-    public ColumnMetadata(String name, int index)
-    {
-        this(name, name, index);
-    }
+  public ColumnMetadata(String name, int index) {
+    this(name, name, index);
+  }
 
-    public ColumnMetadata(String name, String label, int index)
-    {
-        this.name = name;
-        this.index = index;
-        this.label = label;
-    }
+  public ColumnMetadata(String name, String label, int index) {
+    this.name = name;
+    this.index = index;
+    this.label = label;
+  }
 
-    public int getIndex()
-    {
-        return index;
-    }
+  public int getIndex() {
+    return index;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getLabel()
-    {
-        return label;
-    }
+  public String getLabel() {
+    return label;
+  }
 }

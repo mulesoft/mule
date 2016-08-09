@@ -26,10 +26,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -45,84 +48,70 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "import")
-public class Import
-        extends Annotated
-{
+public class Import extends Annotated {
 
-    @XmlAttribute(name = "namespace")
-    @XmlSchemaType(name = "anyURI")
-    protected String namespace;
-    @XmlAttribute(name = "schemaLocation")
-    @XmlSchemaType(name = "anyURI")
-    protected String schemaLocation;
+  @XmlAttribute(name = "namespace")
+  @XmlSchemaType(name = "anyURI")
+  protected String namespace;
+  @XmlAttribute(name = "schemaLocation")
+  @XmlSchemaType(name = "anyURI")
+  protected String schemaLocation;
 
-    /**
-     * Gets the value of the namespace property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getNamespace()
-    {
-        return namespace;
+  /**
+   * Gets the value of the namespace property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getNamespace() {
+    return namespace;
+  }
+
+  /**
+   * Sets the value of the namespace property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setNamespace(String value) {
+    this.namespace = value;
+  }
+
+  /**
+   * Gets the value of the schemaLocation property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getSchemaLocation() {
+    return schemaLocation;
+  }
+
+  /**
+   * Sets the value of the schemaLocation property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setSchemaLocation(String value) {
+    this.schemaLocation = value;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    /**
-     * Sets the value of the namespace property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setNamespace(String value)
-    {
-        this.namespace = value;
-    }
+    Import anImport = (Import) o;
+    return StringUtils.equals(getNamespace(), anImport.getNamespace())
+        && StringUtils.equals(getSchemaLocation(), anImport.getSchemaLocation());
 
-    /**
-     * Gets the value of the schemaLocation property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getSchemaLocation()
-    {
-        return schemaLocation;
-    }
+  }
 
-    /**
-     * Sets the value of the schemaLocation property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setSchemaLocation(String value)
-    {
-        this.schemaLocation = value;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        Import anImport = (Import) o;
-        return StringUtils.equals(getNamespace(), anImport.getNamespace()) &&
-               StringUtils.equals(getSchemaLocation(), anImport.getSchemaLocation());
-
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = getNamespace() != null ? getNamespace().hashCode() : 0;
-        result = 31 * result + (getSchemaLocation() != null ? getSchemaLocation().hashCode() : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = getNamespace() != null ? getNamespace().hashCode() : 0;
+    result = 31 * result + (getSchemaLocation() != null ? getSchemaLocation().hashCode() : 0);
+    return result;
+  }
 }

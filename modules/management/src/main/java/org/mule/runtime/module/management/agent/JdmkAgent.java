@@ -23,174 +23,131 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 /**
- * <code>JdmkAgent</code> configures an Jdmk Http Adaptor for Jmx management,
- * statistics and configuration viewing of a Mule instance.
-* <p/>
- * TODO MULE-1353 
+ * <code>JdmkAgent</code> configures an Jdmk Http Adaptor for Jmx management, statistics and configuration viewing of a Mule
+ * instance.
+ * <p/>
+ * TODO MULE-1353
  */
-public class JdmkAgent extends AbstractAgent
-{
-    /** A FQN of the adaptor class to instantiate via reflection. */
-    public static final String CLASSNAME_ADAPTER = "com.sun.jdmk.comm.HtmlAdaptorServer";
+public class JdmkAgent extends AbstractAgent {
 
-    private static final String PROTOCOL_PREFIX = "http://";
-    public static final String DEFAULT_HOSTNAME = "localhost";
-    public static final int DEFAULT_PORT = 9092;
-    public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
+  /** A FQN of the adaptor class to instantiate via reflection. */
+  public static final String CLASSNAME_ADAPTER = "com.sun.jdmk.comm.HtmlAdaptorServer";
 
-    private String jmxAdaptorUrl;
-    private String host;
-    private String port;
+  private static final String PROTOCOL_PREFIX = "http://";
+  public static final String DEFAULT_HOSTNAME = "localhost";
+  public static final int DEFAULT_PORT = 9092;
+  public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
 
-    private MBeanServer mBeanServer;
-    private ObjectName adaptorName;
+  private String jmxAdaptorUrl;
+  private String host;
+  private String port;
+
+  private MBeanServer mBeanServer;
+  private ObjectName adaptorName;
 
 
-    public JdmkAgent()
-    {
-        super("jdmk-agent");
+  public JdmkAgent() {
+    super("jdmk-agent");
+  }
+
+  protected Object createAdaptor() throws Exception {
+    final URI uri = new URI(jmxAdaptorUrl);
+    final int port = uri.getPort();
+    return ClassUtils.instanciateClass(CLASSNAME_ADAPTER, new Object[] {new Integer(port)}, this.getClass());
+  }
+
+  @Override
+  public String getDescription() {
+    return "Jdmk Http adaptor: " + jmxAdaptorUrl;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    try {
+      mBeanServer.invoke(adaptorName, "start", null, null);
+    } catch (InstanceNotFoundException e) {
+      throw new JmxManagementException(CoreMessages.failedToStart("Jdmk agent"), adaptorName, e);
+    } catch (MBeanException e) {
+      throw new JmxManagementException(CoreMessages.failedToStart("Jdmk agent"), adaptorName, e);
+    } catch (ReflectionException e) {
+      // ignore
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (mBeanServer == null) {
+      return;
     }
 
-    protected Object createAdaptor() throws Exception
-    {
-        final URI uri = new URI(jmxAdaptorUrl);
-        final int port = uri.getPort();
-        return ClassUtils.instanciateClass(CLASSNAME_ADAPTER,
-                                           new Object[] {new Integer(port)}, this.getClass());
+    try {
+      mBeanServer.invoke(adaptorName, "stop", null, null);
+    } catch (InstanceNotFoundException e) {
+      throw new JmxManagementException(CoreMessages.failedToStop("Jdmk agent"), adaptorName, e);
+    } catch (MBeanException e) {
+      throw new JmxManagementException(CoreMessages.failedToStop("Jdmk agent"), adaptorName, e);
+    } catch (ReflectionException e) {
+      // ignore
     }
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "Jdmk Http adaptor: " + jmxAdaptorUrl;
+  @Override
+  public void dispose() {
+    try {
+      stop();
+    } catch (Exception e) {
+      // TODO: log an exception
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        try
-        {
-            mBeanServer.invoke(adaptorName, "start", null, null);
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
+      final Object adaptor = createAdaptor();
+      if (StringUtils.isBlank(jmxAdaptorUrl)) {
+        if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port)) {
+          jmxAdaptorUrl = PROTOCOL_PREFIX + host + ":" + port;
+        } else {
+          jmxAdaptorUrl = DEFAULT_JMX_ADAPTOR_URL;
         }
-        catch (InstanceNotFoundException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStart("Jdmk agent"), adaptorName, e);
-        }
-        catch (MBeanException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStart("Jdmk agent"), adaptorName, e);
-        }
-        catch (ReflectionException e)
-        {
-            // ignore
-        }
+      }
+      // TODO use Jmx support classes
+      adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
+      mBeanServer.registerMBean(adaptor, adaptorName);
+    } catch (Exception e) {
+      throw new InitialisationException(CoreMessages.failedToStart("Jdmk Agent"), e, this);
     }
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        if (mBeanServer == null)
-        {
-            return;
-        }
-        
-        try
-        {
-            mBeanServer.invoke(adaptorName, "stop", null, null);
-        }
-        catch (InstanceNotFoundException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStop("Jdmk agent"), adaptorName, e);
-        }
-        catch (MBeanException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStop("Jdmk agent"), adaptorName, e);
-        }
-        catch (ReflectionException e)
-        {
-            // ignore
-        }
-    }
+  /**
+   * @return Returns the jmxAdaptorUrl.
+   */
+  public String getJmxAdaptorUrl() {
+    return jmxAdaptorUrl;
+  }
 
-    @Override
-    public void dispose()
-    {
-        try
-        {
-            stop();
-        }
-        catch (Exception e)
-        {
-            // TODO: log an exception
-        }
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
-            final Object adaptor = createAdaptor();
-            if (StringUtils.isBlank(jmxAdaptorUrl))
-            {
-                if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port))
-                {
-                    jmxAdaptorUrl = PROTOCOL_PREFIX + host + ":" + port;
-                }
-                else
-                {
-                    jmxAdaptorUrl = DEFAULT_JMX_ADAPTOR_URL;
-                }
-            }
-            // TODO use Jmx support classes
-            adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
-            mBeanServer.registerMBean(adaptor, adaptorName);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToStart("Jdmk Agent"), e, this);
-        }
-    }
-
-    /**
-     * @return Returns the jmxAdaptorUrl.
-     */
-    public String getJmxAdaptorUrl()
-    {
-        return jmxAdaptorUrl;
-    }
-
-    /**
-     * @param jmxAdaptorUrl The jmxAdaptorUrl to set.
-     */
-    public void setJmxAdaptorUrl(String jmxAdaptorUrl)
-    {
-        this.jmxAdaptorUrl = jmxAdaptorUrl;
-    }
+  /**
+   * @param jmxAdaptorUrl The jmxAdaptorUrl to set.
+   */
+  public void setJmxAdaptorUrl(String jmxAdaptorUrl) {
+    this.jmxAdaptorUrl = jmxAdaptorUrl;
+  }
 
 
-    public String getHost()
-    {
-        return host;
-    }
+  public String getHost() {
+    return host;
+  }
 
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
+  public void setHost(String host) {
+    this.host = host;
+  }
 
-    public String getPort()
-    {
-        return port;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public void setPort(String port)
-    {
-        this.port = port;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 }

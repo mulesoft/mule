@@ -87,335 +87,309 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
-{
+public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
-    private static final String CONFIG_NAME = "myConfig";
-    private static final String ERROR_MESSAGE = "ERROR";
-    private static final String SOURCE_NAME = "source";
+  private static final String CONFIG_NAME = "myConfig";
+  private static final String ERROR_MESSAGE = "ERROR";
+  private static final String SOURCE_NAME = "source";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Mock
-    private RuntimeExtensionModel extensionModel;
+  @Mock
+  private RuntimeExtensionModel extensionModel;
 
-    @Mock
-    private RuntimeSourceModel sourceModel;
+  @Mock
+  private RuntimeSourceModel sourceModel;
 
-    @Mock
-    private SourceFactory sourceFactory;
+  @Mock
+  private SourceFactory sourceFactory;
 
-    @Mock
-    private ThreadingProfile threadingProfile;
+  @Mock
+  private ThreadingProfile threadingProfile;
 
-    @Mock
-    private WorkManager workManager;
+  @Mock
+  private WorkManager workManager;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MessageProcessor messageProcessor;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MessageProcessor messageProcessor;
 
-    @Mock
-    private FlowConstruct flowConstruct;
+  @Mock
+  private FlowConstruct flowConstruct;
 
-    @Mock(extraInterfaces = Lifecycle.class)
-    private Source source;
+  @Mock(extraInterfaces = Lifecycle.class)
+  private Source source;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionManagerAdapter extensionManager;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionManagerAdapter extensionManager;
 
-    @Mock
-    private MessageProcessingManager messageProcessingManager;
-
-    @Mock
-    private ExceptionEnricherFactory enricherFactory;
-
-    @Mock
-    private MuleMessage muleMessage;
-
-    @Mock
-    private ConfigurationProvider<Object> configurationProvider;
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private RuntimeConfigurationModel configurationModel;
-
-    @Mock
-    private ConfigurationInstance<Object> configurationInstance;
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleEvent event;
-
-    private ExtensionMessageSource messageSource;
-    private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
-
-    @Before
-    public void before() throws Exception
-    {
-        spyInjector(muleContext);
-        when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenReturn(workManager);
-        when(sourceFactory.createSource()).thenReturn(source);
-        when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
-        when(sourceModel.getName()).thenReturn(SOURCE_NAME);
-        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
-        mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
-
-        initialiseIfNeeded(retryPolicyTemplate, muleContext);
-
-        muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
-
-        when(flowConstruct.getMuleContext()).thenReturn(muleContext);
-
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
-        when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
-        when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
-        when(configurationProvider.get(any())).thenReturn(configurationInstance);
-        when(configurationProvider.getModel()).thenReturn(configurationModel);
-
-        messageSource = getNewExtensionMessageSourceInstance();
-    }
-
-    @Test
-    public void handleMessage() throws Exception
-    {
-        doAnswer(invocation -> {
-            ((Work) invocation.getArguments()[0]).run();
-            return null;
-        }).when(workManager).scheduleWork(any(Work.class));
-
-        messageSource.initialise();
-        messageSource.start();
-
-        CompletionHandler completionHandler = mock(CompletionHandler.class);
-        messageSource.handle(muleMessage, completionHandler);
-
-        ArgumentCaptor<MuleEvent> eventCaptor = ArgumentCaptor.forClass(MuleEvent.class);
-        verify(messageProcessor).process(eventCaptor.capture());
-
-        MuleEvent event = eventCaptor.getValue();
-        assertThat(event.getMessage(), is(sameInstance(muleMessage)));
-        verify(completionHandler).onCompletion(any(MuleMessage.class), any(ExceptionCallback.class));
-    }
-
-    @Test
-    public void handleExceptionAndRestart() throws Exception
-    {
-        messageSource.initialise();
-        messageSource.start();
-
-        messageSource.onException(new ConnectionException(ERROR_MESSAGE));
-        verify((Stoppable) source).stop();
-        verify(workManager, never()).dispose();
-        verify((Disposable) source).dispose();
-        verify((Initialisable) source, times(2)).initialise();
-        verify((Startable) source, times(2)).start();
-        handleMessage();
-    }
-
-    @Test
-    public void initialise() throws Exception
-    {
-        messageSource.initialise();
-        verify(source).setSourceContext(any(SourceContext.class));
-        verify(muleContext.getInjector()).inject(source);
-        verify((Initialisable) source).initialise();
-    }
-
-    @Test
-    public void sourceShouldIsInstantiatedOnce() throws MuleException
-    {
-        messageSource.doInitialise();
-        messageSource.start();
-        verify(sourceFactory, times(1)).createSource();
-    }
-
-    @Test
-    public void initialiseFailsWithInitialisationException() throws Exception
-    {
-        Exception e = mock(InitialisationException.class);
-        doThrow(e).when(((Initialisable) source)).initialise();
-        expectedException.expect(is(sameInstance(e)));
-
-        messageSource.initialise();
-    }
-
-    @Test
-    public void failWithConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception
-    {
-        doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE))).when(source).start();
-
-        final Throwable throwable = catchThrowable(messageSource::start);
-        assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
-        assertThat(throwable.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
-        verify(source, times(3)).start();
-    }
-
-    @Test
-    public void failWithNonConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception
-    {
-        doThrow(new IOException(ERROR_MESSAGE)).when(source).start();
-
-        final Throwable throwable = catchThrowable(messageSource::start);
-        assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
-        assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
-        verify(source, times(1)).start();
-    }
-
-    @Test
-    public void failWithConnectionExceptionWhenStartingAndGetsReconnected() throws Exception
-    {
-        doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE)))
-                .doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE)))
-                .doNothing()
-                .when(source)
-                .start();
-
-        messageSource.initialise();
-        messageSource.start();
-        verify(source, times(3)).start();
-        verify(source, times(2)).stop();
-    }
-
-    @Test
-    public void failOnExceptionWithConnectionExceptionAndGetsReconnected() throws Exception
-    {
-        messageSource.initialise();
-        messageSource.start();
-        messageSource.onException(new ConnectionException(ERROR_MESSAGE));
-
-        verify(source, times(2)).start();
-        verify(source, times(1)).stop();
-    }
-
-    @Test
-    public void failOnExceptionWithNonConnectionExceptionAndGetsExhausted() throws Exception
-    {
-        initialise();
-        messageSource.start();
-        messageSource.onException(new RuntimeException(ERROR_MESSAGE));
-
-        verify(source, times(1)).start();
-        verify(source, times(1)).stop();
-    }
-
-    @Test
-    public void initialiseFailsWithRandomException() throws Exception
-    {
-        Exception e = new RuntimeException();
-        doThrow(e).when(((Initialisable) source)).initialise();
-        expectedException.expectCause(is(sameInstance(e)));
-
-        messageSource.initialise();
-    }
-
-    @Test
-    public void start() throws Exception
-    {
-        initialise();
-        messageSource.start();
-
-        verify(workManager).start();
-        verify((Startable) source).start();
-    }
-
-    @Test
-    public void failedToCreateWorkManager() throws Exception
-    {
-        Exception e = new RuntimeException();
-        when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenThrow(e);
-        initialise();
-
-        final Throwable throwable = catchThrowable(messageSource::start);
-        assertThat(throwable, is(sameInstance(e)));
-        verify((Startable) source, never()).start();
-    }
-
-    @Test
-    public void stop() throws Exception
-    {
-        messageSource.initialise();
-        messageSource.start();
-        InOrder inOrder = inOrder(source, workManager);
-
-        messageSource.stop();
-        inOrder.verify((Stoppable) source).stop();
-        inOrder.verify(workManager).dispose();
-    }
-
-    @Test
-    public void enrichExceptionWithSourceExceptionEnricher() throws Exception
-    {
-        when(enricherFactory.createEnricher()).thenReturn(new HeisenbergConnectionExceptionEnricher());
-        when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
-        ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
-        doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
-        Throwable t = catchThrowable(messageSource::start);
-
-        assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
-        assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
-    }
-
-    @Test
-    public void enrichExceptionWithExtensionEnricher() throws Exception
-    {
-        final String enrichedErrorMessage = "Enriched: " + ERROR_MESSAGE;
-        ExceptionEnricher exceptionEnricher = mock(ExceptionEnricher.class);
-        when(exceptionEnricher.enrichException(any(Exception.class))).thenReturn(new Exception(enrichedErrorMessage));
-        when(enricherFactory.createEnricher()).thenReturn(exceptionEnricher);
-        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
-        ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
-        doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
-        Throwable t = catchThrowable(messageSource::start);
-
-        assertThat(t.getMessage(), containsString(enrichedErrorMessage));
-    }
-
-    @Test
-    public void workManagerDisposedIfSourceFailsToStart() throws Exception
-    {
-        messageSource.initialise();
-        messageSource.start();
-
-        Exception e = new RuntimeException();
-        doThrow(e).when((Stoppable) source).stop();
-        expectedException.expect(new BaseMatcher<Throwable>()
-                                 {
-                                     @Override
-                                     public boolean matches(Object item)
-                                     {
-                                         Exception exception = (Exception) item;
-                                         return exception.getCause() instanceof MuleException &&
-                                                exception.getCause().getCause() == e;
-                                     }
-
-                                     @Override
-                                     public void describeTo(Description description)
-                                     {
-                                         description.appendText("Exception was not wrapped as expected");
-                                     }
-                                 }
-        );
-
-        messageSource.stop();
-        verify(workManager).dispose();
-    }
-
-    @Test
-    public void dispose() throws Exception
-    {
-        messageSource.initialise();
-        messageSource.start();
-        messageSource.stop();
-        messageSource.dispose();
-
-        verify((Disposable) source).dispose();
-    }
-
-    private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException
-    {
-        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate, extensionManager);
-        messageSource.setListener(messageProcessor);
-        messageSource.setFlowConstruct(flowConstruct);
-        muleContext.getInjector().inject(messageSource);
-        return messageSource;
-    }
+  @Mock
+  private MessageProcessingManager messageProcessingManager;
+
+  @Mock
+  private ExceptionEnricherFactory enricherFactory;
+
+  @Mock
+  private MuleMessage muleMessage;
+
+  @Mock
+  private ConfigurationProvider<Object> configurationProvider;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private RuntimeConfigurationModel configurationModel;
+
+  @Mock
+  private ConfigurationInstance<Object> configurationInstance;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleEvent event;
+
+  private ExtensionMessageSource messageSource;
+  private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
+
+  @Before
+  public void before() throws Exception {
+    spyInjector(muleContext);
+    when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout())))
+        .thenReturn(workManager);
+    when(sourceFactory.createSource()).thenReturn(source);
+    when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+    when(sourceModel.getName()).thenReturn(SOURCE_NAME);
+    when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+    mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
+
+    initialiseIfNeeded(retryPolicyTemplate, muleContext);
+
+    muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
+
+    when(flowConstruct.getMuleContext()).thenReturn(muleContext);
+
+    when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
+    when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
+    when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
+    when(configurationProvider.get(any())).thenReturn(configurationInstance);
+    when(configurationProvider.getModel()).thenReturn(configurationModel);
+
+    messageSource = getNewExtensionMessageSourceInstance();
+  }
+
+  @Test
+  public void handleMessage() throws Exception {
+    doAnswer(invocation -> {
+      ((Work) invocation.getArguments()[0]).run();
+      return null;
+    }).when(workManager).scheduleWork(any(Work.class));
+
+    messageSource.initialise();
+    messageSource.start();
+
+    CompletionHandler completionHandler = mock(CompletionHandler.class);
+    messageSource.handle(muleMessage, completionHandler);
+
+    ArgumentCaptor<MuleEvent> eventCaptor = ArgumentCaptor.forClass(MuleEvent.class);
+    verify(messageProcessor).process(eventCaptor.capture());
+
+    MuleEvent event = eventCaptor.getValue();
+    assertThat(event.getMessage(), is(sameInstance(muleMessage)));
+    verify(completionHandler).onCompletion(any(MuleMessage.class), any(ExceptionCallback.class));
+  }
+
+  @Test
+  public void handleExceptionAndRestart() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+    verify((Stoppable) source).stop();
+    verify(workManager, never()).dispose();
+    verify((Disposable) source).dispose();
+    verify((Initialisable) source, times(2)).initialise();
+    verify((Startable) source, times(2)).start();
+    handleMessage();
+  }
+
+  @Test
+  public void initialise() throws Exception {
+    messageSource.initialise();
+    verify(source).setSourceContext(any(SourceContext.class));
+    verify(muleContext.getInjector()).inject(source);
+    verify((Initialisable) source).initialise();
+  }
+
+  @Test
+  public void sourceShouldIsInstantiatedOnce() throws MuleException {
+    messageSource.doInitialise();
+    messageSource.start();
+    verify(sourceFactory, times(1)).createSource();
+  }
+
+  @Test
+  public void initialiseFailsWithInitialisationException() throws Exception {
+    Exception e = mock(InitialisationException.class);
+    doThrow(e).when(((Initialisable) source)).initialise();
+    expectedException.expect(is(sameInstance(e)));
+
+    messageSource.initialise();
+  }
+
+  @Test
+  public void failWithConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception {
+    doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE))).when(source).start();
+
+    final Throwable throwable = catchThrowable(messageSource::start);
+    assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
+    assertThat(throwable.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
+    verify(source, times(3)).start();
+  }
+
+  @Test
+  public void failWithNonConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception {
+    doThrow(new IOException(ERROR_MESSAGE)).when(source).start();
+
+    final Throwable throwable = catchThrowable(messageSource::start);
+    assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
+    assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
+    verify(source, times(1)).start();
+  }
+
+  @Test
+  public void failWithConnectionExceptionWhenStartingAndGetsReconnected() throws Exception {
+    doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE)))
+        .doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE))).doNothing().when(source).start();
+
+    messageSource.initialise();
+    messageSource.start();
+    verify(source, times(3)).start();
+    verify(source, times(2)).stop();
+  }
+
+  @Test
+  public void failOnExceptionWithConnectionExceptionAndGetsReconnected() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+
+    verify(source, times(2)).start();
+    verify(source, times(1)).stop();
+  }
+
+  @Test
+  public void failOnExceptionWithNonConnectionExceptionAndGetsExhausted() throws Exception {
+    initialise();
+    messageSource.start();
+    messageSource.onException(new RuntimeException(ERROR_MESSAGE));
+
+    verify(source, times(1)).start();
+    verify(source, times(1)).stop();
+  }
+
+  @Test
+  public void initialiseFailsWithRandomException() throws Exception {
+    Exception e = new RuntimeException();
+    doThrow(e).when(((Initialisable) source)).initialise();
+    expectedException.expectCause(is(sameInstance(e)));
+
+    messageSource.initialise();
+  }
+
+  @Test
+  public void start() throws Exception {
+    initialise();
+    messageSource.start();
+
+    verify(workManager).start();
+    verify((Startable) source).start();
+  }
+
+  @Test
+  public void failedToCreateWorkManager() throws Exception {
+    Exception e = new RuntimeException();
+    when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenThrow(e);
+    initialise();
+
+    final Throwable throwable = catchThrowable(messageSource::start);
+    assertThat(throwable, is(sameInstance(e)));
+    verify((Startable) source, never()).start();
+  }
+
+  @Test
+  public void stop() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    InOrder inOrder = inOrder(source, workManager);
+
+    messageSource.stop();
+    inOrder.verify((Stoppable) source).stop();
+    inOrder.verify(workManager).dispose();
+  }
+
+  @Test
+  public void enrichExceptionWithSourceExceptionEnricher() throws Exception {
+    when(enricherFactory.createEnricher()).thenReturn(new HeisenbergConnectionExceptionEnricher());
+    when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
+    ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+    doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
+    Throwable t = catchThrowable(messageSource::start);
+
+    assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
+    assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+  }
+
+  @Test
+  public void enrichExceptionWithExtensionEnricher() throws Exception {
+    final String enrichedErrorMessage = "Enriched: " + ERROR_MESSAGE;
+    ExceptionEnricher exceptionEnricher = mock(ExceptionEnricher.class);
+    when(exceptionEnricher.enrichException(any(Exception.class))).thenReturn(new Exception(enrichedErrorMessage));
+    when(enricherFactory.createEnricher()).thenReturn(exceptionEnricher);
+    when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
+    ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+    doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
+    Throwable t = catchThrowable(messageSource::start);
+
+    assertThat(t.getMessage(), containsString(enrichedErrorMessage));
+  }
+
+  @Test
+  public void workManagerDisposedIfSourceFailsToStart() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+
+    Exception e = new RuntimeException();
+    doThrow(e).when((Stoppable) source).stop();
+    expectedException.expect(new BaseMatcher<Throwable>() {
+
+      @Override
+      public boolean matches(Object item) {
+        Exception exception = (Exception) item;
+        return exception.getCause() instanceof MuleException && exception.getCause().getCause() == e;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Exception was not wrapped as expected");
+      }
+    });
+
+    messageSource.stop();
+    verify(workManager).dispose();
+  }
+
+  @Test
+  public void dispose() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    messageSource.stop();
+    messageSource.dispose();
+
+    verify((Disposable) source).dispose();
+  }
+
+  private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
+    ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME,
+                                                                      threadingProfile, retryPolicyTemplate, extensionManager);
+    messageSource.setListener(messageProcessor);
+    messageSource.setFlowConstruct(flowConstruct);
+    muleContext.getInjector().inject(messageSource);
+    return messageSource;
+  }
 }

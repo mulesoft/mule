@@ -13,25 +13,26 @@ import org.mule.runtime.core.api.MuleException;
  *
  * @since 4.0
  */
-public interface PollingTask
-{
+public interface PollingTask {
 
-    /**
-     * @return true if it's runnable, false otherwise
-     */
-    boolean isStarted();
+  /**
+   * @return true if it's runnable, false otherwise
+   */
+  boolean isStarted();
 
-    /**
-     * Task execution logic
-     *
-     * @throws Exception
-     */
-    void run() throws Exception;
+  /**
+   * Task execution logic
+   *
+   * @throws Exception
+   */
+  void run() throws Exception;
 
-    /**
-     * Stops the current task. <p/> This may be called by the task runner in case of a thread interruption.
-     *
-     * @throws MuleException
-     */
-    void stop() throws MuleException;
+  /**
+   * Stops the current task.
+   * <p/>
+   * This may be called by the task runner in case of a thread interruption.
+   *
+   * @throws MuleException
+   */
+  void stop() throws MuleException;
 }

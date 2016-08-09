@@ -15,11 +15,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-interface WithOperations
-{
+interface WithOperations {
 
-    /**
-     * @return a list of {@link MethodWrapper}
-     */
-    List<MethodElement> getOperations();
+  /**
+   * @return a list of {@link MethodWrapper}
+   */
+  List<MethodElement> getOperations();
 }

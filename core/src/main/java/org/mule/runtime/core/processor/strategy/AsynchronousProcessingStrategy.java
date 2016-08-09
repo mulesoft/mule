@@ -17,33 +17,28 @@ import java.util.List;
 import javax.resource.spi.work.WorkManager;
 
 /**
- * This strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors
- * in a single worker thread.
+ * This strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single worker
+ * thread.
  */
-public class AsynchronousProcessingStrategy extends AbstractThreadingProfileProcessingStrategy
-{
+public class AsynchronousProcessingStrategy extends AbstractThreadingProfileProcessingStrategy {
 
-    protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategy();
+  protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategy();
 
-    @Override
-    public void configureProcessors(List<MessageProcessor> processors,
-                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
-                                    MessageProcessorChainBuilder chainBuilder,
-                                    MuleContext muleContext)
-    {
-        if (processors.size() > 0)
-        {
-            chainBuilder.chain(createAsyncMessageProcessor(nameSource, muleContext));
-            synchronousProcessingStrategy.configureProcessors(processors, nameSource, chainBuilder,
-                muleContext);
-        }
+  @Override
+  public void configureProcessors(List<MessageProcessor> processors,
+                                  org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                  MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+    if (processors.size() > 0) {
+      chainBuilder.chain(createAsyncMessageProcessor(nameSource, muleContext));
+      synchronousProcessingStrategy.configureProcessors(processors, nameSource, chainBuilder, muleContext);
     }
+  }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
-                                                                            MuleContext muleContext)
-    {
-        return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext), getThreadPoolName(
-            nameSource.getName(), muleContext), muleContext.getConfiguration().getShutdownTimeout());
-    }
+  protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                                                          MuleContext muleContext) {
+    return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext),
+                                                 getThreadPoolName(nameSource.getName(), muleContext),
+                                                 muleContext.getConfiguration().getShutdownTimeout());
+  }
 
 }

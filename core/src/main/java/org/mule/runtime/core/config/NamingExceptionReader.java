@@ -15,52 +15,43 @@ import java.util.Map;
 import javax.naming.Name;
 import javax.naming.NamingException;
 
-public class NamingExceptionReader implements ExceptionReader
-{
-    /**
-     * Displayed when no remaining or resolved name found.
-     */
-    protected static final String MISSING_NAME_DISPLAY_VALUE = "<none>";
+public class NamingExceptionReader implements ExceptionReader {
 
-    public String getMessage(Throwable t)
-    {
-        return (t instanceof NamingException ? ((NamingException) t).toString(true) : "<unknown>");
-    }
+  /**
+   * Displayed when no remaining or resolved name found.
+   */
+  protected static final String MISSING_NAME_DISPLAY_VALUE = "<none>";
 
-    public Throwable getCause(Throwable t)
-    {
-        return (t instanceof NamingException ? ((NamingException) t).getCause() : null);
-    }
+  public String getMessage(Throwable t) {
+    return (t instanceof NamingException ? ((NamingException) t).toString(true) : "<unknown>");
+  }
 
-    public Class<?> getExceptionType()
-    {
-        return NamingException.class;
-    }
+  public Throwable getCause(Throwable t) {
+    return (t instanceof NamingException ? ((NamingException) t).getCause() : null);
+  }
 
-    /**
-     * Returns a map of the non-stanard information stored on the exception
-     * 
-     * @param t the exception to extract the information from
-     * @return a map of the non-stanard information stored on the exception
-     */
-    public Map<?, ?> getInfo(Throwable t)
-    {
-        if (t instanceof NamingException)
-        {
-            NamingException e = (NamingException) t;
-            
-            Map<String, Object> info = new HashMap<String, Object>();
-            final Name remainingName = e.getRemainingName();
-            final Name resolvedName = e.getResolvedName();
-            info.put("Remaining Name", remainingName == null ?
-                    MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
-            info.put("Resolved Name", resolvedName == null ? 
-                MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
-            return info;
-        }
-        else
-        {
-            return Collections.EMPTY_MAP;
-        }
+  public Class<?> getExceptionType() {
+    return NamingException.class;
+  }
+
+  /**
+   * Returns a map of the non-stanard information stored on the exception
+   * 
+   * @param t the exception to extract the information from
+   * @return a map of the non-stanard information stored on the exception
+   */
+  public Map<?, ?> getInfo(Throwable t) {
+    if (t instanceof NamingException) {
+      NamingException e = (NamingException) t;
+
+      Map<String, Object> info = new HashMap<String, Object>();
+      final Name remainingName = e.getRemainingName();
+      final Name resolvedName = e.getResolvedName();
+      info.put("Remaining Name", remainingName == null ? MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
+      info.put("Resolved Name", resolvedName == null ? MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
+      return info;
+    } else {
+      return Collections.EMPTY_MAP;
     }
+  }
 }

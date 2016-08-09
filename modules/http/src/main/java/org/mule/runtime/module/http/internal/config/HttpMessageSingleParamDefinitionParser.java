@@ -15,29 +15,27 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Bean definition parser for query parameters, URI parameters and headers, for both the request-builder and
- * the response-builder elements.
+ * Bean definition parser for query parameters, URI parameters and headers, for both the request-builder and the response-builder
+ * elements.
  */
-public class HttpMessageSingleParamDefinitionParser extends ChildDefinitionParser
-{
-    private HttpParamType httpParamType;
+public class HttpMessageSingleParamDefinitionParser extends ChildDefinitionParser {
 
-    public HttpMessageSingleParamDefinitionParser(Class<? extends HttpParam> clazz, HttpParamType httpParamType)
-    {
-        super("param", clazz);
+  private HttpParamType httpParamType;
 
-        this.httpParamType = httpParamType;
+  public HttpMessageSingleParamDefinitionParser(Class<? extends HttpParam> clazz, HttpParamType httpParamType) {
+    super("param", clazz);
 
-        addAlias("paramName", "name");
-        addAlias("headerName", "name");
+    this.httpParamType = httpParamType;
 
-    }
+    addAlias("paramName", "name");
+    addAlias("headerName", "name");
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        builder.addConstructorArgValue(httpParamType);
-        super.parseChild(element, parserContext, builder);
-    }
+  }
+
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    builder.addConstructorArgValue(httpParamType);
+    super.parseChild(element, parserContext, builder);
+  }
 
 }

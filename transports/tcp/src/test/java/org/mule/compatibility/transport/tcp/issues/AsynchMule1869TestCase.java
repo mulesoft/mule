@@ -21,35 +21,33 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AsynchMule1869TestCase extends FunctionalTestCase
-{
-    protected static String TEST_MESSAGE = "Test TCP Request";
+public class AsynchMule1869TestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  protected static String TEST_MESSAGE = "Test TCP Request";
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-functional-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Test
-    public void testDispatchAndReply() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "tcp-functional-test-flow.xml";
+  }
 
-        Map<String, Serializable> props = new HashMap<>();
-        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
-        // MULE-2754
-        Thread.sleep(100);
+  @Test
+  public void testDispatchAndReply() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage result =  client.request("asyncClientEndpoint", 10000);
-        assertNotNull("No message received", result);
-        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(result));
-    }
+    Map<String, Serializable> props = new HashMap<>();
+    client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
+    // MULE-2754
+    Thread.sleep(100);
+
+    MuleMessage result = client.request("asyncClientEndpoint", 10000);
+    assertNotNull("No message received", result);
+    assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(result));
+  }
 
 }

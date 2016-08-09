@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.storedprocedure;
 
 import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
-public class StoredProcedureMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
-{
+public class StoredProcedureMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/storedprocedure/stored-procedure-missing-query-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/storedprocedure/stored-procedure-missing-query-config.xml";
+  }
 
-    @Override
-    protected String getMessageProcessorElement()
-    {
-        return "stored-procedure";
-    }
+  @Override
+  protected String getMessageProcessorElement() {
+    return "stored-procedure";
+  }
 }

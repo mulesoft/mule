@@ -19,31 +19,27 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-public abstract class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
-{    
-    @Test
-    public void testSecurityManagerConfigured()
-    {
-        MuleSecurityManager securityManager = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
-        assertNotNull(securityManager);
+public abstract class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase {
 
-        Collection<SecurityProvider> providers = securityManager.getProviders();
-        assertEquals(2, providers.size());
+  @Test
+  public void testSecurityManagerConfigured() {
+    MuleSecurityManager securityManager = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+    assertNotNull(securityManager);
 
-        assertThat(containsSecurityProvider(providers, UserAndPasswordAuthenticationProvider.class), is(true));
-        assertThat(containsSecurityProvider(providers, PreAuthenticatedAuthenticationProvider.class), is(true));
+    Collection<SecurityProvider> providers = securityManager.getProviders();
+    assertEquals(2, providers.size());
+
+    assertThat(containsSecurityProvider(providers, UserAndPasswordAuthenticationProvider.class), is(true));
+    assertThat(containsSecurityProvider(providers, PreAuthenticatedAuthenticationProvider.class), is(true));
+  }
+
+  private boolean containsSecurityProvider(Collection<SecurityProvider> providers, Class authenticationProviderClass) {
+    for (SecurityProvider provider : providers) {
+      assertEquals(SpringProviderAdapter.class, provider.getClass());
+      if (authenticationProviderClass.equals(((SpringProviderAdapter) provider).getAuthenticationProvider().getClass())) {
+        return true;
+      }
     }
-
-    private boolean containsSecurityProvider(Collection<SecurityProvider> providers, Class authenticationProviderClass)
-    {
-        for(SecurityProvider provider : providers)
-        {
-            assertEquals(SpringProviderAdapter.class, provider.getClass());
-            if (authenticationProviderClass.equals(((SpringProviderAdapter) provider).getAuthenticationProvider().getClass()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 }

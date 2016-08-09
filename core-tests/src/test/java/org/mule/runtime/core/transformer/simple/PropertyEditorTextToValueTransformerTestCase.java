@@ -12,52 +12,41 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.beans.PropertyEditor;
 
-public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransformerTestCase
-{
+public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransformerTestCase {
 
-    @Override
-    public Object getResultData()
-    {
-        return new Boolean(true);
-    }
+  @Override
+  public Object getResultData() {
+    return new Boolean(true);
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return new PropertyEditorValueToTextTransformer(getBooleanPropertyEditor(), Boolean.class);
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    return new PropertyEditorValueToTextTransformer(getBooleanPropertyEditor(), Boolean.class);
+  }
 
-    @Override
-    public Object getTestData()
-    {
-        return "True";
-    }
+  @Override
+  public Object getTestData() {
+    return "True";
+  }
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return new PropertyEditorTextToValueTransformer(getBooleanPropertyEditor(), Boolean.class);
-    }
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return new PropertyEditorTextToValueTransformer(getBooleanPropertyEditor(), Boolean.class);
+  }
 
-    private PropertyEditor getBooleanPropertyEditor() throws Exception
-    {
-        String[] classNames = {
-                "com.sun.beans.editors.BooleanEditor", // java 8
-                "sun.beans.editors.BooleanEditor", // java 7
-                "sun.beans.editors.BoolEditor"}; // java 6
-        ClassNotFoundException exception = null;
-        for (String className : classNames)
-        {
-            try
-            {
-                return (PropertyEditor) ClassUtils.getClass(className).newInstance();
-            }
-            catch (ClassNotFoundException e)
-            {
-                exception = e;
-            }
-        }
-        throw exception;
+  private PropertyEditor getBooleanPropertyEditor() throws Exception {
+    String[] classNames = {"com.sun.beans.editors.BooleanEditor", // java 8
+        "sun.beans.editors.BooleanEditor", // java 7
+        "sun.beans.editors.BoolEditor"}; // java 6
+    ClassNotFoundException exception = null;
+    for (String className : classNames) {
+      try {
+        return (PropertyEditor) ClassUtils.getClass(className).newInstance();
+      } catch (ClassNotFoundException e) {
+        exception = e;
+      }
     }
+    throw exception;
+  }
 
 }

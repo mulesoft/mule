@@ -23,47 +23,42 @@ import java.util.List;
 /**
  * Executes a select query on a database
  * <p/>
- * Accepted queries are select queries or stored procedure queries taking input parameters
- * and returning only a resultSet.
+ * Accepted queries are select queries or stored procedure queries taking input parameters and returning only a resultSet.
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
- * being processed.
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent} being processed.
  */
 
-public class SelectMessageProcessor extends AbstractSingleQueryDbMessageProcessor
-{
+public class SelectMessageProcessor extends AbstractSingleQueryDbMessageProcessor {
 
-    private final QueryExecutorFactory queryExecutorFactory;
-    private final boolean streaming;
-    private final List<QueryType> validQueryTypes;
+  private final QueryExecutorFactory queryExecutorFactory;
+  private final boolean streaming;
+  private final List<QueryType> validQueryTypes;
 
-    public SelectMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, QueryExecutorFactory queryExecutorFactory, TransactionalAction transactionalAction, boolean streaming)
-    {
-        super(dbConfigResolver, queryResolver, transactionalAction);
-        this.queryExecutorFactory = queryExecutorFactory;
-        this.streaming = streaming;
+  public SelectMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver,
+                                QueryExecutorFactory queryExecutorFactory, TransactionalAction transactionalAction,
+                                boolean streaming) {
+    super(dbConfigResolver, queryResolver, transactionalAction);
+    this.queryExecutorFactory = queryExecutorFactory;
+    this.streaming = streaming;
 
-        validQueryTypes = new ArrayList<QueryType>();
-        validQueryTypes.add(QueryType.SELECT);
-        validQueryTypes.add(QueryType.STORE_PROCEDURE_CALL);
-    }
+    validQueryTypes = new ArrayList<QueryType>();
+    validQueryTypes.add(QueryType.SELECT);
+    validQueryTypes.add(QueryType.STORE_PROCEDURE_CALL);
+  }
 
-    @Override
-    protected boolean mustCloseConnection()
-    {
-        return !streaming;
-    }
+  @Override
+  protected boolean mustCloseConnection() {
+    return !streaming;
+  }
 
-    @Override
-    protected List<QueryType> getValidQueryTypes()
-    {
-        return validQueryTypes;
-    }
+  @Override
+  protected List<QueryType> getValidQueryTypes() {
+    return validQueryTypes;
+  }
 
-    @Override
-    protected Object doExecuteQuery(DbConnection connection, Query query) throws SQLException
-    {
-        QueryExecutor queryExecutor = queryExecutorFactory.create();
-        return queryExecutor.execute(connection, query);
-    }
+  @Override
+  protected Object doExecuteQuery(DbConnection connection, Query query) throws SQLException {
+    QueryExecutor queryExecutor = queryExecutorFactory.create();
+    return queryExecutor.execute(connection, query);
+  }
 }

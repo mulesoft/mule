@@ -29,236 +29,193 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * <code>MuleSoapHeaders</code> is a helper class for extracting and writing Mule
- * header properties to s Soap message
+ * <code>MuleSoapHeaders</code> is a helper class for extracting and writing Mule header properties to s Soap message
  */
-public class MuleSoapHeaders
-{
-    private String replyTo;
-    private String correlationId;
-    private String correlationGroup;
-    private String correlationSequence;
+public class MuleSoapHeaders {
 
-    public static final String MULE_10_ACTOR = "http://www.muleumo.org/providers/soap/1.0";
-    public static final String MULE_NAMESPACE = "mule";
-    public static final String MULE_HEADER = "header";
-    public static final String ENV_REQUEST_HEADERS = "MULE_REQUEST_HEADERS";
+  private String replyTo;
+  private String correlationId;
+  private String correlationGroup;
+  private String correlationSequence;
 
-    /**
-     * Extracts header properties from a Mule event
-     * 
-     * @param event
-     */
-    public MuleSoapHeaders(MuleEvent event)
-    {
-        event.getMessage().getCorrelation().getId().ifPresent(v -> setCorrelationId(v));
-        event.getMessage().getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
-        event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
+  public static final String MULE_10_ACTOR = "http://www.muleumo.org/providers/soap/1.0";
+  public static final String MULE_NAMESPACE = "mule";
+  public static final String MULE_HEADER = "header";
+  public static final String ENV_REQUEST_HEADERS = "MULE_REQUEST_HEADERS";
+
+  /**
+   * Extracts header properties from a Mule event
+   * 
+   * @param event
+   */
+  public MuleSoapHeaders(MuleEvent event) {
+    event.getMessage().getCorrelation().getId().ifPresent(v -> setCorrelationId(v));
+    event.getMessage().getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
+    event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
+  }
+
+  /**
+   * Extracts Mule header properties from a Soap message
+   * 
+   * @param soapHeader
+   */
+  public MuleSoapHeaders(SOAPHeader soapHeader) {
+    Iterator iter = soapHeader.examineHeaderElements(MULE_10_ACTOR);
+    SOAPHeaderElement headerElement;
+    while (iter.hasNext()) {
+      headerElement = (SOAPHeaderElement) iter.next();
+
+      // checking that the elements are part of the mule namespace
+      if (org.mule.runtime.core.util.StringUtils.equals(MULE_10_ACTOR, headerElement.getNamespaceURI())) {
+        Iterator iter2 = headerElement.getChildElements();
+        readElements(iter2);
+      }
     }
+  }
 
-    /**
-     * Extracts Mule header properties from a Soap message
-     * 
-     * @param soapHeader
-     */
-    public MuleSoapHeaders(SOAPHeader soapHeader)
-    {
-        Iterator iter = soapHeader.examineHeaderElements(MULE_10_ACTOR);
-        SOAPHeaderElement headerElement;
-        while (iter.hasNext())
-        {
-            headerElement = (SOAPHeaderElement)iter.next();
+  public MuleSoapHeaders(Iterator elements) {
+    readElements(elements);
+  }
 
-            // checking that the elements are part of the mule namespace
-            if (org.mule.runtime.core.util.StringUtils.equals(MULE_10_ACTOR, headerElement.getNamespaceURI()))
-            {
-                Iterator iter2 = headerElement.getChildElements();
-                readElements(iter2);
-            }
-        }
-    }
+  protected void readElements(Iterator elements) {
 
-    public MuleSoapHeaders(Iterator elements)
-    {
-        readElements(elements);
-    }
+    SOAPElement element;
 
-    protected void readElements(Iterator elements)
-    {
+    while (elements.hasNext()) {
 
-        SOAPElement element;
+      Object elementObject = elements.next();
 
-        while (elements.hasNext())
-        {
+      // Fixed MULE-770 (http://mule.mulesoft.org/jira/browse/MULE-770)
+      if (elementObject instanceof SOAPElement)
+      // if not, means that it is a value not an element, therefore we cannot
+      // look for correlation_id ...
+      {
+        element = (SOAPElement) elementObject;
+        String localName = element.getLocalName();
+        String elementValue = getStringValue(element);
 
-            Object elementObject = elements.next();
-
-            // Fixed MULE-770 (http://mule.mulesoft.org/jira/browse/MULE-770)
-            if (elementObject instanceof SOAPElement)
-            // if not, means that it is a value not an element, therefore we cannot
-            // look for correlation_id ...
-            {
-                element = (SOAPElement)elementObject;
-                String localName = element.getLocalName();
-                String elementValue = getStringValue(element);
-
-                if (MULE_CORRELATION_ID_PROPERTY.equals(localName))
-                {
-                    correlationId = elementValue;
-                }
-                else if (MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(localName))
-                {
-                    correlationGroup = elementValue;
-                }
-                else if (MULE_CORRELATION_SEQUENCE_PROPERTY.equals(localName))
-                {
-                    correlationSequence = elementValue;
-                }
-                else if (MULE_REPLY_TO_PROPERTY.equals(localName))
-                {
-                    replyTo = elementValue;
-                }
-
-            }
-        }
-    }
-
-    private String getStringValue(Element e)
-    {
-        String value = e.getNodeValue();
-        if (value == null && e.hasChildNodes())
-        {
-            // see if the value is base64 ecoded
-            value = e.getFirstChild().getNodeValue();
-            if (value != null)
-            {
-                // value = new String(org.apache.axis.encoding.Base64.decode(value));
-            }
-        }
-        return value;
-    }
-
-    /**
-     * Writes the header properties to a Soap header
-     * 
-     * @param env
-     * @throws SOAPException
-     */
-    public void addHeaders(SOAPEnvelope env) throws Exception
-    {
-        SOAPHeader header = env.getHeader();
-        SOAPHeaderElement muleHeader;
-        if (correlationId != null || replyTo != null)
-        {
-            if (header == null)
-            {
-                header = env.addHeader();
-            }
-            Name muleHeaderName = env.createName(MULE_HEADER, MULE_NAMESPACE, MULE_10_ACTOR);
-            muleHeader = header.addHeaderElement(muleHeaderName);
-            muleHeader.setActor(MULE_10_ACTOR);
-        }
-        else
-        {
-            return;
+        if (MULE_CORRELATION_ID_PROPERTY.equals(localName)) {
+          correlationId = elementValue;
+        } else if (MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(localName)) {
+          correlationGroup = elementValue;
+        } else if (MULE_CORRELATION_SEQUENCE_PROPERTY.equals(localName)) {
+          correlationSequence = elementValue;
+        } else if (MULE_REPLY_TO_PROPERTY.equals(localName)) {
+          replyTo = elementValue;
         }
 
-        if (correlationId != null)
-        {
-            SOAPElement e = muleHeader.addChildElement(MULE_CORRELATION_ID_PROPERTY,
-                                                       MULE_NAMESPACE);
-            e.addTextNode(correlationId);
-            e = muleHeader.addChildElement(MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                                           MULE_NAMESPACE);
-            e.addTextNode(correlationGroup);
-            e = muleHeader.addChildElement(MULE_CORRELATION_SEQUENCE_PROPERTY, MULE_NAMESPACE);
-            e.addTextNode(correlationSequence);
-        }
-        if (replyTo != null)
-        {
-            SOAPElement e = muleHeader.addChildElement(MULE_REPLY_TO_PROPERTY, MULE_NAMESPACE);
-            // String enc = (String)encoder.transform(replyTo);
-            // e.addTextNode(enc);
-            e.addTextNode(replyTo);
-        }
+      }
+    }
+  }
+
+  private String getStringValue(Element e) {
+    String value = e.getNodeValue();
+    if (value == null && e.hasChildNodes()) {
+      // see if the value is base64 ecoded
+      value = e.getFirstChild().getNodeValue();
+      if (value != null) {
+        // value = new String(org.apache.axis.encoding.Base64.decode(value));
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Writes the header properties to a Soap header
+   * 
+   * @param env
+   * @throws SOAPException
+   */
+  public void addHeaders(SOAPEnvelope env) throws Exception {
+    SOAPHeader header = env.getHeader();
+    SOAPHeaderElement muleHeader;
+    if (correlationId != null || replyTo != null) {
+      if (header == null) {
+        header = env.addHeader();
+      }
+      Name muleHeaderName = env.createName(MULE_HEADER, MULE_NAMESPACE, MULE_10_ACTOR);
+      muleHeader = header.addHeaderElement(muleHeaderName);
+      muleHeader.setActor(MULE_10_ACTOR);
+    } else {
+      return;
     }
 
-    public Element createHeaders() throws Exception
-    {
-        Element muleHeader = null;
+    if (correlationId != null) {
+      SOAPElement e = muleHeader.addChildElement(MULE_CORRELATION_ID_PROPERTY, MULE_NAMESPACE);
+      e.addTextNode(correlationId);
+      e = muleHeader.addChildElement(MULE_CORRELATION_GROUP_SIZE_PROPERTY, MULE_NAMESPACE);
+      e.addTextNode(correlationGroup);
+      e = muleHeader.addChildElement(MULE_CORRELATION_SEQUENCE_PROPERTY, MULE_NAMESPACE);
+      e.addTextNode(correlationSequence);
+    }
+    if (replyTo != null) {
+      SOAPElement e = muleHeader.addChildElement(MULE_REPLY_TO_PROPERTY, MULE_NAMESPACE);
+      // String enc = (String)encoder.transform(replyTo);
+      // e.addTextNode(enc);
+      e.addTextNode(replyTo);
+    }
+  }
 
-        if (correlationId != null || replyTo != null)
-        {
-            muleHeader = new DOMElement(new QName(MULE_HEADER, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR)));
-        }
-        else
-        {
-            return null;
-        }
+  public Element createHeaders() throws Exception {
+    Element muleHeader = null;
 
-        if (correlationId != null)
-        {
-            Node e = muleHeader.appendChild(new DOMElement(new QName(
-                MULE_CORRELATION_ID_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
-            e.setNodeValue(correlationId);
-
-            e = muleHeader.appendChild(new DOMElement(new QName(
-                MULE_CORRELATION_GROUP_SIZE_PROPERTY, new Namespace(MULE_NAMESPACE,
-                    MULE_10_ACTOR))));
-            e.setNodeValue(correlationGroup);
-
-            e = muleHeader.appendChild(new DOMElement(new QName(
-                MULE_CORRELATION_SEQUENCE_PROPERTY, new Namespace(MULE_NAMESPACE,
-                    MULE_10_ACTOR))));
-            e.setNodeValue(correlationSequence);
-        }
-        if (replyTo != null)
-        {
-
-            Node e = muleHeader.appendChild(new DOMElement(new QName(MULE_REPLY_TO_PROPERTY,
-                                                                     new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
-            e.setNodeValue(replyTo);
-        }
-        return muleHeader;
+    if (correlationId != null || replyTo != null) {
+      muleHeader = new DOMElement(new QName(MULE_HEADER, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR)));
+    } else {
+      return null;
     }
 
-    public String getReplyTo()
-    {
-        return replyTo;
-    }
+    if (correlationId != null) {
+      Node e = muleHeader
+          .appendChild(new DOMElement(new QName(MULE_CORRELATION_ID_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+      e.setNodeValue(correlationId);
 
-    public void setReplyTo(String replyTo)
-    {
-        this.replyTo = replyTo;
-    }
+      e = muleHeader.appendChild(new DOMElement(new QName(MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                                                          new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+      e.setNodeValue(correlationGroup);
 
-    public String getCorrelationId()
-    {
-        return correlationId;
+      e = muleHeader.appendChild(new DOMElement(new QName(MULE_CORRELATION_SEQUENCE_PROPERTY,
+                                                          new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+      e.setNodeValue(correlationSequence);
     }
+    if (replyTo != null) {
 
-    public void setCorrelationId(String correlationId)
-    {
-        this.correlationId = correlationId;
+      Node e =
+          muleHeader.appendChild(new DOMElement(new QName(MULE_REPLY_TO_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+      e.setNodeValue(replyTo);
     }
+    return muleHeader;
+  }
 
-    public String getCorrelationGroup()
-    {
-        return correlationGroup;
-    }
+  public String getReplyTo() {
+    return replyTo;
+  }
 
-    public void setCorrelationGroup(String correlationGroup)
-    {
-        this.correlationGroup = correlationGroup;
-    }
+  public void setReplyTo(String replyTo) {
+    this.replyTo = replyTo;
+  }
 
-    public String getCorrelationSequence()
-    {
-        return correlationSequence;
-    }
+  public String getCorrelationId() {
+    return correlationId;
+  }
 
-    public void setCorrelationSequence(String correlationSequence)
-    {
-        this.correlationSequence = correlationSequence;
-    }
+  public void setCorrelationId(String correlationId) {
+    this.correlationId = correlationId;
+  }
+
+  public String getCorrelationGroup() {
+    return correlationGroup;
+  }
+
+  public void setCorrelationGroup(String correlationGroup) {
+    this.correlationGroup = correlationGroup;
+  }
+
+  public String getCorrelationSequence() {
+    return correlationSequence;
+  }
+
+  public void setCorrelationSequence(String correlationSequence) {
+    this.correlationSequence = correlationSequence;
+  }
 }

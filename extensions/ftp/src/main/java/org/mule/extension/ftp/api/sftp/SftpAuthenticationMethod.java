@@ -11,26 +11,20 @@ package org.mule.extension.ftp.api.sftp;
  *
  * @since 4.0
  */
-public enum SftpAuthenticationMethod
-{
-    GSSAPI_WITH_MIC("gssapi_with_mic"),
-    PUBLIC_KEY("publickey"),
-    KEYBOARD_INTERACTIVE("keyboard_interactive"),
-    PASSWORD("password");
+public enum SftpAuthenticationMethod {
+  GSSAPI_WITH_MIC("gssapi_with_mic"), PUBLIC_KEY("publickey"), KEYBOARD_INTERACTIVE("keyboard_interactive"), PASSWORD("password");
 
-    SftpAuthenticationMethod(String code)
-    {
-        this.code = code;
-    }
+  SftpAuthenticationMethod(String code) {
+    this.code = code;
+  }
 
-    private final String code;
+  private final String code;
 
-    /**
-     * @return the method's protocol name
-     */
-    @Override
-    public String toString()
-    {
-        return code;
-    }
+  /**
+   * @return the method's protocol name
+   */
+  @Override
+  public String toString() {
+    return code;
+  }
 }

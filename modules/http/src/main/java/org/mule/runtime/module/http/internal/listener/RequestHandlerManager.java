@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-public interface RequestHandlerManager
-{
+public interface RequestHandlerManager {
 
-    void stop();
-    void start();
-    void dispose();
+  void stop();
+
+  void start();
+
+  void dispose();
 
 }

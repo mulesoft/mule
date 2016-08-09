@@ -13,31 +13,25 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizationCodeBasicTestCase
-{
+public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "authorization-code/authorization-code-minimal-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "authorization-code/authorization-code-minimal-config.xml";
+  }
 
-    @Ignore("MULE-6926: flaky test")
-    @Test
-    public void hitRedirectUrlAndGetToken() throws Exception
-    {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
+  @Ignore("MULE-6926: flaky test")
+  @Test
+  public void hitRedirectUrlAndGetToken() throws Exception {
+    configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
 
-        Request.Get(redirectUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
-                .connectTimeout(REQUEST_TIMEOUT)
-                .socketTimeout(REQUEST_TIMEOUT)
-                .execute();
+    Request.Get(redirectUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
+        .connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
 
-        verifyRequestDoneToTokenUrlForAuthorizationCode();
+    verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-        OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
-                .assertAccessTokenIs(ACCESS_TOKEN)
-                .assertRefreshTokenIs(REFRESH_TOKEN);
-    }
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
+        .assertAccessTokenIs(ACCESS_TOKEN).assertRefreshTokenIs(REFRESH_TOKEN);
+  }
 
 }

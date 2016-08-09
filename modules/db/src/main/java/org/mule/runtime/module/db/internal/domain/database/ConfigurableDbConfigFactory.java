@@ -15,19 +15,19 @@ import java.util.List;
 /**
  * Provides a way to configure a {@link DbConfigFactory}
  */
-public interface ConfigurableDbConfigFactory extends DbConfigFactory
-{
+public interface ConfigurableDbConfigFactory extends DbConfigFactory {
 
-    /**
-     * Sets the list of custom types available for the created {@link DbConfig}
-     * @param customDataTypes list of custom types. Non null
-     */
-    void setCustomDataTypes(List<DbType> customDataTypes);
+  /**
+   * Sets the list of custom types available for the created {@link DbConfig}
+   * 
+   * @param customDataTypes list of custom types. Non null
+   */
+  void setCustomDataTypes(List<DbType> customDataTypes);
 
-    /**
-     * Sets the retry policy template for the created {@link DbConfig}
-     *
-     * @param retryPolicyTemplate retry policety template. Can be null.
-     */
-    void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
+  /**
+   * Sets the retry policy template for the created {@link DbConfig}
+   *
+   * @param retryPolicyTemplate retry policety template. Can be null.
+   */
+  void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
 }

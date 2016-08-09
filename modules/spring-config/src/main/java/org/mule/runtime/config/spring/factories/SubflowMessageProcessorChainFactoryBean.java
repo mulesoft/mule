@@ -11,17 +11,14 @@ import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChainBuilde
 import org.mule.runtime.core.processor.chain.SubflowMessageProcessorChainBuilder;
 
 /**
- * Uses a custom message processor chain builder for subflows
- * in order to genearte the proper message processor ids.
+ * Uses a custom message processor chain builder for subflows in order to genearte the proper message processor ids.
  */
-public class SubflowMessageProcessorChainFactoryBean extends MessageProcessorChainFactoryBean
-{
+public class SubflowMessageProcessorChainFactoryBean extends MessageProcessorChainFactoryBean {
 
-    @Override
-    protected MessageProcessorChainBuilder getBuilderInstance()
-    {
-        AbstractMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
-        builder.setName(name);
-        return builder;
-    }
+  @Override
+  protected MessageProcessorChainBuilder getBuilderInstance() {
+    AbstractMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
+    builder.setName(name);
+    return builder;
+  }
 }

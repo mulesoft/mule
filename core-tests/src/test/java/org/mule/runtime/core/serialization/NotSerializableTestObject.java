@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.core.serialization;
 
-public final class NotSerializableTestObject
-{
-    private final String name;
+public final class NotSerializableTestObject {
 
-    public NotSerializableTestObject(String name)
-    {
-        this.name = name;
-    }
+  private final String name;
 
-    public String getName()
-    {
-        return name;
-    }
+  public NotSerializableTestObject(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 }

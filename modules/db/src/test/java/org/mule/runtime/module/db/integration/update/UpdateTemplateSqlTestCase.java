@@ -17,35 +17,31 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class UpdateTemplateSqlTestCase extends FunctionalTestCase
-{
+public class UpdateTemplateSqlTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/update/update-template-query-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/update/update-template-query-config.xml";
+  }
 
-    @Test
-    public void configuresSimpleQuery() throws Exception
-    {
-        Object queryTemplateBean = muleContext.getRegistry().get("simple");
-        assertTrue(queryTemplateBean instanceof QueryTemplate);
-        QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
-        assertEquals(QueryType.UPDATE, queryTemplate.getType());
-        assertEquals(0, queryTemplate.getInputParams().size());
-    }
+  @Test
+  public void configuresSimpleQuery() throws Exception {
+    Object queryTemplateBean = muleContext.getRegistry().get("simple");
+    assertTrue(queryTemplateBean instanceof QueryTemplate);
+    QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
+    assertEquals(QueryType.UPDATE, queryTemplate.getType());
+    assertEquals(0, queryTemplate.getInputParams().size());
+  }
 
-    @Test
-    public void configuresParameterizedQuery() throws Exception
-    {
-        Object queryTemplateBean = muleContext.getRegistry().get("parameterized");
-        assertTrue(queryTemplateBean instanceof QueryTemplate);
-        QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
-        assertEquals(QueryType.UPDATE, queryTemplate.getType());
-        assertEquals(1, queryTemplate.getInputParams().size());
+  @Test
+  public void configuresParameterizedQuery() throws Exception {
+    Object queryTemplateBean = muleContext.getRegistry().get("parameterized");
+    assertTrue(queryTemplateBean instanceof QueryTemplate);
+    QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
+    assertEquals(QueryType.UPDATE, queryTemplate.getType());
+    assertEquals(1, queryTemplate.getInputParams().size());
 
-        InputQueryParam inputSqlParam = queryTemplate.getInputParams().get(0);
-        assertEquals(UnknownDbType.getInstance(), inputSqlParam.getType());
-    }
+    InputQueryParam inputSqlParam = queryTemplate.getInputParams().get(0);
+    assertEquals(UnknownDbType.getInstance(), inputSqlParam.getType());
+  }
 }

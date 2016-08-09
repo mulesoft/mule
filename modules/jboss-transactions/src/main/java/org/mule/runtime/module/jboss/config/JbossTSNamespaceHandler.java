@@ -15,12 +15,12 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * Registers Bean Definition Parsers for the "jbossts" namespace.
  */
-public class JbossTSNamespaceHandler extends NamespaceHandlerSupport
-{
-    public void init()
-    {
-        registerBeanDefinitionParser("transaction-manager", new MuleOrphanDefinitionParser(JBossArjunaTransactionManagerFactory.class, true));
-        registerBeanDefinitionParser("properties", new ChildMapEntryDefinitionParser("properties","key","value"));
-    }
+public class JbossTSNamespaceHandler extends NamespaceHandlerSupport {
+
+  public void init() {
+    registerBeanDefinitionParser("transaction-manager",
+                                 new MuleOrphanDefinitionParser(JBossArjunaTransactionManagerFactory.class, true));
+    registerBeanDefinitionParser("properties", new ChildMapEntryDefinitionParser("properties", "key", "value"));
+  }
 
 }

@@ -18,28 +18,27 @@ import java.util.Map;
  *
  * @param <T> type of the artifact to deploy
  */
-public interface ArchiveDeployer<T extends Artifact>
-{
+public interface ArchiveDeployer<T extends Artifact> {
 
-    T deployPackagedArtifact(String zip) throws DeploymentException;
+  T deployPackagedArtifact(String zip) throws DeploymentException;
 
-    T deployExplodedArtifact(String artifactDir) throws DeploymentException;
+  T deployExplodedArtifact(String artifactDir) throws DeploymentException;
 
-    T deployPackagedArtifact(URL artifactAchivedUrl);
+  T deployPackagedArtifact(URL artifactAchivedUrl);
 
-    void undeployArtifact(String artifactId);
+  void undeployArtifact(String artifactId);
 
-    File getDeploymentDirectory();
+  File getDeploymentDirectory();
 
-    void setDeploymentListener(CompositeDeploymentListener deploymentListener);
+  void setDeploymentListener(CompositeDeploymentListener deploymentListener);
 
-    void redeploy(T artifact) throws DeploymentException;
+  void redeploy(T artifact) throws DeploymentException;
 
-    Map<URL, Long> getArtifactsZombieMap();
+  Map<URL, Long> getArtifactsZombieMap();
 
-    void setArtifactFactory(ArtifactFactory<T> artifactFactory);
+  void setArtifactFactory(ArtifactFactory<T> artifactFactory);
 
-    void undeployArtifactWithoutUninstall(T artifact);
+  void undeployArtifactWithoutUninstall(T artifact);
 
-    void deployArtifact(T artifact) throws DeploymentException;
+  void deployArtifact(T artifact) throws DeploymentException;
 }

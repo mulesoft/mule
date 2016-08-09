@@ -25,78 +25,72 @@ import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class EncryptStreamTransformer implements StreamTransformer
-{
-    private static final long offset = 1 << 24;
+public class EncryptStreamTransformer implements StreamTransformer {
 
-    private InputStream toBeEncrypted;
-    private PGPPublicKey publicKey;
-    private Provider provider;
+  private static final long offset = 1 << 24;
 
-    private OutputStream pgpOutputStream;
-    private OutputStream compressedEncryptedOutputStream;
-    private OutputStream encryptedOutputStream;
-    private OutputStream armoredOut;
-    private long bytesWrote;
+  private InputStream toBeEncrypted;
+  private PGPPublicKey publicKey;
+  private Provider provider;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider) throws IOException
-    {
-        Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
-        Validate.notNull(publicKey, "The publicKey should not be null");
+  private OutputStream pgpOutputStream;
+  private OutputStream compressedEncryptedOutputStream;
+  private OutputStream encryptedOutputStream;
+  private OutputStream armoredOut;
+  private long bytesWrote;
 
-        this.toBeEncrypted = toBeEncrypted;
-        this.publicKey = publicKey;
-        this.bytesWrote = 0;
-        this.provider = provider;
+  public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider) throws IOException {
+    Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
+    Validate.notNull(publicKey, "The publicKey should not be null");
+
+    this.toBeEncrypted = toBeEncrypted;
+    this.publicKey = publicKey;
+    this.bytesWrote = 0;
+    this.provider = provider;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initialize(OutputStream out) throws Exception {
+    armoredOut = new ArmoredOutputStream(out);
+    BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+    PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
+
+    BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
+    encrDataGen.addMethod(methodGenerator);
+    encryptedOutputStream = encrDataGen.open(armoredOut, new byte[1 << 16]);
+
+    PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
+    compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream);
+
+    PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
+    pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, "stream", new Date(), new byte[1 << 16]);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception {
+    int len = 0;
+    byte[] buf = new byte[1 << 16];
+
+    while (bytesRequested.get() + offset > bytesWrote && (len = this.toBeEncrypted.read(buf)) > 0) {
+      pgpOutputStream.write(buf, 0, len);
+      bytesWrote = bytesWrote + len;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(OutputStream out) throws Exception
-    {
-        armoredOut = new ArmoredOutputStream(out);
-        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
-        PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
-
-        BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
-        encrDataGen.addMethod(methodGenerator);
-        encryptedOutputStream = encrDataGen.open(armoredOut, new byte[1 << 16]);
-
-        PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
-        compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream);
-
-        PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
-        pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, "stream",
-            new Date(), new byte[1 << 16]);
+    if (len <= 0) {
+      pgpOutputStream.close();
+      compressedEncryptedOutputStream.close();
+      encryptedOutputStream.close();
+      armoredOut.close();
+      toBeEncrypted.close();
+      return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception
-    {
-        int len = 0;
-        byte[] buf = new byte[1 << 16];
-
-        while (bytesRequested.get() + offset > bytesWrote && (len = this.toBeEncrypted.read(buf)) > 0)
-        {
-            pgpOutputStream.write(buf, 0, len);
-            bytesWrote = bytesWrote + len;
-        }
-
-        if (len <= 0)
-        {
-            pgpOutputStream.close();
-            compressedEncryptedOutputStream.close();
-            encryptedOutputStream.close();
-            armoredOut.close();
-            toBeEncrypted.close();
-            return true;
-        }
-
-        return false;
-    }
+    return false;
+  }
 }

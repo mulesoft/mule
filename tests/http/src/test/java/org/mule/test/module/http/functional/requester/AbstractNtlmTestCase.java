@@ -26,86 +26,73 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
-{
-    private static final String TYPE_1_MESSAGE = "NTLM TlRMTVNTUAABAAAAAYIIogAAAAAoAAAAAAAAACgAAAAFASgKAAAADw==";
-    private static final String TYPE_2_MESSAGE_CHALLENGE = "TlRMTVNTUAACAAAAAAAAACgAAAABggAAU3J2Tm9uY2UAAAAAAAAAAA==";
-    private static final String TYPE_2_MESSAGE = "NTLM " + TYPE_2_MESSAGE_CHALLENGE;
-    private static final String USER = "Zaphod";
-    private static final String PASSWORD = "Beeblebrox";
-    private static final String DOMAIN = "Ursa-Minor";
-    private static final String AUTHORIZED = "Authorized";
+public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 
-    private String type3Message;
-    protected String requestUrl;
+  private static final String TYPE_1_MESSAGE = "NTLM TlRMTVNTUAABAAAAAYIIogAAAAAoAAAAAAAAACgAAAAFASgKAAAADw==";
+  private static final String TYPE_2_MESSAGE_CHALLENGE = "TlRMTVNTUAACAAAAAAAAACgAAAABggAAU3J2Tm9uY2UAAAAAAAAAAA==";
+  private static final String TYPE_2_MESSAGE = "NTLM " + TYPE_2_MESSAGE_CHALLENGE;
+  private static final String USER = "Zaphod";
+  private static final String PASSWORD = "Beeblebrox";
+  private static final String DOMAIN = "Ursa-Minor";
+  private static final String AUTHORIZED = "Authorized";
 
-    private String clientAuthHeader;
-    private String serverAuthHeader;
-    private int unauthorizedHeader;
+  private String type3Message;
+  protected String requestUrl;
 
-    public AbstractNtlmTestCase(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader)
-    {
-        this.clientAuthHeader = clientAuthHeader;
-        this.serverAuthHeader = serverAuthHeader;
-        this.unauthorizedHeader = unauthorizedHeader;
+  private String clientAuthHeader;
+  private String serverAuthHeader;
+  private int unauthorizedHeader;
+
+  public AbstractNtlmTestCase(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader) {
+    this.clientAuthHeader = clientAuthHeader;
+    this.serverAuthHeader = serverAuthHeader;
+    this.unauthorizedHeader = unauthorizedHeader;
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    String workstation = getWorkstation();
+    String ntlmHost = workstation != null ? workstation : NetworkUtils.getLocalHost().getHostName();
+    String type3Challenge = NTLMEngine.INSTANCE.generateType3Msg(USER, PASSWORD, getDomain(), ntlmHost, TYPE_2_MESSAGE_CHALLENGE);
+    type3Message = "NTLM " + type3Challenge;
+  }
+
+  protected String getDomain() {
+    return DOMAIN;
+  }
+
+  protected String getWorkstation() {
+    return null;
+  }
+
+  @Override
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String auth = request.getHeader(clientAuthHeader);
+    if (auth == null) {
+      response.setStatus(unauthorizedHeader);
+      response.addHeader(serverAuthHeader, "NTLM");
     }
-
-    @Before
-    public void setUp() throws Exception
-    {
-        String workstation = getWorkstation();
-        String ntlmHost = workstation != null ? workstation : NetworkUtils.getLocalHost().getHostName();
-        String type3Challenge = NTLMEngine.INSTANCE.generateType3Msg(USER, PASSWORD, getDomain(), ntlmHost, TYPE_2_MESSAGE_CHALLENGE);
-        type3Message = "NTLM " + type3Challenge;
+    if (TYPE_1_MESSAGE.equals(auth)) {
+      response.setStatus(unauthorizedHeader);
+      response.setHeader(serverAuthHeader, TYPE_2_MESSAGE);
+    } else if (type3Message.equals(auth)) {
+      requestUrl = baseRequest.getRequestURL().toString();
+      response.setStatus(SC_OK);
+      response.getWriter().print(AUTHORIZED);
+    } else {
+      response.setStatus(SC_UNAUTHORIZED);
     }
+  }
 
-    protected String getDomain()
-    {
-        return DOMAIN;
-    }
+  @Test
+  public void validNtlmAuth() throws Exception {
+    MuleMessage response = runFlow(getFlowName()).getMessage();
 
-    protected String getWorkstation()
-    {
-        return null;
-    }
+    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
+    assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
+  }
 
-    @Override
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        String auth = request.getHeader(clientAuthHeader);
-        if (auth == null)
-        {
-            response.setStatus(unauthorizedHeader);
-            response.addHeader(serverAuthHeader, "NTLM");
-        }
-        if (TYPE_1_MESSAGE.equals(auth))
-        {
-            response.setStatus(unauthorizedHeader);
-            response.setHeader(serverAuthHeader, TYPE_2_MESSAGE);
-        }
-        else if (type3Message.equals(auth))
-        {
-            requestUrl = baseRequest.getRequestURL().toString();
-            response.setStatus(SC_OK);
-            response.getWriter().print(AUTHORIZED);
-        }
-        else
-        {
-            response.setStatus(SC_UNAUTHORIZED);
-        }
-    }
-
-    @Test
-    public void validNtlmAuth() throws Exception
-    {
-        MuleMessage response = runFlow(getFlowName()).getMessage();
-
-        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
-        assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
-    }
-
-    protected String getFlowName()
-    {
-        return "ntlmFlow";
-    }
+  protected String getFlowName() {
+    return "ntlmFlow";
+  }
 }

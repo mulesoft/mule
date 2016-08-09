@@ -25,110 +25,97 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import org.junit.Test;
 
-public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalTestCase
-{
+public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
-    private BananaConfig config;
+  private BananaConfig config;
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {VeganExtension.class};
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {VeganExtension.class};
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "vegan-intercepting-operation-config.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    config = getConfigurationFromRegistry("banana", getTestEvent(""));
+  }
+
+  @Test
+  public void interceptingWithoutNext() throws Exception {
+    MuleMessage message = flowRunner("interceptingWithoutNext").run().getMessage();
+    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
+    assertThat(message.getAttributes(), is(instanceOf(VeganAttributes.class)));
+  }
+
+  @Test
+  public void interceptChain() throws Exception {
+    MuleMessage message = flowRunner("interceptingBanana").run().getMessage();
+    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
+    final Banana banana = message.getPayload();
+
+    assertThat(banana.isPeeled(), is(true));
+    assertThat(banana.isBitten(), is(true));
+
+    assertThat(config.getBananasCount(), is(1));
+    assertThat(config.getNonBananasCount(), is(0));
+    assertThat(config.getExceptionCount(), is(0));
+  }
+
+  @Test
+  public void interceptInvalidPayload() throws Exception {
+    MuleMessage message = flowRunner("interceptingNotBanana").run().getMessage();
+
+    assertThat(message.getPayload(), is(not(instanceOf(Fruit.class))));
+
+    assertThat(config.getBananasCount(), is(0));
+    assertThat(config.getNonBananasCount(), is(1));
+    assertThat(config.getExceptionCount(), is(0));
+  }
+
+  @Test
+  public void interceptError() throws Exception {
+    try {
+      flowRunner("interceptingError").run();
+      fail("Flow should have failed");
+    } catch (MessagingException e) {
+      assertThat(config.getExceptionCount(), is(1));
     }
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vegan-intercepting-operation-config.xml";
-    }
+  @Test
+  public void interceptingWithTarget() throws Exception {
+    final String payload = "Hello!";
+    MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
+    assertThat(event.getMessage().getPayload(), is(payload));
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        config = getConfigurationFromRegistry("banana", getTestEvent(""));
-    }
+    MuleMessage message = event.getFlowVariable("banana");
+    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
+    final Banana banana = message.getPayload();
 
-    @Test
-    public void interceptingWithoutNext() throws Exception
-    {
-        MuleMessage message = flowRunner("interceptingWithoutNext").run().getMessage();
-        assertThat(message.getPayload(), is(instanceOf(Banana.class)));
-        assertThat(message.getAttributes(), is(instanceOf(VeganAttributes.class)));
-    }
+    assertThat(banana.isPeeled(), is(true));
+    assertThat(banana.isBitten(), is(true));
 
-    @Test
-    public void interceptChain() throws Exception
-    {
-        MuleMessage message = flowRunner("interceptingBanana").run().getMessage();
-        assertThat(message.getPayload(), is(instanceOf(Banana.class)));
-        final Banana banana = message.getPayload();
+    assertThat(config.getBananasCount(), is(0));
+    assertThat(config.getNonBananasCount(), is(1));
+    assertThat(config.getExceptionCount(), is(0));
+  }
 
-        assertThat(banana.isPeeled(), is(true));
-        assertThat(banana.isBitten(), is(true));
+  @Test
+  public void nestedInterceptingWithTarget() throws Exception {
+    MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
+    assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
 
-        assertThat(config.getBananasCount(), is(1));
-        assertThat(config.getNonBananasCount(), is(0));
-        assertThat(config.getExceptionCount(), is(0));
-    }
+    MuleMessage targetMessage = event.getFlowVariable("banana");
+    assertThat(targetMessage.getPayload(), is(instanceOf(Banana.class)));
 
-    @Test
-    public void interceptInvalidPayload() throws Exception
-    {
-        MuleMessage message = flowRunner("interceptingNotBanana").run().getMessage();
+    assertThat(event.getMessage().getPayload(), is(not(sameInstance(targetMessage.getPayload()))));
 
-        assertThat(message.getPayload(), is(not(instanceOf(Fruit.class))));
-
-        assertThat(config.getBananasCount(), is(0));
-        assertThat(config.getNonBananasCount(), is(1));
-        assertThat(config.getExceptionCount(), is(0));
-    }
-
-    @Test
-    public void interceptError() throws Exception
-    {
-        try
-        {
-            flowRunner("interceptingError").run();
-            fail("Flow should have failed");
-        }
-        catch (MessagingException e)
-        {
-            assertThat(config.getExceptionCount(), is(1));
-        }
-    }
-
-    @Test
-    public void interceptingWithTarget() throws Exception
-    {
-        final String payload = "Hello!";
-        MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
-        assertThat(event.getMessage().getPayload(), is(payload));
-
-        MuleMessage message = event.getFlowVariable("banana");
-        assertThat(message.getPayload(), is(instanceOf(Banana.class)));
-        final Banana banana = message.getPayload();
-
-        assertThat(banana.isPeeled(), is(true));
-        assertThat(banana.isBitten(), is(true));
-
-        assertThat(config.getBananasCount(), is(0));
-        assertThat(config.getNonBananasCount(), is(1));
-        assertThat(config.getExceptionCount(), is(0));
-    }
-
-    @Test
-    public void nestedInterceptingWithTarget() throws Exception
-    {
-        MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
-        assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
-
-        MuleMessage targetMessage = event.getFlowVariable("banana");
-        assertThat(targetMessage.getPayload(), is(instanceOf(Banana.class)));
-
-        assertThat(event.getMessage().getPayload(), is(not(sameInstance(targetMessage.getPayload()))));
-
-        assertThat(config.getBananasCount(), is(2));
-        assertThat(config.getNonBananasCount(), is(0));
-        assertThat(config.getExceptionCount(), is(0));
-    }
+    assertThat(config.getBananasCount(), is(2));
+    assertThat(config.getNonBananasCount(), is(0));
+    assertThat(config.getExceptionCount(), is(0));
+  }
 }

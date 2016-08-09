@@ -26,55 +26,51 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase
-{
+public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase {
 
-    public static final String MEL_EXPRESSION = "foo = bar";
+  public static final String MEL_EXPRESSION = "foo = bar";
 
-    private final MuleEvent event = mock(MuleEvent.class);
-    private final TypedValue typedValue = new TypedValue(TEST_MESSAGE, DataType.STRING);
-    private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
-    private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
+  private final MuleEvent event = mock(MuleEvent.class);
+  private final TypedValue typedValue = new TypedValue(TEST_MESSAGE, DataType.STRING);
+  private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
+  private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
 
-    @Test
-    public void invokesDataTypeAllPropagators() throws Exception
-    {
-        CompiledExpression compiledExpression = compileMelExpression();
+  @Test
+  public void invokesDataTypeAllPropagators() throws Exception {
+    CompiledExpression compiledExpression = compileMelExpression();
 
-        final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
-        propagators.add(propagator1);
-        propagators.add(propagator2);
+    final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
+    propagators.add(propagator1);
+    propagators.add(propagator2);
 
-        MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
+    MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-        dataTypePropagator.propagate(typedValue, event, compiledExpression);
+    dataTypePropagator.propagate(typedValue, event, compiledExpression);
 
-        verify(propagator1).propagate(event, typedValue, compiledExpression);
-        verify(propagator2).propagate(event, typedValue, compiledExpression);
-    }
+    verify(propagator1).propagate(event, typedValue, compiledExpression);
+    verify(propagator2).propagate(event, typedValue, compiledExpression);
+  }
 
-    @Test
-    public void stopsCheckingDataTypePropagatorsAfterSuccessfulPropagation() throws Exception
-    {
-        CompiledExpression compiledExpression = compileMelExpression();
+  @Test
+  public void stopsCheckingDataTypePropagatorsAfterSuccessfulPropagation() throws Exception {
+    CompiledExpression compiledExpression = compileMelExpression();
 
-        final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
-        propagators.add(propagator1);
-        when(propagator1.propagate(event, typedValue, compiledExpression)).thenReturn(true);
-        propagators.add(propagator2);
+    final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
+    propagators.add(propagator1);
+    when(propagator1.propagate(event, typedValue, compiledExpression)).thenReturn(true);
+    propagators.add(propagator2);
 
-        MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
+    MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-        dataTypePropagator.propagate(typedValue, event, compiledExpression);
+    dataTypePropagator.propagate(typedValue, event, compiledExpression);
 
-        verify(propagator1).propagate(event, typedValue, compiledExpression);
-        verify(propagator2, never()).propagate(event, typedValue, compiledExpression);
-    }
+    verify(propagator1).propagate(event, typedValue, compiledExpression);
+    verify(propagator2, never()).propagate(event, typedValue, compiledExpression);
+  }
 
-    private CompiledExpression compileMelExpression()
-    {
-        MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
-        return (CompiledExpression) compileExpression(MEL_EXPRESSION, new ParserContext(expressionLanguage.getParserConfiguration()));
-    }
+  private CompiledExpression compileMelExpression() {
+    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    return (CompiledExpression) compileExpression(MEL_EXPRESSION, new ParserContext(expressionLanguage.getParserConfiguration()));
+  }
 
 }

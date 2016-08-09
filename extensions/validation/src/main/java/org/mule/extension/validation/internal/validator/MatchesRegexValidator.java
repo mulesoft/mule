@@ -15,50 +15,43 @@ import org.mule.extension.validation.internal.ValidationContext;
 import org.apache.commons.validator.routines.RegexValidator;
 
 /**
- * An {@link AbstractValidator} which tests that
- * a {@link #value} matches a given {@link #regex}
+ * An {@link AbstractValidator} which tests that a {@link #value} matches a given {@link #regex}
  *
  * @since 3.7.0
  */
-public class MatchesRegexValidator extends AbstractValidator
-{
+public class MatchesRegexValidator extends AbstractValidator {
 
-    /**
-     * The value to tests
-     */
-    private final String value;
+  /**
+   * The value to tests
+   */
+  private final String value;
 
-    /**
-     * The regex to test again
-     */
-    private final String regex;
+  /**
+   * The regex to test again
+   */
+  private final String regex;
 
-    /**
-     * Whether the test should be case sensitive or not
-     */
-    private final boolean caseSensitive;
+  /**
+   * Whether the test should be case sensitive or not
+   */
+  private final boolean caseSensitive;
 
 
-    public MatchesRegexValidator(String value, String regex, boolean caseSensitive, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
-        this.regex = regex;
-        this.caseSensitive = caseSensitive;
-    }
+  public MatchesRegexValidator(String value, String regex, boolean caseSensitive, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+    this.regex = regex;
+    this.caseSensitive = caseSensitive;
+  }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        RegexValidator validator = new RegexValidator(new String[] {regex}, caseSensitive);
-        return validator.isValid(value)
-               ? ok()
-               : fail();
-    }
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    RegexValidator validator = new RegexValidator(new String[] {regex}, caseSensitive);
+    return validator.isValid(value) ? ok() : fail();
+  }
 
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().regexDoesNotMatch(value, regex);
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().regexDoesNotMatch(value, regex);
+  }
 }

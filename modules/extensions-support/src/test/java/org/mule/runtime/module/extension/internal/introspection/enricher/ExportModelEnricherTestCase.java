@@ -38,64 +38,59 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ExportModelEnricherTestCase extends AbstractMuleTestCase
-{
+public class ExportModelEnricherTestCase extends AbstractMuleTestCase {
 
-    private static final String EXPORTED_RESOURCE = "META-INF/foo";
+  private static final String EXPORTED_RESOURCE = "META-INF/foo";
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private DescribingContext describingContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private DescribingContext describingContext;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclarer extensionDeclarer;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclarer extensionDeclarer;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclaration extensionDeclaration;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclaration extensionDeclaration;
 
-    private ExportModelEnricher enricher = new ExportModelEnricher();
-    private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private ExportModelEnricher enricher = new ExportModelEnricher();
+  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-    @Before
-    public void before()
-    {
-        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
-        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
-    }
+  @Before
+  public void before() {
+    when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+    when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+  }
 
-    @Test
-    public void enrich() throws Exception
-    {
-        setImplementingType(TestExport.class);
+  @Test
+  public void enrich() throws Exception {
+    setImplementingType(TestExport.class);
 
-        enricher.enrich(describingContext);
+    enricher.enrich(describingContext);
 
-        ArgumentCaptor<ExportModelProperty> captor = forClass(ExportModelProperty.class);
-        verify(extensionDeclarer).withModelProperty(captor.capture());
+    ArgumentCaptor<ExportModelProperty> captor = forClass(ExportModelProperty.class);
+    verify(extensionDeclarer).withModelProperty(captor.capture());
 
-        ExportModelProperty property = captor.getValue();
-        assertThat(property, is(notNullValue()));
+    ExportModelProperty property = captor.getValue();
+    assertThat(property, is(notNullValue()));
 
-        assertThat(property.getExportedTypes(), hasItem(typeLoader.load(ExportModelEnricherTestCase.class)));
-        assertThat(property.getExportedResources(), hasItem(EXPORTED_RESOURCE));
-    }
+    assertThat(property.getExportedTypes(), hasItem(typeLoader.load(ExportModelEnricherTestCase.class)));
+    assertThat(property.getExportedResources(), hasItem(EXPORTED_RESOURCE));
+  }
 
 
-    @Test
-    public void shouldNotEnrich() throws Exception
-    {
-        setImplementingType(Object.class);
-        enricher.enrich(describingContext);
-        verify(extensionDeclarer, never()).withModelProperty(any());
-    }
+  @Test
+  public void shouldNotEnrich() throws Exception {
+    setImplementingType(Object.class);
+    enricher.enrich(describingContext);
+    verify(extensionDeclarer, never()).withModelProperty(any());
+  }
 
-    private void setImplementingType(Class<?> type)
-    {
-        when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.of(new ImplementingTypeModelProperty(type)));
-    }
+  private void setImplementingType(Class<?> type) {
+    when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(Optional.of(new ImplementingTypeModelProperty(type)));
+  }
 
-    @Export(classes = {ExportModelEnricherTestCase.class}, resources = {EXPORTED_RESOURCE})
-    private static class TestExport
-    {
+  @Export(classes = {ExportModelEnricherTestCase.class}, resources = {EXPORTED_RESOURCE})
+  private static class TestExport {
 
-    }
+  }
 }

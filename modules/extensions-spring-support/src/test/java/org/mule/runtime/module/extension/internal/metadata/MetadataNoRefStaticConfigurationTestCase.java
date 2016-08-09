@@ -20,21 +20,18 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Test;
 
-public class MetadataNoRefStaticConfigurationTestCase extends MetadataExtensionFunctionalTestCase
-{
+public class MetadataNoRefStaticConfigurationTestCase extends MetadataExtensionFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return METADATA_TEST_STATIC_NO_REF_CONFIGURATION;
-    }
+  @Override
+  protected String getConfigFile() {
+    return METADATA_TEST_STATIC_NO_REF_CONFIGURATION;
+  }
 
-    @Test
-    public void resolveMetadataWithNoRefStaticConfig() throws Exception
-    {
-        componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_STATIC_CONFIG, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
-        assertThat(metadataResult.isSuccess(), is(true));
-    }
+  @Test
+  public void resolveMetadataWithNoRefStaticConfig() throws Exception {
+    componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_STATIC_CONFIG, FIRST_PROCESSOR_INDEX);
+    MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
+    final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
+    assertThat(metadataResult.isSuccess(), is(true));
+  }
 }

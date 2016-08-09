@@ -18,35 +18,29 @@ import org.mule.runtime.core.message.ExceptionMessage;
 
 import org.junit.Test;
 
-public class DLQExceptionHandlerTestCase extends FunctionalTestCase
-{
+public class DLQExceptionHandlerTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/exception-dlq-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/exception-dlq-flow.xml";
+  }
+
+  @Test
+  public void testDLQ() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("jms://request.queue", "testing 1 2 3", null);
+
+    MuleMessage message = client.request("jms://out.queue", 3000);
+    assertNull(message);
+
+    try {
+      message = client.request("jms://DLQ", 20000);
+    } catch (MuleException e) {
+      e.printStackTrace(System.err);
     }
+    assertNotNull(message);
 
-    @Test
-    public void testDLQ() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("jms://request.queue", "testing 1 2 3", null);
-
-        MuleMessage message = client.request("jms://out.queue", 3000);
-        assertNull(message);
-
-        try
-        {
-            message = client.request("jms://DLQ", 20000);
-        }
-        catch (MuleException e)
-        {
-            e.printStackTrace(System.err);
-        }
-        assertNotNull(message);
-
-        ExceptionMessage em = (ExceptionMessage) message.getPayload();
-        assertEquals("testing 1 2 3", em.getPayload());
-    }
+    ExceptionMessage em = (ExceptionMessage) message.getPayload();
+    assertEquals("testing 1 2 3", em.getPayload());
+  }
 }

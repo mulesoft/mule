@@ -15,27 +15,21 @@ import org.mule.mvel2.ast.AssignmentNode;
 /**
  * Propagates data type for inlined flow and session vars used for enrichment target
  */
-public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator
-{
+public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
-    @Override
-    protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node)
-    {
-        if (node instanceof AssignmentNode)
-        {
-            String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
+  @Override
+  protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node) {
+    if (node instanceof AssignmentNode) {
+      String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 
-            if (event.getFlowVariableNames().contains(assignmentVar))
-            {
-                event.setFlowVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
-                return true;
-            }
-            else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar))
-            {
-                event.getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());
-                return true;
-            }
-        }
-        return false;
+      if (event.getFlowVariableNames().contains(assignmentVar)) {
+        event.setFlowVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
+        return true;
+      } else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar)) {
+        event.getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());
+        return true;
+      }
     }
+    return false;
+  }
 }

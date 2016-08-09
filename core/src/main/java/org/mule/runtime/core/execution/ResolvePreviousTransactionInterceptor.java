@@ -15,38 +15,33 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterceptor<T>
-{
-    private static final Logger logger = LoggerFactory.getLogger(ResolvePreviousTransactionInterceptor.class);
-    final private ExecutionInterceptor<T> next;
-    private TransactionConfig transactionConfig;
+class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterceptor<T> {
 
-    public ResolvePreviousTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig)
-    {
-        this.next = next;
-        this.transactionConfig = transactionConfig;
+  private static final Logger logger = LoggerFactory.getLogger(ResolvePreviousTransactionInterceptor.class);
+  final private ExecutionInterceptor<T> next;
+  private TransactionConfig transactionConfig;
+
+  public ResolvePreviousTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig) {
+    this.next = next;
+    this.transactionConfig = transactionConfig;
+  }
+
+  @Override
+  public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception {
+    byte action = transactionConfig.getAction();
+    Transaction transactionBeforeTemplate = TransactionCoordination.getInstance().getTransaction();
+    if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
+        && transactionBeforeTemplate != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug(action + ", " + "current TX: " + transactionBeforeTemplate);
+      }
+
+      resolveTransaction();
     }
+    return next.execute(callback, executionContext);
+  }
 
-    @Override
-    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
-    {
-        byte action = transactionConfig.getAction();
-        Transaction transactionBeforeTemplate = TransactionCoordination.getInstance().getTransaction();
-        if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
-                && transactionBeforeTemplate != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(action + ", " + "current TX: " + transactionBeforeTemplate);
-            }
-
-            resolveTransaction();
-        }
-        return next.execute(callback, executionContext);
-    }
-
-    protected void resolveTransaction() throws TransactionException
-    {
-        TransactionCoordination.getInstance().resolveTransaction();
-    }
+  protected void resolveTransaction() throws TransactionException {
+    TransactionCoordination.getInstance().resolveTransaction();
+  }
 }

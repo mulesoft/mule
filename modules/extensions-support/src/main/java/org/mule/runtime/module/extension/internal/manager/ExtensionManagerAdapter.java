@@ -16,62 +16,57 @@ import java.net.URL;
 import java.util.Optional;
 
 /**
- * Extends the {@link ExtensionManager} interface with contracts
- * which are not to be exposed on the public API
+ * Extends the {@link ExtensionManager} interface with contracts which are not to be exposed on the public API
  *
  * @since 4.0
  */
-public interface ExtensionManagerAdapter extends ExtensionManager
-{
+public interface ExtensionManagerAdapter extends ExtensionManager {
 
-    /**
-     * Locates and returns the {@link ConfigurationProvider} which would serve
-     * an invocation to the {@link #getConfiguration(ExtensionModel, Object)} method.
-     * <p>
-     * This means that the returned provider will be located using the same set of rules
-     * as the aforementioned method
-     *
-     * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
-     * @param <C>            the generic type of the configuration instance that the provider returns
-     * @return an {@link Optional} {@link ConfigurationProvider}
-     */
-    <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel);
+  /**
+   * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
+   * {@link #getConfiguration(ExtensionModel, Object)} method.
+   * <p>
+   * This means that the returned provider will be located using the same set of rules as the aforementioned method
+   *
+   * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
+   * @param <C> the generic type of the configuration instance that the provider returns
+   * @return an {@link Optional} {@link ConfigurationProvider}
+   */
+  <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel);
 
-    /**
-     * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
-     * {@link #getConfiguration(String, Object)} method.
-     * <p>
-     * This means that the returned provided will be located using the same set of rules
-     * as the aforementioned method.
-     *
-     * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
-     * @param <C>                       the generic type of the configuration instance that the provider returns
-     * @return an {@link Optional} {@link ConfigurationProvider}
-     */
-    <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName);
+  /**
+   * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
+   * {@link #getConfiguration(String, Object)} method.
+   * <p>
+   * This means that the returned provided will be located using the same set of rules as the aforementioned method.
+   *
+   * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
+   * @param <C> the generic type of the configuration instance that the provider returns
+   * @return an {@link Optional} {@link ConfigurationProvider}
+   */
+  <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName);
 
-    /**
-     * Registers the given {@link ExtensionModel}.
-     *
-     * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
-     */
-    void registerExtension(RuntimeExtensionModel extensionModel);
+  /**
+   * Registers the given {@link ExtensionModel}.
+   *
+   * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
+   */
+  void registerExtension(RuntimeExtensionModel extensionModel);
 
-    /**
-     * Registered the given {@link ConfigurationProvider} which should be later be used to
-     * serve invocations to {@link #getConfigurationProvider(ExtensionModel)} and
-     * {@link #getConfiguration(String, Object)}
-     *
-     * @param configurationProvider a {@link ConfigurationProvider}
-     * @param <C>                   the generic type of the configuration instances to be returned
-     */
-    <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider);
+  /**
+   * Registered the given {@link ConfigurationProvider} which should be later be used to serve invocations to
+   * {@link #getConfigurationProvider(ExtensionModel)} and {@link #getConfiguration(String, Object)}
+   *
+   * @param configurationProvider a {@link ConfigurationProvider}
+   * @param <C> the generic type of the configuration instances to be returned
+   */
+  <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider);
 
-    /**
-     * Deserializes an {@link ExtensionManifest} in {@code XML} format
-     *
-     * @param manifestUrl the {@link URL} to a file which contains the input data
-     * @return a {@link ExtensionManifest}
-     */
-    ExtensionManifest parseExtensionManifestXml(URL manifestUrl);
+  /**
+   * Deserializes an {@link ExtensionManifest} in {@code XML} format
+   *
+   * @param manifestUrl the {@link URL} to a file which contains the input data
+   * @return a {@link ExtensionManifest}
+   */
+  ExtensionManifest parseExtensionManifestXml(URL manifestUrl);
 }

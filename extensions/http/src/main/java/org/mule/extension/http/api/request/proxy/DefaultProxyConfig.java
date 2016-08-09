@@ -17,54 +17,50 @@ import org.mule.runtime.extension.api.annotation.param.display.Password;
  * @since 4.0
  */
 @Alias("proxy")
-public class DefaultProxyConfig implements ProxyConfig
-{
-    /**
-     * Host where the proxy requests will be sent.
-     */
-    @Parameter
-    private String host;
+public class DefaultProxyConfig implements ProxyConfig {
 
-    /**
-     * Port where the proxy requests will be sent.
-     */
-    @Parameter
-    private int port = Integer.MAX_VALUE;
+  /**
+   * Host where the proxy requests will be sent.
+   */
+  @Parameter
+  private String host;
 
-    /**
-     * The username to authenticate against the proxy.
-     */
-    @Parameter
-    @Optional
-    private String username;
+  /**
+   * Port where the proxy requests will be sent.
+   */
+  @Parameter
+  private int port = Integer.MAX_VALUE;
 
-    /**
-     * The password to authenticate against the proxy.
-     */
-    @Parameter
-    @Optional
-    @Password
-    private String password;
+  /**
+   * The username to authenticate against the proxy.
+   */
+  @Parameter
+  @Optional
+  private String username;
 
-    public String getHost()
-    {
-        return host;
-    }
+  /**
+   * The password to authenticate against the proxy.
+   */
+  @Parameter
+  @Optional
+  @Password
+  private String password;
+
+  public String getHost() {
+    return host;
+  }
 
 
-    public int getPort()
-    {
-        return port;
-    }
+  public int getPort() {
+    return port;
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
 }

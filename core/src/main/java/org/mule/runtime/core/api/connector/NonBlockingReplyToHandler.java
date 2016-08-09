@@ -7,10 +7,9 @@
 package org.mule.runtime.core.api.connector;
 
 /**
- * Marker interface for {@link ReplyToHandler}s used for non-blocking callbacks rather than for processing the ReplyTo
- * of a {@link org.mule.runtime.core.MessageExchangePattern#ONE_WAY} Flow.
+ * Marker interface for {@link ReplyToHandler}s used for non-blocking callbacks rather than for processing the ReplyTo of a
+ * {@link org.mule.runtime.core.MessageExchangePattern#ONE_WAY} Flow.
  */
-public interface NonBlockingReplyToHandler extends ReplyToHandler
-{
+public interface NonBlockingReplyToHandler extends ReplyToHandler {
 
 }

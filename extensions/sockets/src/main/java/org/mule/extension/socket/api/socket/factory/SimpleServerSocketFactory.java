@@ -14,12 +14,13 @@ import java.net.ServerSocket;
  *
  * @since 4.0
  */
-public interface SimpleServerSocketFactory
-{
-    /**
-     * Creates a {@link ServerSocket}
-     * @return a new instance of a {@link ServerSocket} implementation
-     * @throws IOException
-     */
-    ServerSocket createServerSocket() throws IOException;
+public interface SimpleServerSocketFactory {
+
+  /**
+   * Creates a {@link ServerSocket}
+   * 
+   * @return a new instance of a {@link ServerSocket} implementation
+   * @throws IOException
+   */
+  ServerSocket createServerSocket() throws IOException;
 }

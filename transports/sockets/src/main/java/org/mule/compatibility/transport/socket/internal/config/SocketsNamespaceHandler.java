@@ -11,13 +11,15 @@ import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketPr
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
 
-public class SocketsNamespaceHandler extends AbstractMuleNamespaceHandler
-{
+public class SocketsNamespaceHandler extends AbstractMuleNamespaceHandler {
 
-    public void init()
-    {
-        registerBeanDefinitionParser("client-socket-properties", new RootOrNestedElementBeanDefinitionParser(DefaultTcpClientSocketProperties.class, "clientSocketProperties"));
-        registerBeanDefinitionParser("server-socket-properties",  new RootOrNestedElementBeanDefinitionParser(DefaultTcpServerSocketProperties.class, "serverSocketProperties"));
-    }
+  public void init() {
+    registerBeanDefinitionParser("client-socket-properties",
+                                 new RootOrNestedElementBeanDefinitionParser(DefaultTcpClientSocketProperties.class,
+                                                                             "clientSocketProperties"));
+    registerBeanDefinitionParser("server-socket-properties",
+                                 new RootOrNestedElementBeanDefinitionParser(DefaultTcpServerSocketProperties.class,
+                                                                             "serverSocketProperties"));
+  }
 
 }

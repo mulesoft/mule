@@ -11,160 +11,134 @@ import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
-{
-    private static final long serialVersionUID = 5337576392583767442L;
-    private final AtomicLong executionError = new AtomicLong(0);
-    private final AtomicLong fatalError = new AtomicLong(0);
-    private int threadPoolSize = 0;
-    protected final ComponentStatistics flowStatistics = new ComponentStatistics();
-    
-    // these can't sensibly converted to AtomicLong as they are processed together
-    // in incQueuedEvent
-    private long queuedEvent = 0;
-    private long maxQueuedEvent = 0;
-    private long averageQueueSize = 0;
-    private long totalQueuedEvent = 0;
+public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics {
+
+  private static final long serialVersionUID = 5337576392583767442L;
+  private final AtomicLong executionError = new AtomicLong(0);
+  private final AtomicLong fatalError = new AtomicLong(0);
+  private int threadPoolSize = 0;
+  protected final ComponentStatistics flowStatistics = new ComponentStatistics();
+
+  // these can't sensibly converted to AtomicLong as they are processed together
+  // in incQueuedEvent
+  private long queuedEvent = 0;
+  private long maxQueuedEvent = 0;
+  private long averageQueueSize = 0;
+  private long totalQueuedEvent = 0;
 
 
-    public FlowConstructStatistics(String flowConstructType, String name, ProcessingStrategy processingStrategy)
-    {
-        super(flowConstructType, name);
-        flowStatistics.setEnabled(enabled);
-        if (processingStrategy instanceof AsynchronousProcessingStrategy)
-        {
-            this.threadPoolSize = ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads();
-        }
-        if (this.getClass() == FlowConstructStatistics.class)
-        {
-            clear();
-        }
+  public FlowConstructStatistics(String flowConstructType, String name, ProcessingStrategy processingStrategy) {
+    super(flowConstructType, name);
+    flowStatistics.setEnabled(enabled);
+    if (processingStrategy instanceof AsynchronousProcessingStrategy) {
+      this.threadPoolSize = ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads();
     }
-    
-    public FlowConstructStatistics(String flowConstructType, String name, int maxThreadSize)
-    {
-        super(flowConstructType, name);
-        flowStatistics.setEnabled(enabled);
-        this.threadPoolSize = maxThreadSize;
-        if (this.getClass() == FlowConstructStatistics.class)
-        {
-            clear();
-        }
+    if (this.getClass() == FlowConstructStatistics.class) {
+      clear();
     }
+  }
 
-    public FlowConstructStatistics(String flowConstructType, String name)
-    {
-        this(flowConstructType, name, null);
+  public FlowConstructStatistics(String flowConstructType, String name, int maxThreadSize) {
+    super(flowConstructType, name);
+    flowStatistics.setEnabled(enabled);
+    this.threadPoolSize = maxThreadSize;
+    if (this.getClass() == FlowConstructStatistics.class) {
+      clear();
     }
-    
-    /**
-     * Are statistics logged
-     */
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+  }
 
-    public void incExecutionError()
-    {
-        executionError.addAndGet(1);
-    }
+  public FlowConstructStatistics(String flowConstructType, String name) {
+    this(flowConstructType, name, null);
+  }
 
-    public void incFatalError()
-    {
-        fatalError.addAndGet(1);
-    }
+  /**
+   * Are statistics logged
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
 
-    /**
-     * Enable statistics logs (this is a dynamic parameter)
-     */
-    public synchronized void setEnabled(boolean b)
-    {
-        super.setEnabled(b);
-        flowStatistics.setEnabled(enabled);
-    }
+  public void incExecutionError() {
+    executionError.addAndGet(1);
+  }
 
-    public synchronized void clear()
-    {
-        super.clear();
+  public void incFatalError() {
+    fatalError.addAndGet(1);
+  }
 
-        executionError.set(0);
-        fatalError.set(0);        
-        if (flowStatistics != null)
-        {
-            flowStatistics.clear();
-        }
-    }
+  /**
+   * Enable statistics logs (this is a dynamic parameter)
+   */
+  public synchronized void setEnabled(boolean b) {
+    super.setEnabled(b);
+    flowStatistics.setEnabled(enabled);
+  }
 
-    public void addCompleteFlowExecutionTime(long time)
-    {
-        flowStatistics.addCompleteExecutionTime(time);
-    }
+  public synchronized void clear() {
+    super.clear();
 
-    public void addFlowExecutionBranchTime(long time, long total)
-    {
-        flowStatistics.addExecutionBranchTime(time == total, time, total);
+    executionError.set(0);
+    fatalError.set(0);
+    if (flowStatistics != null) {
+      flowStatistics.clear();
     }
+  }
 
-    public long getAverageProcessingTime()
-    {
-        return flowStatistics.getAverageExecutionTime();
-    }
+  public void addCompleteFlowExecutionTime(long time) {
+    flowStatistics.addCompleteExecutionTime(time);
+  }
 
-    public long getProcessedEvents()
-    {
-        return flowStatistics.getExecutedEvents();
-    }
+  public void addFlowExecutionBranchTime(long time, long total) {
+    flowStatistics.addExecutionBranchTime(time == total, time, total);
+  }
 
-    public long getMaxProcessingTime()
-    {
-        return flowStatistics.getMaxExecutionTime();
-    }
+  public long getAverageProcessingTime() {
+    return flowStatistics.getAverageExecutionTime();
+  }
 
-    public long getMinProcessingTime()
-    {
-        return flowStatistics.getMinExecutionTime();
-    }
+  public long getProcessedEvents() {
+    return flowStatistics.getExecutedEvents();
+  }
 
-    public long getTotalProcessingTime()
-    {
-        return flowStatistics.getTotalExecutionTime();
-    }
+  public long getMaxProcessingTime() {
+    return flowStatistics.getMaxExecutionTime();
+  }
 
-    public long getExecutionErrors()
-    {
-        return executionError.get();
-    }
+  public long getMinProcessingTime() {
+    return flowStatistics.getMinExecutionTime();
+  }
 
-    public long getFatalErrors()
-    {
-        return fatalError.get();
-    }
+  public long getTotalProcessingTime() {
+    return flowStatistics.getTotalExecutionTime();
+  }
 
-    public int getThreadPoolSize()
-    {
-        return threadPoolSize;
-    }
+  public long getExecutionErrors() {
+    return executionError.get();
+  }
 
-    public synchronized void incQueuedEvent()
-    {
-        queuedEvent++;
-        totalQueuedEvent++;
-        if (queuedEvent > maxQueuedEvent)
-        {
-            maxQueuedEvent = queuedEvent;
-        }
-        averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
-    }
+  public long getFatalErrors() {
+    return fatalError.get();
+  }
 
-    public synchronized void decQueuedEvent()
-    {
-        queuedEvent--;
+  public int getThreadPoolSize() {
+    return threadPoolSize;
+  }
+
+  public synchronized void incQueuedEvent() {
+    queuedEvent++;
+    totalQueuedEvent++;
+    if (queuedEvent > maxQueuedEvent) {
+      maxQueuedEvent = queuedEvent;
     }
-    
-    public synchronized long getAverageQueueSize()
-    {
-        return averageQueueSize;
-    }
+    averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
+  }
+
+  public synchronized void decQueuedEvent() {
+    queuedEvent--;
+  }
+
+  public synchronized long getAverageQueueSize() {
+    return averageQueueSize;
+  }
 
 }

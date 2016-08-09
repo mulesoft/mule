@@ -9,17 +9,16 @@ package org.mule.runtime.module.oauth2.internal;
 /**
  * OAuth app client credentials
  */
-public interface ApplicationCredentials
-{
+public interface ApplicationCredentials {
 
-    /**
-     * @return oauth client secret of the hosted application
-     */
-    String getClientSecret();
+  /**
+   * @return oauth client secret of the hosted application
+   */
+  String getClientSecret();
 
-    /**
-     * @return oauth client id of the hosted application
-     */
-    String getClientId();
+  /**
+   * @return oauth client id of the hosted application
+   */
+  String getClientId();
 
 }

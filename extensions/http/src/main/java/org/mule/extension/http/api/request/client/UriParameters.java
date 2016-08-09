@@ -16,21 +16,20 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public interface UriParameters
-{
+public interface UriParameters {
 
-    /**
-     * @return the HTTP scheme for the URI.
-     */
-    Protocols getScheme();
+  /**
+   * @return the HTTP scheme for the URI.
+   */
+  Protocols getScheme();
 
-    /**
-     * @return the function that will resolve to the URI host.
-     */
-    Function<MuleEvent, String> getHost();
+  /**
+   * @return the function that will resolve to the URI host.
+   */
+  Function<MuleEvent, String> getHost();
 
-    /**
-     * @return the function that will resolve to the URI port.
-     */
-    Function<MuleEvent, Integer> getPort();
+  /**
+   * @return the function that will resolve to the URI port.
+   */
+  Function<MuleEvent, Integer> getPort();
 }

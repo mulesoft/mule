@@ -19,46 +19,41 @@ import org.mule.runtime.core.transformer.wire.AbstractMuleMessageWireFormatTestC
 
 import java.util.Properties;
 
-public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
-{
+public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase {
 
-    @Override
-    protected WireFormat getWireFormat() throws Exception
-    {
-        return createObject(XStreamWireFormat.class);
-    }
+  @Override
+  protected WireFormat getWireFormat() throws Exception {
+    return createObject(XStreamWireFormat.class);
+  }
 
-    @Override
-    public void testGetDefaultInboundTransformer() throws Exception
-    {
-        assertEquals(XmlToObject.class, ((XStreamWireFormat) getWireFormat()).getInboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultInboundTransformer() throws Exception {
+    assertEquals(XmlToObject.class, ((XStreamWireFormat) getWireFormat()).getInboundTransformer().getClass());
+  }
 
-    @Override
-    public void testGetDefaultOutboundTransformer() throws Exception
-    {
-        assertEquals(ObjectToXml.class, ((XStreamWireFormat) getWireFormat()).getOutboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultOutboundTransformer() throws Exception {
+    assertEquals(ObjectToXml.class, ((XStreamWireFormat) getWireFormat()).getOutboundTransformer().getClass());
+  }
 
-    @Override
-    public void testWriteReadPayload() throws Exception
-    {
-        // Create orange to send over the wire
-        Properties messageProerties = new Properties();
-        messageProerties.put("key1", "val1");
-        Orange inOrange = new Orange();
-        inOrange.setBrand("Walmart");
-        inOrange.setMapProperties(messageProerties);
+  @Override
+  public void testWriteReadPayload() throws Exception {
+    // Create orange to send over the wire
+    Properties messageProerties = new Properties();
+    messageProerties.put("key1", "val1");
+    Orange inOrange = new Orange();
+    inOrange.setBrand("Walmart");
+    inOrange.setMapProperties(messageProerties);
 
-        Object outObject = readWrite(inOrange);
+    Object outObject = readWrite(inOrange);
 
-        // Test deserialized Fruit
-        // TODO This wire-format wraps desrialized payloads in a message. See
-        // MULE-3118
-        // See test implementation in AbstractMuleMessageWireFormatTestCase.
-        assertTrue(outObject instanceof MuleMessage);
-        assertEquals("Walmart", ((Orange) ((MuleMessage) outObject).getPayload()).getBrand());
-        assertEquals("val1", ((Orange) ((MuleMessage) outObject).getPayload()).getMapProperties().get("key1"));
-    }
+    // Test deserialized Fruit
+    // TODO This wire-format wraps desrialized payloads in a message. See
+    // MULE-3118
+    // See test implementation in AbstractMuleMessageWireFormatTestCase.
+    assertTrue(outObject instanceof MuleMessage);
+    assertEquals("Walmart", ((Orange) ((MuleMessage) outObject).getPayload()).getBrand());
+    assertEquals("val1", ((Orange) ((MuleMessage) outObject).getPayload()).getMapProperties().get("key1"));
+  }
 
 }

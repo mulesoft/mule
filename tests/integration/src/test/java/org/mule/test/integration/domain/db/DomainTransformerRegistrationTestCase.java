@@ -16,31 +16,27 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class DomainTransformerRegistrationTestCase extends DomainFunctionalTestCase
-{
+public class DomainTransformerRegistrationTestCase extends DomainFunctionalTestCase {
 
-    private static final String APP1 = "app1";
-    private static final String APP2 = "app2";
-    private static final String[] APPLICATION_RESOURCES = new String[] {"domain/domain-transformer-registration-config.xml"};
+  private static final String APP1 = "app1";
+  private static final String APP2 = "app2";
+  private static final String[] APPLICATION_RESOURCES = new String[] {"domain/domain-transformer-registration-config.xml"};
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/empty-domain-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/empty-domain-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {new ApplicationConfig(APP1, APPLICATION_RESOURCES),
-                new ApplicationConfig(APP2, APPLICATION_RESOURCES)
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(APP1, APPLICATION_RESOURCES),
+        new ApplicationConfig(APP2, APPLICATION_RESOURCES)};
+  }
 
-    @Test
-    public void registerTransformerOnce() throws Exception
-    {
-        final MuleMessage response = new FlowRunner(getMuleContextForApp(APP1), "main").withPayload(TRUE.toString()).run().getMessage();
-        assertThat(response.getPayload(), instanceOf(Boolean.class));
-    }
+  @Test
+  public void registerTransformerOnce() throws Exception {
+    final MuleMessage response =
+        new FlowRunner(getMuleContextForApp(APP1), "main").withPayload(TRUE.toString()).run().getMessage();
+    assertThat(response.getPayload(), instanceOf(Boolean.class));
+  }
 }

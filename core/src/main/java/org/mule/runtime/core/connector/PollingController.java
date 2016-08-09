@@ -9,7 +9,7 @@ package org.mule.runtime.core.connector;
 /**
  * This determines whether polling is turned on or off
  */
-public interface PollingController
-{
-    boolean isPrimaryPollingInstance();
+public interface PollingController {
+
+  boolean isPrimaryPollingInstance();
 }

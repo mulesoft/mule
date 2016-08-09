@@ -18,30 +18,26 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileNoRecursiveConnectorTestCase extends FunctionalTestCase
-{
+public class FileNoRecursiveConnectorTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-no-recursive-connector-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-no-recursive-connector-config.xml";
+  }
 
-    @Before
-    public void setUpFile() throws Exception
-    {
-        File root = FileTestUtils.createFolder(workingDirectory.getRoot(), "root");
-        File subfolder = FileTestUtils.createFolder(root, "subfolder");
-        FileTestUtils.createDataFile(subfolder, TEST_MESSAGE);
-    }
+  @Before
+  public void setUpFile() throws Exception {
+    File root = FileTestUtils.createFolder(workingDirectory.getRoot(), "root");
+    File subfolder = FileTestUtils.createFolder(root, "subfolder");
+    FileTestUtils.createDataFile(subfolder, TEST_MESSAGE);
+  }
 
-    @Test
-    public void findsInRootDirectoryOnly() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void findsInRootDirectoryOnly() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://testOut", RECEIVE_TIMEOUT);
 
-        assertNull("Found a file from a sub directory", result);
-    }
+    assertNull("Found a file from a sub directory", result);
+  }
 }

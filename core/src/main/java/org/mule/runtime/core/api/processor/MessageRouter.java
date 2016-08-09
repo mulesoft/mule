@@ -9,26 +9,24 @@ package org.mule.runtime.core.api.processor;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * A {@link MessageProcessor} that routes messages to zero or more destination
- * message processors. Implementations determine exactly how this is done by making
- * decisions about which route(s) should be used and if the message should be copied
- * or not.
+ * A {@link MessageProcessor} that routes messages to zero or more destination message processors. Implementations determine
+ * exactly how this is done by making decisions about which route(s) should be used and if the message should be copied or not.
  */
-public interface MessageRouter extends MessageProcessor
-{
-    /**
-     * Adds a new message processor to the list of routes
-     * 
-     * @param processor new destination message processor
-     * @throws MuleException 
-     */
-    void addRoute(MessageProcessor processor) throws MuleException;
+public interface MessageRouter extends MessageProcessor {
 
-    /**
-     * Removes a message processor from the list of routes
-     * 
-     * @param processor destination message processor to remove
-     */
-    void removeRoute(MessageProcessor processor) throws MuleException;
+  /**
+   * Adds a new message processor to the list of routes
+   * 
+   * @param processor new destination message processor
+   * @throws MuleException
+   */
+  void addRoute(MessageProcessor processor) throws MuleException;
+
+  /**
+   * Removes a message processor from the list of routes
+   * 
+   * @param processor destination message processor to remove
+   */
+  void removeRoute(MessageProcessor processor) throws MuleException;
 
 }

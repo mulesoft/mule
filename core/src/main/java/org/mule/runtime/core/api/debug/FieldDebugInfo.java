@@ -15,54 +15,48 @@ import org.mule.runtime.core.util.StringUtils;
  * Provides debug information for an object field.
  *
  * <p/>
- * Debug information is for informative purposes while debugging a Mule application.
- * Obtaining such information can cause collateral effects, for example when an MEL expression
- * is evaluated to obtain the value and then evaluated again on the real execution.
+ * Debug information is for informative purposes while debugging a Mule application. Obtaining such information can cause
+ * collateral effects, for example when an MEL expression is evaluated to obtain the value and then evaluated again on the real
+ * execution.
  *
  * @param <T> type of the field's value
  * @since 3.8.0
  */
-public abstract class FieldDebugInfo<T>
-{
+public abstract class FieldDebugInfo<T> {
 
-    private final String name;
-    private final String type;
-    private final T value;
+  private final String name;
+  private final String type;
+  private final T value;
 
-    /**
-     * Creates a new debug info for a field
-     *
-     * @param name field's name. A non blank {@link String}
-     * @param type field's type.
-     * @param value field's value. Can be null.
-     */
-    FieldDebugInfo(String name, String type, T value)
-    {
-        checkArgument(!StringUtils.isEmpty(name), "Name cannot be empty");
+  /**
+   * Creates a new debug info for a field
+   *
+   * @param name field's name. A non blank {@link String}
+   * @param type field's type.
+   * @param value field's value. Can be null.
+   */
+  FieldDebugInfo(String name, String type, T value) {
+    checkArgument(!StringUtils.isEmpty(name), "Name cannot be empty");
 
-        this.type = type;
-        this.name = name;
-        this.value = value;
-    }
+    this.type = type;
+    this.name = name;
+    this.value = value;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public T getValue()
-    {
-        return value;
-    }
+  public T getValue() {
+    return value;
+  }
 
-    public String getType()
-    {
-        return type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s[name: '%s', type: '%s', value: '%s']", this.getClass().getSimpleName(), getName(), type, getValue());
-    }
+  @Override
+  public String toString() {
+    return String.format("%s[name: '%s', type: '%s', value: '%s']", this.getClass().getSimpleName(), getName(), type, getValue());
+  }
 }

@@ -24,52 +24,49 @@ import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfBadSoapRequestTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class CxfBadSoapRequestTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "soap-request-conf-flow-httpn.xml";
-    }
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
+      .method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
-    @Test
-    public void testSoapDocumentError() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "soap-request-conf-flow-httpn.xml";
+  }
 
-        String soapRequest = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-                             + "<soap:Body>"
-                             + "<ssss xmlns=\"http://www.muleumo.org\">"
-                             + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>"
-                             + "</ssss>"
-                             + "</soap:Body>" + "</soap:Envelope>";
+  @Test
+  public void testSoapDocumentError() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", getTestMuleMessage(
-            soapRequest), HTTP_REQUEST_OPTIONS);
+    String soapRequest =
+        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+            + "<soap:Body>" + "<ssss xmlns=\"http://www.muleumo.org\">"
+            + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>" + "</ssss>" + "</soap:Body>" + "</soap:Envelope>";
 
-        assertNotNull(reply);
-        assertNotNull(reply.getPayload());
+    MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent",
+                                    getTestMuleMessage(soapRequest), HTTP_REQUEST_OPTIONS);
 
-        String ct = reply.getDataType().getMediaType().toRfcString();
-        assertEquals("text/xml; charset=UTF-8", ct);
+    assertNotNull(reply);
+    assertNotNull(reply.getPayload());
 
-        Document document = DocumentHelper.parseText(getPayloadAsString(reply));
-        List<?> fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
+    String ct = reply.getDataType().getMediaType().toRfcString();
+    assertEquals("text/xml; charset=UTF-8", ct);
 
-        assertEquals(1, fault.size());
-        Element faultCodeElement = (Element) fault.get(0);
+    Document document = DocumentHelper.parseText(getPayloadAsString(reply));
+    List<?> fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
 
-        assertEquals("soap:Client", faultCodeElement.getStringValue());
+    assertEquals(1, fault.size());
+    Element faultCodeElement = (Element) fault.get(0);
 
-        fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultstring");
-        assertEquals(1, fault.size());
-        Element faultStringElement = (Element) fault.get(0);
-        assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.  (Does it exist in service WSDL?)",
-            faultStringElement.getStringValue());
-    }
+    assertEquals("soap:Client", faultCodeElement.getStringValue());
+
+    fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultstring");
+    assertEquals(1, fault.size());
+    Element faultStringElement = (Element) fault.get(0);
+    assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.  (Does it exist in service WSDL?)",
+                 faultStringElement.getStringValue());
+  }
 }

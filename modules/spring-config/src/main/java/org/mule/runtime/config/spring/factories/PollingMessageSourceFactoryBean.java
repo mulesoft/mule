@@ -16,66 +16,57 @@ import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFact
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContextAware
-{
-    protected SchedulerFactory<Runnable> schedulerFactory;
-    protected MessageProcessor messageProcessor;
-    protected MessageProcessorPollingOverride override;
-    protected Long frequency;
-    private MuleContext muleContext;
+public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContextAware {
 
-    private FixedFrequencySchedulerFactory defaultSchedulerFactory()
-    {
-        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
-        factory.setFrequency(frequency);
-        factory.setMuleContext(muleContext);
-        return factory;
-    }
+  protected SchedulerFactory<Runnable> schedulerFactory;
+  protected MessageProcessor messageProcessor;
+  protected MessageProcessorPollingOverride override;
+  protected Long frequency;
+  private MuleContext muleContext;
 
-    public void setMessageProcessor(MessageProcessor messageProcessor)
-    {
-        this.messageProcessor = messageProcessor;
-    }
+  private FixedFrequencySchedulerFactory defaultSchedulerFactory() {
+    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+    factory.setFrequency(frequency);
+    factory.setMuleContext(muleContext);
+    return factory;
+  }
 
-    public void setOverride(MessageProcessorPollingOverride override)
-    {
-        this.override = override;
-    }
+  public void setMessageProcessor(MessageProcessor messageProcessor) {
+    this.messageProcessor = messageProcessor;
+  }
 
-    public void setFrequency(Long frequency)
-    {
-        this.frequency = frequency;
-    }
+  public void setOverride(MessageProcessorPollingOverride override) {
+    this.override = override;
+  }
 
-    public void setSchedulerFactory(SchedulerFactory<Runnable> schedulerFactory)
-    {
-        this.schedulerFactory = schedulerFactory;
-    }
+  public void setFrequency(Long frequency) {
+    this.frequency = frequency;
+  }
+
+  public void setSchedulerFactory(SchedulerFactory<Runnable> schedulerFactory) {
+    this.schedulerFactory = schedulerFactory;
+  }
 
 
-    @Override
-    public Object getObject() throws Exception
-    {
-        schedulerFactory = schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory;
-        override = override != null ? this.override : new MessageProcessorPollingOverride.NullOverride();
-        return new PollingMessageSource(muleContext, messageProcessor, override, schedulerFactory);
-    }
+  @Override
+  public Object getObject() throws Exception {
+    schedulerFactory = schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory;
+    override = override != null ? this.override : new MessageProcessorPollingOverride.NullOverride();
+    return new PollingMessageSource(muleContext, messageProcessor, override, schedulerFactory);
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return PollingMessageSource.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return PollingMessageSource.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

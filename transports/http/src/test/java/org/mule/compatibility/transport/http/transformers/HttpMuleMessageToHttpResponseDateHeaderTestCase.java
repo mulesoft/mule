@@ -10,29 +10,25 @@ import org.mule.compatibility.transport.http.AbstractDateHeaderTestCase;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.transformers.MuleMessageToHttpResponse;
 
-public class HttpMuleMessageToHttpResponseDateHeaderTestCase extends AbstractDateHeaderTestCase
-{
+public class HttpMuleMessageToHttpResponseDateHeaderTestCase extends AbstractDateHeaderTestCase {
 
-    private static final String EXPECTED_DATE_HEADER = "Mon, 05 Sep 2005 21:30:00 +0000";
-    private MuleMessageToHttpResponse transformer;
+  private static final String EXPECTED_DATE_HEADER = "Mon, 05 Sep 2005 21:30:00 +0000";
+  private MuleMessageToHttpResponse transformer;
 
-    @Override
-    protected void initialise() throws Exception
-    {
-        transformer = new MuleMessageToHttpResponse();
-        transformer.initialise();
-    }
+  @Override
+  protected void initialise() throws Exception {
+    transformer = new MuleMessageToHttpResponse();
+    transformer.initialise();
+  }
 
-    @Override
-    protected void setDateHeader(HttpResponse response, long millis)
-    {
-        transformer.setDateHeader(response, millis);
-    }
+  @Override
+  protected void setDateHeader(HttpResponse response, long millis) {
+    transformer.setDateHeader(response, millis);
+  }
 
-    @Override
-    protected String getExpectedHeaderValue()
-    {
-        return EXPECTED_DATE_HEADER;
-    }
+  @Override
+  protected String getExpectedHeaderValue() {
+    return EXPECTED_DATE_HEADER;
+  }
 
 }

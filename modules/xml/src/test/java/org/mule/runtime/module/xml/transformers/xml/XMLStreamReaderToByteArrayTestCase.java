@@ -14,40 +14,32 @@ import org.mule.runtime.module.xml.util.XMLUtils;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 
-public class XMLStreamReaderToByteArrayTestCase extends AbstractXmlTransformerTestCase
-{
+public class XMLStreamReaderToByteArrayTestCase extends AbstractXmlTransformerTestCase {
 
-    private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>TEST_MESSAGE</test>";
+  private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>TEST_MESSAGE</test>";
 
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(XMLStreamReaderToByteArray.class);
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return createObject(XMLStreamReaderToByteArray.class);
+  }
+
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    return createObject(XmlToXMLStreamReader.class);
+  }
+
+  @Override
+  public Object getTestData() {
+    try {
+      return XMLUtils.toXMLStreamReader(XMLInputFactory.newFactory(), TEST_XML);
+    } catch (XMLStreamException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return createObject(XmlToXMLStreamReader.class);
-    }
-
-    @Override
-    public Object getTestData()
-    {
-        try
-        {
-            return XMLUtils.toXMLStreamReader(XMLInputFactory.newFactory(), TEST_XML);
-        }
-        catch (XMLStreamException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Object getResultData()
-    {
-        return TEST_XML.getBytes();
-    }
+  @Override
+  public Object getResultData() {
+    return TEST_XML.getBytes();
+  }
 }

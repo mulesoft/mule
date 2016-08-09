@@ -10,27 +10,25 @@ import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
- * This protocol is an application level {@link TcpProtocol} that does nothing.
- * Reading is terminated by the stream being closed by the client.
+ * This protocol is an application level {@link TcpProtocol} that does nothing. Reading is terminated by the stream being closed
+ * by the client.
  * <p>
  *
  * @since 4.0
  */
 @Alias("eof-protocol")
-public class EOFProtocol extends DirectProtocol
-{
+public class EOFProtocol extends DirectProtocol {
 
-    /**
-     * Repeat until EOF
-     *
-     * @param len       Amount transferred last call (-1 on EOF or socket error)
-     * @param available Amount available
-     * @return true if the transfer should continue
-     */
-    @Override
-    protected boolean isRepeat(int len, int available)
-    {
-        return true;
-    }
+  /**
+   * Repeat until EOF
+   *
+   * @param len Amount transferred last call (-1 on EOF or socket error)
+   * @param available Amount available
+   * @return true if the transfer should continue
+   */
+  @Override
+  protected boolean isRepeat(int len, int available) {
+    return true;
+  }
 
 }

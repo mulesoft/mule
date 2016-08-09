@@ -10,21 +10,18 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 
 /**
- * Extracts argument values from an {@link OperationContext}
- * and exposes them as an array
+ * Extracts argument values from an {@link OperationContext} and exposes them as an array
  *
  * @since 3.7.0
  */
-interface ArgumentResolverDelegate
-{
+interface ArgumentResolverDelegate {
 
-    /**
-     * Returns an object array with the argument values
-     * of the given {@code operationContext}
-     *
-     * @param operationContext the {@link OperationContext context} of an {@link OperationModel} being currently executed
-     * @param parameterTypes
-     * @return an object array
-     */
-    Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes);
+  /**
+   * Returns an object array with the argument values of the given {@code operationContext}
+   *
+   * @param operationContext the {@link OperationContext context} of an {@link OperationModel} being currently executed
+   * @param parameterTypes
+   * @return an object array
+   */
+  Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes);
 }

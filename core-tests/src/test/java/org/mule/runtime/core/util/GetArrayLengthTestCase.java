@@ -21,47 +21,33 @@ import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class GetArrayLengthTestCase extends AbstractMuleTestCase
-{
+public class GetArrayLengthTestCase extends AbstractMuleTestCase {
 
-    private final Object unaryArray;
-    private final Object emptyArray;
+  private final Object unaryArray;
+  private final Object emptyArray;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {new Object[] {new Apple()}, new Object[] {}},
-                {new Apple[] {new Apple()}, new Apple[] {}},
-                {new boolean[] {true}, new boolean[] {}},
-                {new byte[] {0}, new byte[] {}},
-                {new char[] {'0'}, new char[] {}},
-                {new short[] {0}, new short[] {}},
-                {new int[] {0}, new int[] {}},
-                {new long[] {0}, new long[] {}},
-                {new float[] {0}, new float[] {}},
-                {new double[] {0}, new double[] {}},
-                {new String[] {""}, new String[] {}},
-                {new String[] {""}, null},
-        });
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{new Object[] {new Apple()}, new Object[] {}},
+        {new Apple[] {new Apple()}, new Apple[] {}}, {new boolean[] {true}, new boolean[] {}}, {new byte[] {0}, new byte[] {}},
+        {new char[] {'0'}, new char[] {}}, {new short[] {0}, new short[] {}}, {new int[] {0}, new int[] {}},
+        {new long[] {0}, new long[] {}}, {new float[] {0}, new float[] {}}, {new double[] {0}, new double[] {}},
+        {new String[] {""}, new String[] {}}, {new String[] {""}, null},});
+  }
 
-    public GetArrayLengthTestCase(Object unaryArray, Object emptyArray)
-    {
-        this.unaryArray = unaryArray;
-        this.emptyArray = emptyArray;
-    }
+  public GetArrayLengthTestCase(Object unaryArray, Object emptyArray) {
+    this.unaryArray = unaryArray;
+    this.emptyArray = emptyArray;
+  }
 
 
-    @Test
-    public void unaryArray()
-    {
-        assertThat(ArrayUtils.getLength(unaryArray), is(1));
-    }
+  @Test
+  public void unaryArray() {
+    assertThat(ArrayUtils.getLength(unaryArray), is(1));
+  }
 
-    @Test
-    public void emptyArray()
-    {
-        assertThat(ArrayUtils.getLength(emptyArray), is(0));
-    }
+  @Test
+  public void emptyArray() {
+    assertThat(ArrayUtils.getLength(emptyArray), is(0));
+  }
 }

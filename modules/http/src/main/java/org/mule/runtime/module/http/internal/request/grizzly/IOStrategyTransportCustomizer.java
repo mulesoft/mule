@@ -13,27 +13,25 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 /**
- * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names
- * for the threads that are used.
+ * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names for the threads that
+ * are used.
  */
-public class IOStrategyTransportCustomizer implements TransportCustomizer
-{
-    private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
+public class IOStrategyTransportCustomizer implements TransportCustomizer {
 
-    private final String threadNamePrefix;
+  private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
 
-    public IOStrategyTransportCustomizer(String threadNamePrefix)
-    {
-        this.threadNamePrefix = threadNamePrefix;
-    }
+  private final String threadNamePrefix;
 
-    @Override
-    public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
-    {
-        transport.setIOStrategy(FlowWorkManagerIOStrategy.getInstance());
-        transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
+  public IOStrategyTransportCustomizer(String threadNamePrefix) {
+    this.threadNamePrefix = threadNamePrefix;
+  }
 
-        transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
-        transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
-    }
+  @Override
+  public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
+    transport.setIOStrategy(FlowWorkManagerIOStrategy.getInstance());
+    transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
+
+    transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
+    transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
+  }
 }

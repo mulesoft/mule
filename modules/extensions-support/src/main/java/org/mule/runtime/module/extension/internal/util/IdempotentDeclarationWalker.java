@@ -22,107 +22,84 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * A {@link DeclarationWalker} which assures that each component
- * is visited only once, making it easy to handle the fact
- * that some components such as {@link OperationDeclaration}, {@link SourceDeclaration},
- * {@link ConnectionProviderDeclaration}, etc, implement the flyweight pattern,
- * which means that the same instance might be present at different levels.
+ * A {@link DeclarationWalker} which assures that each component is visited only once, making it easy to handle the fact that some
+ * components such as {@link OperationDeclaration}, {@link SourceDeclaration}, {@link ConnectionProviderDeclaration}, etc,
+ * implement the flyweight pattern, which means that the same instance might be present at different levels.
  * <p>
- * The use of this walker makes it unnecessary to manually control
- * if a given component has already been seen.
+ * The use of this walker makes it unnecessary to manually control if a given component has already been seen.
  *
  * @since 4.0
  */
-public class IdempotentDeclarationWalker extends DeclarationWalker
-{
+public class IdempotentDeclarationWalker extends DeclarationWalker {
 
-    private Set<Reference<SourceDeclaration>> sources = new HashSet<>();
-    private Set<Reference<ParameterDeclaration>> parameters = new HashSet<>();
-    private Set<Reference<OperationDeclaration>> operations = new HashSet<>();
-    private Set<Reference<ConnectionProviderDeclaration>> connectionProviders = new HashSet<>();
+  private Set<Reference<SourceDeclaration>> sources = new HashSet<>();
+  private Set<Reference<ParameterDeclaration>> parameters = new HashSet<>();
+  private Set<Reference<OperationDeclaration>> operations = new HashSet<>();
+  private Set<Reference<ConnectionProviderDeclaration>> connectionProviders = new HashSet<>();
 
-    private <T> boolean isFirstAppearance(Set<Reference<T>> accumulator, T item)
-    {
-        return accumulator.add(new Reference<>(item));
+  private <T> boolean isFirstAppearance(Set<Reference<T>> accumulator, T item) {
+    return accumulator.add(new Reference<>(item));
+  }
+
+  @Override
+  public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
+    doOnce(sources, declaration, this::onSource);
+  }
+
+  @Override
+  public void onParameter(ParameterizedInterceptableDeclaration owner, ParameterDeclaration declaration) {
+    doOnce(parameters, declaration, this::onParameter);
+  }
+
+  @Override
+  public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
+    doOnce(operations, declaration, this::onOperation);
+  }
+
+  @Override
+  public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+    doOnce(connectionProviders, declaration, this::onConnectionProvider);
+  }
+
+  private <T> void doOnce(Set<Reference<T>> accumulator, T item, Consumer<T> delegate) {
+    if (isFirstAppearance(accumulator, item)) {
+      delegate.accept(item);
     }
+  }
 
-    @Override
-    public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
-    {
-        doOnce(sources, declaration, this::onSource);
-    }
+  /**
+   * Invoked when an {@link ConnectedDeclaration} is found in the traversed {@code extensionDeclaration}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param declaration the {@link ConnectionProviderDeclaration}
+   */
+  protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {}
 
-    @Override
-    public void onParameter(ParameterizedInterceptableDeclaration owner, ParameterDeclaration declaration)
-    {
-        doOnce(parameters, declaration, this::onParameter);
-    }
+  /**
+   * Invoked when an {@link SourceDeclaration} is found in the traversed {@code extensionDeclaration}
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param declaration the {@link SourceDeclaration}
+   */
+  protected void onSource(SourceDeclaration declaration) {}
 
-    @Override
-    public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration)
-    {
-        doOnce(operations, declaration, this::onOperation);
-    }
+  /**
+   * Invoked when an {@link ParameterDeclaration} is found in the traversed {@code extensionDeclaration}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param declaration the {@link ParameterDeclaration}
+   */
+  protected void onParameter(ParameterDeclaration declaration) {}
 
-    @Override
-    public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration)
-    {
-        doOnce(connectionProviders, declaration, this::onConnectionProvider);
-    }
-
-    private <T> void doOnce(Set<Reference<T>> accumulator, T item, Consumer<T> delegate)
-    {
-        if (isFirstAppearance(accumulator, item))
-        {
-            delegate.accept(item);
-        }
-    }
-
-    /**
-     * Invoked when an {@link ConnectedDeclaration} is found in the
-     * traversed {@code extensionDeclaration}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param declaration the {@link ConnectionProviderDeclaration}
-     */
-    protected void onConnectionProvider(ConnectionProviderDeclaration declaration)
-    {
-    }
-
-    /**
-     * Invoked when an {@link SourceDeclaration} is found in the
-     * traversed {@code extensionDeclaration}
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param declaration the {@link SourceDeclaration}
-     */
-    protected void onSource(SourceDeclaration declaration)
-    {
-    }
-
-    /**
-     * Invoked when an {@link ParameterDeclaration} is found in the
-     * traversed {@code extensionDeclaration}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param declaration the {@link ParameterDeclaration}
-     */
-    protected void onParameter(ParameterDeclaration declaration)
-    {
-    }
-
-    /**
-     * Invoked when an {@link OperationDeclaration} is found in the
-     * traversed {@code extensionDeclaration}.
-     * <p>
-     * This method will only be invoked once per each found instance.
-     *
-     * @param declaration the {@link WithOperationsDeclaration}
-     */
-    protected void onOperation(OperationDeclaration declaration)
-    {
-    }
+  /**
+   * Invoked when an {@link OperationDeclaration} is found in the traversed {@code extensionDeclaration}.
+   * <p>
+   * This method will only be invoked once per each found instance.
+   *
+   * @param declaration the {@link WithOperationsDeclaration}
+   */
+  protected void onOperation(OperationDeclaration declaration) {}
 }

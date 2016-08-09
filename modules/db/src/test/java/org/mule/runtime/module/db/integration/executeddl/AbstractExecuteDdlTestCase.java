@@ -23,45 +23,35 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.junit.Before;
 
-public abstract class AbstractExecuteDdlTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractExecuteDdlTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractExecuteDdlTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public AbstractExecuteDdlTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Before
+  public void deleteTestDdlTable() throws Exception {
+
+    Connection connection = null;
+    try {
+      DataSource dataSource = getDefaultDataSource();
+      connection = dataSource.getConnection();
+
+      QueryRunner qr = new QueryRunner(dataSource);
+      qr.update(connection, "DROP TABLE TestDdl");
+    } catch (SQLException e) {
+      // Ignore: table does not exist
+    } finally {
+      if (connection != null) {
+        connection.close();
+      }
     }
+  }
 
-    @Before
-    public void deleteTestDdlTable() throws Exception
-    {
+  protected void assertTableCreation(Object payload) throws SQLException {
+    assertEquals(0, payload);
 
-        Connection connection = null;
-        try
-        {
-            DataSource dataSource = getDefaultDataSource();
-            connection = dataSource.getConnection();
-
-            QueryRunner qr = new QueryRunner(dataSource);
-            qr.update(connection, "DROP TABLE TestDdl");
-        }
-        catch (SQLException e)
-        {
-            // Ignore: table does not exist
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                connection.close();
-            }
-        }
-    }
-
-    protected void assertTableCreation(Object payload) throws SQLException
-    {
-        assertEquals(0, payload);
-
-        List<Map<String, String>> result = selectData("select * from TestDdl", getDefaultDataSource());
-        assertRecords(result);
-    }
+    List<Map<String, String>> result = selectData("select * from TestDdl", getDefaultDataSource());
+    assertRecords(result);
+  }
 }

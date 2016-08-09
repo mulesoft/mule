@@ -26,96 +26,85 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase
-{
+public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
-    private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    @Rule
-    public TemporaryFolder serviceFolder = new TemporaryFolder();
-    private ServiceClassLoaderFactory factory = new ServiceClassLoaderFactory();
-    private ServiceDescriptor descriptor;
-    private ArtifactClassLoader parentClassLoader;
+  private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+  @Rule
+  public TemporaryFolder serviceFolder = new TemporaryFolder();
+  private ServiceClassLoaderFactory factory = new ServiceClassLoaderFactory();
+  private ServiceDescriptor descriptor;
+  private ArtifactClassLoader parentClassLoader;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        descriptor = new ServiceDescriptor();
-        descriptor.setName("testService");
-        descriptor.setRootFolder(serviceFolder.getRoot());
+  @Before
+  public void setUp() throws Exception {
+    descriptor = new ServiceDescriptor();
+    descriptor.setName("testService");
+    descriptor.setRootFolder(serviceFolder.getRoot());
 
-        parentClassLoader = mock(ArtifactClassLoader.class);
-        when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
-        when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
+    parentClassLoader = mock(ArtifactClassLoader.class);
+    when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+    when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
+  }
+
+  @Test
+  public void createsEmptyClassLoader() throws Exception {
+    final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
+    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
+    assertThat(classLoader.getURLs(), equalTo(new URL[0]));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesServiceFolder() throws Exception {
+    File fakeServiceFolder = new File("./fake/folder/for/test");
+    descriptor.setRootFolder(fakeServiceFolder);
+    factory.create(null, descriptor);
+  }
+
+  @Test
+  public void addsClassesFolderToClassLoader() throws Exception {
+    File classesFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.CLASSES_DIR);
+
+    final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
+    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
+    assertThat(classLoader.getURLs(), equalTo(new URL[] {classesFolder.toURI().toURL()}));
+  }
+
+  @Test
+  public void addJarsFromLibFolderToClassLoader() throws Exception {
+    File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
+    File jarFile = new File(libFolder, "dummy.jar");
+    jarFile.createNewFile();
+
+    final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
+    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
+    assertThat(classLoader.getURLs(), equalTo(new URL[] {jarFile.toURI().toURL()}));
+  }
+
+  @Test
+  public void ignoresNonJarsFilesFromLibFolder() throws Exception {
+    File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
+    File jarFile = new File(libFolder, "dummy.txt");
+    jarFile.createNewFile();
+
+    final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
+    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
+    assertThat(classLoader.getURLs(), equalTo(new URL[] {}));
+  }
+
+  @Test
+  public void usesClassLoaderLookupPolicy() throws Exception {
+    final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
+    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
+
+    final String className = "com.dummy.Foo";
+    try {
+      classLoader.loadClass(className);
+      fail("Able to load an un-existent class");
+    } catch (ClassNotFoundException e) {
+      // Expected
     }
 
-    @Test
-    public void createsEmptyClassLoader() throws Exception
-    {
-        final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
-        final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-        assertThat(classLoader.getURLs(), equalTo(new URL[0]));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesServiceFolder() throws Exception
-    {
-        File fakeServiceFolder = new File("./fake/folder/for/test");
-        descriptor.setRootFolder(fakeServiceFolder);
-        factory.create(null, descriptor);
-    }
-
-    @Test
-    public void addsClassesFolderToClassLoader() throws Exception
-    {
-        File classesFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.CLASSES_DIR);
-
-        final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
-        final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-        assertThat(classLoader.getURLs(), equalTo(new URL[] {classesFolder.toURI().toURL()}));
-    }
-
-    @Test
-    public void addJarsFromLibFolderToClassLoader() throws Exception
-    {
-        File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
-        File jarFile = new File(libFolder, "dummy.jar");
-        jarFile.createNewFile();
-
-        final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
-        final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-        assertThat(classLoader.getURLs(), equalTo(new URL[] {jarFile.toURI().toURL()}));
-    }
-
-    @Test
-    public void ignoresNonJarsFilesFromLibFolder() throws Exception
-    {
-        File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
-        File jarFile = new File(libFolder, "dummy.txt");
-        jarFile.createNewFile();
-
-        final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
-        final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-        assertThat(classLoader.getURLs(), equalTo(new URL[] {}));
-    }
-
-    @Test
-    public void usesClassLoaderLookupPolicy() throws Exception
-    {
-        final ArtifactClassLoader artifactClassLoader = factory.create(parentClassLoader, descriptor);
-        final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-
-        final String className = "com.dummy.Foo";
-        try
-        {
-            classLoader.loadClass(className);
-            fail("Able to load an un-existent class");
-        }
-        catch (ClassNotFoundException e)
-        {
-            // Expected
-        }
-
-        verify(lookupPolicy).getLookupStrategy(className);
-    }
+    verify(lookupPolicy).getLookupStrategy(className);
+  }
 
 }

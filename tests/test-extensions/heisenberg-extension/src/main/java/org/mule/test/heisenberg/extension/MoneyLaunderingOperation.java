@@ -10,17 +10,15 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.math.BigDecimal;
 
-public class MoneyLaunderingOperation
-{
+public class MoneyLaunderingOperation {
 
-    private long totalLaunderedAmount = 0;
+  private long totalLaunderedAmount = 0;
 
-    public synchronized Long launder(@UseConfig HeisenbergExtension config, long amount)
-    {
-        config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
-        totalLaunderedAmount += amount;
-        return totalLaunderedAmount;
-    }
+  public synchronized Long launder(@UseConfig HeisenbergExtension config, long amount) {
+    config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
+    totalLaunderedAmount += amount;
+    return totalLaunderedAmount;
+  }
 
 
 }

@@ -15,7 +15,7 @@ import org.mule.runtime.module.launcher.ToolingServiceAware;
 /**
  * Manages lifecycle and dependency injection for {@link MuleCoreExtension}
  */
-public interface MuleCoreExtensionManagerServer extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware
-{
+public interface MuleCoreExtensionManagerServer
+    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware {
 
 }

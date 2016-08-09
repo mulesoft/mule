@@ -20,25 +20,22 @@ import org.mule.common.metadata.datatype.DataType;
 /**
  * Provides metadata for bulk queries
  */
-public class BulkExecuteMetadataProvider implements QueryMetadataProvider
-{
+public class BulkExecuteMetadataProvider implements QueryMetadataProvider {
 
-    @Override
-    public Result<MetaData> getInputMetaData()
-    {
-        return null;
-    }
+  @Override
+  public Result<MetaData> getInputMetaData() {
+    return null;
+  }
 
-    @Override
-    public Result<MetaData> getOutputMetaData(MetaData metaData)
-    {
-        DefaultMetaData defaultMetaData;
+  @Override
+  public Result<MetaData> getOutputMetaData(MetaData metaData) {
+    DefaultMetaData defaultMetaData;
 
 
-        MetaDataModel recordModel = new DefaultSimpleMetaDataModel(DataType.DOUBLE);
-        ListMetaDataModel listModel = new DefaultListMetaDataModel(recordModel, true);
-        defaultMetaData = new DefaultMetaData(listModel);
+    MetaDataModel recordModel = new DefaultSimpleMetaDataModel(DataType.DOUBLE);
+    ListMetaDataModel listModel = new DefaultListMetaDataModel(recordModel, true);
+    defaultMetaData = new DefaultMetaData(listModel);
 
-        return new DefaultResult<MetaData>(defaultMetaData);
-    }
+    return new DefaultResult<MetaData>(defaultMetaData);
+  }
 }

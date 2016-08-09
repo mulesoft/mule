@@ -19,31 +19,27 @@ import org.junit.Test;
 /**
  * Test the request-reply construct in flows
  */
-public class RequestReplyInFlowTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/request-reply-flow.xml";
-    }
+public class RequestReplyInFlowTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testRequestReply() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch(getDispatchUrl(), MuleMessage.builder().payload("Message went").build());
-        MuleMessage reply = client.request(getDestinationUrl(), 10000);
-        assertNotNull(reply);
-        assertEquals("Message went-out-and-back-in", reply.getPayload());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/request-reply-flow.xml";
+  }
 
-    protected String getDispatchUrl()
-    {
-        return "vm://input";
-    }
+  @Test
+  public void testRequestReply() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch(getDispatchUrl(), MuleMessage.builder().payload("Message went").build());
+    MuleMessage reply = client.request(getDestinationUrl(), 10000);
+    assertNotNull(reply);
+    assertEquals("Message went-out-and-back-in", reply.getPayload());
+  }
 
-    protected String getDestinationUrl()
-    {
-        return "vm://destination";
-    }
+  protected String getDispatchUrl() {
+    return "vm://input";
+  }
+
+  protected String getDestinationUrl() {
+    return "vm://destination";
+  }
 }

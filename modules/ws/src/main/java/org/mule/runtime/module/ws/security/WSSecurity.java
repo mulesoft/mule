@@ -12,25 +12,21 @@ import org.mule.runtime.core.util.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WSSecurity
-{
+public class WSSecurity {
 
-    private List<SecurityStrategy> strategies = new ArrayList<SecurityStrategy>();
+  private List<SecurityStrategy> strategies = new ArrayList<SecurityStrategy>();
 
-    public List<SecurityStrategy> getStrategies()
-    {
-        return strategies;
-    }
+  public List<SecurityStrategy> getStrategies() {
+    return strategies;
+  }
 
-    public void setStrategies(List<SecurityStrategy> strategies)
-    {
-        Preconditions.checkArgument(strategies != null, "Strategy list cannot be null");
-        this.strategies = strategies;
-    }
+  public void setStrategies(List<SecurityStrategy> strategies) {
+    Preconditions.checkArgument(strategies != null, "Strategy list cannot be null");
+    this.strategies = strategies;
+  }
 
-    public boolean hasStrategies()
-    {
-        return !strategies.isEmpty();
-    }
+  public boolean hasStrategies() {
+    return !strategies.isEmpty();
+  }
 
 }

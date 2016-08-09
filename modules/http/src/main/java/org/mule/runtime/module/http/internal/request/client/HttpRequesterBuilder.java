@@ -20,163 +20,137 @@ import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.ObjectNameHelper;
 
-public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>
-{
-    public static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "_muleDefaultHttpRequestConfig";
+public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder> {
 
-    private final DefaultHttpRequester httpRequester;
-    private final MuleContext muleContext;
-    private TlsContextFactory tlsContextFactory;
+  public static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "_muleDefaultHttpRequestConfig";
 
-    public HttpRequesterBuilder(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-        httpRequester = new DefaultHttpRequester();
-        httpRequester.setMuleContext(muleContext);
+  private final DefaultHttpRequester httpRequester;
+  private final MuleContext muleContext;
+  private TlsContextFactory tlsContextFactory;
+
+  public HttpRequesterBuilder(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    httpRequester = new DefaultHttpRequester();
+    httpRequester.setMuleContext(muleContext);
+  }
+
+  public HttpRequesterBuilder setHost(String host) {
+    httpRequester.setHost(host);
+    return this;
+  }
+
+  public HttpRequesterBuilder setPort(String port) {
+    httpRequester.setPort(port);
+    return this;
+  }
+
+  public HttpRequesterBuilder setPath(String path) {
+    httpRequester.setPath(path);
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder method(String method) {
+    httpRequester.setMethod(method);
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder enableFollowsRedirect() {
+    httpRequester.setFollowRedirects(Boolean.TRUE.toString());
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder disableFollowsRedirect() {
+    httpRequester.setFollowRedirects(Boolean.FALSE.toString());
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder requestStreamingMode(HttpStreamingType mode) {
+    httpRequester.setRequestStreamingMode(mode.name());
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder requestConfig(HttpRequesterConfig requestConfig) {
+    httpRequester.setConfig((DefaultHttpRequesterConfig) requestConfig);
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder disableStatusCodeValidation() {
+    httpRequester.setResponseValidator(NULL_VALIDATOR);
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder disableParseResponse() {
+    httpRequester.setParseResponse(Boolean.FALSE.toString());
+    return this;
+  }
+
+  public HttpRequesterBuilder setUrl(String url) {
+    httpRequester.setUrl(url);
+    return this;
+  }
+
+  @Override
+  public HttpRequesterBuilder responseTimeout(long responseTimeout) {
+    this.httpRequester.setResponseTimeout(String.valueOf(responseTimeout));
+    return this;
+  }
+
+  public DefaultHttpRequester build() throws MuleException {
+    if (httpRequester.getConfig() != null && tlsContextFactory != null) {
+      throw new IllegalStateException("The request config and the TLS context factory cannot be configured at the same time");
+    }
+    if (tlsContextFactory != null) {
+      DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
+      requesterConfig.setTlsContext(tlsContextFactory);
+      requesterConfig.setProtocol(HTTPS);
+      muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"),
+                                               requesterConfig);
+      httpRequester.setConfig(requesterConfig);
+    } else if (httpRequester.getConfig() == null) {
+      DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+
+      if (requestConfig == null) {
+        requestConfig = new DefaultHttpRequesterConfig();
+        muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+      }
+
+      httpRequester.setConfig(requestConfig);
     }
 
-    public HttpRequesterBuilder setHost(String host)
-    {
-        httpRequester.setHost(host);
-        return this;
+    httpRequester.initialise();
+    return httpRequester;
+  }
+
+  public HttpRequesterBuilder setOperationConfig(HttpRequestOptions operationOptions) {
+    if (operationOptions.getMethod() != null) {
+      httpRequester.setMethod(operationOptions.getMethod());
     }
-
-    public HttpRequesterBuilder setPort(String port)
-    {
-        httpRequester.setPort(port);
-        return this;
+    if (operationOptions.isFollowsRedirect() != null && !operationOptions.isFollowsRedirect()) {
+      httpRequester.setFollowRedirects(operationOptions.isFollowsRedirect().toString());
     }
-
-    public HttpRequesterBuilder setPath(String path)
-    {
-        httpRequester.setPath(path);
-        return this;
+    if (operationOptions.getRequestStreamingMode() != null) {
+      httpRequester.setRequestStreamingMode(operationOptions.getRequestStreamingMode().name());
     }
-
-    @Override
-    public HttpRequesterBuilder method(String method)
-    {
-        httpRequester.setMethod(method);
-        return this;
+    if (operationOptions.getRequesterConfig() != null) {
+      httpRequester.setConfig((DefaultHttpRequesterConfig) operationOptions.getRequesterConfig());
     }
-
-    @Override
-    public HttpRequesterBuilder enableFollowsRedirect()
-    {
-        httpRequester.setFollowRedirects(Boolean.TRUE.toString());
-        return this;
+    if (operationOptions.isStatusCodeValidationDisabled()) {
+      httpRequester.setResponseValidator(NULL_VALIDATOR);
     }
-
-    @Override
-    public HttpRequesterBuilder disableFollowsRedirect()
-    {
-        httpRequester.setFollowRedirects(Boolean.FALSE.toString());
-        return this;
+    if (operationOptions.isParseResponseDisabled()) {
+      httpRequester.setParseResponse(Boolean.FALSE.toString());
     }
-
-    @Override
-    public HttpRequesterBuilder requestStreamingMode(HttpStreamingType mode)
-    {
-        httpRequester.setRequestStreamingMode(mode.name());
-        return this;
+    if (operationOptions.getResponseTimeout() != null) {
+      httpRequester.setResponseTimeout(String.valueOf(operationOptions.getResponseTimeout()));
     }
-
-    @Override
-    public HttpRequesterBuilder requestConfig(HttpRequesterConfig requestConfig)
-    {
-        httpRequester.setConfig((DefaultHttpRequesterConfig) requestConfig);
-        return this;
-    }
-
-    @Override
-    public HttpRequesterBuilder disableStatusCodeValidation()
-    {
-        httpRequester.setResponseValidator(NULL_VALIDATOR);
-        return this;
-    }
-
-    @Override
-    public HttpRequesterBuilder disableParseResponse()
-    {
-        httpRequester.setParseResponse(Boolean.FALSE.toString());
-        return this;
-    }
-
-    public HttpRequesterBuilder setUrl(String url)
-    {
-        httpRequester.setUrl(url);
-        return this;
-    }
-
-    @Override
-    public HttpRequesterBuilder responseTimeout(long responseTimeout)
-    {
-        this.httpRequester.setResponseTimeout(String.valueOf(responseTimeout));
-        return this;
-    }
-
-    public DefaultHttpRequester build() throws MuleException
-    {
-        if (httpRequester.getConfig() != null && tlsContextFactory != null)
-        {
-            throw new IllegalStateException("The request config and the TLS context factory cannot be configured at the same time");
-        }
-        if (tlsContextFactory != null)
-        {
-            DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
-            requesterConfig.setTlsContext(tlsContextFactory);
-            requesterConfig.setProtocol(HTTPS);
-            muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
-            httpRequester.setConfig(requesterConfig);
-        }
-        else if (httpRequester.getConfig() == null)
-        {
-            DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
-
-            if (requestConfig == null)
-            {
-                requestConfig = new DefaultHttpRequesterConfig();
-                muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
-            }
-
-            httpRequester.setConfig(requestConfig);
-        }
-
-        httpRequester.initialise();
-        return httpRequester;
-    }
-
-    public HttpRequesterBuilder setOperationConfig(HttpRequestOptions operationOptions)
-    {
-        if (operationOptions.getMethod() != null)
-        {
-            httpRequester.setMethod(operationOptions.getMethod());
-        }
-        if (operationOptions.isFollowsRedirect() != null && !operationOptions.isFollowsRedirect())
-        {
-            httpRequester.setFollowRedirects(operationOptions.isFollowsRedirect().toString());
-        }
-        if (operationOptions.getRequestStreamingMode() != null)
-        {
-            httpRequester.setRequestStreamingMode(operationOptions.getRequestStreamingMode().name());
-        }
-        if (operationOptions.getRequesterConfig() != null)
-        {
-            httpRequester.setConfig((DefaultHttpRequesterConfig) operationOptions.getRequesterConfig());
-        }
-        if (operationOptions.isStatusCodeValidationDisabled())
-        {
-            httpRequester.setResponseValidator(NULL_VALIDATOR);
-        }
-        if (operationOptions.isParseResponseDisabled())
-        {
-            httpRequester.setParseResponse(Boolean.FALSE.toString());
-        }
-        if (operationOptions.getResponseTimeout() != null)
-        {
-            httpRequester.setResponseTimeout(String.valueOf(operationOptions.getResponseTimeout()));
-        }
-        this.tlsContextFactory = operationOptions.getTlsContextFactory();
-        return this;
-    }
+    this.tlsContextFactory = operationOptions.getTlsContextFactory();
+    return this;
+  }
 }

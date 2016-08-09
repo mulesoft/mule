@@ -11,17 +11,16 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 @ExclusiveOptionals
-public class ExclusiveCashier
-{
+public class ExclusiveCashier {
 
-    @Parameter
-    private String cashierName;
+  @Parameter
+  private String cashierName;
 
-    @Parameter
-    @Optional
-    private String rothIRA;
+  @Parameter
+  @Optional
+  private String rothIRA;
 
-    @Parameter
-    @Optional
-    private String pensionPlan;
+  @Parameter
+  @Optional
+  private String pensionPlan;
 }

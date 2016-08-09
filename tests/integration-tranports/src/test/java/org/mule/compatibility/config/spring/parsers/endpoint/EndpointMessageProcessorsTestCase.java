@@ -24,95 +24,89 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
-{
+public class EndpointMessageProcessorsTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml";
+  }
 
-    @Test
-    public void testGlobalEndpoint1() throws MuleException
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
+  @Test
+  public void testGlobalEndpoint1() throws MuleException {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
 
-        List<MessageProcessor> processors = endpoint.getMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof TestMessageProcessor);
+    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(1, processors.size());
+    assertTrue(processors.get(0) instanceof TestMessageProcessor);
 
-        processors = endpoint.getResponseMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof MessageProcessorChain);
-    }
+    processors = endpoint.getResponseMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(1, processors.size());
+    assertTrue(processors.get(0) instanceof MessageProcessorChain);
+  }
 
-    @Test
-    public void testGlobalEndpoint2() throws MuleException
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
+  @Test
+  public void testGlobalEndpoint2() throws MuleException {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
 
-        List<MessageProcessor> processors = endpoint.getMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("2", ((TestMessageProcessor) processors.get(1)).getLabel());
+    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(2, processors.size());
+    assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
+    assertEquals("2", ((TestMessageProcessor) processors.get(1)).getLabel());
 
-        processors = endpoint.getResponseMessageProcessors();
-        assertNotNull(processors);
+    processors = endpoint.getResponseMessageProcessors();
+    assertNotNull(processors);
 
-        assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof MessageProcessorChain);
-        MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
-        assertEquals("3", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
-        assertEquals("4", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
-    }
+    assertEquals(1, processors.size());
+    assertTrue(processors.get(0) instanceof MessageProcessorChain);
+    MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
+    assertEquals("3", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+    assertEquals("4", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
+  }
 
-    @Test
-    public void testLocalEndpoints() throws MuleException
-    {
-        Flow flow = muleContext.getRegistry().lookupObject("localEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
+  @Test
+  public void testLocalEndpoints() throws MuleException {
+    Flow flow = muleContext.getRegistry().lookupObject("localEndpoints");
+    ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
 
-        List<MessageProcessor> processors = endpoint.getMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("B", ((TestMessageProcessor) processors.get(1)).getLabel());
+    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(2, processors.size());
+    assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
+    assertEquals("B", ((TestMessageProcessor) processors.get(1)).getLabel());
 
-        processors = endpoint.getResponseMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof MessageProcessorChain);
-        MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
-        assertEquals(2, chain.getMessageProcessors().size());
-        assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
-        assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
+    processors = endpoint.getResponseMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(1, processors.size());
+    assertTrue(processors.get(0) instanceof MessageProcessorChain);
+    MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
+    assertEquals(2, chain.getMessageProcessors().size());
+    assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+    assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
 
-        MessageProcessor mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors().get(0);
+    MessageProcessor mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors().get(0);
 
-        endpoint = (ImmutableEndpoint) mp;
-        processors = endpoint.getMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("E", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("F", ((TestMessageProcessor) processors.get(1)).getLabel());
+    endpoint = (ImmutableEndpoint) mp;
+    processors = endpoint.getMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(2, processors.size());
+    assertEquals("E", ((TestMessageProcessor) processors.get(0)).getLabel());
+    assertEquals("F", ((TestMessageProcessor) processors.get(1)).getLabel());
 
-        processors = endpoint.getResponseMessageProcessors();
-        assertNotNull(processors);
-        assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof MessageProcessorChain);
-        chain = (MessageProcessorChain) processors.get(0);
-        assertEquals(2, chain.getMessageProcessors().size());
-        assertEquals("G", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
-        assertEquals("H", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
-    }
+    processors = endpoint.getResponseMessageProcessors();
+    assertNotNull(processors);
+    assertEquals(1, processors.size());
+    assertTrue(processors.get(0) instanceof MessageProcessorChain);
+    chain = (MessageProcessorChain) processors.get(0);
+    assertEquals(2, chain.getMessageProcessors().size());
+    assertEquals("G", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+    assertEquals("H", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
+  }
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 
 }

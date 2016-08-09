@@ -25,77 +25,69 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 
-public class TestConnectorMessageNotificationListener implements ServerNotificationListener<ConnectorMessageNotification>
-{
+public class TestConnectorMessageNotificationListener implements ServerNotificationListener<ConnectorMessageNotification> {
 
-    private final CountDownLatch latch;
-    private final String expectedExchangePoint;
+  private final CountDownLatch latch;
+  private final String expectedExchangePoint;
 
-    private List<ConnectorMessageNotification> notifications = new ArrayList<>();
+  private List<ConnectorMessageNotification> notifications = new ArrayList<>();
 
-    public TestConnectorMessageNotificationListener()
-    {
-        // Dummy listener for registration
-        latch = null;
-        expectedExchangePoint = null;
+  public TestConnectorMessageNotificationListener() {
+    // Dummy listener for registration
+    latch = null;
+    expectedExchangePoint = null;
+  }
+
+  public TestConnectorMessageNotificationListener(CountDownLatch latch, String expectedExchangePoint) {
+    this.latch = latch;
+    this.expectedExchangePoint = expectedExchangePoint;
+  }
+
+  @Override
+  public void onNotification(ConnectorMessageNotification notification) {
+    notifications.add(notification);
+    if (latch != null) {
+      assertThat(notification.getEndpoint(), is(expectedExchangePoint));
+      latch.countDown();
     }
+  }
 
-    public TestConnectorMessageNotificationListener(CountDownLatch latch, String expectedExchangePoint)
-    {
-        this.latch = latch;
-        this.expectedExchangePoint = expectedExchangePoint;
-    }
+  public List<String> getNotificationActionNames() {
+    return (List<String>) CollectionUtils.collect(notifications, new Transformer() {
 
-    @Override
-    public void onNotification(ConnectorMessageNotification notification)
-    {
-        notifications.add(notification);
-        if (latch != null)
-        {
-            assertThat(notification.getEndpoint(), is(expectedExchangePoint));
-            latch.countDown();
-        }
-    }
+      @Override
+      public Object transform(Object input) {
+        return ((ConnectorMessageNotification) input).getActionName();
+      }
+    });
+  }
 
-    public List<String> getNotificationActionNames()
-    {
-        return (List<String>) CollectionUtils.collect(notifications, new Transformer()
-        {
-            @Override
-            public Object transform(Object input)
-            {
-                return ((ConnectorMessageNotification) input).getActionName();
-            }
-        });
-    }
+  /**
+   * Gets the list of notifications for the action name.
+   * 
+   * @param actionName
+   * @return The notifications sent for the given action.
+   */
+  public List<ConnectorMessageNotification> getNotifications(final String actionName) {
+    return (List<ConnectorMessageNotification>) CollectionUtils.select(notifications, new Predicate() {
 
-    /**
-     * Gets the list of notifications for the action name.
-     * @param actionName
-     * @return The notifications sent for the given action.
-     */
-    public List<ConnectorMessageNotification> getNotifications(final String actionName)
-    {
-        return (List<ConnectorMessageNotification>) CollectionUtils.select(notifications, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return ((ConnectorMessageNotification) object).getActionName().equals(actionName);
-            }
-        });
-    }
+      @Override
+      public boolean evaluate(Object object) {
+        return ((ConnectorMessageNotification) object).getActionName().equals(actionName);
+      }
+    });
+  }
 
-    public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager)
-    {
-        final Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> mapping = serverNotificationManager.getInterfaceToTypes();
-        if (!mapping.containsKey(ConnectorMessageNotificationListener.class))
-        {
-            serverNotificationManager.addInterfaceToType(TestConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
-            serverNotificationManager.addListener(new TestConnectorMessageNotificationListener());
-        }
-        return serverNotificationManager;
+  public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager) {
+    final Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> mapping =
+        serverNotificationManager.getInterfaceToTypes();
+    if (!mapping.containsKey(ConnectorMessageNotificationListener.class)) {
+      serverNotificationManager.addInterfaceToType(TestConnectorMessageNotificationListener.class,
+                                                   ConnectorMessageNotification.class);
+      serverNotificationManager.addListener(new TestConnectorMessageNotificationListener());
     }
+    return serverNotificationManager;
+  }
 
 
 }

@@ -9,17 +9,16 @@ package org.mule.runtime.core.util.queue;
 /**
  * Listener for queue operations affecting the queue store cache.
  */
-public interface QueueStoreCacheListener
-{
+public interface QueueStoreCacheListener {
 
-    /**
-     * @param queueStore queue to be disposed
-     */
-    void disposeQueueStore(QueueStore queueStore);
+  /**
+   * @param queueStore queue to be disposed
+   */
+  void disposeQueueStore(QueueStore queueStore);
 
-    /**
-     * @param queueStore queue to be closed.
-     */
-    void closeQueueStore(QueueStore queueStore);
+  /**
+   * @param queueStore queue to be closed.
+   */
+  void closeQueueStore(QueueStore queueStore);
 
 }

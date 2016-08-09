@@ -21,89 +21,76 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware
-{
+public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
+    implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware {
 
-    private long timeout = 0;
-    private List<MessageProcessor> messageProcessors;
-    private AggregationStrategy aggregationStrategy;
-    private ThreadingProfile threadingProfile;
-    private MuleContext muleContext;
-    private FlowConstruct flowConstruct;
+  private long timeout = 0;
+  private List<MessageProcessor> messageProcessors;
+  private AggregationStrategy aggregationStrategy;
+  private ThreadingProfile threadingProfile;
+  private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
 
-    @Override
-    public ScatterGatherRouter getObject() throws Exception
-    {
-        ScatterGatherRouter sg = new ScatterGatherRouter();
-        sg.setTimeout(timeout);
-        sg.setMuleContext(muleContext);
-        sg.setFlowConstruct(flowConstruct);
+  @Override
+  public ScatterGatherRouter getObject() throws Exception {
+    ScatterGatherRouter sg = new ScatterGatherRouter();
+    sg.setTimeout(timeout);
+    sg.setMuleContext(muleContext);
+    sg.setFlowConstruct(flowConstruct);
 
-        for (MessageProcessor mp : this.messageProcessors)
-        {
-            sg.addRoute(mp);
-        }
-
-        if (this.aggregationStrategy != null)
-        {
-            sg.setAggregationStrategy(this.aggregationStrategy);
-        }
-
-        if (this.threadingProfile != null)
-        {
-            sg.setThreadingProfile(this.threadingProfile);
-        }
-
-        sg.setAnnotations(getAnnotations());
-        return sg;
+    for (MessageProcessor mp : this.messageProcessors) {
+      sg.addRoute(mp);
     }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ScatterGatherRouter.class;
+    if (this.aggregationStrategy != null) {
+      sg.setAggregationStrategy(this.aggregationStrategy);
     }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
+    if (this.threadingProfile != null) {
+      sg.setThreadingProfile(this.threadingProfile);
     }
 
-    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
-    {
-        this.messageProcessors = messageProcessors;
-    }
+    sg.setAnnotations(getAnnotations());
+    return sg;
+  }
 
-    public void setTimeout(long timeout)
-    {
-        this.timeout = timeout;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return ScatterGatherRouter.class;
+  }
 
-    public void setAggregationStrategy(AggregationStrategy aggregationStrategy)
-    {
-        this.aggregationStrategy = aggregationStrategy;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
-    public ThreadingProfile getThreadingProfile()
-    {
-        return this.threadingProfile;
-    }
+  public void setMessageProcessors(List<MessageProcessor> messageProcessors) {
+    this.messageProcessors = messageProcessors;
+  }
 
-    public void setThreadingProfile(ThreadingProfile threadingProfile)
-    {
-        this.threadingProfile = threadingProfile;
-    }
+  public void setTimeout(long timeout) {
+    this.timeout = timeout;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
+    this.aggregationStrategy = aggregationStrategy;
+  }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
+  public ThreadingProfile getThreadingProfile() {
+    return this.threadingProfile;
+  }
+
+  public void setThreadingProfile(ThreadingProfile threadingProfile) {
+    this.threadingProfile = threadingProfile;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 }

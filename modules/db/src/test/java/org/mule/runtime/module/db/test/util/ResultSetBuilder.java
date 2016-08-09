@@ -16,40 +16,34 @@ import java.util.Map;
 /**
  * Builds {@link ResultSet} instances for testing purposes
  */
-public class ResultSetBuilder
-{
+public class ResultSetBuilder {
 
-    private final List<ColumnMetadata> columns;
-    private final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
-    private final Statement statement;
+  private final List<ColumnMetadata> columns;
+  private final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+  private final Statement statement;
 
-    public ResultSetBuilder(List<ColumnMetadata> columns)
-    {
-        this(columns, null);
-    }
+  public ResultSetBuilder(List<ColumnMetadata> columns) {
+    this(columns, null);
+  }
 
-    public ResultSetBuilder(List<ColumnMetadata> columns, Statement statement)
-    {
-        this.columns = columns;
-        this.statement = statement;
-    }
+  public ResultSetBuilder(List<ColumnMetadata> columns, Statement statement) {
+    this.columns = columns;
+    this.statement = statement;
+  }
 
-    public ResultSetBuilder with(Map<String, Object> record)
-    {
-        records.add(record);
+  public ResultSetBuilder with(Map<String, Object> record) {
+    records.add(record);
 
-        return this;
-    }
+    return this;
+  }
 
-    public ResultSetBuilder with(List<Map<String, Object>> records)
-    {
-        this.records.addAll(records);
+  public ResultSetBuilder with(List<Map<String, Object>> records) {
+    this.records.addAll(records);
 
-        return this;
-    }
+    return this;
+  }
 
-    public ResultSet build()
-    {
-        return new InMemoryResultSet(columns, records, statement);
-    }
+  public ResultSet build() {
+    return new InMemoryResultSet(columns, records, statement);
+  }
 }

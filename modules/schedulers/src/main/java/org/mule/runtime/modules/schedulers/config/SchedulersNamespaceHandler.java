@@ -11,12 +11,10 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.modules.schedulers.cron.CronSchedulerFactory;
 
 
-public class SchedulersNamespaceHandler extends AbstractMuleNamespaceHandler
-{
+public class SchedulersNamespaceHandler extends AbstractMuleNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        registerBeanDefinitionParser("cron-scheduler", new ChildDefinitionParser("schedulerFactory", CronSchedulerFactory.class));
-    }
+  @Override
+  public void init() {
+    registerBeanDefinitionParser("cron-scheduler", new ChildDefinitionParser("schedulerFactory", CronSchedulerFactory.class));
+  }
 }

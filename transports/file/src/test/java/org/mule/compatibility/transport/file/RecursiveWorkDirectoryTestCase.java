@@ -19,26 +19,23 @@ import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RecursiveWorkDirectoryTestCase extends FunctionalTestCase
-{
+public class RecursiveWorkDirectoryTestCase extends FunctionalTestCase {
 
-    @Rule
-    public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder("temp");
+  @Rule
+  public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder("temp");
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return  "recursive-work-directory-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "recursive-work-directory-config.xml";
+  }
 
-    @Test
-    public void ignoresWorkDirectoryOnRequest() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        
-        MuleMessage response = client.request("file://" + temporaryFolder.getRoot(), RECEIVE_TIMEOUT);
-        
-        assertThat(response, is(nullValue()));
-    }
+  @Test
+  public void ignoresWorkDirectoryOnRequest() throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    MuleMessage response = client.request("file://" + temporaryFolder.getRoot(), RECEIVE_TIMEOUT);
+
+    assertThat(response, is(nullValue()));
+  }
 }

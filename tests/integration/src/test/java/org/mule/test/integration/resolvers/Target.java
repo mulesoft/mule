@@ -9,52 +9,42 @@ package org.mule.test.integration.resolvers;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
-public class Target implements Callable
-{
+public class Target implements Callable {
 
-    public String array(String[] array)
-    {
-        return "array";
-    }
+  public String array(String[] array) {
+    return "array";
+  }
 
-    public String object(Object object)
-    {
-        return "object";
-    }
+  public String object(Object object) {
+    return "object";
+  }
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        return "callable";
-    }
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    return "callable";
+  }
 
-    public String custom(Object object)
-    {
-        return "custom";
-    }
+  public String custom(Object object) {
+    return "custom";
+  }
 
-    public String methodString(String string)
-    {
-        return "methodString";
-    }
+  public String methodString(String string) {
+    return "methodString";
+  }
 
-    public String methodInteger(Integer integer)
-    {
-        return "methodInteger";
-    }
+  public String methodInteger(Integer integer) {
+    return "methodInteger";
+  }
 
-    public String noArguments()
-    {
-        return "noArguments";
-    }
+  public String noArguments() {
+    return "noArguments";
+  }
 
-    public String property(Object object)
-    {
-        return "property";
-    }
+  public String property(Object object) {
+    return "property";
+  }
 
-    public String reflection(Integer integer, String string)
-    {
-        return "reflection";
-    }
+  public String reflection(Integer integer, String string) {
+    return "reflection";
+  }
 
 }

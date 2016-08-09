@@ -34,254 +34,216 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCase
-{
+public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCase {
 
-    /** Name of the method override property on the event. */
-    private static final String METHOD_PROPERTY_NAME = MuleProperties.MULE_METHOD_PROPERTY;
+  /** Name of the method override property on the event. */
+  private static final String METHOD_PROPERTY_NAME = MuleProperties.MULE_METHOD_PROPERTY;
 
-    /** Name of the non-existent method. */
-    private static final String INVALID_METHOD_NAME = "nosuchmethod";
+  /** Name of the non-existent method. */
+  private static final String INVALID_METHOD_NAME = "nosuchmethod";
 
-    @Test
-    public void testExplicitMethodMatch() throws Exception
-    {
-        try
-        {
-            LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-            resolver.invoke(new WaterMelon(), getTestEventContext("blah"));
-        }
-        catch (MuleException e)
-        {
-            fail("Test should have passed: " + e);
-        }
+  @Test
+  public void testExplicitMethodMatch() throws Exception {
+    try {
+      LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+      resolver.invoke(new WaterMelon(), getTestEventContext("blah"));
+    } catch (MuleException e) {
+      fail("Test should have passed: " + e);
     }
+  }
 
-    @Test
-    public void testExplicitMethodMatchComplexObject() throws Exception
-    {
-        try
-        {
-            LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-            resolver.invoke(new FruitBowl(), getTestEventContext(new FruitLover("Mmmm")));
-        }
-        catch (MuleException e)
-        {
-            fail("Test should have passed: " + e);
-        }
+  @Test
+  public void testExplicitMethodMatchComplexObject() throws Exception {
+    try {
+      LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+      resolver.invoke(new FruitBowl(), getTestEventContext(new FruitLover("Mmmm")));
+    } catch (MuleException e) {
+      fail("Test should have passed: " + e);
     }
+  }
 
-    @Test
-    public void testExplicitMethodMatchSetArrayFail() throws Exception
-    {
-        try
-        {
-            LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-            resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
-            fail("Test should have failed because the arguments were not wrapped properly: ");
-        }
-        catch (MuleException e)
-        {
-            //expected
-        }
+  @Test
+  public void testExplicitMethodMatchSetArrayFail() throws Exception {
+    try {
+      LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+      resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[] {new Apple(), new Orange()}));
+      fail("Test should have failed because the arguments were not wrapped properly: ");
+    } catch (MuleException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testExplicitMethodMatchSetArrayPass() throws Exception
-    {
-        try
-        {
-            LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-            resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Fruit[]{new Apple(), new Orange()}}));
-        }
-        catch (MuleException e)
-        {
-            fail("Test should have passed: " + e);
-        }
+  @Test
+  public void testExplicitMethodMatchSetArrayPass() throws Exception {
+    try {
+      LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+      resolver.invoke(new FruitBowl(), getTestEventContext(new Object[] {new Fruit[] {new Apple(), new Orange()}}));
+    } catch (MuleException e) {
+      fail("Test should have passed: " + e);
     }
+  }
 
-    /* this tests the same as above except it uses the {@link ArrayEntryPointResolver} and does not wrap the args with an array
-     */
-    @Test
-    public void testExplicitMethodMatchSetArrayPassUsingExplicitResolver() throws Exception
-    {
-        try
-        {
-            LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-            resolver.addEntryPointResolver(new ArrayEntryPointResolver());
-            resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
-        }
-        catch (MuleException e)
-        {
-            fail("Test should have passed: " + e);
-        }
+  /*
+   * this tests the same as above except it uses the {@link ArrayEntryPointResolver} and does not wrap the args with an array
+   */
+  @Test
+  public void testExplicitMethodMatchSetArrayPassUsingExplicitResolver() throws Exception {
+    try {
+      LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+      resolver.addEntryPointResolver(new ArrayEntryPointResolver());
+      resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[] {new Apple(), new Orange()}));
+    } catch (MuleException e) {
+      fail("Test should have passed: " + e);
     }
+  }
 
-    /**
-     * Tests entrypoint discovery when there is more than one discoverable method
-     * with MuleEventContext parameter.
-     */
-    @Test
-    public void testFailEntryPointMultiplePayloadMatches() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+  /**
+   * Tests entrypoint discovery when there is more than one discoverable method with MuleEventContext parameter.
+   */
+  @Test
+  public void testFailEntryPointMultiplePayloadMatches() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
 
-        try
-        {
-            RequestContext.setEvent(getTestEvent("Hello"));
-            resolverSet.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
-            fail("Should have failed to find entrypoint.");
-        }
-        catch (EntryPointNotFoundException itex)
-        {
-            // expected
-        }
+    try {
+      RequestContext.setEvent(getTestEvent("Hello"));
+      resolverSet.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
+      fail("Should have failed to find entrypoint.");
+    } catch (EntryPointNotFoundException itex) {
+      // expected
     }
+  }
 
-    /**
-     * If there was a method parameter specified to override the discovery mechanism
-     * and no such method exists, an exception should be thrown, and no fallback to
-     * the default discovery should take place.
-     */
-    @Test
-    public void testMethodOverrideDoesNotFallback() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
-        RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+  /**
+   * If there was a method parameter specified to override the discovery mechanism and no such method exists, an exception should
+   * be thrown, and no fallback to the default discovery should take place.
+   */
+  @Test
+  public void testMethodOverrideDoesNotFallback() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+    RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
-        // those are usually set on the endpoint and copied over to the message
-        final String methodName = "nosuchmethod";
-        final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
+    // those are usually set on the endpoint and copied over to the message
+    final String methodName = "nosuchmethod";
+    final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
 
-        MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+    MuleEvent event = RequestContext.getEventContext().getEvent();
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
 
-        resolverSet.invoke(new FruitBowl(), RequestContext.getEventContext());
-        // fail("Should have failed to find an entrypoint.");
+    resolverSet.invoke(new FruitBowl(), RequestContext.getEventContext());
+    // fail("Should have failed to find an entrypoint.");
+  }
+
+  /**
+   * If there was a method parameter specified to override the discovery mechanism and a Callable instance is serving the request,
+   * call the Callable, ignore the method override parameter.
+   */
+  @Test
+  public void testMethodOverrideIgnoredWithCallable() throws Exception {
+    EntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+
+    RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+
+    // those are usually set on the endpoint and copied over to the message
+    MuleEvent event = RequestContext.getEventContext().getEvent();
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME)
+        .build());
+
+    Apple apple = new Apple();
+    apple.setAppleCleaner(new FruitCleaner() {
+
+      @Override
+      public void wash(Fruit fruit) {
+        // dummy
+      }
+
+      @Override
+      public void polish(Fruit fruit) {
+        // dummy
+      }
+    });
+    resolver.invoke(apple, RequestContext.getEventContext());
+  }
+
+  /**
+   * If there was a method parameter specified to override the discovery mechanism and a target instance has a method accepting
+   * MuleEventContext, proceed to call this method, ignore the method override parameter.
+   */
+  @Test
+  public void testMethodOverrideIgnoredWithEventContext() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+
+    RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+
+    // those are usually set on the endpoint and copied over to the message
+    final String methodName = "nosuchmethod";
+    final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
+    MuleEvent event = RequestContext.getEventContext().getEvent();
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+
+    try {
+      resolverSet.invoke(new Kiwi(), RequestContext.getEventContext());
+      fail("no such method on service");
+    } catch (EntryPointNotFoundException e) {
+      // expected
     }
+  }
 
-    /**
-     * If there was a method parameter specified to override the discovery mechanism
-     * and a Callable instance is serving the request, call the Callable, ignore the
-     * method override parameter.
-     */
-    @Test
-    public void testMethodOverrideIgnoredWithCallable() throws Exception
-    {
-        EntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
+  /** Test for proper resolution of a method that takes an array as argument. */
+  // TODO MULE-1088: currently fails, therefore disabled
+  @Test
+  public void testArrayArgumentResolution() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
 
-        RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+    Object payload = new Object[] {new Fruit[] {new Apple(), new Banana()}};
+    RequestContext.setEvent(getTestEvent(payload));
 
-        // those are usually set on the endpoint and copied over to the message
-        MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME).build());
+    FruitBowl bowl = new FruitBowl();
+    assertFalse(bowl.hasApple());
+    assertFalse(bowl.hasBanana());
 
-        Apple apple = new Apple();
-        apple.setAppleCleaner(new FruitCleaner()
-        {
-            @Override
-            public void wash(Fruit fruit)
-            {
-                // dummy
-            }
+    resolverSet.invoke(bowl, RequestContext.getEventContext());
 
-            @Override
-            public void polish(Fruit fruit)
-            {
-                // dummy
-            }
-        });
-        resolver.invoke(apple, RequestContext.getEventContext());
-    }
+    assertTrue(bowl.hasApple());
+    assertTrue(bowl.hasBanana());
+  }
 
-    /**
-     * If there was a method parameter specified to override the discovery mechanism
-     * and a target instance has a method accepting MuleEventContext, proceed to call
-     * this method, ignore the method override parameter.
-     */
-    @Test
-    public void testMethodOverrideIgnoredWithEventContext() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+  /** Test for proper resolution of a method that takes a List as argument. */
+  @Test
+  public void testListArgumentResolution() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+    Object payload = Arrays.asList(new Fruit[] {new Apple(), new Banana()});
+    RequestContext.setEvent(getTestEvent(payload));
 
-        RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+    FruitBowl bowl = new FruitBowl();
+    assertFalse(bowl.hasApple());
+    assertFalse(bowl.hasBanana());
 
-        // those are usually set on the endpoint and copied over to the message
-        final String methodName = "nosuchmethod";
-        final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-        MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+    resolverSet.invoke(bowl, RequestContext.getEventContext());
 
-        try
-        {
-            resolverSet.invoke(new Kiwi(), RequestContext.getEventContext());
-            fail("no such method on service");
-        }
-        catch (EntryPointNotFoundException e)
-        {
-            // expected
-        }
-    }
+    assertTrue(bowl.hasApple());
+    assertTrue(bowl.hasBanana());
+  }
 
-    /** Test for proper resolution of a method that takes an array as argument. */
-    // TODO MULE-1088: currently fails, therefore disabled
-    @Test
-    public void testArrayArgumentResolution() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
+  /** Test for proper resolution of an existing method specified as override */
+  @Test
+  public void testExplicitOverride() throws Exception {
+    EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
 
-        Object payload = new Object[]{new Fruit[]{new Apple(), new Banana()}};
-        RequestContext.setEvent(getTestEvent(payload));
+    Object payload = Arrays.asList(new Fruit[] {new Apple(), new Banana()});
+    RequestContext.setEvent(getTestEvent(payload));
 
-        FruitBowl bowl = new FruitBowl();
-        assertFalse(bowl.hasApple());
-        assertFalse(bowl.hasBanana());
+    final String methodName = "setFruit";
+    final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
+    MuleEvent event = RequestContext.getEventContext().getEvent();
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
 
-        resolverSet.invoke(bowl, RequestContext.getEventContext());
+    FruitBowl bowl = new FruitBowl();
+    assertFalse(bowl.hasApple());
+    assertFalse(bowl.hasBanana());
 
-        assertTrue(bowl.hasApple());
-        assertTrue(bowl.hasBanana());
-    }
+    resolverSet.invoke(bowl, RequestContext.getEventContext());
 
-    /** Test for proper resolution of a method that takes a List as argument. */
-    @Test
-    public void testListArgumentResolution() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
-        Object payload = Arrays.asList(new Fruit[]{new Apple(), new Banana()});
-        RequestContext.setEvent(getTestEvent(payload));
-
-        FruitBowl bowl = new FruitBowl();
-        assertFalse(bowl.hasApple());
-        assertFalse(bowl.hasBanana());
-
-        resolverSet.invoke(bowl, RequestContext.getEventContext());
-
-        assertTrue(bowl.hasApple());
-        assertTrue(bowl.hasBanana());
-    }
-
-    /** Test for proper resolution of an existing method specified as override */
-    @Test
-    public void testExplicitOverride() throws Exception
-    {
-        EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
-
-        Object payload = Arrays.asList(new Fruit[]{new Apple(), new Banana()});
-        RequestContext.setEvent(getTestEvent(payload));
-
-        final String methodName = "setFruit";
-        final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-        MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
-
-        FruitBowl bowl = new FruitBowl();
-        assertFalse(bowl.hasApple());
-        assertFalse(bowl.hasBanana());
-
-        resolverSet.invoke(bowl, RequestContext.getEventContext());
-
-        assertTrue(bowl.hasApple());
-        assertTrue(bowl.hasBanana());
-    }
+    assertTrue(bowl.hasApple());
+    assertTrue(bowl.hasBanana());
+  }
 }

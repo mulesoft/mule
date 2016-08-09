@@ -19,47 +19,43 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class CorrelationResequencerTestCase extends AbstractIntegrationTestCase
-{
-    private CountDownLatch receiveLatch = new CountDownLatch(6);
+public class CorrelationResequencerTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "correlation-resequencer-test-flow.xml";
-    }
+  private CountDownLatch receiveLatch = new CountDownLatch(6);
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected String getConfigFile() {
+    return "correlation-resequencer-test-flow.xml";
+  }
 
-        FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
-        testComponent.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                receiveLatch.countDown();
-            }
-        });
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-    @Test
-    public void testResequencer() throws Exception
-    {
-        flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).asynchronously().run();
+    FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
+    testComponent.setEventCallback(new EventCallback() {
 
-        FunctionalTestComponent resequencer = getFunctionalTestComponent("sorted");
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        receiveLatch.countDown();
+      }
+    });
+  }
 
-        assertTrue(receiveLatch.await(3000, TimeUnit.SECONDS));
+  @Test
+  public void testResequencer() throws Exception {
+    flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).asynchronously().run();
 
-        assertEquals("Wrong number of messages received.", 6, resequencer.getReceivedMessagesCount());
-        assertEquals("Sequence wasn't reordered.", "a", resequencer.getReceivedMessage(1));
-        assertEquals("Sequence wasn't reordered.", "b", resequencer.getReceivedMessage(2));
-        assertEquals("Sequence wasn't reordered.", "c", resequencer.getReceivedMessage(3));
-        assertEquals("Sequence wasn't reordered.", "d", resequencer.getReceivedMessage(4));
-        assertEquals("Sequence wasn't reordered.", "e", resequencer.getReceivedMessage(5));
-        assertEquals("Sequence wasn't reordered.", "f", resequencer.getReceivedMessage(6));
-    }
+    FunctionalTestComponent resequencer = getFunctionalTestComponent("sorted");
+
+    assertTrue(receiveLatch.await(3000, TimeUnit.SECONDS));
+
+    assertEquals("Wrong number of messages received.", 6, resequencer.getReceivedMessagesCount());
+    assertEquals("Sequence wasn't reordered.", "a", resequencer.getReceivedMessage(1));
+    assertEquals("Sequence wasn't reordered.", "b", resequencer.getReceivedMessage(2));
+    assertEquals("Sequence wasn't reordered.", "c", resequencer.getReceivedMessage(3));
+    assertEquals("Sequence wasn't reordered.", "d", resequencer.getReceivedMessage(4));
+    assertEquals("Sequence wasn't reordered.", "e", resequencer.getReceivedMessage(5));
+    assertEquals("Sequence wasn't reordered.", "f", resequencer.getReceivedMessage(6));
+  }
 }

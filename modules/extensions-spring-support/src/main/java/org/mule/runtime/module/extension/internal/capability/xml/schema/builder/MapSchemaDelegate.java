@@ -32,99 +32,96 @@ import java.math.BigInteger;
  *
  * @since 4.0.0
  */
-final class MapSchemaDelegate
-{
+final class MapSchemaDelegate {
 
-    private final ObjectFactory objectFactory = new ObjectFactory();
-    private final SchemaBuilder builder;
+  private final ObjectFactory objectFactory = new ObjectFactory();
+  private final SchemaBuilder builder;
 
-    MapSchemaDelegate(SchemaBuilder builder)
-    {
-        this.builder = builder;
-    }
+  MapSchemaDelegate(SchemaBuilder builder) {
+    this.builder = builder;
+  }
 
-    void generateMapElement(DictionaryType metadataType, DslElementSyntax paramDsl, String description, boolean required, ExplicitGroup all)
-    {
-        BigInteger minOccurs = required ? ONE : ZERO;
-        LocalComplexType mapComplexType = generateMapComplexType(paramDsl, metadataType);
+  void generateMapElement(DictionaryType metadataType, DslElementSyntax paramDsl, String description, boolean required,
+                          ExplicitGroup all) {
+    BigInteger minOccurs = required ? ONE : ZERO;
+    LocalComplexType mapComplexType = generateMapComplexType(paramDsl, metadataType);
 
-        TopLevelElement mapElement = builder.createTopLevelElement(paramDsl.getElementName(), minOccurs, "1");
-        mapElement.setAnnotation(builder.createDocAnnotation(description));
-        all.getParticle().add(objectFactory.createElement(mapElement));
+    TopLevelElement mapElement = builder.createTopLevelElement(paramDsl.getElementName(), minOccurs, "1");
+    mapElement.setAnnotation(builder.createDocAnnotation(description));
+    all.getParticle().add(objectFactory.createElement(mapElement));
 
-        mapElement.setComplexType(mapComplexType);
-    }
+    mapElement.setComplexType(mapComplexType);
+  }
 
-    private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final DictionaryType metadataType)
-    {
-        final MetadataType keyType = metadataType.getKeyType();
-        final MetadataType valueType = metadataType.getValueType();
-        final LocalComplexType entryComplexType = new LocalComplexType();
-        final Attribute keyAttribute = builder.createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, REQUIRED);
-        entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
+  private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final DictionaryType metadataType) {
+    final MetadataType keyType = metadataType.getKeyType();
+    final MetadataType valueType = metadataType.getValueType();
+    final LocalComplexType entryComplexType = new LocalComplexType();
+    final Attribute keyAttribute = builder.createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, REQUIRED);
+    entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
-        final LocalComplexType mapComplexType = new LocalComplexType();
-        final ExplicitGroup mapEntrySequence = new ExplicitGroup();
-        mapComplexType.setSequence(mapEntrySequence);
+    final LocalComplexType mapComplexType = new LocalComplexType();
+    final ExplicitGroup mapEntrySequence = new ExplicitGroup();
+    mapComplexType.setSequence(mapEntrySequence);
 
-        DslElementSyntax entryValueDsl = mapDsl.getGeneric(valueType).orElseThrow(
-                () -> new IllegalArgumentException("Illegal DslSyntax definition of the given DictionaryType. The DslElementSyntax for the entry is required"));
+    DslElementSyntax entryValueDsl = mapDsl.getGeneric(valueType)
+        .orElseThrow(() -> new IllegalArgumentException("Illegal DslSyntax definition of the given DictionaryType. The DslElementSyntax for the entry is required"));
 
-        final TopLevelElement mapEntryElement = new TopLevelElement();
-        mapEntryElement.setName(entryValueDsl.getElementName());
-        mapEntryElement.setMinOccurs(ZERO);
-        mapEntryElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
+    final TopLevelElement mapEntryElement = new TopLevelElement();
+    mapEntryElement.setName(entryValueDsl.getElementName());
+    mapEntryElement.setMinOccurs(ZERO);
+    mapEntryElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
-        valueType.accept(new MetadataTypeVisitor()
-        {
-            @Override
-            public void visitObject(ObjectType objectType)
-            {
-                final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
+    valueType.accept(new MetadataTypeVisitor() {
 
-                entryComplexType.getAttributeOrAttributeGroup().add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
+      @Override
+      public void visitObject(ObjectType objectType) {
+        final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
 
-                if (shouldGenerateChildElement)
-                {
-                    ExplicitGroup singleItemSequence = new ExplicitGroup();
-                    singleItemSequence.setMaxOccurs("1");
+        entryComplexType.getAttributeOrAttributeGroup()
+            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
-                    TopLevelElement mapItemElement = builder.createTypeRef(objectType, false);
-                    singleItemSequence.getParticle().add(objectFactory.createElement(mapItemElement));
+        if (shouldGenerateChildElement) {
+          ExplicitGroup singleItemSequence = new ExplicitGroup();
+          singleItemSequence.setMaxOccurs("1");
 
-                    entryComplexType.setSequence(singleItemSequence);
-                }
-            }
+          TopLevelElement mapItemElement = builder.createTypeRef(objectType, false);
+          singleItemSequence.getParticle().add(objectFactory.createElement(mapItemElement));
 
-            @Override
-            public void visitArrayType(ArrayType arrayType)
-            {
-                entryComplexType.getAttributeOrAttributeGroup().add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
-                entryComplexType.setSequence(new ExplicitGroup());
+          entryComplexType.setSequence(singleItemSequence);
+        }
+      }
 
-                LocalComplexType itemComplexType = new LocalComplexType();
-                MetadataType itemType = arrayType.getType();
-                itemComplexType.getAttributeOrAttributeGroup().add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        entryComplexType.getAttributeOrAttributeGroup()
+            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
+        entryComplexType.setSequence(new ExplicitGroup());
 
-                DslElementSyntax itemDsl = entryValueDsl.getGeneric(itemType).orElseThrow(
-                        () -> new IllegalArgumentException("Illegal DslSyntax definition of the given ArrayType. The DslElementSyntax for the item is required"));
+        LocalComplexType itemComplexType = new LocalComplexType();
+        MetadataType itemType = arrayType.getType();
+        itemComplexType.getAttributeOrAttributeGroup()
+            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
 
-                TopLevelElement itemElement = builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
-                entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
-            }
+        DslElementSyntax itemDsl = entryValueDsl.getGeneric(itemType)
+            .orElseThrow(() -> new IllegalArgumentException("Illegal DslSyntax definition of the given ArrayType. The DslElementSyntax for the item is required"));
 
-            @Override
-            protected void defaultVisit(MetadataType metadataType)
-            {
-                entryComplexType.getAttributeOrAttributeGroup().add(builder.createValueAttribute(valueType));
-            }
-        });
+        TopLevelElement itemElement =
+            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
+        entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
+      }
 
-        mapEntryElement.setComplexType(entryComplexType);
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        entryComplexType.getAttributeOrAttributeGroup().add(builder.createValueAttribute(valueType));
+      }
+    });
 
-        mapEntrySequence.getParticle().add(objectFactory.createElement(mapEntryElement));
+    mapEntryElement.setComplexType(entryComplexType);
 
-        return mapComplexType;
-    }
+    mapEntrySequence.getParticle().add(objectFactory.createElement(mapEntryElement));
+
+    return mapComplexType;
+  }
 
 }

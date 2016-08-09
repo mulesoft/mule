@@ -11,35 +11,29 @@ import java.io.PrintWriter;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 
 /**
- * Takes the log output from the standard CXF LoggingInterceptor, 
- * disassembles it, pretty-prints the XML payload, then puts it all back 
- * together again.
+ * Takes the log output from the standard CXF LoggingInterceptor, disassembles it, pretty-prints the XML payload, then puts it all
+ * back together again.
  */
-public class PrettyLoggingInInterceptor extends LoggingInInterceptor
-{
-    public PrettyLoggingInInterceptor()
-    {
-        super();
-    }
+public class PrettyLoggingInInterceptor extends LoggingInInterceptor {
 
-    public PrettyLoggingInInterceptor(String phase)
-    {
-        super(phase);
-    }
+  public PrettyLoggingInInterceptor() {
+    super();
+  }
 
-    public PrettyLoggingInInterceptor(int lim)
-    {
-        super(lim);
-    }
+  public PrettyLoggingInInterceptor(String phase) {
+    super(phase);
+  }
 
-    public PrettyLoggingInInterceptor(PrintWriter w)
-    {
-        super(w);
-    }
+  public PrettyLoggingInInterceptor(int lim) {
+    super(lim);
+  }
 
-    @Override
-    protected String transform(String originalLogString)
-    {
-        return PrettyLoggingFeature.formatXmlPayload(originalLogString);
-    }
+  public PrettyLoggingInInterceptor(PrintWriter w) {
+    super(w);
+  }
+
+  @Override
+  protected String transform(String originalLogString) {
+    return PrettyLoggingFeature.formatXmlPayload(originalLogString);
+  }
 }

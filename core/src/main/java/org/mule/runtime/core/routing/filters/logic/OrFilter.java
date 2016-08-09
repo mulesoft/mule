@@ -16,46 +16,37 @@ import java.util.List;
  * <code>OrFilter</code> accepts if any of the filters accept the message
  */
 
-public class OrFilter extends AbstractFilterCollection
-{
-    public OrFilter()
-    {
-        super();
-    }
+public class OrFilter extends AbstractFilterCollection {
 
-    public OrFilter(Filter... filters)
-    {
-        super(filters);
-    }
+  public OrFilter() {
+    super();
+  }
 
-    public OrFilter(List<Filter> filters)
-    {
-        super(filters);
-    }
+  public OrFilter(Filter... filters) {
+    super(filters);
+  }
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        for (Filter filter : getFilters())
-        {
-            if(filter.accept(message))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+  public OrFilter(List<Filter> filters) {
+    super(filters);
+  }
 
-    @Override
-    public boolean accept(Object object)
-    {
-        for (Filter filter : getFilters())
-        {
-            if (((ObjectFilter) filter).accept(object))
-            {
-                return true;
-            }
-        }
-        return false;
+  @Override
+  public boolean accept(MuleMessage message) {
+    for (Filter filter : getFilters()) {
+      if (filter.accept(message)) {
+        return true;
+      }
     }
+    return false;
+  }
+
+  @Override
+  public boolean accept(Object object) {
+    for (Filter filter : getFilters()) {
+      if (((ObjectFilter) filter).accept(object)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

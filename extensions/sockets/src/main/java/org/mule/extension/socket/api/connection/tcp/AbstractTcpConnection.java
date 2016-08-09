@@ -27,47 +27,43 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-abstract class AbstractTcpConnection extends AbstractSocketConnection implements Initialisable
-{
+abstract class AbstractTcpConnection extends AbstractSocketConnection implements Initialisable {
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    /**
-     * {@link TcpProtocol}
-     */
-    protected final TcpProtocol protocol;
+  /**
+   * {@link TcpProtocol}
+   */
+  protected final TcpProtocol protocol;
 
-    public AbstractTcpConnection(ConnectionSettings connectionSettings, TcpProtocol protocol)
-    {
-        super(connectionSettings);
-        this.protocol = protocol;
+  public AbstractTcpConnection(ConnectionSettings connectionSettings, TcpProtocol protocol) {
+    super(connectionSettings);
+    this.protocol = protocol;
+  }
+
+  /**
+   * Injection of the {@link ObjectSerializer} is needed for {@link TcpProtocol}
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(protocol, true, muleContext);
+  }
+
+
+  /**
+   * Creates an {@link InetSocketAddress} with the host and port information.
+   *
+   * @param failOnUnresolvedHost whether a {@link UnresolvableHostException} should be thrown if the address couldn't be resolved.
+   * @return an {@link InetSocketAddress} configured with the host and port received
+   */
+  protected InetSocketAddress getSocketAddress(ConnectionSettings connectionSettings, boolean failOnUnresolvedHost)
+      throws ConnectionException {
+
+    InetSocketAddress address = connectionSettings.getInetSocketAddress();
+    if (address.isUnresolved() && failOnUnresolvedHost) {
+      throw new ConnectionException(format("Host '%s' could not be resolved", connectionSettings.getHost()));
     }
-
-    /**
-     * Injection of the {@link ObjectSerializer} is needed for {@link TcpProtocol}
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(protocol, true, muleContext);
-    }
-
-
-    /**
-     * Creates an {@link InetSocketAddress} with the host and port information.
-     *
-     * @param failOnUnresolvedHost whether a {@link UnresolvableHostException} should be thrown if the address couldn't be resolved.
-     * @return an {@link InetSocketAddress} configured with the host and port received
-     */
-    protected InetSocketAddress getSocketAddress(ConnectionSettings connectionSettings, boolean failOnUnresolvedHost) throws ConnectionException
-    {
-
-        InetSocketAddress address = connectionSettings.getInetSocketAddress();
-        if (address.isUnresolved() && failOnUnresolvedHost)
-        {
-            throw new ConnectionException(format("Host '%s' could not be resolved", connectionSettings.getHost()));
-        }
-        return address;
-    }
+    return address;
+  }
 }

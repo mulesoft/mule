@@ -30,55 +30,51 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectJoinOutputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectJoinOutputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectJoinOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectJoinOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-join-output-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-join-output-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsSelectOutputMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("joinMetadata");
+  @Test
+  public void returnsSelectOutputMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("joinMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
-        assertThat(ArrayList.class.getName(), equalTo(listMetaDataModel.getImplementationClass()));
+    DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
+    assertThat(ArrayList.class.getName(), equalTo(listMetaDataModel.getImplementationClass()));
 
-        DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
-        assertThat(mapDataModel.getKeys().size(), equalTo(2));
-        assertThat(mapDataModel.getValueMetaDataModel("NAME"), not(isNull()));
-        assertThat(mapDataModel.getValueMetaDataModel("NAME2"), not(isNull()));
-    }
+    DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
+    assertThat(mapDataModel.getKeys().size(), equalTo(2));
+    assertThat(mapDataModel.getValueMetaDataModel("NAME"), not(isNull()));
+    assertThat(mapDataModel.getValueMetaDataModel("NAME2"), not(isNull()));
+  }
 
-    @Test
-    public void detectsInvalidSelectOutputMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("joinInvalidMetadata");
+  @Test
+  public void detectsInvalidSelectOutputMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("joinInvalidMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
 
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
-        assertThat(outputMetaData.getStatus(), equalTo(Result.Status.FAILURE));
-        assertThat(outputMetaData.get(), nullValue());
-        assertThat(outputMetaData.getMessage(), equalTo(DUPLICATE_COLUMN_LABEL_ERROR));
-    }
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    assertThat(outputMetaData.getStatus(), equalTo(Result.Status.FAILURE));
+    assertThat(outputMetaData.get(), nullValue());
+    assertThat(outputMetaData.getMessage(), equalTo(DUPLICATE_COLUMN_LABEL_ERROR));
+  }
 }

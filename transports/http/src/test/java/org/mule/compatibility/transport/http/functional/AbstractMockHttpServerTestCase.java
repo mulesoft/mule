@@ -10,33 +10,29 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 
-public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase
-{
+public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase {
 
-    private MockHttpServer mockHttpServer;
+  private MockHttpServer mockHttpServer;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        mockHttpServer = getHttpServer();
-        new Thread(mockHttpServer).start();
+    mockHttpServer = getHttpServer();
+    new Thread(mockHttpServer).start();
 
-        assertTrue("MockHttpServer start failed", mockHttpServer.waitUntilServerStarted());
-    }
+    assertTrue("MockHttpServer start failed", mockHttpServer.waitUntilServerStarted());
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
 
-        assertTrue("MockHttpServer failed to shut down", mockHttpServer.waitUntilServerStopped());
-    }
+    assertTrue("MockHttpServer failed to shut down", mockHttpServer.waitUntilServerStopped());
+  }
 
-    /**
-     * Subclasses must implement this method to return their Subclass of
-     * {@link MockHttpServer}.
-     */
-    protected abstract MockHttpServer getHttpServer();
+  /**
+   * Subclasses must implement this method to return their Subclass of {@link MockHttpServer}.
+   */
+  protected abstract MockHttpServer getHttpServer();
 }

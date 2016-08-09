@@ -13,32 +13,23 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 
-public class TransformerWeightingFunctionalTestCase extends AbstractIntegrationTestCase
-{
-    private static final String XML_REQUEST = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                              "<catalog>\n" +
-                                              "    <cd>\n" +
-                                              "        <title>Empire Burlesque</title>\n" +
-                                              "        <artist>Bob Dylan</artist>\n" +
-                                              "        <country>USA</country>\n" +
-                                              "        <company>Columbia</company>\n" +
-                                              "        <price>10.90</price>\n" +
-                                              "        <year>1985</year>\n" +
-                                              "    </cd>\n" +
-                                              "</catalog>";
+public class TransformerWeightingFunctionalTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/transformers/transformer-weighting-functional-config.xml";
-    }
+  private static final String XML_REQUEST =
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<catalog>\n" + "    <cd>\n" + "        <title>Empire Burlesque</title>\n"
+          + "        <artist>Bob Dylan</artist>\n" + "        <country>USA</country>\n" + "        <company>Columbia</company>\n"
+          + "        <price>10.90</price>\n" + "        <year>1985</year>\n" + "    </cd>\n" + "</catalog>";
 
-    @Test
-    public void findTwoTransformers() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("test").withPayload(XML_REQUEST).run();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/transformers/transformer-weighting-functional-config.xml";
+  }
 
-        MuleMessage response = muleEvent.getMessage();
-        XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));
-    }
+  @Test
+  public void findTwoTransformers() throws Exception {
+    final MuleEvent muleEvent = flowRunner("test").withPayload(XML_REQUEST).run();
+
+    MuleMessage response = muleEvent.getMessage();
+    XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));
+  }
 }

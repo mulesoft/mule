@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleException;
 /**
  *
  */
-interface CallAndExpect
-{
-    void callEndpointAndExecuteAsserts() throws MuleException;
+interface CallAndExpect {
+
+  void callEndpointAndExecuteAsserts() throws MuleException;
 }

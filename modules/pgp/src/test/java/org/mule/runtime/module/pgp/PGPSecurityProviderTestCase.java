@@ -16,39 +16,36 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestCase
-{
-    private PGPSecurityProvider securityProvider;
-    private Message message;
+public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  private PGPSecurityProvider securityProvider;
+  private Message message;
 
-        securityProvider = new PGPSecurityProvider();
-        securityProvider.setKeyManager(keyManager);
-        securityProvider.initialise();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        URL url = Thread.currentThread().getContextClassLoader().getResource("./signed.asc");
-        FileInputStream in = new FileInputStream(url.getFile());
+    securityProvider = new PGPSecurityProvider();
+    securityProvider.setKeyManager(keyManager);
+    securityProvider.initialise();
 
-        message = MessageFactory.getMessage(IOUtils.toByteArray(in));
-    }
+    URL url = Thread.currentThread().getContextClassLoader().getResource("./signed.asc");
+    FileInputStream in = new FileInputStream(url.getFile());
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        securityProvider = null;
-        message = null;
-        super.doTearDown();
-    }
+    message = MessageFactory.getMessage(IOUtils.toByteArray(in));
+  }
 
-    @Test
-    public void testAuthenticate() throws Exception
-    {
-        Authentication auth = new PGPAuthentication("Mule client <mule_client@mule.com>", message);
-        auth = securityProvider.authenticate(auth);
-        assertTrue(auth.isAuthenticated());
-    }
+  @Override
+  protected void doTearDown() throws Exception {
+    securityProvider = null;
+    message = null;
+    super.doTearDown();
+  }
+
+  @Test
+  public void testAuthenticate() throws Exception {
+    Authentication auth = new PGPAuthentication("Mule client <mule_client@mule.com>", message);
+    auth = securityProvider.authenticate(auth);
+    assertTrue(auth.isAuthenticated());
+  }
 }

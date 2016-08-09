@@ -12,27 +12,23 @@ import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.simple.ByteArrayToMuleMessage;
 import org.mule.runtime.core.transformer.simple.MuleMessageToByteArray;
 
-public class SerializedMuleMessageWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
-{
+public class SerializedMuleMessageWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase {
 
-    @Override
-    protected WireFormat getWireFormat() throws Exception
-    {
-        return createObject(SerializedMuleMessageWireFormat.class);
-    }
+  @Override
+  protected WireFormat getWireFormat() throws Exception {
+    return createObject(SerializedMuleMessageWireFormat.class);
+  }
 
-    @Override
-    public void testGetDefaultInboundTransformer() throws Exception
-    {
-        SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
-        assertEquals(ByteArrayToMuleMessage.class, wireFormat.getInboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultInboundTransformer() throws Exception {
+    SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
+    assertEquals(ByteArrayToMuleMessage.class, wireFormat.getInboundTransformer().getClass());
+  }
 
-    @Override
-    public void testGetDefaultOutboundTransformer() throws Exception
-    {
-        SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
-        assertEquals(MuleMessageToByteArray.class, wireFormat.getOutboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultOutboundTransformer() throws Exception {
+    SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
+    assertEquals(MuleMessageToByteArray.class, wireFormat.getOutboundTransformer().getClass());
+  }
 
 }

@@ -12,46 +12,40 @@ import org.junit.Test;
 
 /**
  * This constructs a <em>temporary</em> bean whose contents are injected into a parent map by
- * {@link org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler}.  Since this occurs
- * <em>before</em> child elements are processed this will <em>cannot</em> handle nested elements.
+ * {@link org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler}. Since this occurs <em>before</em> child elements
+ * are processed this will <em>cannot</em> handle nested elements.
  */
-public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/map-entry-combiner-test.xml";
+public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/map-entry-combiner-test.xml";
+  }
+
+  @Test
+  public void testProperties() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    assertMapEntryExists(bean.getMap(), "0", 0);
+  }
+
+  @Test
+  public void testCombinedMap() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    for (int i = 0; i < 6; ++i) {
+      assertMapEntryExists(bean.getMap(), Integer.toString(i + 1), i + 1);
+    }
+  }
+
+  @Test
+  public void testReversedOrder() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    for (int i = 0; i < 2; ++i) {
+      assertMapEntryExists(bean.getMap(), Integer.toString(i + 1), i + 1);
     }
 
-    @Test
-    public void testProperties()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        assertMapEntryExists(bean.getMap(), "0", 0);
-    }
-
-    @Test
-    public void testCombinedMap()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        for (int i = 0; i < 6; ++i)
-        {
-            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
-        }
-    }
-
-    @Test
-    public void testReversedOrder()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        for (int i = 0; i < 2; ++i)
-        {
-            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
-        }
-
-    }
+  }
 
 }

@@ -12,11 +12,11 @@ package org.mule.functional.listener;
  *
  * @param <T> the type of the source object provided by the listened notification.
  */
-public interface Callback<T>
-{
+public interface Callback<T> {
 
-    /**
-     * @param source is the source value of the {@link org.mule.runtime.core.api.context.notification.ServerNotification} received by the notification listener that executes this callback
-     */
-    public void execute(final T source);
+  /**
+   * @param source is the source value of the {@link org.mule.runtime.core.api.context.notification.ServerNotification} received
+   *        by the notification listener that executes this callback
+   */
+  public void execute(final T source);
 }

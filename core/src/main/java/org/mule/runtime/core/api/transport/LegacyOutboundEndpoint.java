@@ -14,27 +14,24 @@ import org.mule.runtime.core.api.routing.filter.Filter;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface LegacyOutboundEndpoint
-{
+public interface LegacyOutboundEndpoint {
 
-    /**
-     * The filter to apply to incoming messages. Only applies when the endpoint endpointUri is a receiver
-     *
-     * @return the Filter to use or null if one is not set
-     */
-    Filter getFilter();
+  /**
+   * The filter to apply to incoming messages. Only applies when the endpoint endpointUri is a receiver
+   *
+   * @return the Filter to use or null if one is not set
+   */
+  Filter getFilter();
 
-    MessageExchangePattern getExchangePattern();
+  MessageExchangePattern getExchangePattern();
 
-    default boolean filterAccepts(MuleMessage message)
-    {
-        return getFilter() == null || (getFilter() != null && getFilter().accept(message));
-    }
+  default boolean filterAccepts(MuleMessage message) {
+    return getFilter() == null || (getFilter() != null && getFilter().accept(message));
+  }
 
-    default boolean mayReturnVoidEvent()
-    {
-        MessageExchangePattern exchangePattern = getExchangePattern();
-        return exchangePattern == null ? true : !exchangePattern.hasResponse();
-    }
+  default boolean mayReturnVoidEvent() {
+    MessageExchangePattern exchangePattern = getExchangePattern();
+    return exchangePattern == null ? true : !exchangePattern.hasResponse();
+  }
 
 }

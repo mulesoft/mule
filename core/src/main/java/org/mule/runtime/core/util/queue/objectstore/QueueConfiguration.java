@@ -15,68 +15,57 @@ import java.io.Serializable;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public class QueueConfiguration implements org.mule.runtime.core.util.queue.QueueConfiguration
-{
-    public final static int INFINITY_CAPACTY = 0;
-    protected final int capacity;
-    protected final QueueStore<Serializable> objectStore;
+public class QueueConfiguration implements org.mule.runtime.core.util.queue.QueueConfiguration {
 
-    public QueueConfiguration(MuleContext context, int capacity, QueueStore<Serializable> objectStore)
-    {
-        this.capacity = capacity;
-        this.objectStore = objectStore;
-    }
+  public final static int INFINITY_CAPACTY = 0;
+  protected final int capacity;
+  protected final QueueStore<Serializable> objectStore;
 
-    public QueueConfiguration(int capacity, QueueStore<Serializable> objectStore)
-    {
-        this.capacity = capacity;
-        this.objectStore = objectStore;
-    }
+  public QueueConfiguration(MuleContext context, int capacity, QueueStore<Serializable> objectStore) {
+    this.capacity = capacity;
+    this.objectStore = objectStore;
+  }
 
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + capacity;
-        result = prime * result + objectStore.hashCode();
-        return result;
-    }
+  public QueueConfiguration(int capacity, QueueStore<Serializable> objectStore) {
+    this.capacity = capacity;
+    this.objectStore = objectStore;
+  }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (getClass() != obj.getClass())
-        {
-            return false;
-        }
-        QueueConfiguration other = (QueueConfiguration) obj;
-        if (capacity != other.capacity)
-        {
-            return false;
-        }
-        if (!objectStore.equals(objectStore))
-        {
-            return false;
-        }
-        return true;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + capacity;
+    result = prime * result + objectStore.hashCode();
+    return result;
+  }
 
-    public boolean isPersistent()
-    {
-        return objectStore.isPersistent();
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    QueueConfiguration other = (QueueConfiguration) obj;
+    if (capacity != other.capacity) {
+      return false;
+    }
+    if (!objectStore.equals(objectStore)) {
+      return false;
+    }
+    return true;
+  }
 
-    public int getCapacity()
-    {
-        return capacity;
-    }
+  public boolean isPersistent() {
+    return objectStore.isPersistent();
+  }
+
+  public int getCapacity() {
+    return capacity;
+  }
 }

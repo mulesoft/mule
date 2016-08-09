@@ -26,107 +26,101 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
-public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
-{
+public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase {
 
-    private static String USERNAME = "username";
-    private static String PASSWORD = "password";
+  private static String USERNAME = "username";
+  private static String PASSWORD = "password";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/activemq-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/activemq-config.xml";
+  }
 
-    @Test
-    public void testConfigurationDefaults() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-        assertNotNull(c);
+  @Test
+  public void testConfigurationDefaults() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+    assertNotNull(c);
 
-        assertFalse(c.isEagerConsumer());
-        
-        ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQConnectionFactory);
-        assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
-        
-        assertNotNull(c.getTopicResolver());
-        assertTrue("Wrong topic resolver configured on the connector.",
-                   c.getTopicResolver() instanceof DefaultJmsTopicResolver);
-    }
-    
-    @Test
-    public void testDefaultActiveMqConnectorConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnector");
+    assertFalse(c.isEagerConsumer());
 
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
-        
-        assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
-        assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertNull(c.getUsername());
-        assertNull(c.getPassword());
+    ConnectionFactory cf = c.getConnectionFactory();
+    assertTrue(cf instanceof ActiveMQConnectionFactory);
+    assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof JmsXRedeliveryHandler);
-        
-        assertFalse(c.isDurable());
-        assertFalse(c.isNoLocal());
-        assertFalse(c.isPersistentDelivery());
-        assertEquals(0, c.getMaxRedelivery());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
+    assertNotNull(c.getTopicResolver());
+    assertTrue("Wrong topic resolver configured on the connector.", c.getTopicResolver() instanceof DefaultJmsTopicResolver);
+  }
 
-        assertEquals("1.0.2b", c.getSpecification());
-    }
-    
-    @Test
-    public void testCustomActiveMqConnectorConfig() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("customActiveMqJmsConnector");
+  @Test
+  public void testDefaultActiveMqConnectorConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnector");
 
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
+    assertNotNull(c);
+    assertTrue(c instanceof ActiveMQJmsConnector);
 
-        assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof CachingConnectionFactory);
-        assertTrue(((CachingConnectionFactory) c.getConnectionFactory()).getTargetConnectionFactory() instanceof ActiveMQConnectionFactory);
-        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertNull(c.getUsername());
-        assertNull(c.getPassword());
+    assertNotNull(c.getConnectionFactory());
+    assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
+    assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
+    assertNull(c.getUsername());
+    assertNull(c.getPassword());
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+    assertNotNull(c.getRedeliveryHandlerFactory());
+    assertTrue(c.getRedeliveryHandlerFactory().create() instanceof JmsXRedeliveryHandler);
 
-        assertEquals("myClient", c.getClientId());
-        assertTrue(c.isDurable());
-        assertTrue(c.isNoLocal());
-        assertTrue(c.isPersistentDelivery());
-        assertEquals(5, c.getMaxRedelivery());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
+    assertFalse(c.isDurable());
+    assertFalse(c.isNoLocal());
+    assertFalse(c.isPersistentDelivery());
+    assertEquals(0, c.getMaxRedelivery());
+    assertTrue(c.isCacheJmsSessions());
+    assertFalse(c.isEagerConsumer());
 
-        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
-    }
+    assertEquals("1.0.2b", c.getSpecification());
+  }
 
-    /**
-     * See MULE-8221
-     */
-    @Test
-    public void testActiveMqConnectorWithUsernameAndPassword() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnectorWithUsernameAndPassword");
+  @Test
+  public void testCustomActiveMqConnectorConfig() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("customActiveMqJmsConnector");
 
-        assertTrue(c instanceof ActiveMQJmsConnector);
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
+    assertNotNull(c);
+    assertTrue(c instanceof ActiveMQJmsConnector);
 
-        assertEquals(USERNAME, c.getUsername());
-        assertEquals(PASSWORD, c.getPassword());
-        assertTrue(c.isCacheJmsSessions());
-        assertEquals("1.1", c.getSpecification());
-    }
+    assertNotNull(c.getConnectionFactory());
+    assertTrue(c.getConnectionFactory() instanceof CachingConnectionFactory);
+    assertTrue(((CachingConnectionFactory) c.getConnectionFactory())
+        .getTargetConnectionFactory() instanceof ActiveMQConnectionFactory);
+    assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
+    assertNull(c.getUsername());
+    assertNull(c.getPassword());
+
+    assertNotNull(c.getRedeliveryHandlerFactory());
+    assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+
+    assertEquals("myClient", c.getClientId());
+    assertTrue(c.isDurable());
+    assertTrue(c.isNoLocal());
+    assertTrue(c.isPersistentDelivery());
+    assertEquals(5, c.getMaxRedelivery());
+    assertTrue(c.isCacheJmsSessions());
+    assertFalse(c.isEagerConsumer());
+
+    assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
+  }
+
+  /**
+   * See MULE-8221
+   */
+  @Test
+  public void testActiveMqConnectorWithUsernameAndPassword() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnectorWithUsernameAndPassword");
+
+    assertTrue(c instanceof ActiveMQJmsConnector);
+    assertTrue(c.isConnected());
+    assertTrue(c.isStarted());
+
+    assertEquals(USERNAME, c.getUsername());
+    assertEquals(PASSWORD, c.getPassword());
+    assertTrue(c.isCacheJmsSessions());
+    assertEquals("1.1", c.getSpecification());
+  }
 
 }

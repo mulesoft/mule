@@ -11,9 +11,9 @@ import org.mule.runtime.core.api.management.stats.Statistics;
 /**
  * Exposes methods required to increment/decrement queue statistics
  */
-public interface QueueStatistics extends Statistics
-{
-    void incQueuedEvent();
+public interface QueueStatistics extends Statistics {
 
-    void decQueuedEvent();
+  void incQueuedEvent();
+
+  void decQueuedEvent();
 }

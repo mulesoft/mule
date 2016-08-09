@@ -17,78 +17,69 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase
-{
+public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
-    private static final String KEY = "Name";
-    private static final String VALUE = "MG";
-    private ExpressionLanguage el;
+  private static final String KEY = "Name";
+  private static final String VALUE = "MG";
+  private ExpressionLanguage el;
 
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        el = muleContext.getExpressionLanguage();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    el = muleContext.getExpressionLanguage();
+  }
 
-    @Test
-    public void keyWithNonNullValue() throws Exception
-    {
-        Map<String, String> payload = new HashMap<String, String>();
-        payload.put(KEY, VALUE);
+  @Test
+  public void keyWithNonNullValue() throws Exception {
+    Map<String, String> payload = new HashMap<String, String>();
+    payload.put(KEY, VALUE);
 
-        assertMapKey(payload, KEY, VALUE);
-    }
+    assertMapKey(payload, KEY, VALUE);
+  }
 
-    @Test
-    public void keyWithNullValue() throws Exception
-    {
-        Map<String, String> payload = new HashMap<String, String>();
-        assertMapKey(payload, KEY, null);
-    }
+  @Test
+  public void keyWithNullValue() throws Exception {
+    Map<String, String> payload = new HashMap<String, String>();
+    assertMapKey(payload, KEY, null);
+  }
 
-    @Test
-    public void keyWithNullableValue() throws Exception
-    {
-        Map<String, String> payload = new HashMap<String, String>();
-        payload.put(KEY, VALUE);
+  @Test
+  public void keyWithNullableValue() throws Exception {
+    Map<String, String> payload = new HashMap<String, String>();
+    payload.put(KEY, VALUE);
 
-        MuleEvent event = getTestEvent(payload);
+    MuleEvent event = getTestEvent(payload);
 
-        assertMapKey(event, KEY, VALUE);
-        payload.remove(KEY);
-        assertMapKey(event, KEY, null);
-    }
+    assertMapKey(event, KEY, VALUE);
+    payload.remove(KEY);
+    assertMapKey(event, KEY, null);
+  }
 
-    @Test
-    public void nullKeyWhichGetsValueLater() throws Exception
-    {
-        Map<String, String> payload = new HashMap<String, String>();
+  @Test
+  public void nullKeyWhichGetsValueLater() throws Exception {
+    Map<String, String> payload = new HashMap<String, String>();
 
-        MuleEvent event = getTestEvent(payload);
+    MuleEvent event = getTestEvent(payload);
 
-        assertMapKey(event, KEY, null);
+    assertMapKey(event, KEY, null);
 
-        payload.put(KEY, VALUE);
-        assertMapKey(event, KEY, VALUE);
-    }
+    payload.put(KEY, VALUE);
+    assertMapKey(event, KEY, VALUE);
+  }
 
-    private void assertMapKey(Object payload, String key, Object expectedValue) throws Exception
-    {
-        assertMapKey(getTestEvent(payload), key, expectedValue);
-    }
+  private void assertMapKey(Object payload, String key, Object expectedValue) throws Exception {
+    assertMapKey(getTestEvent(payload), key, expectedValue);
+  }
 
-    private void assertMapKey(MuleEvent event, String key, Object expectedValue) throws Exception
-    {
-        runExpressionAndExpect(String.format("#[payload.%s]", key), expectedValue, event);
-        runExpressionAndExpect(String.format("#[payload['%s']]", key), expectedValue, event);
-        runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
-    }
+  private void assertMapKey(MuleEvent event, String key, Object expectedValue) throws Exception {
+    runExpressionAndExpect(String.format("#[payload.%s]", key), expectedValue, event);
+    runExpressionAndExpect(String.format("#[payload['%s']]", key), expectedValue, event);
+    runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
+  }
 
-    private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event)
-    {
-        Object result = el.evaluate(expression, event);
-        assertThat(String.format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
-    }
+  private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event) {
+    Object result = el.evaluate(expression, event);
+    assertThat(String.format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
+  }
 }

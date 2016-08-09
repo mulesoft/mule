@@ -12,55 +12,40 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 
 /**
- * Defines a simple {@link JndiNameResolver} that maintains a {@link Context}
- * instance opened all the time and always relies on the context to do the look
- * ups.
+ * Defines a simple {@link JndiNameResolver} that maintains a {@link Context} instance opened all the time and always relies on
+ * the context to do the look ups.
  */
-public class SimpleJndiNameResolver extends AbstractJndiNameResolver
-{
+public class SimpleJndiNameResolver extends AbstractJndiNameResolver {
 
-    // @GuardedBy(this)
-    private Context jndiContext;
+  // @GuardedBy(this)
+  private Context jndiContext;
 
-    @Override
-    public synchronized Object lookup(String name) throws NamingException
-    {
-        return jndiContext.lookup(name);
+  @Override
+  public synchronized Object lookup(String name) throws NamingException {
+    return jndiContext.lookup(name);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (jndiContext == null) {
+      try {
+        jndiContext = createInitialContext();
+      } catch (NamingException e) {
+        throw new InitialisationException(e, this);
+      }
     }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (jndiContext == null)
-        {
-            try
-            {
-                jndiContext = createInitialContext();
-            }
-            catch (NamingException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
+  @Override
+  public void dispose() {
+    if (jndiContext != null) {
+      try {
+        jndiContext.close();
+      } catch (NamingException e) {
+        logger.error("Jms connector failed to dispose properly: ", e);
+      } finally {
+        jndiContext = null;
+      }
     }
-
-    @Override
-    public void dispose()
-    {
-        if (jndiContext != null)
-        {
-            try
-            {
-                jndiContext.close();
-            }
-            catch (NamingException e)
-            {
-                logger.error("Jms connector failed to dispose properly: ", e);
-            }
-            finally
-            {
-                jndiContext = null;
-            }
-        }
-    }
+  }
 }

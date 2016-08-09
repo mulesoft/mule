@@ -14,34 +14,29 @@ import org.mule.runtime.module.extension.file.api.FileMetadataResolverTestCommon
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileMetadataResolverTestCase extends FileConnectorTestCase
-{
+public class FileMetadataResolverTestCase extends FileConnectorTestCase {
 
-    private MetadataManager manager;
-    private FileMetadataResolverTestCommon testCommon;
+  private MetadataManager manager;
+  private FileMetadataResolverTestCommon testCommon;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-metadata-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-metadata-config.xml";
+  }
 
-    @Before
-    public void setupManager() throws RegistrationException
-    {
-        manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
-        testCommon = new FileMetadataResolverTestCommon();
-    }
+  @Before
+  public void setupManager() throws RegistrationException {
+    manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
+    testCommon = new FileMetadataResolverTestCommon();
+  }
 
-    @Test
-    public void getReadAttributesMetadata()
-    {
-        testCommon.testReadAttributesMetadata(manager, LocalFileAttributes.class);
-    }
+  @Test
+  public void getReadAttributesMetadata() {
+    testCommon.testReadAttributesMetadata(manager, LocalFileAttributes.class);
+  }
 
-    @Test
-    public void getListOperationOutputMetadata()
-    {
-        testCommon.testTreeNodeType(manager, LocalFileAttributes.class);
-    }
+  @Test
+  public void getListOperationOutputMetadata() {
+    testCommon.testTreeNodeType(manager, LocalFileAttributes.class);
+  }
 }

@@ -15,45 +15,37 @@ import org.mule.runtime.core.api.MuleException;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class MuleEventCheckAnswer extends Object implements Answer<MuleEvent>
-{
-    private MuleEvent returnEvent;
-    private MuleException exceptionToThrow;
+public class MuleEventCheckAnswer extends Object implements Answer<MuleEvent> {
 
-    public MuleEventCheckAnswer()
-    {
-        this((MuleEvent) null);
+  private MuleEvent returnEvent;
+  private MuleException exceptionToThrow;
+
+  public MuleEventCheckAnswer() {
+    this((MuleEvent) null);
+  }
+
+  public MuleEventCheckAnswer(MuleEvent returnEvent) {
+    this.returnEvent = returnEvent;
+  }
+
+  public MuleEventCheckAnswer(MuleException ex) {
+    this.exceptionToThrow = ex;
+  }
+
+  @Override
+  public MuleEvent answer(InvocationOnMock invocation) throws Throwable {
+    if (exceptionToThrow != null) {
+      throw exceptionToThrow;
+    } else {
+      return checkInvocation(invocation);
     }
+  }
 
-    public MuleEventCheckAnswer(MuleEvent returnEvent)
-    {
-        this.returnEvent = returnEvent;
-    }
+  private MuleEvent checkInvocation(InvocationOnMock invocation) {
+    Object[] arguments = invocation.getArguments();
+    assertEquals(1, arguments.length);
+    assertTrue(arguments[0] instanceof MuleEvent);
 
-    public MuleEventCheckAnswer(MuleException ex)
-    {
-        this.exceptionToThrow = ex;
-    }
-
-    @Override
-    public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-    {
-        if (exceptionToThrow != null)
-        {
-            throw exceptionToThrow;
-        }
-        else
-        {
-            return checkInvocation(invocation);
-        }
-    }
-
-    private MuleEvent checkInvocation(InvocationOnMock invocation)
-    {
-        Object[] arguments = invocation.getArguments();
-        assertEquals(1, arguments.length);
-        assertTrue(arguments[0] instanceof MuleEvent);
-
-        return returnEvent;
-    }
+    return returnEvent;
+  }
 }

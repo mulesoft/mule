@@ -11,39 +11,33 @@ import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class BooleanAttributeSelectionDefinitionParser extends AbstractParallelDelegatingDefinitionParser
-{
+public class BooleanAttributeSelectionDefinitionParser extends AbstractParallelDelegatingDefinitionParser {
 
-    private String attribute;
-    private boolean dflt;
-    private MuleDefinitionParser whenTrue;
-    private MuleDefinitionParser whenFalse;
+  private String attribute;
+  private boolean dflt;
+  private MuleDefinitionParser whenTrue;
+  private MuleDefinitionParser whenFalse;
 
-    public BooleanAttributeSelectionDefinitionParser(String attribute, boolean dflt, MuleDefinitionParser whenTrue, MuleDefinitionParser whenFalse)
-    {
-        super(new MuleDefinitionParser[]{whenTrue, whenFalse});
-        this.attribute = attribute;
-        this.dflt = dflt;
-        this.whenTrue = whenTrue;
-        this.whenFalse = whenFalse;
-        addIgnored(attribute);
+  public BooleanAttributeSelectionDefinitionParser(String attribute, boolean dflt, MuleDefinitionParser whenTrue,
+                                                   MuleDefinitionParser whenFalse) {
+    super(new MuleDefinitionParser[] {whenTrue, whenFalse});
+    this.attribute = attribute;
+    this.dflt = dflt;
+    this.whenTrue = whenTrue;
+    this.whenFalse = whenFalse;
+    addIgnored(attribute);
+  }
+
+  protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext) {
+    boolean value = dflt;
+    if (null != element && element.hasAttribute(attribute)) {
+      value = Boolean.valueOf(element.getAttribute(attribute)).booleanValue();
     }
-
-    protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
-    {
-        boolean value = dflt;
-        if (null != element && element.hasAttribute(attribute))
-        {
-            value = Boolean.valueOf(element.getAttribute(attribute)).booleanValue();
-        }
-        if (value)
-        {
-            return whenTrue;
-        }
-        else
-        {
-            return whenFalse;
-        }
+    if (value) {
+      return whenTrue;
+    } else {
+      return whenFalse;
     }
+  }
 
 }

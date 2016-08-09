@@ -16,23 +16,20 @@ import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand
  *
  * @since 4.0
  */
-public final class SftpCreateDirectoryCommand extends SftpCommand implements CreateDirectoryCommand
-{
+public final class SftpCreateDirectoryCommand extends SftpCommand implements CreateDirectoryCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpCreateDirectoryCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public SftpCreateDirectoryCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createDirectory(FileConnectorConfig config, String directoryName)
-    {
-        super.createDirectory(config, directoryName);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createDirectory(FileConnectorConfig config, String directoryName) {
+    super.createDirectory(config, directoryName);
+  }
 }

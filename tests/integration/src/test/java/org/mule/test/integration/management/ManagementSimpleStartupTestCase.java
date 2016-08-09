@@ -14,23 +14,21 @@ import org.mule.runtime.module.management.agent.DefaultJmxSupportAgent;
 
 import org.junit.Test;
 
-public class ManagementSimpleStartupTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/management/management-simple-startup-test.xml";
-    }
+public class ManagementSimpleStartupTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testAgentConfiguration() throws MuleException
-    {
-        DefaultJmxSupportAgent agent = (DefaultJmxSupportAgent) muleContext.getRegistry().lookupAgent("jmx-default-config");
-        assertNotNull(agent);
-        // these values are different from DEFAULT_HOST and DEFAULT_PORT in agent
-        assertNotNull(agent.getHost());
-        assertEquals("0.0.0.0", agent.getHost());
-        assertNotNull(agent.getPort());
-        assertEquals("1100", agent.getPort());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/management/management-simple-startup-test.xml";
+  }
+
+  @Test
+  public void testAgentConfiguration() throws MuleException {
+    DefaultJmxSupportAgent agent = (DefaultJmxSupportAgent) muleContext.getRegistry().lookupAgent("jmx-default-config");
+    assertNotNull(agent);
+    // these values are different from DEFAULT_HOST and DEFAULT_PORT in agent
+    assertNotNull(agent.getHost());
+    assertEquals("0.0.0.0", agent.getHost());
+    assertNotNull(agent.getPort());
+    assertEquals("1100", agent.getPort());
+  }
 }

@@ -13,25 +13,22 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 
-public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase
-{
+public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase {
 
-    @Override
-    public void doSetUp()
-    {
-        setProtocol(new XmlMessageEOFProtocol());
-    }
+  @Override
+  public void doSetUp() {
+    setProtocol(new XmlMessageEOFProtocol());
+  }
 
-    @Override
-    public void testSlowStream() throws Exception
-    {
-        String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
+  @Override
+  public void testSlowStream() throws Exception {
+    String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
 
-        SlowInputStream bais = new SlowInputStream(msgData.getBytes());
+    SlowInputStream bais = new SlowInputStream(msgData.getBytes());
 
-        InputStream result = read(bais);
-        assertNotNull(result);
-        assertEquals(msgData, IOUtils.toString(result));
-    }
+    InputStream result = read(bais);
+    assertNotNull(result);
+    assertEquals(msgData, IOUtils.toString(result));
+  }
 
 }

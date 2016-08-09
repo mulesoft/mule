@@ -13,16 +13,14 @@ import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 /**
  * Creates {@link DbConfigResolver} for MySql databases
  */
-public class MySqlConfigResolverFactoryBean extends AbstractVendorConfigResolverFactoryBean
-{
+public class MySqlConfigResolverFactoryBean extends AbstractVendorConfigResolverFactoryBean {
 
-    private static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private static final String MYSQL_URL_PREFIX = "jdbc:mysql://";
+  private static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+  private static final String MYSQL_URL_PREFIX = "jdbc:mysql://";
 
-    public MySqlConfigResolverFactoryBean()
-    {
-        super(MYSQL_URL_PREFIX, new GenericDbConfigFactory());
+  public MySqlConfigResolverFactoryBean() {
+    super(MYSQL_URL_PREFIX, new GenericDbConfigFactory());
 
-        setDriverClassName(DRIVER_CLASS_NAME);
-    }
+    setDriverClassName(DRIVER_CLASS_NAME);
+  }
 }

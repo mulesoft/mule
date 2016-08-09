@@ -8,33 +8,27 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Delta extends AggregateCounter
-{
-    private double first = 0.0;
-    private double second = 0.0;
+public class Delta extends AggregateCounter {
 
-    public Delta(String name, AbstractCounter base)
-    {
-        super(name, Type.DELTA, base);
-    }
+  private double first = 0.0;
+  private double second = 0.0;
 
-    @Override
-    public double nextValue()
-    {
-        if (Double.isNaN(first) || Double.isNaN(second))
-        {
-            return Double.NaN;
-        }
-        else
-        {
-            return second - first > 0.0 ? second - first : 0.0;
-        }
-    }
+  public Delta(String name, AbstractCounter base) {
+    super(name, Type.DELTA, base);
+  }
 
-    @Override
-    public void doCompute()
-    {
-        first = second;
-        second = this.getBase().nextValue();
+  @Override
+  public double nextValue() {
+    if (Double.isNaN(first) || Double.isNaN(second)) {
+      return Double.NaN;
+    } else {
+      return second - first > 0.0 ? second - first : 0.0;
     }
+  }
+
+  @Override
+  public void doCompute() {
+    first = second;
+    second = this.getBase().nextValue();
+  }
 }

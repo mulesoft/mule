@@ -12,14 +12,14 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * Enables an artifact to be matched for routing before actually routing to it
  */
-public interface Matchable
-{
-    /**
-     * Determines if the event should be processed
-     *
-     * @param event the current event to evaluate
-     * @return true if the event should be processed by this router
-     * @throws MuleException if the event cannot be evaluated
-     */
-    boolean isMatch(MuleEvent event) throws MuleException;
+public interface Matchable {
+
+  /**
+   * Determines if the event should be processed
+   *
+   * @param event the current event to evaluate
+   * @return true if the event should be processed by this router
+   * @throws MuleException if the event cannot be evaluated
+   */
+  boolean isMatch(MuleEvent event) throws MuleException;
 }

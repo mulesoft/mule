@@ -9,19 +9,16 @@ package org.mule.runtime.module.db.internal.domain.logger;
 
 import org.slf4j.Logger;
 
-public class DebugBulkQueryLogger extends AbstractDebugQueryLogger implements BulkQueryLogger
-{
+public class DebugBulkQueryLogger extends AbstractDebugQueryLogger implements BulkQueryLogger {
 
-    public DebugBulkQueryLogger(Logger logger)
-    {
-        super(logger);
-        builder.append("Executing bulk query:\n");
-    }
+  public DebugBulkQueryLogger(Logger logger) {
+    super(logger);
+    builder.append("Executing bulk query:\n");
+  }
 
 
-    @Override
-    public void addQuery(String query)
-    {
-        builder.append(query).append("\n");
-    }
+  @Override
+  public void addQuery(String query) {
+    builder.append(query).append("\n");
+  }
 }

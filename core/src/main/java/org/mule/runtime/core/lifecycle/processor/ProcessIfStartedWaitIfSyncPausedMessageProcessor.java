@@ -13,47 +13,33 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
-public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends
-    ProcessIfStartedWaitIfPausedMessageProcessor
-{
+public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends ProcessIfStartedWaitIfPausedMessageProcessor {
 
-    public ProcessIfStartedWaitIfSyncPausedMessageProcessor(Startable startable, LifecycleState lifecycleState)
-    {
-        super(startable, lifecycleState);
-    }
+  public ProcessIfStartedWaitIfSyncPausedMessageProcessor(Startable startable, LifecycleState lifecycleState) {
+    super(startable, lifecycleState);
+  }
 
-    // TODO DF This needs refactoring. This is to ensure processNext()
-    // is used and not next.process()
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (accept(event))
-        {
-            if (isPaused() && event.getExchangePattern().hasResponse())
-            {
-                try
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
-                                     + " is paused. Blocking call until resumd");
-                    }
-                    while (isPaused())
-                    {
-                        Thread.sleep(500);
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    throw new MessagingException(
-                        CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
-                }
-            }
-            return processNext(event);
+  // TODO DF This needs refactoring. This is to ensure processNext()
+  // is used and not next.process()
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (accept(event)) {
+      if (isPaused() && event.getExchangePattern().hasResponse()) {
+        try {
+          if (logger.isDebugEnabled()) {
+            logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
+                + " is paused. Blocking call until resumd");
+          }
+          while (isPaused()) {
+            Thread.sleep(500);
+          }
+        } catch (InterruptedException e) {
+          throw new MessagingException(CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
         }
-        else
-        {
-            return handleUnaccepted(event);
-        }
+      }
+      return processNext(event);
+    } else {
+      return handleUnaccepted(event);
     }
+  }
 }

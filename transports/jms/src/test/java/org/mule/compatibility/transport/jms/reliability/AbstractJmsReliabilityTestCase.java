@@ -19,113 +19,91 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-public abstract class AbstractJmsReliabilityTestCase extends AbstractJmsFunctionalTestCase
-{
-    protected int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-    protected int deliveryMode = DeliveryMode.PERSISTENT;
-        
-    // These are used by the receiver only, not the sender
-    protected Connection connection;
-    protected Session session;
-    protected MessageConsumer consumer;
-        
-    public AbstractJmsReliabilityTestCase()
-    {
-        setMultipleProviders(false);
-    }
-    
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        closeConsumer();
-        super.doTearDown();
-    }
-    
-    protected void closeConsumer() throws Exception
-    {
-        if (consumer != null)
-        {
-            consumer.close();
-            consumer = null;
-            session.close();
-            session = null;
-            connection.close();
-            connection = null;
-        }
-    }
+public abstract class AbstractJmsReliabilityTestCase extends AbstractJmsFunctionalTestCase {
 
-    protected void putMessageOnQueue(String queueName) throws Exception
-    {
-        JmsVendorConfiguration jmsConfig = new ActiveMQJmsConfiguration();
-        Connection connection = null;
-        try
-        {
-            connection = jmsConfig.getConnection(false, false);
-            connection.start();
-            Session session = null;
-            try
-            {
-                session = connection.createSession(false, acknowledgeMode);
-                Destination destination = session.createQueue(queueName);
-                MessageProducer producer = null;
-                try
-                {
-                    producer = session.createProducer(destination);
-                    producer.setDeliveryMode(deliveryMode);
-                    Message msg = session.createTextMessage(AbstractJmsFunctionalTestCase.DEFAULT_INPUT_MESSAGE);
-                    msg.setJMSExpiration(0);
-                    producer.send(msg);
-                }
-                finally
-                {
-                    if (producer != null)
-                    {
-                        producer.close();
-                    }
-                }
-            }
-            finally
-            {
-                if (session != null)
-                {
-                    session.close();
-                }
-            }
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                connection.close();
-            }
-        }
-    }
-    
-    protected Message readMessageFromQueue(String queueName) throws Exception
-    {
-        if (consumer == null)
-        {
-            createConsumer(queueName);
-        }        
-        return consumer.receive(getTimeout());
-    }
+  protected int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
+  protected int deliveryMode = DeliveryMode.PERSISTENT;
 
-    protected void listenOnQueue(String queueName, MessageListener listener) throws Exception
-    {
-        if (consumer == null)
-        {
-            createConsumer(queueName);
-        }        
-        consumer.setMessageListener(listener);
+  // These are used by the receiver only, not the sender
+  protected Connection connection;
+  protected Session session;
+  protected MessageConsumer consumer;
+
+  public AbstractJmsReliabilityTestCase() {
+    setMultipleProviders(false);
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    closeConsumer();
+    super.doTearDown();
+  }
+
+  protected void closeConsumer() throws Exception {
+    if (consumer != null) {
+      consumer.close();
+      consumer = null;
+      session.close();
+      session = null;
+      connection.close();
+      connection = null;
     }
-    
-    protected void createConsumer(String queueName) throws Exception
-    {
-        connection = getConnection(false, false);
-        connection.start();
+  }
+
+  protected void putMessageOnQueue(String queueName) throws Exception {
+    JmsVendorConfiguration jmsConfig = new ActiveMQJmsConfiguration();
+    Connection connection = null;
+    try {
+      connection = jmsConfig.getConnection(false, false);
+      connection.start();
+      Session session = null;
+      try {
         session = connection.createSession(false, acknowledgeMode);
-        consumer = session.createConsumer(session.createQueue(queueName));
+        Destination destination = session.createQueue(queueName);
+        MessageProducer producer = null;
+        try {
+          producer = session.createProducer(destination);
+          producer.setDeliveryMode(deliveryMode);
+          Message msg = session.createTextMessage(AbstractJmsFunctionalTestCase.DEFAULT_INPUT_MESSAGE);
+          msg.setJMSExpiration(0);
+          producer.send(msg);
+        } finally {
+          if (producer != null) {
+            producer.close();
+          }
+        }
+      } finally {
+        if (session != null) {
+          session.close();
+        }
+      }
+    } finally {
+      if (connection != null) {
+        connection.close();
+      }
     }
+  }
+
+  protected Message readMessageFromQueue(String queueName) throws Exception {
+    if (consumer == null) {
+      createConsumer(queueName);
+    }
+    return consumer.receive(getTimeout());
+  }
+
+  protected void listenOnQueue(String queueName, MessageListener listener) throws Exception {
+    if (consumer == null) {
+      createConsumer(queueName);
+    }
+    consumer.setMessageListener(listener);
+  }
+
+  protected void createConsumer(String queueName) throws Exception {
+    connection = getConnection(false, false);
+    connection.start();
+    session = connection.createSession(false, acknowledgeMode);
+    consumer = session.createConsumer(session.createQueue(queueName));
+  }
 }
 
 

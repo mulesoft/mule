@@ -14,99 +14,83 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Fake {@link ClassLoader} for testing purposes
+ * Fake {@link ClassLoader} for testing purposes
  */
-public class TestClassLoader extends ClassLoader
-{
+public class TestClassLoader extends ClassLoader {
 
-    private Map<String, Class> classes = new HashMap<>();
-    private Map<String, URL> resources = new HashMap<>();
-    private Map<String, InputStream> streamResources = new HashMap<>();
-    private Map<String, String> libraries = new HashMap<>();
+  private Map<String, Class> classes = new HashMap<>();
+  private Map<String, URL> resources = new HashMap<>();
+  private Map<String, InputStream> streamResources = new HashMap<>();
+  private Map<String, String> libraries = new HashMap<>();
 
-    @Override
-    public Class<?> loadClass(String s) throws ClassNotFoundException
-    {
+  @Override
+  public Class<?> loadClass(String s) throws ClassNotFoundException {
 
-        Class aClass = classes.get(s);
-        if (aClass == null)
-        {
-            throw new TestClassNotFoundException(s, this);
-        }
-
-        return aClass;
+    Class aClass = classes.get(s);
+    if (aClass == null) {
+      throw new TestClassNotFoundException(s, this);
     }
 
-    @Override
-    public URL getResource(String s)
-    {
-        return resources.get(s);
+    return aClass;
+  }
+
+  @Override
+  public URL getResource(String s) {
+    return resources.get(s);
+  }
+
+  @Override
+  public InputStream getResourceAsStream(String s) {
+    return streamResources.get(s);
+  }
+
+  @Override
+  public Enumeration<URL> getResources(String s) throws IOException {
+    return new EnumerationAdapter<>(resources.values());
+  }
+
+  @Override
+  protected URL findResource(String s) {
+    return resources.get(s);
+  }
+
+  @Override
+  protected String findLibrary(String s) {
+    return libraries.get(s);
+  }
+
+  public void addClass(String className, Class aClass) {
+    classes.put(className, aClass);
+  }
+
+  public void addResource(String resourceName, URL resourceUrl) {
+    resources.put(resourceName, resourceUrl);
+  }
+
+  public void addStreamResource(String resourceName, InputStream resourceStream) {
+    streamResources.put(resourceName, resourceStream);
+  }
+
+  public void addLibrary(String libraryName, String libraryPath) {
+    libraries.put(libraryName, libraryPath);
+  }
+
+  @Override
+  protected synchronized Class<?> loadClass(String s, boolean b) throws ClassNotFoundException {
+    return loadClass(s);
+  }
+
+  public static class TestClassNotFoundException extends ClassNotFoundException {
+
+    private ClassLoader classLoader;
+
+    public TestClassNotFoundException(String s, ClassLoader classLoader) {
+      super(s);
+      this.classLoader = classLoader;
     }
 
-    @Override
-    public InputStream getResourceAsStream(String s)
-    {
-        return streamResources.get(s);
+    public ClassLoader getClassLoader() {
+      return classLoader;
     }
-
-    @Override
-    public Enumeration<URL> getResources(String s) throws IOException
-    {
-        return new EnumerationAdapter<>(resources.values());
-    }
-
-    @Override
-    protected URL findResource(String s)
-    {
-        return resources.get(s);
-    }
-
-    @Override
-    protected String findLibrary(String s)
-    {
-        return libraries.get(s);
-    }
-
-    public void addClass(String className, Class aClass)
-    {
-        classes.put(className, aClass);
-    }
-
-    public void addResource(String resourceName, URL resourceUrl)
-    {
-        resources.put(resourceName, resourceUrl);
-    }
-
-    public void addStreamResource(String resourceName, InputStream resourceStream)
-    {
-        streamResources.put(resourceName, resourceStream);
-    }
-
-    public void addLibrary(String libraryName, String libraryPath)
-    {
-        libraries.put(libraryName, libraryPath);
-    }
-
-    @Override
-    protected synchronized Class<?> loadClass(String s, boolean b) throws ClassNotFoundException
-    {
-        return loadClass(s);
-    }
-
-    public static class TestClassNotFoundException extends ClassNotFoundException
-    {
-
-        private ClassLoader classLoader;
-
-        public TestClassNotFoundException(String s, ClassLoader classLoader)
-        {
-            super(s);
-            this.classLoader = classLoader;
-        }
-
-        public ClassLoader getClassLoader()
-        {
-            return classLoader;
-        }
-    }
+  }
 }

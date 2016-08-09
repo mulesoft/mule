@@ -28,65 +28,61 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
-{
-    private static final String PLAIN_TEXT = "This is a plain text";
-    private static final String EXPRESSION = "#[testVariable]";
+public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
-    private SetPayloadTransformer setPayloadTransformer;
-    private MuleContext mockMuleContext;
-    private MuleEvent mockMuleEvent;
-    private MuleMessage mockMuleMessage;
-    private ExpressionManager mockExpressionManager;
+  private static final String PLAIN_TEXT = "This is a plain text";
+  private static final String EXPRESSION = "#[testVariable]";
 
-    @Before
-    public void setUp()
-    {
-        setPayloadTransformer = new SetPayloadTransformer();
-        mockMuleContext = mock(MuleContext.class);
-        setPayloadTransformer.setMuleContext(mockMuleContext);
-        mockExpressionManager = mock(ExpressionManager.class);
-        mockMuleEvent = mock(MuleEvent.class);
-        mockMuleMessage = mock(MuleMessage.class);
+  private SetPayloadTransformer setPayloadTransformer;
+  private MuleContext mockMuleContext;
+  private MuleEvent mockMuleEvent;
+  private MuleMessage mockMuleMessage;
+  private ExpressionManager mockExpressionManager;
 
-        when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
-        when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
-            invocation -> (String) invocation.getArguments()[0]);
-    }
+  @Before
+  public void setUp() {
+    setPayloadTransformer = new SetPayloadTransformer();
+    mockMuleContext = mock(MuleContext.class);
+    setPayloadTransformer.setMuleContext(mockMuleContext);
+    mockExpressionManager = mock(ExpressionManager.class);
+    mockMuleEvent = mock(MuleEvent.class);
+    mockMuleMessage = mock(MuleMessage.class);
 
-    @Test
-    public void testSetPayloadTransformerNulValue() throws InitialisationException, TransformerException
-    {
-        setPayloadTransformer.setValue(null);
-        setPayloadTransformer.initialise();
+    when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
+    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class)))
+        .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
+  }
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertThat(response, is(nullValue()));
-    }
+  @Test
+  public void testSetPayloadTransformerNulValue() throws InitialisationException, TransformerException {
+    setPayloadTransformer.setValue(null);
+    setPayloadTransformer.initialise();
 
-    @Test
-    public void testSetPayloadTransformerPlainText() throws InitialisationException, TransformerException
-    {
-        setPayloadTransformer.setValue(PLAIN_TEXT);
-        setPayloadTransformer.initialise();
+    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
+    assertThat(response, is(nullValue()));
+  }
 
-        when(mockExpressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
+  @Test
+  public void testSetPayloadTransformerPlainText() throws InitialisationException, TransformerException {
+    setPayloadTransformer.setValue(PLAIN_TEXT);
+    setPayloadTransformer.initialise();
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertEquals(PLAIN_TEXT, response);
-    }
+    when(mockExpressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-    @Test
-    public void testSetPayloadTransformerExpression() throws InitialisationException, TransformerException
-    {
-        setPayloadTransformer.setValue(EXPRESSION);
-        when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
-        setPayloadTransformer.initialise();
-        when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(PLAIN_TEXT);
+    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
+    assertEquals(PLAIN_TEXT, response);
+  }
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertEquals(PLAIN_TEXT, response);
-    }
+  @Test
+  public void testSetPayloadTransformerExpression() throws InitialisationException, TransformerException {
+    setPayloadTransformer.setValue(EXPRESSION);
+    when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
+    setPayloadTransformer.initialise();
+    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(PLAIN_TEXT);
+
+    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
+    assertEquals(PLAIN_TEXT, response);
+  }
 
 }

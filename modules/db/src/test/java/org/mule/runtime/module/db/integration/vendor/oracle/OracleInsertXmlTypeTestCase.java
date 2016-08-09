@@ -34,126 +34,102 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
-{
+public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase {
 
-    public OracleInsertXmlTypeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public OracleInsertXmlTypeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getOracleResource();
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/vendor/oracle/oracle-insert-xml-type-config.xml"};
+  }
+
+  @Test
+  public void insertXmlTypeFromXmlType() throws Exception {
+    assertAlienWasInserted(doTest(new XmlContentBuilder() {
+
+      @Override
+      public Object build(Connection connection) throws Exception {
+        return OracleXmlType.createXmlType(connection, Alien.ET.getXml());
+      }
+    }));
+  }
+
+  @Test
+  public void insertLargeXmlTypeFromInputStream() throws Exception {
+    assertAlienWasInserted(doTest(new XmlContentBuilder() {
+
+      @Override
+      public Object build(Connection connection) throws Exception {
+        return IOUtils.getResourceAsStream("integration/vendor/oracle/oracle-insert-xml-type-large-sample.xml", this.getClass());
+      }
+    }));
+  }
+
+  @Test
+  public void insertXmlTypeFromString() throws Exception {
+    assertAlienWasInserted(doTest(new XmlContentBuilder() {
+
+      @Override
+      public Object build(Connection connection) throws Exception {
+        return Alien.ET.getXml();
+      }
+    }));
+  }
+
+  @Test
+  public void insertXmlTypeFromWrongType() throws Exception {
+    assertNoAliens(doTest(new XmlContentBuilder() {
+
+      @Override
+      public Object build(Connection connection) throws Exception {
+        return new Integer(1);
+      }
+    }));
+  }
+
+  private void assertNoAliens(MuleMessage response) throws SQLException {
+    assertThat(response.getExceptionPayload(), is(notNullValue()));
+
+    List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
+    assertRecords(result);
+  }
+
+  private void assertAlienWasInserted(MuleMessage response) throws SQLException {
+    assertThat(response.getExceptionPayload(), is(nullValue()));
+
+    assertThat((Integer) response.getPayload(), is(equalTo(1)));
+
+    List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", Alien.ET.getName())));
+  }
+
+  private interface XmlContentBuilder {
+
+    Object build(Connection connection) throws Exception;
+  }
+
+  private MuleMessage doTest(XmlContentBuilder builder) throws Exception {
+    DataSource defaultDataSource = getDefaultDataSource();
+    Connection connection = defaultDataSource.getConnection();
+
+    try {
+      testDatabase.executeUpdate(connection, "DELETE FROM ALIEN");
+
+      final MuleEvent responseEvent =
+          flowRunner("insertXmlType").withPayload(TEST_MESSAGE).withInboundProperty("name", Alien.ET.getName()).run();
+
+      return responseEvent.getMessage();
+    } finally {
+      if (connection != null) {
+        connection.close();
+      }
     }
-
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getOracleResource();
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/vendor/oracle/oracle-insert-xml-type-config.xml"};
-    }
-
-    @Test
-    public void insertXmlTypeFromXmlType() throws Exception
-    {
-        assertAlienWasInserted(
-                doTest(new XmlContentBuilder()
-                {
-                    @Override
-                    public Object build(Connection connection) throws Exception
-                    {
-                        return OracleXmlType.createXmlType(connection, Alien.ET.getXml());
-                    }
-                }));
-    }
-
-    @Test
-    public void insertLargeXmlTypeFromInputStream() throws Exception
-    {
-        assertAlienWasInserted(
-                doTest(new XmlContentBuilder()
-                {
-                    @Override
-                    public Object build(Connection connection) throws Exception
-                    {
-                        return IOUtils.getResourceAsStream("integration/vendor/oracle/oracle-insert-xml-type-large-sample.xml", this.getClass());
-                    }
-                }));
-    }
-
-    @Test
-    public void insertXmlTypeFromString() throws Exception
-    {
-        assertAlienWasInserted(
-                doTest(new XmlContentBuilder()
-                {
-                    @Override
-                    public Object build(Connection connection) throws Exception
-                    {
-                        return Alien.ET.getXml();
-                    }
-                }));
-    }
-
-    @Test
-    public void insertXmlTypeFromWrongType() throws Exception
-    {
-        assertNoAliens(
-                doTest(new XmlContentBuilder()
-                {
-                    @Override
-                    public Object build(Connection connection) throws Exception
-                    {
-                        return new Integer(1);
-                    }
-                }));
-    }
-
-    private void assertNoAliens(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getExceptionPayload(), is(notNullValue()));
-
-        List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
-        assertRecords(result);
-    }
-
-    private void assertAlienWasInserted(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getExceptionPayload(), is(nullValue()));
-
-        assertThat((Integer) response.getPayload(), is(equalTo(1)));
-
-        List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", Alien.ET.getName())));
-    }
-
-    private interface XmlContentBuilder
-    {
-         Object build(Connection connection) throws Exception;
-    }
-
-    private MuleMessage doTest(XmlContentBuilder builder) throws Exception
-    {
-        DataSource defaultDataSource = getDefaultDataSource();
-        Connection connection = defaultDataSource.getConnection();
-
-        try
-        {
-            testDatabase.executeUpdate(connection, "DELETE FROM ALIEN");
-
-            final MuleEvent responseEvent = flowRunner("insertXmlType").withPayload(TEST_MESSAGE)
-                                                                       .withInboundProperty("name", Alien.ET.getName())
-                                                                       .run();
-
-            return responseEvent.getMessage();
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                connection.close();
-            }
-        }
-    }
+  }
 }

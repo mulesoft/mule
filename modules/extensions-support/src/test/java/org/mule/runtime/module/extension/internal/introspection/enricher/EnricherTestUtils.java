@@ -17,22 +17,17 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.NamedDecl
 import java.util.List;
 import java.util.Optional;
 
-class EnricherTestUtils
-{
+class EnricherTestUtils {
 
-    private EnricherTestUtils()
-    {
-    }
+  private EnricherTestUtils() {}
 
-    public static <T extends NamedDeclaration> T getDeclaration(List<T> operationList, String name)
-    {
-        return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
-    }
+  public static <T extends NamedDeclaration> T getDeclaration(List<T> operationList, String name) {
+    return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
+  }
 
-    public static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty)
-    {
-        final Optional<T> property = declaration.getModelProperty(modelProperty);
-        assertThat(property.isPresent(), is(true));
-        return property.get();
-    }
+  public static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty) {
+    final Optional<T> property = declaration.getModelProperty(modelProperty);
+    assertThat(property.isPresent(), is(true));
+    return property.get();
+  }
 }

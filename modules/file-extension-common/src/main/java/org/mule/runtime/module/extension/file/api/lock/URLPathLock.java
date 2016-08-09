@@ -13,84 +13,71 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 
 /**
- * A {@link PathLock} which is based on {@link Lock locks}
- * obtained through a {@link #lockFactory}. The lock's keys
- * are generated through the external form of a {@link URL}
+ * A {@link PathLock} which is based on {@link Lock locks} obtained through a {@link #lockFactory}. The lock's keys are generated
+ * through the external form of a {@link URL}
  *
  * @since 4.0
  */
-public class URLPathLock implements PathLock
-{
+public class URLPathLock implements PathLock {
 
-    private final URL url;
-    private final LockFactory lockFactory;
-    private final AtomicReference<Lock> ownedLock = new AtomicReference<>();
+  private final URL url;
+  private final LockFactory lockFactory;
+  private final AtomicReference<Lock> ownedLock = new AtomicReference<>();
 
-    /**
-     * Creates a new instance
-     *
-     * @param url         the URL from which the lock's key is to be extracted
-     * @param lockFactory a {@link LockFactory}
-     */
-    public URLPathLock(URL url, LockFactory lockFactory)
-    {
-        this.url = url;
-        this.lockFactory = lockFactory;
+  /**
+   * Creates a new instance
+   *
+   * @param url the URL from which the lock's key is to be extracted
+   * @param lockFactory a {@link LockFactory}
+   */
+  public URLPathLock(URL url, LockFactory lockFactory) {
+    this.url = url;
+    this.lockFactory = lockFactory;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean tryLock() {
+    Lock lock = getLock();
+    if (lock.tryLock()) {
+      ownedLock.set(lock);
+      return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean tryLock()
-    {
-        Lock lock = getLock();
-        if (lock.tryLock())
-        {
-            ownedLock.set(lock);
-            return true;
-        }
+    return false;
+  }
 
-        return false;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLocked() {
+    if (ownedLock.get() != null) {
+      return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isLocked()
-    {
-        if (ownedLock.get() != null)
-        {
-            return true;
-        }
-
-        Lock lock = getLock();
-        try
-        {
-            return !lock.tryLock();
-        }
-        finally
-        {
-            lock.unlock();
-        }
+    Lock lock = getLock();
+    try {
+      return !lock.tryLock();
+    } finally {
+      lock.unlock();
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void release()
-    {
-        Lock lock = ownedLock.getAndSet(null);
-        if (lock != null)
-        {
-            lock.unlock();
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void release() {
+    Lock lock = ownedLock.getAndSet(null);
+    if (lock != null) {
+      lock.unlock();
     }
+  }
 
-    private Lock getLock()
-    {
-        return lockFactory.createLock(url.toExternalForm());
-    }
+  private Lock getLock() {
+    return lockFactory.createLock(url.toExternalForm());
+  }
 }

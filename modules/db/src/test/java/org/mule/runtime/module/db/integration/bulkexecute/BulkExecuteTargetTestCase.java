@@ -19,34 +19,29 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase
-{
+public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase {
 
-    public BulkExecuteTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/bulkexecute/bulk-execute-target-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-target-config.xml"};
+  }
 
-    @Test
-    public void usesCustomTarget() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("bulkUpdateCustomTarget").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomTarget() throws Exception {
+    final MuleEvent responseEvent = flowRunner("bulkUpdateCustomTarget").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
-        assertBulkModeResult(response.getOutboundProperty("updateCounts"));
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
+    assertBulkModeResult(response.getOutboundProperty("updateCounts"));
+  }
 
 }

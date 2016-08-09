@@ -15,17 +15,15 @@ import org.junit.Test;
 /**
  * Test that the lifecycle is properly managed.
  */
-public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
-{
-    @Test
-    public void testRedeploy() throws Exception
-    {
-        final String name = jmxSupport.getDomainName(muleContext) +
-                            ":" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
-        mBeanServer.registerMBean(new HttpAdaptor(), jmxSupport.getObjectName(name));
+public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase {
 
-        Mx4jAgent agent = new Mx4jAgent();
-        agent.setMuleContext(muleContext);
-        agent.initialise();
-    }
+  @Test
+  public void testRedeploy() throws Exception {
+    final String name = jmxSupport.getDomainName(muleContext) + ":" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
+    mBeanServer.registerMBean(new HttpAdaptor(), jmxSupport.getObjectName(name));
+
+    Mx4jAgent agent = new Mx4jAgent();
+    agent.setMuleContext(muleContext);
+    agent.initialise();
+  }
 }

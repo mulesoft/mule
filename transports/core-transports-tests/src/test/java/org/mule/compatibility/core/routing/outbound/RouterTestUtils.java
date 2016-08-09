@@ -16,32 +16,29 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class RouterTestUtils
-{
-    private RouterTestUtils()
-    {
-        super();
-    }
+public class RouterTestUtils {
 
-    public static OutboundEndpoint createMockEndpoint(final OutboundEndpoint toMock)
-    {
-        OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
-        when(endpoint.getEndpointURI()).thenReturn(toMock.getEndpointURI());
-        when(endpoint.getAddress()).thenReturn(toMock.getAddress());
-        when(endpoint.toString()).thenReturn(toMock.toString());
-        when(endpoint.getExchangePattern()).thenReturn(toMock.getExchangePattern());
-        when(endpoint.getProperties()).thenReturn(toMock.getProperties());
-        when(endpoint.getFilter()).thenReturn(toMock.getFilter());
-        when(endpoint.filterAccepts(any(MuleMessage.class))).thenAnswer(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                return toMock.filterAccepts((MuleMessage) invocation.getArguments()[0]);
-            }
-        });
-        when(endpoint.getName()).thenReturn(toMock.getName());
-        when(endpoint.getResponseMessageProcessors()).thenReturn(toMock.getResponseMessageProcessors());
-        return endpoint;
-    }
+  private RouterTestUtils() {
+    super();
+  }
+
+  public static OutboundEndpoint createMockEndpoint(final OutboundEndpoint toMock) {
+    OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
+    when(endpoint.getEndpointURI()).thenReturn(toMock.getEndpointURI());
+    when(endpoint.getAddress()).thenReturn(toMock.getAddress());
+    when(endpoint.toString()).thenReturn(toMock.toString());
+    when(endpoint.getExchangePattern()).thenReturn(toMock.getExchangePattern());
+    when(endpoint.getProperties()).thenReturn(toMock.getProperties());
+    when(endpoint.getFilter()).thenReturn(toMock.getFilter());
+    when(endpoint.filterAccepts(any(MuleMessage.class))).thenAnswer(new Answer<Boolean>() {
+
+      @Override
+      public Boolean answer(InvocationOnMock invocation) throws Throwable {
+        return toMock.filterAccepts((MuleMessage) invocation.getArguments()[0]);
+      }
+    });
+    when(endpoint.getName()).thenReturn(toMock.getName());
+    when(endpoint.getResponseMessageProcessors()).thenReturn(toMock.getResponseMessageProcessors());
+    return endpoint;
+  }
 }

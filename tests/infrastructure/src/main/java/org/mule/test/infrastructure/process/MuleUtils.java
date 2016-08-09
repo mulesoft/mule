@@ -17,62 +17,52 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
 
-public class MuleUtils
-{
+public class MuleUtils {
 
-    private static final long TIMEOUT = 1800000;
-    private String muleHome;
-    private String populateM2repoCommand;
+  private static final long TIMEOUT = 1800000;
+  private String muleHome;
+  private String populateM2repoCommand;
 
-    public MuleUtils(String muleHome)
-    {
-        this.muleHome = muleHome;
-        this.populateM2repoCommand = muleHome + "/bin/populate_m2_repo";
+  public MuleUtils(String muleHome) {
+    this.muleHome = muleHome;
+    this.populateM2repoCommand = muleHome + "/bin/populate_m2_repo";
+  }
+
+  public void populateM2Repo(String repo) throws IOException {
+    File repository = new File(repo);
+    if (!repository.exists()) {
+      FileUtils.forceMkdir(repository);
     }
-
-    public void populateM2Repo(String repo) throws IOException
-    {
-        File repository = new File(repo);
-        if (!repository.exists())
-        {
-            FileUtils.forceMkdir(repository);
-        }
-        if (!repository.isDirectory())
-        {
-            throw new IllegalArgumentException("Repository should be a directory.");
-        }
-        executeCommand(populateM2repoCommand + " " + repo, "MULE_HOME=" + muleHome);
+    if (!repository.isDirectory()) {
+      throw new IllegalArgumentException("Repository should be a directory.");
     }
+    executeCommand(populateM2repoCommand + " " + repo, "MULE_HOME=" + muleHome);
+  }
 
-    public static int executeCommand(String command, String... envVars) throws IOException
-    {
-        CommandLine cmdLine = CommandLine.parse(command);
-        DefaultExecutor executor = new DefaultExecutor();
-        Map<String, String> env = addEnvProperties(envVars);
-        ExecuteWatchdog watchDog = new ExecuteWatchdog(TIMEOUT);
-        executor.setWatchdog(watchDog);
-        executor.setStreamHandler(new PumpStreamHandler());
-        int result = executor.execute(cmdLine, env);
-        if (executor.isFailure(result))
-        {
-            if (watchDog.killedProcess())
-            {
-                throw new RuntimeException("Reached timeout while running: " + cmdLine);
-            }
-            throw new RuntimeException("Process failed with return code [" + result + "]: " + cmdLine);
-        }
-        return result;
+  public static int executeCommand(String command, String... envVars) throws IOException {
+    CommandLine cmdLine = CommandLine.parse(command);
+    DefaultExecutor executor = new DefaultExecutor();
+    Map<String, String> env = addEnvProperties(envVars);
+    ExecuteWatchdog watchDog = new ExecuteWatchdog(TIMEOUT);
+    executor.setWatchdog(watchDog);
+    executor.setStreamHandler(new PumpStreamHandler());
+    int result = executor.execute(cmdLine, env);
+    if (executor.isFailure(result)) {
+      if (watchDog.killedProcess()) {
+        throw new RuntimeException("Reached timeout while running: " + cmdLine);
+      }
+      throw new RuntimeException("Process failed with return code [" + result + "]: " + cmdLine);
     }
+    return result;
+  }
 
-    private static Map<String, String> addEnvProperties(String[] envVars) throws IOException
-    {
-        @SuppressWarnings("unchecked")
-        Map<String, String> env = EnvironmentUtils.getProcEnvironment();
-        for (String envVar : envVars)
-        {
-            EnvironmentUtils.addVariableToEnvironment(env, envVar);
-        }
-        return env;
+  private static Map<String, String> addEnvProperties(String[] envVars) throws IOException {
+    @SuppressWarnings("unchecked")
+    Map<String, String> env = EnvironmentUtils.getProcEnvironment();
+    for (String envVar : envVars) {
+      EnvironmentUtils.addVariableToEnvironment(env, envVar);
     }
+    return env;
+  }
 
 }

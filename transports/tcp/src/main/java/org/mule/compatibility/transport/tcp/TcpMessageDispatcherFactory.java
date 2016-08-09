@@ -11,13 +11,11 @@ import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
 import org.mule.runtime.core.api.MuleException;
 
-public class TcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
+public class TcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
 
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new TcpMessageDispatcher(endpoint);
-    }
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new TcpMessageDispatcher(endpoint);
+  }
 
 }

@@ -15,71 +15,56 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /**
- * <code>SerializableToByteArray</code> converts a serializable object or a String
- * to a byte array. If <code>MuleMessage</code> is configured as a source type on this
- * transformer by calling <code>setAcceptMuleMessage(true)</code> then the MuleMessage
- * will be serialised. This is useful for transports such as TCP where the message
- * headers would normally be lost.
+ * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>MuleMessage</code> is
+ * configured as a source type on this transformer by calling <code>setAcceptMuleMessage(true)</code> then the MuleMessage will be
+ * serialised. This is useful for transports such as TCP where the message headers would normally be lost.
  */
-public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer
-{
-    /**
-     * Give core transformers a slightly higher priority
+public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer {
+
+  /**
+   * Give core transformers a slightly higher priority
+   */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+
+  public SerializableToByteArray() {
+    this.registerSourceType(DataType.fromType(Serializable.class));
+    this.setReturnDataType(DataType.BYTE_ARRAY);
+  }
+
+  public boolean isAcceptMuleMessage() {
+    return this.isSourceDataTypeSupported(DataType.MULE_MESSAGE, true);
+  }
+
+  public void setAcceptMuleMessage(boolean value) {
+    if (value) {
+      this.registerSourceType(DataType.MULE_MESSAGE);
+    } else {
+      this.unregisterSourceType(DataType.MULE_MESSAGE);
+    }
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    /*
+     * If the MuleMessage source type has been registered then we can assume that the whole message is to be serialised, not just
+     * the payload. This can be useful for protocols such as tcp where the protocol does not support headers and the whole message
+     * needs to be serialized.
      */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public SerializableToByteArray()
-    {
-        this.registerSourceType(DataType.fromType(Serializable.class));
-        this.setReturnDataType(DataType.BYTE_ARRAY);
+    try {
+      return muleContext.getObjectSerializer().serialize(src);
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    public boolean isAcceptMuleMessage()
-    {
-        return this.isSourceDataTypeSupported(DataType.MULE_MESSAGE, true);
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    public void setAcceptMuleMessage(boolean value)
-    {
-        if (value)
-        {
-            this.registerSourceType(DataType.MULE_MESSAGE);
-        }
-        else
-        {
-            this.unregisterSourceType(DataType.MULE_MESSAGE);
-        }
-    }
-
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        /*
-         * If the MuleMessage source type has been registered then we can assume that
-         * the whole message is to be serialised, not just the payload. This can be
-         * useful for protocols such as tcp where the protocol does not support
-         * headers and the whole message needs to be serialized.
-         */
-
-        try
-        {
-            return muleContext.getObjectSerializer().serialize(src);
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
-
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

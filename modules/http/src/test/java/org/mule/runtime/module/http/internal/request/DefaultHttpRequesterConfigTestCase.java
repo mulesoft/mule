@@ -26,58 +26,52 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultHttpRequesterConfigTestCase extends AbstractMuleTestCase
-{
+public class DefaultHttpRequesterConfigTestCase extends AbstractMuleTestCase {
 
-    private static final String LOCALHOST = "localhost";
+  private static final String LOCALHOST = "localhost";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
-    private DefaultHttpRequesterConfig requestConfig;
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
+  private DefaultHttpRequesterConfig requestConfig;
 
-    @Before
-    public void setUp() throws RegistrationException
-    {
-        when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
-        requestConfig = createBaseRequester();
+  @Before
+  public void setUp() throws RegistrationException {
+    when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
+    requestConfig = createBaseRequester();
 
-        MuleRegistry registry = mock(MuleRegistry.class);
-        when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
-        when(mockMuleContext.getRegistry()).thenReturn(registry);
-    }
+    MuleRegistry registry = mock(MuleRegistry.class);
+    when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
+    when(mockMuleContext.getRegistry()).thenReturn(registry);
+  }
 
-    @Test
-    public void defaultPortWithDefaultProtocol() throws Exception
-    {
-        requestConfig.initialise();
-        assertThat(requestConfig.getPort(), is(String.valueOf(HTTP.getDefaultPort())));
-    }
+  @Test
+  public void defaultPortWithDefaultProtocol() throws Exception {
+    requestConfig.initialise();
+    assertThat(requestConfig.getPort(), is(String.valueOf(HTTP.getDefaultPort())));
+  }
 
-    @Test
-    public void defaultPortWithHttpConfigured() throws Exception
-    {
-        requestConfig.setProtocol(HTTP);
-        requestConfig.initialise();
-        assertThat(requestConfig.getPort(), is(String.valueOf(HTTP.getDefaultPort())));
-    }
+  @Test
+  public void defaultPortWithHttpConfigured() throws Exception {
+    requestConfig.setProtocol(HTTP);
+    requestConfig.initialise();
+    assertThat(requestConfig.getPort(), is(String.valueOf(HTTP.getDefaultPort())));
+  }
 
-    @Test
-    public void defaultPortWithHttpsConfigured() throws Exception
-    {
-        requestConfig.setProtocol(HTTPS);
-        requestConfig.setTlsContext(mockTlsContextFactory);
-        requestConfig.initialise();
-        assertThat(requestConfig.getPort(), is(String.valueOf(HTTPS.getDefaultPort())));
-    }
+  @Test
+  public void defaultPortWithHttpsConfigured() throws Exception {
+    requestConfig.setProtocol(HTTPS);
+    requestConfig.setTlsContext(mockTlsContextFactory);
+    requestConfig.initialise();
+    assertThat(requestConfig.getPort(), is(String.valueOf(HTTPS.getDefaultPort())));
+  }
 
-    private DefaultHttpRequesterConfig createBaseRequester()
-    {
-        DefaultHttpRequesterConfig requestConfig = new DefaultHttpRequesterConfig();
-        requestConfig.setHost(LOCALHOST);
-        requestConfig.setMuleContext(mockMuleContext);
-        return requestConfig;
-    }
+  private DefaultHttpRequesterConfig createBaseRequester() {
+    DefaultHttpRequesterConfig requestConfig = new DefaultHttpRequesterConfig();
+    requestConfig.setHost(LOCALHOST);
+    requestConfig.setMuleContext(mockMuleContext);
+    return requestConfig;
+  }
 }

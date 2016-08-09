@@ -12,12 +12,10 @@ import java.util.concurrent.Executor;
 
 import javax.resource.spi.work.WorkException;
 
-public class ScheduleWorkExecutor implements WorkExecutor
-{
+public class ScheduleWorkExecutor implements WorkExecutor {
 
-    public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException
-    {
-        executor.execute(work);
-    }
+  public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException {
+    executor.execute(work);
+  }
 
 }

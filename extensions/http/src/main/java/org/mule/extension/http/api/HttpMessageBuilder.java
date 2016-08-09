@@ -25,51 +25,45 @@ import javax.activation.DataHandler;
  *
  * @since 4.0
  */
-public class HttpMessageBuilder
-{
-    /**
-     * HTTP headers the message should include.
-     */
-    @Parameter
-    @Optional
-    protected Map<String, String> headers = new HashMap<>();
+public class HttpMessageBuilder {
 
-    /**
-     * HTTP parts the message should include.
-     */
-    @Parameter
-    @Optional
-    protected List<HttpPart> parts = new LinkedList<>();
+  /**
+   * HTTP headers the message should include.
+   */
+  @Parameter
+  @Optional
+  protected Map<String, String> headers = new HashMap<>();
 
-    public Map<String, String> getHeaders()
-    {
-        return headers;
-    }
+  /**
+   * HTTP parts the message should include.
+   */
+  @Parameter
+  @Optional
+  protected List<HttpPart> parts = new LinkedList<>();
 
-    public Map<String, DataHandler> getParts()
-    {
-        return getResolvedParts(parts);
-    }
+  public Map<String, String> getHeaders() {
+    return headers;
+  }
 
-    protected Map<String, DataHandler> getResolvedParts(List<HttpPart> parts)
-    {
-        Map<String, DataHandler> resolvedAttachments = new HashMap<>();
+  public Map<String, DataHandler> getParts() {
+    return getResolvedParts(parts);
+  }
 
-        parts.forEach(attachment -> {
-            String filename = attachment.getFilename();
-            String name = filename != null ? filename : attachment.getId();
-            DataHandler dataHandler;
-            try
-            {
-                dataHandler = toDataHandler(name, attachment.getData(), attachment.getContentType());
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(createStaticMessage("Could not create part %s", attachment.getId()), e);
-            }
-            resolvedAttachments.put(attachment.getId(), dataHandler);
-        });
+  protected Map<String, DataHandler> getResolvedParts(List<HttpPart> parts) {
+    Map<String, DataHandler> resolvedAttachments = new HashMap<>();
 
-        return resolvedAttachments;
-    }
+    parts.forEach(attachment -> {
+      String filename = attachment.getFilename();
+      String name = filename != null ? filename : attachment.getId();
+      DataHandler dataHandler;
+      try {
+        dataHandler = toDataHandler(name, attachment.getData(), attachment.getContentType());
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not create part %s", attachment.getId()), e);
+      }
+      resolvedAttachments.put(attachment.getId(), dataHandler);
+    });
+
+    return resolvedAttachments;
+  }
 }

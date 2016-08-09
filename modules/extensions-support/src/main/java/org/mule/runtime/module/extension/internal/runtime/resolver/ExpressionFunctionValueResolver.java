@@ -13,33 +13,28 @@ import org.mule.metadata.api.model.MetadataType;
 import java.util.function.Function;
 
 /**
- * A {@link ValueResolver} which evaluates an {@link ExpressionFunction}
- * for later resolution of a MEL expression.
+ * A {@link ValueResolver} which evaluates an {@link ExpressionFunction} for later resolution of a MEL expression.
  *
  * @since 4.0
  */
-public final class ExpressionFunctionValueResolver<T> implements ValueResolver<Function<MuleEvent, T>>
-{
+public final class ExpressionFunctionValueResolver<T> implements ValueResolver<Function<MuleEvent, T>> {
 
-    private final String exp;
-    private final MetadataType metadataType;
+  private final String exp;
+  private final MetadataType metadataType;
 
-    public ExpressionFunctionValueResolver(String exp, MetadataType metadataType)
-    {
-        this.exp = exp;
-        this.metadataType = metadataType;
-    }
+  public ExpressionFunctionValueResolver(String exp, MetadataType metadataType) {
+    this.exp = exp;
+    this.metadataType = metadataType;
+  }
 
-    @Override
-    public Function<MuleEvent, T> resolve(MuleEvent event) throws MuleException
-    {
-        return new ExpressionFunction<>(exp, metadataType);
-    }
+  @Override
+  public Function<MuleEvent, T> resolve(MuleEvent event) throws MuleException {
+    return new ExpressionFunction<>(exp, metadataType);
+  }
 
-    @Override
-    public boolean isDynamic()
-    {
-        return false;
-    }
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 
 }

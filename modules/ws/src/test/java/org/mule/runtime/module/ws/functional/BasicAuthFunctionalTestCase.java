@@ -23,47 +23,44 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "basic-auth-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "basic-auth-config.xml";
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        // Change default behavior of AbstractWSConsumerFunctionalTestCase as this test only uses the new connector.
-        return Arrays.asList(new Object[][] { new Object[]{false} });
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    // Change default behavior of AbstractWSConsumerFunctionalTestCase as this test only uses the new connector.
+    return Arrays.asList(new Object[][] {new Object[] {false}});
+  }
 
-    @Test
-    public void requestWithValidCredentialsReturnsExpectedAnswer() throws Exception
-    {
-        MuleEvent event = flowRunner("clientValidCredentials").withPayload(ECHO_REQUEST).run();
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-        assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(OK.getStatusCode())));
-    }
+  @Test
+  public void requestWithValidCredentialsReturnsExpectedAnswer() throws Exception {
+    MuleEvent event = flowRunner("clientValidCredentials").withPayload(ECHO_REQUEST).run();
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
+    assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(OK.getStatusCode())));
+  }
 
-    @Test
-    public void requestWithInvalidCredentialsThrowsException() throws Exception
-    {
-        // The unauthorized response contains an error message in the payload (which is not a SOAP Fault), then WSConsumer
-        // should fail to parse the response and throw a SoapFaultException because of this.
-        SoapFaultException e = (SoapFaultException) flowRunner("clientInvalidCredentials").withPayload(ECHO_REQUEST).runExpectingException();
-        MuleEvent event = e.getEvent();
-        assertThat(event.getMessage().<String> getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
-    }
+  @Test
+  public void requestWithInvalidCredentialsThrowsException() throws Exception {
+    // The unauthorized response contains an error message in the payload (which is not a SOAP Fault), then WSConsumer
+    // should fail to parse the response and throw a SoapFaultException because of this.
+    SoapFaultException e =
+        (SoapFaultException) flowRunner("clientInvalidCredentials").withPayload(ECHO_REQUEST).runExpectingException();
+    MuleEvent event = e.getEvent();
+    assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY),
+               equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
+  }
 
-    @Test
-    public void requestWithInvalidCredentialsEmptyResponseThrowsException() throws Exception
-    {
-        // The unauthorized response contains an empty response, then no exception is thrown, and the payload is NullPayload.
-        // The response message still contains inbound properties from the HTTP response.
-        MuleEvent event = flowRunner("clientInvalidCredentialsEmptyResponse").withPayload(ECHO_REQUEST).run();
-        assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
-    }
+  @Test
+  public void requestWithInvalidCredentialsEmptyResponseThrowsException() throws Exception {
+    // The unauthorized response contains an empty response, then no exception is thrown, and the payload is NullPayload.
+    // The response message still contains inbound properties from the HTTP response.
+    MuleEvent event = flowRunner("clientInvalidCredentialsEmptyResponse").withPayload(ECHO_REQUEST).run();
+    assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY),
+               equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
+  }
 
 }

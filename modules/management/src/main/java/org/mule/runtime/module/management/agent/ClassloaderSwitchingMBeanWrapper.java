@@ -18,99 +18,76 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ensures any external jmx invocation (like e.g. remote) is executed with a correct application
- * classloader (otherwise a bootstrap classloader is used by default for platform mbean server). Note
- * the irony - extends StandardMBean, but StandardMBean is not your 'standard mbean', but rather a
- * special kind of the DynamicMBean which generates attributes/operations based on the passed in
- * interface (via reflection).
+ * Ensures any external jmx invocation (like e.g. remote) is executed with a correct application classloader (otherwise a
+ * bootstrap classloader is used by default for platform mbean server). Note the irony - extends StandardMBean, but StandardMBean
+ * is not your 'standard mbean', but rather a special kind of the DynamicMBean which generates attributes/operations based on the
+ * passed in interface (via reflection).
  */
-public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements MBeanRegistration
-{
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements MBeanRegistration {
 
-    private ClassLoader executionClassLoader;
+  protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    public <T> ClassloaderSwitchingMBeanWrapper(T implementation, Class<T> mbeanInterface, ClassLoader executionClassLoader)
-            throws NotCompliantMBeanException
-    {
-        super(implementation, mbeanInterface);
-        this.executionClassLoader = executionClassLoader;
+  private ClassLoader executionClassLoader;
+
+  public <T> ClassloaderSwitchingMBeanWrapper(T implementation, Class<T> mbeanInterface, ClassLoader executionClassLoader)
+      throws NotCompliantMBeanException {
+    super(implementation, mbeanInterface);
+    this.executionClassLoader = executionClassLoader;
+  }
+
+  @Override
+  public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
+    ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(executionClassLoader);
+      return super.invoke(actionName, params, signature);
+    } catch (MBeanException mbex) {
+      throw mbex;
+    } catch (ReflectionException rex) {
+      throw rex;
+    } catch (Exception ex) {
+      logger.error(String.format("MBean operation '%s' failed", actionName), ex);
+      if (ex instanceof RuntimeException) {
+        throw (RuntimeException) ex;
+      }
+
+      throw new RuntimeException(ex);
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldCl);
+    }
+  }
+
+  public ClassLoader getExecutionClassLoader() {
+    return executionClassLoader;
+  }
+
+  public void setExecutionClassLoader(ClassLoader executionClassLoader) {
+    this.executionClassLoader = executionClassLoader;
+  }
+
+  public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+    if (getImplementation() instanceof MBeanRegistration) {
+      return ((MBeanRegistration) getImplementation()).preRegister(server, name);
     }
 
-    @Override
-    public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException
-    {
-        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(executionClassLoader);
-            return super.invoke(actionName, params, signature);
-        }
-        catch (MBeanException mbex)
-        {
-            throw mbex;
-        }
-        catch (ReflectionException rex)
-        {
-            throw rex;
-        }
-        catch (Exception ex)
-        {
-            logger.error(String.format("MBean operation '%s' failed", actionName), ex);
-            if (ex instanceof RuntimeException)
-            {
-                throw (RuntimeException) ex;
-            }
+    return name;
+  }
 
-            throw new RuntimeException(ex);
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(oldCl);
-        }
+  public void postRegister(Boolean registrationDone) {
+    if (getImplementation() instanceof MBeanRegistration) {
+      ((MBeanRegistration) getImplementation()).postRegister(registrationDone);
     }
+  }
 
-    public ClassLoader getExecutionClassLoader()
-    {
-        return executionClassLoader;
+  public void preDeregister() throws Exception {
+    if (getImplementation() instanceof MBeanRegistration) {
+      ((MBeanRegistration) getImplementation()).preDeregister();
     }
+  }
 
-    public void setExecutionClassLoader(ClassLoader executionClassLoader)
-    {
-        this.executionClassLoader = executionClassLoader;
+  public void postDeregister() {
+    if (getImplementation() instanceof MBeanRegistration) {
+      ((MBeanRegistration) getImplementation()).postDeregister();
     }
-
-    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
-    {
-        if (getImplementation() instanceof MBeanRegistration)
-        {
-            return ((MBeanRegistration) getImplementation()).preRegister(server, name);
-        }
-
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone)
-    {
-        if (getImplementation() instanceof MBeanRegistration)
-        {
-            ((MBeanRegistration) getImplementation()).postRegister(registrationDone);
-        }
-    }
-
-    public void preDeregister() throws Exception
-    {
-        if (getImplementation() instanceof MBeanRegistration)
-        {
-            ((MBeanRegistration) getImplementation()).preDeregister();
-        }
-    }
-
-    public void postDeregister()
-    {
-        if (getImplementation() instanceof MBeanRegistration)
-        {
-            ((MBeanRegistration) getImplementation()).postDeregister();
-        }
-    }
+  }
 }

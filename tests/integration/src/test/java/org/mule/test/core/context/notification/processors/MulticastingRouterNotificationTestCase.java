@@ -16,55 +16,37 @@ import java.util.List;
 import org.junit.Ignore;
 
 @Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
-public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
-{
+public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
+  }
 
-    @Override
-    public void doTest() throws Exception
-    {
-        List<String> testList = Arrays.asList(TEST_PAYLOAD);
-        assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("all2").withPayload(testList).run());
-        assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
-    }
+  @Override
+  public void doTest() throws Exception {
+    List<String> testList = Arrays.asList(TEST_PAYLOAD);
+    assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
+    assertNotNull(flowRunner("all2").withPayload(testList).run());
+    assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
+  }
 
 
-    @Override
-    public RestrictedNode getSpecification()
-    {
-        return new Node()
-                .serial(pre())      //Two routes with chain with one element
-                .serial(prePost())
-                .serial(prePost())
-                .serial(post())
-                .serial(prePost())    //MP after the Scope;
+  @Override
+  public RestrictedNode getSpecification() {
+    return new Node().serial(pre()) // Two routes with chain with one element
+        .serial(prePost()).serial(prePost()).serial(post()).serial(prePost()) // MP after the Scope;
 
-                /*All*/.serial(pre())      //Two routes with chain with two first one is interceptiong elements
-                /*CollectionSplitter*/.serial(pre())
-                /* Logger           */.serial(prePost())
-                /*CollectionSplitter*/.serial(post())
-                /*CollectionSplitter*/.serial(pre())
-                /* Logger           */.serial(prePost())
-                /*CollectionSplitter*/.serial(post())
-                /*All*/.serial(post())
-                /*Logger*/.serial(prePost())    //MP after the Scope;
+        /* All */.serial(pre()) // Two routes with chain with two first one is interceptiong elements
+        /* CollectionSplitter */.serial(pre())/* Logger */.serial(prePost())/* CollectionSplitter */.serial(post())
+        /* CollectionSplitter */.serial(pre())/* Logger */.serial(prePost())/* CollectionSplitter */.serial(post())
+        /* All */.serial(post())/* Logger */.serial(prePost()) // MP after the Scope;
 
-                .serial(pre())       //Two routes with no chain with one element
-                .serial(prePost())
-                .serial(prePost())
-                .serial(post())
-                .serial(prePost())    //MP after the Scope;
-                ;
-    }
+        .serial(pre()) // Two routes with no chain with one element
+        .serial(prePost()).serial(prePost()).serial(post()).serial(prePost()) // MP after the Scope;
+    ;
+  }
 
-    @Override
-    public void validateSpecification(RestrictedNode spec) throws Exception
-    {
-    }
+  @Override
+  public void validateSpecification(RestrictedNode spec) throws Exception {}
 }

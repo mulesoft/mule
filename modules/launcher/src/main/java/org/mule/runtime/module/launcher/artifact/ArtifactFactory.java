@@ -14,20 +14,19 @@ import java.io.IOException;
 /**
  * Generic Factory for an {@link Artifact}.
  */
-public interface ArtifactFactory<T extends Artifact>
-{
+public interface ArtifactFactory<T extends Artifact> {
 
-    /**
-     * Creates an Artifact
-     *
-     * @param artifactName artifact identifier
-     * @return the newly created Artifact
-     */
-    T createArtifact(String artifactName) throws IOException;
+  /**
+   * Creates an Artifact
+   *
+   * @param artifactName artifact identifier
+   * @return the newly created Artifact
+   */
+  T createArtifact(String artifactName) throws IOException;
 
-    /**
-     * @return the directory of the Artifact. Usually this directory contains the Artifact resources
-     */
-    File getArtifactDir();
+  /**
+   * @return the directory of the Artifact. Usually this directory contains the Artifact resources
+   */
+  File getArtifactDir();
 
 }

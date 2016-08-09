@@ -18,47 +18,43 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * Proxies a {@link Service} instance to filter invocations of lifecycle methods from
- * {@link Startable} and {@link Stoppable} interfaces.
+ * Proxies a {@link Service} instance to filter invocations of lifecycle methods from {@link Startable} and {@link Stoppable}
+ * interfaces.
  */
-public class LifecycleFilterServiceProxy implements InvocationHandler
-{
+public class LifecycleFilterServiceProxy implements InvocationHandler {
 
-    private final Service service;
+  private final Service service;
 
-    /**
-     * Creates a new proxy for the provided service instance.
-     *
-     * @param service service instance to wrap. Non null.
-     */
-    public LifecycleFilterServiceProxy(Service service)
-    {
-        checkArgument(service != null, "service cannot be null");
-        this.service = service;
+  /**
+   * Creates a new proxy for the provided service instance.
+   *
+   * @param service service instance to wrap. Non null.
+   */
+  public LifecycleFilterServiceProxy(Service service) {
+    checkArgument(service != null, "service cannot be null");
+    this.service = service;
+  }
+
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    if (method.getDeclaringClass() == Startable.class || method.getDeclaringClass() == Stoppable.class) {
+      throw new UnsupportedOperationException("Cannot invoke lifecycle methods on a service instance");
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-    {
-        if (method.getDeclaringClass() == Startable.class || method.getDeclaringClass() == Stoppable.class)
-        {
-            throw new UnsupportedOperationException("Cannot invoke lifecycle methods on a service instance");
-        }
+    return method.invoke(service, args);
+  }
 
-        return method.invoke(service, args);
-    }
+  /**
+   * Creates a proxy for the provided service instance.
+   *
+   * @param service service to wrap. Non null.
+   * @return a new proxy instance.
+   */
+  public static Service createServiceProxy(Service service) {
+    checkArgument(service != null, "service cannot be null");
+    InvocationHandler handler = new LifecycleFilterServiceProxy(service);
 
-    /**
-     * Creates a proxy for the provided service instance.
-     *
-     * @param service service to wrap. Non null.
-     * @return a new proxy instance.
-     */
-    public static Service createServiceProxy(Service service)
-    {
-        checkArgument(service != null, "service cannot be null");
-        InvocationHandler handler = new LifecycleFilterServiceProxy(service);
-
-        return (Service) Proxy.newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()), handler);
-    }
+    return (Service) Proxy.newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()),
+                                            handler);
+  }
 }

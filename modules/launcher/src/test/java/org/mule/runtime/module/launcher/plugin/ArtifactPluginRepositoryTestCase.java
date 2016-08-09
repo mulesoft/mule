@@ -29,103 +29,99 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
-{
+public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
 
-    private static final String PLUGIN_NAME = "testPlugin";
+  private static final String PLUGIN_NAME = "testPlugin";
 
-    private static final String PLUGIN_PROPERTIES = "plugin.properties";
-    private static final String PLUGIN_LIB_FOLDER = "lib";
+  private static final String PLUGIN_PROPERTIES = "plugin.properties";
+  private static final String PLUGIN_LIB_FOLDER = "lib";
 
-    @Rule
-    public TemporaryFolder muleHomeFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder muleHomeFolder = new TemporaryFolder();
 
-    private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
-    private final ArtifactPluginRepository applicationPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
+  private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
+  private final ArtifactPluginRepository applicationPluginRepository =
+      new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
 
-    private File pluginsLibFolder;
+  private File pluginsLibFolder;
 
-    @Before
-    public void setUp() throws IOException
-    {
-        System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
-        when(artifactPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
-            ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
-            descriptor.setName(((File) invocation.getArguments()[0]).getName());
-            return descriptor;
-        });
+  @Before
+  public void setUp() throws IOException {
+    System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
+    when(artifactPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
+      ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
+      descriptor.setName(((File) invocation.getArguments()[0]).getName());
+      return descriptor;
+    });
 
-        pluginsLibFolder = createContainerAppPluginsFolder();
-    }
+    pluginsLibFolder = createContainerAppPluginsFolder();
+  }
 
-    @Test
-    public void emptyListOfPlugins() throws Exception
-    {
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
-        assertThat(descriptorList.size(), is(0));
-    }
+  @Test
+  public void emptyListOfPlugins() throws Exception {
+    final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+    assertThat(descriptorList.size(), is(0));
+  }
 
-    @Test
-    public void unzipPluginZipFileCreateDescriptor() throws Exception
-    {
-        File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
+  @Test
+  public void unzipPluginZipFileCreateDescriptor() throws Exception {
+    File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
 
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+    final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
 
-        assertThat(descriptorList.size(), is(1));
-        ArtifactPluginDescriptor descriptor = descriptorList.get(0);
-        assertThat(descriptor.getName(), is(PLUGIN_NAME));
+    assertThat(descriptorList.size(), is(1));
+    ArtifactPluginDescriptor descriptor = descriptorList.get(0);
+    assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
-        assertThat(zipPlugin.exists(), is(false));
-        assertThat(new File(pluginsLibFolder, descriptor.getName()).exists(), is(true));
-    }
+    assertThat(zipPlugin.exists(), is(false));
+    assertThat(new File(pluginsLibFolder, descriptor.getName()).exists(), is(true));
+  }
 
-    @Test
-    public void loadPluginAlreadyUnzippedCreateDescriptor() throws Exception
-    {
-        File pluginFolder = createPluginFolder(pluginsLibFolder, PLUGIN_NAME);
+  @Test
+  public void loadPluginAlreadyUnzippedCreateDescriptor() throws Exception {
+    File pluginFolder = createPluginFolder(pluginsLibFolder, PLUGIN_NAME);
 
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+    final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
 
-        assertThat(descriptorList.size(), is(1));
-        ArtifactPluginDescriptor descriptor = descriptorList.get(0);
-        assertThat(descriptor.getName(), is(PLUGIN_NAME));
+    assertThat(descriptorList.size(), is(1));
+    ArtifactPluginDescriptor descriptor = descriptorList.get(0);
+    assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
-        assertThat(pluginFolder.exists(), is(true));
-    }
+    assertThat(pluginFolder.exists(), is(true));
+  }
 
-    private File createContainerAppPluginsFolder() throws IOException
-    {
-        final File pluginsFolder = new File(muleHomeFolder.getRoot(), CONTAINER_APP_PLUGINS);
-        assertThat(pluginsFolder.mkdir(), is(true));
-        return pluginsFolder;
-    }
+  private File createContainerAppPluginsFolder() throws IOException {
+    final File pluginsFolder = new File(muleHomeFolder.getRoot(), CONTAINER_APP_PLUGINS);
+    assertThat(pluginsFolder.mkdir(), is(true));
+    return pluginsFolder;
+  }
 
-    private File createPluginZipFile(File pluginsLibFolder, String pluginName) throws IOException
-    {
-        final File pluginFolder = new File(pluginsLibFolder, pluginName);
-        final File pluginPropertiesFile = new File(pluginFolder, PLUGIN_PROPERTIES);
-        FileUtils.write(pluginPropertiesFile, "foo");
-        final File libFolder = new File(pluginFolder, PLUGIN_LIB_FOLDER);
-        final String libraryJarName = "library.jar";
-        final File dummyJar = new File(libFolder, libraryJarName);
-        FileUtils.write(dummyJar, "bar");
+  private File createPluginZipFile(File pluginsLibFolder, String pluginName) throws IOException {
+    final File pluginFolder = new File(pluginsLibFolder, pluginName);
+    final File pluginPropertiesFile = new File(pluginFolder, PLUGIN_PROPERTIES);
+    FileUtils.write(pluginPropertiesFile, "foo");
+    final File libFolder = new File(pluginFolder, PLUGIN_LIB_FOLDER);
+    final String libraryJarName = "library.jar";
+    final File dummyJar = new File(libFolder, libraryJarName);
+    FileUtils.write(dummyJar, "bar");
 
 
-        File zipFile = new File(pluginsLibFolder, pluginName + ".zip");
-        ZipUtils.compress(zipFile, new ZipResource[] {new ZipResource(dummyJar.getAbsolutePath(), PLUGIN_LIB_FOLDER + separator + libraryJarName), new ZipResource(pluginPropertiesFile.getAbsolutePath(), pluginPropertiesFile.getName())});
+    File zipFile = new File(pluginsLibFolder, pluginName + ".zip");
+    ZipUtils.compress(zipFile,
+                      new ZipResource[] {
+                          new ZipResource(dummyJar.getAbsolutePath(), PLUGIN_LIB_FOLDER + separator + libraryJarName),
+                          new ZipResource(pluginPropertiesFile.getAbsolutePath(), pluginPropertiesFile.getName())});
 
-        FileUtils.forceDelete(pluginFolder);
+    FileUtils.forceDelete(pluginFolder);
 
-        return zipFile;
-    }
+    return zipFile;
+  }
 
-    private File createPluginFolder(File pluginsLibFolder, String pluginName) throws IOException
-    {
-        final File pluginZipFile = createPluginZipFile(pluginsLibFolder, pluginName);
-        final File pluginFolder = new File(pluginsLibFolder, pluginName);
-        FileUtils.unzip(pluginZipFile, pluginFolder);
-        FileUtils.forceDelete(pluginZipFile);
-        return pluginFolder;
-    }
+  private File createPluginFolder(File pluginsLibFolder, String pluginName) throws IOException {
+    final File pluginZipFile = createPluginZipFile(pluginsLibFolder, pluginName);
+    final File pluginFolder = new File(pluginsLibFolder, pluginName);
+    FileUtils.unzip(pluginZipFile, pluginFolder);
+    FileUtils.forceDelete(pluginZipFile);
+    return pluginFolder;
+  }
 }

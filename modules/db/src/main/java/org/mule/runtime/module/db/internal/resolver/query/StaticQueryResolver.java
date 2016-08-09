@@ -14,19 +14,16 @@ import org.mule.runtime.module.db.internal.domain.query.Query;
 /**
  * Resolves a query to a static value without using the current event
  */
-public class StaticQueryResolver implements QueryResolver
-{
+public class StaticQueryResolver implements QueryResolver {
 
-    private final Query query;
+  private final Query query;
 
-    public StaticQueryResolver(Query query)
-    {
-        this.query = query;
-    }
+  public StaticQueryResolver(Query query) {
+    this.query = query;
+  }
 
-    @Override
-    public Query resolve(DbConnection connection, MuleEvent muleEvent) throws QueryResolutionException
-    {
-        return query;
-    }
+  @Override
+  public Query resolve(DbConnection connection, MuleEvent muleEvent) throws QueryResolutionException {
+    return query;
+  }
 }

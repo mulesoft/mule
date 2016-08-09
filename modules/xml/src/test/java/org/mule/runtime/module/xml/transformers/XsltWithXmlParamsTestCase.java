@@ -16,41 +16,35 @@ import org.mule.runtime.module.xml.util.XMLTestUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
-public class XsltWithXmlParamsTestCase extends FunctionalTestCase
-{
+public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
 
-    private static final String EXPECTED = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>";
+  private static final String EXPECTED =
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "xslt-with-xml-param-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "xslt-with-xml-param-config.xml";
+  }
 
-    @Test
-    public void xmlSourceParam() throws Exception
-    {
-        MuleEvent event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
-                                                      .withFlowVariable("xml", XMLTestUtils.toSource("test.xml"))
-                                                      .run();
+  @Test
+  public void xmlSourceParam() throws Exception {
+    MuleEvent event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+        .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
-        assertExpected(event);
-    }
+    assertExpected(event);
+  }
 
-    @Test
-    public void xmlStringParam() throws Exception
-    {
-        MuleEvent event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
-                                                      .withFlowVariable("xml", XMLTestUtils.toSource("test.xml"))
-                                                      .run();
+  @Test
+  public void xmlStringParam() throws Exception {
+    MuleEvent event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+        .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
-        assertExpected(event);
-    }
+    assertExpected(event);
+  }
 
-    private void assertExpected(MuleEvent event) throws Exception
-    {
-        assertThat(XMLUnit.compareXML(event.getMessage().getPayload().toString(), EXPECTED).similar(), is(true));
-    }
+  private void assertExpected(MuleEvent event) throws Exception {
+    assertThat(XMLUnit.compareXML(event.getMessage().getPayload().toString(), EXPECTED).similar(), is(true));
+  }
 
 
 }

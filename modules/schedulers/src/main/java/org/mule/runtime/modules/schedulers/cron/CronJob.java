@@ -14,29 +14,25 @@ import org.quartz.StatefulJob;
 
 /**
  * <p>
- * {@link StatefulJob} for polling. This is always stateful as the synchronous processing strategy is defined by
- * the flow of the poll.
+ * {@link StatefulJob} for polling. This is always stateful as the synchronous processing strategy is defined by the flow of the
+ * poll.
  * </p>
  *
  * @since 3.5.0
  */
-public class CronJob implements StatefulJob
-{
+public class CronJob implements StatefulJob {
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException
-    {
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        PollingWorker work = (PollingWorker) getSchedulerWork(context);
-        if (work != null)
-        {
-            work.run();
-        }
-
+    PollingWorker work = (PollingWorker) getSchedulerWork(context);
+    if (work != null) {
+      work.run();
     }
 
-    private Object getSchedulerWork(JobExecutionContext context)
-    {
-        return context.getJobDetail().getJobDataMap().get(CronScheduler.POLL_CRON_SCHEDULER_JOB);
-    }
+  }
+
+  private Object getSchedulerWork(JobExecutionContext context) {
+    return context.getJobDetail().getJobDataMap().get(CronScheduler.POLL_CRON_SCHEDULER_JOB);
+  }
 }

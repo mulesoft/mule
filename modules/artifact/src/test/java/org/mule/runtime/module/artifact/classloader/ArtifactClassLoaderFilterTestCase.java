@@ -18,62 +18,53 @@ import java.lang.annotation.Annotation;
 import org.junit.Test;
 
 @SmallTest
-public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase
-{
+public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase {
 
-    private ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
+  private ArtifactClassLoaderFilter filter =
+      new ArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
 
-    @Test
-    public void filtersClassWhenPackageNotExported() throws Exception
-    {
-        assertThat(filter.exportsClass(java.io.Closeable.class.getName()), equalTo(false));
-    }
+  @Test
+  public void filtersClassWhenPackageNotExported() throws Exception {
+    assertThat(filter.exportsClass(java.io.Closeable.class.getName()), equalTo(false));
+  }
 
-    @Test
-    public void filtersClassWhenPackageNotExportedAndParentPackageIsExported() throws Exception
-    {
-        assertThat(filter.exportsClass(Annotation.class.getName()), equalTo(false));
-    }
+  @Test
+  public void filtersClassWhenPackageNotExportedAndParentPackageIsExported() throws Exception {
+    assertThat(filter.exportsClass(Annotation.class.getName()), equalTo(false));
+  }
 
-    @Test
-    public void acceptsClassWhenPackageExported() throws Exception
-    {
-        assertThat(filter.exportsClass(Object.class.getName()), equalTo(true));
-    }
+  @Test
+  public void acceptsClassWhenPackageExported() throws Exception {
+    assertThat(filter.exportsClass(Object.class.getName()), equalTo(true));
+  }
 
-    @Test
-    public void acceptsExportedResource() throws Exception
-    {
-        assertThat(filter.exportsResource("/META-INF/schema.xsd"), equalTo(true));
-    }
+  @Test
+  public void acceptsExportedResource() throws Exception {
+    assertThat(filter.exportsResource("/META-INF/schema.xsd"), equalTo(true));
+  }
 
-    @Test
-    public void filtersNotExportedResource() throws Exception
-    {
-        assertThat(filter.exportsResource("/META-INF/readme.txt"), equalTo(false));
-    }
+  @Test
+  public void filtersNotExportedResource() throws Exception {
+    assertThat(filter.exportsResource("/META-INF/readme.txt"), equalTo(false));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesNullClassName() throws Exception
-    {
-        filter.exportsClass(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesNullClassName() throws Exception {
+    filter.exportsClass(null);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesEmptyClassName() throws Exception
-    {
-        filter.exportsClass("");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesEmptyClassName() throws Exception {
+    filter.exportsClass("");
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesNullResourceName() throws Exception
-    {
-        filter.exportsResource(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesNullResourceName() throws Exception {
+    filter.exportsResource(null);
+  }
 
-    @Test
-    public void validatesEmptyResourceName() throws Exception
-    {
-        assertThat(filter.exportsResource(""), equalTo(false));
-    }
+  @Test
+  public void validatesEmptyResourceName() throws Exception {
+    assertThat(filter.exportsResource(""), equalTo(false));
+  }
 }

@@ -14,26 +14,21 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SessionPropertiesValidatorComponent implements Callable
-{
+public class SessionPropertiesValidatorComponent implements Callable {
 
-    private Map<String,String> expectedProperties = new HashMap<String,String>();
+  private Map<String, String> expectedProperties = new HashMap<String, String>();
 
-    public void setExpectedProperties(Map<String, String> expectedProperties)
-    {
-        this.expectedProperties = expectedProperties;
+  public void setExpectedProperties(Map<String, String> expectedProperties) {
+    this.expectedProperties = expectedProperties;
+  }
+
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    if (expectedProperties.isEmpty()) {
+      throw new IllegalStateException("you must set at least one expected property");
     }
-
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        if (expectedProperties.isEmpty())
-        {
-            throw new IllegalStateException("you must set at least one expected property");
-        }
-        for (String propertyName : expectedProperties.keySet())
-        {
-            assertThat(eventContext.getEvent().getSession().getProperty(propertyName), is(expectedProperties.get(propertyName)));
-        }
-        return eventContext.getMessage();
+    for (String propertyName : expectedProperties.keySet()) {
+      assertThat(eventContext.getEvent().getSession().getProperty(propertyName), is(expectedProperties.get(propertyName)));
     }
+    return eventContext.getMessage();
+  }
 }

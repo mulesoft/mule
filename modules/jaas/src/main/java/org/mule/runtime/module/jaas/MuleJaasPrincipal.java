@@ -9,31 +9,26 @@ package org.mule.runtime.module.jaas;
 import java.io.Serializable;
 import java.security.Principal;
 
-public class MuleJaasPrincipal implements Principal, Serializable
-{
-    private final String name;
+public class MuleJaasPrincipal implements Principal, Serializable {
 
-    public MuleJaasPrincipal(String name)
-    {
-        if (name == null)
-        {
-            throw new IllegalArgumentException("Null name");
-        }
-        this.name = name;
-    }
+  private final String name;
 
-    public String getName()
-    {
-        return name;
+  public MuleJaasPrincipal(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("Null name");
     }
+    this.name = name;
+  }
 
-    public String toString()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int hasCode()
-    {
-        return name.hashCode();
-    }
+  public String toString() {
+    return name;
+  }
+
+  public int hasCode() {
+    return name.hashCode();
+  }
 }

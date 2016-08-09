@@ -10,22 +10,21 @@ package org.mule.runtime.module.artifact.classloader;
 /**
  * Determines if a given class or resource is exported in a plugin classloader
  */
-public interface ClassLoaderFilter
-{
+public interface ClassLoaderFilter {
 
-    /**
-     * Determines if a given name must be accepted or filtered.
-     *
-     * @param name class name to check. Non empty.
-     * @return true if the class is exported, false otherwise
-     */
-    boolean exportsClass(String name);
+  /**
+   * Determines if a given name must be accepted or filtered.
+   *
+   * @param name class name to check. Non empty.
+   * @return true if the class is exported, false otherwise
+   */
+  boolean exportsClass(String name);
 
-    /**
-     * Determines if a given resource must be accepted or filtered.
-     *
-     * @param name resource name to check. Non empty.
-     * @return true if the resource is exported, false otherwise
-     */
-    boolean exportsResource(String name);
+  /**
+   * Determines if a given resource must be accepted or filtered.
+   *
+   * @param name resource name to check. Non empty.
+   * @return true if the resource is exported, false otherwise
+   */
+  boolean exportsResource(String name);
 }

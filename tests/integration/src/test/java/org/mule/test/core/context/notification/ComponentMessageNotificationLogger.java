@@ -9,7 +9,6 @@ package org.mule.test.core.context.notification;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 
 public class ComponentMessageNotificationLogger extends AbstractNotificationLogger
-    implements ComponentMessageNotificationListener
-{
-    // nothing to do here
+    implements ComponentMessageNotificationListener {
+  // nothing to do here
 }

@@ -13,81 +13,69 @@ import java.util.Map;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class PGPAuthentication implements Authentication
-{
-    private boolean authenticated;
-    private String userName;
-    private Message message;
-    private PGPPublicKey publicKey;
-    transient private MuleEvent event;
-    
-    public PGPAuthentication(String userName, Message message)
-    {
-        this(userName, message, null);
-    }
+public class PGPAuthentication implements Authentication {
 
-    public PGPAuthentication(String userName, Message message, MuleEvent event)
-    {
-        this.authenticated = false;
-        this.userName = userName;
-        this.message = message;
-    }
+  private boolean authenticated;
+  private String userName;
+  private Message message;
+  private PGPPublicKey publicKey;
+  transient private MuleEvent event;
 
-    @Override
-    public void setAuthenticated(boolean b)
-    {
-        authenticated = b;
-    }
+  public PGPAuthentication(String userName, Message message) {
+    this(userName, message, null);
+  }
 
-    @Override
-    public boolean isAuthenticated()
-    {
-        return authenticated;
-    }
+  public PGPAuthentication(String userName, Message message, MuleEvent event) {
+    this.authenticated = false;
+    this.userName = userName;
+    this.message = message;
+  }
 
-    @Override
-    public Object getCredentials()
-    {
-        return message;
-    }
+  @Override
+  public void setAuthenticated(boolean b) {
+    authenticated = b;
+  }
 
-    public Object getDetails()
-    {
-        return publicKey;
-    }
+  @Override
+  public boolean isAuthenticated() {
+    return authenticated;
+  }
 
-    protected void setDetails(PGPPublicKey publicKey)
-    {
-        this.publicKey = publicKey;
-    }
+  @Override
+  public Object getCredentials() {
+    return message;
+  }
 
-    @Override
-    public Object getPrincipal()
-    {
-        return userName;
-    }
+  public Object getDetails() {
+    return publicKey;
+  }
 
-    @Override
-    public Map<String, Object> getProperties()
-    {
-        // TODO
-        return null;
-    }
+  protected void setDetails(PGPPublicKey publicKey) {
+    this.publicKey = publicKey;
+  }
 
-    @Override
-    public void setProperties(Map<String, Object> properties)
-    {
-        // TODO
-    }
+  @Override
+  public Object getPrincipal() {
+    return userName;
+  }
 
-    @Override
-    public MuleEvent getEvent()
-    {
-        return event;
-    }
+  @Override
+  public Map<String, Object> getProperties() {
+    // TODO
+    return null;
+  }
 
-    public void setEvent(MuleEvent muleEvent)
-    {
-        this.event = muleEvent;
-    }
+  @Override
+  public void setProperties(Map<String, Object> properties) {
+    // TODO
+  }
+
+  @Override
+  public MuleEvent getEvent() {
+    return event;
+  }
+
+  public void setEvent(MuleEvent muleEvent) {
+    this.event = muleEvent;
+  }
 }

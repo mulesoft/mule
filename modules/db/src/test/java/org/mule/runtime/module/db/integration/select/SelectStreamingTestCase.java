@@ -24,33 +24,28 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStreamingTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectStreamingTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectStreamingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectStreamingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-streaming-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-streaming-config.xml"};
+  }
 
-    @Test
-    public void streamsRecords() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void streamsRecords() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
-        assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
+    assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
+  }
 }

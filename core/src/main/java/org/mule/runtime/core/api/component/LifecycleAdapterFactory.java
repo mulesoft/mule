@@ -12,11 +12,9 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /** <code>LifecycleAdapterFactory</code> TODO (document class) */
-public interface LifecycleAdapterFactory<JC extends JavaComponent>
-{
-    LifecycleAdapter create(Object pojoService,
-                            JC component,
-                            FlowConstruct flowConstruct,
-                            EntryPointResolverSet resolver,
-                            MuleContext muleContext) throws MuleException;
+public interface LifecycleAdapterFactory<JC extends JavaComponent> {
+
+  LifecycleAdapter create(Object pojoService, JC component, FlowConstruct flowConstruct, EntryPointResolverSet resolver,
+                          MuleContext muleContext)
+      throws MuleException;
 }

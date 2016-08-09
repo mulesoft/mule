@@ -15,34 +15,27 @@ import javax.sql.DataSource;
 /**
  * Creates a {@link Connection} from a {@link DataSource}
  */
-public class SimpleConnectionFactory extends AbstractConnectionFactory
-{
+public class SimpleConnectionFactory extends AbstractConnectionFactory {
 
-    private Map<String, Class<?>> typeMapping;
+  private Map<String, Class<?>> typeMapping;
 
-    public SimpleConnectionFactory(Map<String, Class<?>> typeMapping)
-    {
-        this.typeMapping = typeMapping;
+  public SimpleConnectionFactory(Map<String, Class<?>> typeMapping) {
+    this.typeMapping = typeMapping;
+  }
+
+  @Override
+  protected Connection doCreateConnection(DataSource dataSource) {
+    Connection connection;
+    try {
+      connection = dataSource.getConnection();
+
+      if (typeMapping != null && !typeMapping.isEmpty()) {
+        connection.setTypeMap(typeMapping);
+      }
+    } catch (Exception e) {
+      throw new ConnectionCreationException(e);
     }
 
-    @Override
-    protected Connection doCreateConnection(DataSource dataSource)
-    {
-        Connection connection;
-        try
-        {
-            connection = dataSource.getConnection();
-
-            if (typeMapping != null && !typeMapping.isEmpty())
-            {
-                connection.setTypeMap(typeMapping);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new ConnectionCreationException(e);
-        }
-
-        return connection;
-    }
+    return connection;
+  }
 }

@@ -29,276 +29,222 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Allows EndpointURI to be set and changed dynamically by wrapping up an immutable
- * endpoint instance.
+ * Allows EndpointURI to be set and changed dynamically by wrapping up an immutable endpoint instance.
  */
-public class DynamicURIOutboundEndpoint implements OutboundEndpoint
-{
+public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
 
-    private static final long serialVersionUID = -2814979100270307813L;
+  private static final long serialVersionUID = -2814979100270307813L;
 
-    protected OutboundEndpoint endpoint;
-    private EndpointURI dynamicEndpointURI;
+  protected OutboundEndpoint endpoint;
+  private EndpointURI dynamicEndpointURI;
 
-    public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
+  public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint, EndpointURI dynamicEndpointURI) {
+    this.endpoint = endpoint;
+    setEndpointURI(dynamicEndpointURI);
+  }
+
+  @Override
+  public EndpointURI getEndpointURI() {
+    if (dynamicEndpointURI != null) {
+      return dynamicEndpointURI;
+    } else {
+      return endpoint.getEndpointURI();
     }
+  }
 
-    public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint, EndpointURI dynamicEndpointURI)
-    {
-        this.endpoint = endpoint;
-        setEndpointURI(dynamicEndpointURI);
+  @Override
+  public String getAddress() {
+    EndpointURI uri = getEndpointURI();
+    if (uri != null) {
+      return uri.getUri().toString();
+    } else {
+      return null;
     }
+  }
 
-    @Override
-    public EndpointURI getEndpointURI()
-    {
-        if (dynamicEndpointURI != null)
-        {
-            return dynamicEndpointURI;
-        }
-        else
-        {
-            return endpoint.getEndpointURI();
-        }
-    }
+  public void setEndpointURI(EndpointURI dynamicEndpointURI) {
+    this.dynamicEndpointURI = dynamicEndpointURI;
+  }
 
-    @Override
-    public String getAddress()
-    {
-        EndpointURI uri = getEndpointURI();
-        if (uri != null)
-        {
-            return uri.getUri().toString();
-        }
-        else
-        {
-            return null;
-        }
-    }
+  @Override
+  public RetryPolicyTemplate getRetryPolicyTemplate() {
+    return endpoint.getRetryPolicyTemplate();
+  }
 
-    public void setEndpointURI(EndpointURI dynamicEndpointURI)
-    {
-        this.dynamicEndpointURI = dynamicEndpointURI;
-    }
+  @Override
+  public AbstractRedeliveryPolicy getRedeliveryPolicy() {
+    return endpoint.getRedeliveryPolicy();
+  }
 
-    @Override
-    public RetryPolicyTemplate getRetryPolicyTemplate()
-    {
-        return endpoint.getRetryPolicyTemplate();
-    }
+  @Override
+  public Connector getConnector() {
+    return endpoint.getConnector();
+  }
 
-    @Override
-    public AbstractRedeliveryPolicy getRedeliveryPolicy()
-    {
-        return endpoint.getRedeliveryPolicy();
-    }
+  @Override
+  public Charset getEncoding() {
+    return endpoint.getEncoding();
+  }
 
-    @Override
-    public Connector getConnector()
-    {
-        return endpoint.getConnector();
-    }
+  @Override
+  public MediaType getMimeType() {
+    return endpoint.getMimeType();
+  }
 
-    @Override
-    public Charset getEncoding()
-    {
-        return endpoint.getEncoding();
-    }
+  @Override
+  public Filter getFilter() {
+    return endpoint.getFilter();
+  }
 
-    @Override
-    public MediaType getMimeType()
-    {
-        return endpoint.getMimeType();
-    }
+  @Override
+  public String getInitialState() {
+    return endpoint.getInitialState();
+  }
 
-    @Override
-    public Filter getFilter()
-    {
-        return endpoint.getFilter();
-    }
+  @Override
+  public MuleContext getMuleContext() {
+    return endpoint.getMuleContext();
+  }
 
-    @Override
-    public String getInitialState()
-    {
-        return endpoint.getInitialState();
-    }
+  @Override
+  public String getName() {
+    return endpoint.getName();
+  }
 
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return endpoint.getMuleContext();
-    }
+  @Override
+  public Map<String, Serializable> getProperties() {
+    return endpoint.getProperties();
+  }
 
-    @Override
-    public String getName()
-    {
-        return endpoint.getName();
-    }
+  @Override
+  public Serializable getProperty(Object key) {
+    return endpoint.getProperty(key);
+  }
 
-    @Override
-    public Map<String, Serializable> getProperties()
-    {
-        return endpoint.getProperties();
-    }
+  @Override
+  public String getProtocol() {
+    return endpoint.getProtocol();
+  }
 
-    @Override
-    public Serializable getProperty(Object key)
-    {
-        return endpoint.getProperty(key);
-    }
+  @Override
+  public int getResponseTimeout() {
+    return endpoint.getResponseTimeout();
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return endpoint.getProtocol();
-    }
+  @Override
+  public EndpointMessageProcessorChainFactory getMessageProcessorsFactory() {
+    return endpoint.getMessageProcessorsFactory();
+  }
 
-    @Override
-    public int getResponseTimeout()
-    {
-        return endpoint.getResponseTimeout();
-    }
+  @Override
+  public List<MessageProcessor> getMessageProcessors() {
+    return endpoint.getMessageProcessors();
+  }
 
-    @Override
-    public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
-    {
-        return endpoint.getMessageProcessorsFactory();
-    }
+  @Override
+  public List<MessageProcessor> getResponseMessageProcessors() {
+    return endpoint.getResponseMessageProcessors();
+  }
 
-    @Override
-    public List <MessageProcessor> getMessageProcessors()
-    {
-        return endpoint.getMessageProcessors();
-    }
+  @Override
+  public EndpointSecurityFilter getSecurityFilter() {
+    return endpoint.getSecurityFilter();
+  }
 
-    @Override
-    public List<MessageProcessor> getResponseMessageProcessors()
-    {
-        return endpoint.getResponseMessageProcessors();
-    }
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return endpoint.getTransactionConfig();
+  }
 
-    @Override
-    public EndpointSecurityFilter getSecurityFilter()
-    {
-        return endpoint.getSecurityFilter();
-    }
+  @Override
+  public boolean isDeleteUnacceptedMessages() {
+    return endpoint.isDeleteUnacceptedMessages();
+  }
 
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return endpoint.getTransactionConfig();
-    }
+  @Override
+  public boolean isReadOnly() {
+    return endpoint.isReadOnly();
+  }
 
-    @Override
-    public boolean isDeleteUnacceptedMessages()
-    {
-        return endpoint.isDeleteUnacceptedMessages();
-    }
+  @Override
+  public MessageExchangePattern getExchangePattern() {
+    return endpoint.getExchangePattern();
+  }
 
-    @Override
-    public boolean isReadOnly()
-    {
-        return endpoint.isReadOnly();
-    }
+  @Override
+  public List<String> getResponseProperties() {
+    return endpoint.getResponseProperties();
+  }
 
-    @Override
-    public MessageExchangePattern getExchangePattern()
-    {
-        return endpoint.getExchangePattern();
-    }
+  @Override
+  public boolean isDynamic() {
+    return true;
+  }
 
-    @Override
-    public List<String> getResponseProperties()
-    {
-        return endpoint.getResponseProperties();
-    }
+  @Override
+  public String getEndpointBuilderName() {
+    return endpoint.getEndpointBuilderName();
+  }
 
-    @Override
-    public boolean isDynamic()
-    {
-        return true;
-    }
+  @Override
+  public boolean isDisableTransportTransformer() {
+    return endpoint.isDisableTransportTransformer();
+  }
 
-    @Override
-    public String getEndpointBuilderName()
-    {
-        return endpoint.getEndpointBuilderName();
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((dynamicEndpointURI == null) ? 0 : dynamicEndpointURI.hashCode());
+    result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
+    return result;
+  }
 
-    @Override
-    public boolean isDisableTransportTransformer()
-    {
-        return endpoint.isDisableTransportTransformer();
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final DynamicURIOutboundEndpoint other = (DynamicURIOutboundEndpoint) obj;
+    if (dynamicEndpointURI == null) {
+      if (other.dynamicEndpointURI != null) {
+        return false;
+      }
+    } else if (!dynamicEndpointURI.equals(other.dynamicEndpointURI)) {
+      return false;
+    }
+    if (endpoint == null) {
+      if (other.endpoint != null) {
+        return false;
+      }
+    } else if (!endpoint.equals(other.endpoint)) {
+      return false;
+    }
+    return true;
+  }
 
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((dynamicEndpointURI == null) ? 0 : dynamicEndpointURI.hashCode());
-        result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
-        return result;
-    }
+  @Override
+  public boolean isProtocolSupported(String protocol) {
+    return getConnector().supportsProtocol(protocol);
+  }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (getClass() != obj.getClass())
-        {
-            return false;
-        }
-        final DynamicURIOutboundEndpoint other = (DynamicURIOutboundEndpoint) obj;
-        if (dynamicEndpointURI == null)
-        {
-            if (other.dynamicEndpointURI != null)
-            {
-                return false;
-            }
-        }
-        else if (!dynamicEndpointURI.equals(other.dynamicEndpointURI))
-        {
-            return false;
-        }
-        if (endpoint == null)
-        {
-            if (other.endpoint != null)
-            {
-                return false;
-            }
-        }
-        else if (!endpoint.equals(other.endpoint))
-        {
-            return false;
-        }
-        return true;
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return endpoint.process(event);
+  }
 
-    @Override
-    public boolean isProtocolSupported(String protocol)
-    {
-        return getConnector().supportsProtocol(protocol);
-    }
-
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return endpoint.process(event);
-    }
-
-    @Override
-    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
-    {
-        endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
-    }
+  @Override
+  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
+  }
 }

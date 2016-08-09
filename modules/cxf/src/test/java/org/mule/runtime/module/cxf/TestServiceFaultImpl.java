@@ -14,13 +14,12 @@ import javax.jws.WebService;
 import org.apache.cxf.interceptor.Fault;
 
 @WebService(endpointInterface = "org.mule.runtime.module.cxf.TestServiceFault", serviceName = "TestServiceFault")
-public class TestServiceFaultImpl implements TestServiceFault
-{
-    public String sayHi(String name) throws CxfEnabledFaultMessage
-    {
-        CustomFault fault = new CustomFault();
-        fault.setDescription("Custom Exception Message");
-        throw new CxfEnabledFaultMessage("Cxf Exception Message", fault);
-    }
+public class TestServiceFaultImpl implements TestServiceFault {
+
+  public String sayHi(String name) throws CxfEnabledFaultMessage {
+    CustomFault fault = new CustomFault();
+    fault.setDescription("Custom Exception Message");
+    throw new CxfEnabledFaultMessage("Cxf Exception Message", fault);
+  }
 }
 

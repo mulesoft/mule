@@ -16,63 +16,48 @@ import java.io.UnsupportedEncodingException;
 /**
  * Tests {@link GZipCompressTransformer} and its counterpart, the {@link GZipUncompressTransformer} with raw bytes as input.
  */
-public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
-{
+public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase {
 
-    @Override
-    public Object getResultData()
-    {
-        try
-        {
-            return strat.compressByteArray((byte[]) this.getTestData());
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
+  @Override
+  public Object getResultData() {
+    try {
+      return strat.compressByteArray((byte[]) this.getTestData());
+    } catch (Exception e) {
+      fail(e.getMessage());
+      return null;
+    }
+  }
+
+  @Override
+  public Object getTestData() {
+    try {
+      return ((String) super.getTestData()).getBytes("UTF8");
+    } catch (UnsupportedEncodingException uex) {
+      fail(uex.getMessage());
+      return null;
+    }
+  }
+
+  @Override
+  public Transformer getRoundTripTransformer() {
+    GZipUncompressTransformer transformer = new GZipUncompressTransformer();
+    transformer.setMuleContext(muleContext);
+
+    try {
+      transformer.initialise();
+    } catch (InitialisationException e) {
+      fail(e.getMessage());
     }
 
-    @Override
-    public Object getTestData()
-    {
-        try
-        {
-            return ((String) super.getTestData()).getBytes("UTF8");
-        }
-        catch (UnsupportedEncodingException uex)
-        {
-            fail(uex.getMessage());
-            return null;
-        }
-    }
+    return transformer;
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer()
-    {
-        GZipUncompressTransformer transformer = new GZipUncompressTransformer();
-        transformer.setMuleContext(muleContext);
-
-        try
-        {
-            transformer.initialise();
-        }
-        catch (InitialisationException e)
-        {
-            fail(e.getMessage());
-        }
-
-        return transformer;
-    }
-
-    @Override
-    public void doTestBadReturnType(Transformer tran, Object src) throws Exception
-    {
-        /*
-         * Disabled, otherwise the test for invalid return types would fail. The
-         * "invalid" class that is configured as returnType by the test harness would
-         * actually be a valid return type for our roundTripTransformer.
-         */
-    }
+  @Override
+  public void doTestBadReturnType(Transformer tran, Object src) throws Exception {
+    /*
+     * Disabled, otherwise the test for invalid return types would fail. The "invalid" class that is configured as returnType by
+     * the test harness would actually be a valid return type for our roundTripTransformer.
+     */
+  }
 
 }

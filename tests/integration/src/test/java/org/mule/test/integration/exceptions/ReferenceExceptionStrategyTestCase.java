@@ -24,56 +24,56 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.IsNot;
 import org.junit.Test;
 
-public class ReferenceExceptionStrategyTestCase extends AbstractIntegrationTestCase
-{
-    public static final int TIMEOUT = 5000;
-    public static final String JSON_RESPONSE = "{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}";
-    public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
+public class ReferenceExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/reference-flow-exception-strategy.xml";
-    }
+  public static final int TIMEOUT = 5000;
+  public static final String JSON_RESPONSE =
+      "{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}";
+  public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
 
-    @Test
-    public void testFlowUsingGlobalExceptionStrategy() throws Exception
-    {
-        MuleMessage response = flowRunner("referenceExceptionStrategyFlow").withPayload(JSON_REQUEST).run().getMessage();
-        assertThat(response, notNullValue());
-        // compare the structure and values but not the attributes' order
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
-        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
-        assertThat(actualJsonNode, is(expectedJsonNode));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/reference-flow-exception-strategy.xml";
+  }
 
-    @Test
-    public void testFlowUsingConfiguredExceptionStrategy() throws Exception
-    {
-        MessagingException e = flowRunner("configuredExceptionStrategyFlow").withPayload(JSON_REQUEST).runExpectingException();
-        assertThat(e, instanceOf(ComponentException.class));
-        assertThat(e.getEvent().getMessage(), notNullValue());
-        assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
-        assertThat(e.getEvent().getMessage().getExceptionPayload(), notNullValue());
-    }
+  @Test
+  public void testFlowUsingGlobalExceptionStrategy() throws Exception {
+    MuleMessage response = flowRunner("referenceExceptionStrategyFlow").withPayload(JSON_REQUEST).run().getMessage();
+    assertThat(response, notNullValue());
+    // compare the structure and values but not the attributes' order
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
+    JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+    assertThat(actualJsonNode, is(expectedJsonNode));
+  }
 
-    @Test
-    public void testTwoFlowsReferencingSameExceptionStrategyGetDifferentInstances()
-    {
-        MessagingExceptionHandler firstExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("otherFlowWithSameReferencedExceptionStrategy").getExceptionListener();
-        MessagingExceptionHandler secondExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("referenceExceptionStrategyFlow").getExceptionListener();
-        assertThat(firstExceptionStrategy, IsNot.not(secondExceptionStrategy));
-    }
+  @Test
+  public void testFlowUsingConfiguredExceptionStrategy() throws Exception {
+    MessagingException e = flowRunner("configuredExceptionStrategyFlow").withPayload(JSON_REQUEST).runExpectingException();
+    assertThat(e, instanceOf(ComponentException.class));
+    assertThat(e.getEvent().getMessage(), notNullValue());
+    assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
+    assertThat(e.getEvent().getMessage().getExceptionPayload(), notNullValue());
+  }
 
-    @Test
-    public void testTwoFlowsReferencingDifferentExceptionStrategy()
-    {
-        MessagingExceptionHandler firstExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("otherFlowWithSameReferencedExceptionStrategy").getExceptionListener();
-        MessagingExceptionHandler secondExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("anotherFlowUsingDifferentExceptionStrategy").getExceptionListener();
-        assertThat(firstExceptionStrategy, IsNot.not(secondExceptionStrategy));
-        assertThat(((AbstractExceptionListener)firstExceptionStrategy).getMessageProcessors().size(), is(2));
-        assertThat(secondExceptionStrategy, instanceOf(ChoiceMessagingExceptionStrategy.class));
-    }
+  @Test
+  public void testTwoFlowsReferencingSameExceptionStrategyGetDifferentInstances() {
+    MessagingExceptionHandler firstExceptionStrategy =
+        muleContext.getRegistry().lookupFlowConstruct("otherFlowWithSameReferencedExceptionStrategy").getExceptionListener();
+    MessagingExceptionHandler secondExceptionStrategy =
+        muleContext.getRegistry().lookupFlowConstruct("referenceExceptionStrategyFlow").getExceptionListener();
+    assertThat(firstExceptionStrategy, IsNot.not(secondExceptionStrategy));
+  }
+
+  @Test
+  public void testTwoFlowsReferencingDifferentExceptionStrategy() {
+    MessagingExceptionHandler firstExceptionStrategy =
+        muleContext.getRegistry().lookupFlowConstruct("otherFlowWithSameReferencedExceptionStrategy").getExceptionListener();
+    MessagingExceptionHandler secondExceptionStrategy =
+        muleContext.getRegistry().lookupFlowConstruct("anotherFlowUsingDifferentExceptionStrategy").getExceptionListener();
+    assertThat(firstExceptionStrategy, IsNot.not(secondExceptionStrategy));
+    assertThat(((AbstractExceptionListener) firstExceptionStrategy).getMessageProcessors().size(), is(2));
+    assertThat(secondExceptionStrategy, instanceOf(ChoiceMessagingExceptionStrategy.class));
+  }
 
 }

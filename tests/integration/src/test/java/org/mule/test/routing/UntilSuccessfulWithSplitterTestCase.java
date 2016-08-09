@@ -21,53 +21,46 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class UntilSuccessfulWithSplitterTestCase extends AbstractIntegrationTestCase
-{
+public class UntilSuccessfulWithSplitterTestCase extends AbstractIntegrationTestCase {
 
-    private static final int TIMEOUT = 5;
-    private static Multiset<String> seenPayloads;
-    private static CountDownLatch latch;
+  private static final int TIMEOUT = 5;
+  private static Multiset<String> seenPayloads;
+  private static CountDownLatch latch;
+
+  @Override
+  protected String getConfigFile() {
+    return "until-successful-with-splitter.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    seenPayloads = HashMultiset.create();
+    latch = new CountDownLatch(2);
+  }
+
+  @Test
+  public void withSplitter() throws Exception {
+    runFlow("withSplitter");
+
+    assertThat(latch.await(TIMEOUT, TimeUnit.SECONDS), is(true));
+    assertThat(seenPayloads.count("a"), is(2));
+    assertThat(seenPayloads.count("b"), is(2));
+  }
+
+  public static class FailAtFirstAttempt implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "until-successful-with-splitter.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      final String payload = event.getMessageAsString();
+      seenPayloads.add(payload);
+
+      if (seenPayloads.count(payload) == 1) {
+        throw new RuntimeException("first time");
+      }
+
+      latch.countDown();
+
+      return event;
     }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        seenPayloads = HashMultiset.create();
-        latch = new CountDownLatch(2);
-    }
-
-    @Test
-    public void withSplitter() throws Exception
-    {
-        runFlow("withSplitter");
-
-        assertThat(latch.await(TIMEOUT, TimeUnit.SECONDS), is(true));
-        assertThat(seenPayloads.count("a"), is(2));
-        assertThat(seenPayloads.count("b"), is(2));
-    }
-
-    public static class FailAtFirstAttempt implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            final String payload = event.getMessageAsString();
-            seenPayloads.add(payload);
-
-            if (seenPayloads.count(payload) == 1)
-            {
-                throw new RuntimeException("first time");
-            }
-
-            latch.countDown();
-
-            return event;
-        }
-    }
+  }
 }

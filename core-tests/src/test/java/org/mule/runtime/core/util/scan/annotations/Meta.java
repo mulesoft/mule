@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(java.lang.annotation.ElementType.ANNOTATION_TYPE)
-public @interface Meta
-{
-    // no custom methods
+public @interface Meta {
+  // no custom methods
 }

@@ -14,7 +14,7 @@ import org.mule.runtime.module.http.internal.listener.Server;
  *
  * @since 4.0
  */
-public interface HttpServerFactory
-{
-    Server create(HttpServerConfiguration serverConfiguration) throws ConnectionException;
+public interface HttpServerFactory {
+
+  Server create(HttpServerConfiguration serverConfiguration) throws ConnectionException;
 }

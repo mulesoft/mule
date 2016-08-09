@@ -9,18 +9,15 @@ package org.mule.runtime.module.cxf.support;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class ComponentNotFoundRuntimeException extends MuleRuntimeException
-{
+public class ComponentNotFoundRuntimeException extends MuleRuntimeException {
 
-    public ComponentNotFoundRuntimeException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ComponentNotFoundRuntimeException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ComponentNotFoundRuntimeException(Message message)
-    {
-        super(message);
-    }
+  public ComponentNotFoundRuntimeException(Message message) {
+    super(message);
+  }
 
 }
 

@@ -11,13 +11,12 @@ package org.mule.runtime.core.util.journal;
  *
  * @param <T> type of the transaction identifier.
  */
-public interface JournalEntry<T>
-{
+public interface JournalEntry<T> {
 
-    /**
-     * @return the transaction identifier
-     */
-    public T getTxId();
+  /**
+   * @return the transaction identifier
+   */
+  public T getTxId();
 
 }
 

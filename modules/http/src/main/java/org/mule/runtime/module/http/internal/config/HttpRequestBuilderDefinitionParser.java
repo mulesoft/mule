@@ -11,12 +11,11 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.module.http.internal.request.HttpRequesterRequestBuilder;
 
-public class HttpRequestBuilderDefinitionParser extends ParentContextDefinitionParser
-{
-    public HttpRequestBuilderDefinitionParser()
-    {
-        super("request", new ChildDefinitionParser("request-builder", HttpRequesterRequestBuilder.class));
-        otherwise(new MuleOrphanDefinitionParser(HttpRequesterRequestBuilder.class, true));
-    }
+public class HttpRequestBuilderDefinitionParser extends ParentContextDefinitionParser {
+
+  public HttpRequestBuilderDefinitionParser() {
+    super("request", new ChildDefinitionParser("request-builder", HttpRequesterRequestBuilder.class));
+    otherwise(new MuleOrphanDefinitionParser(HttpRequesterRequestBuilder.class, true));
+  }
 
 }

@@ -31,54 +31,52 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Broken on removing services")
-public class MtomTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class MtomTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mtom-conf-flow-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testEchoService() throws Exception
-    {
-        URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
-        assertNotNull(wsdl);
+  @Override
+  protected String getConfigFile() {
+    return "mtom-conf-flow-httpn.xml";
+  }
 
-        CxfConfiguration clientConfig = new CxfConfiguration();
-        clientConfig.setMuleContext(muleContext);
-        clientConfig.initialise();
-        BusFactory.setThreadDefaultBus(clientConfig.getCxfBus());
+  @Test
+  public void testEchoService() throws Exception {
+    URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
+    assertNotNull(wsdl);
 
-        TestMtomService svc = new TestMtomService(wsdl);
+    CxfConfiguration clientConfig = new CxfConfiguration();
+    clientConfig.setMuleContext(muleContext);
+    clientConfig.initialise();
+    BusFactory.setThreadDefaultBus(clientConfig.getCxfBus());
 
-        TestMtom port = svc.getTestMtomPort();
+    TestMtomService svc = new TestMtomService(wsdl);
 
-        BindingProvider bp = ((BindingProvider) port);
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-            "http://localhost:" + dynamicPort.getNumber() + "/services/mtom");
-        ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
-        // Client client = ClientProxy.getClient(port);
-        // new LoggingFeature().initialize(client, null);
+    TestMtom port = svc.getTestMtomPort();
 
-        File file = new File("src/test/resources/mtom-conf-service.xml");
-        DataHandler dh = new DataHandler(new FileDataSource(file));
+    BindingProvider bp = ((BindingProvider) port);
+    bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                               "http://localhost:" + dynamicPort.getNumber() + "/services/mtom");
+    ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
+    // Client client = ClientProxy.getClient(port);
+    // new LoggingFeature().initialize(client, null);
 
-        Holder<String> name = new Holder<String>("test");
-        Holder<DataHandler> info = new Holder<DataHandler>(dh);
+    File file = new File("src/test/resources/mtom-conf-service.xml");
+    DataHandler dh = new DataHandler(new FileDataSource(file));
 
-        port.testXop(name, info);
+    Holder<String> name = new Holder<String>("test");
+    Holder<DataHandler> info = new Holder<DataHandler>(dh);
 
-        assertEquals("return detail + test", name.value);
-        assertNotNull(info.value);
+    port.testXop(name, info);
 
-        InputStream input = info.value.getInputStream();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(input, bos);
-        input.close();
-    }
+    assertEquals("return detail + test", name.value);
+    assertNotNull(info.value);
+
+    InputStream input = info.value.getInputStream();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    IOUtils.copy(input, bos);
+    input.close();
+  }
 }
 

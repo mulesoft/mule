@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.transformer.builder;
 
-public class MockConverterBuilder extends AbstractMockConverterBuilder<MockConverterBuilder>
-{
+public class MockConverterBuilder extends AbstractMockConverterBuilder<MockConverterBuilder> {
 
 }

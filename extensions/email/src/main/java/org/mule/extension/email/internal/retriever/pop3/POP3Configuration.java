@@ -22,17 +22,15 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 @Providers({POP3Provider.class, POP3SProvider.class})
 @Configuration(name = "pop3")
 @DisplayName("POP3")
-public class POP3Configuration implements RetrieverConfiguration
-{
+public class POP3Configuration implements RetrieverConfiguration {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The pop3 protocol always read the content when retrieves an email.
-     */
-    @Override
-    public boolean isEagerlyFetchContent()
-    {
-        return true;
-    }
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The pop3 protocol always read the content when retrieves an email.
+   */
+  @Override
+  public boolean isEagerlyFetchContent() {
+    return true;
+  }
 }

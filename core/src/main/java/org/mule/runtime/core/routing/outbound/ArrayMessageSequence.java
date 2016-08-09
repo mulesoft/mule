@@ -8,35 +8,30 @@ package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.routing.AbstractMessageSequence;
 
-public class ArrayMessageSequence extends AbstractMessageSequence<Object>
-{
+public class ArrayMessageSequence extends AbstractMessageSequence<Object> {
 
-    private Object[] array;
-    private int idx;
+  private Object[] array;
+  private int idx;
 
-    public ArrayMessageSequence(Object[] array)
-    {
-        this.array = array;
-        idx = 0;
-    }
+  public ArrayMessageSequence(Object[] array) {
+    this.array = array;
+    idx = 0;
+  }
 
-    @Override
-    public Integer size()
-    {
-        return array.length - idx;
-    }
+  @Override
+  public Integer size() {
+    return array.length - idx;
+  }
 
-    @Override
-    public boolean hasNext()
-    {
-        return idx < array.length;
-    }
+  @Override
+  public boolean hasNext() {
+    return idx < array.length;
+  }
 
-    @Override
-    public Object next()
-    {
-        return array[idx++];
-    }
+  @Override
+  public Object next() {
+    return array[idx++];
+  }
 
 }
 

@@ -12,27 +12,21 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Set;
 
-public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTransformer
-{
+public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTransformer {
 
-    @Override
-    protected void removeProperty(MuleEvent event, String propertyName)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .removeOutboundProperty(propertyName)
-                                    .build());
-    }
+  @Override
+  protected void removeProperty(MuleEvent event, String propertyName) {
+    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build());
+  }
 
-    @Override
-    protected Set<String> getPropertyNames(MuleEvent event)
-    {
-        return event.getMessage().getOutboundPropertyNames();
-    }
+  @Override
+  protected Set<String> getPropertyNames(MuleEvent event) {
+    return event.getMessage().getOutboundPropertyNames();
+  }
 
-    @Override
-    protected String getScopeName()
-    {
-        return PropertyScope.OUTBOUND_NAME;
-    }
+  @Override
+  protected String getScopeName() {
+    return PropertyScope.OUTBOUND_NAME;
+  }
 
 }

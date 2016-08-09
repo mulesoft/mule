@@ -38,175 +38,141 @@ import java.util.Optional;
 
 
 /**
- * Resolves the values of an {@link OperationModel}'s {@link ParameterModel parameterModels} by
- * matching them to the arguments in a {@link Method}
+ * Resolves the values of an {@link OperationModel}'s {@link ParameterModel parameterModels} by matching them to the arguments in
+ * a {@link Method}
  *
  * @since 3.7.0
  */
-public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
-{
+public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
-    private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
-    private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
-    private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
+  private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
+  private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
+  private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
+  private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
 
 
-    private final Method method;
-    private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
-    private ArgumentResolver<? extends Object>[] argumentResolvers;
-    private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<? extends Object>> parameterGroupResolvers;
+  private final Method method;
+  private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
+  private ArgumentResolver<? extends Object>[] argumentResolvers;
+  private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<? extends Object>> parameterGroupResolvers;
 
-    /**
-     * Creates a new instance for the given {@code method}
-     *
-     * @param method the {@link Method} to be called
-     */
-    public MethodArgumentResolverDelegate(OperationModel operationModel, Method method)
-    {
-        this.method = method;
-        initArgumentResolvers(operationModel);
+  /**
+   * Creates a new instance for the given {@code method}
+   *
+   * @param method the {@link Method} to be called
+   */
+  public MethodArgumentResolverDelegate(OperationModel operationModel, Method method) {
+    this.method = method;
+    initArgumentResolvers(operationModel);
+  }
+
+  private void initArgumentResolvers(OperationModel model) {
+    final Class<?>[] parameterTypes = method.getParameterTypes();
+
+    if (isEmpty(parameterTypes)) {
+      argumentResolvers = new ArgumentResolver[] {};
+      return;
     }
 
-    private void initArgumentResolvers(OperationModel model)
-    {
-        final Class<?>[] parameterTypes = method.getParameterTypes();
+    argumentResolvers = new ArgumentResolver[parameterTypes.length];
+    Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+    Parameter[] parameters = method.getParameters();
+    parameterGroupResolvers = getParameterGroupResolvers(model);
+    final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
-        if (isEmpty(parameterTypes))
-        {
-            argumentResolvers = new ArgumentResolver[] {};
-            return;
-        }
+    for (int i = 0; i < parameterTypes.length; i++) {
+      final Class<?> parameterType = parameterTypes[i];
+      Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
-        argumentResolvers = new ArgumentResolver[parameterTypes.length];
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        Parameter[] parameters = method.getParameters();
-        parameterGroupResolvers = getParameterGroupResolvers(model);
-        final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
+      ArgumentResolver<?> argumentResolver;
 
-        for (int i = 0; i < parameterTypes.length; i++)
-        {
-            final Class<?> parameterType = parameterTypes[i];
-            Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
+      if (annotations.containsKey(UseConfig.class)) {
+        argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
+      } else if (annotations.containsKey(Connection.class)) {
+        argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
+      } else if (MuleEvent.class.isAssignableFrom(parameterType)) {
+        argumentResolver = EVENT_ARGUMENT_RESOLVER;
+      } else if (MuleMessage.class.isAssignableFrom(parameterType)) {
+        argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
+      } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
+        argumentResolver = parameterGroupResolvers.get(parameters[i]);
+      } else {
+        argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
+      }
 
-            ArgumentResolver<?> argumentResolver;
+      argumentResolvers[i] = argumentResolver;
+    }
+  }
 
-            if (annotations.containsKey(UseConfig.class))
-            {
-                argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
-            }
-            else if (annotations.containsKey(Connection.class))
-            {
-                argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
-            }
-            else if (MuleEvent.class.isAssignableFrom(parameterType))
-            {
-                argumentResolver = EVENT_ARGUMENT_RESOLVER;
-            }
-            else if (MuleMessage.class.isAssignableFrom(parameterType))
-            {
-                argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
-            }
-            else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)))
-            {
-                argumentResolver = parameterGroupResolvers.get(parameters[i]);
-            }
-            else
-            {
-                argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
-            }
+  @Override
+  public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes) {
 
-            argumentResolvers[i] = argumentResolver;
-        }
+    Object[] parameterValues = new Object[argumentResolvers.length];
+    int i = 0;
+    for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
+      parameterValues[i++] = argumentResolver.resolve(operationContext);
     }
 
-    @Override
-    public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
-    {
+    return resolvePrimitiveTypes(parameterTypes, parameterValues);
+  }
 
-        Object[] parameterValues = new Object[argumentResolvers.length];
-        int i = 0;
-        for (ArgumentResolver<?> argumentResolver : argumentResolvers)
-        {
-            parameterValues[i++] = argumentResolver.resolve(operationContext);
-        }
+  private Object[] resolvePrimitiveTypes(Class<?>[] parametersType, Object[] parameterValues) {
+    Object[] resolvedParameters = new Object[parameterValues.length];
+    for (int i = 0; i < parameterValues.length; i++) {
+      Object parameterValue = parameterValues[i];
+      if (parameterValue == null) {
+        resolvedParameters[i] = resolvePrimitiveTypeDefaultValue(parametersType[i]);
+      } else {
+        resolvedParameters[i] = parameterValue;
+      }
+    }
+    return resolvedParameters;
+  }
 
-        return resolvePrimitiveTypes(parameterTypes, parameterValues);
+  private Object resolvePrimitiveTypeDefaultValue(Class<?> type) {
+    if (type.equals(byte.class)) {
+      return (byte) 0;
+    }
+    if (type.equals(short.class)) {
+      return (short) 0;
+    }
+    if (type.equals(int.class)) {
+      return 0;
+    }
+    if (type.equals(long.class)) {
+      return 0l;
+    }
+    if (type.equals(float.class)) {
+      return 0.0f;
+    }
+    if (type.equals(double.class)) {
+      return 0.0d;
+    }
+    if (type.equals(boolean.class)) {
+      return false;
+    }
+    if (type.equals(char.class)) {
+      return '\u0000';
+    }
+    return null;
+  }
+
+  /**
+   * Uses the {@link ParameterGroupModelProperty} obtain the resolvers.
+   * 
+   * @param model operation model
+   * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
+   */
+  private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model) {
+    Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
+    Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap<>();
+
+    if (parameterGroupModelProperty.isPresent()) {
+      for (ParameterGroup<Parameter> group : parameterGroupModelProperty.get().getGroups()) {
+        resolverMap.put(group.getContainer(), new ParameterGroupArgumentResolver<>(group));
+      }
     }
 
-    private Object[] resolvePrimitiveTypes(Class<?>[] parametersType, Object[] parameterValues)
-    {
-        Object[] resolvedParameters = new Object[parameterValues.length];
-        for (int i = 0; i < parameterValues.length; i++)
-        {
-            Object parameterValue = parameterValues[i];
-            if (parameterValue == null)
-            {
-                resolvedParameters[i] = resolvePrimitiveTypeDefaultValue(parametersType[i]);
-            }
-            else
-            {
-                resolvedParameters[i] = parameterValue;
-            }
-        }
-        return resolvedParameters;
-    }
-
-    private Object resolvePrimitiveTypeDefaultValue(Class<?> type)
-    {
-        if (type.equals(byte.class))
-        {
-            return (byte) 0;
-        }
-        if (type.equals(short.class))
-        {
-            return (short) 0;
-        }
-        if (type.equals(int.class))
-        {
-            return 0;
-        }
-        if (type.equals(long.class))
-        {
-            return 0l;
-        }
-        if (type.equals(float.class))
-        {
-            return 0.0f;
-        }
-        if (type.equals(double.class))
-        {
-            return 0.0d;
-        }
-        if (type.equals(boolean.class))
-        {
-            return false;
-        }
-        if (type.equals(char.class))
-        {
-            return '\u0000';
-        }
-        return null;
-    }
-
-    /**
-     * Uses the {@link ParameterGroupModelProperty} obtain the resolvers.
-     * @param model operation model
-     * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
-     */
-    private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model)
-    {
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap<>();
-
-        if (parameterGroupModelProperty.isPresent())
-        {
-            for (ParameterGroup<Parameter> group : parameterGroupModelProperty.get().getGroups())
-            {
-                resolverMap.put(group.getContainer(), new ParameterGroupArgumentResolver<>(group));
-            }
-        }
-
-        return resolverMap;
-    }
+    return resolverMap;
+  }
 }

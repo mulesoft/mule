@@ -23,34 +23,32 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Set up a listener that returns form data and a requester that triggers it, all while preserving the headers name case.
- * That way we make sure the Host, Content-Type and other headers are handled correctly by both listener and requester.
+ * Set up a listener that returns form data and a requester that triggers it, all while preserving the headers name case. That way
+ * we make sure the Host, Content-Type and other headers are handled correctly by both listener and requester.
  */
-public class HttpHeaderCaseTestCase extends AbstractHttpTestCase
-{
-    public static final String PRESERVE_HEADER_CASE = "org.glassfish.grizzly.http.PRESERVE_HEADER_CASE";
+public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
-    @Rule
-    public SystemProperty headerCaseProperty = new SystemProperty(PRESERVE_HEADER_CASE, "true");
+  public static final String PRESERVE_HEADER_CASE = "org.glassfish.grizzly.http.PRESERVE_HEADER_CASE";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-header-case-config.xml";
-    }
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
+  @Rule
+  public SystemProperty headerCaseProperty = new SystemProperty(PRESERVE_HEADER_CASE, "true");
 
-    @Test
-    public void worksPreservingHeaders() throws Exception
-    {
-        MuleEvent response = runFlow("client");
-        Object payload = response.getMessage().getPayload();
-        assertThat(payload, is(instanceOf(ParameterMap.class)));
-        assertThat(((ParameterMap) payload).keySet(), hasItem("CustomValue"));
-        assertThat(((ParameterMap) payload).get("CustomValue"), is("value"));
-        HttpResponseAttributes attributes = (HttpResponseAttributes) response.getMessage().getAttributes();
-        assertThat(attributes.getHeaders().get(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
-        assertThat(attributes.getHeaders().get("customname1"), is("customValue"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-header-case-config.xml";
+  }
+
+  @Test
+  public void worksPreservingHeaders() throws Exception {
+    MuleEvent response = runFlow("client");
+    Object payload = response.getMessage().getPayload();
+    assertThat(payload, is(instanceOf(ParameterMap.class)));
+    assertThat(((ParameterMap) payload).keySet(), hasItem("CustomValue"));
+    assertThat(((ParameterMap) payload).get("CustomValue"), is("value"));
+    HttpResponseAttributes attributes = (HttpResponseAttributes) response.getMessage().getAttributes();
+    assertThat(attributes.getHeaders().get(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
+    assertThat(attributes.getHeaders().get("customname1"), is("customValue"));
+  }
 }

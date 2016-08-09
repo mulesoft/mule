@@ -28,75 +28,70 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Parameterized.Parameter(value = 0)
-    public String configFile;
+  @Parameterized.Parameter(value = 0)
+  public String configFile;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return configFile;
-    }
+  @Override
+  protected String getConfigFile() {
+    return configFile;
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {{"ws-consumer-http-module-config-nb.xml"}});
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"ws-consumer-http-module-config-nb.xml"}});
+  }
 
-    @Test
-    public void validRequestReturnsExpectedAnswer() throws Exception
-    {
-        assertValidResponse("http://localhost:" + dynamicPort.getNumber() + "/in");
-        muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsDifferent();
-    }
+  @Test
+  public void validRequestReturnsExpectedAnswer() throws Exception {
+    assertValidResponse("http://localhost:" + dynamicPort.getNumber() + "/in");
+    muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class)
+        .assertRequestResponseThreadsDifferent();
+  }
 
-    @Test
-    public void invalidRequestFormatReturnsSOAPFault() throws Exception
-    {
-        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\"><invalid>Hello</invalid></tns:echo>";
-        assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message, "unexpected element (uri:\"\", local:\"invalid\")");
-        muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsDifferent();
-    }
+  @Test
+  public void invalidRequestFormatReturnsSOAPFault() throws Exception {
+    String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\"><invalid>Hello</invalid></tns:echo>";
+    assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message,
+                    "unexpected element (uri:\"\", local:\"invalid\")");
+    muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class)
+        .assertRequestResponseThreadsDifferent();
+  }
 
-    @Test
-    public void invalidNamespaceReturnsSOAPFault() throws Exception
-    {
-        String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
-        assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message, "Unexpected wrapper element {http://invalid/}echo found");
-        muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsDifferent();
-    }
+  @Test
+  public void invalidNamespaceReturnsSOAPFault() throws Exception {
+    String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
+    assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message,
+                    "Unexpected wrapper element {http://invalid/}echo found");
+    muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class)
+        .assertRequestResponseThreadsDifferent();
+  }
 
-    @Test
-    public void webServiceConsumerMidFlow() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow",
-                                           request, newOptions().method(POST.name()).disableStatusCodeValidation()
-                                                   .build());
-        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void webServiceConsumerMidFlow() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow", request,
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
+  }
 
-    @Override
-    protected void assertValidResponse(String address, Object payload, Map<String, Serializable> properties) throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(payload).inboundProperties(properties).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
-    }
+  @Override
+  protected void assertValidResponse(String address, Object payload, Map<String, Serializable> properties) throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(payload).inboundProperties(properties).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
+  }
 
-    @Override
-    protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(message).build();
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String responsePayload = getPayloadAsString(response);
-        assertThat(responsePayload, Matchers.containsString(expectedErrorMessage));
-    }
+  @Override
+  protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(message).build();
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    String responsePayload = getPayloadAsString(response);
+    assertThat(responsePayload, Matchers.containsString(expectedErrorMessage));
+  }
 
 }

@@ -31,210 +31,175 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Represents the config element for oauth:authentication-code-config.
  * <p/>
- * This config will:
- * - If the authorization-request is defined then it will create a flow listening for an user call to begin the oauth login.
- * - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the authentication code and retrieve the access token
+ * This config will: - If the authorization-request is defined then it will create a flow listening for an user call to begin the
+ * oauth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
+ * authentication code and retrieve the access token
  */
-public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware
-{
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
+    implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware {
 
-    private String clientId;
-    private String clientSecret;
-    private String redirectionUrl;
-    private AuthorizationRequestHandler authorizationRequestHandler;
-    private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
-    private MuleContext muleContext;
-    private TlsContextFactory tlsContextFactory;
-    private TokenManagerConfig tokenManagerConfig;
-    private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
-    private AttributeEvaluator resourceOwnerIdEvaluator;
+  private String clientId;
+  private String clientSecret;
+  private String redirectionUrl;
+  private AuthorizationRequestHandler authorizationRequestHandler;
+  private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
+  private MuleContext muleContext;
+  private TlsContextFactory tlsContextFactory;
+  private TokenManagerConfig tokenManagerConfig;
+  private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
+  private AttributeEvaluator resourceOwnerIdEvaluator;
 
-    public void setClientId(final String clientId)
-    {
-        this.clientId = clientId;
+  public void setClientId(final String clientId) {
+    this.clientId = clientId;
+  }
+
+  public void setClientSecret(final String clientSecret) {
+    this.clientSecret = clientSecret;
+  }
+
+  public void setRedirectionUrl(final String redirectionUrl) {
+    this.redirectionUrl = redirectionUrl;
+  }
+
+  public void setAuthorizationRequestHandler(final AuthorizationRequestHandler authorizationRequestHandler) {
+    this.authorizationRequestHandler = authorizationRequestHandler;
+  }
+
+  public void setTokenRequestHandler(final AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler) {
+    this.tokenRequestHandler = tokenRequestHandler;
+  }
+
+  public ConfigOAuthContext getConfigOAuthContext() {
+    return tokenManagerConfig.getConfigOAuthContext();
+  }
+
+  public String getRedirectionUrl() {
+    return redirectionUrl;
+  }
+
+  @Override
+  public String getRefreshTokenWhen() {
+    return tokenRequestHandler.getRefreshTokenWhen();
+  }
+
+  public AttributeEvaluator getLocalAuthorizationUrlResourceOwnerIdEvaluator() {
+    return localAuthorizationUrlResourceOwnerIdEvaluator;
+  }
+
+  public AttributeEvaluator getResourceOwnerIdEvaluator() {
+    return resourceOwnerIdEvaluator;
+  }
+
+  @Override
+  public void refreshToken(final MuleEvent currentFlowEvent, final String resourceOwnerId) throws MuleException {
+    tokenRequestHandler.refreshToken(currentFlowEvent, resourceOwnerId);
+  }
+
+  @Override
+  public ConfigOAuthContext getUserOAuthContext() {
+    return tokenManagerConfig.getConfigOAuthContext();
+  }
+
+  public String getClientSecret() {
+    return clientSecret;
+  }
+
+  public String getClientId() {
+    return clientId;
+  }
+
+  @Override
+  public void setMuleContext(final MuleContext context) {
+    this.muleContext = context;
+  }
+
+  public TlsContextFactory getTlsContext() {
+    return tlsContextFactory;
+  }
+
+  public void setTlsContext(TlsContextFactory tlsContextFactory) {
+    this.tlsContextFactory = tlsContextFactory;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      if (tokenManagerConfig == null) {
+        this.tokenManagerConfig = TokenManagerConfig.createDefault(muleContext);
+        this.tokenManagerConfig.initialise();
+      }
+      if (localAuthorizationUrlResourceOwnerIdEvaluator == null) {
+        localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(null);
+      }
+      localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+      if (resourceOwnerIdEvaluator == null) {
+        resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+      }
+      resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
     }
+  }
 
-    public void setClientSecret(final String clientSecret)
-    {
-        this.clientSecret = clientSecret;
+  @Override
+  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException {
+    final String resourceOwnerId = resourceOwnerIdEvaluator.resolveStringValue(muleEvent);
+    if (resourceOwnerId == null) {
+      throw new RequestAuthenticationException(createStaticMessage(String
+          .format("Evaluation of %s return an empty resourceOwnerId",
+                  localAuthorizationUrlResourceOwnerIdEvaluator.getRawValue())));
     }
-
-    public void setRedirectionUrl(final String redirectionUrl)
-    {
-        this.redirectionUrl = redirectionUrl;
+    final String accessToken = getUserOAuthContext().getContextForResourceOwner(resourceOwnerId).getAccessToken();
+    if (accessToken == null) {
+      throw new RequestAuthenticationException(createStaticMessage(String.format(
+                                                                                 "No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.",
+                                                                                 resourceOwnerId)));
     }
+    builder.addHeader(HttpHeaders.Names.AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
+  }
 
-    public void setAuthorizationRequestHandler(final AuthorizationRequestHandler authorizationRequestHandler)
-    {
-        this.authorizationRequestHandler = authorizationRequestHandler;
-    }
-
-    public void setTokenRequestHandler(final AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler)
-    {
-        this.tokenRequestHandler = tokenRequestHandler;
-    }
-
-    public ConfigOAuthContext getConfigOAuthContext()
-    {
-        return tokenManagerConfig.getConfigOAuthContext();
-    }
-
-    public String getRedirectionUrl()
-    {
-        return redirectionUrl;
-    }
-
-    @Override
-    public String getRefreshTokenWhen()
-    {
-        return tokenRequestHandler.getRefreshTokenWhen();
-    }
-
-    public AttributeEvaluator getLocalAuthorizationUrlResourceOwnerIdEvaluator()
-    {
-        return localAuthorizationUrlResourceOwnerIdEvaluator;
-    }
-
-    public AttributeEvaluator getResourceOwnerIdEvaluator()
-    {
-        return resourceOwnerIdEvaluator;
-    }
-
-    @Override
-    public void refreshToken(final MuleEvent currentFlowEvent, final String resourceOwnerId) throws MuleException
-    {
-        tokenRequestHandler.refreshToken(currentFlowEvent, resourceOwnerId);
-    }
-
-    @Override
-    public ConfigOAuthContext getUserOAuthContext()
-    {
-        return tokenManagerConfig.getConfigOAuthContext();
-    }
-
-    public String getClientSecret()
-    {
-        return clientSecret;
-    }
-
-    public String getClientId()
-    {
-        return clientId;
-    }
-
-    @Override
-    public void setMuleContext(final MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContextFactory;
-    }
-
-    public void setTlsContext(TlsContextFactory tlsContextFactory)
-    {
-        this.tlsContextFactory = tlsContextFactory;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            if (tokenManagerConfig == null)
-            {
-                this.tokenManagerConfig = TokenManagerConfig.createDefault(muleContext);
-                this.tokenManagerConfig.initialise();
-            }
-            if (localAuthorizationUrlResourceOwnerIdEvaluator == null)
-            {
-                localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(null);
-            }
-            localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
-            if (resourceOwnerIdEvaluator == null)
-            {
-                resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-            }
-            resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+  @Override
+  public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException {
+    if (!StringUtils.isBlank(getRefreshTokenWhen())) {
+      final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent);
+      if (!(value instanceof Boolean)) {
+        throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
+                                                           getRefreshTokenWhen(), value));
+      }
+      Boolean shouldRetryRequest = (Boolean) value;
+      if (shouldRetryRequest) {
+        try {
+          refreshToken(firstAttemptResponseEvent, resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
         }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
+      }
+      return shouldRetryRequest;
     }
+    return false;
+  }
 
-    @Override
-    public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException
-    {
-        final String resourceOwnerId = resourceOwnerIdEvaluator.resolveStringValue(muleEvent);
-        if (resourceOwnerId == null)
-        {
-            throw new RequestAuthenticationException(createStaticMessage(String.format("Evaluation of %s return an empty resourceOwnerId", localAuthorizationUrlResourceOwnerIdEvaluator.getRawValue())));
-        }
-        final String accessToken = getUserOAuthContext().getContextForResourceOwner(resourceOwnerId).getAccessToken();
-        if (accessToken == null)
-        {
-            throw new RequestAuthenticationException(createStaticMessage(String.format("No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.", resourceOwnerId)));
-        }
-        builder.addHeader(HttpHeaders.Names.AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
-    }
+  public void setLocalAuthorizationUrlResourceOwnerId(final String resourceOwnerId) {
+    localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(resourceOwnerId);
+  }
 
-    @Override
-    public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException
-    {
-        if (!StringUtils.isBlank(getRefreshTokenWhen()))
-        {
-            final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent);
-            if (!(value instanceof Boolean))
-            {
-                throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s", getRefreshTokenWhen(), value));
-            }
-            Boolean shouldRetryRequest = (Boolean) value;
-            if (shouldRetryRequest)
-            {
-                try
-                {
-                    refreshToken(firstAttemptResponseEvent, resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent));
-                }
-                catch (MuleException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            }
-            return shouldRetryRequest;
-        }
-        return false;
-    }
+  public void setResourceOwnerId(String resourceOwnerId) {
+    this.resourceOwnerIdEvaluator = new AttributeEvaluator(resourceOwnerId);
+  }
 
-    public void setLocalAuthorizationUrlResourceOwnerId(final String resourceOwnerId)
-    {
-        localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(resourceOwnerId);
-    }
+  public void setTokenManager(TokenManagerConfig tokenManagerConfig) {
+    this.tokenManagerConfig = tokenManagerConfig;
+  }
 
-    public void setResourceOwnerId(String resourceOwnerId)
-    {
-        this.resourceOwnerIdEvaluator = new AttributeEvaluator(resourceOwnerId);
+  @Override
+  public void start() throws MuleException {
+    if (authorizationRequestHandler != null) {
+      authorizationRequestHandler.setOauthConfig(this);
+      authorizationRequestHandler.init();
     }
-
-    public void setTokenManager(TokenManagerConfig tokenManagerConfig)
-    {
-        this.tokenManagerConfig = tokenManagerConfig;
+    if (tokenRequestHandler != null) {
+      tokenRequestHandler.setOauthConfig(this);
+      tokenRequestHandler.init();
     }
-
-    @Override
-    public void start() throws MuleException
-    {
-        if (authorizationRequestHandler != null)
-        {
-            authorizationRequestHandler.setOauthConfig(this);
-            authorizationRequestHandler.init();
-        }
-        if (tokenRequestHandler != null)
-        {
-            tokenRequestHandler.setOauthConfig(this);
-            tokenRequestHandler.init();
-        }
-    }
+  }
 }

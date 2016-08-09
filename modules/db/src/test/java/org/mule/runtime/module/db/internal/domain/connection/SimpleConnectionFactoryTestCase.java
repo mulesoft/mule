@@ -21,36 +21,32 @@ import javax.sql.DataSource;
 import org.junit.Test;
 
 @SmallTest
-public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
-{
+public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase {
 
-    private final SimpleConnectionFactory connectionFactory = new SimpleConnectionFactory(null);
-    private final DataSource dataSource = mock(DataSource.class);
+  private final SimpleConnectionFactory connectionFactory = new SimpleConnectionFactory(null);
+  private final DataSource dataSource = mock(DataSource.class);
 
-    @Test
-    public void createsConnection() throws Exception
-    {
-        Connection expectedConnection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(expectedConnection);
+  @Test
+  public void createsConnection() throws Exception {
+    Connection expectedConnection = mock(Connection.class);
+    when(dataSource.getConnection()).thenReturn(expectedConnection);
 
-        Connection connection = connectionFactory.create(dataSource);
-        assertThat(connection, equalTo(expectedConnection));
-    }
+    Connection connection = connectionFactory.create(dataSource);
+    assertThat(connection, equalTo(expectedConnection));
+  }
 
-    @Test(expected = ConnectionCreationException.class)
-    public void failsOnConnectionError() throws Exception
-    {
-        when(dataSource.getConnection()).thenThrow(new RuntimeException());
+  @Test(expected = ConnectionCreationException.class)
+  public void failsOnConnectionError() throws Exception {
+    when(dataSource.getConnection()).thenThrow(new RuntimeException());
 
-        connectionFactory.create(dataSource);
-    }
+    connectionFactory.create(dataSource);
+  }
 
-    @Test(expected = ConnectionCreationException.class)
-    public void failsOnNullConnection() throws Exception
-    {
-        Connection expectedConnection = null;
-        when(dataSource.getConnection()).thenReturn(expectedConnection);
+  @Test(expected = ConnectionCreationException.class)
+  public void failsOnNullConnection() throws Exception {
+    Connection expectedConnection = null;
+    when(dataSource.getConnection()).thenReturn(expectedConnection);
 
-        connectionFactory.create(dataSource);
-    }
+    connectionFactory.create(dataSource);
+  }
 }

@@ -8,16 +8,14 @@ package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
-public class RetryNotifierDefinitionParser extends ChildDefinitionParser
-{
-    public RetryNotifierDefinitionParser()
-    {
-        super("notifier");
-    }
+public class RetryNotifierDefinitionParser extends ChildDefinitionParser {
 
-    public RetryNotifierDefinitionParser(Class clazz)
-    {
-        super("notifier", clazz);
-    }
+  public RetryNotifierDefinitionParser() {
+    super("notifier");
+  }
+
+  public RetryNotifierDefinitionParser(Class clazz) {
+    super("notifier", clazz);
+  }
 }
 

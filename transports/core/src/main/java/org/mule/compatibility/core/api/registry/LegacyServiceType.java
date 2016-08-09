@@ -12,26 +12,22 @@ import org.mule.runtime.core.api.registry.ServiceType;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface LegacyServiceType extends ServiceType
-{
+public interface LegacyServiceType extends ServiceType {
 
-    public static final ServiceType TRANSPORT = new ServiceType()
-    {
-        @Override
-        public String toString()
-        {
-            return getPath() + ": " + getName();
-        }
+  public static final ServiceType TRANSPORT = new ServiceType() {
 
-        public String getPath()
-        {
-            return "org/mule/runtime/transport";
-        }
+    @Override
+    public String toString() {
+      return getPath() + ": " + getName();
+    }
 
-        public String getName()
-        {
-            return "transport";
-        }
-    };
+    public String getPath() {
+      return "org/mule/runtime/transport";
+    }
+
+    public String getName() {
+      return "transport";
+    }
+  };
 
 }

@@ -30,72 +30,63 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return Collections.singletonList(new Object[] {"integration/config/derby-xa-db-config.xml", new DerbyTestDatabase()});
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return Collections.singletonList(new Object[] {"integration/config/derby-xa-db-config.xml", new DerbyTestDatabase()});
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {getTransactionManagerResource(), "integration/xa/xa-transactional-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {getTransactionManagerResource(), "integration/xa/xa-transactional-config.xml"};
+  }
 
-    protected abstract String getTransactionManagerResource();
+  protected abstract String getTransactionManagerResource();
 
-    @Test
-    public void commitsChanges() throws Exception
-    {
-        MuleMessage response = flowRunner("jdbcCommit").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
-                                                       .run()
-                                                       .getMessage();
+  @Test
+  public void commitsChanges() throws Exception {
+    MuleMessage response =
+        flowRunner("jdbcCommit").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).run().getMessage();
 
-        assertThat(response.getPayload(), equalTo(1));
+    assertThat(response.getPayload(), equalTo(1));
 
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 
-    @Test
-    public void rollbacksChanges() throws Exception
-    {
-        MessagingException e = flowRunner("jdbcRollback").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
-                                                         .runExpectingException();
+  @Test
+  public void rollbacksChanges() throws Exception {
+    MessagingException e =
+        flowRunner("jdbcRollback").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).runExpectingException();
 
-        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", MARS.getName()), new Field("POSITION", 4)));
-    }
+    assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", MARS.getName()), new Field("POSITION", 4)));
+  }
 
-    @Test
-    public void commitsChangesWhenMpIsNotTransactionalOnRollback() throws Exception
-    {
-        MessagingException e = flowRunner("rollbackWithNonTransactionalMP").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
-                                                                           .runExpectingException();
+  @Test
+  public void commitsChangesWhenMpIsNotTransactionalOnRollback() throws Exception {
+    MessagingException e = flowRunner("rollbackWithNonTransactionalMP")
+        .transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).runExpectingException();
 
-        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 
-    @Test
-    public void commitsChangesWhenMpIsNotTransactionalOnCommit() throws Exception
-    {
-        MessagingException e = flowRunner("commitWithNonTransactionalMP").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
-                                                                         .runExpectingException();
+  @Test
+  public void commitsChangesWhenMpIsNotTransactionalOnCommit() throws Exception {
+    MessagingException e = flowRunner("commitWithNonTransactionalMP")
+        .transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).runExpectingException();
 
-        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 
 }

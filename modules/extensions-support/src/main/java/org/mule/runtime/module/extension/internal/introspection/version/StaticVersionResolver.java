@@ -9,32 +9,28 @@ package org.mule.runtime.module.extension.internal.introspection.version;
 import org.mule.runtime.extension.api.annotation.Extension;
 
 /**
- * An immutable implementation of {@link VersionResolver} which
- * always returns a fixed value obtained in the constructor
+ * An immutable implementation of {@link VersionResolver} which always returns a fixed value obtained in the constructor
  *
  * @since 4.0
  */
-public final class StaticVersionResolver implements VersionResolver
-{
+public final class StaticVersionResolver implements VersionResolver {
 
-    private final String version;
+  private final String version;
 
-    /**
-     * Creates a new instance
-     *
-     * @param version the value to be returned
-     */
-    public StaticVersionResolver(String version)
-    {
-        this.version = version;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param version the value to be returned
+   */
+  public StaticVersionResolver(String version) {
+    this.version = version;
+  }
 
-    /**
-     * @return {@link #version}
-     */
-    @Override
-    public String resolveVersion(Extension extension)
-    {
-        return version;
-    }
+  /**
+   * @return {@link #version}
+   */
+  @Override
+  public String resolveVersion(Extension extension) {
+    return version;
+  }
 }

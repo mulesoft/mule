@@ -56,75 +56,92 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 
-public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
-{
+public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        // Core
-        registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", EndpointDlqUntilSuccessful.class));
-        registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncEndpointRequestReplyRequester.class));
-        registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
+  @Override
+  public void init() {
+    // Core
+    registerBeanDefinitionParser("until-successful",
+                                 new ChildDefinitionParser("messageProcessor", EndpointDlqUntilSuccessful.class));
+    registerBeanDefinitionParser("request-reply",
+                                 new ChildDefinitionParser("messageProcessor", SimpleAsyncEndpointRequestReplyRequester.class));
+    registerBeanDefinitionParser("default-exception-strategy",
+                                 new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
 
-        registerMuleBeanDefinitionParser("set-session-variable", new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE,
-                IDENTIFIER_PROPERTY);
-        registerMuleBeanDefinitionParser("remove-session-variable", new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-        registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
-        registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
-        registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
-        // TODO MULE-10192
-        registerBeanDefinitionParser("set-correlation-id", new MessageProcessorDefinitionParser(SetCorrelationIdTransformer.class));
+    registerMuleBeanDefinitionParser("set-session-variable",
+                                     new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableTransformer.class))
+                                         .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
+    registerMuleBeanDefinitionParser("remove-session-variable",
+                                     new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class))
+                                         .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
+    registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
+    registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
+    registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
+    // TODO MULE-10192
+    registerBeanDefinitionParser("set-correlation-id", new MessageProcessorDefinitionParser(SetCorrelationIdTransformer.class));
 
-        // Endpoint elements
-        registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
-        registerBeanDefinitionParser("response", new ResponseDefinitionParser());
+    // Endpoint elements
+    registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+    registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+    registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
+    registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
+    registerBeanDefinitionParser("response", new ResponseDefinitionParser());
 
-        // Connector elements
-        registerBeanDefinitionParser("dispatcher-threading-profile",
-                new ThreadingProfileDefinitionParser("dispatcherThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
-        registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser("receiverThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
-        registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
+    // Connector elements
+    registerBeanDefinitionParser("dispatcher-threading-profile",
+                                 new ThreadingProfileDefinitionParser("dispatcherThreadingProfile",
+                                                                      MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
+    registerBeanDefinitionParser("receiver-threading-profile",
+                                 new ThreadingProfileDefinitionParser("receiverThreadingProfile",
+                                                                      MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+    registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
+    registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
 
-        // Routing: Conditional Routers
-        registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
+    // Routing: Conditional Routers
+    registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
-        // Scripting
-        registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaWithBindingComponent.class));
-        registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
-        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
+    // Scripting
+    registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaWithBindingComponent.class));
+    registerBeanDefinitionParser("pooled-component",
+                                 new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
+    registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
 
-        // Security
-        SecurityFilterDefinitionParser securityFilterDefinitionParser = new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
-        securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
-        registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
+    // Security
+    SecurityFilterDefinitionParser securityFilterDefinitionParser =
+        new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
+    securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
+    registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
 
-        // HTTP
-        registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", ConnectorConfiguration.class));
+    // HTTP
+    registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", ConnectorConfiguration.class));
 
-        // CXF
-        MessageProcessorDefinitionParser jsParser = new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);
-        jsParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.JAX_WS_FRONTEND));
-        registerBeanDefinitionParser("jaxws-service", jsParser);
+    // CXF
+    MessageProcessorDefinitionParser jsParser =
+        new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);
+    jsParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.JAX_WS_FRONTEND));
+    registerBeanDefinitionParser("jaxws-service", jsParser);
 
-        MessageProcessorDefinitionParser ssParser = new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);
-        ssParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.SIMPLE_FRONTEND));
-        registerBeanDefinitionParser("simple-service", ssParser);
+    MessageProcessorDefinitionParser ssParser =
+        new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);
+    ssParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.SIMPLE_FRONTEND));
+    registerBeanDefinitionParser("simple-service", ssParser);
 
-        registerBeanDefinitionParser("simple-client", new MessageProcessorDefinitionParser(SimpleClientWithDecoupledEndpointFactoryBean.class));
-        registerBeanDefinitionParser("jaxws-client", new MessageProcessorDefinitionParser(JaxWsClientWithDecoupledEndpointFactoryBean.class));
-        registerBeanDefinitionParser("proxy-client", new MessageProcessorDefinitionParser(ProxyClientWithDecoupledEndpointFactoryBean.class));
+    registerBeanDefinitionParser("simple-client",
+                                 new MessageProcessorDefinitionParser(SimpleClientWithDecoupledEndpointFactoryBean.class));
+    registerBeanDefinitionParser("jaxws-client",
+                                 new MessageProcessorDefinitionParser(JaxWsClientWithDecoupledEndpointFactoryBean.class));
+    registerBeanDefinitionParser("proxy-client",
+                                 new MessageProcessorDefinitionParser(ProxyClientWithDecoupledEndpointFactoryBean.class));
 
-        registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
+    registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
 
-        // Management
-        registerBeanDefinitionParser("publish-notifications", new DefaultNameMuleOrphanDefinitionParser(EndpointNotificationLoggerAgent.class));
-        MuleDefinitionParserConfiguration defaultJmxParser = registerMuleBeanDefinitionParser("jmx-default-config", new DefaultNameMuleOrphanDefinitionParser(DefaultTransportJmxSupportAgent.class));
-        defaultJmxParser.addAlias("registerMx4jAdapter", "loadMx4jAgent");
-        defaultJmxParser.addAlias("registerLog4j", "loadLog4jAgent");
-    }
+    // Management
+    registerBeanDefinitionParser("publish-notifications",
+                                 new DefaultNameMuleOrphanDefinitionParser(EndpointNotificationLoggerAgent.class));
+    MuleDefinitionParserConfiguration defaultJmxParser =
+        registerMuleBeanDefinitionParser("jmx-default-config",
+                                         new DefaultNameMuleOrphanDefinitionParser(DefaultTransportJmxSupportAgent.class));
+    defaultJmxParser.addAlias("registerMx4jAdapter", "loadMx4jAgent");
+    defaultJmxParser.addAlias("registerLog4j", "loadLog4jAgent");
+  }
 }

@@ -27,54 +27,47 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectStreamingResourceManagementTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectStreamingResourceManagementTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/derby-pooling-db-config.xml", "integration/select/select-streaming-resource-management-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/derby-pooling-db-config.xml",
+        "integration/select/select-streaming-resource-management-config.xml"};
+  }
 
-    @Test
-    public void closesConnectionsWhenResultSetConsumed() throws Exception
-    {
-        doSuccessfulTestMessage();
-        doSuccessfulTestMessage();
-        doSuccessfulTestMessage();
-    }
+  @Test
+  public void closesConnectionsWhenResultSetConsumed() throws Exception {
+    doSuccessfulTestMessage();
+    doSuccessfulTestMessage();
+    doSuccessfulTestMessage();
+  }
 
-    private void doSuccessfulTestMessage() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
+  private void doSuccessfulTestMessage() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
-        assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
+    assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
+  }
 
-    @Test
-    public void closesConnectionsOnProcessingError() throws Exception
-    {
-        doFailedMessageTest();
-        doFailedMessageTest();
-        doFailedMessageTest();
-    }
+  @Test
+  public void closesConnectionsOnProcessingError() throws Exception {
+    doFailedMessageTest();
+    doFailedMessageTest();
+    doFailedMessageTest();
+  }
 
-    private void doFailedMessageTest() throws Exception
-    {
-        MessagingException e = flowRunner("selectStreamingError").withPayload(TEST_MESSAGE).runExpectingException();
-        assertThat(e.getMessage(), containsString("Failing test on purpose"));
-    }
+  private void doFailedMessageTest() throws Exception {
+    MessagingException e = flowRunner("selectStreamingError").withPayload(TEST_MESSAGE).runExpectingException();
+    assertThat(e.getMessage(), containsString("Failing test on purpose"));
+  }
 }

@@ -20,64 +20,54 @@ import java.nio.charset.Charset;
 import javax.activation.MimetypesFileTypeMap;
 
 /**
- * <code>FileMuleMessageFactory</code> creates a new {@link MuleMessage} with a
- * {@link File} or {@link InputStream} payload. Users can obtain the filename and
- * directory in the properties using <code>FileConnector.PROPERTY_FILENAME</code> and
+ * <code>FileMuleMessageFactory</code> creates a new {@link MuleMessage} with a {@link File} or {@link InputStream} payload. Users
+ * can obtain the filename and directory in the properties using <code>FileConnector.PROPERTY_FILENAME</code> and
  * <code>FileConnector.PROPERTY_DIRECTORY</code>.
  */
-public class FileMuleMessageFactory extends AbstractMuleMessageFactory
-{
-    private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+public class FileMuleMessageFactory extends AbstractMuleMessageFactory {
 
-    @Override
-    protected Class<?>[] getSupportedTransportMessageTypes()
-    {
-        return new Class[]{File.class, ReceiverFileInputStream.class};
+  private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
+  @Override
+  protected Class<?>[] getSupportedTransportMessageTypes() {
+    return new Class[] {File.class, ReceiverFileInputStream.class};
+  }
+
+  @Override
+  protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception {
+    return transportMessage;
+  }
+
+  @Override
+  protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+    super.addProperties(messageBuilder, transportMessage);
+    File file = convertToFile(transportMessage);
+    setPropertiesFromFile(messageBuilder, file);
+  }
+
+  @Override
+  protected String getMimeType(Object transportMessage) {
+    File file = convertToFile(transportMessage);
+
+    return mimetypesFileTypeMap.getContentType(file.getName().toLowerCase());
+  }
+
+  protected File convertToFile(Object transportMessage) {
+    File file = null;
+
+    if (transportMessage instanceof File) {
+      file = (File) transportMessage;
+    } else if (transportMessage instanceof ReceiverFileInputStream) {
+      file = ((ReceiverFileInputStream) transportMessage).getCurrentFile();
     }
 
-    @Override
-    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
-    {
-        return transportMessage;
-    }
+    return file;
+  }
 
-    @Override
-    protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
-    {
-        super.addProperties(messageBuilder, transportMessage);
-        File file = convertToFile(transportMessage);
-        setPropertiesFromFile(messageBuilder, file);
-    }
-
-    @Override
-    protected String getMimeType(Object transportMessage)
-    {
-        File file = convertToFile(transportMessage);
-
-        return mimetypesFileTypeMap.getContentType(file.getName().toLowerCase());
-    }
-
-    protected File convertToFile(Object transportMessage)
-    {
-        File file = null;
-
-        if (transportMessage instanceof File)
-        {
-            file = (File) transportMessage;
-        }
-        else if (transportMessage instanceof ReceiverFileInputStream)
-        {
-            file = ((ReceiverFileInputStream) transportMessage).getCurrentFile();
-        }
-
-        return file;
-    }
-
-    protected void setPropertiesFromFile(MuleMessage.Builder messageBuilder, File file)
-    {
-        messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_FILENAME, file.getName());
-        messageBuilder.addInboundProperty(PROPERTY_DIRECTORY, file.getParent());
-        messageBuilder.addInboundProperty(PROPERTY_FILE_SIZE, file.length());
-        messageBuilder.addInboundProperty(PROPERTY_FILE_TIMESTAMP, file.lastModified());
-    }
+  protected void setPropertiesFromFile(MuleMessage.Builder messageBuilder, File file) {
+    messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_FILENAME, file.getName());
+    messageBuilder.addInboundProperty(PROPERTY_DIRECTORY, file.getParent());
+    messageBuilder.addInboundProperty(PROPERTY_FILE_SIZE, file.length());
+    messageBuilder.addInboundProperty(PROPERTY_FILE_TIMESTAMP, file.lastModified());
+  }
 }

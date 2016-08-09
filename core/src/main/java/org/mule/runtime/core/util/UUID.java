@@ -7,20 +7,18 @@
 package org.mule.runtime.core.util;
 
 /**
- * <code>UUID</code> Generates a UUID using the <a href="http://johannburkard.de/software/uuid/">Johann
- * Burkard UUID Library</a>. In our performance tests we found this to be the implementation of type 1 UUID
- * that was most performant in high concurrency scenarios.
+ * <code>UUID</code> Generates a UUID using the <a href="http://johannburkard.de/software/uuid/">Johann Burkard UUID Library</a>.
+ * In our performance tests we found this to be the implementation of type 1 UUID that was most performant in high concurrency
+ * scenarios.
  */
 // @ThreadSafe
-public final class UUID
-{
-    private UUID()
-    {
-        // no go
-    }
+public final class UUID {
 
-    public static String getUUID()
-    {
-        return new com.eaio.uuid.UUID().toString();
-    }
+  private UUID() {
+    // no go
+  }
+
+  public static String getUUID() {
+    return new com.eaio.uuid.UUID().toString();
+  }
 }

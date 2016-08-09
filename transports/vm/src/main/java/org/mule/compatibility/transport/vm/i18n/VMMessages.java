@@ -10,21 +10,19 @@ import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class VMMessages extends MessageFactory
-{
-    private static final VMMessages factory = new VMMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath(VMConnector.VM);
+public class VMMessages extends MessageFactory {
 
-    public static Message noReceiverForEndpoint(String name, Object uri)
-    {
-        return factory.createMessage(BUNDLE_PATH, 1, name, uri);
-    }
+  private static final VMMessages factory = new VMMessages();
 
-    public static Message queueIsFull(String queueName, int maxCapacity)
-    {
-        return factory.createMessage(BUNDLE_PATH, 2, queueName, maxCapacity);
-    }
+  private static final String BUNDLE_PATH = getBundlePath(VMConnector.VM);
+
+  public static Message noReceiverForEndpoint(String name, Object uri) {
+    return factory.createMessage(BUNDLE_PATH, 1, name, uri);
+  }
+
+  public static Message queueIsFull(String queueName, int maxCapacity) {
+    return factory.createMessage(BUNDLE_PATH, 2, queueName, maxCapacity);
+  }
 }
 
 

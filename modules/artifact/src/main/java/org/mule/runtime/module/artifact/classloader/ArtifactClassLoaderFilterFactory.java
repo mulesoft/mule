@@ -10,15 +10,14 @@ package org.mule.runtime.module.artifact.classloader;
 /**
  * Creates {@link ArtifactClassLoaderFilter} instances
  */
-public interface ArtifactClassLoaderFilterFactory
-{
+public interface ArtifactClassLoaderFilterFactory {
 
-    /**
-     * Creates a filter based on the provided configuration
-     *
-     * @param exportedClassPackages comma separated list of class packages to export. Can be null
-     * @param exportedResources comma separated list of resources to export. Can be null
-     * @return a class loader filter that matches the provided configuration
-     */
-    ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources);
+  /**
+   * Creates a filter based on the provided configuration
+   *
+   * @param exportedClassPackages comma separated list of class packages to export. Can be null
+   * @param exportedResources comma separated list of resources to export. Can be null
+   * @return a class loader filter that matches the provided configuration
+   */
+  ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources);
 }

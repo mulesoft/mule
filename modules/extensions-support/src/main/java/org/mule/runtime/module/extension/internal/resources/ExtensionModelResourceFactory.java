@@ -16,18 +16,16 @@ import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import java.util.Optional;
 
 /**
- * Generates a resource of name {@link ExtensionProperties#EXTENSION_MODEL_JSON_FILE_NAME}
- * which contains a json representation of the {@link ExtensionModel}
+ * Generates a resource of name {@link ExtensionProperties#EXTENSION_MODEL_JSON_FILE_NAME} which contains a json representation of
+ * the {@link ExtensionModel}
  *
  * @since 4.0
  */
-public class ExtensionModelResourceFactory implements GeneratedResourceFactory
-{
+public class ExtensionModelResourceFactory implements GeneratedResourceFactory {
 
-    @Override
-    public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel)
-    {
-        String json = new ExtensionModelJsonSerializer(true).serialize(extensionModel);
-        return Optional.of(new GeneratedResource(EXTENSION_MODEL_JSON_FILE_NAME, json.getBytes()));
-    }
+  @Override
+  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+    String json = new ExtensionModelJsonSerializer(true).serialize(extensionModel);
+    return Optional.of(new GeneratedResource(EXTENSION_MODEL_JSON_FILE_NAME, json.getBytes()));
+  }
 }

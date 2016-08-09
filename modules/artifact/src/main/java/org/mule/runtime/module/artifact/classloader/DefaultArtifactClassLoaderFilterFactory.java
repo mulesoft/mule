@@ -15,48 +15,38 @@ import java.util.Set;
 /**
  * Creates {@link ArtifactClassLoaderFilter} instances
  */
-public class DefaultArtifactClassLoaderFilterFactory implements ArtifactClassLoaderFilterFactory
-{
+public class DefaultArtifactClassLoaderFilterFactory implements ArtifactClassLoaderFilterFactory {
 
-    private static final String PACKAGE_SEPARATOR = "/";
+  private static final String PACKAGE_SEPARATOR = "/";
 
-    @Override
-    public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources)
-    {
-        Set<String> exportedArtifactPackages = getPackages(exportedClassPackages);
-        Set<String> exportedArtifactResources = getPackages(exportedResources);
+  @Override
+  public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources) {
+    Set<String> exportedArtifactPackages = getPackages(exportedClassPackages);
+    Set<String> exportedArtifactResources = getPackages(exportedResources);
 
-        if (exportedArtifactPackages.isEmpty() && exportedArtifactResources.isEmpty())
-        {
-            return ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+    if (exportedArtifactPackages.isEmpty() && exportedArtifactResources.isEmpty()) {
+      return ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+    } else {
+      return new ArtifactClassLoaderFilter(exportedArtifactPackages, exportedArtifactResources);
+    }
+  }
+
+  private Set<String> getPackages(String exportedPackages) {
+    Set<String> exported = new HashSet<>();
+    if (StringUtils.isNotBlank(exportedPackages)) {
+      final String[] exports = exportedPackages.split(",");
+      for (String export : exports) {
+        export = export.trim();
+        if (export.startsWith(PACKAGE_SEPARATOR)) {
+          export = export.substring(1);
         }
-        else
-        {
-            return new ArtifactClassLoaderFilter(exportedArtifactPackages, exportedArtifactResources);
+        if (export.endsWith(PACKAGE_SEPARATOR)) {
+          export = export.substring(0, export.length() - 1);
         }
+        exported.add(export);
+      }
     }
 
-    private Set<String> getPackages(String exportedPackages)
-    {
-        Set<String> exported = new HashSet<>();
-        if (StringUtils.isNotBlank(exportedPackages))
-        {
-            final String[] exports = exportedPackages.split(",");
-            for (String export : exports)
-            {
-                export = export.trim();
-                if (export.startsWith(PACKAGE_SEPARATOR))
-                {
-                    export = export.substring(1);
-                }
-                if (export.endsWith(PACKAGE_SEPARATOR))
-                {
-                    export = export.substring(0, export.length() -1);
-                }
-                exported.add(export);
-            }
-        }
-
-        return exported;
-    }
+    return exported;
+  }
 }

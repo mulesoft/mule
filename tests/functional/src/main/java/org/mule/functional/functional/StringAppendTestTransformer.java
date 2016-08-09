@@ -8,19 +8,16 @@ package org.mule.functional.functional;
 
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
-public class StringAppendTestTransformer extends StringAppendTransformer
-{
+public class StringAppendTestTransformer extends StringAppendTransformer {
 
-    public static final String DEFAULT_TEXT = " transformed";
+  public static final String DEFAULT_TEXT = " transformed";
 
-    public StringAppendTestTransformer()
-    {
-        setMessage(DEFAULT_TEXT);
-    }
+  public StringAppendTestTransformer() {
+    setMessage(DEFAULT_TEXT);
+  }
 
-    public static String appendDefault(String msg)
-    {
-        return append(DEFAULT_TEXT, msg);
-    }
+  public static String appendDefault(String msg) {
+    return append(DEFAULT_TEXT, msg);
+  }
 
 }

@@ -32,291 +32,228 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
- * and logs them and can optionally route them to an endpoint. This agent will only
- * receive notifications for notification events that are enabled. The notifications
- * that are enabled are determined by the {@link MuleContextBuilder} that is used or
- * configuration mechanisms that may override these values.
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications and logs them and can optionally route them to
+ * an endpoint. This agent will only receive notifications for notification events that are enabled. The notifications that are
+ * enabled are determined by the {@link MuleContextBuilder} that is used or configuration mechanisms that may override these
+ * values.
  */
-public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
-{
-    /**
-     * The logger used for this class
-     */
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractNotificationLoggerAgent extends AbstractAgent {
 
-    private boolean ignoreManagerNotifications = false;
-    private boolean ignoreConnectionNotifications = false;
-    private boolean ignoreSecurityNotifications = false;
-    private boolean ignoreManagementNotifications = false;
-    private boolean ignoreCustomNotifications = false;
-    private boolean ignoreAdminNotifications = false;
-    private boolean ignoreMessageNotifications = false;
-    private boolean ignoreComponentMessageNotifications = false;
-    private boolean ignoreMessageProcessorNotifications = true;
+  /**
+   * The logger used for this class
+   */
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Set<ServerNotificationListener<? extends ServerNotification>> listeners = new HashSet<ServerNotificationListener<? extends ServerNotification>>();
+  private boolean ignoreManagerNotifications = false;
+  private boolean ignoreConnectionNotifications = false;
+  private boolean ignoreSecurityNotifications = false;
+  private boolean ignoreManagementNotifications = false;
+  private boolean ignoreCustomNotifications = false;
+  private boolean ignoreAdminNotifications = false;
+  private boolean ignoreMessageNotifications = false;
+  private boolean ignoreComponentMessageNotifications = false;
+  private boolean ignoreMessageProcessorNotifications = true;
 
-    protected AbstractNotificationLoggerAgent(String name)
-    {
-        super(name);
+  protected Set<ServerNotificationListener<? extends ServerNotification>> listeners =
+      new HashSet<ServerNotificationListener<? extends ServerNotification>>();
+
+  protected AbstractNotificationLoggerAgent(String name) {
+    super(name);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    // nothing to do
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    // nothing to do
+  }
+
+  @Override
+  public void dispose() {
+    for (ServerNotificationListener<?> listener : listeners) {
+      muleContext.unregisterListener(listener);
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        // nothing to do
-    }
+  public boolean isIgnoreManagerNotifications() {
+    return ignoreManagerNotifications;
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        // nothing to do
-    }
+  public void setIgnoreManagerNotifications(boolean ignoreManagerNotifications) {
+    this.ignoreManagerNotifications = ignoreManagerNotifications;
+  }
 
-    @Override
-    public void dispose()
-    {
-        for (ServerNotificationListener<?> listener : listeners)
-        {
-            muleContext.unregisterListener(listener);
+  public boolean isIgnoreMessageNotifications() {
+    return ignoreMessageNotifications;
+  }
+
+  public void setIgnoreMessageNotifications(boolean ignoreMessageNotifications) {
+    this.ignoreMessageNotifications = ignoreMessageNotifications;
+  }
+
+  public boolean isIgnoreSecurityNotifications() {
+    return ignoreSecurityNotifications;
+  }
+
+  public void setIgnoreSecurityNotifications(boolean ignoreSecurityNotifications) {
+    this.ignoreSecurityNotifications = ignoreSecurityNotifications;
+  }
+
+  public boolean isIgnoreManagementNotifications() {
+    return ignoreManagementNotifications;
+  }
+
+  public void setIgnoreManagementNotifications(boolean ignoreManagementNotifications) {
+    this.ignoreManagementNotifications = ignoreManagementNotifications;
+  }
+
+  public boolean isIgnoreCustomNotifications() {
+    return ignoreCustomNotifications;
+  }
+
+  public void setIgnoreCustomNotifications(boolean ignoreCustomNotifications) {
+    this.ignoreCustomNotifications = ignoreCustomNotifications;
+  }
+
+  public boolean isIgnoreAdminNotifications() {
+    return ignoreAdminNotifications;
+  }
+
+  public void setIgnoreAdminNotifications(boolean ignoreAdminNotifications) {
+    this.ignoreAdminNotifications = ignoreAdminNotifications;
+  }
+
+  public boolean isIgnoreConnectionNotifications() {
+    return ignoreConnectionNotifications;
+  }
+
+  public void setIgnoreConnectionNotifications(boolean ignoreConnectionNotifications) {
+    this.ignoreConnectionNotifications = ignoreConnectionNotifications;
+  }
+
+  public boolean isIgnoreComponentMessageNotifications() {
+    return ignoreComponentMessageNotifications;
+  }
+
+  public void setIgnoreComponentMessageNotifications(boolean ignoreComponentMessageNotifications) {
+    this.ignoreComponentMessageNotifications = ignoreComponentMessageNotifications;
+  }
+
+  public boolean isIgnoreMessageProcessorNotifications() {
+    return ignoreMessageProcessorNotifications;
+  }
+
+  public void setIgnoreMessageProcessorNotifications(boolean ignoreMessageProcessorNotifications) {
+    this.ignoreMessageProcessorNotifications = ignoreMessageProcessorNotifications;
+  }
+
+  @Override
+  public final void initialise() throws InitialisationException {
+    doInitialise();
+    if (!ignoreManagerNotifications) {
+      ServerNotificationListener<MuleContextNotification> l = new MuleContextNotificationListener<MuleContextNotification>() {
+
+        @Override
+        public void onNotification(MuleContextNotification notification) {
+          logEvent(notification);
         }
+      };
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
     }
+    if (!ignoreSecurityNotifications) {
+      ServerNotificationListener<SecurityNotification> l = new SecurityNotificationListener<SecurityNotification>() {
 
-    public boolean isIgnoreManagerNotifications()
-    {
-        return ignoreManagerNotifications;
-    }
-
-    public void setIgnoreManagerNotifications(boolean ignoreManagerNotifications)
-    {
-        this.ignoreManagerNotifications = ignoreManagerNotifications;
-    }
-
-    public boolean isIgnoreMessageNotifications()
-    {
-        return ignoreMessageNotifications;
-    }
-
-    public void setIgnoreMessageNotifications(boolean ignoreMessageNotifications)
-    {
-        this.ignoreMessageNotifications = ignoreMessageNotifications;
-    }
-
-    public boolean isIgnoreSecurityNotifications()
-    {
-        return ignoreSecurityNotifications;
-    }
-
-    public void setIgnoreSecurityNotifications(boolean ignoreSecurityNotifications)
-    {
-        this.ignoreSecurityNotifications = ignoreSecurityNotifications;
-    }
-
-    public boolean isIgnoreManagementNotifications()
-    {
-        return ignoreManagementNotifications;
-    }
-
-    public void setIgnoreManagementNotifications(boolean ignoreManagementNotifications)
-    {
-        this.ignoreManagementNotifications = ignoreManagementNotifications;
-    }
-
-    public boolean isIgnoreCustomNotifications()
-    {
-        return ignoreCustomNotifications;
-    }
-
-    public void setIgnoreCustomNotifications(boolean ignoreCustomNotifications)
-    {
-        this.ignoreCustomNotifications = ignoreCustomNotifications;
-    }
-
-    public boolean isIgnoreAdminNotifications()
-    {
-        return ignoreAdminNotifications;
-    }
-
-    public void setIgnoreAdminNotifications(boolean ignoreAdminNotifications)
-    {
-        this.ignoreAdminNotifications = ignoreAdminNotifications;
-    }
-
-    public boolean isIgnoreConnectionNotifications()
-    {
-        return ignoreConnectionNotifications;
-    }
-
-    public void setIgnoreConnectionNotifications(boolean ignoreConnectionNotifications)
-    {
-        this.ignoreConnectionNotifications = ignoreConnectionNotifications;
-    }
-
-    public boolean isIgnoreComponentMessageNotifications()
-    {
-        return ignoreComponentMessageNotifications;
-    }
-
-    public void setIgnoreComponentMessageNotifications(boolean ignoreComponentMessageNotifications)
-    {
-        this.ignoreComponentMessageNotifications = ignoreComponentMessageNotifications;
-    }
-
-    public boolean isIgnoreMessageProcessorNotifications()
-    {
-        return ignoreMessageProcessorNotifications;
-    }
-
-    public void setIgnoreMessageProcessorNotifications(boolean ignoreMessageProcessorNotifications)
-    {
-        this.ignoreMessageProcessorNotifications = ignoreMessageProcessorNotifications;
-    }
-
-    @Override
-    public final void initialise() throws InitialisationException
-    {
-        doInitialise();
-        if (!ignoreManagerNotifications)
-        {
-            ServerNotificationListener<MuleContextNotification> l
-                = new MuleContextNotificationListener<MuleContextNotification>()
-            {
-                @Override
-                public void onNotification(MuleContextNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
+        @Override
+        public void onNotification(SecurityNotification notification) {
+          logEvent(notification);
         }
-        if (!ignoreSecurityNotifications)
-        {
-            ServerNotificationListener<SecurityNotification> l
-                = new SecurityNotificationListener<SecurityNotification>()
-            {
-                @Override
-                public void onNotification(SecurityNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreManagementNotifications)
-        {
-            ServerNotificationListener<ManagementNotification> l
-                = new ManagementNotificationListener<ManagementNotification>()
-            {
-                @Override
-                public void onNotification(ManagementNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreCustomNotifications)
-        {
-            ServerNotificationListener<?> l = new CustomNotificationListener<ServerNotification>()
-            {
-                @Override
-                public void onNotification(ServerNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreConnectionNotifications)
-        {
-            ServerNotificationListener<ConnectionNotification> l
-                = new ConnectionNotificationListener<ConnectionNotification>()
-            {
-                @Override
-                public void onNotification(ConnectionNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreMessageNotifications && !ignoreComponentMessageNotifications)
-        {
-            ServerNotificationListener<ComponentMessageNotification> l =
-                    notification -> logEvent(notification);
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreMessageNotifications && !ignoreMessageProcessorNotifications)
-        {
-            ServerNotificationListener<MessageProcessorNotification> l =
-                    notification -> logEvent(notification);
-            try
-            {
-                muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
+      };
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
     }
 
-    protected abstract void doInitialise() throws InitialisationException;
+    if (!ignoreManagementNotifications) {
+      ServerNotificationListener<ManagementNotification> l = new ManagementNotificationListener<ManagementNotification>() {
 
-    protected abstract void logEvent(ServerNotification e);
+        @Override
+        public void onNotification(ManagementNotification notification) {
+          logEvent(notification);
+        }
+      };
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
+    }
+
+    if (!ignoreCustomNotifications) {
+      ServerNotificationListener<?> l = new CustomNotificationListener<ServerNotification>() {
+
+        @Override
+        public void onNotification(ServerNotification notification) {
+          logEvent(notification);
+        }
+      };
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
+    }
+
+    if (!ignoreConnectionNotifications) {
+      ServerNotificationListener<ConnectionNotification> l = new ConnectionNotificationListener<ConnectionNotification>() {
+
+        @Override
+        public void onNotification(ConnectionNotification notification) {
+          logEvent(notification);
+        }
+      };
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
+    }
+
+    if (!ignoreMessageNotifications && !ignoreComponentMessageNotifications) {
+      ServerNotificationListener<ComponentMessageNotification> l = notification -> logEvent(notification);
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
+    }
+
+    if (!ignoreMessageNotifications && !ignoreMessageProcessorNotifications) {
+      ServerNotificationListener<MessageProcessorNotification> l = notification -> logEvent(notification);
+      try {
+        muleContext.registerListener(l);
+      } catch (NotificationException e) {
+        throw new InitialisationException(e, this);
+      }
+      listeners.add(l);
+    }
+  }
+
+  protected abstract void doInitialise() throws InitialisationException;
+
+  protected abstract void logEvent(ServerNotification e);
 }

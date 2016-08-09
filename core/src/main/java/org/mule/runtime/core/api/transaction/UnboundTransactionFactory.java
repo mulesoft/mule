@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * Create an unbound transaction, to be bound and started by other parts of the transaction framework.
  */
-public interface UnboundTransactionFactory
-{
-    Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException;
+public interface UnboundTransactionFactory {
+
+  Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException;
 }

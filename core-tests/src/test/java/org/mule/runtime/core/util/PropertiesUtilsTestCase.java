@@ -25,113 +25,109 @@ import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 @SmallTest
-public class PropertiesUtilsTestCase extends AbstractMuleTestCase
-{
+public class PropertiesUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testRemoveNameSpacePrefix()
-    {
-        String temp = "this.is.a.namespace";
-        String result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("namespace", result);
+  @Test
+  public void testRemoveNameSpacePrefix() {
+    String temp = "this.is.a.namespace";
+    String result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("namespace", result);
 
-        temp = "this.namespace";
-        result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("namespace", result);
+    temp = "this.namespace";
+    result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("namespace", result);
 
-        temp = "namespace";
-        result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("namespace", result);
+    temp = "namespace";
+    result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("namespace", result);
 
-        temp = "this_is-a-namespace";
-        result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("this_is-a-namespace", result);
-    }
+    temp = "this_is-a-namespace";
+    result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("this_is-a-namespace", result);
+  }
 
-    @Test
-    public void testRemoveXMLNameSpacePrefix()
-    {
-        String temp = "j:namespace";
-        String result = PropertiesUtils.removeXmlNamespacePrefix(temp);
-        assertEquals("namespace", result);
+  @Test
+  public void testRemoveXMLNameSpacePrefix() {
+    String temp = "j:namespace";
+    String result = PropertiesUtils.removeXmlNamespacePrefix(temp);
+    assertEquals("namespace", result);
 
-        temp = "this-namespace";
-        result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("this-namespace", result);
+    temp = "this-namespace";
+    result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("this-namespace", result);
 
-        temp = "namespace";
-        result = PropertiesUtils.removeNamespacePrefix(temp);
-        assertEquals("namespace", result);
-    }
+    temp = "namespace";
+    result = PropertiesUtils.removeNamespacePrefix(temp);
+    assertEquals("namespace", result);
+  }
 
-    @Test
-    public void testRemoveNamespaces() throws Exception
-    {
-        Map props = new HashMap();
+  @Test
+  public void testRemoveNamespaces() throws Exception {
+    Map props = new HashMap();
 
-        props.put("blah.booleanProperty", "true");
-        props.put("blah.blah.doubleProperty", NumberFormat.getInstance().format(0.124));
-        props.put("blah.blah.Blah.intProperty", "14");
-        props.put("longProperty", "999999999");
-        props.put("3456.stringProperty", "string");
+    props.put("blah.booleanProperty", "true");
+    props.put("blah.blah.doubleProperty", NumberFormat.getInstance().format(0.124));
+    props.put("blah.blah.Blah.intProperty", "14");
+    props.put("longProperty", "999999999");
+    props.put("3456.stringProperty", "string");
 
-        props = PropertiesUtils.removeNamespaces(props);
+    props = PropertiesUtils.removeNamespaces(props);
 
-        assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
-        assertEquals(0.124, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
-        assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
-        assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
-        assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
-    }
+    assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
+    assertEquals(0.124, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
+    assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
+    assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
+    assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
+  }
 
-    @Test
-    public void testMaskedProperties()
-    {
-        // test nulls
-        assertNull(PropertiesUtils.maskedPropertyValue(null));
-        assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry(null, "value")));
-        assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry("key", null)));
+  @Test
+  public void testMaskedProperties() {
+    // test nulls
+    assertNull(PropertiesUtils.maskedPropertyValue(null));
+    assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry(null, "value")));
+    assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry("key", null)));
 
-        // try non-masked value
-        Map.Entry property = new DefaultMapEntry("secretname", "secret");
-        assertTrue("secret".equals(PropertiesUtils.maskedPropertyValue(property)));
+    // try non-masked value
+    Map.Entry property = new DefaultMapEntry("secretname", "secret");
+    assertTrue("secret".equals(PropertiesUtils.maskedPropertyValue(property)));
 
-        // now mask value
-        PropertiesUtils.registerMaskedPropertyName("secretname");
-        String masked = PropertiesUtils.maskedPropertyValue(property);
-        assertFalse("secret".equals(masked));
-        assertTrue(masked.startsWith("*"));
-    }
-    
-    @Test
-    public void testLoadAllProperties()
-    {
-        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-exception-codes.properties", this.getClass().getClassLoader());
-        assertThat((String) properties.get("java.lang.IllegalArgumentException"), is("104000"));
-        assertThat((String) properties.get("org.mule.runtime.core.api.MuleException"),is("10000"));
-    }
+    // now mask value
+    PropertiesUtils.registerMaskedPropertyName("secretname");
+    String masked = PropertiesUtils.maskedPropertyValue(property);
+    assertFalse("secret".equals(masked));
+    assertTrue(masked.startsWith("*"));
+  }
 
-    @Test
-    public void testLoadAllPropertiesNoFile()
-    {
-        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/config/mule-non-existent.properties", this.getClass().getClassLoader());
-        assertThat(properties, IsNull.notNullValue());
-        assertThat(properties.isEmpty(), is(true));
-    }
-    
-    @Test
-    public void testLoadAllPropertiesEmptyFile()
-    {
-        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-empty.properties", this.getClass().getClassLoader());
-        assertThat(properties, IsNull.notNullValue());
-        assertThat(properties.isEmpty(), is(true));
-    }
+  @Test
+  public void testLoadAllProperties() {
+    Properties properties =
+        PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-exception-codes.properties",
+                                          this.getClass().getClassLoader());
+    assertThat((String) properties.get("java.lang.IllegalArgumentException"), is("104000"));
+    assertThat((String) properties.get("org.mule.runtime.core.api.MuleException"), is("10000"));
+  }
 
-    @Test
-    public void noPropertiesAreFoundOnEmptyQueryString()
-    {
-        Properties properties = PropertiesUtils.getPropertiesFromQueryString("");
-        assertThat(properties.size(), is(0));
-    }
+  @Test
+  public void testLoadAllPropertiesNoFile() {
+    Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/config/mule-non-existent.properties",
+                                                              this.getClass().getClassLoader());
+    assertThat(properties, IsNull.notNullValue());
+    assertThat(properties.isEmpty(), is(true));
+  }
+
+  @Test
+  public void testLoadAllPropertiesEmptyFile() {
+    Properties properties =
+        PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-empty.properties",
+                                          this.getClass().getClassLoader());
+    assertThat(properties, IsNull.notNullValue());
+    assertThat(properties.isEmpty(), is(true));
+  }
+
+  @Test
+  public void noPropertiesAreFoundOnEmptyQueryString() {
+    Properties properties = PropertiesUtils.getPropertiesFromQueryString("");
+    assertThat(properties.size(), is(0));
+  }
 
 }

@@ -19,23 +19,20 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class SetPropertyDataTypeTestCase extends AbstractIntegrationTestCase
-{
+public class SetPropertyDataTypeTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "set-property-data-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "set-property-data-type-config.xml";
+  }
 
-    @Test
-    public void setsPropertyDataType() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void setsPropertyDataType() throws Exception {
+    final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
-        MuleMessage response = muleEvent.getMessage();
-        DataType dataType = response.getOutboundPropertyDataType("testProperty");
+    MuleMessage response = muleEvent.getMessage();
+    DataType dataType = response.getOutboundPropertyDataType("testProperty");
 
-        assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
-    }
+    assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
+  }
 }

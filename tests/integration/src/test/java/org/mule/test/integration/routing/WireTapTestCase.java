@@ -16,43 +16,34 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class WireTapTestCase extends AbstractIntegrationTestCase
-{
+public class WireTapTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/wire-tap-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/wire-tap-flow.xml";
+  }
 
-    @Test
-    public void testWireTap() throws Exception
-    {
-        final Latch receiverLatch = new Latch();
-        final Latch tappedReceiver1Latch = new Latch();
-        final Latch tappedReceiver2Latch = new Latch();
-        muleContext.registerListener(new FunctionalTestNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                if (notification.getResourceIdentifier().equals("Receiver"))
-                {
-                    receiverLatch.countDown();
-                }
-                else if (notification.getResourceIdentifier().equals("TappedReceiver1"))
-                {
-                    tappedReceiver1Latch.countDown();
-                }
-                else if (notification.getResourceIdentifier().equals("TappedReceiver2"))
-                {
-                    tappedReceiver2Latch.countDown();
-                }
-            }
-        });
-        flowRunner("Receiver").withPayload(TEST_PAYLOAD).run();
-        assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
-        assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));
-        assertTrue(tappedReceiver2Latch.await(1L, TimeUnit.SECONDS));
-    }
+  @Test
+  public void testWireTap() throws Exception {
+    final Latch receiverLatch = new Latch();
+    final Latch tappedReceiver1Latch = new Latch();
+    final Latch tappedReceiver2Latch = new Latch();
+    muleContext.registerListener(new FunctionalTestNotificationListener() {
+
+      @Override
+      public void onNotification(ServerNotification notification) {
+        if (notification.getResourceIdentifier().equals("Receiver")) {
+          receiverLatch.countDown();
+        } else if (notification.getResourceIdentifier().equals("TappedReceiver1")) {
+          tappedReceiver1Latch.countDown();
+        } else if (notification.getResourceIdentifier().equals("TappedReceiver2")) {
+          tappedReceiver2Latch.countDown();
+        }
+      }
+    });
+    flowRunner("Receiver").withPayload(TEST_PAYLOAD).run();
+    assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
+    assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));
+    assertTrue(tappedReceiver2Latch.await(1L, TimeUnit.SECONDS));
+  }
 }

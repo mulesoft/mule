@@ -14,25 +14,22 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class InputParamDefinitionDefinitionParser extends AbstractParamDefinitionDefinitionParser
-{
+public class InputParamDefinitionDefinitionParser extends AbstractParamDefinitionDefinitionParser {
 
-    @Override
-    protected Class<?> getBeanClass(Element element)
-    {
-        return DefaultInputQueryParam.class;
-    }
+  @Override
+  protected Class<?> getBeanClass(Element element) {
+    return DefaultInputQueryParam.class;
+  }
 
 
-    @Override
-    protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
-    {
-        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
+  @Override
+  protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+    builder.setScope(BeanDefinition.SCOPE_SINGLETON);
 
-        builder.addConstructorArgValue(getListElementIndex(element));
-        builder.addConstructorArgValue(getType(element));
-        builder.addConstructorArgValue(getValue(element));
-        builder.addConstructorArgValue(getName(element));
-    }
+    builder.addConstructorArgValue(getListElementIndex(element));
+    builder.addConstructorArgValue(getType(element));
+    builder.addConstructorArgValue(getValue(element));
+    builder.addConstructorArgValue(getName(element));
+  }
 
 }

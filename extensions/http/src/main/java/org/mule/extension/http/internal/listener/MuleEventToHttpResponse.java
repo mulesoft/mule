@@ -53,268 +53,215 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class MuleEventToHttpResponse
-{
-    public static final String MULTIPART = "multipart";
-    private Logger logger = LoggerFactory.getLogger(getClass());
+public class MuleEventToHttpResponse {
 
-    private HttpStreamingType responseStreaming = AUTO;
-    private boolean multipartEntityWithNoMultipartContentyTypeWarned;
-    private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
+  public static final String MULTIPART = "multipart";
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public MuleEventToHttpResponse(HttpStreamingType responseStreaming)
-    {
-        this.responseStreaming = responseStreaming;
+  private HttpStreamingType responseStreaming = AUTO;
+  private boolean multipartEntityWithNoMultipartContentyTypeWarned;
+  private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
+
+  public MuleEventToHttpResponse(HttpStreamingType responseStreaming) {
+    this.responseStreaming = responseStreaming;
+  }
+
+  /**
+   * Creates an {@HttpResponse}.
+   *
+   * @param event The {@link MuleEvent} that should be used to set the {@link HttpResponse} content.
+   * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
+   *        {@link HttpResponse}.
+   * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
+   * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
+   * @return an {@HttpResponse} configured based on the parameters.
+   * @throws MessagingException if the response creation fails.
+   */
+  public HttpResponse create(MuleEvent event, HttpResponseBuilder responseBuilder,
+                             HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding)
+      throws MessagingException {
+    Map<String, String> headers = listenerResponseBuilder.getHeaders(event);
+
+    final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
+
+    for (String name : headers.keySet()) {
+      // For now, only support single headers
+      if (TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding) {
+        logger
+            .debug("Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+      } else {
+        httpResponseHeaderBuilder.addHeader(name, headers.get(name));
+      }
     }
 
-    /**
-     * Creates an {@HttpResponse}.
-     *
-     * @param event The {@link MuleEvent} that should be used to set the {@link HttpResponse} content.
-     * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the {@link HttpResponse}.
-     * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
-     * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
-     * @return an {@HttpResponse} configured based on the parameters.
-     * @throws MessagingException if the response creation fails.
-     */
-    public HttpResponse create(MuleEvent event,
-                               HttpResponseBuilder responseBuilder,
-                               HttpListenerResponseBuilder listenerResponseBuilder,
-                               boolean supportsTransferEncoding) throws MessagingException
-    {
-        Map<String, String> headers = listenerResponseBuilder.getHeaders(event);
-
-        final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
-
-        for (String name : headers.keySet())
-        {
-            //For now, only support single headers
-            if (TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding)
-            {
-                logger.debug("Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
-            }
-            else
-            {
-                httpResponseHeaderBuilder.addHeader(name, headers.get(name));
-            }
-        }
-
-        if (httpResponseHeaderBuilder.getContentType() == null)
-        {
-            DataType dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMediaType()))
-            {
-                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
-            }
-        }
-
-        final String configuredContentType = httpResponseHeaderBuilder.getContentType();
-        final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
-        final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
-
-        HttpEntity httpEntity;
-
-        Map<String, DataHandler> parts = listenerResponseBuilder.getParts(event);
-
-        if (!parts.isEmpty())
-        {
-            if (configuredContentType == null)
-            {
-                httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
-            }
-            else if (!configuredContentType.startsWith(MULTIPART))
-            {
-                warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
-            }
-            httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), parts);
-            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding, (ByteArrayHttpEntity) httpEntity);
-        }
-        else
-        {
-            final Object payload = event.getMessage().getPayload();
-            if (payload == null)
-            {
-                setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-                httpEntity = new EmptyHttpEntity();
-            }
-            else if (payload instanceof Map)
-            {
-                if (configuredContentType == null)
-                {
-                    httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
-                }
-                else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
-                {
-                    warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
-                }
-                httpEntity = createUrlEncodedEntity(event, (Map) payload);
-            }
-            else if (payload instanceof InputStream)
-            {
-                if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
-                {
-                    if (supportsTransferEncoding)
-                    {
-                        setupChunkedEncoding(httpResponseHeaderBuilder);
-                    }
-                    httpEntity = new InputStreamHttpEntity((InputStream) payload);
-                }
-                else
-                {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
-                    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-                    httpEntity = byteArrayHttpEntity;
-                }
-            }
-            else
-            {
-                try
-                {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes());
-                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding, byteArrayHttpEntity);
-                    httpEntity = byteArrayHttpEntity;
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
-        for (String headerName : headerNames)
-        {
-            Collection<String> values = httpResponseHeaderBuilder.getHeader(headerName);
-            for (String value : values)
-            {
-                responseBuilder.addHeader(headerName, value);
-            }
-        }
-
-        Integer statusCode = listenerResponseBuilder.getStatusCode(event);
-        if (statusCode != null)
-        {
-            responseBuilder.setStatusCode(statusCode);
-        }
-        String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(event), statusCode);
-        if (reasonPhrase != null)
-        {
-            responseBuilder.setReasonPhrase(reasonPhrase);
-        }
-        responseBuilder.setEntity(httpEntity);
-        return responseBuilder.build();
+    if (httpResponseHeaderBuilder.getContentType() == null) {
+      DataType dataType = event.getMessage().getDataType();
+      if (!MediaType.ANY.matches(dataType.getMediaType())) {
+        httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
+      }
     }
 
-    public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode)
-    {
-        String reasonPhrase = builderReasonPhrase;
-        if (reasonPhrase == null && statusCode != null)
-        {
-            reasonPhrase = getReasonPhraseForStatusCode(statusCode);
+    final String configuredContentType = httpResponseHeaderBuilder.getContentType();
+    final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
+    final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
+
+    HttpEntity httpEntity;
+
+    Map<String, DataHandler> parts = listenerResponseBuilder.getParts(event);
+
+    if (!parts.isEmpty()) {
+      if (configuredContentType == null) {
+        httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
+      } else if (!configuredContentType.startsWith(MULTIPART)) {
+        warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
+      }
+      httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), parts);
+      resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                      (ByteArrayHttpEntity) httpEntity);
+    } else {
+      final Object payload = event.getMessage().getPayload();
+      if (payload == null) {
+        setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
+        httpEntity = new EmptyHttpEntity();
+      } else if (payload instanceof Map) {
+        if (configuredContentType == null) {
+          httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
+        } else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
+          warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
         }
-        return reasonPhrase;
+        httpEntity = createUrlEncodedEntity(event, (Map) payload);
+      } else if (payload instanceof InputStream) {
+        if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
+          if (supportsTransferEncoding) {
+            setupChunkedEncoding(httpResponseHeaderBuilder);
+          }
+          httpEntity = new InputStreamHttpEntity((InputStream) payload);
+        } else {
+          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
+          setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+          httpEntity = byteArrayHttpEntity;
+        }
+      } else {
+        try {
+          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes());
+          resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                          byteArrayHttpEntity);
+          httpEntity = byteArrayHttpEntity;
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
     }
 
-    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder,
-                                 String existingTransferEncoding,
-                                 String existingContentLength,
-                                 boolean supportsTransferEncoding,
-                                 ByteArrayHttpEntity byteArrayHttpEntity)
-    {
-        if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
-        {
-            if (supportsTransferEncoding)
-            {
-                setupChunkedEncoding(httpResponseHeaderBuilder);
-            }
-        }
-        else
-        {
-            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-        }
+    Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
+    for (String headerName : headerNames) {
+      Collection<String> values = httpResponseHeaderBuilder.getHeader(headerName);
+      for (String value : values) {
+        responseBuilder.addHeader(headerName, value);
+      }
     }
 
-    private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength)
-    {
-        if (httpResponseHeaderBuilder.getTransferEncoding() != null)
-        {
-            logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
-            httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
-        }
-        httpResponseHeaderBuilder.setContentLenght(String.valueOf(contentLength));
+    Integer statusCode = listenerResponseBuilder.getStatusCode(event);
+    if (statusCode != null) {
+      responseBuilder.setStatusCode(statusCode);
+    }
+    String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(event), statusCode);
+    if (reasonPhrase != null) {
+      responseBuilder.setReasonPhrase(reasonPhrase);
+    }
+    responseBuilder.setEntity(httpEntity);
+    return responseBuilder.build();
+  }
+
+  public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode) {
+    String reasonPhrase = builderReasonPhrase;
+    if (reasonPhrase == null && statusCode != null) {
+      reasonPhrase = getReasonPhraseForStatusCode(statusCode);
+    }
+    return reasonPhrase;
+  }
+
+  private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding,
+                               String existingContentLength, boolean supportsTransferEncoding,
+                               ByteArrayHttpEntity byteArrayHttpEntity) {
+    if (responseStreaming == ALWAYS
+        || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding))) {
+      if (supportsTransferEncoding) {
+        setupChunkedEncoding(httpResponseHeaderBuilder);
+      }
+    } else {
+      setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+    }
+  }
+
+  private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength) {
+    if (httpResponseHeaderBuilder.getTransferEncoding() != null) {
+      logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
+      httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+    }
+    httpResponseHeaderBuilder.setContentLenght(String.valueOf(contentLength));
+  }
+
+  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+    if (httpResponseHeaderBuilder.getContentLength() != null) {
+      logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
+      httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
+    }
+    httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
+  }
+
+  private String createMultipartFormDataContentType() {
+    return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
+  }
+
+  private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload) {
+    final Map mapPayload = payload;
+    HttpEntity entity = new EmptyHttpEntity();
+    if (!mapPayload.isEmpty()) {
+      String encodedBody;
+      final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
+      if (mapPayload instanceof ParameterMap) {
+        encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
+      } else {
+        encodedBody = HttpParser.encodeString(encoding, mapPayload);
+      }
+      entity = new ByteArrayHttpEntity(encodedBody.getBytes());
+    }
+    return entity;
+  }
+
+  private void warnMapPayloadButNoUrlEncodedContentType(String contentType) {
+    if (!mapPayloadButNoUrlEncodedContentyTypeWarned) {
+      logger.warn(String.format(
+                                "Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
+                                contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+      mapPayloadButNoUrlEncodedContentyTypeWarned = true;
+    }
+  }
+
+  private void warnNoMultipartContentTypeButMultipartEntity(String contentType) {
+    if (!multipartEntityWithNoMultipartContentyTypeWarned) {
+      logger.warn(String.format(
+                                "Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated.",
+                                contentType));
+      multipartEntityWithNoMultipartContentyTypeWarned = true;
+    }
+  }
+
+  private HttpEntity createMultipartEntity(MuleEvent event, String contentType, Map<String, DataHandler> parts)
+      throws MessagingException {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
     }
 
-    private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder)
-    {
-        if (httpResponseHeaderBuilder.getContentLength() != null)
-        {
-            logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
-            httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
-        }
-        httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
+    final MultipartHttpEntity multipartEntity;
+    try {
+      multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
+      return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
+    } catch (Exception e) {
+      throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."),
+                                   event.getMessage(), event.getMuleContext(), e);
     }
-
-    private String createMultipartFormDataContentType()
-    {
-        return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
-    }
-
-    private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload)
-    {
-        final Map mapPayload = payload;
-        HttpEntity entity = new EmptyHttpEntity();
-        if (!mapPayload.isEmpty())
-        {
-            String encodedBody;
-            final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
-            if (mapPayload instanceof ParameterMap)
-            {
-                encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
-            }
-            else
-            {
-                encodedBody = HttpParser.encodeString(encoding, mapPayload);
-            }
-            entity = new ByteArrayHttpEntity(encodedBody.getBytes());
-        }
-        return entity;
-    }
-
-    private void warnMapPayloadButNoUrlEncodedContentType(String contentType)
-    {
-        if (!mapPayloadButNoUrlEncodedContentyTypeWarned)
-        {
-            logger.warn(String.format("Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.", contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
-            mapPayloadButNoUrlEncodedContentyTypeWarned = true;
-        }
-    }
-
-    private void warnNoMultipartContentTypeButMultipartEntity(String contentType)
-    {
-        if (!multipartEntityWithNoMultipartContentyTypeWarned)
-        {
-            logger.warn(String.format("Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated.", contentType));
-            multipartEntityWithNoMultipartContentyTypeWarned = true;
-        }
-    }
-
-    private HttpEntity createMultipartEntity(MuleEvent event, String contentType, Map<String, DataHandler> parts) throws MessagingException
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
-        }
-
-        final MultipartHttpEntity multipartEntity;
-        try
-        {
-            multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
-            return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
-        }
-        catch (Exception e)
-        {
-            throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."), event.getMessage(), event.getMuleContext(), e);
-        }
-    }
+  }
 
 }

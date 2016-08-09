@@ -17,43 +17,37 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class JmsSelectorDetectionTestCase extends FunctionalTestCase
-{
+public class JmsSelectorDetectionTestCase extends FunctionalTestCase {
 
-    public JmsSelectorDetectionTestCase()
-    {
-        setStartContext(false);
-    }
+  public JmsSelectorDetectionTestCase() {
+    setStartContext(false);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-selector-detection-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "jms-selector-detection-flow.xml";
+  }
 
-    @Test
-    public void testDetectsSelector() throws Exception
-    {
-        MessageSource source = getSource();
-        InboundEndpoint ep = null;
-        ep = getEnpoint(source, ep);
+  @Test
+  public void testDetectsSelector() throws Exception {
+    MessageSource source = getSource();
+    InboundEndpoint ep = null;
+    ep = getEnpoint(source, ep);
 
-        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-        JmsSelectorFilter selector = connector.getSelector(ep);
-        assertNotNull(selector);
-    }
+    JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+    JmsSelectorFilter selector = connector.getSelector(ep);
+    assertNotNull(selector);
+  }
 
-    private InboundEndpoint getEnpoint(MessageSource source, InboundEndpoint ep)
-    {
-        return (InboundEndpoint) source;
-    }
+  private InboundEndpoint getEnpoint(MessageSource source, InboundEndpoint ep) {
+    return (InboundEndpoint) source;
+  }
 
-    private MessageSource getSource()
-    {
-        Object flowOrService = muleContext.getRegistry().lookupObject("TestSelector");
-        assertNotNull(flowOrService);
-        Flow flow = (Flow) flowOrService;
-        return flow.getMessageSource();
-    }
+  private MessageSource getSource() {
+    Object flowOrService = muleContext.getRegistry().lookupObject("TestSelector");
+    assertNotNull(flowOrService);
+    Flow flow = (Flow) flowOrService;
+    return flow.getMessageSource();
+  }
 
 }

@@ -10,35 +10,31 @@ import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 /**
- * An {@link Authenticator} object that knows how to obtain
- * authentication for a network connection using username and password.
+ * An {@link Authenticator} object that knows how to obtain authentication for a network connection using username and password.
  *
  * @since 4.0
  */
-public final class PasswordAuthenticator extends Authenticator
-{
+public final class PasswordAuthenticator extends Authenticator {
 
-    private String user;
-    private String pass;
+  private String user;
+  private String pass;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param user the username to establish connection to.
-     * @param pass the password for the specified {@code username}.
-     */
-    public PasswordAuthenticator(String user, String pass)
-    {
-        this.user = user;
-        this.pass = pass;
-    }
+  /**
+   * Creates a new instance.
+   *
+   * @param user the username to establish connection to.
+   * @param pass the password for the specified {@code username}.
+   */
+  public PasswordAuthenticator(String user, String pass) {
+    this.user = user;
+    this.pass = pass;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected PasswordAuthentication getPasswordAuthentication()
-    {
-        return new PasswordAuthentication(user, pass);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected PasswordAuthentication getPasswordAuthentication() {
+    return new PasswordAuthentication(user, pass);
+  }
 }

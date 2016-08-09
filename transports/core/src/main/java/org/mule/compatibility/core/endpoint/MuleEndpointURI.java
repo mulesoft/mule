@@ -32,663 +32,523 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url
- * defines the protocol, the endpointUri destination of the message and optionally the endpoint to
- * use when dispatching the event. Mule urls take the form of -
- * protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e. vm:///my.object
- * <br/>
- * The protocol can be any of any connector registered with Mule. The endpoint name if specified
- * must be the name of a registered global endpoint. The endpointUri can be any endpointUri
- * recognized by the endpoint type.
+ * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url defines the protocol, the
+ * endpointUri destination of the message and optionally the endpoint to use when dispatching the event. Mule urls take the form
+ * of - protocol://[host]:[port]/[provider]/endpointUri or protocol://[host]:[port]/endpointUri i.e. vm:///my.object <br/>
+ * The protocol can be any of any connector registered with Mule. The endpoint name if specified must be the name of a registered
+ * global endpoint. The endpointUri can be any endpointUri recognized by the endpoint type.
  */
-public class MuleEndpointURI implements EndpointURI
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 3906735768171252877L;
+public class MuleEndpointURI implements EndpointURI {
 
-    /**
-     * logger used by this class
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(MuleEndpointURI.class);
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 3906735768171252877L;
 
-    public static boolean isMuleUri(String url)
-    {
-        return url.indexOf(":/") != -1;
+  /**
+   * logger used by this class
+   */
+  protected static final Logger logger = LoggerFactory.getLogger(MuleEndpointURI.class);
+
+  public static boolean isMuleUri(String url) {
+    return url.indexOf(":/") != -1;
+  }
+
+  private String address;
+  private String filterAddress;
+  private String endpointName;
+  private String connectorName;
+  private String transformers;
+  private String responseTransformers;
+  private Properties params = new Properties();
+  private URI uri;
+  private String userInfo;
+  private String schemeMetaInfo;
+  private String resourceInfo;
+  private boolean dynamic;
+  private transient MuleContext muleContext;
+  private Properties serviceOverrides;
+
+  private String user;
+  private String password;
+
+  MuleEndpointURI(String address, String endpointName, String connectorName, String transformers, String responseTransformers,
+                  Properties properties, URI uri, String userInfo, MuleContext muleContext) {
+    this(address, endpointName, connectorName, transformers, responseTransformers, properties, uri, muleContext);
+    if (userInfo != null) {
+      this.userInfo = userInfo;
     }
+  }
 
-    private String address;
-    private String filterAddress;
-    private String endpointName;
-    private String connectorName;
-    private String transformers;
-    private String responseTransformers;
-    private Properties params = new Properties();
-    private URI uri;
-    private String userInfo;
-    private String schemeMetaInfo;
-    private String resourceInfo;
-    private boolean dynamic;
-    private transient MuleContext muleContext;
-    private Properties serviceOverrides;
+  public MuleEndpointURI(String address, String endpointName, String connectorName, String transformers,
+                         String responseTransformers, Properties properties, URI uri, MuleContext muleContext) {
+    this.address = address;
+    this.endpointName = endpointName;
+    this.connectorName = connectorName;
+    this.transformers = transformers;
+    this.responseTransformers = responseTransformers;
+    this.params = properties;
+    this.uri = uri;
+    this.userInfo = uri.getUserInfo();
+    this.muleContext = muleContext;
+    if (properties != null) {
+      resourceInfo = (String) properties.remove("resourceInfo");
+    }
+  }
 
-    private String user;
-    private String password;
+  public MuleEndpointURI(EndpointURI endpointUri) {
+    initialise(endpointUri);
+  }
 
-    MuleEndpointURI(String address,
-                    String endpointName,
-                    String connectorName,
-                    String transformers,
-                    String responseTransformers,
-                    Properties properties,
-                    URI uri,
-                    String userInfo, MuleContext muleContext)
-    {
-        this(address, endpointName, connectorName, transformers, responseTransformers,
-                properties, uri, muleContext);
-        if (userInfo != null)
-        {
-            this.userInfo = userInfo;
+  public MuleEndpointURI(EndpointURI endpointUri, String filterAddress) {
+    initialise(endpointUri);
+    this.filterAddress = filterAddress;
+  }
+
+  public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException {
+    this(uri, null, muleContext);
+  }
+
+  public MuleEndpointURI(String uri, MuleContext muleContext, Properties serviceOverrides) throws EndpointException {
+    this(uri, null, muleContext);
+    this.serviceOverrides = serviceOverrides;
+  }
+
+  /**
+   * Creates but does not initialize the endpoint URI. It is up to the caller to call initialise() at some point.
+   */
+  public MuleEndpointURI(String uri, String encodedUri, MuleContext muleContext) throws EndpointException {
+    this.muleContext = muleContext;
+    uri = preprocessUri(uri);
+    String startUri = uri;
+    uri = convertExpressionDelimiters(uri, "#");
+    uri = convertExpressionDelimiters(uri, "$");
+
+    if (uri.indexOf("#[") >= 0) {
+      address = uri;
+      dynamic = true;
+    } else {
+      try {
+        this.uri = new URI((encodedUri != null && uri.equals(startUri)) ? preprocessUri(encodedUri) : uri);
+      } catch (URISyntaxException e) {
+        throw new MalformedEndpointException(uri, e);
+      }
+      this.userInfo = this.uri.getUserInfo();
+    }
+  }
+
+  private String convertExpressionDelimiters(String uriString, String startChar) {
+    // Allow Expressions to be embedded
+    int uriLength = uriString.length();
+    for (int index = 0; index < uriLength;) {
+      index = uriString.indexOf(startChar + "{", index);
+      if (index < 0) {
+        break;
+      }
+      int braceCount = 1;
+      for (int seek = index + 2; seek < uriLength; seek++) {
+        char c = uriString.charAt(seek);
+        if (c == '{') {
+          braceCount++;
+        } else if (c == '}') {
+          if (--braceCount == 0) {
+            uriString = uriString.substring(0, index) + startChar + "[" + uriString.substring(index + 2, seek) + "]"
+                + uriString.substring(seek + 1);
+            break;
+          }
         }
+      }
+      index += 2;
+    }
+    return uriString;
+  }
+
+  protected String preprocessUri(String uriString) throws MalformedEndpointException {
+    uriString = uriString.trim().replaceAll(" ", "%20");
+    if (!validateUrl(uriString)) {
+      throw new MalformedEndpointException(uriString);
+    }
+    schemeMetaInfo = retrieveSchemeMetaInfo(uriString);
+    if (schemeMetaInfo != null) {
+      uriString = uriString.replaceFirst(schemeMetaInfo + ":", "");
+    }
+    return uriString;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      String scheme = getFullScheme();
+      TransportServiceDescriptor sd;
+      sd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme,
+                                                                serviceOverrides);
+      if (sd == null) {
+        throw new ServiceException(TransportCoreMessages.noServiceTransportDescriptor(scheme));
+      }
+      EndpointURIBuilder builder = sd.createEndpointURIBuilder();
+      EndpointURI built = builder.build(this.uri, muleContext);
+      initialise(built);
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+  private String retrieveSchemeMetaInfo(String url) {
+    int i = url.indexOf(':');
+    if (i == -1) {
+      return null;
+    }
+    if (url.charAt(i + 1) == '/') {
+      return null;
+    } else {
+      return url.substring(0, i);
+    }
+  }
+
+  protected boolean validateUrl(String url) {
+    return (url.indexOf(":/") > 0);
+  }
+
+  private void initialise(EndpointURI endpointUri) {
+    this.address = endpointUri.getAddress();
+    if (this.endpointName == null) {
+      this.endpointName = endpointUri.getEndpointName();
+    }
+    this.connectorName = endpointUri.getConnectorName();
+    this.transformers = endpointUri.getTransformers();
+    this.responseTransformers = endpointUri.getResponseTransformers();
+    this.params = endpointUri.getParams();
+    this.uri = endpointUri.getUri();
+    this.resourceInfo = endpointUri.getResourceInfo();
+    this.userInfo = endpointUri.getUserInfo();
+  }
+
+  @Override
+  public String getAddress() {
+    return address;
+  }
+
+  @Override
+  public String getEndpointName() {
+    return (StringUtils.isEmpty(endpointName) ? null : endpointName);
+  }
+
+  @Override
+  public Properties getParams() {
+    // TODO fix this so that the query string properties are not lost.
+    // not sure whats causing this at the moment
+    if (params.size() == 0 && getQuery() != null) {
+      params = PropertiesUtils.getPropertiesFromQueryString(getQuery());
+    }
+    return params;
+  }
+
+  @Override
+  public Properties getUserParams() {
+    Properties p = new Properties();
+    p.putAll(getParams());
+    p.remove(PROPERTY_ENDPOINT_NAME);
+    p.remove(PROPERTY_ENDPOINT_URI);
+    p.remove(PROPERTY_TRANSFORMERS);
+    return p;
+  }
+
+  public URI parseServerAuthority() throws URISyntaxException {
+    return uri.parseServerAuthority();
+  }
+
+  public URI normalize() {
+    return uri.normalize();
+  }
+
+  public URI resolve(URI uri) {
+    return uri.resolve(uri);
+  }
+
+  public URI resolve(String str) {
+    return uri.resolve(str);
+  }
+
+  public URI relativize(URI uri) {
+    return uri.relativize(uri);
+  }
+
+  @Override
+  public String getScheme() {
+    return isDynamic() ? getDynamicScheme() : uri.getScheme();
+  }
+
+  private String getDynamicScheme() {
+    int colon = address.indexOf(':');
+    return address.substring(0, colon);
+  }
+
+  @Override
+  public String getFullScheme() {
+    String scheme;
+    if (dynamic) {
+      scheme = getDynamicScheme();
+    } else {
+      scheme = uri.getScheme();
+    }
+    return (schemeMetaInfo == null ? scheme : schemeMetaInfo + ':' + scheme);
+  }
+
+  public boolean isAbsolute() {
+    return uri.isAbsolute();
+  }
+
+  public boolean isOpaque() {
+    return uri.isOpaque();
+  }
+
+  public String getRawSchemeSpecificPart() {
+    return uri.getRawSchemeSpecificPart();
+  }
+
+  public String getSchemeSpecificPart() {
+    return uri.getSchemeSpecificPart();
+  }
+
+  public String getRawAuthority() {
+    return uri.getRawAuthority();
+  }
+
+  @Override
+  public String getAuthority() {
+    return uri.getAuthority();
+  }
+
+  public String getRawUserInfo() {
+    return uri.getRawUserInfo();
+  }
+
+  @Override
+  public String getUserInfo() {
+    return userInfo;
+  }
+
+  @Override
+  public String getHost() {
+    return uri.getHost();
+  }
+
+  @Override
+  public int getPort() {
+    return uri.getPort();
+  }
+
+  public String getRawPath() {
+    return uri.getRawPath();
+  }
+
+  @Override
+  public String getPath() {
+    return uri.getPath();
+  }
+
+  public String getRawQuery() {
+    return uri.getRawQuery();
+  }
+
+  @Override
+  public String getQuery() {
+    return uri.getQuery();
+  }
+
+  public String getRawFragment() {
+    return uri.getRawFragment();
+  }
+
+  public String getFragment() {
+    return uri.getFragment();
+  }
+
+  @Override
+  public String toString() {
+    if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0)) {
+      return createUriStringWithPasswordMasked();
+    }
+    return uri.toASCIIString();
+  }
+
+  protected String createUriStringWithPasswordMasked() {
+    String rawUserInfo = uri.getRawUserInfo();
+    // uri.getRawUserInfo() returns null for JMS endpoints with passwords, so use the userInfo
+    // from this instance instead
+    if (StringUtils.isBlank(rawUserInfo)) {
+      rawUserInfo = userInfo;
     }
 
-    public MuleEndpointURI(String address,
-                           String endpointName,
-                           String connectorName,
-                           String transformers,
-                           String responseTransformers,
-                           Properties properties,
-                           URI uri, MuleContext muleContext)
-    {
-        this.address = address;
-        this.endpointName = endpointName;
-        this.connectorName = connectorName;
-        this.transformers = transformers;
-        this.responseTransformers = responseTransformers;
-        this.params = properties;
-        this.uri = uri;
-        this.userInfo = uri.getUserInfo();
-        this.muleContext = muleContext;
-        if (properties != null)
-        {
-            resourceInfo = (String) properties.remove("resourceInfo");
+    String maskedUserInfo = null;
+    int index = rawUserInfo.indexOf(":");
+    if (index > -1) {
+      maskedUserInfo = rawUserInfo.substring(0, index);
+    }
+
+    maskedUserInfo = maskedUserInfo + ":****";
+    return uri.toASCIIString().replace(rawUserInfo, maskedUserInfo);
+  }
+
+  @Override
+  public String getTransformers() {
+    return transformers;
+  }
+
+  @Override
+  public URI getUri() {
+    return uri;
+  }
+
+  @Override
+  public String getConnectorName() {
+    return connectorName;
+  }
+
+  @Override
+  public String getSchemeMetaInfo() {
+    return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo);
+  }
+
+  @Override
+  public String getResourceInfo() {
+    return resourceInfo;
+  }
+
+  @Override
+  public String getFilterAddress() {
+    return filterAddress;
+  }
+
+  @Override
+  public String getUser() {
+    if (user == null) {
+      user = getUserInfoDataUsing(new DataExtractor() {
+
+        @Override
+        public String extract(String source) {
+          int i = source.indexOf(':');
+          if (i == -1) {
+            return source;
+          } else {
+            return source.substring(0, i);
+          }
         }
+      });
     }
+    return user;
+  }
 
-    public MuleEndpointURI(EndpointURI endpointUri)
-    {
-        initialise(endpointUri);
-    }
+  @Override
+  public String getPassword() {
+    if (password == null) {
+      password = getUserInfoDataUsing(new DataExtractor() {
 
-    public MuleEndpointURI(EndpointURI endpointUri, String filterAddress)
-    {
-        initialise(endpointUri);
-        this.filterAddress = filterAddress;
-    }
-
-    public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
-    {
-        this(uri, null, muleContext);
-    }
-
-    public MuleEndpointURI(String uri, MuleContext muleContext, Properties serviceOverrides) throws EndpointException
-    {
-        this(uri, null, muleContext);
-        this.serviceOverrides = serviceOverrides;
-    }
-
-    /**
-     * Creates but does not initialize the endpoint URI.  It is up to the caller
-     * to call initialise() at some point.
-     */
-    public MuleEndpointURI(String uri, String encodedUri, MuleContext muleContext) throws EndpointException
-    {
-        this.muleContext = muleContext;
-        uri = preprocessUri(uri);
-        String startUri = uri;
-        uri = convertExpressionDelimiters(uri, "#");
-        uri = convertExpressionDelimiters(uri, "$");
-
-        if (uri.indexOf("#[") >= 0)
-        {
-            address = uri;
-            dynamic = true;
+        @Override
+        public String extract(String source) {
+          int i = source.indexOf(':');
+          if (i > -1) {
+            return source.substring(i + 1);
+          }
+          return null;
         }
-        else
-        {
-            try
-            {
-                this.uri = new URI((encodedUri != null && uri.equals(startUri)) ? preprocessUri(encodedUri) : uri);
-            }
-            catch (URISyntaxException e)
-            {
-                throw new MalformedEndpointException(uri, e);
-            }
-            this.userInfo = this.uri.getUserInfo();
-        }
+      });
+    }
+    return password;
+  }
+
+  private String getUserInfoDataUsing(DataExtractor extractor) {
+    // try getting it from raw data, but fallback to available data if not possible
+    String userInfoData = getRawUserInfo();
+    boolean decode = true;
+    if (userInfoData == null) {
+      userInfoData = userInfo;
+      decode = false;
+    }
+    String data = null;
+    if (isNotBlank(userInfoData)) {
+      data = extractor.extract(userInfoData);
+    }
+    return (data != null && decode) ? decode(data) : data;
+  }
+
+  @Override
+  public String getResponseTransformers() {
+    return responseTransformers;
+  }
+
+  @Override
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
+  public boolean isDynamic() {
+    return dynamic;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof MuleEndpointURI)) {
+      return false;
+    }
+    MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
+    return ClassUtils.equal(address, muleEndpointURI.address) && ClassUtils.equal(connectorName, muleEndpointURI.connectorName)
+        && ClassUtils.equal(endpointName, muleEndpointURI.endpointName)
+        && ClassUtils.equal(filterAddress, muleEndpointURI.filterAddress) && areParamsEquals(muleEndpointURI.params)
+        && ClassUtils.equal(resourceInfo, muleEndpointURI.resourceInfo)
+        && ClassUtils.equal(schemeMetaInfo, muleEndpointURI.schemeMetaInfo)
+        && ClassUtils.equal(transformers, muleEndpointURI.transformers)
+        && ClassUtils.equal(responseTransformers, muleEndpointURI.responseTransformers)
+        && ClassUtils.equal(uri, muleEndpointURI.uri);
+  }
+
+  /**
+   * Checks whether or not params are equals to another instance's params.
+   * <p/>
+   * The reason of this method is because {code}params{code} is a {@link Properties} which extends from
+   * {@link java.util.Hashtable}. This last class has a synchronized {@link java.util.Hashtable#equals(Object)} which calls the
+   * synchronized {@link Hashtable#size()} on the compared object. This implies that doing {@code A.equals(B)} and
+   * {@code B.equals(A)} can cause a deadlock depending on the invocation order.
+   * <p/>
+   * As the detected problem occurs when {@link org.mule.endpoint.MuleEndpointURI} instances are compared, the workaround consist
+   * in compare both instances's params using always the same order. The order is determine by the identity hashcode of each
+   * {@code params} instance.
+   *
+   * @See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6582568
+   * @return
+   * @param theirParams
+   */
+  private boolean areParamsEquals(Properties theirParams) {
+    boolean result;
+    if (params == null) {
+      result = theirParams == null;
+    } else if (theirParams == null) {
+      result = params == null;
+    } else {
+      final int ourIdentity = System.identityHashCode(params);
+      final int theirIdentity = System.identityHashCode(theirParams);
+
+      if (ourIdentity <= theirIdentity) {
+        result = params.equals(theirParams);
+      } else {
+        result = theirParams.equals(params);
+      }
     }
 
-    private String convertExpressionDelimiters(String uriString, String startChar)
-    {
-        //Allow Expressions to be embedded
-        int uriLength = uriString.length();
-        for (int index = 0; index < uriLength; )
-        {
-            index = uriString.indexOf(startChar + "{", index);
-            if (index < 0)
-            {
-                break;
-            }
-            int braceCount = 1;
-            for (int seek = index + 2; seek < uriLength; seek++)
-            {
-                char c = uriString.charAt(seek);
-                if (c == '{')
-                {
-                    braceCount++;
-                }
-                else if (c == '}')
-                {
-                    if (--braceCount == 0)
-                    {
-                        uriString = uriString.substring(0, index) + startChar + "[" + uriString.substring(index + 2, seek) + "]" + uriString.substring(seek+1);
-                        break;
-                    }
-                }
-            }
-            index += 2;
-        }
-        return uriString;
-    }
+    return result;
+  }
 
-    protected String preprocessUri(String uriString) throws MalformedEndpointException
-    {
-        uriString = uriString.trim().replaceAll(" ", "%20");
-        if (!validateUrl(uriString))
-        {
-            throw new MalformedEndpointException(uriString);
-        }
-        schemeMetaInfo = retrieveSchemeMetaInfo(uriString);
-        if (schemeMetaInfo != null)
-        {
-            uriString = uriString.replaceFirst(schemeMetaInfo + ":", "");
-        }
-        return uriString;
-    }
+  @Override
+  public int hashCode() {
+    return ClassUtils.hash(new Object[] {address, filterAddress, endpointName, connectorName, transformers, responseTransformers,
+        params, uri, schemeMetaInfo, resourceInfo});
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            String scheme = getFullScheme();
-            TransportServiceDescriptor sd;
-            sd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme, serviceOverrides);
-            if (sd == null)
-            {
-                throw new ServiceException(TransportCoreMessages.noServiceTransportDescriptor(scheme));
-            }
-            EndpointURIBuilder builder = sd.createEndpointURIBuilder();
-            EndpointURI built = builder.build(this.uri, muleContext);
-            initialise(built);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
+  private abstract class DataExtractor {
 
-    private String retrieveSchemeMetaInfo(String url)
-    {
-        int i = url.indexOf(':');
-        if (i == -1)
-        {
-            return null;
-        }
-        if (url.charAt(i + 1) == '/')
-        {
-            return null;
-        }
-        else
-        {
-            return url.substring(0, i);
-        }
-    }
-
-    protected boolean validateUrl(String url)
-    {
-        return (url.indexOf(":/") > 0);
-    }
-
-    private void initialise(EndpointURI endpointUri)
-    {
-        this.address = endpointUri.getAddress();
-        if (this.endpointName == null)
-        {
-            this.endpointName = endpointUri.getEndpointName();
-        }
-        this.connectorName = endpointUri.getConnectorName();
-        this.transformers = endpointUri.getTransformers();
-        this.responseTransformers = endpointUri.getResponseTransformers();
-        this.params = endpointUri.getParams();
-        this.uri = endpointUri.getUri();
-        this.resourceInfo = endpointUri.getResourceInfo();
-        this.userInfo = endpointUri.getUserInfo();
-    }
-
-    @Override
-    public String getAddress()
-    {
-        return address;
-    }
-
-    @Override
-    public String getEndpointName()
-    {
-        return (StringUtils.isEmpty(endpointName) ? null : endpointName);
-    }
-
-    @Override
-    public Properties getParams()
-    {
-        // TODO fix this so that the query string properties are not lost.
-        // not sure whats causing this at the moment
-        if (params.size() == 0 && getQuery() != null)
-        {
-            params = PropertiesUtils.getPropertiesFromQueryString(getQuery());
-        }
-        return params;
-    }
-
-    @Override
-    public Properties getUserParams()
-    {
-        Properties p = new Properties();
-        p.putAll(getParams());
-        p.remove(PROPERTY_ENDPOINT_NAME);
-        p.remove(PROPERTY_ENDPOINT_URI);
-        p.remove(PROPERTY_TRANSFORMERS);
-        return p;
-    }
-
-    public URI parseServerAuthority() throws URISyntaxException
-    {
-        return uri.parseServerAuthority();
-    }
-
-    public URI normalize()
-    {
-        return uri.normalize();
-    }
-
-    public URI resolve(URI uri)
-    {
-        return uri.resolve(uri);
-    }
-
-    public URI resolve(String str)
-    {
-        return uri.resolve(str);
-    }
-
-    public URI relativize(URI uri)
-    {
-        return uri.relativize(uri);
-    }
-
-    @Override
-    public String getScheme()
-    {
-        return isDynamic() ? getDynamicScheme() : uri.getScheme();
-    }
-
-    private String getDynamicScheme()
-    {
-        int colon = address.indexOf(':');
-        return address.substring(0, colon);
-    }
-
-    @Override
-    public String getFullScheme()
-    {
-        String scheme;
-        if (dynamic)
-        {
-            scheme = getDynamicScheme();
-        }
-        else
-        {
-            scheme = uri.getScheme();
-        }
-        return (schemeMetaInfo == null ? scheme : schemeMetaInfo + ':' + scheme);
-    }
-
-    public boolean isAbsolute()
-    {
-        return uri.isAbsolute();
-    }
-
-    public boolean isOpaque()
-    {
-        return uri.isOpaque();
-    }
-
-    public String getRawSchemeSpecificPart()
-    {
-        return uri.getRawSchemeSpecificPart();
-    }
-
-    public String getSchemeSpecificPart()
-    {
-        return uri.getSchemeSpecificPart();
-    }
-
-    public String getRawAuthority()
-    {
-        return uri.getRawAuthority();
-    }
-
-    @Override
-    public String getAuthority()
-    {
-        return uri.getAuthority();
-    }
-
-    public String getRawUserInfo()
-    {
-        return uri.getRawUserInfo();
-    }
-
-    @Override
-    public String getUserInfo()
-    {
-        return userInfo;
-    }
-
-    @Override
-    public String getHost()
-    {
-        return uri.getHost();
-    }
-
-    @Override
-    public int getPort()
-    {
-        return uri.getPort();
-    }
-
-    public String getRawPath()
-    {
-        return uri.getRawPath();
-    }
-
-    @Override
-    public String getPath()
-    {
-        return uri.getPath();
-    }
-
-    public String getRawQuery()
-    {
-        return uri.getRawQuery();
-    }
-
-    @Override
-    public String getQuery()
-    {
-        return uri.getQuery();
-    }
-
-    public String getRawFragment()
-    {
-        return uri.getRawFragment();
-    }
-
-    public String getFragment()
-    {
-        return uri.getFragment();
-    }
-
-    @Override
-    public String toString()
-    {
-        if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0))
-        {
-            return createUriStringWithPasswordMasked();
-        }
-        return uri.toASCIIString();
-    }
-
-    protected String createUriStringWithPasswordMasked()
-    {
-        String rawUserInfo =  uri.getRawUserInfo();
-        // uri.getRawUserInfo() returns null for JMS endpoints with passwords, so use the userInfo
-        // from this instance instead
-        if (StringUtils.isBlank(rawUserInfo))
-        {
-            rawUserInfo = userInfo;
-        }
-
-        String maskedUserInfo = null;
-        int index = rawUserInfo.indexOf(":");
-        if (index > -1)
-        {
-            maskedUserInfo = rawUserInfo.substring(0, index);
-        }
-
-        maskedUserInfo = maskedUserInfo + ":****";
-        return uri.toASCIIString().replace(rawUserInfo, maskedUserInfo);
-    }
-
-    @Override
-    public String getTransformers()
-    {
-        return transformers;
-    }
-
-    @Override
-    public URI getUri()
-    {
-        return uri;
-    }
-
-    @Override
-    public String getConnectorName()
-    {
-        return connectorName;
-    }
-
-    @Override
-    public String getSchemeMetaInfo()
-    {
-        return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo);
-    }
-
-    @Override
-    public String getResourceInfo()
-    {
-        return resourceInfo;
-    }
-
-    @Override
-    public String getFilterAddress()
-    {
-        return filterAddress;
-    }
-
-    @Override
-    public String getUser()
-    {
-        if(user == null)
-        {
-            user = getUserInfoDataUsing(new DataExtractor()
-            {
-                @Override
-                public String extract(String source)
-                {
-                    int i = source.indexOf(':');
-                    if (i == -1)
-                    {
-                        return source;
-                    }
-                    else
-                    {
-                        return source.substring(0, i);
-                    }                
-                }
-            });
-        }
-        return user;
-    }
-
-    @Override
-    public String getPassword()
-    {
-        if (password == null)
-        {
-            password = getUserInfoDataUsing(new DataExtractor()
-            {
-                @Override
-                public String extract(String source)
-                {
-                    int i = source.indexOf(':');
-                    if (i > -1)
-                    {
-                        return source.substring(i + 1);
-                    }
-                    return null;
-                }
-            });
-        }
-        return password;
-    }
-
-    private String getUserInfoDataUsing(DataExtractor extractor)
-    {
-        // try getting it from raw data, but fallback to available data if not possible
-        String userInfoData = getRawUserInfo();
-        boolean decode = true;
-        if (userInfoData == null)
-        {
-            userInfoData = userInfo;
-            decode = false;
-        }
-        String data = null;
-        if (isNotBlank(userInfoData))
-        {
-            data = extractor.extract(userInfoData);
-        }
-        return (data != null && decode) ? decode(data) : data;
-    }
-
-    @Override
-    public String getResponseTransformers()
-    {
-        return responseTransformers;
-    }
-
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    public boolean isDynamic()
-    {
-        return dynamic;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof MuleEndpointURI))
-        {
-            return false;
-        }
-        MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
-        return ClassUtils.equal(address, muleEndpointURI.address) &&
-                ClassUtils.equal(connectorName, muleEndpointURI.connectorName) &&
-                ClassUtils.equal(endpointName, muleEndpointURI.endpointName) &&
-                ClassUtils.equal(filterAddress, muleEndpointURI.filterAddress) &&
-               areParamsEquals(muleEndpointURI.params) &&
-                ClassUtils.equal(resourceInfo, muleEndpointURI.resourceInfo) &&
-                ClassUtils.equal(schemeMetaInfo, muleEndpointURI.schemeMetaInfo) &&
-                ClassUtils.equal(transformers, muleEndpointURI.transformers) &&
-                ClassUtils.equal(responseTransformers, muleEndpointURI.responseTransformers) &&
-                ClassUtils.equal(uri, muleEndpointURI.uri);
-    }
-
-    /**
-     * Checks whether or not params are equals to another instance's params.
-     * <p/>
-     * The reason of this method is because {code}params{code} is a {@link Properties} which
-     * extends from {@link java.util.Hashtable}. This last class has  a synchronized {@link java.util.Hashtable#equals(Object)}
-     * which calls the synchronized {@link Hashtable#size()} on the compared object.
-     * This implies that doing {@code A.equals(B)} and {@code B.equals(A)} can cause a deadlock
-     * depending on the invocation order.
-     * <p/>
-     * As the detected problem occurs when {@link org.mule.endpoint.MuleEndpointURI} instances are compared, the workaround consist
-     * in compare both instances's params using always the same order. The order is determine by the identity
-     * hashcode of each {@code params} instance.
-     *
-     * @See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6582568
-     * @return
-     * @param theirParams
-     */
-    private boolean areParamsEquals(Properties theirParams)
-    {
-        boolean result;
-        if (params == null)
-        {
-            result = theirParams == null;
-        }
-        else if (theirParams == null)
-        {
-            result = params == null;
-        }
-        else
-        {
-            final int ourIdentity = System.identityHashCode(params);
-            final int theirIdentity = System.identityHashCode(theirParams);
-
-            if (ourIdentity <= theirIdentity)
-            {
-                result = params.equals(theirParams);
-            }
-            else
-            {
-                result = theirParams.equals(params);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return ClassUtils.hash(new Object[]{
-                address,
-                filterAddress,
-                endpointName,
-                connectorName,
-                transformers,
-                responseTransformers,
-                params,
-                uri,
-                schemeMetaInfo,
-                resourceInfo
-        });
-    }
-
-    private abstract class DataExtractor
-    {
-        public abstract String extract(String source);
-    }
+    public abstract String extract(String source);
+  }
 }

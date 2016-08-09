@@ -30,77 +30,69 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
 
-    private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
+  private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
 
-    @Rule
-    public SystemProperty strictContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
+  @Rule
+  public SystemProperty strictContentType =
+      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-content-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-content-type-config.xml";
+  }
 
-    @Test
-    public void returnsContentTypeInResponse() throws Exception
-    {
-        HttpResponse response = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
+  @Test
+  public void returnsContentTypeInResponse() throws Exception {
+    HttpResponse response = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
 
-        assertContentTypeProperty(response, EXPECTED_CONTENT_TYPE);
-    }
+    assertContentTypeProperty(response, EXPECTED_CONTENT_TYPE);
+  }
 
-    @Test
-    public void returnsContentTypeInResponseFromBuilder() throws Exception
-    {
-        HttpResponse response = Request.Post(getUrl("testBuilder")).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
+  @Test
+  public void returnsContentTypeInResponseFromBuilder() throws Exception {
+    HttpResponse response =
+        Request.Post(getUrl("testBuilder")).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
 
-        assertContentTypeProperty(response, "text/plain");
-    }
+    assertContentTypeProperty(response, "text/plain");
+  }
 
-    @Test
-    public void rejectsInvalidContentTypeWithoutBody() throws Exception
-    {
-        Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
-        testRejectContentType(request, "MediaType cannot be parsed: application");
-    }
+  @Test
+  public void rejectsInvalidContentTypeWithoutBody() throws Exception {
+    Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
+    testRejectContentType(request, "MediaType cannot be parsed: application");
+  }
 
-    @Test
-    public void rejectsInvalidContentTypeWithBody() throws Exception
-    {
-        Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "application", null));
-        testRejectContentType(request, "MediaType cannot be parsed: application");
-    }
+  @Test
+  public void rejectsInvalidContentTypeWithBody() throws Exception {
+    Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "application", null));
+    testRejectContentType(request, "MediaType cannot be parsed: application");
+  }
 
-    private void testRejectContentType(Request request, String expectedMessage) throws IOException
-    {
-        HttpResponse response = request.execute().returnResponse();
-        StatusLine statusLine = response.getStatusLine();
+  private void testRejectContentType(Request request, String expectedMessage) throws IOException {
+    HttpResponse response = request.execute().returnResponse();
+    StatusLine statusLine = response.getStatusLine();
 
-        assertThat(IOUtils.toString(response.getEntity().getContent()), containsString(expectedMessage));
-        assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
-        assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
-    }
+    assertThat(IOUtils.toString(response.getEntity().getContent()), containsString(expectedMessage));
+    assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+    assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
+  }
 
-    private String getUrl()
-    {
-        return getUrl("testInput");
-    }
+  private String getUrl() {
+    return getUrl("testInput");
+  }
 
-    private String getUrl(String path)
-    {
-        return String.format("http://localhost:%s/%s", httpPort.getValue(), path);
-    }
+  private String getUrl(String path) {
+    return String.format("http://localhost:%s/%s", httpPort.getValue(), path);
+  }
 
-    private void assertContentTypeProperty(HttpResponse response, String expectedContentType)
-    {
-        String contentType = response.getFirstHeader(CONTENT_TYPE).getValue();
-        assertThat(contentType, notNullValue());
-        assertThat(contentType, equalTo(expectedContentType));
-    }
+  private void assertContentTypeProperty(HttpResponse response, String expectedContentType) {
+    String contentType = response.getFirstHeader(CONTENT_TYPE).getValue();
+    assertThat(contentType, notNullValue());
+    assertThat(contentType, equalTo(expectedContentType));
+  }
 }

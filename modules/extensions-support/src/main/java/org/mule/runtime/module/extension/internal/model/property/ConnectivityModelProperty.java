@@ -14,63 +14,57 @@ import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 /**
- * An immutable  model property which specifies that the owning {@link EnrichableModel}
- * requires a connection of a given {@link #connectionType}
+ * An immutable model property which specifies that the owning {@link EnrichableModel} requires a connection of a given
+ * {@link #connectionType}
  *
  * @since 4.0
  */
-public final class ConnectivityModelProperty implements ModelProperty
-{
+public final class ConnectivityModelProperty implements ModelProperty {
 
-    private final MetadataType connectionType;
-    private final boolean supportsTransactions;
+  private final MetadataType connectionType;
+  private final boolean supportsTransactions;
 
-    /**
-     * Creates a new instance for the given {@code connectionType}
-     *
-     * @param connectionType
-     */
-    public ConnectivityModelProperty(MetadataType connectionType)
-    {
-        this.connectionType = connectionType;
-        this.supportsTransactions = TransactionalConnection.class.isAssignableFrom(getType(connectionType));
-    }
+  /**
+   * Creates a new instance for the given {@code connectionType}
+   *
+   * @param connectionType
+   */
+  public ConnectivityModelProperty(MetadataType connectionType) {
+    this.connectionType = connectionType;
+    this.supportsTransactions = TransactionalConnection.class.isAssignableFrom(getType(connectionType));
+  }
 
-    /**
-     * @return the {@link {@link #connectionType}}
-     */
-    public MetadataType getConnectionType()
-    {
-        return connectionType;
-    }
+  /**
+   * @return the {@link {@link #connectionType}}
+   */
+  public MetadataType getConnectionType() {
+    return connectionType;
+  }
 
-    /**
-     * @return whether this connection supports transactions
-     */
-    public boolean supportsTransactions()
-    {
-        return supportsTransactions;
-    }
+  /**
+   * @return whether this connection supports transactions
+   */
+  public boolean supportsTransactions() {
+    return supportsTransactions;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code connectionType}
-     */
-    @Override
-    public String getName()
-    {
-        return "connectionType";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code connectionType}
+   */
+  @Override
+  public String getName() {
+    return "connectionType";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

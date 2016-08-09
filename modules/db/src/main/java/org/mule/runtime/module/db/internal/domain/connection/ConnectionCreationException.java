@@ -10,16 +10,13 @@ package org.mule.runtime.module.db.internal.domain.connection;
 /**
  * Thrown to indicate an error creating a connection
  */
-public class ConnectionCreationException extends RuntimeException
-{
+public class ConnectionCreationException extends RuntimeException {
 
-    public ConnectionCreationException(String message)
-    {
-        super(message);
-    }
+  public ConnectionCreationException(String message) {
+    super(message);
+  }
 
-    public ConnectionCreationException(Throwable throwable)
-    {
-        super(throwable);
-    }
+  public ConnectionCreationException(Throwable throwable) {
+    super(throwable);
+  }
 }

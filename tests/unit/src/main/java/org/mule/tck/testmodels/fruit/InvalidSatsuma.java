@@ -9,23 +9,21 @@ package org.mule.tck.testmodels.fruit;
 /**
  * <code>InvalidSatsuma</code> has no discoverable methods
  */
-public class InvalidSatsuma implements Fruit
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6328691504772842584L;
+public class InvalidSatsuma implements Fruit {
 
-    private boolean bitten = false;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -6328691504772842584L;
 
-    public void bite()
-    {
-        bitten = true;
+  private boolean bitten = false;
 
-    }
+  public void bite() {
+    bitten = true;
 
-    public boolean isBitten()
-    {
-        return bitten;
-    }
+  }
+
+  public boolean isBitten() {
+    return bitten;
+  }
 }

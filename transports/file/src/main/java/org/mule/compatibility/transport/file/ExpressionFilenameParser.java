@@ -16,17 +16,17 @@ import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * <code>ExpressionFilenameParser</code> can use any expression language supported by Mule to construct a file name for
- * the current message. Expressions can be xpath, xquery, mvel, header, function and more. For more information see
+ * <code>ExpressionFilenameParser</code> can use any expression language supported by Mule to construct a file name for the
+ * current message. Expressions can be xpath, xquery, mvel, header, function and more. For more information see
  * http://www.mulesoft.org/documentation/display/MULE3USER/Using+Expressions.
  * <p/>
- * For example an xpath expression can be defined to pull a message id out of an xml message and use that as the file
- * name - <code>
+ * For example an xpath expression can be defined to pull a message id out of an xml message and use that as the file name -
+ * <code>
  * #[xpath:/message/header/@id]
  * </code>
  * <p/>
- * This parser superseeds the (now removed) <code>org.mule.compatibility.transport.file.SimpleFilenameParser</code> which has
- * been kept in Mule 2 for compatibility. The following demonstrates how to achieve the same results when using the
+ * This parser superseeds the (now removed) <code>org.mule.compatibility.transport.file.SimpleFilenameParser</code> which has been
+ * kept in Mule 2 for compatibility. The following demonstrates how to achieve the same results when using the
  * <code>ExpressionFilenameParser</code> over the <code>SimpleFilenameParser</code>
  * <ul>
  * <li>#[DATE] : #[org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')]</li>
@@ -39,66 +39,56 @@ import java.util.concurrent.atomic.AtomicLong;
  * <li>#[&lt;Message Property Name&gt;] : #[message.outboundProperties&lt;Message Property Name&gt;]</li>
  * </ul>
  */
-public class ExpressionFilenameParser implements FilenameParser, MuleContextAware
-{
-    /**
-     * A local counter that will increment for each call. If the server is re-started the counter will return to zero
-     */
-    private static final AtomicLong count = new AtomicLong(0);
+public class ExpressionFilenameParser implements FilenameParser, MuleContextAware {
 
-    public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
-    public static final String DEFAULT_EXPRESSION = MessageFormat.format("{0}org.mule.runtime.core.util.UUID.getUUID(){1}.dat",
-                                                                         ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                                         ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+  /**
+   * A local counter that will increment for each call. If the server is re-started the counter will return to zero
+   */
+  private static final AtomicLong count = new AtomicLong(0);
 
-    private final TemplateParser wigglyMuleParser = TemplateParser.createMuleStyleParser();
-    private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
+  public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
+  public static final String DEFAULT_EXPRESSION =
+      MessageFormat.format("{0}org.mule.runtime.core.util.UUID.getUUID(){1}.dat", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                           ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
-    protected MuleContext muleContext;
+  private final TemplateParser wigglyMuleParser = TemplateParser.createMuleStyleParser();
+  private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
+  protected MuleContext muleContext;
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public String getFilename(MuleEvent event, String expression) {
+    if (expression == null) {
+      expression = DEFAULT_EXPRESSION;
     }
 
-    @Override
-    public String getFilename(MuleEvent event, String expression)
-    {
-        if (expression == null)
-        {
-            expression = DEFAULT_EXPRESSION;
-        }
-
-        if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1)
-        {
-            return getFilename(event, expression, wigglyMuleParser);
-        }
-        else
-        {
-            return getFilename(event, expression, squareParser);
-        }
+    if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1) {
+      return getFilename(event, expression, wigglyMuleParser);
+    } else {
+      return getFilename(event, expression, squareParser);
     }
+  }
 
-    protected String getFilename(final MuleEvent event, String expression, TemplateParser parser)
-    {
-        return parser.parse(new TemplateParser.TemplateCallback()
-        {
-            @Override
-            public Object match(String token)
-            {
-                return muleContext.getExpressionManager().evaluate(token, event);
-            }
-        }, expression);
-    }
+  protected String getFilename(final MuleEvent event, String expression, TemplateParser parser) {
+    return parser.parse(new TemplateParser.TemplateCallback() {
 
-    public static Long count()
-    {
-        return count.getAndIncrement();
-    }
+      @Override
+      public Object match(String token) {
+        return muleContext.getExpressionManager().evaluate(token, event);
+      }
+    }, expression);
+  }
 
-    public static void resetCount()
-    {
-        count.set(0L);
-    }
+  public static Long count() {
+    return count.getAndIncrement();
+  }
+
+  public static void resetCount() {
+    count.set(0L);
+  }
 }

@@ -19,76 +19,65 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * A {@link FactoryBean} which returns a fixed instanced obtained
- * through the constructor. {@link #isSingleton()} always returns {@code true}.
+ * A {@link FactoryBean} which returns a fixed instanced obtained through the constructor. {@link #isSingleton()} always returns
+ * {@code true}.
  * <p/>
- * Invocations related to the {@link MuleContextAware} and {@link Lifecycle} interfaces
- * are delegated into the {@link #value} object when applies.
+ * Invocations related to the {@link MuleContextAware} and {@link Lifecycle} interfaces are delegated into the {@link #value}
+ * object when applies.
  *
  * @param <T>
  * @since 3.7.0
  */
-public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle
-{
+public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
 
-    private final T value;
+  private final T value;
 
-    public ConstantFactoryBean(T value)
-    {
-        checkArgument(value != null, "value cannot be null");
-        this.value = value;
+  public ConstantFactoryBean(T value) {
+    checkArgument(value != null, "value cannot be null");
+    this.value = value;
+  }
+
+  @Override
+  public T getObject() throws Exception {
+    return value;
+  }
+
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
+
+  @Override
+  public Class<?> getObjectType() {
+    return value.getClass();
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    if (value instanceof MuleContextAware) {
+      ((MuleContextAware) value).setMuleContext(context);
     }
+  }
 
-    @Override
-    public T getObject() throws Exception
-    {
-        return value;
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    LifecycleUtils.initialiseIfNeeded(value);
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public void start() throws MuleException {
+    LifecycleUtils.startIfNeeded(value);
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return value.getClass();
-    }
+  @Override
+  public void stop() throws MuleException {
+    LifecycleUtils.stopIfNeeded(value);
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        if (value instanceof MuleContextAware)
-        {
-            ((MuleContextAware) value).setMuleContext(context);
-        }
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        LifecycleUtils.initialiseIfNeeded(value);
-    }
-
-    @Override
-    public void start() throws MuleException
-    {
-        LifecycleUtils.startIfNeeded(value);
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        LifecycleUtils.stopIfNeeded(value);
-    }
-
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeIfNeeded(value, LOGGER);
-    }
+  @Override
+  public void dispose() {
+    LifecycleUtils.disposeIfNeeded(value, LOGGER);
+  }
 }

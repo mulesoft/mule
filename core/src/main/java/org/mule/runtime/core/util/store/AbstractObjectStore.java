@@ -18,78 +18,66 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the
- * contract defined in the interface's javadocs. Subclasses only need to implement storing the
- * actual objects.
+ * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the contract defined in the interface's
+ * javadocs. Subclasses only need to implement storing the actual objects.
  */
-public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T>
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T> {
 
-    @Override
-    public boolean contains(Serializable key) throws ObjectStoreException
-    {
-        if (key == null)
-        {
-            throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
-        }
-        return doContains(key);
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+  @Override
+  public boolean contains(Serializable key) throws ObjectStoreException {
+    if (key == null) {
+      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+    }
+    return doContains(key);
+  }
+
+  protected abstract boolean doContains(Serializable key) throws ObjectStoreException;
+
+  @Override
+  public void store(Serializable key, T value) throws ObjectStoreException {
+    if (key == null) {
+      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
     }
 
-    protected abstract boolean doContains(Serializable key) throws ObjectStoreException;
-
-    @Override
-    public void store(Serializable key, T value) throws ObjectStoreException
-    {
-        if (key == null)
-        {
-            throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
-        }
-
-        if (contains(key))
-        {
-            throw new ObjectAlreadyExistsException();
-        }
-
-        doStore(key, value);
+    if (contains(key)) {
+      throw new ObjectAlreadyExistsException();
     }
 
-    protected  abstract void doStore(Serializable key, T value) throws ObjectStoreException;
+    doStore(key, value);
+  }
 
-    @Override
-    public T retrieve(Serializable key) throws ObjectStoreException
-    {
-        if (key == null)
-        {
-            throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
-        }
+  protected abstract void doStore(Serializable key, T value) throws ObjectStoreException;
 
-        if (contains(key) == false)
-        {
-            String message = "Key does not exist: " + key;
-            throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
-        }
-
-        return doRetrieve(key);
+  @Override
+  public T retrieve(Serializable key) throws ObjectStoreException {
+    if (key == null) {
+      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
     }
 
-    protected abstract T doRetrieve(Serializable key) throws ObjectStoreException;
-
-    @Override
-    public T remove(Serializable key) throws ObjectStoreException
-    {
-        if (key == null)
-        {
-            throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
-        }
-
-        if (contains(key) == false)
-        {
-            throw new ObjectDoesNotExistException();
-        }
-
-        return doRemove(key);
+    if (contains(key) == false) {
+      String message = "Key does not exist: " + key;
+      throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
     }
 
-    protected abstract T doRemove(Serializable key) throws ObjectStoreException;
+    return doRetrieve(key);
+  }
+
+  protected abstract T doRetrieve(Serializable key) throws ObjectStoreException;
+
+  @Override
+  public T remove(Serializable key) throws ObjectStoreException {
+    if (key == null) {
+      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+    }
+
+    if (contains(key) == false) {
+      throw new ObjectDoesNotExistException();
+    }
+
+    return doRemove(key);
+  }
+
+  protected abstract T doRemove(Serializable key) throws ObjectStoreException;
 }

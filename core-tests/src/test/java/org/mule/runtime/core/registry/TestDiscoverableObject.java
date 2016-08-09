@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.registry;
 
-public interface TestDiscoverableObject
-{
+public interface TestDiscoverableObject {
 
 }

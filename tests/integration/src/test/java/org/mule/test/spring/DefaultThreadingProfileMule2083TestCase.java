@@ -10,20 +10,15 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class DefaultThreadingProfileMule2083TestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-            "default-threading-profile-1-mule-2083.xml",
-            "default-threading-profile-2-mule-2083.xml"
-        };
-    }
+public class DefaultThreadingProfileMule2083TestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testStartup()
-    {
-        // no-op
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"default-threading-profile-1-mule-2083.xml", "default-threading-profile-2-mule-2083.xml"};
+  }
+
+  @Test
+  public void testStartup() {
+    // no-op
+  }
 }

@@ -11,24 +11,20 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.tck.testmodels.fruit.Peach;
 
-public class VeganPeachConnectionProvider implements ConnectionProvider<Peach>
-{
+public class VeganPeachConnectionProvider implements ConnectionProvider<Peach> {
 
-    @Override
-    public Peach connect() throws ConnectionException
-    {
-        return new Peach();
-    }
+  @Override
+  public Peach connect() throws ConnectionException {
+    return new Peach();
+  }
 
-    @Override
-    public void disconnect(Peach peach)
-    {
+  @Override
+  public void disconnect(Peach peach) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(Peach peach)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(Peach peach) {
+    return ConnectionValidationResult.success();
+  }
 }

@@ -17,75 +17,62 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase
-{
-    @Rule
-    public ContiPerfRule rule = new ContiPerfRule();
+public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 360;
-    }
+  @Rule
+  public ContiPerfRule rule = new ContiPerfRule();
 
-    @Test
-    @PerfTest(duration = 30000, threads = 1, warmUp = 5000)
-    public void singleThread() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
-    }
+  @Override
+  public int getTestTimeoutSecs() {
+    return 360;
+  }
 
-    @Test
-    @PerfTest(duration = 30000, threads = 10, warmUp = 5000)
-    public void tenThreads() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
+  @Test
+  @PerfTest(duration = 30000, threads = 1, warmUp = 5000)
+  public void singleThread() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
     }
+  }
 
-    @Test
-    @PerfTest(duration = 30000, threads = 20, warmUp = 5000)
-    public void twentyThreads() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
+  @Test
+  @PerfTest(duration = 30000, threads = 10, warmUp = 5000)
+  public void tenThreads() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
     }
+  }
 
-    @Test
-    @PerfTest(duration = 30000, threads = 50, warmUp = 5000)
-    public void fivtyThreads() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
+  @Test
+  @PerfTest(duration = 30000, threads = 20, warmUp = 5000)
+  public void twentyThreads() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
     }
+  }
 
-    @Test
-    @PerfTest(duration = 30000, threads = 100, warmUp = 5000)
-    public void hundredThreads() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
+  @Test
+  @PerfTest(duration = 30000, threads = 50, warmUp = 5000)
+  public void fivtyThreads() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
     }
+  }
 
-    @Test
-    @PerfTest(duration = 30000, threads = 200, warmUp = 5000)
-    public void twoHundredThreads() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            UUID.getUUID();
-        }
+  @Test
+  @PerfTest(duration = 30000, threads = 100, warmUp = 5000)
+  public void hundredThreads() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
     }
+  }
+
+  @Test
+  @PerfTest(duration = 30000, threads = 200, warmUp = 5000)
+  public void twoHundredThreads() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      UUID.getUUID();
+    }
+  }
 
 }

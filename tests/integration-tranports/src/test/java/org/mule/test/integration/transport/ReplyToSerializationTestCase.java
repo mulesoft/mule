@@ -30,48 +30,47 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ReplyToSerializationTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class ReplyToSerializationTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transport/reply-to-serialization.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    @Ignore("MULE-9307 - add behaviour to store config name to be used for reply to destination")
-    public void testSerialization() throws Exception
-    {
-        EndpointBuilder jmsEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "jmsEndpoint");
-        EndpointBuilder vmEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "vmEndpoint");
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transport/reply-to-serialization.xml";
+  }
 
-        InboundEndpoint jmsEndpoint = jmsEndpointBuilder.buildInboundEndpoint();
-        Connector jmsConnector = jmsEndpoint.getConnector();
-        InboundEndpoint vmEndpoint = vmEndpointBuilder.buildInboundEndpoint();
-        Connector vmConnector = vmEndpoint.getConnector();
+  @Test
+  @Ignore("MULE-9307 - add behaviour to store config name to be used for reply to destination")
+  public void testSerialization() throws Exception {
+    EndpointBuilder jmsEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "jmsEndpoint");
+    EndpointBuilder vmEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "vmEndpoint");
 
-        EndpointReplyToHandler jmsHandler = (EndpointReplyToHandler) ((AbstractConnector) jmsConnector).getReplyToHandler(jmsEndpoint);
-        EndpointReplyToHandler vmHandler = (EndpointReplyToHandler) ((AbstractConnector) vmConnector).getReplyToHandler(vmEndpoint);
+    InboundEndpoint jmsEndpoint = jmsEndpointBuilder.buildInboundEndpoint();
+    Connector jmsConnector = jmsEndpoint.getConnector();
+    InboundEndpoint vmEndpoint = vmEndpointBuilder.buildInboundEndpoint();
+    Connector vmConnector = vmEndpoint.getConnector();
 
-        EndpointReplyToHandler jmsHandler2 = serialize(jmsHandler);
-        EndpointReplyToHandler vmHandler2 = serialize(vmHandler);
+    EndpointReplyToHandler jmsHandler =
+        (EndpointReplyToHandler) ((AbstractConnector) jmsConnector).getReplyToHandler(jmsEndpoint);
+    EndpointReplyToHandler vmHandler = (EndpointReplyToHandler) ((AbstractConnector) vmConnector).getReplyToHandler(vmEndpoint);
 
-        assertEquals(jmsHandler.getConnector(), jmsHandler2.getConnector());
-        assertEquals(vmHandler.getConnector(), vmHandler2.getConnector());
-    }
+    EndpointReplyToHandler jmsHandler2 = serialize(jmsHandler);
+    EndpointReplyToHandler vmHandler2 = serialize(vmHandler);
 
-    private EndpointReplyToHandler serialize(ReplyToHandler handler) throws IOException, ClassNotFoundException, MuleException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(handler);
-        oos.flush();
-        EndpointReplyToHandler serialized = (EndpointReplyToHandler) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
-        serialized.initAfterDeserialisation(muleContext);
-        return serialized;
-    }
+    assertEquals(jmsHandler.getConnector(), jmsHandler2.getConnector());
+    assertEquals(vmHandler.getConnector(), vmHandler2.getConnector());
+  }
+
+  private EndpointReplyToHandler serialize(ReplyToHandler handler) throws IOException, ClassNotFoundException, MuleException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+    oos.writeObject(handler);
+    oos.flush();
+    EndpointReplyToHandler serialized =
+        (EndpointReplyToHandler) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    serialized.initAfterDeserialisation(muleContext);
+    return serialized;
+  }
 
 }

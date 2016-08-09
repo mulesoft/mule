@@ -19,33 +19,28 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class ExecuteDdlTargetTestCase extends AbstractExecuteDdlTestCase
-{
+public class ExecuteDdlTargetTestCase extends AbstractExecuteDdlTestCase {
 
-    public ExecuteDdlTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public ExecuteDdlTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/executeddl/execute-ddl-target-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/executeddl/execute-ddl-target-config.xml"};
+  }
 
-    @Test
-    public void usesCustomTarget() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("executeDdlCustomTarget").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomTarget() throws Exception {
+    final MuleEvent responseEvent = flowRunner("executeDdlCustomTarget").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
-        assertTableCreation(response.<Integer>getOutboundProperty("updateCount"));
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
+    assertTableCreation(response.<Integer>getOutboundProperty("updateCount"));
+  }
 }

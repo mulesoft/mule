@@ -17,40 +17,34 @@ import org.mule.runtime.module.cxf.CxfConstants;
 import org.junit.Test;
 
 /**
- * This test verifies that WS consumer doesn't fail if the message contains an invocation property
- * called "operation". This variable is used by CXF proxy client to allow the user to explicitly set the
- * operation, and as WS consumer uses CXF proxy client if the variable is defined it may change its behavior
- * and make it fail.
+ * This test verifies that WS consumer doesn't fail if the message contains an invocation property called "operation". This
+ * variable is used by CXF proxy client to allow the user to explicitly set the operation, and as WS consumer uses CXF proxy
+ * client if the variable is defined it may change its behavior and make it fail.
  */
-public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    private static final String OPERATION_VALUE = "INVALID";
+  private static final String OPERATION_VALUE = "INVALID";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "operation-invocation-property-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "operation-invocation-property-config.xml";
+  }
 
-    @Test
-    public void consumerWorksWithOperationInvocationPropertyDefined() throws Exception
-    {
-        MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST)
-                                            .withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE)
-                                            .run();
+  @Test
+  public void consumerWorksWithOperationInvocationPropertyDefined() throws Exception {
+    MuleEvent event =
+        flowRunner("echo").withPayload(ECHO_REQUEST).withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE).run();
 
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-        assertThat(event.getFlowVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
-    }
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
+    assertThat(event.getFlowVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
+  }
 
 
-    @Test
-    public void consumerWorksWithNoOperationInvocationPropertyDefined() throws Exception
-    {
-        MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
+  @Test
+  public void consumerWorksWithNoOperationInvocationPropertyDefined() throws Exception {
+    MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
 
-        assertNull(event.getFlowVariable(CxfConstants.OPERATION));
-    }
+    assertNull(event.getFlowVariable(CxfConstants.OPERATION));
+  }
 }

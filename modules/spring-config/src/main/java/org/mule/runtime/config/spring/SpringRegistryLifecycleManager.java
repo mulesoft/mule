@@ -50,104 +50,73 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
-{
+public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
-    public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext)
-    {
-        super(id, springRegistry, muleContext);
+  public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext) {
+    super(id, springRegistry, muleContext);
+  }
+
+  @Override
+  protected void registerPhases() {
+    final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
+    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////////////
+  // Spring custom lifecycle phases
+  // ///////////////////////////////////////////////////////////////////////////////////
+
+  class SpringContextInitialisePhase extends MuleContextInitialisePhase {
+
+    public SpringContextInitialisePhase() {
+      super();
+
+      Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
+      initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(ExpressionManager.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
+      setOrderedLifecycleObjects(initOrderedObjects);
+
+      setIgnoredObjectTypes(new Class[] {ExtensionManager.class, SpringRegistry.class, SpringRegistryBootstrap.class,
+          Component.class, MessageSource.class, InterceptingMessageProcessor.class, AbstractMessageProcessorOwner.class,
+          MessagingExceptionHandler.class, AbstractAsyncRequestReplyRequester.class, OutboundRouter.class,
+          MessageProcessorChain.class, MuleContext.class, Service.class});
+    }
+  }
+
+  /**
+   * A lifecycle phase that will delegate to the {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in
+   * turn will destroy the application context managed by this registry
+   */
+  class SpringContextDisposePhase extends MuleContextDisposePhase {
+
+    public SpringContextDisposePhase() {
+      super();
+      setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
+          OutboundRouter.class, Transformer.class, MuleContext.class, ServerNotificationManager.class, Service.class});
     }
 
     @Override
-    protected void registerPhases()
-    {
-        final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
-        registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
-        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
-        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
-        registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+    public void applyLifecycle(Object o) throws LifecycleException {
+      if (o instanceof SpringRegistry) {
+        ((SpringRegistry) o).doDispose();
+      } else {
+        super.applyLifecycle(o);
+      }
     }
-
-    // ///////////////////////////////////////////////////////////////////////////////////
-    // Spring custom lifecycle phases
-    // ///////////////////////////////////////////////////////////////////////////////////
-
-    class SpringContextInitialisePhase extends MuleContextInitialisePhase
-    {
-
-        public SpringContextInitialisePhase()
-        {
-            super();
-
-            Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
-            initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(ExpressionManager.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
-            setOrderedLifecycleObjects(initOrderedObjects);
-
-            setIgnoredObjectTypes(new Class[] {
-                    ExtensionManager.class,
-                    SpringRegistry.class,
-                    SpringRegistryBootstrap.class,
-                    Component.class,
-                    MessageSource.class,
-                    InterceptingMessageProcessor.class,
-                    AbstractMessageProcessorOwner.class,
-                    MessagingExceptionHandler.class,
-                    AbstractAsyncRequestReplyRequester.class,
-                    OutboundRouter.class,
-                    MessageProcessorChain.class,
-                    MuleContext.class,
-                    Service.class
-            });
-        }
-    }
-
-    /**
-     * A lifecycle phase that will delegate to the
-     * {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in turn
-     * will destroy the application context managed by this registry
-     */
-    class SpringContextDisposePhase extends MuleContextDisposePhase
-    {
-
-        public SpringContextDisposePhase()
-        {
-            super();
-            setIgnoredObjectTypes(new Class[] {
-                    Component.class,
-                    MessageSource.class,
-                    InterceptingMessageProcessor.class,
-                    OutboundRouter.class,
-                    Transformer.class,
-                    MuleContext.class,
-                    ServerNotificationManager.class,
-                    Service.class
-            });
-        }
-
-        @Override
-        public void applyLifecycle(Object o) throws LifecycleException
-        {
-            if (o instanceof SpringRegistry)
-            {
-                ((SpringRegistry) o).doDispose();
-            }
-            else
-            {
-                super.applyLifecycle(o);
-            }
-        }
-    }
+  }
 
 }

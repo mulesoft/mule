@@ -9,70 +9,57 @@ package org.mule.runtime.module.launcher;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * Convenience implementation of DeploymentListener.  Default 
- * method implementations are no-ops.  Sub-classes can implement 
- * the DeploymentListener interface without having to override 
- * all methods.
+ * Convenience implementation of DeploymentListener. Default method implementations are no-ops. Sub-classes can implement the
+ * DeploymentListener interface without having to override all methods.
  * 
- * This was implemented so that DeploymentStatusTracker would not need 
- * to provide default implementations of undeployment events.
+ * This was implemented so that DeploymentStatusTracker would not need to provide default implementations of undeployment events.
  * 
  */
-public class AbstractDeploymentListener implements DeploymentListener
-{
+public class AbstractDeploymentListener implements DeploymentListener {
 
-    @Override
-    public void onDeploymentStart(String artifactName)
-    {
-        //No-op default
-    }
+  @Override
+  public void onDeploymentStart(String artifactName) {
+    // No-op default
+  }
 
-    @Override
-    public void onDeploymentSuccess(String artifactName)
-    {
-        //No-op default
-    }
+  @Override
+  public void onDeploymentSuccess(String artifactName) {
+    // No-op default
+  }
 
-    @Override
-    public void onDeploymentFailure(String artifactName, Throwable cause)
-    {
-        //No-op default
-    }
+  @Override
+  public void onDeploymentFailure(String artifactName, Throwable cause) {
+    // No-op default
+  }
 
-    @Override
-    public void onUndeploymentStart(String artifactName)
-    {
-        //No-op default
-    }
+  @Override
+  public void onUndeploymentStart(String artifactName) {
+    // No-op default
+  }
 
-    @Override
-    public void onUndeploymentSuccess(String artifactName)
-    {
-        //No-op default
-    }
+  @Override
+  public void onUndeploymentSuccess(String artifactName) {
+    // No-op default
+  }
 
-    @Override
-    public void onUndeploymentFailure(String artifactName, Throwable cause)
-    {
-        //No-op default
-    }
+  @Override
+  public void onUndeploymentFailure(String artifactName, Throwable cause) {
+    // No-op default
+  }
 
-    @Override
-    public void onMuleContextCreated(String artifactName, MuleContext context)
-    {
-        //No-op default
-    }
+  @Override
+  public void onMuleContextCreated(String artifactName, MuleContext context) {
+    // No-op default
+  }
 
-    @Override
-    public void onMuleContextInitialised(String artifactName, MuleContext context)
-    {
-        //No-op default
-    }
+  @Override
+  public void onMuleContextInitialised(String artifactName, MuleContext context) {
+    // No-op default
+  }
 
-    @Override
-    public void onMuleContextConfigured(String artifactName, MuleContext context)
-    {
-        //No-op default
-    }
+  @Override
+  public void onMuleContextConfigured(String artifactName, MuleContext context) {
+    // No-op default
+  }
 
 }

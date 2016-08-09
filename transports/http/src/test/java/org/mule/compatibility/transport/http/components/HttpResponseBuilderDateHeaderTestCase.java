@@ -17,38 +17,33 @@ import java.util.Date;
 
 import org.junit.Before;
 
-public class HttpResponseBuilderDateHeaderTestCase extends AbstractDateHeaderTestCase
-{
+public class HttpResponseBuilderDateHeaderTestCase extends AbstractDateHeaderTestCase {
 
-    private static final String EXPECTED_DATE_HEADER = "Mon, 05 Sep 2005 21:30:00 +0000";
-    private MuleContext muleContext;
-    private HttpResponseBuilder httpResponseBuilder;
+  private static final String EXPECTED_DATE_HEADER = "Mon, 05 Sep 2005 21:30:00 +0000";
+  private MuleContext muleContext;
+  private HttpResponseBuilder httpResponseBuilder;
 
-    @Before
-    public void setUp()
-    {
-        muleContext = mock(MuleContext.class);
-    }
+  @Before
+  public void setUp() {
+    muleContext = mock(MuleContext.class);
+  }
 
-    @Override
-    protected void initialise() throws Exception
-    {
-        HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
-        httpResponseBuilder.setMuleContext(muleContext);
-        httpResponseBuilder.initialise();
-        this.httpResponseBuilder = httpResponseBuilder;
-    }
+  @Override
+  protected void initialise() throws Exception {
+    HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
+    httpResponseBuilder.setMuleContext(muleContext);
+    httpResponseBuilder.initialise();
+    this.httpResponseBuilder = httpResponseBuilder;
+  }
 
-    @Override
-    protected void setDateHeader(HttpResponse response, long millis)
-    {
-        httpResponseBuilder.setDateHeader(response, new Date(millis));
-    }
+  @Override
+  protected void setDateHeader(HttpResponse response, long millis) {
+    httpResponseBuilder.setDateHeader(response, new Date(millis));
+  }
 
-    @Override
-    protected String getExpectedHeaderValue()
-    {
-        return EXPECTED_DATE_HEADER;
-    }
+  @Override
+  protected String getExpectedHeaderValue() {
+    return EXPECTED_DATE_HEADER;
+  }
 
 }

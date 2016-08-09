@@ -6,18 +6,15 @@
  */
 package org.mule.test.subtypes.extension;
 
-public final class FinalPojo
-{
+public final class FinalPojo {
 
-    private String someString;
+  private String someString;
 
-    public String getSomeString()
-    {
-        return someString;
-    }
+  public String getSomeString() {
+    return someString;
+  }
 
-    public void setSomeString(String someString)
-    {
-        this.someString = someString;
-    }
+  public void setSomeString(String someString) {
+    this.someString = someString;
+  }
 }

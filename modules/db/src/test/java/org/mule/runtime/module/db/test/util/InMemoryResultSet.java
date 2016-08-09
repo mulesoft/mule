@@ -15,33 +15,29 @@ import java.util.Map;
 /**
  * In memory implementation of {@link java.sql.ResultSet} for testing purpose.
  */
-public class InMemoryResultSet extends AbstractInMemoryResultSet
-{
+public class InMemoryResultSet extends AbstractInMemoryResultSet {
 
-    /**
-     * Creates a new in memory resultSet
-     *
-     * @param columns column definitions
-     * @param records values for each record using the order defined in the columns
-     */
-    public InMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records, Statement statement)
-    {
-        super(columns, records, statement);
-    }
+  /**
+   * Creates a new in memory resultSet
+   *
+   * @param columns column definitions
+   * @param records values for each record using the order defined in the columns
+   */
+  public InMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records, Statement statement) {
+    super(columns, records, statement);
+  }
 
-    @Override
-    public <T> T getObject(int columnIndex, Class<T> type) throws SQLException
-    {
-        checkOpenResultSet();
+  @Override
+  public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+    checkOpenResultSet();
 
-        throw new UnsupportedOperationException();
-    }
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException
-    {
-        checkOpenResultSet();
+  @Override
+  public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+    checkOpenResultSet();
 
-        throw new UnsupportedOperationException();
-    }
+    throw new UnsupportedOperationException();
+  }
 }

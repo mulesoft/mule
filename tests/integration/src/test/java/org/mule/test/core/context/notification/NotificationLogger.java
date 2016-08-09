@@ -8,9 +8,8 @@ package org.mule.test.core.context.notification;
 
 import java.util.List;
 
-public interface NotificationLogger
-{
+public interface NotificationLogger {
 
-    public List getNotifications();
+  public List getNotifications();
 
 }

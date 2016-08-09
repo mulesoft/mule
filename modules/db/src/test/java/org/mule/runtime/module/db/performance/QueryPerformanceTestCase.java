@@ -14,90 +14,73 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Not a real test, used to generate load and verify that there are no memory
- * leaks using a profiler.
+ * Not a real test, used to generate load and verify that there are no memory leaks using a profiler.
  */
 @Ignore
-public class QueryPerformanceTestCase extends FunctionalTestCase
-{
+public class QueryPerformanceTestCase extends FunctionalTestCase {
 
-    private LoadGenerator loadGenerator = new LoadGenerator();
+  private LoadGenerator loadGenerator = new LoadGenerator();
+
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"integration/derby-datasource.xml", "integration/select/select-default-config.xml"};
+  }
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 5 * 60;
+  }
+
+  @Test
+  public void testRequestResponsePerformance() throws Exception {
+    loadGenerator.generateLoad(new RequestResponseLoadTask());
+    takeANap();
+  }
+
+  @Test
+  public void testOneWayPerformance() throws Exception {
+    Thread outputCleaner = new Thread(new LoadCleaner());
+    outputCleaner.start();
+    loadGenerator.generateLoad(new OneWayLoadTask());
+    takeANap();
+    outputCleaner.interrupt();
+  }
+
+  private void takeANap() throws InterruptedException {
+    Thread.sleep(2 * 60 * 1000);
+  }
+
+  private static class LoadCleaner implements Runnable {
 
     @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {"integration/derby-datasource.xml", "integration/select/select-default-config.xml"};
+    public void run() {
+      MuleClient client = muleContext.getClient();
+      while (!Thread.currentThread().isInterrupted()) {
+        try {
+          client.request("test://testOut", RECEIVE_TIMEOUT);
+        } catch (Exception e) {
+          // Ignore
+        }
+      }
     }
+  }
+
+  private class RequestResponseLoadTask implements LoadTask {
 
     @Override
-    public int getTestTimeoutSecs()
-    {
-        return 5 * 60;
+    public void execute(int messageId) throws Exception {
+      logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
+      flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
     }
+  }
 
-    @Test
-    public void testRequestResponsePerformance() throws Exception
-    {
-        loadGenerator.generateLoad(new RequestResponseLoadTask());
-        takeANap();
+  private class OneWayLoadTask implements LoadTask {
+
+    @Override
+    public void execute(int messageId) throws Exception {
+      logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
+      flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
     }
-
-    @Test
-    public void testOneWayPerformance() throws Exception
-    {
-        Thread outputCleaner = new Thread(new LoadCleaner());
-        outputCleaner.start();
-        loadGenerator.generateLoad(new OneWayLoadTask());
-        takeANap();
-        outputCleaner.interrupt();
-    }
-
-    private void takeANap() throws InterruptedException
-    {
-        Thread.sleep(2 * 60 * 1000);
-    }
-
-    private static class LoadCleaner implements Runnable
-    {
-
-        @Override
-        public void run()
-        {
-            MuleClient client = muleContext.getClient();
-            while (!Thread.currentThread().isInterrupted())
-            {
-                try
-                {
-                    client.request("test://testOut", RECEIVE_TIMEOUT);
-                }
-                catch (Exception e)
-                {
-                    // Ignore
-                }
-            }
-        }
-    }
-
-    private class RequestResponseLoadTask implements LoadTask
-    {
-
-        @Override
-        public void execute(int messageId) throws Exception
-        {
-            logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
-        }
-    }
-
-    private class OneWayLoadTask implements LoadTask
-    {
-
-        @Override
-        public void execute(int messageId) throws Exception
-        {
-            logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
-        }
-    }
+  }
 
 }

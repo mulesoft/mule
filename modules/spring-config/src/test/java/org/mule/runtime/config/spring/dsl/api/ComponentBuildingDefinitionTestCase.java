@@ -22,61 +22,39 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class ComponentBuildingDefinitionTestCase extends AbstractMuleTestCase
-{
+public class ComponentBuildingDefinitionTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expectException = none();
-    private ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder()
-            .withIdentifier("test")
-            .withNamespace("namespace");
+  @Rule
+  public ExpectedException expectException = none();
+  private ComponentBuildingDefinition.Builder baseDefinition =
+      new ComponentBuildingDefinition.Builder().withIdentifier("test").withNamespace("namespace");
 
-    @Test
-    public void simpleTypeWithTypeConverter()
-    {
-        baseDefinition
-                .copy()
-                .withTypeDefinition(fromType(Integer.class))
-                .withTypeConverter(getFakeTypeConverter())
-                .build();
-    }
+  @Test
+  public void simpleTypeWithTypeConverter() {
+    baseDefinition.copy().withTypeDefinition(fromType(Integer.class)).withTypeConverter(getFakeTypeConverter()).build();
+  }
 
-    @Test
-    public void typeFromConfigAndTypeConverter()
-    {
-        expectException.expectMessage(is(TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE));
-        baseDefinition
-                .copy()
-                .withTypeDefinition(fromConfigurationAttribute("class"))
-                .withTypeConverter(getFakeTypeConverter())
-                .build();
-    }
+  @Test
+  public void typeFromConfigAndTypeConverter() {
+    expectException.expectMessage(is(TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE));
+    baseDefinition.copy().withTypeDefinition(fromConfigurationAttribute("class")).withTypeConverter(getFakeTypeConverter())
+        .build();
+  }
 
-    @Test
-    public void noSimpleTypeWithTypeConverter()
-    {
-        expectException.expectMessage(is(format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, Object.class.getName())));
-        baseDefinition
-                .copy()
-                .withTypeDefinition(fromType(Object.class))
-                .withTypeConverter(getFakeTypeConverter())
-                .build();
-    }
+  @Test
+  public void noSimpleTypeWithTypeConverter() {
+    expectException.expectMessage(is(format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, Object.class.getName())));
+    baseDefinition.copy().withTypeDefinition(fromType(Object.class)).withTypeConverter(getFakeTypeConverter()).build();
+  }
 
-    @Test
-    public void keyTypeConverterAndNoMapType()
-    {
-        expectException.expectMessage(is(KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE));
-        baseDefinition
-                .copy()
-                .withTypeDefinition(fromType(Object.class))
-                .withKeyTypeConverter(getFakeTypeConverter())
-                .build();
-    }
+  @Test
+  public void keyTypeConverterAndNoMapType() {
+    expectException.expectMessage(is(KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE));
+    baseDefinition.copy().withTypeDefinition(fromType(Object.class)).withKeyTypeConverter(getFakeTypeConverter()).build();
+  }
 
-    private TypeConverter getFakeTypeConverter()
-    {
-        return o -> null;
-    }
+  private TypeConverter getFakeTypeConverter() {
+    return o -> null;
+  }
 
 }

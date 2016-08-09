@@ -23,113 +23,94 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ManuallyRegisteredObjectLifecycleTestCase extends AbstractIntegrationTestCase
-{
+public class ManuallyRegisteredObjectLifecycleTestCase extends AbstractIntegrationTestCase {
 
-    private static final String INITIALISABLE = "initialisable";
-    private static final String STARTABLE = "startable";
+  private static final String INITIALISABLE = "initialisable";
+  private static final String STARTABLE = "startable";
+
+
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {};
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        muleContext.getRegistry().registerObject("TestInitialisableObject", new TestInitialisableObject());
+        muleContext.getRegistry().registerObject("TestStartableObject", new TestStartableObject());
+      }
+    });
+  }
+
+  @Test
+  public void manuallyRegisteredStartableLifecycle() throws Exception {
+    assertLifecycle(STARTABLE);
+  }
+
+  @Test
+  public void manuallyRegisteredInitialisableLifecycle() throws Exception {
+    assertLifecycle(INITIALISABLE);
+  }
+
+
+  private void assertLifecycle(String key) {
+    TestLifecycleObject testLifecycleObject = muleContext.getRegistry().get(key);
+    assertThat(testLifecycleObject, is(notNullValue()));
+
+    assertThat(testLifecycleObject.getInitialise(), is(1));
+    assertThat(testLifecycleObject.getStart(), is(1));
+  }
+
+  private abstract class RegisteringObject implements MuleContextAware {
+
+    private MuleContext muleContext;
+
+    @Override
+    public void setMuleContext(MuleContext muleContext) {
+      this.muleContext = muleContext;
+    }
+
+    protected void manuallyRegisterObject() throws MuleException {
+      Object o = new TestLifecycleObject();
+      muleContext.getRegistry().registerObject(getKey(), o);
+    }
+
+    protected abstract String getKey();
+  }
+
+  private class TestStartableObject extends RegisteringObject implements Startable {
 
 
     @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {};
+    public void start() throws MuleException {
+      manuallyRegisterObject();
     }
 
     @Override
-    protected void addBuilders(List<ConfigurationBuilder> builders)
-    {
-        super.addBuilders(builders);
-        builders.add(new AbstractConfigurationBuilder()
-        {
-            @Override
-            protected void doConfigure(MuleContext muleContext) throws Exception
-            {
-                muleContext.getRegistry().registerObject("TestInitialisableObject", new TestInitialisableObject());
-                muleContext.getRegistry().registerObject("TestStartableObject", new TestStartableObject());
-            }
-        });
+    protected String getKey() {
+      return STARTABLE;
+    }
+  }
+
+  private class TestInitialisableObject extends RegisteringObject implements Initialisable {
+
+    @Override
+    public void initialise() throws InitialisationException {
+      try {
+        manuallyRegisterObject();
+      } catch (MuleException e) {
+        throw new InitialisationException(e, this);
+      }
     }
 
-    @Test
-    public void manuallyRegisteredStartableLifecycle() throws Exception
-    {
-        assertLifecycle(STARTABLE);
+    @Override
+    protected String getKey() {
+      return INITIALISABLE;
     }
-
-    @Test
-    public void manuallyRegisteredInitialisableLifecycle() throws Exception
-    {
-        assertLifecycle(INITIALISABLE);
-    }
-
-
-    private void assertLifecycle(String key)
-    {
-        TestLifecycleObject testLifecycleObject = muleContext.getRegistry().get(key);
-        assertThat(testLifecycleObject, is(notNullValue()));
-
-        assertThat(testLifecycleObject.getInitialise(), is(1));
-        assertThat(testLifecycleObject.getStart(), is(1));
-    }
-
-    private abstract class RegisteringObject implements MuleContextAware
-    {
-
-        private MuleContext muleContext;
-
-        @Override
-        public void setMuleContext(MuleContext muleContext)
-        {
-            this.muleContext = muleContext;
-        }
-
-        protected void manuallyRegisterObject() throws MuleException
-        {
-            Object o = new TestLifecycleObject();
-            muleContext.getRegistry().registerObject(getKey(), o);
-        }
-
-        protected abstract String getKey();
-    }
-
-    private class TestStartableObject extends RegisteringObject implements Startable
-    {
-
-
-        @Override
-        public void start() throws MuleException
-        {
-            manuallyRegisterObject();
-        }
-
-        @Override
-        protected String getKey()
-        {
-            return STARTABLE;
-        }
-    }
-
-    private class TestInitialisableObject extends RegisteringObject implements Initialisable
-    {
-
-        @Override
-        public void initialise() throws InitialisationException
-        {
-            try
-            {
-                manuallyRegisterObject();
-            }
-            catch (MuleException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
-
-        @Override
-        protected String getKey()
-        {
-            return INITIALISABLE;
-        }
-    }
+  }
 }

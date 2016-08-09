@@ -12,14 +12,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 
-public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder
-{
+public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder {
 
-    @Override
-    protected void doConfigure(MuleContext muleContext) throws Exception
-    {
-        super.doConfigure(muleContext);
+  @Override
+  protected void doConfigure(MuleContext muleContext) throws Exception {
+    super.doConfigure(muleContext);
 
-        registerObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory(), muleContext);
-    }
+    registerObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory(), muleContext);
+  }
 }

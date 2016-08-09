@@ -30,103 +30,93 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class NotificationHelperTestCase extends AbstractMuleTestCase
-{
+public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ServerNotificationHandler defaultNotificationHandler;
+  @Mock
+  private ServerNotificationHandler defaultNotificationHandler;
 
-    @Mock
-    private ServerNotificationManager eventNotificationHandler;
+  @Mock
+  private ServerNotificationManager eventNotificationHandler;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleEvent event;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleEvent event;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleMessage message;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleMessage message;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MessageSource messageSource;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MessageSource messageSource;
 
-    private NotificationHelper helper;
+  private NotificationHelper helper;
 
-    @Before
-    public void before()
-    {
-        when(event.getMuleContext().getNotificationManager()).thenReturn(eventNotificationHandler);
-        when(event.getMessage()).thenReturn(message);
-        when((Class<String>) message.getDataType().getType()).thenReturn(String.class);
-        initMocks(eventNotificationHandler);
-        initMocks(defaultNotificationHandler);
+  @Before
+  public void before() {
+    when(event.getMuleContext().getNotificationManager()).thenReturn(eventNotificationHandler);
+    when(event.getMessage()).thenReturn(message);
+    when((Class<String>) message.getDataType().getType()).thenReturn(String.class);
+    initMocks(eventNotificationHandler);
+    initMocks(defaultNotificationHandler);
 
-        helper = new NotificationHelper(defaultNotificationHandler, TestServerNotification.class, false);
+    helper = new NotificationHelper(defaultNotificationHandler, TestServerNotification.class, false);
+  }
+
+  private void initMocks(ServerNotificationHandler notificationHandler) {
+    when(notificationHandler.isNotificationEnabled(TestServerNotification.class)).thenReturn(true);
+    when(notificationHandler.isNotificationEnabled(ConnectorMessageNotification.class)).thenReturn(true);
+  }
+
+  @Test
+  public void isNotificationEnabled() {
+    assertThat(helper.isNotificationEnabled(), is(true));
+    verify(defaultNotificationHandler).isNotificationEnabled(TestServerNotification.class);
+  }
+
+  @Test
+  public void isNotificationEnabledForEvent() {
+    assertThat(helper.isNotificationEnabled(event), is(true));
+    verify(eventNotificationHandler).isNotificationEnabled(TestServerNotification.class);
+  }
+
+  @Test
+  public void fireNotificationForEvent() {
+    final String uri = "uri";
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    final int action = 100;
+
+    helper.fireNotification(messageSource, event, uri, flowConstruct, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, uri, flowConstruct, action);
+  }
+
+  @Test
+  public void fireSpecificNotificationForEvent() {
+    TestServerNotification notification = new TestServerNotification();
+    helper.fireNotification(notification, event);
+    verify(eventNotificationHandler).fireNotification(notification);
+  }
+
+  @Test
+  public void fireSpecificNotificationOnDefaultHandler() {
+    TestServerNotification notification = new TestServerNotification();
+    helper.fireNotification(notification);
+    verify(defaultNotificationHandler).fireNotification(notification);
+  }
+
+  private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource,
+                                                  String uri, FlowConstruct flowConstruct, int action) {
+    ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
+    verify(notificationHandler).fireNotification(notificationCaptor.capture());
+
+    ConnectorMessageNotification notification = notificationCaptor.getValue();
+    assertThat(notification.getComponent(), is(messageSource));
+    assertThat(notification.getAction(), is(action));
+    assertThat(notification.getFlowConstruct(), is(flowConstruct));
+    assertThat(notification.getEndpoint(), is(uri));
+  }
+
+  private class TestServerNotification extends ServerNotification {
+
+    public TestServerNotification() {
+      super("", 0);
     }
-
-    private void initMocks(ServerNotificationHandler notificationHandler)
-    {
-        when(notificationHandler.isNotificationEnabled(TestServerNotification.class)).thenReturn(true);
-        when(notificationHandler.isNotificationEnabled(ConnectorMessageNotification.class)).thenReturn(true);
-    }
-
-    @Test
-    public void isNotificationEnabled()
-    {
-        assertThat(helper.isNotificationEnabled(), is(true));
-        verify(defaultNotificationHandler).isNotificationEnabled(TestServerNotification.class);
-    }
-
-    @Test
-    public void isNotificationEnabledForEvent()
-    {
-        assertThat(helper.isNotificationEnabled(event), is(true));
-        verify(eventNotificationHandler).isNotificationEnabled(TestServerNotification.class);
-    }
-
-    @Test
-    public void fireNotificationForEvent()
-    {
-        final String uri = "uri";
-        final FlowConstruct flowConstruct = mock(FlowConstruct.class);
-        final int action = 100;
-
-        helper.fireNotification(messageSource, event, uri, flowConstruct, action);
-        assertConnectorMessageNotification(eventNotificationHandler, messageSource, uri, flowConstruct, action);
-    }
-
-    @Test
-    public void fireSpecificNotificationForEvent()
-    {
-        TestServerNotification notification = new TestServerNotification();
-        helper.fireNotification(notification, event);
-        verify(eventNotificationHandler).fireNotification(notification);
-    }
-
-    @Test
-    public void fireSpecificNotificationOnDefaultHandler()
-    {
-        TestServerNotification notification = new TestServerNotification();
-        helper.fireNotification(notification);
-        verify(defaultNotificationHandler).fireNotification(notification);
-    }
-
-    private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource, String uri, FlowConstruct flowConstruct, int action)
-    {
-        ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
-        verify(notificationHandler).fireNotification(notificationCaptor.capture());
-
-        ConnectorMessageNotification notification = notificationCaptor.getValue();
-        assertThat(notification.getComponent(), is(messageSource));
-        assertThat(notification.getAction(), is(action));
-        assertThat(notification.getFlowConstruct(), is(flowConstruct));
-        assertThat(notification.getEndpoint(), is(uri));
-    }
-
-    private class TestServerNotification extends ServerNotification
-    {
-
-        public TestServerNotification()
-        {
-            super("", 0);
-        }
-    }
+  }
 }

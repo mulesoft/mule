@@ -19,16 +19,14 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
- * A {@link Qualifier} annotation for injecting
- * the {@link ObjectSerializer} which has been
- * selected as the default in the {@link MuleConfiguration}
+ * A {@link Qualifier} annotation for injecting the {@link ObjectSerializer} which has been selected as the default in the
+ * {@link MuleConfiguration}
  *
  * @since 3.7.0
  */
 @Qualifier
 @Retention(RUNTIME)
 @Target({TYPE, ElementType.METHOD, FIELD, PARAMETER})
-public @interface DefaultObjectSerializer
-{
+public @interface DefaultObjectSerializer {
 
 }

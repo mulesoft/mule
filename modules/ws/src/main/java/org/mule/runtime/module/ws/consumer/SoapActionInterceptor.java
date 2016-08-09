@@ -16,20 +16,17 @@ import org.apache.cxf.phase.Phase;
 /**
  * CXF interceptor that adds the SOAP action to the message.
  */
-public class SoapActionInterceptor extends AbstractPhaseInterceptor
-{
+public class SoapActionInterceptor extends AbstractPhaseInterceptor {
 
-    private final String soapAction;
+  private final String soapAction;
 
-    public SoapActionInterceptor(String soapAction)
-    {
-        super(Phase.PRE_LOGICAL);
-        this.soapAction = soapAction;
-    }
+  public SoapActionInterceptor(String soapAction) {
+    super(Phase.PRE_LOGICAL);
+    this.soapAction = soapAction;
+  }
 
-    @Override
-    public void handleMessage(Message message) throws Fault
-    {
-        message.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
-    }
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    message.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+  }
 }

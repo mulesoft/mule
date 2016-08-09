@@ -13,25 +13,22 @@ import org.apache.cxf.endpoint.Client;
 /**
  * An abstract builder for non proxy clients.
  */
-public abstract class AbstractClientMessageProcessorBuilder extends AbstractOutboundMessageProcessorBuilder
-{
-    protected Class<?> serviceClass;
-    
-    @Override
-    protected void configureClient(Client client)
-    {
-        // EE-1806/MULE-4404
-        client.getInInterceptors().add(new StreamClosingInterceptor());
-        client.getInFaultInterceptors().add(new StreamClosingInterceptor());
-    }
-    
-    public void setServiceClass(Class<?> serviceClass)
-    {
-        this.serviceClass = serviceClass;
-    }
+public abstract class AbstractClientMessageProcessorBuilder extends AbstractOutboundMessageProcessorBuilder {
 
-    public Class<?> getServiceClass()
-    {
-        return serviceClass;
-    }
+  protected Class<?> serviceClass;
+
+  @Override
+  protected void configureClient(Client client) {
+    // EE-1806/MULE-4404
+    client.getInInterceptors().add(new StreamClosingInterceptor());
+    client.getInFaultInterceptors().add(new StreamClosingInterceptor());
+  }
+
+  public void setServiceClass(Class<?> serviceClass) {
+    this.serviceClass = serviceClass;
+  }
+
+  public Class<?> getServiceClass() {
+    return serviceClass;
+  }
 }

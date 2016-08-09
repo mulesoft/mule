@@ -21,59 +21,52 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 
 /**
- * Bean definition creator for elements that are just containers for a reference
- * to another bean definition. i.e.:
+ * Bean definition creator for elements that are just containers for a reference to another bean definition. i.e.:
+ * 
  * <pre>
  *     <queue-profile>
  *         <queue-store ref="aQueueStore"/>
  *     </queue-profile>
  * </pre>
  * <p/>
- * This construct is deprecated and will only be used for backward compatibility. No new
- * constructs in the language must use this mechanism. The preferred mechanism is to
- * use an attribute to define the reference or define the object inline as a child element. i.e.:
+ * This construct is deprecated and will only be used for backward compatibility. No new constructs in the language must use this
+ * mechanism. The preferred mechanism is to use an attribute to define the reference or define the object inline as a child
+ * element. i.e.:
+ * 
  * <pre>
  *     <http:request tlsContext="aTlsContext"/>
  * </pre>
  *
  * @since 4.0
  */
-public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator
-{
+public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    private ImmutableMap<ComponentIdentifier, Consumer<ComponentModel>> referenceConsumers = new ImmutableMap.Builder()
-            .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
-            .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
-            .put(TRANSFORMER_IDENTIFIER, getProcessorConsumer())
-            .build();
+  private ImmutableMap<ComponentIdentifier, Consumer<ComponentModel>> referenceConsumers =
+      new ImmutableMap.Builder().put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
+          .put(PROCESSOR_IDENTIFIER, getProcessorConsumer()).put(TRANSFORMER_IDENTIFIER, getProcessorConsumer()).build();
 
-    private Consumer<ComponentModel> getProcessorConsumer()
-    {
-        return getConsumer(MessageProcessor.class);
+  private Consumer<ComponentModel> getProcessorConsumer() {
+    return getConsumer(MessageProcessor.class);
+  }
+
+  private Consumer<ComponentModel> getQueueStoreConsumer() {
+    return getConsumer(QueueStore.class);
+  }
+
+  private Consumer<ComponentModel> getConsumer(Class<?> componentModelType) {
+    return (componentModel) -> {
+      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get("ref")));
+      componentModel.setType(componentModelType);
+    };
+  }
+
+  @Override
+  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    if (referenceConsumers.containsKey(componentModel.getIdentifier())) {
+      referenceConsumers.get(componentModel.getIdentifier()).accept(componentModel);
+      return true;
     }
-
-    private Consumer<ComponentModel> getQueueStoreConsumer()
-    {
-        return getConsumer(QueueStore.class);
-    }
-
-    private Consumer<ComponentModel> getConsumer(Class<?> componentModelType)
-    {
-        return (componentModel) -> {
-            componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get("ref")));
-            componentModel.setType(componentModelType);
-        };
-    }
-
-    @Override
-    boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        if (referenceConsumers.containsKey(componentModel.getIdentifier()))
-        {
-            referenceConsumers.get(componentModel.getIdentifier()).accept(componentModel);
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }

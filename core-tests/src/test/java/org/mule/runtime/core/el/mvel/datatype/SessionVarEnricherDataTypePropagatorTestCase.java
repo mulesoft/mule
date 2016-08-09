@@ -14,23 +14,19 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.Serializable;
 
-public class SessionVarEnricherDataTypePropagatorTestCase extends AbstractScopedVarAssignmentDataTypePropagatorTestCase
-{
+public class SessionVarEnricherDataTypePropagatorTestCase extends AbstractScopedVarAssignmentDataTypePropagatorTestCase {
 
-    public SessionVarEnricherDataTypePropagatorTestCase()
-    {
-        super(new SessionVarEnricherDataTypePropagator(), SESSION_VARS);
-    }
+  public SessionVarEnricherDataTypePropagatorTestCase() {
+    super(new SessionVarEnricherDataTypePropagator(), SESSION_VARS);
+  }
 
-    @Override
-    protected DataType getVariableDataType(MuleEvent event)
-    {
-        return event.getSession().getPropertyDataType(PROPERTY_NAME);
-    }
+  @Override
+  protected DataType getVariableDataType(MuleEvent event) {
+    return event.getSession().getPropertyDataType(PROPERTY_NAME);
+  }
 
-    @Override
-    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
-    {
-        event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
-    }
+  @Override
+  protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
+    event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
+  }
 }

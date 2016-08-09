@@ -18,90 +18,76 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
  * @param <T> the generic type of the {@link TransactionalConnection}
  * @since 4.0
  */
-public class ExtensionTransactionalResource<T extends TransactionalConnection> implements Transactional
-{
+public class ExtensionTransactionalResource<T extends TransactionalConnection> implements Transactional {
 
-    private final T connection;
-    private final ConnectionHandler<T> connectionHandler;
-    private final Transaction transaction;
+  private final T connection;
+  private final ConnectionHandler<T> connectionHandler;
+  private final Transaction transaction;
 
-    /**
-     * Creates a new instance
-     *
-     * @param connection        the connection
-     * @param connectionHandler the {@link ConnectionHandler} for the {@code connection}
-     * @param transaction       the bound {@link Transaction}
-     */
-    public ExtensionTransactionalResource(T connection, ConnectionHandler<T> connectionHandler, Transaction transaction)
-    {
-        this.connection = connection;
-        this.connectionHandler = connectionHandler;
-        this.transaction = transaction;
+  /**
+   * Creates a new instance
+   *
+   * @param connection the connection
+   * @param connectionHandler the {@link ConnectionHandler} for the {@code connection}
+   * @param transaction the bound {@link Transaction}
+   */
+  public ExtensionTransactionalResource(T connection, ConnectionHandler<T> connectionHandler, Transaction transaction) {
+    this.connection = connection;
+    this.connectionHandler = connectionHandler;
+    this.transaction = transaction;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void begin() throws Exception {
+    connection.begin();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void commit() throws Exception {
+    try {
+      connection.commit();
+    } finally {
+      connectionHandler.release();
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void begin() throws Exception
-    {
-        connection.begin();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void rollback() throws Exception {
+    try {
+      connection.rollback();
+    } finally {
+      connectionHandler.release();
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commit() throws Exception
-    {
-        try
-        {
-            connection.commit();
-        }
-        finally
-        {
-            connectionHandler.release();
-        }
-    }
+  /**
+   * @return whether the transaction is commited or rolled back
+   * @throws TransactionException
+   */
+  public boolean isTransactionResolved() throws TransactionException {
+    return transaction.isCommitted() || transaction.isRolledBack();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void rollback() throws Exception
-    {
-        try
-        {
-            connection.rollback();
-        }
-        finally
-        {
-            connectionHandler.release();
-        }
-    }
+  /**
+   * @return the {@link TransactionalConnection}
+   */
+  public T getConnection() {
+    return connection;
+  }
 
-    /**
-     * @return whether the transaction is commited or rolled back
-     * @throws TransactionException
-     */
-    public boolean isTransactionResolved() throws TransactionException
-    {
-        return transaction.isCommitted() || transaction.isRolledBack();
-    }
-
-    /**
-     * @return the {@link TransactionalConnection}
-     */
-    public T getConnection()
-    {
-        return connection;
-    }
-
-    /**
-     * @return the {@link ConnectionHandler}
-     */
-    public ConnectionHandler<T> getConnectionHandler()
-    {
-        return connectionHandler;
-    }
+  /**
+   * @return the {@link ConnectionHandler}
+   */
+  public ConnectionHandler<T> getConnectionHandler() {
+    return connectionHandler;
+  }
 }

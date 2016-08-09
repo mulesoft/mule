@@ -22,49 +22,46 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleContextEndpointTestCase
-{
-    public IdempotentSecureHashMessageFilterTestCase()
-    {
-        setStartContext(true);
-    }
+public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Test
-    public void testIdempotentReceiver() throws Exception
-    {
-        InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider",
-                "test://Test1Provider?exchangePattern=one-way");
-        Flow flow = getTestFlow();
+  public IdempotentSecureHashMessageFilterTestCase() {
+    setStartContext(true);
+  }
 
-        MuleSession session = mock(MuleSession.class);
+  @Test
+  public void testIdempotentReceiver() throws Exception {
+    InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
+    Flow flow = getTestFlow();
 
-        IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
-        ir.setFlowConstruct(flow);
-        ir.setThrowOnUnaccepted(false);
-        ir.setStorePrefix("foo");
-        ir.setStore(new InMemoryObjectStore<String>());
-        ir.setMuleContext(muleContext);
+    MuleSession session = mock(MuleSession.class);
 
-        MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
-        DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
+    ir.setFlowConstruct(flow);
+    ir.setThrowOnUnaccepted(false);
+    ir.setStorePrefix("foo");
+    ir.setStore(new InMemoryObjectStore<String>());
+    ir.setMuleContext(muleContext);
 
-        // This one will process the event on the target endpoint
-        MuleEvent processedEvent = ir.process(event);
-        assertNotNull(processedEvent);
+    MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
+    DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
 
-         // This will not process, because the message is a duplicate
-        okMessage = MuleMessage.builder().payload("OK").build();
-        event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
-        processedEvent = ir.process(event);
-        assertNull(processedEvent);
+    // This one will process the event on the target endpoint
+    MuleEvent processedEvent = ir.process(event);
+    assertNotNull(processedEvent);
 
-        // This will process, because the message  is not a duplicate
-        okMessage = MuleMessage.builder().payload("Not OK").build();
-        event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
-        processedEvent = ir.process(event);
-        assertNotNull(processedEvent);
-    }
+    // This will not process, because the message is a duplicate
+    okMessage = MuleMessage.builder().payload("OK").build();
+    event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    processedEvent = ir.process(event);
+    assertNull(processedEvent);
+
+    // This will process, because the message is not a duplicate
+    okMessage = MuleMessage.builder().payload("Not OK").build();
+    event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    processedEvent = ir.process(event);
+    assertNotNull(processedEvent);
+  }
 }

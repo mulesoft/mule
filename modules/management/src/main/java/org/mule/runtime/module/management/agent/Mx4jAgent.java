@@ -44,333 +44,261 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
- * statistics and configuration viewing of a Mule instance.
+ * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management, statistics and configuration viewing of a Mule
+ * instance.
  */
-public class Mx4jAgent extends AbstractAgent
-{
-    public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
+public class Mx4jAgent extends AbstractAgent {
 
-    protected static final String DEFAULT_PATH_IN_JAR = 
-        StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') + "/http/xsl";
+  public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
 
-    private static final Logger logger = LoggerFactory.getLogger(Mx4jAgent.class);
+  protected static final String DEFAULT_PATH_IN_JAR =
+      StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') + "/http/xsl";
 
-    private static final String PROTOCOL_PREFIX = "http://";
-    public static final String DEFAULT_HOSTNAME = "localhost";
-    public static final int DEFAULT_PORT = 9999;
-    public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
+  private static final Logger logger = LoggerFactory.getLogger(Mx4jAgent.class);
 
-    private String jmxAdaptorUrl;
-    private String host;
-    private String port;
+  private static final String PROTOCOL_PREFIX = "http://";
+  public static final String DEFAULT_HOSTNAME = "localhost";
+  public static final int DEFAULT_PORT = 9999;
+  public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
 
-    private HttpAdaptor adaptor;
-    private MBeanServer mBeanServer;
-    private ObjectName adaptorName;
+  private String jmxAdaptorUrl;
+  private String host;
+  private String port;
 
-    // Adaptor overrides
-    private String login;
+  private HttpAdaptor adaptor;
+  private MBeanServer mBeanServer;
+  private ObjectName adaptorName;
 
-    private String password;
+  // Adaptor overrides
+  private String login;
 
-    private String authenticationMethod = "basic";
+  private String password;
 
-    // TODO AH check how an embedded scenario can be handled (no mule home) 
-    private String xslFilePath = System.getProperty("mule.home") + "/lib/mule/mule-module-management-" +
-            MuleManifest.getProductVersion() + ".jar";
+  private String authenticationMethod = "basic";
 
-    private String pathInJar = DEFAULT_PATH_IN_JAR;
+  // TODO AH check how an embedded scenario can be handled (no mule home)
+  private String xslFilePath =
+      System.getProperty("mule.home") + "/lib/mule/mule-module-management-" + MuleManifest.getProductVersion() + ".jar";
 
-    private boolean cacheXsl = true;
+  private String pathInJar = DEFAULT_PATH_IN_JAR;
 
-    // SSL/TLS socket factory config
-    private Map socketFactoryProperties = new HashMap();
+  private boolean cacheXsl = true;
 
-    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-    private JmxSupport jmxSupport;
+  // SSL/TLS socket factory config
+  private Map socketFactoryProperties = new HashMap();
+
+  private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+  private JmxSupport jmxSupport;
 
 
-    public Mx4jAgent()
-    {
-        super("jmx-mx4j-adaptor");
+  public Mx4jAgent() {
+    super("jmx-mx4j-adaptor");
+  }
+
+  protected HttpAdaptor createAdaptor() throws Exception {
+    Log.redirectTo(new CommonsLogger());
+    URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
+    adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
+
+    // Set the XSLT Processor with any local overrides
+    XSLTProcessor processor;
+    try {
+      processor = new XSLTProcessor();
+    } catch (TransformerFactoryConfigurationError e) {
+      System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
+      processor = new XSLTProcessor();
     }
 
-    protected HttpAdaptor createAdaptor() throws Exception
-    {
-        Log.redirectTo(new CommonsLogger());
-        URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
-        adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
+    if (StringUtils.isNotBlank(xslFilePath)) {
+      processor.setFile(xslFilePath.trim());
+    }
 
-        // Set the XSLT Processor with any local overrides
-        XSLTProcessor processor;
-        try
-        {
-            processor = new XSLTProcessor();
+    if (StringUtils.isNotBlank(pathInJar)) {
+      processor.setPathInJar(pathInJar.trim());
+    }
+
+    processor.setUseCache(cacheXsl);
+
+    adaptor.setProcessor(processor);
+
+    // Set endpoint authentication if required
+    if (login != null) {
+      adaptor.addAuthorization(login, password);
+      adaptor.setAuthenticationMethod(authenticationMethod);
+    }
+
+    if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
+      SSLAdaptorServerSocketFactoryMBean factory = new SSLAdaptorServerSocketFactory();
+      BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
+      adaptor.setSocketFactory(factory);
+    }
+
+    return adaptor;
+  }
+
+  public void initialise() throws InitialisationException {
+    try {
+      jmxSupport = jmxSupportFactory.getJmxSupport();
+      mBeanServer = MBeanServerFactory.getOrCreateMBeanServer();
+
+      if (StringUtils.isBlank(jmxAdaptorUrl)) {
+        if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port)) {
+          jmxAdaptorUrl = PROTOCOL_PREFIX + host + ":" + port;
+        } else {
+          jmxAdaptorUrl = DEFAULT_JMX_ADAPTOR_URL;
         }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
-            processor = new XSLTProcessor();
-        }
+      }
 
-        if (StringUtils.isNotBlank(xslFilePath))
-        {
-            processor.setFile(xslFilePath.trim());
-        }
+      adaptor = createAdaptor();
+      adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + HTTP_ADAPTER_OBJECT_NAME);
 
-        if (StringUtils.isNotBlank(pathInJar))
-        {
-            processor.setPathInJar(pathInJar.trim());
-        }
+      unregisterMBeansIfNecessary();
+      mBeanServer.registerMBean(adaptor, adaptorName);
+    } catch (Exception e) {
+      throw new InitialisationException(CoreMessages.failedToStart("mx4j agent"), e, this);
+    }
+  }
 
-        processor.setUseCache(cacheXsl);
-
-        adaptor.setProcessor(processor);
-
-        // Set endpoint authentication if required
-        if (login != null)
-        {
-            adaptor.addAuthorization(login, password);
-            adaptor.setAuthenticationMethod(authenticationMethod);
-        }
-
-        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty())
-        {
-            SSLAdaptorServerSocketFactoryMBean factory = new SSLAdaptorServerSocketFactory();
-            BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
-            adaptor.setSocketFactory(factory);
-        }
-
-        return adaptor;
+  public void start() throws MuleException {
+    if (mBeanServer == null) {
+      throw new InitialisationException(MessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
     }
 
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            jmxSupport = jmxSupportFactory.getJmxSupport();
-            mBeanServer = MBeanServerFactory.getOrCreateMBeanServer();
-
-            if (StringUtils.isBlank(jmxAdaptorUrl))
-            {
-                if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port))
-                {
-                    jmxAdaptorUrl = PROTOCOL_PREFIX + host + ":" + port;
-                }
-                else
-                {
-                    jmxAdaptorUrl = DEFAULT_JMX_ADAPTOR_URL;
-                }
-            }
-
-            adaptor = createAdaptor();
-            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + HTTP_ADAPTER_OBJECT_NAME);
-
-            unregisterMBeansIfNecessary();
-            mBeanServer.registerMBean(adaptor, adaptorName);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToStart("mx4j agent"), e, this);
-        }
+    try {
+      mBeanServer.invoke(adaptorName, "start", null, null);
+    } catch (InstanceNotFoundException e) {
+      throw new JmxManagementException(CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
+    } catch (MBeanException e) {
+      throw new JmxManagementException(CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
+    } catch (ReflectionException e) {
+      // ignore
     }
+  }
 
-    public void start() throws MuleException
-    {
-        if (mBeanServer == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
-        }
-        
-        try
-        {
-            mBeanServer.invoke(adaptorName, "start", null, null);
-        }
-        catch (InstanceNotFoundException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
-        }
-        catch (MBeanException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
-        }
-        catch (ReflectionException e)
-        {
-            // ignore
-        }
+  public void stop() throws MuleException {
+    if (mBeanServer == null) {
+      return;
     }
+    try {
+      mBeanServer.invoke(adaptorName, "stop", null, null);
+    } catch (InstanceNotFoundException e) {
+      throw new JmxManagementException(CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
+    } catch (MBeanException e) {
+      throw new JmxManagementException(CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
+    } catch (ReflectionException e) {
+      // ignore
+    }
+  }
 
-    public void stop() throws MuleException
-    {
-        if (mBeanServer == null)
-        {
-            return;
-        }
-        try
-        {
-            mBeanServer.invoke(adaptorName, "stop", null, null);
-        }
-        catch (InstanceNotFoundException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
-        }
-        catch (MBeanException e)
-        {
-            throw new JmxManagementException(
-                CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
-        }
-        catch (ReflectionException e)
-        {
-            // ignore
-        }
+  /**
+   * Unregister all Mx4j MBeans if there are any left over the old deployment
+   */
+  protected void unregisterMBeansIfNecessary()
+      throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
+    if (mBeanServer != null && mBeanServer.isRegistered(adaptorName)) {
+      mBeanServer.unregisterMBean(adaptorName);
     }
+  }
 
-    /**
-     * Unregister all Mx4j MBeans if there are any left over the old deployment
-     */
-    protected void unregisterMBeansIfNecessary()
-        throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
-    {
-        if (mBeanServer != null && mBeanServer.isRegistered(adaptorName))
-        {
-            mBeanServer.unregisterMBean(adaptorName);
-        }
+  public void dispose() {
+    try {
+      stop();
+    } catch (Exception e) {
+      logger.warn("Failed to stop Mx4jAgent: " + e.getMessage());
+    } finally {
+      try {
+        unregisterMBeansIfNecessary();
+      } catch (Exception e) {
+        logger.error("Couldn't unregister MBean: " + (adaptorName != null ? adaptorName.getCanonicalName() : "null"), e);
+      }
     }
+  }
 
-    public void dispose()
-    {
-        try
-        {
-            stop();
-        }
-        catch (Exception e)
-        {
-            logger.warn("Failed to stop Mx4jAgent: " + e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                unregisterMBeansIfNecessary();
-            }
-            catch (Exception e)
-            {
-                logger.error("Couldn't unregister MBean: "
-                             + (adaptorName != null ? adaptorName.getCanonicalName() : "null"), e);
-            }
-        }
-    }
+  // /////////////////////////////////////////////////////////////////////////
+  // Getters and setters
+  // /////////////////////////////////////////////////////////////////////////
+  @Override
+  public String getDescription() {
+    return "MX4J Http adaptor: " + jmxAdaptorUrl;
+  }
 
-    // /////////////////////////////////////////////////////////////////////////
-    // Getters and setters
-    // /////////////////////////////////////////////////////////////////////////
-    @Override
-    public String getDescription()
-    {
-        return "MX4J Http adaptor: " + jmxAdaptorUrl;
-    }
+  public String getJmxAdaptorUrl() {
+    return jmxAdaptorUrl;
+  }
 
-    public String getJmxAdaptorUrl()
-    {
-        return jmxAdaptorUrl;
-    }
+  public void setJmxAdaptorUrl(String jmxAdaptorUrl) {
+    this.jmxAdaptorUrl = jmxAdaptorUrl;
+  }
 
-    public void setJmxAdaptorUrl(String jmxAdaptorUrl)
-    {
-        this.jmxAdaptorUrl = jmxAdaptorUrl;
-    }
+  public Map getSocketFactoryProperties() {
+    return socketFactoryProperties;
+  }
 
-    public Map getSocketFactoryProperties()
-    {
-        return socketFactoryProperties;
-    }
+  public void setSocketFactoryProperties(Map socketFactoryProperties) {
+    this.socketFactoryProperties = socketFactoryProperties;
+  }
 
-    public void setSocketFactoryProperties(Map socketFactoryProperties)
-    {
-        this.socketFactoryProperties = socketFactoryProperties;
-    }
+  public String getLogin() {
+    return login;
+  }
 
-    public String getLogin()
-    {
-        return login;
-    }
+  public void setLogin(String login) {
+    this.login = login;
+  }
 
-    public void setLogin(String login)
-    {
-        this.login = login;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
+  public String getAuthenticationMethod() {
+    return authenticationMethod;
+  }
 
-    public String getAuthenticationMethod()
-    {
-        return authenticationMethod;
-    }
+  public void setAuthenticationMethod(String authenticationMethod) {
+    this.authenticationMethod = authenticationMethod;
+  }
 
-    public void setAuthenticationMethod(String authenticationMethod)
-    {
-        this.authenticationMethod = authenticationMethod;
-    }
+  public String getXslFilePath() {
+    return xslFilePath;
+  }
 
-    public String getXslFilePath()
-    {
-        return xslFilePath;
-    }
+  public void setXslFilePath(String xslFilePath) {
+    this.xslFilePath = xslFilePath;
+  }
 
-    public void setXslFilePath(String xslFilePath)
-    {
-        this.xslFilePath = xslFilePath;
-    }
+  public String getPathInJar() {
+    return pathInJar;
+  }
 
-    public String getPathInJar()
-    {
-        return pathInJar;
-    }
+  public void setPathInJar(String pathInJar) {
+    this.pathInJar = pathInJar;
+  }
 
-    public void setPathInJar(String pathInJar)
-    {
-        this.pathInJar = pathInJar;
-    }
+  public boolean isCacheXsl() {
+    return cacheXsl;
+  }
 
-    public boolean isCacheXsl()
-    {
-        return cacheXsl;
-    }
+  public void setCacheXsl(boolean cacheXsl) {
+    this.cacheXsl = cacheXsl;
+  }
 
-    public void setCacheXsl(boolean cacheXsl)
-    {
-        this.cacheXsl = cacheXsl;
-    }
+  public String getHost() {
+    return host;
+  }
 
-    public String getHost()
-    {
-        return host;
-    }
+  public void setHost(String host) {
+    this.host = host;
+  }
 
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public String getPort()
-    {
-        return port;
-    }
-
-    public void setPort(String port)
-    {
-        this.port = port;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 }

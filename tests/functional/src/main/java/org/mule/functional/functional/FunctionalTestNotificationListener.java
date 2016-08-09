@@ -12,21 +12,19 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
 
 /**
  * By implementing this listener interface and registering the object with the
- * {@link MuleContext#registerListener(ServerNotificationListener)}
- * You can receive {@link FunctionalTestNotification}s from the {@link FunctionalTestComponent}.
+ * {@link MuleContext#registerListener(ServerNotificationListener)} You can receive {@link FunctionalTestNotification}s from the
+ * {@link FunctionalTestComponent}.
  *
- * This Notification contains the current MuleEventContext and reply message. The resource 
- * identifier for this event is the service name that received the message.  This means you can 
- * register to listen to Notifications from a selected {@link FunctionalTestComponent}. i.e.
- * <code>
+ * This Notification contains the current MuleEventContext and reply message. The resource identifier for this event is the
+ * service name that received the message. This means you can register to listen to Notifications from a selected
+ * {@link FunctionalTestComponent}. i.e. <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");
  * </code>
  *
- * This registration would only receive {@link FunctionalTestNotification} objects from components 
- * called 'MyJmsTestComponent' and 'YourJmsTestComponent' but not 'HerFileTestComponent'.
+ * This registration would only receive {@link FunctionalTestNotification} objects from components called 'MyJmsTestComponent' and
+ * 'YourJmsTestComponent' but not 'HerFileTestComponent'.
  *
- * To receive all notifications simply do -
- * <code>
+ * To receive all notifications simply do - <code>
  * muleContext.registerListener(this");
  * </code>
  *
@@ -34,7 +32,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
  * @see FunctionalTestNotificationListener
  * @see MuleContext
  */
-public interface FunctionalTestNotificationListener extends CustomNotificationListener
-{
-    // no methods
+public interface FunctionalTestNotificationListener extends CustomNotificationListener {
+  // no methods
 }

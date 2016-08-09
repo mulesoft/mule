@@ -27,74 +27,54 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 @ArtifactClassLoaderRunnerConfig(exportClasses = {SftpClientFactory.class, SftpClient.class})
-public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCase
-{
+public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
-    private final String name;
+  private final String name;
 
-    @Rule
-    public final FtpTestHarness testHarness;
+  @Rule
+  public final FtpTestHarness testHarness;
 
-    @Parameters(name = "{0}")
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {"ftp", new ClassicFtpTestHarness()},
-                {"sftp", new SftpTestHarness()}
-        });
-    }
+  @Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"ftp", new ClassicFtpTestHarness()}, {"sftp", new SftpTestHarness()}});
+  }
 
-    public FtpConnectorTestCase(String name, FtpTestHarness testHarness)
-    {
-        this.name = name;
-        this.testHarness = testHarness;
-    }
+  public FtpConnectorTestCase(String name, FtpTestHarness testHarness) {
+    this.name = name;
+    this.testHarness = testHarness;
+  }
 
-    protected MuleEvent readHelloWorld() throws Exception
-    {
-        return getPath(HELLO_PATH);
-    }
+  protected MuleEvent readHelloWorld() throws Exception {
+    return getPath(HELLO_PATH);
+  }
 
-    protected MuleMessage readPath(String path) throws Exception
-    {
-        return getPath(path).getMessage();
-    }
+  protected MuleMessage readPath(String path) throws Exception {
+    return getPath(path).getMessage();
+  }
 
-    protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
-    {
-        doWrite("write", path, content, mode, createParent);
-    }
+  protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite("write", path, content, mode, createParent);
+  }
 
-    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
-    {
-        doWrite(flow, path, content, mode, createParent, null);
-    }
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite(flow, path, content, mode, createParent, null);
+  }
 
-    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding) throws Exception
-    {
-        flowRunner(flow)
-                .withFlowVariable("path", path)
-                .withFlowVariable("createParent", createParent)
-                .withFlowVariable("mode", mode)
-                .withFlowVariable("encoding", encoding)
-                .withPayload(content)
-                .run();
-    }
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding)
+      throws Exception {
+    flowRunner(flow).withFlowVariable("path", path).withFlowVariable("createParent", createParent).withFlowVariable("mode", mode)
+        .withFlowVariable("encoding", encoding).withPayload(content).run();
+  }
 
-    private MuleEvent getPath(String path) throws Exception
-    {
-        return flowRunner("read")
-                .withFlowVariable("path", path)
-                .run();
-    }
+  private MuleEvent getPath(String path) throws Exception {
+    return flowRunner("read").withFlowVariable("path", path).run();
+  }
 
-    protected String readPathAsString(String path) throws Exception
-    {
-        return getPayloadAsString(readPath(path));
-    }
+  protected String readPathAsString(String path) throws Exception {
+    return getPayloadAsString(readPath(path));
+  }
 
-    protected boolean isLocked(MuleMessage message)
-    {
-        return ((AbstractFileInputStream) message.getPayload()).isLocked();
-    }
+  protected boolean isLocked(MuleMessage message) {
+    return ((AbstractFileInputStream) message.getPayload()).isLocked();
+  }
 }

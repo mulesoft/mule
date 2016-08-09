@@ -30,67 +30,58 @@ if they are using the same Session activeMQ won't execute them concurrently
 (since it will not do two onMessage invocations concurrently using the same session)
 One of the latch.await(..) will fail in that case.
  */
-public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
-{
-    public static final String MESSAGE = "some message";
-    public static final int TIMEOUT = 10000;
-    private static final Latch messageSuccessfulReceived = new Latch();
-    private static final Latch messageFailureReceived = new Latch();
+public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase {
+
+  public static final String MESSAGE = "some message";
+  public static final int TIMEOUT = 10000;
+  private static final Latch messageSuccessfulReceived = new Latch();
+  private static final Latch messageFailureReceived = new Latch();
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transaction/jms-concurrent-in-transaction.xml";
+  }
+
+  @Test
+  @Ignore("MULE-6926")
+  public void testTwoMessagesOneRollbackOneCommit() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    muleClient.dispatch("jms://in", "success", null);
+    muleClient.dispatch("jms://in", "failure", null);
+    if (!messageSuccessfulReceived.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("JMS messages didn't execute concurrently, might be using only one Session for more than one transaction");
+    }
+    if (!messageFailureReceived.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("JMS messages didn't execute concurrently, might be using only one Session for more than one transaction");
+    }
+    Flow flowWithTxConfigured = (Flow) getFlowConstruct("flowWithTxConfigured");
+    flowWithTxConfigured.stop();
+    MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
+    assertThat(muleMessage, IsNull.<Object>notNullValue());
+    muleMessage = muleClient.request("jms://in", TIMEOUT);
+    assertThat(muleMessage, IsNull.<Object>nullValue());
+  }
+
+  public static class SuccessComponent implements Callable {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transaction/jms-concurrent-in-transaction.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      messageSuccessfulReceived.release();
+      messageFailureReceived.await(TIMEOUT, TimeUnit.MILLISECONDS);
+      return eventContext.getMessage();
     }
+  }
 
-    @Test
-    @Ignore("MULE-6926") 
-    public void testTwoMessagesOneRollbackOneCommit() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        muleClient.dispatch("jms://in", "success", null);
-        muleClient.dispatch("jms://in", "failure", null);
-        if (!messageSuccessfulReceived.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("JMS messages didn't execute concurrently, might be using only one Session for more than one transaction");
-        }
-        if (!messageFailureReceived.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("JMS messages didn't execute concurrently, might be using only one Session for more than one transaction");
-        }
-        Flow flowWithTxConfigured = (Flow) getFlowConstruct("flowWithTxConfigured");
-        flowWithTxConfigured.stop();
-        MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
-        assertThat(muleMessage, IsNull.<Object>notNullValue());
-        muleMessage = muleClient.request("jms://in", TIMEOUT);
-        assertThat(muleMessage, IsNull.<Object>nullValue());
-    }
+  public static class FailureComponent implements Callable {
 
-    public static class SuccessComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            messageSuccessfulReceived.release();
-            messageFailureReceived.await(TIMEOUT, TimeUnit.MILLISECONDS);
-            return eventContext.getMessage();
-        }
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      try {
+        throw new RuntimeException("something bad happend :)");
+      } finally {
+        messageFailureReceived.release();
+        messageSuccessfulReceived.await(TIMEOUT, TimeUnit.MILLISECONDS);
+      }
     }
-
-    public static class FailureComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            try
-            {
-                throw new RuntimeException("something bad happend :)");
-            }
-            finally
-            {
-                messageFailureReceived.release();
-                messageSuccessfulReceived.await(TIMEOUT,TimeUnit.MILLISECONDS);
-            }
-        }
-    }
+  }
 }

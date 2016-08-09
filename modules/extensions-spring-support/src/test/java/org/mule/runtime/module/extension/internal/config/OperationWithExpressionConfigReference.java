@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal.config;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-public class OperationWithExpressionConfigReference extends InvalidExtensionConfigTestCase
-{
+public class OperationWithExpressionConfigReference extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[]{HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {HeisenbergExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "operation-with-expression-config-ref.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "operation-with-expression-config-ref.xml";
+  }
 }

@@ -23,44 +23,40 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractIntegrationTestCase
-{
+public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "collection-aggregator-router-custom-store.xml";
+  }
+
+  @Test
+  public void eventGroupWithCustomStore() throws Exception {
+    MuleClient client = muleContext.getClient();
+    List<String> list = Arrays.asList("first", "second");
+
+    flowRunner("splitter").withPayload(list).run();
+
+    MuleMessage request = client.request("test://out", 10000);
+    assertNotNull(request);
+    assertEquals(list.size(), ((List) request.getPayload()).size());
+
+    assertThat(CustomPartitionableObjectStore.askedForKey, not(nullValue()));
+    assertThat(CustomPartitionableObjectStore.askedForPartition, not(nullValue()));
+  }
+
+
+  public static class CustomPartitionableObjectStore extends PartitionedInMemoryObjectStore<Serializable> {
+
+    private static Serializable askedForKey;
+    private static Serializable askedForPartition;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "collection-aggregator-router-custom-store.xml";
+    public Serializable retrieve(Serializable key, String partitionKey) throws ObjectStoreException {
+      askedForKey = key;
+      askedForPartition = partitionKey;
+      return super.retrieve(key, partitionKey);
     }
-
-    @Test
-    public void eventGroupWithCustomStore() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        List<String> list = Arrays.asList("first", "second");
-
-        flowRunner("splitter").withPayload(list).run();
-
-        MuleMessage request = client.request("test://out", 10000);
-        assertNotNull(request);
-        assertEquals(list.size(), ((List) request.getPayload()).size());
-
-        assertThat(CustomPartitionableObjectStore.askedForKey, not(nullValue()));
-        assertThat(CustomPartitionableObjectStore.askedForPartition, not(nullValue()));
-    }
-
-
-    public static class CustomPartitionableObjectStore extends PartitionedInMemoryObjectStore<Serializable>
-    {
-        private static Serializable askedForKey;
-        private static Serializable askedForPartition;
-
-        @Override
-        public Serializable retrieve(Serializable key, String partitionKey) throws ObjectStoreException
-        {
-            askedForKey = key;
-            askedForPartition = partitionKey;
-            return super.retrieve(key, partitionKey);
-        }
-    }
+  }
 
 }

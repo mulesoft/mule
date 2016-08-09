@@ -12,26 +12,22 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
- * This can be used inside a {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser} - it
- * takes named properties and, instead of inserting them individually on the target, it packages them as
- * a Map and inserts that.
+ * This can be used inside a {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser} - it takes named
+ * properties and, instead of inserting them individually on the target, it packages them as a Map and inserts that.
  */
-public class AttributeMapBeanAssembler extends AbstractMapBeanAssembler
-{
+public class AttributeMapBeanAssembler extends AbstractMapBeanAssembler {
 
-    public AttributeMapBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-                                     PropertyConfiguration targetConfig, BeanDefinition target)
-    {
-        super(beanConfig, bean, targetConfig, target);
-    }
+  public AttributeMapBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                   PropertyConfiguration targetConfig, BeanDefinition target) {
+    super(beanConfig, bean, targetConfig, target);
+  }
 
-    /**
-     * We override this method to insert a map instead of the definition.
-     */
-    public void insertBeanInTarget(String oldName)
-    {
-        assertTargetPresent();
-        insertDefinitionAsMap(oldName);
-    }
+  /**
+   * We override this method to insert a map instead of the definition.
+   */
+  public void insertBeanInTarget(String oldName) {
+    assertTargetPresent();
+    insertDefinitionAsMap(oldName);
+  }
 
 }

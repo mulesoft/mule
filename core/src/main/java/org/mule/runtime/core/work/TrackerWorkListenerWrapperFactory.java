@@ -9,12 +9,10 @@ package org.mule.runtime.core.work;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkListener;
 
-public class TrackerWorkListenerWrapperFactory implements WorkListenerWrapperFactory
-{
+public class TrackerWorkListenerWrapperFactory implements WorkListenerWrapperFactory {
 
-    @Override
-    public WorkListener create(Work work, WorkListener listener)
-    {
-        return new TrackerWorkListener(work, listener);
-    }
+  @Override
+  public WorkListener create(Work work, WorkListener listener) {
+    return new TrackerWorkListener(work, listener);
+  }
 }

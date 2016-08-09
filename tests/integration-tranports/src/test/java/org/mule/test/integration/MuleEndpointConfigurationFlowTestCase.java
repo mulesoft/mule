@@ -35,119 +35,108 @@ import org.junit.Test;
 /**
  * Test the creation of various targets from the service descriptor
  */
-public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/test-endpoints-config-flow.xml";
-    }
+public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testComponent3RouterEndpoints() throws Exception
-    {
-        Object flow = muleContext.getRegistry().lookupObject("TestComponent3");
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/test-endpoints-config-flow.xml";
+  }
 
-        assertNotNull(flow);
-        List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+  @Test
+  public void testComponent3RouterEndpoints() throws Exception {
+    Object flow = muleContext.getRegistry().lookupObject("TestComponent3");
 
-        assertNotNull(messageProcessors);
-        assertEquals(2, messageProcessors.size());
+    assertNotNull(flow);
+    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
 
-        // <all> Router
-        OutboundRouter allRouter = (OutboundRouter) messageProcessors.get(1);
-        assertEquals(3, allRouter.getRoutes().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(0);
-        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("tcp://localhost:60201", endpoint.getEndpointURI().getAddress());
-        assertTrue(endpoint instanceof OutboundEndpoint);
+    assertNotNull(messageProcessors);
+    assertEquals(2, messageProcessors.size());
 
-        endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(1);
-        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertTrue(endpoint instanceof OutboundEndpoint);
+    // <all> Router
+    OutboundRouter allRouter = (OutboundRouter) messageProcessors.get(1);
+    assertEquals(3, allRouter.getRoutes().size());
+    ImmutableEndpoint endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(0);
+    assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("tcp://localhost:60201", endpoint.getEndpointURI().getAddress());
+    assertTrue(endpoint instanceof OutboundEndpoint);
 
-        endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(2);
-        assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
-        assertTrue(endpoint instanceof OutboundEndpoint);
-    }
+    endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(1);
+    assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
+    assertTrue(endpoint instanceof OutboundEndpoint);
 
-    @Test
-    public void testComponent4InboundEndpoint() throws Exception
-    {
-        Object flow = muleContext.getRegistry().lookupObject("TestComponent4");
+    endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(2);
+    assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
+    assertTrue(endpoint instanceof OutboundEndpoint);
+  }
 
-        assertNotNull(flow);
-        assertNotNull(((Flow) flow).getMessageSource());
+  @Test
+  public void testComponent4InboundEndpoint() throws Exception {
+    Object flow = muleContext.getRegistry().lookupObject("TestComponent4");
 
-        assertEquals(1, ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource()).getMessageProcessors()
-            .size());
+    assertNotNull(flow);
+    assertNotNull(((Flow) flow).getMessageSource());
 
-        ImmutableEndpoint endpoint = ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource());
-        assertNotNull(endpoint);
-        assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("queue4", endpoint.getEndpointURI().getAddress());
-        assertFalse(endpoint.getMessageProcessors().isEmpty());
-        assertTrue(endpoint.getMessageProcessors().get(0) instanceof ObjectToXml);
-        assertTrue(endpoint instanceof InboundEndpoint);
-    }
+    assertEquals(1, ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource()).getMessageProcessors().size());
 
-    @Test
-    public void testComponent4OutboundEndpoint() throws Exception
-    {
-        Object flow = muleContext.getRegistry().lookupObject("TestComponent4");
+    ImmutableEndpoint endpoint = ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource());
+    assertNotNull(endpoint);
+    assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("queue4", endpoint.getEndpointURI().getAddress());
+    assertFalse(endpoint.getMessageProcessors().isEmpty());
+    assertTrue(endpoint.getMessageProcessors().get(0) instanceof ObjectToXml);
+    assertTrue(endpoint instanceof InboundEndpoint);
+  }
 
-        assertNotNull(flow);
-        List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
-        assertNotNull(messageProcessors);
+  @Test
+  public void testComponent4OutboundEndpoint() throws Exception {
+    Object flow = muleContext.getRegistry().lookupObject("TestComponent4");
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
-        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertTrue(endpoint instanceof OutboundEndpoint);
-    }
+    assertNotNull(flow);
+    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+    assertNotNull(messageProcessors);
 
-    @Test
-    public void testComponent5RouterEndpoints() throws Exception
-    {
-        Object flow = muleContext.getRegistry().lookupObject("TestComponent5");
+    ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
+    assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
+    assertTrue(endpoint instanceof OutboundEndpoint);
+  }
 
-        assertNotNull(flow);
-        List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
-        assertNotNull(messageProcessors);
+  @Test
+  public void testComponent5RouterEndpoints() throws Exception {
+    Object flow = muleContext.getRegistry().lookupObject("TestComponent5");
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
-        assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
-        assertTrue(endpoint instanceof OutboundEndpoint);
-    }
+    assertNotNull(flow);
+    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+    assertNotNull(messageProcessors);
 
-    @Test
-    public void testEndpointFromURI() throws Exception
-    {
-        ImmutableEndpoint ep = getEndpointFactory().getInboundEndpoint(
-            "test://hello?exchangePattern=request-response&responseTimeout=2002&connector=testConnector1");
-        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getExchangePattern());
-        assertEquals(2002, ep.getResponseTimeout());
-        assertTrue(ep instanceof InboundEndpoint);
+    ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
+    assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
+    assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
+    assertTrue(endpoint instanceof OutboundEndpoint);
+  }
 
-        // Test MuleEvent timeout proporgation
-        MuleEvent event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(),
-                (InboundEndpoint) ep, muleContext);
-        assertEquals(2002, event.getTimeout());
+  @Test
+  public void testEndpointFromURI() throws Exception {
+    ImmutableEndpoint ep = getEndpointFactory()
+        .getInboundEndpoint("test://hello?exchangePattern=request-response&responseTimeout=2002&connector=testConnector1");
+    assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getExchangePattern());
+    assertEquals(2002, ep.getResponseTimeout());
+    assertTrue(ep instanceof InboundEndpoint);
 
-        ImmutableEndpoint ep2 = getEndpointFactory().getInboundEndpoint(
-            "test://hello?connector=testConnector1");
+    // Test MuleEvent timeout proporgation
+    MuleEvent event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(), (InboundEndpoint) ep, muleContext);
+    assertEquals(2002, event.getTimeout());
 
-        event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(), (InboundEndpoint) ep2,
-                muleContext);
-        // default event timeout set in the test config file
-        assertEquals(1001, event.getTimeout());
-    }
+    ImmutableEndpoint ep2 = getEndpointFactory().getInboundEndpoint("test://hello?connector=testConnector1");
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+    event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(), (InboundEndpoint) ep2, muleContext);
+    // default event timeout set in the test config file
+    assertEquals(1001, event.getTimeout());
+  }
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

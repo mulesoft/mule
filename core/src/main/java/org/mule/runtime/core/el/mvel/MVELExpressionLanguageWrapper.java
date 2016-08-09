@@ -13,24 +13,21 @@ import org.mule.runtime.core.expression.DefaultExpressionManager;
 import javax.inject.Inject;
 
 /**
- * Wraps a {@link MVELExpressionLanguage} to take care of injecting new instances in the
- * muleContext's {@link DefaultExpressionManager}
+ * Wraps a {@link MVELExpressionLanguage} to take care of injecting new instances in the muleContext's
+ * {@link DefaultExpressionManager}
  */
-public final class MVELExpressionLanguageWrapper extends MVELExpressionLanguage
-{
-    @Inject
-    public MVELExpressionLanguageWrapper(MuleContext muleContext)
-    {
-        super(muleContext);
-    }
+public final class MVELExpressionLanguageWrapper extends MVELExpressionLanguage {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
-        {
-            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
-        }
-        super.initialise();
+  @Inject
+  public MVELExpressionLanguageWrapper(MuleContext muleContext) {
+    super(muleContext);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (muleContext.getExpressionManager() instanceof DefaultExpressionManager) {
+      ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
     }
+    super.initialise();
+  }
 }

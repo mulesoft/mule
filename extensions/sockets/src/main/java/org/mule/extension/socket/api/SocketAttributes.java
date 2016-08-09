@@ -14,40 +14,37 @@ import java.security.cert.Certificate;
 /**
  * Canonical representation a connection's metadata attributes.
  * <p>
- * It contains information such as a the port from which the sending endpoint
- * is writing information, its host name and address.
+ * It contains information such as a the port from which the sending endpoint is writing information, its host name and address.
  *
  * @since 4.0
  */
-public interface SocketAttributes extends Attributes
-{
+public interface SocketAttributes extends Attributes {
 
-    /**
-     *  @return the port number from which the sender is bounded.
-     */
-    int getPort();
+  /**
+   * @return the port number from which the sender is bounded.
+   */
+  int getPort();
 
-    /**
-     * @return the host address of the sender
-     */
-    String getHostAddress();
+  /**
+   * @return the host address of the sender
+   */
+  String getHostAddress();
 
-    /**
-     * @return the host name of the sender
-     */
-    String getHostName();
+  /**
+   * @return the host name of the sender
+   */
+  String getHostName();
 
 
-    /**
-     * @return the certificate(s) that were sent to the peer during the SSL handshaking.
-     */
-    Certificate[] getLocalCertificates();
+  /**
+   * @return the certificate(s) that were sent to the peer during the SSL handshaking.
+   */
+  Certificate[] getLocalCertificates();
 
-    /**
-     * @return  the identity of the peer which was established as part of defining the session.
-     * Note: This method can be used only when using certificate-based cipher suites;
-     * using it with non-certificate-based cipher suites, such as Kerberos,
-     * will be return {@code null}
-     */
-    Certificate[] getPeerCertificates();
+  /**
+   * @return the identity of the peer which was established as part of defining the session. Note: This method can be used only
+   *         when using certificate-based cipher suites; using it with non-certificate-based cipher suites, such as Kerberos, will
+   *         be return {@code null}
+   */
+  Certificate[] getPeerCertificates();
 }

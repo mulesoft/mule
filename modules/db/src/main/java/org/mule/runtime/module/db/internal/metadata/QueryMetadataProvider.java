@@ -13,19 +13,20 @@ import org.mule.common.metadata.MetaData;
 /**
  * Provides metadata for a given type of query
  */
-public interface QueryMetadataProvider
-{
-    /**
-     * Provides input metadata
-     *
-     * @return input metadata for a given type of query. Can be null
-     */
-    Result<MetaData> getInputMetaData();
+public interface QueryMetadataProvider {
 
-    /**
-     * Provides output metadata
-     * @param metaData metadata propagated from the input
-     * @return input metadata for a given type of query. Can be null
-     */
-    Result<MetaData> getOutputMetaData(MetaData metaData);
+  /**
+   * Provides input metadata
+   *
+   * @return input metadata for a given type of query. Can be null
+   */
+  Result<MetaData> getInputMetaData();
+
+  /**
+   * Provides output metadata
+   * 
+   * @param metaData metadata propagated from the input
+   * @return input metadata for a given type of query. Can be null
+   */
+  Result<MetaData> getOutputMetaData(MetaData metaData);
 }

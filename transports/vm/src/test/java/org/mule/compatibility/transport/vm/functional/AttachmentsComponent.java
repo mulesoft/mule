@@ -16,36 +16,31 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 /**
- * A test service that reads inbound attachments and sends an attachment back. This
- * class is only suitable for the VMAttachementsTestCase.
+ * A test service that reads inbound attachments and sends an attachment back. This class is only suitable for the
+ * VMAttachementsTestCase.
  */
-public class AttachmentsComponent implements Callable
-{
-    @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        MuleMessage msg = eventContext.getMessage();
-        if (msg.getInboundAttachmentNames().size() == 2)
-        {
-            throw new IllegalArgumentException("There shuold be 2 attachments");
-        }
+public class AttachmentsComponent implements Callable {
 
-        DataHandler dh = msg.getInboundAttachment("test-attachment");
-        if (dh == null)
-        {
-            throw new IllegalArgumentException("test-attachment is not on the message");
-        }
-        if (!dh.getContentType().startsWith("text/xml"))
-        {
-            throw new IllegalArgumentException("content type is not text/xml");
-        }
-
-        if (!"Mmm... attachments!".equals(eventContext.getMessageAsString()))
-        {
-            throw new IllegalArgumentException("payload is incorrect");
-        }
-        // Lets return an image
-        FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
-        return MuleMessage.builder().payload("here is one for you!").addOutboundAttachment("mule", new DataHandler(ds)).build();
+  @Override
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    MuleMessage msg = eventContext.getMessage();
+    if (msg.getInboundAttachmentNames().size() == 2) {
+      throw new IllegalArgumentException("There shuold be 2 attachments");
     }
+
+    DataHandler dh = msg.getInboundAttachment("test-attachment");
+    if (dh == null) {
+      throw new IllegalArgumentException("test-attachment is not on the message");
+    }
+    if (!dh.getContentType().startsWith("text/xml")) {
+      throw new IllegalArgumentException("content type is not text/xml");
+    }
+
+    if (!"Mmm... attachments!".equals(eventContext.getMessageAsString())) {
+      throw new IllegalArgumentException("payload is incorrect");
+    }
+    // Lets return an image
+    FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
+    return MuleMessage.builder().payload("here is one for you!").addOutboundAttachment("mule", new DataHandler(ds)).build();
+  }
 }

@@ -14,18 +14,15 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Thrown when a static file is requested but not found
  */
-public class ResourceNotFoundException extends MessagingException
-{
+public class ResourceNotFoundException extends MessagingException {
 
-    private static final long serialVersionUID = -6693780652453067693L;
+  private static final long serialVersionUID = -6693780652453067693L;
 
-    public ResourceNotFoundException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-    }
+  public ResourceNotFoundException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+  }
 
-    public ResourceNotFoundException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  public ResourceNotFoundException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
 }

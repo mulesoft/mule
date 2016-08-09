@@ -14,24 +14,21 @@ import java.util.Properties;
 /**
  * Defines a BootstrapServiceDiscoverer useful for testing purposes
  */
-public class TestBootstrapServiceDiscoverer implements BootstrapServiceDiscoverer
-{
+public class TestBootstrapServiceDiscoverer implements BootstrapServiceDiscoverer {
 
-    private final Properties properties;
+  private final Properties properties;
 
-    /**
-     * Creates a new instance that will discover only a {@link BootstrapService}
-     *
-     * @param properties properties that will be returned by the discovered {@link BootstrapService}
-     */
-    public TestBootstrapServiceDiscoverer(Properties properties)
-    {
-        this.properties = properties;
-    }
+  /**
+   * Creates a new instance that will discover only a {@link BootstrapService}
+   *
+   * @param properties properties that will be returned by the discovered {@link BootstrapService}
+   */
+  public TestBootstrapServiceDiscoverer(Properties properties) {
+    this.properties = properties;
+  }
 
-    @Override
-    public List<BootstrapService> discover()
-    {
-        return Collections.singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(), properties));
-    }
+  @Override
+  public List<BootstrapService> discover() {
+    return Collections.singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(), properties));
+  }
 }

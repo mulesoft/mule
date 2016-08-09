@@ -24,99 +24,83 @@ import java.util.concurrent.TimeUnit;
 /**
  * Listener for connection notifications.
  */
-public class ConnectionListener
-{
+public class ConnectionListener {
 
-    private CountDownLatch notificationReceivedLatch = new Latch();
-    private int timeout = 10000;
-    private Optional<Long> previousNotificationTimestamp = Optional.empty();
-    private Optional<Long> minimumTimeBetweenNotifications = Optional.empty();
-    private int expectedAction = ConnectionNotification.CONNECTION_CONNECTED;
+  private CountDownLatch notificationReceivedLatch = new Latch();
+  private int timeout = 10000;
+  private Optional<Long> previousNotificationTimestamp = Optional.empty();
+  private Optional<Long> minimumTimeBetweenNotifications = Optional.empty();
+  private int expectedAction = ConnectionNotification.CONNECTION_CONNECTED;
 
-    public ConnectionListener(MuleContext muleContext)
-    {
-        try
-        {
-            muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>()
-            {
-                @Override
-                public void onNotification(ConnectionNotification notification)
-                {
-                    if (notification.getAction() == expectedAction)
-                    {
-                        long currentNotificationTimestamp = System.currentTimeMillis();
-                        if (previousNotificationTimestamp.isPresent())
-                        {
-                            long timeBetweenNotifications = currentNotificationTimestamp - previousNotificationTimestamp.get();
-                            if (!minimumTimeBetweenNotifications.isPresent() || minimumTimeBetweenNotifications.get() > timeBetweenNotifications)
-                            {
-                                minimumTimeBetweenNotifications = Optional.of(timeBetweenNotifications);
-                            }
-                        }
-                        previousNotificationTimestamp = Optional.of(currentNotificationTimestamp);
-                        notificationReceivedLatch.countDown();
-                    }
-                }
-            });
-        }
-        catch (NotificationException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+  public ConnectionListener(MuleContext muleContext) {
+    try {
+      muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>() {
 
-    public void waitUntilNotificationsAreReceived()
-    {
-        try
-        {
-            if (!notificationReceivedLatch.await(timeout, TimeUnit.MILLISECONDS))
-            {
-                fail("Expected notifications were not received");
+        @Override
+        public void onNotification(ConnectionNotification notification) {
+          if (notification.getAction() == expectedAction) {
+            long currentNotificationTimestamp = System.currentTimeMillis();
+            if (previousNotificationTimestamp.isPresent()) {
+              long timeBetweenNotifications = currentNotificationTimestamp - previousNotificationTimestamp.get();
+              if (!minimumTimeBetweenNotifications.isPresent()
+                  || minimumTimeBetweenNotifications.get() > timeBetweenNotifications) {
+                minimumTimeBetweenNotifications = Optional.of(timeBetweenNotifications);
+              }
             }
+            previousNotificationTimestamp = Optional.of(currentNotificationTimestamp);
+            notificationReceivedLatch.countDown();
+          }
         }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+      });
+    } catch (NotificationException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
-     */
-    public ConnectionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
-    {
-        this.notificationReceivedLatch = new CountDownLatch(numberOfExecutionsRequired);
-        return this;
+  public void waitUntilNotificationsAreReceived() {
+    try {
+      if (!notificationReceivedLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+        fail("Expected notifications were not received");
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public ConnectionListener setTimeoutInMillis(int timeout)
-    {
-        this.timeout = timeout;
-        return this;
-    }
+  /**
+   * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
+   */
+  public ConnectionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired) {
+    this.notificationReceivedLatch = new CountDownLatch(numberOfExecutionsRequired);
+    return this;
+  }
 
-    public ConnectionListener setExpectedAction(int expectedAction)
-    {
-        this.expectedAction = expectedAction;
-        return this;
-    }
+  public ConnectionListener setTimeoutInMillis(int timeout) {
+    this.timeout = timeout;
+    return this;
+  }
 
-    /**
-     * @return resets the listener state so it can be reused
-     */
-    public ConnectionListener reset()
-    {
-        this.notificationReceivedLatch = new Latch();
-        return this;
-    }
+  public ConnectionListener setExpectedAction(int expectedAction) {
+    this.expectedAction = expectedAction;
+    return this;
+  }
 
-    /**
-     * @return the minimum time tracked between all received notifications
-     * @throws IllegalStateException if there were less than two notifications received
-     */
-    public void assertMinimumTimeBetweenNotifications(long expectedTimeBetweenNotifications)
-    {
-        Preconditions.checkState(minimumTimeBetweenNotifications.isPresent(), "At least two notifications must be received in order to get the minimum time between notifications");
-        assertThat(minimumTimeBetweenNotifications.get(), greaterThanOrEqualTo(expectedTimeBetweenNotifications));
-    }
+  /**
+   * @return resets the listener state so it can be reused
+   */
+  public ConnectionListener reset() {
+    this.notificationReceivedLatch = new Latch();
+    return this;
+  }
+
+  /**
+   * @return the minimum time tracked between all received notifications
+   * @throws IllegalStateException if there were less than two notifications received
+   */
+  public void assertMinimumTimeBetweenNotifications(long expectedTimeBetweenNotifications) {
+    Preconditions
+        .checkState(minimumTimeBetweenNotifications.isPresent(),
+                    "At least two notifications must be received in order to get the minimum time between notifications");
+    assertThat(minimumTimeBetweenNotifications.get(), greaterThanOrEqualTo(expectedTimeBetweenNotifications));
+  }
 }

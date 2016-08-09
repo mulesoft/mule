@@ -10,17 +10,16 @@ package org.mule.runtime.module.db.internal.result.statement;
 /**
  * Represents a single result from a {@link java.sql.Statement} execution
  */
-public interface StatementResult
-{
+public interface StatementResult {
 
-    /**
-     * @return name of the result. Non null
-     */
-    String getName();
+  /**
+   * @return name of the result. Non null
+   */
+  String getName();
 
 
-    /**
-     * @return value for the result. Can be null.
-     */
-    Object getResult();
+  /**
+   * @return value for the result. Can be null.
+   */
+  Object getResult();
 }

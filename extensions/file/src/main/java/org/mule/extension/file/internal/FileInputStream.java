@@ -17,42 +17,32 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * {@link AbstractFileInputStream} implementation used to obtain
- * a file's content based on a {@link Reader}.
+ * {@link AbstractFileInputStream} implementation used to obtain a file's content based on a {@link Reader}.
  * <p>
- * This stream will automatically close itself once fully
- * consumed but will not fail if {@link #close()} is invoked
- * after that.
+ * This stream will automatically close itself once fully consumed but will not fail if {@link #close()} is invoked after that.
  * <p>
- * This class also contains a {@link PathLock} which will be
- * released when the stream is closed. However, this class
- * will never invoke the {@link PathLock#tryLock()} method
- * on it, it's the responsibility of whomever is creating
- * this instance to determine if that lock is to be acquired.
+ * This class also contains a {@link PathLock} which will be released when the stream is closed. However, this class will never
+ * invoke the {@link PathLock#tryLock()} method on it, it's the responsibility of whomever is creating this instance to determine
+ * if that lock is to be acquired.
  *
  * @since 4.0
  */
-public final class FileInputStream extends AbstractFileInputStream
-{
+public final class FileInputStream extends AbstractFileInputStream {
 
-    /**
-     * Creates a new instance
-     *
-     * @param path
-     * @param lock a {@link PathLock}
-     */
-    public FileInputStream(Path path, PathLock lock)
-    {
-        super(new LazyStreamSupplier(() -> {
-            try
-            {
-                return new BufferedInputStream(Files.newInputStream(path));
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }), lock);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param path
+   * @param lock a {@link PathLock}
+   */
+  public FileInputStream(Path path, PathLock lock) {
+    super(new LazyStreamSupplier(() -> {
+      try {
+        return new BufferedInputStream(Files.newInputStream(path));
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    }), lock);
+  }
 
 }

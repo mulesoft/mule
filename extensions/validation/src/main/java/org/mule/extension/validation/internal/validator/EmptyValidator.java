@@ -19,80 +19,58 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A {@link AbstractValidator} which verifies that a given
- * {@link #value} is empty. The definition of empty depends on
- * the type of {@link #value}. If it's a {@link String} it will check that
- * it is not blank. If it's a {@link Collection}, array or {@link Map} it will check
- * that it's not empty. No other types are supported, an
- * {@link IllegalArgumentException} will be thrown if any other type is supplied
+ * A {@link AbstractValidator} which verifies that a given {@link #value} is empty. The definition of empty depends on the type of
+ * {@link #value}. If it's a {@link String} it will check that it is not blank. If it's a {@link Collection}, array or {@link Map}
+ * it will check that it's not empty. No other types are supported, an {@link IllegalArgumentException} will be thrown if any
+ * other type is supplied
  *
  * @since 3.7.0
  */
-public class EmptyValidator extends AbstractValidator
-{
+public class EmptyValidator extends AbstractValidator {
 
-    private final Object value;
-    private Message errorMessage;
+  private final Object value;
+  private Message errorMessage;
 
-    public EmptyValidator(Object value, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
+  public EmptyValidator(Object value, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    if (value == null) {
+      return ok();
+    } else if (value instanceof String) {
+      if (!StringUtils.isBlank((String) value)) {
+        errorMessage = getMessages().stringIsNotBlank();
+        return fail();
+      }
+    } else if (value instanceof Collection) {
+      if (!((Collection<?>) value).isEmpty()) {
+        errorMessage = getMessages().collectionIsNotEmpty();
+        return fail();
+      }
+    } else if (value instanceof Map) {
+      if (!((Map<?, ?>) value).isEmpty()) {
+        errorMessage = getMessages().mapIsNotEmpty();
+        return fail();
+      }
+    } else if (value.getClass().isArray()) {
+      if (ArrayUtils.getLength(value) > 0) {
+        errorMessage = getMessages().arrayIsNotEmpty();
+        return fail();
+      }
+    } else {
+      throw new IllegalArgumentException(String.format(
+                                                       "Only instances of Map, Collection, Array and String can be checked for emptyness. Instance of %s was found instead",
+                                                       value.getClass().getName()));
     }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        if (value == null)
-        {
-            return ok();
-        }
-        else if (value instanceof String)
-        {
-            if (!StringUtils.isBlank((String) value))
-            {
-                errorMessage = getMessages().stringIsNotBlank();
-                return fail();
-            }
-        }
-        else if (value instanceof Collection)
-        {
-            if (!((Collection<?>) value).isEmpty())
-            {
-                errorMessage = getMessages().collectionIsNotEmpty();
-                return fail();
-            }
-        }
-        else if (value instanceof Map)
-        {
-            if (!((Map<?, ?>) value).isEmpty())
-            {
-                errorMessage = getMessages().mapIsNotEmpty();
-                return fail();
-            }
-        }
-        else if (value.getClass().isArray())
-        {
-            if (ArrayUtils.getLength(value) > 0)
-            {
-                errorMessage = getMessages().arrayIsNotEmpty();
-                return fail();
-            }
-        }
-        else
-        {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Only instances of Map, Collection, Array and String can be checked for emptyness. Instance of %s was found instead",
-                            value.getClass().getName()));
-        }
+    return ok();
+  }
 
-        return ok();
-    }
-
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return errorMessage;
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return errorMessage;
+  }
 }

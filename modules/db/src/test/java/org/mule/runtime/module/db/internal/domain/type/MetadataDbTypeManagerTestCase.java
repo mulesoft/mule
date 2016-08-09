@@ -31,98 +31,89 @@ import java.util.Map;
 import org.junit.Test;
 
 @SmallTest
-public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
-{
+public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase {
 
-    private static final DbType UDT_ARRAY = new ResolvedDbType(Types.ARRAY, "UDT_ARRAY");
-    private static final DbType UDT_DISTINCT = new ResolvedDbType(Types.DISTINCT, "UDT_DISTINCT");
-    private static final DbType UDT_STRUCT = new ResolvedDbType(Types.STRUCT, "UDT_STRUCT");
-    private static final DbType UDT_OK = new ResolvedDbType(1, "UDT_OK");
+  private static final DbType UDT_ARRAY = new ResolvedDbType(Types.ARRAY, "UDT_ARRAY");
+  private static final DbType UDT_DISTINCT = new ResolvedDbType(Types.DISTINCT, "UDT_DISTINCT");
+  private static final DbType UDT_STRUCT = new ResolvedDbType(Types.STRUCT, "UDT_STRUCT");
+  private static final DbType UDT_OK = new ResolvedDbType(1, "UDT_OK");
 
-    @Test
-    public void ignoreUserDefinedTypes() throws Exception
-    {
-        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
-        when(metaData.getTypeInfo()).thenReturn(createResultSetWithUserDefinedTypes());
+  @Test
+  public void ignoreUserDefinedTypes() throws Exception {
+    DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+    when(metaData.getTypeInfo()).thenReturn(createResultSetWithUserDefinedTypes());
 
-        DbConnection connection = mock(DbConnection.class);
-        when(connection.getMetaData()).thenReturn(metaData);
+    DbConnection connection = mock(DbConnection.class);
+    when(connection.getMetaData()).thenReturn(metaData);
 
-        MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+    MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
 
-        assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
+    assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
 
-        assertNotContainsUserDefinedType(typeManager, connection, UDT_ARRAY);
-        assertNotContainsUserDefinedType(typeManager, connection, UDT_DISTINCT);
-        assertNotContainsUserDefinedType(typeManager, connection, UDT_STRUCT);
+    assertNotContainsUserDefinedType(typeManager, connection, UDT_ARRAY);
+    assertNotContainsUserDefinedType(typeManager, connection, UDT_DISTINCT);
+    assertNotContainsUserDefinedType(typeManager, connection, UDT_STRUCT);
+  }
+
+  @Test
+  public void ignoreDuplicatedTypes() throws Exception {
+    DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+    when(metaData.getTypeInfo()).thenReturn(createResultSetWithDuplicatedTypes());
+
+    DbConnection connection = mock(DbConnection.class);
+    when(connection.getMetaData()).thenReturn(metaData);
+
+    MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+
+    assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
+  }
+
+  private void assertNotContainsUserDefinedType(MetadataDbTypeManager typeManager, DbConnection connection, DbType udtDbType) {
+    try {
+      typeManager.lookup(connection, udtDbType.getId(), udtDbType.getName());
+      fail("User defined types must not be registered by the MetadataDbTypeManager.");
+    } catch (UnknownDbTypeException e) {
+      // Expected
     }
+  }
 
-    @Test
-    public void ignoreDuplicatedTypes() throws Exception
-    {
-        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
-        when(metaData.getTypeInfo()).thenReturn(createResultSetWithDuplicatedTypes());
+  private ResultSet createResultSetWithUserDefinedTypes() throws SQLException {
+    List<ColumnMetadata> columns = getTypeMedataColumns();
 
-        DbConnection connection = mock(DbConnection.class);
-        when(connection.getMetaData()).thenReturn(metaData);
+    ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
 
-        MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+    addRecord(resultSetBuilder, UDT_ARRAY);
+    addRecord(resultSetBuilder, UDT_DISTINCT);
+    addRecord(resultSetBuilder, UDT_STRUCT);
+    addRecord(resultSetBuilder, UDT_OK);
 
-        assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
-    }
+    return resultSetBuilder.build();
+  }
 
-    private void assertNotContainsUserDefinedType(MetadataDbTypeManager typeManager, DbConnection connection, DbType udtDbType)
-    {
-        try
-        {
-            typeManager.lookup(connection, udtDbType.getId(), udtDbType.getName());
-            fail("User defined types must not be registered by the MetadataDbTypeManager.");
-        }
-        catch (UnknownDbTypeException e)
-        {
-            // Expected
-        }
-    }
+  private ResultSet createResultSetWithDuplicatedTypes() throws SQLException {
+    List<ColumnMetadata> columns = getTypeMedataColumns();
 
-    private ResultSet createResultSetWithUserDefinedTypes() throws SQLException
-    {
-        List<ColumnMetadata> columns = getTypeMedataColumns();
+    ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
 
-        ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
+    addRecord(resultSetBuilder, UDT_OK);
+    addRecord(resultSetBuilder, UDT_OK);
 
-        addRecord(resultSetBuilder, UDT_ARRAY);
-        addRecord(resultSetBuilder, UDT_DISTINCT);
-        addRecord(resultSetBuilder, UDT_STRUCT);
-        addRecord(resultSetBuilder, UDT_OK);
+    return resultSetBuilder.build();
+  }
 
-        return resultSetBuilder.build();
-    }
+  private List<ColumnMetadata> getTypeMedataColumns() {
+    List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
+    columns
+        .add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, 1));
+    columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN,
+                                   MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, 2));
+    return columns;
+  }
 
-    private ResultSet createResultSetWithDuplicatedTypes() throws SQLException
-    {
-        List<ColumnMetadata> columns = getTypeMedataColumns();
-
-        ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
-
-        addRecord(resultSetBuilder, UDT_OK);
-        addRecord(resultSetBuilder, UDT_OK);
-
-        return resultSetBuilder.build();
-    }
-
-    private List<ColumnMetadata> getTypeMedataColumns()
-    {
-        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
-        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, 1));
-        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, 2));
-        return columns;
-    }
-
-    private void addRecord(ResultSetBuilder resultSetBuilder, DbType dbType)
-    {
-        Map<String, Object> record = new HashMap<String, Object>();
-        record.put(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, dbType.getId());
-        record.put(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, dbType.getName());
-        resultSetBuilder.with(record);
-    }
+  private void addRecord(ResultSetBuilder resultSetBuilder, DbType dbType) {
+    Map<String, Object> record = new HashMap<String, Object>();
+    record.put(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, dbType.getId());
+    record.put(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, dbType.getName());
+    resultSetBuilder.with(record);
+  }
 }

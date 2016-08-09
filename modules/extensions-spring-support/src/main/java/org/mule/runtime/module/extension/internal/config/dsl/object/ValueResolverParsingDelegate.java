@@ -10,12 +10,10 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
- * Specialization of {@link ParsingDelegate} that always produces
- * instances of {@link ValueResolver}
+ * Specialization of {@link ParsingDelegate} that always produces instances of {@link ValueResolver}
  *
  * @since 4.0
  */
-public interface ValueResolverParsingDelegate extends ParsingDelegate<MetadataType, ValueResolver<Object>>
-{
+public interface ValueResolverParsingDelegate extends ParsingDelegate<MetadataType, ValueResolver<Object>> {
 
 }

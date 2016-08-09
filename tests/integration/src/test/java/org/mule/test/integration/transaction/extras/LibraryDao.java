@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.transaction.extras;
 
-public interface LibraryDao
-{
-    boolean insertBook(Book book) throws Exception;
+public interface LibraryDao {
+
+  boolean insertBook(Book book) throws Exception;
 }

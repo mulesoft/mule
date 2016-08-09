@@ -20,40 +20,35 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @since 4.0
  */
 // TODO: Change generic signature for a more specific one. MULE-9874
-public abstract class AbstractRetrieverProvider<Connection extends AbstractEmailConnection> extends AbstractEmailConnectionProvider<Connection>
-        implements PoolingConnectionProvider<Connection>
-{
+public abstract class AbstractRetrieverProvider<Connection extends AbstractEmailConnection>
+    extends AbstractEmailConnectionProvider<Connection> implements PoolingConnectionProvider<Connection> {
 
-    /**
-     * A basic set of parameters for email connections.
-     */
-    @ParameterGroup
-    protected EmailConnectionSettings settings;
+  /**
+   * A basic set of parameters for email connections.
+   */
+  @ParameterGroup
+  protected EmailConnectionSettings settings;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect(Connection connection)
-    {
-        connection.disconnect();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect(Connection connection) {
+    connection.disconnect();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validate(Connection connection) {
+    return connection.validate();
+  }
+
+  @Override
+  public void onBorrow(Connection connection) {
+    if (connection instanceof RetrieverConnection) {
+      ((RetrieverConnection) connection).closeFolder(false);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validate(Connection connection)
-    {
-        return connection.validate();
-    }
-
-    @Override
-    public void onBorrow(Connection connection)
-    {
-        if (connection instanceof RetrieverConnection)
-        {
-            ((RetrieverConnection) connection).closeFolder(false);
-        }
-    }
+  }
 }

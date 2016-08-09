@@ -9,31 +9,27 @@ package org.mule.runtime.module.management.i18n;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class ManagementMessages extends MessageFactory
-{
-    private static final ManagementMessages factory = new ManagementMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath("management");
+public class ManagementMessages extends MessageFactory {
 
-    public static Message createOrLocateShouldBeSet()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  private static final ManagementMessages factory = new ManagementMessages();
 
-    public static Message cannotLocateOrCreateServer()
-    {
-        return factory.createMessage(BUNDLE_PATH, 2);
-    }
+  private static final String BUNDLE_PATH = getBundlePath("management");
 
-    public static Message noMBeanServerAvailable()
-    {
-        return factory.createMessage(BUNDLE_PATH, 3);
-    }
+  public static Message createOrLocateShouldBeSet() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
 
-    public static Message forceGC(long[] heapSizes)
-    {
-        return factory.createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
-    }
+  public static Message cannotLocateOrCreateServer() {
+    return factory.createMessage(BUNDLE_PATH, 2);
+  }
+
+  public static Message noMBeanServerAvailable() {
+    return factory.createMessage(BUNDLE_PATH, 3);
+  }
+
+  public static Message forceGC(long[] heapSizes) {
+    return factory.createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
+  }
 
 
 }

@@ -15,32 +15,29 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractIntegrationTestCase
-{
+public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return  "org/mule/module/xml/property-extractor-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/property-extractor-test.xml";
+  }
 
-    protected abstract Object getMatchMessage() throws Exception;
+  protected abstract Object getMatchMessage() throws Exception;
 
-    protected abstract Object getErrorMessage() throws Exception;
+  protected abstract Object getErrorMessage() throws Exception;
 
-    @Test
-    public void testMatch() throws Exception
-    {
-        MuleMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
+  @Test
+  public void testMatch() throws Exception {
+    MuleMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
 
-        assertNotNull(message);
-        assertThat(message.getPayload(), is("match"));
-    }
+    assertNotNull(message);
+    assertThat(message.getPayload(), is("match"));
+  }
 
-    @Test
-    public void testError() throws Exception
-    {
-        MessagingException e = flowRunner("test").withPayload(getErrorMessage()).runExpectingException();
-        assertThat(e.getMessage(), is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.runtime.core.api.expression.ExpressionRuntimeException)."));
-    }
+  @Test
+  public void testError() throws Exception {
+    MessagingException e = flowRunner("test").withPayload(getErrorMessage()).runExpectingException();
+    assertThat(e.getMessage(),
+               is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.runtime.core.api.expression.ExpressionRuntimeException)."));
+  }
 }

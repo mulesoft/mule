@@ -17,59 +17,52 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-public class EmailAttachment
-{
+public class EmailAttachment {
 
-    /**
-     * the name of the attachment.
-     */
-    @Parameter
-    private String id;
-    /**
-     * the content of the attachment.
-     */
-    @Parameter
-    @XmlHints(allowReferences = false)
-    private Object content;
-    /**
-     * the content type of the attachment content.
-     */
-    @Parameter
-    @Optional
-    private String contentType;
+  /**
+   * the name of the attachment.
+   */
+  @Parameter
+  private String id;
+  /**
+   * the content of the attachment.
+   */
+  @Parameter
+  @XmlHints(allowReferences = false)
+  private Object content;
+  /**
+   * the content type of the attachment content.
+   */
+  @Parameter
+  @Optional
+  private String contentType;
 
-    public EmailAttachment()
-    {
-    }
+  public EmailAttachment() {}
 
-    public EmailAttachment(String id, Object content, MediaType contentType)
-    {
-        this.id = id;
-        this.content = content;
-        this.contentType = contentType.toString();
-    }
+  public EmailAttachment(String id, Object content, MediaType contentType) {
+    this.id = id;
+    this.content = content;
+    this.contentType = contentType.toString();
+  }
 
-    /**
-     * @return the name of the attachment.
-     */
-    public String getId()
-    {
-        return id;
-    }
+  /**
+   * @return the name of the attachment.
+   */
+  public String getId() {
+    return id;
+  }
 
-    /**
-     * @return the content of the attachment.
-     */
-    public Object getContent()
-    {
-        return content;
-    }
+  /**
+   * @return the content of the attachment.
+   */
+  public Object getContent() {
+    return content;
+  }
 
-    /**
-     * @return the content type of the attachment content.
-     */
-    public MediaType getContentType()
-    {
-        return contentType != null ? DataType.builder().mediaType(contentType).build().getMediaType() : null;
-    }
+  /**
+   * @return the content type of the attachment content.
+   */
+  public MediaType getContentType() {
+    return contentType != null ? DataType.builder().mediaType(contentType).build().getMediaType() : null;
+  }
 }

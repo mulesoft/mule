@@ -22,36 +22,32 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LoggerContextReaperThreadFactoryTestCase extends AbstractMuleTestCase
-{
+public class LoggerContextReaperThreadFactoryTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ClassLoader contextClassLoader;
+  @Mock
+  private ClassLoader contextClassLoader;
 
-    @Mock
-    private Runnable runnable;
+  @Mock
+  private Runnable runnable;
 
-    private LoggerContextReaperThreadFactory factory;
-    private Thread thread;
+  private LoggerContextReaperThreadFactory factory;
+  private Thread thread;
 
-    @Before
-    public void before()
-    {
-        factory = new LoggerContextReaperThreadFactory(contextClassLoader);
-        thread = factory.newThread(runnable);
-    }
+  @Before
+  public void before() {
+    factory = new LoggerContextReaperThreadFactory(contextClassLoader);
+    thread = factory.newThread(runnable);
+  }
 
-    @Test
-    public void testProperties() throws Exception
-    {
-        assertThat(thread.getName(), is(THREAD_NAME));
-        assertThat(thread.getContextClassLoader(), is(sameInstance(contextClassLoader)));
-    }
+  @Test
+  public void testProperties() throws Exception {
+    assertThat(thread.getName(), is(THREAD_NAME));
+    assertThat(thread.getContextClassLoader(), is(sameInstance(contextClassLoader)));
+  }
 
-    @Test
-    public void runDelegatesIntoTheRightRunnable()
-    {
-        thread.run();
-        verify(runnable).run();
-    }
+  @Test
+  public void runDelegatesIntoTheRightRunnable() {
+    thread.run();
+    verify(runnable).run();
+  }
 }

@@ -10,11 +10,10 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService(serviceName = "WeatherForecaster", portName = "WeatherForecasterPort")
-public class WeatherForecaster
-{
-    @WebMethod(operationName = "GetWeatherByZipCode")
-    public String getByZipCode(String zipCode)
-    {
-        return zipCode + ": cloudy with chances of meatballs.";
-    }
+public class WeatherForecaster {
+
+  @WebMethod(operationName = "GetWeatherByZipCode")
+  public String getByZipCode(String zipCode) {
+    return zipCode + ": cloudy with chances of meatballs.";
+  }
 }

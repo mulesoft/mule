@@ -8,9 +8,8 @@ package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleEvent;
 
-public interface ResponseValidator
-{
+public interface ResponseValidator {
 
-    public void validate(MuleEvent responseEvent) throws ResponseValidatorException;
+  public void validate(MuleEvent responseEvent) throws ResponseValidatorException;
 
 }

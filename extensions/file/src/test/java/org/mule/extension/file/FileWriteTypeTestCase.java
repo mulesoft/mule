@@ -24,75 +24,60 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
-public class FileWriteTypeTestCase extends FileConnectorTestCase
-{
+public class FileWriteTypeTestCase extends FileConnectorTestCase {
 
-    @Parameters(name = "{0}")
-    public static Iterable<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {"String", HELLO_WORLD, HELLO_WORLD},
-                {"native byte", "A".getBytes()[0], "A"},
-                {"Object byte", new Byte("A".getBytes()[0]), "A"},
-                {"byte[]", HELLO_WORLD.getBytes(), HELLO_WORLD},
-                {"OutputHandler", new TestOutputHandler(), HELLO_WORLD},
-                {"InputStream", new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
-        });
-    }
+  @Parameters(name = "{0}")
+  public static Iterable<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"String", HELLO_WORLD, HELLO_WORLD}, {"native byte", "A".getBytes()[0], "A"},
+        {"Object byte", new Byte("A".getBytes()[0]), "A"}, {"byte[]", HELLO_WORLD.getBytes(), HELLO_WORLD},
+        {"OutputHandler", new TestOutputHandler(), HELLO_WORLD},
+        {"InputStream", new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},});
+  }
 
-    private final Object content;
-    private final String expected;
-    private String path;
+  private final Object content;
+  private final String expected;
+  private String path;
 
-    public FileWriteTypeTestCase(String name, Object content, String expected)
-    {
-        this.content = content;
-        this.expected = expected;
-    }
+  public FileWriteTypeTestCase(String name, Object content, String expected) {
+    this.content = content;
+    this.expected = expected;
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "file-write-config.xml";
+  }
+
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    path = temporaryFolder.newFolder().getPath() + "/test.txt";
+  }
+
+  @Test
+  public void writeAndAssert() throws Exception {
+    write(content);
+    assertThat(readPathAsString(path), equalTo(expected));
+  }
+
+  private void write(Object content) throws Exception {
+    doWrite(path, content, FileWriteMode.APPEND, false);
+  }
+
+  private static class TestOutputHandler implements OutputHandler {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "file-write-config.xml";
+    public void write(MuleEvent event, OutputStream out) throws IOException {
+      IOUtils.write(HELLO_WORLD, out);
     }
+  }
 
+  private static class HelloWorld {
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        path = temporaryFolder.newFolder().getPath() + "/test.txt";
+    public String toString() {
+      return HELLO_WORLD;
     }
-
-    @Test
-    public void writeAndAssert() throws Exception
-    {
-        write(content);
-        assertThat(readPathAsString(path), equalTo(expected));
-    }
-
-    private void write(Object content) throws Exception
-    {
-        doWrite(path, content, FileWriteMode.APPEND, false);
-    }
-
-    private static class TestOutputHandler implements OutputHandler
-    {
-
-        @Override
-        public void write(MuleEvent event, OutputStream out) throws IOException
-        {
-            IOUtils.write(HELLO_WORLD, out);
-        }
-    }
-
-    private static class HelloWorld
-    {
-
-        @Override
-        public String toString()
-        {
-            return HELLO_WORLD;
-        }
-    }
+  }
 }

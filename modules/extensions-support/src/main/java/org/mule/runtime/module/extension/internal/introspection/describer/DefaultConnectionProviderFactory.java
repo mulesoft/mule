@@ -19,60 +19,52 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConnectionPro
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
  *
- * @param <Connection> the generic type for the connections that the created  {@link ConnectionProvider providers} produce
+ * @param <Connection> the generic type for the connections that the created {@link ConnectionProvider providers} produce
  * @since 4.0
  */
-final class DefaultConnectionProviderFactory<Connection> implements ConnectionProviderFactory<Connection>
-{
+final class DefaultConnectionProviderFactory<Connection> implements ConnectionProviderFactory<Connection> {
 
-    private final Class<? extends ConnectionProvider> providerClass;
-    private final ClassLoader extensionClassLoader;
+  private final Class<? extends ConnectionProvider> providerClass;
+  private final ClassLoader extensionClassLoader;
 
-    /**
-     * Creates a new instance which creates {@link ConnectionProvider} instances of the given
-     * {@code providerClass}
-     *
-     * @param providerClass        the {@link Class} of the created {@link ConnectionProvider providers}
-     * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
-     * @throws IllegalModelDefinitionException if {@code providerClass} doesn't implement the {@link ConnectionProvider} interface
-     * @throws IllegalArgumentException        if {@code providerClass} is not an instantiable type
-     */
-    DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader)
-    {
-        this.extensionClassLoader = extensionClassLoader;
-        if (!ConnectionProvider.class.isAssignableFrom(providerClass))
-        {
-            throw new IllegalConnectionProviderModelDefinitionException(String.format(
-                    "Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
-                    providerClass.getName(), ConnectionProvider.class.getName()));
-        }
-
-        checkInstantiable(providerClass);
-        this.providerClass = (Class<? extends ConnectionProvider>) providerClass;
+  /**
+   * Creates a new instance which creates {@link ConnectionProvider} instances of the given {@code providerClass}
+   *
+   * @param providerClass the {@link Class} of the created {@link ConnectionProvider providers}
+   * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
+   * @throws IllegalModelDefinitionException if {@code providerClass} doesn't implement the {@link ConnectionProvider} interface
+   * @throws IllegalArgumentException if {@code providerClass} is not an instantiable type
+   */
+  DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader) {
+    this.extensionClassLoader = extensionClassLoader;
+    if (!ConnectionProvider.class.isAssignableFrom(providerClass)) {
+      throw new IllegalConnectionProviderModelDefinitionException(String
+          .format("Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
+                  providerClass.getName(), ConnectionProvider.class.getName()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionProvider<Connection> newInstance()
-    {
-        try
-        {
-            return (ConnectionProvider) withContextClassLoader(extensionClassLoader, providerClass::newInstance);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not create connection provider of type " + providerClass.getName()), e);
-        }
-    }
+    checkInstantiable(providerClass);
+    this.providerClass = (Class<? extends ConnectionProvider>) providerClass;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<? extends ConnectionProvider> getObjectType()
-    {
-        return providerClass;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionProvider<Connection> newInstance() {
+    try {
+      return (ConnectionProvider) withContextClassLoader(extensionClassLoader, providerClass::newInstance);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create connection provider of type "
+          + providerClass.getName()), e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<? extends ConnectionProvider> getObjectType() {
+    return providerClass;
+  }
 }

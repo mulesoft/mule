@@ -24,93 +24,73 @@ import java.util.concurrent.TimeUnit;
 /**
  * Listener for exceptions managed by the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler}.
  */
-public class SystemExceptionListener
-{
+public class SystemExceptionListener {
 
-    private CountDownLatch exceptionThrownLatch = new Latch();
-    private int timeout = 10000;
-    private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+  private CountDownLatch exceptionThrownLatch = new Latch();
+  private int timeout = 10000;
+  private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
 
-    public SystemExceptionListener(MuleContext muleContext)
-    {
-        try
-        {
-            final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
-            muleContext.setExceptionListener(new SystemExceptionHandler()
-            {
-                @Override
-                public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
-                {
-                    try
-                    {
-                        exceptionListener.handleException(exception, rollbackMethod);
-                    }
-                    finally
-                    {
-                        exceptionThrownLatch.countDown();
-                    }
-                }
+  public SystemExceptionListener(MuleContext muleContext) {
+    try {
+      final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
+      muleContext.setExceptionListener(new SystemExceptionHandler() {
 
-                @Override
-                public void handleException(Exception exception)
-                {
-                    try
-                    {
-                        exceptionListener.handleException(exception);
-                    }
-                    finally
-                    {
-                        exceptionThrownLatch.countDown();
-                    }
-                }
-            });
-            muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
-            {
-                @Override
-                public void onNotification(ExceptionNotification notification)
-                {
-                    exceptionNotifications.add(notification);
-
-                }
-            });
+        @Override
+        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
+          try {
+            exceptionListener.handleException(exception, rollbackMethod);
+          } finally {
+            exceptionThrownLatch.countDown();
+          }
         }
-        catch (NotificationException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public SystemExceptionListener waitUntilAllNotificationsAreReceived()
-    {
-        try
-        {
-            if (!exceptionThrownLatch.await(timeout, TimeUnit.MILLISECONDS))
-            {
-                fail("An exception was never thrown");
-            }
+        @Override
+        public void handleException(Exception exception) {
+          try {
+            exceptionListener.handleException(exception);
+          } finally {
+            exceptionThrownLatch.countDown();
+          }
         }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
+      });
+      muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+
+        @Override
+        public void onNotification(ExceptionNotification notification) {
+          exceptionNotifications.add(notification);
+
         }
-        return this;
+      });
+    } catch (NotificationException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
-     */
-    public SystemExceptionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
-    {
-        this.exceptionThrownLatch = new CountDownLatch(numberOfExecutionsRequired);
-        return this;
+  public SystemExceptionListener waitUntilAllNotificationsAreReceived() {
+    try {
+      if (!exceptionThrownLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+        fail("An exception was never thrown");
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+    return this;
+  }
 
-    /**
-     * @param timeout milliseconds to wait when calling {@link #waitUntilAllNotificationsAreReceived()} for an exception to be handled
-     */
-    public SystemExceptionListener setTimeoutInMillis(int timeout)
-    {
-        this.timeout = timeout;
-        return this;
-    }
+  /**
+   * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
+   */
+  public SystemExceptionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired) {
+    this.exceptionThrownLatch = new CountDownLatch(numberOfExecutionsRequired);
+    return this;
+  }
+
+  /**
+   * @param timeout milliseconds to wait when calling {@link #waitUntilAllNotificationsAreReceived()} for an exception to be
+   *        handled
+   */
+  public SystemExceptionListener setTimeoutInMillis(int timeout) {
+    this.timeout = timeout;
+    return this;
+  }
 }

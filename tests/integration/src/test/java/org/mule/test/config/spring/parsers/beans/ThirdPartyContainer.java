@@ -6,19 +6,16 @@
  */
 package org.mule.test.config.spring.parsers.beans;
 
-public class ThirdPartyContainer
-{
+public class ThirdPartyContainer {
 
-    private Object thing;
+  private Object thing;
 
-    public Object getThing()
-    {
-        return thing;
-    }
+  public Object getThing() {
+    return thing;
+  }
 
-    public void setThing(Object thing)
-    {
-        this.thing = thing;
-    }
+  public void setThing(Object thing) {
+    this.thing = thing;
+  }
 
 }

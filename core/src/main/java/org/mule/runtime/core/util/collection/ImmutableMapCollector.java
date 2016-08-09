@@ -25,51 +25,44 @@ import java.util.stream.Collector;
  * @param <V> the output map's values type
  * @since 4.0
  */
-public class ImmutableMapCollector<T, K, V> implements Collector<T, ImmutableMap.Builder<K, V>, Map<K, V>>
-{
+public class ImmutableMapCollector<T, K, V> implements Collector<T, ImmutableMap.Builder<K, V>, Map<K, V>> {
 
-    private final Function<T, K> keyMapper;
-    private final Function<T, V> valueMapper;
+  private final Function<T, K> keyMapper;
+  private final Function<T, V> valueMapper;
 
-    /**
-     * Creates a new instance
-     *
-     * @param keyMapper   a mapping function to produce keys
-     * @param valueMapper a mapping function to produce values
-     */
-    public ImmutableMapCollector(Function<T, K> keyMapper, Function<T, V> valueMapper)
-    {
-        this.keyMapper = keyMapper;
-        this.valueMapper = valueMapper;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param keyMapper a mapping function to produce keys
+   * @param valueMapper a mapping function to produce values
+   */
+  public ImmutableMapCollector(Function<T, K> keyMapper, Function<T, V> valueMapper) {
+    this.keyMapper = keyMapper;
+    this.valueMapper = valueMapper;
+  }
 
-    @Override
-    public Supplier<ImmutableMap.Builder<K, V>> supplier()
-    {
-        return ImmutableMap::builder;
-    }
+  @Override
+  public Supplier<ImmutableMap.Builder<K, V>> supplier() {
+    return ImmutableMap::builder;
+  }
 
-    @Override
-    public BiConsumer<ImmutableMap.Builder<K, V>, T> accumulator()
-    {
-        return (builder, value) -> builder.put(keyMapper.apply(value), valueMapper.apply(value));
-    }
+  @Override
+  public BiConsumer<ImmutableMap.Builder<K, V>, T> accumulator() {
+    return (builder, value) -> builder.put(keyMapper.apply(value), valueMapper.apply(value));
+  }
 
-    @Override
-    public BinaryOperator<ImmutableMap.Builder<K, V>> combiner()
-    {
-        return (left, right) -> left.putAll(right.build());
-    }
+  @Override
+  public BinaryOperator<ImmutableMap.Builder<K, V>> combiner() {
+    return (left, right) -> left.putAll(right.build());
+  }
 
-    @Override
-    public Function<ImmutableMap.Builder<K, V>, Map<K, V>> finisher()
-    {
-        return ImmutableMap.Builder::build;
-    }
+  @Override
+  public Function<ImmutableMap.Builder<K, V>, Map<K, V>> finisher() {
+    return ImmutableMap.Builder::build;
+  }
 
-    @Override
-    public Set<Characteristics> characteristics()
-    {
-        return ImmutableSet.of();
-    }
+  @Override
+  public Set<Characteristics> characteristics() {
+    return ImmutableSet.of();
+  }
 }

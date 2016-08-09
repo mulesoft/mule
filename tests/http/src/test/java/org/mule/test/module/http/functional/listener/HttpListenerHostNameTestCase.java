@@ -16,24 +16,21 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerHostNameTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerHostNameTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-host-name-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-host-name-config.xml";
+  }
 
-    @Test
-    public void routeToTheRightListener() throws Exception
-    {
-        final String url = String.format("http://localhost:%s/", listenPort.getNumber());
-        final Response response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-        assertThat(response.returnContent().asString(), is("ok"));
-    }
+  @Test
+  public void routeToTheRightListener() throws Exception {
+    final String url = String.format("http://localhost:%s/", listenPort.getNumber());
+    final Response response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+    assertThat(response.returnContent().asString(), is("ok"));
+  }
 
 }

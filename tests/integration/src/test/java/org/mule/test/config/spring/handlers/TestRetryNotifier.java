@@ -9,27 +9,23 @@ package org.mule.test.config.spring.handlers;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 
-public class TestRetryNotifier implements RetryNotifier
-{
-    private String color = "blue";
-    
-    public void onSuccess(RetryContext context)
-    {
-        // empty
-    }
+public class TestRetryNotifier implements RetryNotifier {
 
-    public void onFailure(RetryContext context, Throwable e)
-    {
-        // empty
-    }
+  private String color = "blue";
 
-    public String getColor()
-    {
-        return color;
-    }
+  public void onSuccess(RetryContext context) {
+    // empty
+  }
 
-    public void setColor(String color)
-    {
-        this.color = color;
-    }
+  public void onFailure(RetryContext context, Throwable e) {
+    // empty
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
+  }
 }

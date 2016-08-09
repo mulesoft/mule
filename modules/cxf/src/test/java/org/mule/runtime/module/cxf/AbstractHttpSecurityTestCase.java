@@ -21,45 +21,38 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.junit.Before;
 
-public class AbstractHttpSecurityTestCase extends FunctionalTestCase
-{
+public class AbstractHttpSecurityTestCase extends FunctionalTestCase {
 
-    @Before
-    public void setUp() throws Exception
-    {
-        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.setTrustStorePath("trustStore");
-        tlsContextFactory.setTrustStorePassword("mulepassword");
-        tlsContextFactory.initialise();
+  @Before
+  public void setUp() throws Exception {
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    tlsContextFactory.setTrustStorePath("trustStore");
+    tlsContextFactory.setTrustStorePassword("mulepassword");
+    tlsContextFactory.initialise();
 
-        SSLSocketFactory factory = tlsContextFactory.createSslContext().getSocketFactory();
-        Protocol httpsWithTrustStore = new Protocol(HTTPS.getScheme(), getSocketFactory(factory),  HTTPS.getDefaultPort());
-        Protocol.registerProtocol(HTTPS.getScheme(), httpsWithTrustStore);
-    }
+    SSLSocketFactory factory = tlsContextFactory.createSslContext().getSocketFactory();
+    Protocol httpsWithTrustStore = new Protocol(HTTPS.getScheme(), getSocketFactory(factory), HTTPS.getDefaultPort());
+    Protocol.registerProtocol(HTTPS.getScheme(), httpsWithTrustStore);
+  }
 
-    private static ProtocolSocketFactory getSocketFactory(final SSLSocketFactory factory)
-    {
-        return new ProtocolSocketFactory()
-        {
-            private SSLSocketFactory socketFactory = factory;
+  private static ProtocolSocketFactory getSocketFactory(final SSLSocketFactory factory) {
+    return new ProtocolSocketFactory() {
 
-            public Socket createSocket(String host, int port) throws IOException
-            {
-                return socketFactory.createSocket(host, port);
-            }
+      private SSLSocketFactory socketFactory = factory;
 
-            public Socket createSocket(String host, int port, InetAddress localAddress, int localPort)
-                    throws IOException
-            {
-                return socketFactory.createSocket(host, port, localAddress, localPort);
-            }
+      public Socket createSocket(String host, int port) throws IOException {
+        return socketFactory.createSocket(host, port);
+      }
 
-            public Socket createSocket(String host, int port, InetAddress localAddress, int localPort,
-                                       HttpConnectionParams params) throws IOException
-            {
-                return createSocket(host, port, localAddress, localPort);
-            }
+      public Socket createSocket(String host, int port, InetAddress localAddress, int localPort) throws IOException {
+        return socketFactory.createSocket(host, port, localAddress, localPort);
+      }
 
-        };
-    }
+      public Socket createSocket(String host, int port, InetAddress localAddress, int localPort, HttpConnectionParams params)
+          throws IOException {
+        return createSocket(host, port, localAddress, localPort);
+      }
+
+    };
+  }
 }

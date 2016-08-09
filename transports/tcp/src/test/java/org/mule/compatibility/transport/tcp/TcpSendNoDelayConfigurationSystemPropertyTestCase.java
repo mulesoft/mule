@@ -11,24 +11,21 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 
-public class TcpSendNoDelayConfigurationSystemPropertyTestCase extends TcpSendNoDelayConfigurationTestCase
-{
+public class TcpSendNoDelayConfigurationSystemPropertyTestCase extends TcpSendNoDelayConfigurationTestCase {
 
-    private static boolean defaultSendTcpNoDelay = true;
+  private static boolean defaultSendTcpNoDelay = true;
 
-    @Rule
-    public SystemProperty SendTcpNoDelaySystemProperty = new SystemProperty(
-        TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, Boolean.toString(defaultSendTcpNoDelay));
+  @Rule
+  public SystemProperty SendTcpNoDelaySystemProperty =
+      new SystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, Boolean.toString(defaultSendTcpNoDelay));
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "send-tcp-no-delay-configuration-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "send-tcp-no-delay-configuration-test.xml";
+  }
 
-    protected boolean getDefaultSendTcpNoDelay()
-    {
-        return defaultSendTcpNoDelay;
-    }
+  protected boolean getDefaultSendTcpNoDelay() {
+    return defaultSendTcpNoDelay;
+  }
 
 }

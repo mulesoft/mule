@@ -28,56 +28,46 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder
-{
+public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
 
-    private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
-    private final List<ArtifactPlugin> artifactPlugins;
+  private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
+  private final List<ArtifactPlugin> artifactPlugins;
 
-    public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins)
-    {
-        this(artifactPlugins, new DefaultExtensionManagerAdapterFactory());
+  public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins) {
+    this(artifactPlugins, new DefaultExtensionManagerAdapterFactory());
+  }
+
+  public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
+                                                          ExtensionManagerAdapterFactory extensionManagerAdapterFactory) {
+    this.artifactPlugins = artifactPlugins;
+    this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
+  }
+
+  @Override
+  protected void doConfigure(MuleContext muleContext) throws Exception {
+    final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
+
+    for (ArtifactPlugin artifactPlugin : artifactPlugins) {
+      URL manifestUrl = artifactPlugin.getArtifactClassLoader().findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
+      if (manifestUrl == null) {
+        continue;
+      }
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Discovered extension " + artifactPlugin.getArtifactName());
+      }
+      ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
+      extensionManager.registerExtension(extensionManifest, artifactPlugin.getArtifactClassLoader().getClassLoader());
     }
+  }
 
-    public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins, ExtensionManagerAdapterFactory extensionManagerAdapterFactory)
-    {
-        this.artifactPlugins = artifactPlugins;
-        this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
+  private ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) throws InitialisationException {
+    try {
+      return extensionManagerAdapterFactory.createExtensionManager(muleContext);
+    } catch (Exception e) {
+      throw new InitialisationException(e, muleContext);
     }
-
-    @Override
-    protected void doConfigure(MuleContext muleContext) throws Exception
-    {
-        final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
-
-        for (ArtifactPlugin artifactPlugin : artifactPlugins)
-        {
-            URL manifestUrl = artifactPlugin.getArtifactClassLoader().findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
-            if (manifestUrl == null)
-            {
-                continue;
-            }
-
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug("Discovered extension " + artifactPlugin.getArtifactName());
-            }
-            ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-            extensionManager.registerExtension(extensionManifest, artifactPlugin.getArtifactClassLoader().getClassLoader());
-        }
-    }
-
-    private ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) throws InitialisationException
-    {
-        try
-        {
-            return extensionManagerAdapterFactory.createExtensionManager(muleContext);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, muleContext);
-        }
-    }
+  }
 }

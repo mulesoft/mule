@@ -21,39 +21,33 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InsertDynamicQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class InsertDynamicQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public InsertDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-dynamic-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-dynamic-query-config.xml"};
+  }
 
-    @Test
-    public void usesDynamicQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("insertDynamicQuery").withPayload("Pluto").run();
+  @Test
+  public void usesDynamicQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("insertDynamicQuery").withPayload("Pluto").run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertInsert(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertInsert(response);
+  }
 
-    private void assertInsert(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getPayload(), equalTo(1));
+  private void assertInsert(MuleMessage response) throws SQLException {
+    assertThat(response.getPayload(), equalTo(1));
 
-        assertPlanetRecordsFromQuery("Pluto");
-    }
+    assertPlanetRecordsFromQuery("Pluto");
+  }
 }

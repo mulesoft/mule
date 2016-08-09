@@ -21,39 +21,33 @@ import javax.jms.TextMessage;
 
 import org.junit.Test;
 
-public class JmsObjectToMessageDataTypeTransformerTestCase extends AbstractJmsFunctionalTestCase
-{
+public class JmsObjectToMessageDataTypeTransformerTestCase extends AbstractJmsFunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-object-to-message-transformer-data-type-test-case.xml";
+  }
+
+  @Test
+  public void testDataTypeTransformation() throws Exception {
+    Scenario sendTextMessageScenario = new NonTransactedScenario() {
+
+      @Override
+      public void send(Session session, MessageProducer producer) throws JMSException {
+        producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
+      }
+    };
+    send(sendTextMessageScenario);
+    verify("message-to-string-flow");
+  }
+
+  public static class CheckTextMessageType implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-object-to-message-transformer-data-type-test-case.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      assertThat(event.getMessage().getDataType().getType(), typeCompatibleWith(TextMessage.class));
+      return event;
     }
-
-    @Test
-    public void testDataTypeTransformation() throws Exception
-    {
-        Scenario sendTextMessageScenario = new NonTransactedScenario()
-        {
-            @Override
-            public void send(Session session, MessageProducer producer) throws JMSException
-            {
-                producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            }
-        };
-        send(sendTextMessageScenario);
-        verify("message-to-string-flow");
-    }
-
-    public static class CheckTextMessageType implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            assertThat(event.getMessage().getDataType().getType(), typeCompatibleWith(TextMessage.class));
-            return event;
-        }
-    }
+  }
 
 }

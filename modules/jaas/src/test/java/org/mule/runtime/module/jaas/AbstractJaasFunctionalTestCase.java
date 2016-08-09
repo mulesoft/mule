@@ -16,50 +16,44 @@ import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.security.MuleCredentials;
 
-public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase
-{
+public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase {
 
-    protected static final String TEST_FLOW_NAME = "TestUMO";
-    protected static final String TEST_PAYLOAD = "Test";
+  protected static final String TEST_FLOW_NAME = "TestUMO";
+  protected static final String TEST_PAYLOAD = "Test";
 
-    protected SecurityHeader createSecurityHeader(String username, String password)
-        throws CryptoFailureException
-    {
-        String header = createEncryptedHeader(username, password);
-        return new SecurityHeader(MuleProperties.MULE_USER_PROPERTY, header);
+  protected SecurityHeader createSecurityHeader(String username, String password) throws CryptoFailureException {
+    String header = createEncryptedHeader(username, password);
+    return new SecurityHeader(MuleProperties.MULE_USER_PROPERTY, header);
+  }
+
+  private String createEncryptedHeader(String username, String password) throws CryptoFailureException {
+    EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
+    return MuleCredentials.createHeader(username, password, "PBE", strategy);
+  }
+
+  protected void runFlowAndExpectUnauthorizedException(SecurityHeader securityHeader) throws Exception {
+    MessagingException exception =
+        flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+            .withPayload(TEST_PAYLOAD).runExpectingException();
+    assertThat(exception, instanceOf(UnauthorisedException.class));
+  }
+
+  public static class SecurityHeader {
+
+    private String key;
+    private String value;
+
+    public SecurityHeader(String key, String value) {
+      this.key = key;
+      this.value = value;
     }
 
-    private String createEncryptedHeader(String username, String password) throws CryptoFailureException
-    {
-        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
-        return MuleCredentials.createHeader(username, password, "PBE", strategy);
+    public String getKey() {
+      return key;
     }
 
-    protected void runFlowAndExpectUnauthorizedException(SecurityHeader securityHeader) throws Exception
-    {
-        MessagingException exception = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload(TEST_PAYLOAD).runExpectingException();
-        assertThat(exception, instanceOf(UnauthorisedException.class));
+    public String getValue() {
+      return value;
     }
-
-    public static class SecurityHeader {
-
-        private String key;
-        private String value;
-
-        public SecurityHeader(String key, String value)
-        {
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getKey()
-        {
-            return key;
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
-    }
+  }
 }

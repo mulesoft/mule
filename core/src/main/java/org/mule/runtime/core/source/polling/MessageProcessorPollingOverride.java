@@ -9,39 +9,33 @@ package org.mule.runtime.core.source.polling;
 /**
  * Extension point to hook extra functionality to a message processor polling component.
  *
- * Implementation registered with Poll will be called on each execution to provide an interceptor which
- * will then be called on several execution checkpoints.
- * Note that while this class should be threadsafe, interceptors returned will be scoped on a single execution, and
- * hence may carry state.
+ * Implementation registered with Poll will be called on each execution to provide an interceptor which will then be called on
+ * several execution checkpoints. Note that while this class should be threadsafe, interceptors returned will be scoped on a
+ * single execution, and hence may carry state.
  */
-public abstract class MessageProcessorPollingOverride
-{
+public abstract class MessageProcessorPollingOverride {
 
-    /**
-     * Returns an interceptor instance.
-     * This method will be called on every poll, and may return a new instance every time or always the same instance
-     * (the latter case requires the instance to be threadsafe). Interceptor's are scoped for each poll and flow execution
-     * and will be discarded after the scope ends.
-     * @return a new interceptor instance that cn be used to alter the functionality of a message processor polling component
-     */
-    public abstract MessageProcessorPollingInterceptor interceptor();
+  /**
+   * Returns an interceptor instance. This method will be called on every poll, and may return a new instance every time or always
+   * the same instance (the latter case requires the instance to be threadsafe). Interceptor's are scoped for each poll and flow
+   * execution and will be discarded after the scope ends.
+   * 
+   * @return a new interceptor instance that cn be used to alter the functionality of a message processor polling component
+   */
+  public abstract MessageProcessorPollingInterceptor interceptor();
 
 
-    /**
-     * Override implementation that doesn't change anything. Used as a default when no override is defined
-     */
-    public static class NullOverride extends MessageProcessorPollingOverride
-    {
+  /**
+   * Override implementation that doesn't change anything. Used as a default when no override is defined
+   */
+  public static class NullOverride extends MessageProcessorPollingOverride {
 
-        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor()
-        {
-        };
+    private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor() {};
 
-        @Override
-        public MessageProcessorPollingInterceptor interceptor()
-        {
-            return noOpInterceptor;
-        }
+    @Override
+    public MessageProcessorPollingInterceptor interceptor() {
+      return noOpInterceptor;
     }
+  }
 
 }

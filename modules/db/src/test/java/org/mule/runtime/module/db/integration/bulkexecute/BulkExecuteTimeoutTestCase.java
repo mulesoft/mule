@@ -10,17 +10,14 @@ package org.mule.runtime.module.db.integration.bulkexecute;
 import org.mule.runtime.module.db.integration.AbstractQueryTimeoutTestCase;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class BulkExecuteTimeoutTestCase extends AbstractQueryTimeoutTestCase
-{
+public class BulkExecuteTimeoutTestCase extends AbstractQueryTimeoutTestCase {
 
-    public BulkExecuteTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[]{"integration/bulkexecute/bulk-execute-timeout-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-timeout-config.xml"};
+  }
 }

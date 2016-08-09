@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.routing.filter;
 /**
  * Interface for filtering any kind of object.
  */
-public interface ObjectFilter
-{
-    boolean accept(Object object);
+public interface ObjectFilter {
+
+  boolean accept(Object object);
 }

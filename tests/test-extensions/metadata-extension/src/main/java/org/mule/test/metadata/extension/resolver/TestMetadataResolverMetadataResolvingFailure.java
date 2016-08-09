@@ -17,22 +17,19 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
 import java.util.Set;
 
-public class TestMetadataResolverMetadataResolvingFailure implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
-{
+public class TestMetadataResolverMetadataResolvingFailure
+    implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
 
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException
-    {
-        throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
-    }
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException {
+    throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
+  }
 
-    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException
-    {
-        throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
-    }
+  public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+    throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
+  }
 
-    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException
-    {
-        throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
-    }
+  public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+    throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
+  }
 
 }

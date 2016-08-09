@@ -9,19 +9,16 @@ package org.mule.runtime.core.context.notification;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
-public abstract class AbstractListener<T extends ServerNotification> implements ServerNotificationListener<T>
-{
+public abstract class AbstractListener<T extends ServerNotification> implements ServerNotificationListener<T> {
 
-    private T notification = null;
+  private T notification = null;
 
-    public void onNotification(T notification)
-    {
-        this.notification = notification;
-    }
+  public void onNotification(T notification) {
+    this.notification = notification;
+  }
 
-    public boolean isNotified()
-    {
-        return null != notification;
-    }
+  public boolean isNotified() {
+    return null != notification;
+  }
 
 }

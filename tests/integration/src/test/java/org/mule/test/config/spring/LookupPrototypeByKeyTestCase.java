@@ -12,47 +12,40 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class LookupPrototypeByKeyTestCase extends AbstractIntegrationTestCase
-{
+public class LookupPrototypeByKeyTestCase extends AbstractIntegrationTestCase {
 
-    private static final String PROTOTYPE_KEY = "prototype";
+  private static final String PROTOTYPE_KEY = "prototype";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "prototype-lifecycle-object-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "prototype-lifecycle-object-config.xml";
+  }
 
-    @Test
-    public void lookupWithLifecycle() throws Exception
-    {
-        TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY, true);
-        assertLifecycleApplied(object);
-    }
+  @Test
+  public void lookupWithLifecycle() throws Exception {
+    TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY, true);
+    assertLifecycleApplied(object);
+  }
 
-    @Test
-    public void lookupWithoutLifecycle() throws Exception
-    {
-        TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY, false);
-        assertLifecycleNotApplied(object);
-    }
+  @Test
+  public void lookupWithoutLifecycle() throws Exception {
+    TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY, false);
+    assertLifecycleNotApplied(object);
+  }
 
-    @Test
-    public void defaultLookupPrototype() throws Exception
-    {
-        TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY);
-        assertLifecycleApplied(object);
-    }
+  @Test
+  public void defaultLookupPrototype() throws Exception {
+    TestLifecycleObject object = muleContext.getRegistry().lookupObject(PROTOTYPE_KEY);
+    assertLifecycleApplied(object);
+  }
 
-    private void assertLifecycleApplied(TestLifecycleObject object)
-    {
-        assertThat(object.getInitialise(), is(1));
-        assertThat(object.getStart(), is(1));
-    }
+  private void assertLifecycleApplied(TestLifecycleObject object) {
+    assertThat(object.getInitialise(), is(1));
+    assertThat(object.getStart(), is(1));
+  }
 
-    private void assertLifecycleNotApplied(TestLifecycleObject object)
-    {
-        assertThat(object.getInitialise(), is(0));
-        assertThat(object.getStart(), is(0));
-    }
+  private void assertLifecycleNotApplied(TestLifecycleObject object) {
+    assertThat(object.getInitialise(), is(0));
+    assertThat(object.getStart(), is(0));
+  }
 }

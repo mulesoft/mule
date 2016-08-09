@@ -24,36 +24,33 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpResponseBuilderTestCase
-{
+public class HttpResponseBuilderTestCase {
 
-    public static final String EXAMPLE_STRING = "exampleString";
-    private MuleContext muleContext;
-    private MuleMessage mockMuleMessage;
-    private MuleEvent mockEvent;
+  public static final String EXAMPLE_STRING = "exampleString";
+  private MuleContext muleContext;
+  private MuleMessage mockMuleMessage;
+  private MuleEvent mockEvent;
 
-    @Before
-    public void setUp()
-    {
-        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        mockEvent = mock(MuleEvent.class);
-        mockMuleMessage = mock(MuleMessage.class);
-    }
+  @Before
+  public void setUp() {
+    muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    mockEvent = mock(MuleEvent.class);
+    mockMuleMessage = mock(MuleMessage.class);
+  }
 
-    @Test
-    public void testContentLengthIsOverridden() throws Exception
-    {
-        HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
-        int contentLengthDifferingPayloadSize = 12;
-        mockMuleMessage(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
+  @Test
+  public void testContentLengthIsOverridden() throws Exception {
+    HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
+    int contentLengthDifferingPayloadSize = 12;
+    mockMuleMessage(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
 
-        HttpResponse httpResponse = httpResponseBuilder.build(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder(), mockEvent);
-        assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
-    }
+    HttpResponse httpResponse =
+        httpResponseBuilder.build(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder(), mockEvent);
+    assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
+  }
 
-    private void mockMuleMessage(InputStream payload, int contentLength)
-    {
-        mockMuleMessage = MuleMessage.builder().payload(payload).addOutboundProperty(CONTENT_LENGTH, contentLength).build();
-        when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
-    }
+  private void mockMuleMessage(InputStream payload, int contentLength) {
+    mockMuleMessage = MuleMessage.builder().payload(payload).addOutboundProperty(CONTENT_LENGTH, contentLength).build();
+    when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
+  }
 }

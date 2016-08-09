@@ -16,71 +16,63 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class WSConsumerTestCase extends AbstractMuleContextTestCase
-{
+public class WSConsumerTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void initialisesCorrectlyWithValidArguments() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.initialise();
-    }
+  @Test
+  public void initialisesCorrectlyWithValidArguments() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.initialise();
+  }
 
-    @Test
-    public void initialisesCorrectlyWithNullSecurityStrategyList() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.getConfig().setSecurity(new WSSecurity());
-        wsConsumer.initialise();
-    }
+  @Test
+  public void initialisesCorrectlyWithNullSecurityStrategyList() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.getConfig().setSecurity(new WSSecurity());
+    wsConsumer.initialise();
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void failsToInitializeWithInvalidWsdlLocation() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.getConfig().setWsdlLocation("invalid");
-        wsConsumer.initialise();
-    }
+  @Test(expected = InitialisationException.class)
+  public void failsToInitializeWithInvalidWsdlLocation() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.getConfig().setWsdlLocation("invalid");
+    wsConsumer.initialise();
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void failsToInitializeWithInvalidService() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.getConfig().setService("invalid");
-        wsConsumer.initialise();
-    }
+  @Test(expected = InitialisationException.class)
+  public void failsToInitializeWithInvalidService() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.getConfig().setService("invalid");
+    wsConsumer.initialise();
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void failsToInitializeWithInvalidPort() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.getConfig().setPort("invalid");
-        wsConsumer.initialise();
-    }
+  @Test(expected = InitialisationException.class)
+  public void failsToInitializeWithInvalidPort() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.getConfig().setPort("invalid");
+    wsConsumer.initialise();
+  }
 
-    @Test(expected = InitialisationException.class)
-    public void failsToInitializeWithInvalidOperation() throws MuleException
-    {
-        WSConsumer wsConsumer = createConsumer();
-        wsConsumer.setOperation("invalid");
-        wsConsumer.initialise();
-    }
+  @Test(expected = InitialisationException.class)
+  public void failsToInitializeWithInvalidOperation() throws MuleException {
+    WSConsumer wsConsumer = createConsumer();
+    wsConsumer.setOperation("invalid");
+    wsConsumer.initialise();
+  }
 
-    private WSConsumer createConsumer()
-    {
-        WSConsumerConfig wsConsumerConfig = new WSConsumerConfig();
+  private WSConsumer createConsumer() {
+    WSConsumerConfig wsConsumerConfig = new WSConsumerConfig();
 
-        wsConsumerConfig.setWsdlLocation("Test.wsdl");
-        wsConsumerConfig.setServiceAddress("http://localhost/test");
-        wsConsumerConfig.setService("TestService");
-        wsConsumerConfig.setPort("TestPort");
-        wsConsumerConfig.setMuleContext(muleContext);
+    wsConsumerConfig.setWsdlLocation("Test.wsdl");
+    wsConsumerConfig.setServiceAddress("http://localhost/test");
+    wsConsumerConfig.setService("TestService");
+    wsConsumerConfig.setPort("TestPort");
+    wsConsumerConfig.setMuleContext(muleContext);
 
-        WSConsumer wsConsumer = new WSConsumer();
-        wsConsumer.setOperation("echo");
-        wsConsumer.setConfig(wsConsumerConfig);
-        wsConsumer.setMuleContext(muleContext);
+    WSConsumer wsConsumer = new WSConsumer();
+    wsConsumer.setOperation("echo");
+    wsConsumer.setConfig(wsConsumerConfig);
+    wsConsumer.setMuleContext(muleContext);
 
-        return wsConsumer;
-    }
+    return wsConsumer;
+  }
 }

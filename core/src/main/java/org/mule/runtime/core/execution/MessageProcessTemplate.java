@@ -9,10 +9,9 @@ package org.mule.runtime.core.execution;
 /**
  * Maker interface for every template that can be used in a {@link MessageProcessPhase}
  *
- * A {@link MessageProcessTemplate} must contain all the required method that redefines behavior
- * inside a {@link MessageProcessPhase} and it's particular from the {@link org.mule.runtime.core.api.source.MessageSource}
+ * A {@link MessageProcessTemplate} must contain all the required method that redefines behavior inside a
+ * {@link MessageProcessPhase} and it's particular from the {@link org.mule.runtime.core.api.source.MessageSource}
  *
  */
-public interface MessageProcessTemplate
-{
+public interface MessageProcessTemplate {
 }

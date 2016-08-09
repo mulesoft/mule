@@ -14,24 +14,20 @@ import org.mule.tck.size.SmallTest;
 import java.util.Collections;
 
 @SmallTest
-public class UpdateMessageProcessorDebugInfoTestCase extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase
-{
+public class UpdateMessageProcessorDebugInfoTestCase extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase {
 
-    @Override
-    protected AbstractSingleQueryDbMessageProcessor createMessageProcessor()
-    {
-        return new UpdateMessageProcessor(dbConfigResolver, queryResolver, null, null, Collections.singletonList(UPDATE));
-    }
+  @Override
+  protected AbstractSingleQueryDbMessageProcessor createMessageProcessor() {
+    return new UpdateMessageProcessor(dbConfigResolver, queryResolver, null, null, Collections.singletonList(UPDATE));
+  }
 
-    @Override
-    protected String getSqlText()
-    {
-        return "UPDATE PLANET SET NAME = 'Mercury' WHERE NAME = ? AND POSITION = ?";
-    }
+  @Override
+  protected String getSqlText() {
+    return "UPDATE PLANET SET NAME = 'Mercury' WHERE NAME = ? AND POSITION = ?";
+  }
 
-    @Override
-    protected QueryType getQueryType()
-    {
-        return UPDATE;
-    }
+  @Override
+  protected QueryType getQueryType() {
+    return UPDATE;
+  }
 }

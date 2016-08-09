@@ -10,13 +10,12 @@ package org.mule.runtime.module.launcher.domain;
 /**
  * Provides access to {@link Domain} available on the container
  */
-public interface DomainRepository
-{
+public interface DomainRepository {
 
-    /**
-     * @param name domain name to find. Non empty.
-     * @return a {@link Domain} corresponding to the given name or null is no such domain exists.
-     */
-    Domain getDomain(String name);
+  /**
+   * @param name domain name to find. Non empty.
+   * @return a {@link Domain} corresponding to the given name or null is no such domain exists.
+   */
+  Domain getDomain(String name);
 
 }

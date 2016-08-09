@@ -21,24 +21,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class XStreamFactoryTestCase extends AbstractMuleTestCase
-{
-    @Test
-    public void testConcurrentHashMapConverter()
-        throws ClassNotFoundException, IllegalAccessException, InstantiationException
-    {
-        ConcurrentHashMap<Object, Object> map = new ConcurrentHashMap<Object, Object>();
-        map.put("foo", "bar");
+public class XStreamFactoryTestCase extends AbstractMuleTestCase {
 
-        XStream xstream = new XStreamFactory().getInstance();
-        String mapXML = xstream.toXML(map);
-        assertNotNull(mapXML);
-        assertTrue(StringUtils.isNotEmpty(mapXML));
+  @Test
+  public void testConcurrentHashMapConverter() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    ConcurrentHashMap<Object, Object> map = new ConcurrentHashMap<Object, Object>();
+    map.put("foo", "bar");
 
-        Object newMap = xstream.fromXML(mapXML);
-        assertNotNull(newMap);
-        assertTrue(newMap instanceof ConcurrentHashMap);
-        assertEquals(1, ((Map<?, ?>) newMap).size());
-        assertEquals("bar", ((Map<?, ?>) newMap).get("foo"));
-    }
+    XStream xstream = new XStreamFactory().getInstance();
+    String mapXML = xstream.toXML(map);
+    assertNotNull(mapXML);
+    assertTrue(StringUtils.isNotEmpty(mapXML));
+
+    Object newMap = xstream.fromXML(mapXML);
+    assertNotNull(newMap);
+    assertTrue(newMap instanceof ConcurrentHashMap);
+    assertEquals(1, ((Map<?, ?>) newMap).size());
+    assertEquals("bar", ((Map<?, ?>) newMap).get("foo"));
+  }
 }

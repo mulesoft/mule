@@ -29,62 +29,53 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTestCase
-{
+public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
-    private NonBlockingMessageProcessor nonBlockingMessageProcessor = new TestNonBlockingProcessor();
+  private NonBlockingMessageProcessor nonBlockingMessageProcessor = new TestNonBlockingProcessor();
 
-    @Test
-    public void blockingProcess() throws MuleException, Exception
-    {
-        MuleEvent request = getTestEvent(TEST_MESSAGE);
-        MuleEvent response = nonBlockingMessageProcessor.process(request);
+  @Test
+  public void blockingProcess() throws MuleException, Exception {
+    MuleEvent request = getTestEvent(TEST_MESSAGE);
+    MuleEvent response = nonBlockingMessageProcessor.process(request);
 
-        // Test processor echos request so we can assert request equals response.
-        assertThat(response, equalTo(request));
+    // Test processor echos request so we can assert request equals response.
+    assertThat(response, equalTo(request));
+  }
+
+  @Test
+  public void nonBlockingProcessVoidMuleEventResponse() throws MuleException, Exception {
+    MuleEvent request = createNonBlockingTestEvent();
+    MuleEvent response = nonBlockingMessageProcessor.process(request);
+
+    assertThat(response, is(instanceOf(NonBlockingVoidMuleEvent.class)));
+  }
+
+  @Test
+  public void clearRequestContextAfterNonBlockingProcess() throws MuleException, Exception {
+    MuleEvent request = createNonBlockingTestEvent();
+    OptimizedRequestContext.unsafeSetEvent(request);
+    MuleEvent response = nonBlockingMessageProcessor.process(request);
+
+    assertThat(RequestContext.getEvent(), is(nullValue()));
+  }
+
+  private MuleEvent createNonBlockingTestEvent() throws Exception {
+    Flow flow = MuleTestUtils.getTestFlow(muleContext);
+    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(), MessageExchangePattern.REQUEST_RESPONSE,
+                                new SensingNullReplyToHandler(), flow);
+  }
+
+  private class TestNonBlockingProcessor extends AbstractNonBlockingMessageProcessor {
+
+    @Override
+    protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
+      return event;
     }
 
-    @Test
-    public void nonBlockingProcessVoidMuleEventResponse() throws MuleException, Exception
-    {
-        MuleEvent request = createNonBlockingTestEvent();
-        MuleEvent response = nonBlockingMessageProcessor.process(request);
-
-        assertThat(response, is(instanceOf(NonBlockingVoidMuleEvent.class)));
-    }
-
-    @Test
-    public void clearRequestContextAfterNonBlockingProcess() throws MuleException, Exception
-    {
-        MuleEvent request = createNonBlockingTestEvent();
-        OptimizedRequestContext.unsafeSetEvent(request);
-        MuleEvent response = nonBlockingMessageProcessor.process(request);
-
-        assertThat(RequestContext.getEvent(), is(nullValue()));
-    }
-
-    private MuleEvent createNonBlockingTestEvent() throws Exception
-    {
-        Flow flow = MuleTestUtils.getTestFlow(muleContext);
-        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
-                                                 MessageExchangePattern.REQUEST_RESPONSE,
-                                                 new SensingNullReplyToHandler(), flow);
-    }
-
-    private class TestNonBlockingProcessor extends AbstractNonBlockingMessageProcessor
-    {
-        @Override
-        protected MuleEvent processBlocking(MuleEvent event) throws MuleException
-        {
-            return event;
-        }
-
-        @Override
-        public void processNonBlocking(final MuleEvent event, CompletionHandler completionHandler)
-        {
-        }
-    }
+    @Override
+    public void processNonBlocking(final MuleEvent event, CompletionHandler completionHandler) {}
+  }
 }
 
 

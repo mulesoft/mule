@@ -12,21 +12,20 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * <code>TransactionFactory</code> creates a transaction.
  */
-public interface TransactionFactory
-{
-    /**
-     * Create and begins a new transaction
-     * 
-     * @return a new Transaction
-     * @throws TransactionException if the transaction cannot be created or begun
-     * @param muleContext
-     */
-    Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
+public interface TransactionFactory {
 
-    /**
-     * Determines whether this transaction factory creates transactions that are
-     * really transacted or if they are being used to simulate batch actions, such as
-     * using Jms Client Acknowledge.
-     */
-    boolean isTransacted();
+  /**
+   * Create and begins a new transaction
+   * 
+   * @return a new Transaction
+   * @throws TransactionException if the transaction cannot be created or begun
+   * @param muleContext
+   */
+  Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
+
+  /**
+   * Determines whether this transaction factory creates transactions that are really transacted or if they are being used to
+   * simulate batch actions, such as using Jms Client Acknowledge.
+   */
+  boolean isTransacted();
 }

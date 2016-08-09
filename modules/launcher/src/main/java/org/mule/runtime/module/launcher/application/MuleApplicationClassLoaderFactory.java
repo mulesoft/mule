@@ -31,88 +31,75 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates {@link MuleApplicationClassLoader} instances based on the
- * application descriptor.
+ * Creates {@link MuleApplicationClassLoader} instances based on the application descriptor.
  */
-public class MuleApplicationClassLoaderFactory implements DeployableArtifactClassLoaderFactory<ApplicationDescriptor>
-{
+public class MuleApplicationClassLoaderFactory implements DeployableArtifactClassLoaderFactory<ApplicationDescriptor> {
 
-    public static final String CLASS_EXTENSION = ".class";
+  public static final String CLASS_EXTENSION = ".class";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
 
-    public MuleApplicationClassLoaderFactory(NativeLibraryFinderFactory nativeLibraryFinderFactory)
-    {
-        this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+  public MuleApplicationClassLoaderFactory(NativeLibraryFinderFactory nativeLibraryFinderFactory) {
+    this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+  }
+
+  @Override
+  public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoders) {
+    List<URL> urls = getApplicationResourceUrls(descriptor);
+
+    return new MuleApplicationClassLoader(descriptor.getName(), parent.getClassLoader(),
+                                          nativeLibraryFinderFactory.create(descriptor.getName()), urls,
+                                          parent.getClassLoaderLookupPolicy(), artifactPluginClassLoders);
+  }
+
+  private List<URL> getApplicationResourceUrls(ApplicationDescriptor descriptor) {
+    List<URL> urls = new LinkedList<>();
+    try {
+      urls.add(getAppClassesFolder(descriptor.getName()).toURI().toURL());
+      urls.addAll(findJars(descriptor.getName(), getAppLibFolder(descriptor.getName()), true));
+      urls.addAll(findJars(descriptor.getName(), getMulePerAppLibFolder(), true));
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to create classloader for application", e);
     }
 
-    @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor, List<ArtifactClassLoader> artifactPluginClassLoders)
-    {
-        List<URL> urls = getApplicationResourceUrls(descriptor);
+    return urls;
+  }
 
-        return new MuleApplicationClassLoader(descriptor.getName(), parent.getClassLoader(), nativeLibraryFinderFactory.create(descriptor.getName()), urls, parent.getClassLoaderLookupPolicy(), artifactPluginClassLoders);
-    }
+  /**
+   * Add jars from the supplied directory to the class path
+   */
+  private List<URL> findJars(String appName, File dir, boolean verbose) throws MalformedURLException {
+    List<URL> result = new LinkedList<>();
 
-    private List<URL> getApplicationResourceUrls(ApplicationDescriptor descriptor)
-    {
-        List<URL> urls = new LinkedList<>();
-        try
-        {
-            urls.add(getAppClassesFolder(descriptor.getName()).toURI().toURL());
-            urls.addAll(findJars(descriptor.getName(), getAppLibFolder(descriptor.getName()), true));
-            urls.addAll(findJars(descriptor.getName(), getMulePerAppLibFolder(), true));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Unable to create classloader for application", e);
-        }
+    if (dir.exists() && dir.canRead()) {
+      @SuppressWarnings("unchecked")
+      Collection<File> jars = listFiles(dir, new String[] {"jar"}, false);
 
-        return urls;
-    }
+      if (!jars.isEmpty() && logger.isInfoEnabled()) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("[%s] Loading the following jars:%n", appName));
+        sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
-    /**
-     * Add jars from the supplied directory to the class path
-     */
-    private List<URL> findJars(String appName, File dir, boolean verbose) throws MalformedURLException
-    {
-        List<URL> result = new LinkedList<>();
-
-        if (dir.exists() && dir.canRead())
-        {
-            @SuppressWarnings("unchecked")
-            Collection<File> jars = listFiles(dir, new String[] {"jar"}, false);
-
-            if (!jars.isEmpty() && logger.isInfoEnabled())
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("[%s] Loading the following jars:%n", appName));
-                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                for (File jar : jars)
-                {
-                    sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
-                }
-
-                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                if (verbose)
-                {
-                    logger.info(sb.toString());
-                }
-                else
-                {
-                    logger.debug(sb.toString());
-                }
-            }
-
-            for (File jar : jars)
-            {
-                result.add(jar.toURI().toURL());
-            }
+        for (File jar : jars) {
+          sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
         }
 
-        return result;
+        sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+        if (verbose) {
+          logger.info(sb.toString());
+        } else {
+          logger.debug(sb.toString());
+        }
+      }
+
+      for (File jar : jars) {
+        result.add(jar.toURI().toURL());
+      }
     }
+
+    return result;
+  }
 }

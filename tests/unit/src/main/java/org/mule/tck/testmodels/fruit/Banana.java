@@ -11,81 +11,69 @@ import java.util.EventObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Banana implements Fruit
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1371515374040436874L;
+public class Banana implements Fruit {
 
-    /**
-     * logger used by this class
-     */
-    private static final Logger logger = LoggerFactory.getLogger(Banana.class);
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -1371515374040436874L;
 
-    private boolean peeled = false;
-    private boolean bitten = false;
+  /**
+   * logger used by this class
+   */
+  private static final Logger logger = LoggerFactory.getLogger(Banana.class);
 
-    public void peel()
-    {
-        peeled = true;
+  private boolean peeled = false;
+  private boolean bitten = false;
+
+  public void peel() {
+    peeled = true;
+  }
+
+  public void peelEvent(EventObject e) {
+    logger.debug("Banana got peel event in peelEvent(EventObject)! MuleEvent says: " + e.getSource().toString());
+    peel();
+  }
+
+  public boolean isPeeled() {
+    return peeled;
+  }
+
+  @Override
+  public void bite() {
+    bitten = true;
+  }
+
+  @Override
+  public boolean isBitten() {
+    return bitten;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Banana)) {
+      return false;
     }
 
-    public void peelEvent(EventObject e)
-    {
-        logger.debug("Banana got peel event in peelEvent(EventObject)! MuleEvent says: "
-                        + e.getSource().toString());
-        peel();
+    Banana banana = (Banana) o;
+
+    if (bitten != banana.bitten) {
+      return false;
+    }
+    if (peeled != banana.peeled) {
+      return false;
     }
 
-    public boolean isPeeled()
-    {
-        return peeled;
-    }
+    return true;
+  }
 
-    @Override
-    public void bite()
-    {
-        bitten = true;
-    }
-
-    @Override
-    public boolean isBitten()
-    {
-        return bitten;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof Banana))
-        {
-            return false;
-        }
-
-        Banana banana = (Banana) o;
-
-        if (bitten != banana.bitten)
-        {
-            return false;
-        }
-        if (peeled != banana.peeled)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = (peeled ? 1 : 0);
-        result = 31 * result + (bitten ? 1 : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = (peeled ? 1 : 0);
+    result = 31 * result + (bitten ? 1 : 0);
+    return result;
+  }
 }

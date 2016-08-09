@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.util.collection;
 
-public interface SplittingStrategy<Input, Output>
-{
-    
-    Output split(Input input);
+public interface SplittingStrategy<Input, Output> {
+
+  Output split(Input input);
 }
 
 

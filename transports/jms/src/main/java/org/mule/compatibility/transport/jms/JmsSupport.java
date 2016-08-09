@@ -18,59 +18,44 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
- * <code>JmsSupport</code> is an interface that provides a polymorphic facade to
- * the JMS 1.0.2b and 1.1 API specifications. this interface is not intended for
- * general purpose use and should only be used with the Mule JMS connector.
+ * <code>JmsSupport</code> is an interface that provides a polymorphic facade to the JMS 1.0.2b and 1.1 API specifications. this
+ * interface is not intended for general purpose use and should only be used with the Mule JMS connector.
  */
 
-public interface JmsSupport
-{
-    Connection createConnection(ConnectionFactory connectionFactory) throws JMSException;
+public interface JmsSupport {
 
-    Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
-        throws JMSException;
+  Connection createConnection(ConnectionFactory connectionFactory) throws JMSException;
 
-    Session createSession(Connection connection,
-                          boolean topic,
-                          boolean transacted,
-                          int ackMode,
-                          boolean noLocal) throws JMSException;
+  Connection createConnection(ConnectionFactory connectionFactory, String username, String password) throws JMSException;
 
-    MessageProducer createProducer(Session session, Destination destination, boolean topic)
-        throws JMSException;
+  Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
+      throws JMSException;
 
-    MessageConsumer createConsumer(Session session,
-                                   Destination destination,
-                                   String messageSelector,
-                                   boolean noLocal,
-                                   String durableName,
-                                   boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  MessageProducer createProducer(Session session, Destination destination, boolean topic) throws JMSException;
 
-    MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
-        throws JMSException;
+  MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, boolean noLocal,
+                                 String durableName, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException;
 
-    Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException;
 
-    Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException;
+  Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
-    Destination createTemporaryDestination(Session session, boolean topic) throws JMSException;
+  Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException;
 
-    void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  Destination createTemporaryDestination(Session session, boolean topic) throws JMSException;
 
-    void send(MessageProducer producer,
-              Message message,
-              boolean persistent,
-              int priority,
-              long ttl,
-              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
-    void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic,
+            ImmutableEndpoint endpoint)
+      throws JMSException;
 
-    void send(MessageProducer producer,
-              Message message,
-              Destination dest,
-              boolean persistent,
-              int priority,
-              long ttl,
-              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+  void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException;
+
+  void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl,
+            boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException;
 }

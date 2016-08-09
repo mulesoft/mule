@@ -13,32 +13,28 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
-public class SecureConnectionProvider implements ConnectionProvider<Object>
-{
+public class SecureConnectionProvider implements ConnectionProvider<Object> {
 
-    @Parameter
-    @Password
-    private String providerPassword;
+  @Parameter
+  @Password
+  private String providerPassword;
 
-    @Parameter
-    @Text
-    private String anotherLongText;
+  @Parameter
+  @Text
+  private String anotherLongText;
 
-    @Override
-    public Object connect() throws ConnectionException
-    {
-        return null;
-    }
+  @Override
+  public Object connect() throws ConnectionException {
+    return null;
+  }
 
-    @Override
-    public void disconnect(Object o)
-    {
+  @Override
+  public void disconnect(Object o) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(Object o)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(Object o) {
+    return ConnectionValidationResult.success();
+  }
 }

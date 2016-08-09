@@ -23,108 +23,84 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This transformer uses the returnClass to create the return object and then will populate the bean
- * with arguments defined as expressions
+ * This transformer uses the returnClass to create the return object and then will populate the bean with arguments defined as
+ * expressions
  */
-public class BeanBuilderTransformer extends AbstractExpressionTransformer
-{
-    private ObjectFactory beanFactory;
-    private Class<?> beanClass;
+public class BeanBuilderTransformer extends AbstractExpressionTransformer {
 
-    public Class<?> getBeanClass()
-    {
-        return beanClass;
+  private ObjectFactory beanFactory;
+  private Class<?> beanClass;
+
+  public Class<?> getBeanClass() {
+    return beanClass;
+  }
+
+  public void setBeanClass(Class<?> beanClass) {
+    this.beanClass = beanClass;
+  }
+
+  public ObjectFactory getBeanFactory() {
+    return beanFactory;
+  }
+
+  public void setBeanFactory(ObjectFactory beanFactory) {
+    this.beanFactory = beanFactory;
+  }
+
+  /**
+   * Template method were deriving classes can do any initialisation after the properties have been set on this transformer
+   *
+   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+
+    if (getBeanFactory() == null && getBeanClass() == null) {
+      throw new InitialisationException(CoreMessages.objectIsNull("beanFactory"), this);
+    } else if (getBeanClass() != null) {
+      setBeanFactory(new PrototypeObjectFactory(getBeanClass()));
+    }
+    setReturnDataType(DataType.fromType(getBeanFactory().getObjectClass()));
+    // We need to set the MuleContext if we create the factory here
+    if (getBeanFactory() instanceof MuleContextAware) {
+      ((MuleContextAware) getBeanFactory()).setMuleContext(muleContext);
+    }
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Object bean;
+    try {
+      bean = getBeanFactory().getInstance(muleContext);
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
 
-    public void setBeanClass(Class<?> beanClass)
-    {
-        this.beanClass = beanClass;
+    Map<String, Object> args = new HashMap<String, Object>(arguments.size());
+
+    for (ExpressionArgument argument : arguments) {
+      Object value = null;
+      try {
+        value = argument.evaluate(event);
+      } catch (ExpressionRuntimeException e) {
+        throw new TransformerException(this, e);
+      }
+
+      if (!argument.isOptional() && value == null) {
+        throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
+      }
+      args.put(argument.getName(), value);
     }
 
-    public ObjectFactory getBeanFactory()
-    {
-        return beanFactory;
+    try {
+      BeanUtils.populate(bean, args);
+    } catch (IllegalAccessException e) {
+      throw new TransformerException(this, e);
+    } catch (InvocationTargetException e) {
+      throw new TransformerException(this, e.getTargetException());
     }
 
-    public void setBeanFactory(ObjectFactory beanFactory)
-    {
-        this.beanFactory = beanFactory;
-    }
-
-    /**
-     * Template method were deriving classes can do any initialisation after the
-     * properties have been set on this transformer
-     *
-     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-
-        if(getBeanFactory()==null && getBeanClass()==null)
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("beanFactory"), this);
-        }
-        else if(getBeanClass()!=null)
-        {
-            setBeanFactory(new PrototypeObjectFactory(getBeanClass()));
-        }
-        setReturnDataType(DataType.fromType(getBeanFactory().getObjectClass()));
-        //We need to set the MuleContext if we create the factory here
-        if(getBeanFactory() instanceof MuleContextAware)
-        {
-            ((MuleContextAware)getBeanFactory()).setMuleContext(muleContext);
-        }
-    }
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Object bean;
-        try
-        {
-            bean = getBeanFactory().getInstance(muleContext);
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-
-        Map<String, Object> args = new HashMap<String, Object>(arguments.size());
-
-        for (ExpressionArgument argument : arguments)
-        {
-            Object value = null;
-            try
-            {
-                value = argument.evaluate(event);
-            }
-            catch (ExpressionRuntimeException e)
-            {
-                throw new TransformerException(this, e);
-            }
-
-            if (!argument.isOptional() && value == null)
-            {
-                throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
-            }
-            args.put(argument.getName(), value);
-        }
-
-        try
-        {
-            BeanUtils.populate(bean, args);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new TransformerException(this, e);
-        }
-        catch (InvocationTargetException e)
-        {
-            throw new TransformerException(this, e.getTargetException());
-        }
-
-        return bean;
-    }
+    return bean;
+  }
 }

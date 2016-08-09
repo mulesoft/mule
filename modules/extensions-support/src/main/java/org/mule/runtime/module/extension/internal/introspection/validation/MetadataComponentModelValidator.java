@@ -26,58 +26,46 @@ import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import java.util.Map;
 
 /**
- * Validates that all {@link OperationModel operations} which
- * return type is a {@link Object} or a {@link Map} have defined
- * a {@link MetadataOutputResolver}. The {@link MetadataOutputResolver}
- * can't be the {@link NullMetadataResolver}.
+ * Validates that all {@link OperationModel operations} which return type is a {@link Object} or a {@link Map} have defined a
+ * {@link MetadataOutputResolver}. The {@link MetadataOutputResolver} can't be the {@link NullMetadataResolver}.
  *
  * @since 4.0
  */
-public class MetadataComponentModelValidator implements ModelValidator
-{
+public class MetadataComponentModelValidator implements ModelValidator {
 
-    @Override
-    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
-    {
-        new ExtensionWalker()
-        {
+  @Override
+  public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
+    new ExtensionWalker() {
 
-            @Override
-            public void onOperation(HasOperationModels owner, OperationModel model)
-            {
-                validateMetadataReturnType(extensionModel, model);
-            }
+      @Override
+      public void onOperation(HasOperationModels owner, OperationModel model) {
+        validateMetadataReturnType(extensionModel, model);
+      }
 
-            @Override
-            public void onSource(HasSourceModels owner, SourceModel model)
-            {
-                validateMetadataReturnType(extensionModel, model);
-            }
-        }.walk(extensionModel);
+      @Override
+      public void onSource(HasSourceModels owner, SourceModel model) {
+        validateMetadataReturnType(extensionModel, model);
+      }
+    }.walk(extensionModel);
+  }
+
+  private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel componentModel) {
+    RuntimeComponentModel component = (RuntimeComponentModel) componentModel;
+    MetadataType returnMetadataType = component.getOutput().getType();
+
+    if (returnMetadataType instanceof ObjectType) {
+      validateReturnType(extensionModel, component, getType(returnMetadataType));
+    } else if (returnMetadataType instanceof DictionaryType) {
+      validateReturnType(extensionModel, component, getType(((DictionaryType) returnMetadataType).getValueType()));
     }
+  }
 
-    private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel componentModel)
-    {
-        RuntimeComponentModel component = (RuntimeComponentModel) componentModel;
-        MetadataType returnMetadataType = component.getOutput().getType();
-
-        if (returnMetadataType instanceof ObjectType)
-        {
-            validateReturnType(extensionModel, component, getType(returnMetadataType));
-        }
-        else if (returnMetadataType instanceof DictionaryType)
-        {
-            validateReturnType(extensionModel, component, getType(((DictionaryType) returnMetadataType).getValueType()));
-        }
+  private void validateReturnType(ExtensionModel extensionModel, RuntimeComponentModel component, Class<?> returnType) {
+    if (Object.class.equals(returnType)
+        && component.getMetadataResolverFactory().getOutputResolver() instanceof NullMetadataResolver) {
+      throw new IllegalModelDefinitionException(format("Component '%s' in Extension '%s' specifies '%s' as a return type. Operations and Sources with "
+          + "return type such as Object or Map must have defined a not null MetadataOutputResolver", component.getName(),
+                                                       extensionModel.getName(), returnType.getName()));
     }
-
-    private void validateReturnType(ExtensionModel extensionModel, RuntimeComponentModel component, Class<?> returnType)
-    {
-        if (Object.class.equals(returnType) && component.getMetadataResolverFactory().getOutputResolver() instanceof NullMetadataResolver)
-        {
-            throw new IllegalModelDefinitionException(format("Component '%s' in Extension '%s' specifies '%s' as a return type. Operations and Sources with " +
-                                                             "return type such as Object or Map must have defined a not null MetadataOutputResolver",
-                                                             component.getName(), extensionModel.getName(), returnType.getName()));
-        }
-    }
+  }
 }

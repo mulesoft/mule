@@ -10,31 +10,31 @@ import org.mule.runtime.module.http.internal.domain.HttpMessage;
 import org.mule.runtime.module.http.internal.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 
-public interface HttpRequest extends HttpMessage
-{
+public interface HttpRequest extends HttpMessage {
 
-    /**
-     * @return the protocol version
-     */
-    HttpProtocol getProtocol();
+  /**
+   * @return the protocol version
+   */
+  HttpProtocol getProtocol();
 
-    /**
-     * @return the request path extracted from the uri
-     */
-    String getPath();
+  /**
+   * @return the request path extracted from the uri
+   */
+  String getPath();
 
-    /**
-     * @return the request http method
-     */
-    String getMethod();
+  /**
+   * @return the request http method
+   */
+  String getMethod();
 
-    /**
-     * @return the request uri
-     */
-    String getUri();
+  /**
+   * @return the request uri
+   */
+  String getUri();
 
-    /**
-     * @return the raw input stream from the body. if there's not body then returns null. After calling this method #getEntity should not be used.
-     */
-    InputStreamHttpEntity getInputStreamEntity();
+  /**
+   * @return the raw input stream from the body. if there's not body then returns null. After calling this method #getEntity
+   *         should not be used.
+   */
+  InputStreamHttpEntity getInputStreamEntity();
 }

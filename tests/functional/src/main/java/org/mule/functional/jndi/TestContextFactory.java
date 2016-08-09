@@ -18,26 +18,23 @@ import javax.naming.NamingException;
 /**
  * Creates an in-memory context and populates it with test data.
  */
-public class TestContextFactory extends InMemoryContextFactory
-{
-    public Context getInitialContext() throws NamingException
-    {
-        Context context = super.getInitialContext();
-        populateTestData(context);
-        return context;
-    }
+public class TestContextFactory extends InMemoryContextFactory {
 
-    public Context getInitialContext(Hashtable environment) throws NamingException
-    {
-        Context context = super.getInitialContext(environment);
-        populateTestData(context);
-        return context;
-    }
-    
-    protected void populateTestData(Context context) throws NamingException
-    {
-        context.bind("fruit/apple", new Apple());
-        context.bind("fruit/banana", new Banana());
-        context.bind("fruit/orange", new Orange(new Integer(8), new Double(10), "Florida Sunny"));
-    }
+  public Context getInitialContext() throws NamingException {
+    Context context = super.getInitialContext();
+    populateTestData(context);
+    return context;
+  }
+
+  public Context getInitialContext(Hashtable environment) throws NamingException {
+    Context context = super.getInitialContext(environment);
+    populateTestData(context);
+    return context;
+  }
+
+  protected void populateTestData(Context context) throws NamingException {
+    context.bind("fruit/apple", new Apple());
+    context.bind("fruit/banana", new Banana());
+    context.bind("fruit/orange", new Orange(new Integer(8), new Double(10), "Florida Sunny"));
+  }
 }

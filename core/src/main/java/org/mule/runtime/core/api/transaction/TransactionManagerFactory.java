@@ -11,18 +11,17 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import javax.transaction.TransactionManager;
 
 /**
- * <code>TranactionManagerFactory</code> is a factory class for creating a
- * transaction manager for the MuleServer.
+ * <code>TranactionManagerFactory</code> is a factory class for creating a transaction manager for the MuleServer.
  * 
  */
-public interface TransactionManagerFactory
-{
-    /**
-     * Creates of obtains the jta transaction manager to use for mule transactions
-     * 
-     * @return the transaction manager to use
-     * @throws Exception if the transaction manager cannot be located or created
-     * @param config Mule configuration parameters
-     */
-    TransactionManager create(MuleConfiguration config) throws Exception;
+public interface TransactionManagerFactory {
+
+  /**
+   * Creates of obtains the jta transaction manager to use for mule transactions
+   * 
+   * @return the transaction manager to use
+   * @throws Exception if the transaction manager cannot be located or created
+   * @param config Mule configuration parameters
+   */
+  TransactionManager create(MuleConfiguration config) throws Exception;
 }

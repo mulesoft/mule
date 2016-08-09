@@ -17,24 +17,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-multiple-cookies-on-endpoint-test-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "HELLO", null);
-        assertNotNull(response);
-        assertNotNull(response.getPayload());
-        assertEquals("Both Cookies Found!", getPayloadAsString(response));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-multiple-cookies-on-endpoint-test-flow.xml";
+  }
+
+  @Test
+  public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("vm://in", "HELLO", null);
+    assertNotNull(response);
+    assertNotNull(response.getPayload());
+    assertEquals("Both Cookies Found!", getPayloadAsString(response));
+  }
 }

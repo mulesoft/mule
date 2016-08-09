@@ -40,36 +40,32 @@ import javax.inject.Inject;
 @Providers({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 @Export(classes = {SftpFileAttributes.class, ClassicFtpFileAttributes.class, FtpFileAttributes.class})
 @Xml(namespace = "ftp")
-public class FtpConnector extends FileConnectorConfig
-{
+public class FtpConnector extends FileConnectorConfig {
 
-    public static final String FTP_PROTOCOL = "ftp";
+  public static final String FTP_PROTOCOL = "ftp";
 
-    @Inject
-    private ConnectionManager connectionManager;
+  @Inject
+  private ConnectionManager connectionManager;
 
-    /**
-     * The directory to be considered as the root of every
-     * relative path used with this connector. If not provided,
-     * it will default to the remote server default.
-     */
-    @Parameter
-    @Optional
-    @Summary("The directory to be considered as the root of every relative path used with this connector")
-    @DisplayName("Working Directory")
-    private String workingDir = null;
+  /**
+   * The directory to be considered as the root of every relative path used with this connector. If not provided, it will default
+   * to the remote server default.
+   */
+  @Parameter
+  @Optional
+  @Summary("The directory to be considered as the root of every relative path used with this connector")
+  @DisplayName("Working Directory")
+  private String workingDir = null;
 
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getWorkingDir()
-    {
-        return workingDir;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public String getWorkingDir() {
+    return workingDir;
+  }
 
-    public ConnectionManager getConnectionManager()
-    {
-        return connectionManager;
-    }
+  public ConnectionManager getConnectionManager() {
+    return connectionManager;
+  }
 }

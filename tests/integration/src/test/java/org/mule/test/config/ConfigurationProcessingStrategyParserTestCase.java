@@ -26,39 +26,34 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ConfigurationProcessingStrategyParserTestCase extends AbstractIntegrationTestCase
-{
+public class ConfigurationProcessingStrategyParserTestCase extends AbstractIntegrationTestCase {
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategy.class},
-                {ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategy.class},
-                {ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY, AsynchronousProcessingStrategy.class},
-        });
-    }
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> parameters() {
+    return Arrays
+        .asList(new Object[][] {{ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategy.class},
+            {ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategy.class},
+            {ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY, AsynchronousProcessingStrategy.class},});
+  }
 
-    private final Class<? extends ProcessingStrategy> expectedStrategyType;
+  private final Class<? extends ProcessingStrategy> expectedStrategyType;
 
-    @Rule
-    public SystemProperty processingStrategyProperty;
+  @Rule
+  public SystemProperty processingStrategyProperty;
 
-    public ConfigurationProcessingStrategyParserTestCase(String defaultProcessingStrategy, Class<? extends ProcessingStrategy> expectedStrategyType)
-    {
-        this.expectedStrategyType = expectedStrategyType;
-        processingStrategyProperty = new SystemProperty("processingStrategy", defaultProcessingStrategy);
-    }
+  public ConfigurationProcessingStrategyParserTestCase(String defaultProcessingStrategy,
+                                                       Class<? extends ProcessingStrategy> expectedStrategyType) {
+    this.expectedStrategyType = expectedStrategyType;
+    processingStrategyProperty = new SystemProperty("processingStrategy", defaultProcessingStrategy);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "configuration-processing-strategy-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "configuration-processing-strategy-config.xml";
+  }
 
-    @Test
-    public void verifyConfigurationProcessingStrategy() throws Exception
-    {
-        assertThat(muleContext.getConfiguration().getDefaultProcessingStrategy(), is(instanceOf(expectedStrategyType)));
-    }
+  @Test
+  public void verifyConfigurationProcessingStrategy() throws Exception {
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategy(), is(instanceOf(expectedStrategyType)));
+  }
 }

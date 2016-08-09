@@ -8,35 +8,29 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class InstantRate extends AggregateCounter
-{
-    private double firstTime;
-    private double lastTime;
-    private double value;
+public class InstantRate extends AggregateCounter {
 
-    public InstantRate(String name, AbstractCounter base)
-    {
-        super(name, Type.INSTANT_RATE, base);
-    }
+  private double firstTime;
+  private double lastTime;
+  private double value;
 
-    @Override
-    public double nextValue()
-    {
-        if (firstTime == 0 || firstTime == lastTime)
-        {
-            return Double.NaN;
-        }
-        else
-        {
-            return value / (lastTime - firstTime) * 1000.0;
-        }
-    }
+  public InstantRate(String name, AbstractCounter base) {
+    super(name, Type.INSTANT_RATE, base);
+  }
 
-    @Override
-    public void doCompute()
-    {
-        firstTime = lastTime;
-        lastTime = System.currentTimeMillis();
-        value = getBase().nextValue();
+  @Override
+  public double nextValue() {
+    if (firstTime == 0 || firstTime == lastTime) {
+      return Double.NaN;
+    } else {
+      return value / (lastTime - firstTime) * 1000.0;
     }
+  }
+
+  @Override
+  public void doCompute() {
+    firstTime = lastTime;
+    lastTime = System.currentTimeMillis();
+    value = getBase().nextValue();
+  }
 }

@@ -20,72 +20,61 @@ import java.util.Locale;
 import org.junit.Ignore;
 
 @Ignore("See MULE-9307")
-public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
-{
-    private static final String ENCODING = "Windows-31J";
+public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase {
 
-    private final String jsonString;
-    private final FruitCollection jsonObject;
+  private static final String ENCODING = "Windows-31J";
 
-    public JsonBeanRoundTripNonAsciiTestCase()
-    {
-        jsonString = "{\"apple\":{\"bitten\":true,\"washed\":false},\"orange\":{\"brand\":\""
-            +  getBrandOfOrange(Locale.JAPAN)
-            + "\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
+  private final String jsonString;
+  private final FruitCollection jsonObject;
 
-        jsonObject = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, getBrandOfOrange(Locale.JAPAN)));
+  public JsonBeanRoundTripNonAsciiTestCase() {
+    jsonString = "{\"apple\":{\"bitten\":true,\"washed\":false},\"orange\":{\"brand\":\"" + getBrandOfOrange(Locale.JAPAN)
+        + "\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
+
+    jsonObject = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, getBrandOfOrange(Locale.JAPAN)));
+  }
+
+  @Override
+  public void testTransform() throws Exception {
+    // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
+    String javaVersion = System.getProperty("java.specification.version", "<None>");
+    String osName = System.getProperty("os.name", "<None>");
+    if (javaVersion.equals("1.6") && osName.startsWith("Windows")) {
+      return;
     }
+    super.testTransform();
+  }
 
-    @Override
-    public void testTransform() throws Exception
-    {
-        // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
-        String javaVersion = System.getProperty("java.specification.version", "<None>");
-        String osName = System.getProperty("os.name", "<None>");
-        if (javaVersion.equals("1.6") && osName.startsWith("Windows"))
-        {
-            return;
-        }
-        super.testTransform();
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    Transformer trans = super.getRoundTripTransformer();
+    return trans;
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        Transformer trans = super.getRoundTripTransformer();
-        return trans;
-    }
+  @Override
+  public Transformer getTransformer() throws Exception {
+    Transformer trans = super.getTransformer();
+    trans.setReturnDataType(DataType.BYTE_ARRAY);
+    return trans;
+  }
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        Transformer trans = super.getTransformer();
-        trans.setReturnDataType(DataType.BYTE_ARRAY);
-        return trans;
-    }
-    
-    @Override
-    public Object getTestData()
-    {
-        return jsonObject;
-    }
+  @Override
+  public Object getTestData() {
+    return jsonObject;
+  }
 
-    @Override
-    public Object getResultData()
-    {
-        try
-        {
-            return jsonString.getBytes(ENCODING);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            fail();
-            return null;
-        }
+  @Override
+  public Object getResultData() {
+    try {
+      return jsonString.getBytes(ENCODING);
+    } catch (UnsupportedEncodingException e) {
+      fail();
+      return null;
     }
+  }
 
-    private String getBrandOfOrange(Locale locale)
-    {
-        return LocaleMessageHandler.getString("test-data", locale, "JsonBeanRoundTripNonAsciiTestCase.getBrandOfOrange", new Object[] {});
-    }
+  private String getBrandOfOrange(Locale locale) {
+    return LocaleMessageHandler.getString("test-data", locale, "JsonBeanRoundTripNonAsciiTestCase.getBrandOfOrange",
+                                          new Object[] {});
+  }
 }

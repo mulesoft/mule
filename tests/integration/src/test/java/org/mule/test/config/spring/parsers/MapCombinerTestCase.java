@@ -10,41 +10,35 @@ import org.mule.test.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
-public class MapCombinerTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/map-combiner-test.xml";
-    }
+public class MapCombinerTestCase extends AbstractNamespaceTestCase {
 
-    @Test
-    public void testProperties()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        assertMapEntryExists(bean.getMap(), "0", 0);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/map-combiner-test.xml";
+  }
 
-    @Test
-    public void testCombinedMap()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        for (int i = 0; i < 6; ++i)
-        {
-            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
-        }
-    }
+  @Test
+  public void testProperties() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    assertMapEntryExists(bean.getMap(), "0", 0);
+  }
 
-    @Test
-    public void testReverersedOrder()
-    {
-        OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
-        for (int i = 0; i < 2; ++i)
-        {
-            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
-        }
+  @Test
+  public void testCombinedMap() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    for (int i = 0; i < 6; ++i) {
+      assertMapEntryExists(bean.getMap(), Integer.toString(i + 1), i + 1);
     }
+  }
+
+  @Test
+  public void testReverersedOrder() {
+    OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+    logger.info("Map size: " + bean.getMap().size());
+    for (int i = 0; i < 2; ++i) {
+      assertMapEntryExists(bean.getMap(), Integer.toString(i + 1), i + 1);
+    }
+  }
 }

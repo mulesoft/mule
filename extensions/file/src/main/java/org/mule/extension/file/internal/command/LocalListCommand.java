@@ -25,65 +25,56 @@ import java.util.function.Predicate;
  *
  * @since 4.0
  */
-public final class LocalListCommand extends LocalFileCommand implements ListCommand
-{
+public final class LocalListCommand extends LocalFileCommand implements ListCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public LocalListCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
+  /**
+   * {@inheritDoc}
+   */
+  public LocalListCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message,
+                       Predicate<FileAttributes> matcher) {
+    Path path = resolveExistingPath(config, directoryPath);
+    if (!Files.isDirectory(path)) {
+      throw cannotListFileException(path);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
-    {
-        Path path = resolveExistingPath(config, directoryPath);
-        if (!Files.isDirectory(path))
-        {
-            throw cannotListFileException(path);
-        }
+    TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(new LocalFileAttributes(path));
+    doList(config, path.toFile(), treeNodeBuilder, recursive, message, matcher);
 
-        TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(new LocalFileAttributes(path));
-        doList(config, path.toFile(), treeNodeBuilder, recursive, message, matcher);
+    return treeNodeBuilder.build();
+  }
 
-        return treeNodeBuilder.build();
+  private void doList(FileConnectorConfig config, File parent, TreeNode.Builder treeNodeBuilder, boolean recursive,
+                      MuleMessage message, Predicate<FileAttributes> matcher) {
+    if (!parent.canRead()) {
+      throw exception(format("Could not list files from directory '%s' because access was denied by the operating system",
+                             parent.getAbsolutePath()));
     }
 
-    private void doList(FileConnectorConfig config, File parent, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
-    {
-        if (!parent.canRead())
-        {
-            throw exception(format("Could not list files from directory '%s' because access was denied by the operating system", parent.getAbsolutePath()));
+    for (File child : parent.listFiles()) {
+      Path path = child.toPath();
+      FileAttributes attributes = new LocalFileAttributes(path);
+      if (!matcher.test(attributes)) {
+        continue;
+      }
+
+      if (child.isDirectory()) {
+        TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
+        treeNodeBuilder.addChild(childNodeBuilder);
+
+        if (recursive) {
+          doList(config, child, childNodeBuilder, recursive, message, matcher);
         }
-
-        for (File child : parent.listFiles())
-        {
-            Path path = child.toPath();
-            FileAttributes attributes = new LocalFileAttributes(path);
-            if (!matcher.test(attributes))
-            {
-                continue;
-            }
-
-            if (child.isDirectory())
-            {
-                TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
-                treeNodeBuilder.addChild(childNodeBuilder);
-
-                if (recursive)
-                {
-                    doList(config, child, childNodeBuilder, recursive, message, matcher);
-                }
-            }
-            else
-            {
-                treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, child.getAbsolutePath(), false)));
-            }
-        }
+      } else {
+        treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, child.getAbsolutePath(), false)));
+      }
     }
+  }
 }

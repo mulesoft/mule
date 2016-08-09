@@ -12,14 +12,12 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * <code>FileMessageDispatcherFactory</code> creaes a dispatcher responsible for
- * writing files to disk
+ * <code>FileMessageDispatcherFactory</code> creaes a dispatcher responsible for writing files to disk
  */
-public class FileMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new FileMessageDispatcher(endpoint);
-    }
+public class FileMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
+
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new FileMessageDispatcher(endpoint);
+  }
 }

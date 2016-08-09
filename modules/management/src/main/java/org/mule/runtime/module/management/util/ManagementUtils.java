@@ -22,45 +22,39 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 
-public class ManagementUtils
-{
+public class ManagementUtils {
 
-    protected static JmxSupportFactory jmxSupportFactory;
-    protected static JmxSupport jmxSupport;
+  protected static JmxSupportFactory jmxSupportFactory;
+  protected static JmxSupport jmxSupport;
 
-    public static void restart() throws Exception
-    {
-        WrapperManagerMBean proxy = getProxy();
-        if (proxy != null) {
-            proxy.restart();
-        }
-        else
-        {
-            throw new RuntimeException("The wrapper is not enabled.");
-        }
+  public static void restart() throws Exception {
+    WrapperManagerMBean proxy = getProxy();
+    if (proxy != null) {
+      proxy.restart();
+    } else {
+      throw new RuntimeException("The wrapper is not enabled.");
+    }
+  }
+
+
+  protected synchronized static WrapperManagerMBean getProxy() throws MalformedObjectNameException, MBeanRegistrationException,
+      InstanceAlreadyExistsException, NotCompliantMBeanException {
+    if (jmxSupport == null) {
+      jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+      jmxSupport = jmxSupportFactory.getJmxSupport();
     }
 
-
-    protected synchronized static WrapperManagerMBean getProxy() throws MalformedObjectNameException, MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException
-    {
-        if (jmxSupport == null)
-        {
-            jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-            jmxSupport = jmxSupportFactory.getJmxSupport();
-        }
-
-        MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        final String jmxNameForMule = String.format("%s:%s", JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX, WrapperManagerAgent.WRAPPER_JMX_NAME);
-        ObjectName on = jmxSupport.getObjectName(jmxNameForMule);
-        if (!mBeanServer.isRegistered(on))
-        {
-            mBeanServer.registerMBean(new WrapperManager(), on);
-        }
-
-        WrapperManagerMBean proxy = MBeanServerInvocationHandler.newProxyInstance(
-            mBeanServer, on, WrapperManagerMBean.class, false);
-        return proxy;
+    MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+    final String jmxNameForMule =
+        String.format("%s:%s", JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX, WrapperManagerAgent.WRAPPER_JMX_NAME);
+    ObjectName on = jmxSupport.getObjectName(jmxNameForMule);
+    if (!mBeanServer.isRegistered(on)) {
+      mBeanServer.registerMBean(new WrapperManager(), on);
     }
+
+    WrapperManagerMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mBeanServer, on, WrapperManagerMBean.class, false);
+    return proxy;
+  }
 
 }
 

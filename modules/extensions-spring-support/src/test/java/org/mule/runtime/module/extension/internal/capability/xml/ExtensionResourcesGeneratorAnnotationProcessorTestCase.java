@@ -42,101 +42,103 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 @SmallTest
-public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractMuleTestCase
-{
+public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractMuleTestCase {
 
-    private static final String GROUP_PARAMETER_1 = "Group parameter 1";
-    private static final String GROUP_PARAMETER_2 = "Group parameter 2";
+  private static final String GROUP_PARAMETER_1 = "Group parameter 1";
+  private static final String GROUP_PARAMETER_2 = "Group parameter 2";
 
-    private XPath xpath;
-    private DocumentBuilderFactory builderFactory;
+  private XPath xpath;
+  private DocumentBuilderFactory builderFactory;
 
-    @Before
-    public void before() throws Exception
-    {
-        XPathFactory xpathFactory = new XPathFactoryImpl();
-        xpath = xpathFactory.newXPath();
+  @Before
+  public void before() throws Exception {
+    XPathFactory xpathFactory = new XPathFactoryImpl();
+    xpath = xpathFactory.newXPath();
 
-        builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setNamespaceAware(true);
+    builderFactory = DocumentBuilderFactory.newInstance();
+    builderFactory.setNamespaceAware(true);
+  }
+
+  @Test
+  public void generateDocumentedSchema() throws Exception {
+    ArgumentCaptor<ByteSource> byteSourceCaptor = ArgumentCaptor.forClass(ByteSource.class);
+    ByteSource byteSource = mock(ByteSource.class);
+    when(byteSource.contentEquals(byteSourceCaptor.capture())).thenReturn(true);
+
+    assert_().about(javaSources()).that(testSourceFiles()).withCompilerOptions("-Aextension.version=1.0.0-dev")
+        .processedWith(new ExtensionResourcesGeneratorAnnotationProcessor()).compilesWithoutError().and()
+        .generatesFileNamed(StandardLocation.SOURCE_OUTPUT, "", "mule-documentation.xsd").withContents(byteSource);
+
+    ByteSource generatedByteSource = byteSourceCaptor.getValue();
+    assertThat(generatedByteSource, is(notNullValue()));
+    String generatedSchema = IOUtils.toString(generatedByteSource.openStream());
+
+    assertXpath(generatedSchema, "//xs:attribute[@name='configParameter']/xs:annotation/xs:documentation", "Config parameter");
+    assertXpath(generatedSchema, "//xs:attribute[@name='configParameterWithComplexJavadoc']/xs:annotation/xs:documentation",
+                "Config Parameter with an Optional value");
+    assertXpath(generatedSchema, "//xs:attribute[@name='value1']/xs:annotation/xs:documentation", GROUP_PARAMETER_1);
+    assertXpath(generatedSchema, "//xs:attribute[@name='value2']/xs:annotation/xs:documentation", GROUP_PARAMETER_2);
+
+
+    assertXpath(generatedSchema, "//xs:element[@name='operation']/xs:annotation/xs:documentation", "Test Operation");
+    assertXpath(generatedSchema,
+                "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation",
+                "test value");
+    assertXpath(generatedSchema,
+                "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value1']/xs:annotation/xs:documentation",
+                GROUP_PARAMETER_1);
+    assertXpath(generatedSchema,
+                "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value2']/xs:annotation/xs:documentation",
+                GROUP_PARAMETER_2);
+
+    assertXpath(generatedSchema, "//xs:element[@name='ignore-operation-should-be-ignored']/xs:annotation/xs:documentation", "");
+    assertXpath(generatedSchema, "//xs:element[@name='private-operation-should-be-ignored']/xs:annotation/xs:documentation", "");
+
+    assertXpath(generatedSchema,
+                "//xs:element[@name='operation-with-blank-parameter-description']/xs:annotation/xs:documentation",
+                "Test Operation with blank parameter description");
+    assertXpath(generatedSchema,
+                "//xs:complexType[@name='OperationWithBlankParameterDescriptionType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation",
+                "");
+
+    assertXpath(generatedSchema, "//xs:element[@name='operation-with-javadoc-link-references']/xs:annotation/xs:documentation",
+                "Operation that returns a String value");
+    assertXpath(generatedSchema,
+                "//xs:complexType[@name='OperationWithJavadocLinkReferencesType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation",
+                "this is the String to be returned");
+  }
+
+  private void assertXpath(String input, String expression, String expected) throws Exception {
+    assertThat(xpath(input, expression), is(expected));
+  }
+
+  private String xpath(String input, String expression) throws Exception {
+    Node node = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(input)));
+    return (String) xpath.evaluate(expression, node, XPathConstants.STRING);
+  }
+
+  private Iterable<JavaFileObject> testSourceFiles() throws Exception {
+    // this will be xxx/target/test-classes
+    File folder = new File(getClass().getClassLoader().getResource("").getPath().toString());
+
+    // up to levels
+    folder = folder.getParentFile().getParentFile();
+
+    folder = new File(folder, "src/test/java/" + getClass().getPackage().getName().replaceAll("\\.", "/"));
+
+    File[] files = folder.listFiles(new FilenameFilter() {
+
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.endsWith(".java");
+      }
+    });
+
+    List<JavaFileObject> javaFileObjects = new ArrayList<>(files.length);
+    for (File file : files) {
+      javaFileObjects.add(JavaFileObjects.forResource(file.toURI().toURL()));
     }
 
-    @Test
-    public void generateDocumentedSchema() throws Exception
-    {
-        ArgumentCaptor<ByteSource> byteSourceCaptor = ArgumentCaptor.forClass(ByteSource.class);
-        ByteSource byteSource = mock(ByteSource.class);
-        when(byteSource.contentEquals(byteSourceCaptor.capture())).thenReturn(true);
-
-        assert_().about(javaSources())
-                .that(testSourceFiles())
-                .withCompilerOptions("-Aextension.version=1.0.0-dev")
-                .processedWith(new ExtensionResourcesGeneratorAnnotationProcessor())
-                .compilesWithoutError()
-                .and().generatesFileNamed(StandardLocation.SOURCE_OUTPUT, "", "mule-documentation.xsd")
-                .withContents(byteSource);
-
-        ByteSource generatedByteSource = byteSourceCaptor.getValue();
-        assertThat(generatedByteSource, is(notNullValue()));
-        String generatedSchema = IOUtils.toString(generatedByteSource.openStream());
-
-        assertXpath(generatedSchema, "//xs:attribute[@name='configParameter']/xs:annotation/xs:documentation", "Config parameter");
-        assertXpath(generatedSchema, "//xs:attribute[@name='configParameterWithComplexJavadoc']/xs:annotation/xs:documentation", "Config Parameter with an Optional value");
-        assertXpath(generatedSchema, "//xs:attribute[@name='value1']/xs:annotation/xs:documentation", GROUP_PARAMETER_1);
-        assertXpath(generatedSchema, "//xs:attribute[@name='value2']/xs:annotation/xs:documentation", GROUP_PARAMETER_2);
-
-
-        assertXpath(generatedSchema, "//xs:element[@name='operation']/xs:annotation/xs:documentation", "Test Operation");
-        assertXpath(generatedSchema, "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation", "test value");
-        assertXpath(generatedSchema, "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value1']/xs:annotation/xs:documentation", GROUP_PARAMETER_1);
-        assertXpath(generatedSchema, "//xs:complexType[@name='OperationType']/xs:complexContent/xs:extension/xs:attribute[@name='value2']/xs:annotation/xs:documentation", GROUP_PARAMETER_2);
-
-        assertXpath(generatedSchema, "//xs:element[@name='ignore-operation-should-be-ignored']/xs:annotation/xs:documentation", "");
-        assertXpath(generatedSchema, "//xs:element[@name='private-operation-should-be-ignored']/xs:annotation/xs:documentation", "");
-
-        assertXpath(generatedSchema, "//xs:element[@name='operation-with-blank-parameter-description']/xs:annotation/xs:documentation", "Test Operation with blank parameter description");
-        assertXpath(generatedSchema, "//xs:complexType[@name='OperationWithBlankParameterDescriptionType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation", "");
-
-        assertXpath(generatedSchema, "//xs:element[@name='operation-with-javadoc-link-references']/xs:annotation/xs:documentation", "Operation that returns a String value");
-        assertXpath(generatedSchema, "//xs:complexType[@name='OperationWithJavadocLinkReferencesType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation", "this is the String to be returned");
-    }
-
-    private void assertXpath(String input, String expression, String expected) throws Exception
-    {
-        assertThat(xpath(input, expression), is(expected));
-    }
-
-    private String xpath(String input, String expression) throws Exception
-    {
-        Node node = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(input)));
-        return (String) xpath.evaluate(expression, node, XPathConstants.STRING);
-    }
-
-    private Iterable<JavaFileObject> testSourceFiles() throws Exception
-    {
-        // this will be xxx/target/test-classes
-        File folder = new File(getClass().getClassLoader().getResource("").getPath().toString());
-
-        // up to levels
-        folder = folder.getParentFile().getParentFile();
-
-        folder = new File(folder, "src/test/java/" + getClass().getPackage().getName().replaceAll("\\.", "/"));
-
-        File[] files = folder.listFiles(new FilenameFilter()
-        {
-            @Override
-            public boolean accept(File dir, String name)
-            {
-                return name.endsWith(".java");
-            }
-        });
-
-        List<JavaFileObject> javaFileObjects = new ArrayList<>(files.length);
-        for (File file : files)
-        {
-            javaFileObjects.add(JavaFileObjects.forResource(file.toURI().toURL()));
-        }
-
-        return javaFileObjects;
-    }
+    return javaFileObjects;
+  }
 }

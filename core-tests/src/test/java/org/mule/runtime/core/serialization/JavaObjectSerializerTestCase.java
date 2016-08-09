@@ -10,19 +10,16 @@ import org.mule.runtime.core.api.serialization.SerializationException;
 
 import org.junit.Test;
 
-public class JavaObjectSerializerTestCase extends AbstractObjectSerializerContractTestCase
-{
+public class JavaObjectSerializerTestCase extends AbstractObjectSerializerContractTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        serializer = muleContext.getObjectSerializer();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    serializer = muleContext.getObjectSerializer();
+  }
 
-    @Test(expected = SerializationException.class)
-    public void notSerializable() throws Exception
-    {
-        serializer.serialize(new Object());
-    }
+  @Test(expected = SerializationException.class)
+  public void notSerializable() throws Exception {
+    serializer.serialize(new Object());
+  }
 
 }

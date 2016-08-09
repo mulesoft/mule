@@ -12,56 +12,51 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class FileDeleteTestCase extends FileConnectorTestCase
-{
+public class FileDeleteTestCase extends FileConnectorTestCase {
 
-    private static final String GRAND_CHILD = "grandChild";
-    private static final String DELETE = "delete";
+  private static final String GRAND_CHILD = "grandChild";
+  private static final String DELETE = "delete";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-delete-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-delete-config.xml";
+  }
 
-    @Test
-    public void deleteFile() throws Exception
-    {
-        File file = temporaryFolder.newFile();
-        assertExists(true, file);
+  @Test
+  public void deleteFile() throws Exception {
+    File file = temporaryFolder.newFile();
+    assertExists(true, file);
 
-        flowRunner(DELETE).withFlowVariable(DELETE, file.getAbsolutePath()).run();
+    flowRunner(DELETE).withFlowVariable(DELETE, file.getAbsolutePath()).run();
 
-        assertExists(false, file);
-    }
+    assertExists(false, file);
+  }
 
-    @Test
-    public void deleteReadFile() throws Exception
-    {
-        File file = temporaryFolder.newFile();
+  @Test
+  public void deleteReadFile() throws Exception {
+    File file = temporaryFolder.newFile();
 
-        flowRunner("readAndDelete").withFlowVariable(DELETE, file.getAbsolutePath()).run();
+    flowRunner("readAndDelete").withFlowVariable(DELETE, file.getAbsolutePath()).run();
 
-        assertExists(false, file);
-    }
+    assertExists(false, file);
+  }
 
 
-    @Test
-    public void deleteFolder() throws Exception
-    {
-        File directory = temporaryFolder.newFolder();
-        File child = new File(directory, "file");
-        FileUtils.write(child, "child");
+  @Test
+  public void deleteFolder() throws Exception {
+    File directory = temporaryFolder.newFolder();
+    File child = new File(directory, "file");
+    FileUtils.write(child, "child");
 
-        File subFolder = new File(directory, "subfolder");
-        subFolder.mkdir();
-        File grandChild = new File(subFolder, GRAND_CHILD);
-        FileUtils.write(grandChild, GRAND_CHILD);
+    File subFolder = new File(directory, "subfolder");
+    subFolder.mkdir();
+    File grandChild = new File(subFolder, GRAND_CHILD);
+    FileUtils.write(grandChild, GRAND_CHILD);
 
-        assertExists(true, child, subFolder, grandChild);
+    assertExists(true, child, subFolder, grandChild);
 
-        flowRunner(DELETE).withFlowVariable(DELETE, directory.getAbsolutePath()).run();
-        assertExists(false, directory, child, subFolder, grandChild);
-    }
+    flowRunner(DELETE).withFlowVariable(DELETE, directory.getAbsolutePath()).run();
+    assertExists(false, directory, child, subFolder, grandChild);
+  }
 
 }

@@ -24,46 +24,42 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpListenerPathRoutingTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerPathRoutingTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
-    @Rule
-    public SystemProperty path = new SystemProperty("path", "path");
-    @Rule
-    public SystemProperty path2 = new SystemProperty("path2", "path2");
-    @Rule
-    public SystemProperty anotherPath = new SystemProperty("anotherPath", "anotherPath");
-    @Rule
-    public SystemProperty pathSubPath = new SystemProperty("path/subpath", "path/subpath");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public SystemProperty path = new SystemProperty("path", "path");
+  @Rule
+  public SystemProperty path2 = new SystemProperty("path2", "path2");
+  @Rule
+  public SystemProperty anotherPath = new SystemProperty("anotherPath", "anotherPath");
+  @Rule
+  public SystemProperty pathSubPath = new SystemProperty("path/subpath", "path/subpath");
 
-    private final String testPath;
+  private final String testPath;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {{"path"},{"path2"},{"anotherPath"},{"path/subpath"}});
-    }
-
-
-    public HttpListenerPathRoutingTestCase(String path)
-    {
-        this.testPath = path;
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"path"}, {"path2"}, {"anotherPath"}, {"path/subpath"}});
+  }
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-path-routing-config.xml";
-    }
+  public HttpListenerPathRoutingTestCase(String path) {
+    this.testPath = path;
+  }
 
-    @Test
-    public void callPath() throws Exception
-    {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), testPath);
-        final Response response = Request.Post(url).body(new StringEntity(testPath)).connectTimeout(1000).execute();
-        assertThat(response.returnContent().asString(), is(testPath));
-    }
+
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-path-routing-config.xml";
+  }
+
+  @Test
+  public void callPath() throws Exception {
+    final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), testPath);
+    final Response response = Request.Post(url).body(new StringEntity(testPath)).connectTimeout(1000).execute();
+    assertThat(response.returnContent().asString(), is(testPath));
+  }
 
 }

@@ -12,15 +12,13 @@ import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 /**
  * Creates {@link ParamTypeResolver} instances
  */
-public interface ParamTypeResolverFactory
-{
+public interface ParamTypeResolverFactory {
 
-    /**
-     * Creates a new parameter type resolver to resolve the parameter types
-     * of a given query template.
-     *
-     * @param queryTemplate query template to resolve
-     * @return a non null {@link ParamTypeResolver} to resolve the given query template
-     */
-    ParamTypeResolver create(QueryTemplate queryTemplate);
+  /**
+   * Creates a new parameter type resolver to resolve the parameter types of a given query template.
+   *
+   * @param queryTemplate query template to resolve
+   * @return a non null {@link ParamTypeResolver} to resolve the given query template
+   */
+  ParamTypeResolver create(QueryTemplate queryTemplate);
 }

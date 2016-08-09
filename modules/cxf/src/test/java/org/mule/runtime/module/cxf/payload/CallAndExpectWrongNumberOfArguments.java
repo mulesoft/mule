@@ -11,18 +11,14 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  *
  */
-class CallAndExpectWrongNumberOfArguments extends AbstractCallAndExpectIllegalArgumentException
-{
-    public CallAndExpectWrongNumberOfArguments(String outputEndpointName,
-                                               Object payload,
-                                               MuleContext muleContext)
-    {
-        super(outputEndpointName, payload, muleContext);
-    }
+class CallAndExpectWrongNumberOfArguments extends AbstractCallAndExpectIllegalArgumentException {
 
-    @Override
-    public String expectedIllegalArgumentExceptionMessage()
-    {
-        return "wrong number of arguments";
-    }
+  public CallAndExpectWrongNumberOfArguments(String outputEndpointName, Object payload, MuleContext muleContext) {
+    super(outputEndpointName, payload, muleContext);
+  }
+
+  @Override
+  public String expectedIllegalArgumentExceptionMessage() {
+    return "wrong number of arguments";
+  }
 }

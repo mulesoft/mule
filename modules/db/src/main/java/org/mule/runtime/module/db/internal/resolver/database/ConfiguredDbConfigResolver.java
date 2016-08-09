@@ -11,28 +11,23 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 
 /**
- * Resolves a {@link DbConfig} delegating to the {@link DbConfigResolver}
- * corresponding to the configured config.
+ * Resolves a {@link DbConfig} delegating to the {@link DbConfigResolver} corresponding to the configured config.
  */
-public class ConfiguredDbConfigResolver extends AbstractDbConfigResolver
-{
+public class ConfiguredDbConfigResolver extends AbstractDbConfigResolver {
 
-    private final DbConfigResolver dbConfigResolver;
+  private final DbConfigResolver dbConfigResolver;
 
-    public ConfiguredDbConfigResolver(DbConfigResolver dbConfigResolver)
-    {
-        this.dbConfigResolver = dbConfigResolver;
-    }
+  public ConfiguredDbConfigResolver(DbConfigResolver dbConfigResolver) {
+    this.dbConfigResolver = dbConfigResolver;
+  }
 
-    @Override
-    public DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException
-    {
-        return dbConfigResolver.resolve(muleEvent);
-    }
+  @Override
+  public DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException {
+    return dbConfigResolver.resolve(muleEvent);
+  }
 
-    @Override
-    protected DbConfig resolveDefaultConfig()
-    {
-        return dbConfigResolver.resolve(null);
-    }
+  @Override
+  protected DbConfig resolveDefaultConfig() {
+    return dbConfigResolver.resolve(null);
+  }
 }

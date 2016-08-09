@@ -23,58 +23,48 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.junit.Test;
 
-public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "activemq-xa.xml";
+public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "activemq-xa.xml";
+  }
+
+  @Test
+  public void testReflectiveXaCleanup() throws Exception {
+    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+    assertNotNull(c);
+
+    ConnectionFactory cf = c.getConnectionFactory();
+    assertTrue(cf instanceof ActiveMQXAConnectionFactory);
+
+    DefaultXAConnectionFactoryWrapper wrapper = new DefaultXAConnectionFactoryWrapper(cf);
+    // can be a proxy
+    Connection connection = wrapper.createConnection();
+    assertNotNull(connection);
+    assertTrue(Proxy.isProxyClass(connection.getClass()));
+
+    try {
+      final Class clazz = connection.getClass();
+      Method cleanupMethod;
+      if (Proxy.isProxyClass(clazz)) {
+        TargetInvocationHandler handler = (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
+        // this is really an XA connection
+        connection = (Connection) handler.getTargetObject();
+        Class realConnectionClass = connection.getClass();
+        cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[]) null);
+      } else {
+        cleanupMethod = clazz.getMethod("cleanup", (Class[]) null);
+      }
+
+
+      if (cleanupMethod != null) {
+        cleanupMethod.invoke(connection, (Object[]) null);
+      }
+    } finally {
+      connection.close();
     }
 
-    @Test
-    public void testReflectiveXaCleanup() throws Exception
-    {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-        assertNotNull(c);
-        
-        ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQXAConnectionFactory);
-
-        DefaultXAConnectionFactoryWrapper wrapper = new DefaultXAConnectionFactoryWrapper(cf);
-        // can be a proxy
-        Connection connection = wrapper.createConnection();
-        assertNotNull(connection);
-        assertTrue(Proxy.isProxyClass(connection.getClass()));
-
-        try
-        {
-            final Class clazz = connection.getClass();
-            Method cleanupMethod;
-            if (Proxy.isProxyClass(clazz))
-            {
-                TargetInvocationHandler handler =
-                        (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
-                // this is really an XA connection
-                connection = (Connection) handler.getTargetObject();
-                Class realConnectionClass = connection.getClass();
-                cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
-            }
-            else
-            {
-                cleanupMethod = clazz.getMethod("cleanup", (Class[])null);
-            }
-
-
-            if (cleanupMethod != null)
-            {
-                cleanupMethod.invoke(connection, (Object[])null);
-            }
-        }
-        finally
-        {
-            connection.close();
-        }
-
-        // there should be no errors
-    }
+    // there should be no errors
+  }
 }

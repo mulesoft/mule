@@ -12,10 +12,9 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
-public class MuleInitialContextFactory implements InitialContextFactory
-{
-    public Context getInitialContext(Hashtable hashtable) throws NamingException
-    {
-        return new SimpleContext();
-    }
+public class MuleInitialContextFactory implements InitialContextFactory {
+
+  public Context getInitialContext(Hashtable hashtable) throws NamingException {
+    return new SimpleContext();
+  }
 }

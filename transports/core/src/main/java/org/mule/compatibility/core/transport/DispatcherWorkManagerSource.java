@@ -13,19 +13,16 @@ import org.mule.runtime.core.api.context.WorkManagerSource;
 /**
  * WorkManagerSource for connector dispatcher work manager
  */
-public class DispatcherWorkManagerSource implements WorkManagerSource
-{
+public class DispatcherWorkManagerSource implements WorkManagerSource {
 
-    private final AbstractConnector connector;
+  private final AbstractConnector connector;
 
-    public DispatcherWorkManagerSource(AbstractConnector connector)
-    {
-        this.connector = connector;
-    }
+  public DispatcherWorkManagerSource(AbstractConnector connector) {
+    this.connector = connector;
+  }
 
-    @Override
-    public WorkManager getWorkManager() throws MuleException
-    {
-        return connector.getDispatcherWorkManager();
-    }
+  @Override
+  public WorkManager getWorkManager() throws MuleException {
+    return connector.getDispatcherWorkManager();
+  }
 }

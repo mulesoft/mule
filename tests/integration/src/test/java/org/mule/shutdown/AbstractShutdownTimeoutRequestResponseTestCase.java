@@ -17,40 +17,33 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Before;
 import org.junit.Rule;
 
-public abstract class AbstractShutdownTimeoutRequestResponseTestCase extends AbstractIntegrationTestCase
-{
+public abstract class AbstractShutdownTimeoutRequestResponseTestCase extends AbstractIntegrationTestCase {
 
-    protected static int WAIT_TIME = 2000;
-    protected static Latch waitLatch;
+  protected static int WAIT_TIME = 2000;
+  protected static Latch waitLatch;
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Before
-    public void setUpWaitLatch() throws Exception
-    {
-        waitLatch = new Latch();
+  @Before
+  public void setUpWaitLatch() throws Exception {
+    waitLatch = new Latch();
+  }
+
+  private static class BlockMessageProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      waitLatch.release();
+
+      try {
+        Thread.sleep(WAIT_TIME);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new DefaultMuleException(e);
+      }
+
+      return event;
     }
-
-    private static class BlockMessageProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            waitLatch.release();
-
-            try
-            {
-                Thread.sleep(WAIT_TIME);
-            }
-            catch (InterruptedException e)
-            {
-                Thread.currentThread().interrupt();
-                throw new DefaultMuleException(e);
-            }
-
-            return event;
-        }
-    }
+  }
 }

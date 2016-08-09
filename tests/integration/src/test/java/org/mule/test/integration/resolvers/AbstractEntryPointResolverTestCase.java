@@ -13,17 +13,14 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Map;
 
-public abstract class AbstractEntryPointResolverTestCase extends AbstractIntegrationTestCase
-{
+public abstract class AbstractEntryPointResolverTestCase extends AbstractIntegrationTestCase {
 
-    protected void doTest(String flowName, Object payload, String result) throws Exception
-    {
-        doTest(flowName, payload, result, emptyMap());
-    }
+  protected void doTest(String flowName, Object payload, String result) throws Exception {
+    doTest(flowName, payload, result, emptyMap());
+  }
 
-    protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception
-    {
-        MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
-        assertEquals(result, getPayloadAsString(response));
-    }
+  protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception {
+    MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
+    assertEquals(result, getPayloadAsString(response));
+  }
 }

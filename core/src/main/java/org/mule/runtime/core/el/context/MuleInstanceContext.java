@@ -12,39 +12,33 @@ import org.mule.runtime.core.config.MuleManifest;
 /**
  * Expose information about the Mule instance:
  * 
- * <li> <b>clusterid</b>       <i>Cluster ID</i>
- * <li> <b>home</b>            <i>Home directory</i>
- * <li> <b>nodeid</b>          <i>Cluster Node ID</i>
- * <li> <b>version</b>         <i>Mule Version</i>
+ * <li><b>clusterid</b> <i>Cluster ID</i>
+ * <li><b>home</b> <i>Home directory</i>
+ * <li><b>nodeid</b> <i>Cluster Node ID</i>
+ * <li><b>version</b> <i>Mule Version</i>
  */
-public class MuleInstanceContext
-{
+public class MuleInstanceContext {
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    public MuleInstanceContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  public MuleInstanceContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
-    public String getVersion()
-    {
-        return MuleManifest.getProductVersion();
-    }
+  public String getVersion() {
+    return MuleManifest.getProductVersion();
+  }
 
-    public String getClusterId()
-    {
-        return muleContext.getClusterId();
-    }
+  public String getClusterId() {
+    return muleContext.getClusterId();
+  }
 
-    public int getNodeId()
-    {
-        return muleContext.getClusterNodeId();
-    }
+  public int getNodeId() {
+    return muleContext.getClusterNodeId();
+  }
 
-    public String getHome()
-    {
-        return muleContext.getConfiguration().getMuleHomeDirectory();
-    }
+  public String getHome() {
+    return muleContext.getConfiguration().getMuleHomeDirectory();
+  }
 
 }

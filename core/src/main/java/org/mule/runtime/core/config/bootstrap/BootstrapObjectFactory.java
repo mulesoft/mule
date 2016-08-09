@@ -9,7 +9,7 @@ package org.mule.runtime.core.config.bootstrap;
 /**
  * A simple factory interface that can be listed in a registry-bootstrap.properties file
  */
-public interface BootstrapObjectFactory
-{
-    Object create();
+public interface BootstrapObjectFactory {
+
+  Object create();
 }

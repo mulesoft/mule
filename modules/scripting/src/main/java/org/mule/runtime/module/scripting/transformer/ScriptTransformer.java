@@ -26,53 +26,43 @@ import org.slf4j.LoggerFactory;
 /**
  * Runs a script to perform transformation on an object.
  */
-public class ScriptTransformer extends AbstractMessageTransformer
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTransformer.class);
+public class ScriptTransformer extends AbstractMessageTransformer {
 
-    private Scriptable script;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTransformer.class);
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        LifecycleUtils.initialiseIfNeeded(script, muleContext);
+  private Scriptable script;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    LifecycleUtils.initialiseIfNeeded(script, muleContext);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    LifecycleUtils.disposeIfNeeded(script, LOGGER);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Bindings bindings = script.getScriptEngine().createBindings();
+    script.populateBindings(bindings, event);
+    try {
+      return script.runScript(bindings);
+    } catch (ScriptException e) {
+      throw new TransformerException(this, e);
+    } finally {
+      event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
+      bindings.clear();
     }
+  }
 
-    @Override
-    public void dispose()
-    {
-        super.dispose();
-        LifecycleUtils.disposeIfNeeded(script, LOGGER);
-    }
+  public Scriptable getScript() {
+    return script;
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Bindings bindings = script.getScriptEngine().createBindings();
-        script.populateBindings(bindings, event);
-        try
-        {
-            return script.runScript(bindings);
-        }
-        catch (ScriptException e)
-        {
-            throw new TransformerException(this, e);
-        }
-        finally
-        {
-            event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
-            bindings.clear();
-        }
-    }
-
-    public Scriptable getScript()
-    {
-        return script;
-    }
-
-    public void setScript(Scriptable script)
-    {
-        this.script = script;
-    }
+  public void setScript(Scriptable script) {
+    this.script = script;
+  }
 }

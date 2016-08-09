@@ -25,72 +25,53 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  *
  * @since 4.0
  */
-public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor>
-{
-    private final RuntimeExtensionModel extensionModel;
-    private final RuntimeOperationModel operationModel;
-    private final MuleContext muleContext;
+public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor> {
 
-    private String configurationProviderName;
-    private String target = EMPTY;
+  private final RuntimeExtensionModel extensionModel;
+  private final RuntimeOperationModel operationModel;
+  private final MuleContext muleContext;
 
-    public OperationMessageProcessorObjectFactory(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel, MuleContext muleContext)
-    {
-        this.extensionModel = extensionModel;
-        this.operationModel = operationModel;
-        this.muleContext = muleContext;
+  private String configurationProviderName;
+  private String target = EMPTY;
+
+  public OperationMessageProcessorObjectFactory(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+                                                MuleContext muleContext) {
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
+    this.muleContext = muleContext;
+  }
+
+  @Override
+  public OperationMessageProcessor getObject() throws Exception {
+    return withContextClassLoader(getClassLoader(extensionModel), () -> {
+      try {
+        ResolverSet resolverSet = getParametersAsResolverSet(operationModel);
+        OperationMessageProcessor processor = createMessageProcessor(resolverSet);
+
+        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
+        muleContext.getInjector().inject(processor);
+        return processor;
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+  }
+
+  private OperationMessageProcessor createMessageProcessor(ResolverSet resolverSet) {
+    if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
+      return new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target,
+                                                       resolverSet, (ExtensionManagerAdapter) muleContext.getExtensionManager());
+    } else {
+      return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet,
+                                           (ExtensionManagerAdapter) muleContext.getExtensionManager());
     }
+  }
 
-    @Override
-    public OperationMessageProcessor getObject() throws Exception
-    {
-        return withContextClassLoader(getClassLoader(extensionModel), () ->
-        {
-            try
-            {
-                ResolverSet resolverSet = getParametersAsResolverSet(operationModel);
-                OperationMessageProcessor processor = createMessageProcessor(resolverSet);
+  public void setConfigurationProviderName(String configurationProviderName) {
+    this.configurationProviderName = configurationProviderName;
+  }
 
-                //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-                muleContext.getInjector().inject(processor);
-                return processor;
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        });
-    }
-
-    private OperationMessageProcessor createMessageProcessor(ResolverSet resolverSet)
-    {
-        if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent())
-        {
-            return new InterceptingOperationMessageProcessor(extensionModel,
-                                                             operationModel,
-                                                             configurationProviderName,
-                                                             target,
-                                                             resolverSet,
-                                                             (ExtensionManagerAdapter) muleContext.getExtensionManager());
-        }
-        else
-        {
-            return new OperationMessageProcessor(extensionModel,
-                                                 operationModel,
-                                                 configurationProviderName,
-                                                 target,
-                                                 resolverSet,
-                                                 (ExtensionManagerAdapter) muleContext.getExtensionManager());
-        }
-    }
-
-    public void setConfigurationProviderName(String configurationProviderName)
-    {
-        this.configurationProviderName = configurationProviderName;
-    }
-
-    public void setTarget(String target)
-    {
-        this.target = target;
-    }
+  public void setTarget(String target) {
+    this.target = target;
+  }
 }

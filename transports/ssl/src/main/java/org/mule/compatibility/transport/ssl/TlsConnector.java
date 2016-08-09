@@ -11,20 +11,17 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * <code>TlsConnector</code> Provides TLS connections
  */
-public class TlsConnector extends SslConnector
-{
+public class TlsConnector extends SslConnector {
 
-    public static final String TLS = "tls";
+  public static final String TLS = "tls";
 
-    public TlsConnector(MuleContext context)
-    {
-        super(context);
-    }
-    
-    @Override
-    public String getProtocol()
-    {
-        return TLS;
-    }
+  public TlsConnector(MuleContext context) {
+    super(context);
+  }
+
+  @Override
+  public String getProtocol() {
+    return TLS;
+  }
 
 }

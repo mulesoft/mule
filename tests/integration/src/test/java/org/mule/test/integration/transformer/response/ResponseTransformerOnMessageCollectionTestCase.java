@@ -15,21 +15,18 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ResponseTransformerOnMessageCollectionTestCase extends AbstractIntegrationTestCase
-{
+public class ResponseTransformerOnMessageCollectionTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-flow-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-flow-config.xml";
+  }
 
-    @Test
-    public void transformedDataIsNotLost() throws Exception
-    {
-        MuleMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
+  @Test
+  public void transformedDataIsNotLost() throws Exception {
+    MuleMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
 
-        assertEquals("foo", response.getPayload());
-        assertFalse(response.getPayload() instanceof List);
-    }
+    assertEquals("foo", response.getPayload());
+    assertFalse(response.getPayload() instanceof List);
+  }
 }

@@ -9,15 +9,14 @@ package org.mule.runtime.core.util.timer;
 import java.util.EventListener;
 
 /**
- * <code>TimeEventListener</code> provides a method to pass timer events to
- * implementing objects.
+ * <code>TimeEventListener</code> provides a method to pass timer events to implementing objects.
  */
-public interface TimeEventListener extends EventListener
-{
-    /**
-     * Passes the TimeEvent to an object
-     * 
-     * @param e the time event that occurred
-     */
-    void timeExpired(TimeEvent e);
+public interface TimeEventListener extends EventListener {
+
+  /**
+   * Passes the TimeEvent to an object
+   * 
+   * @param e the time event that occurred
+   */
+  void timeExpired(TimeEvent e);
 }

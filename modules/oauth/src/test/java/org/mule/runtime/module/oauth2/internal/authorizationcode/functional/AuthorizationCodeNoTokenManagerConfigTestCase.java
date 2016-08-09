@@ -16,34 +16,30 @@ import org.apache.http.client.fluent.Request;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAuthorizationCodeBasicTestCase
-{
+public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "authorization-code/authorization-code-no-token-manager-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "authorization-code/authorization-code-no-token-manager-config.xml";
+  }
 
-    @Test
-    public void hitRedirectUrlAndGetToken() throws Exception
-    {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
+  @Test
+  public void hitRedirectUrlAndGetToken() throws Exception {
+    configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
 
-        Request.Get(redirectUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
-                .connectTimeout(REQUEST_TIMEOUT)
-                .socketTimeout(REQUEST_TIMEOUT)
-                .execute();
+    Request.Get(redirectUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
+        .connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
 
-        verifyRequestDoneToTokenUrlForAuthorizationCode();
+    verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-        TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
+    TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
 
-        final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext()
+        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
 
-        assertThat(oauthContext.getAccessToken(), Is.is(ACCESS_TOKEN));
-        assertThat(oauthContext.getRefreshToken(), Is.is(REFRESH_TOKEN));
-    }
+    assertThat(oauthContext.getAccessToken(), Is.is(ACCESS_TOKEN));
+    assertThat(oauthContext.getRefreshToken(), Is.is(REFRESH_TOKEN));
+  }
 
 }

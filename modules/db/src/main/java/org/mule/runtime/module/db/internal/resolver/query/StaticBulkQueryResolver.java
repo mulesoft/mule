@@ -14,30 +14,24 @@ import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 /**
  * Resolves a bulk query to a static value without using the current event
  */
-public class StaticBulkQueryResolver extends AbstractBulkQueryResolver
-{
+public class StaticBulkQueryResolver extends AbstractBulkQueryResolver {
 
-    private BulkQuery bulkQuery;
+  private BulkQuery bulkQuery;
 
-    public StaticBulkQueryResolver(String bulkQuery, QueryTemplateParser queryTemplateParser)
-    {
-        super(bulkQuery, queryTemplateParser);
-    }
+  public StaticBulkQueryResolver(String bulkQuery, QueryTemplateParser queryTemplateParser) {
+    super(bulkQuery, queryTemplateParser);
+  }
 
-    @Override
-    protected BulkQuery createBulkQuery(MuleEvent muleEvent)
-    {
-        if (bulkQuery == null)
-        {
-            synchronized (this)
-            {
-                if (bulkQuery == null)
-                {
-                    bulkQuery = super.createBulkQuery(muleEvent);
-                }
-            }
+  @Override
+  protected BulkQuery createBulkQuery(MuleEvent muleEvent) {
+    if (bulkQuery == null) {
+      synchronized (this) {
+        if (bulkQuery == null) {
+          bulkQuery = super.createBulkQuery(muleEvent);
         }
-
-        return bulkQuery;
+      }
     }
+
+    return bulkQuery;
+  }
 }

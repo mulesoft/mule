@@ -15,64 +15,60 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import java.util.Optional;
 
 /**
- * Default immutable implementation of {@link MetadataContext}, it provides access to the extension configuration and
- * connection in the metadata fetch invocation.
+ * Default immutable implementation of {@link MetadataContext}, it provides access to the extension configuration and connection
+ * in the metadata fetch invocation.
  *
  * @since 4.0
  */
-public class DefaultMetadataContext implements MetadataContext
-{
+public class DefaultMetadataContext implements MetadataContext {
 
-    private final ConfigurationInstance<?> configInstance;
-    private final ConnectionManager connectionManager;
-    private final MetadataCache cache;
+  private final ConfigurationInstance<?> configInstance;
+  private final ConnectionManager connectionManager;
+  private final MetadataCache cache;
 
-    /**
-     * Retrieves the configuration for the related component
-     *
-     * @param configInstance    instance of the configuration of a component
-     * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the {@param configInstance}
-     * @param cache             instance of the {@link MetadataCache} for this context
-     */
-    public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager, MetadataCache cache)
-    {
-        this.configInstance = configInstance;
-        this.connectionManager = connectionManager;
-        this.cache = cache;
+  /**
+   * Retrieves the configuration for the related component
+   *
+   * @param configInstance instance of the configuration of a component
+   * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the
+   *        {@param configInstance}
+   * @param cache instance of the {@link MetadataCache} for this context
+   */
+  public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager,
+                                MetadataCache cache) {
+    this.configInstance = configInstance;
+    this.connectionManager = connectionManager;
+    this.cache = cache;
+  }
+
+  /**
+   * @param <C> Configuration type
+   * @return The instance of the configuration of a component
+   */
+  @Override
+  public <C> C getConfig() {
+    return (C) configInstance.getValue();
+  }
+
+  /**
+   * Retrieves the connection for the related component and configuration
+   *
+   * @param <C> Connection type
+   * @return A connection instance of {@param <C>} type for the component. If the related configuration does not require a
+   *         connection {@link Optional#empty()} will be returned
+   * @throws ConnectionException when no valid connection is found for the related component and configuration
+   */
+  @Override
+  public <C> Optional<C> getConnection() throws ConnectionException {
+    if (!configInstance.getConnectionProvider().isPresent()) {
+      return Optional.empty();
     }
 
-    /**
-     * @param <C> Configuration type
-     * @return The instance of the configuration of a component
-     */
-    @Override
-    public <C> C getConfig()
-    {
-        return (C) configInstance.getValue();
-    }
+    return Optional.of((C) connectionManager.getConnection(configInstance.getValue()).getConnection());
+  }
 
-    /**
-     * Retrieves the connection for the related component and configuration
-     *
-     * @param <C> Connection type
-     * @return A connection instance of {@param <C>} type for the component. If the related configuration does not
-     * require a connection {@link Optional#empty()} will be returned
-     * @throws ConnectionException when no valid connection is found for the related component and configuration
-     */
-    @Override
-    public <C> Optional<C> getConnection() throws ConnectionException
-    {
-        if (!configInstance.getConnectionProvider().isPresent())
-        {
-            return Optional.empty();
-        }
-
-        return Optional.of((C) connectionManager.getConnection(configInstance.getValue()).getConnection());
-    }
-
-    @Override
-    public MetadataCache getCache()
-    {
-        return cache;
-    }
+  @Override
+  public MetadataCache getCache() {
+    return cache;
+  }
 }

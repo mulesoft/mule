@@ -11,29 +11,24 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
-public class TwoStageMapBeanAssemblerFactory implements BeanAssemblerFactory
-{
+public class TwoStageMapBeanAssemblerFactory implements BeanAssemblerFactory {
 
-    private BeanAssemblerStore store;
+  private BeanAssemblerStore store;
 
-    public TwoStageMapBeanAssemblerFactory(BeanAssemblerStore store)
-    {
-        this.store = store;
-    }
+  public TwoStageMapBeanAssemblerFactory(BeanAssemblerStore store) {
+    this.store = store;
+  }
 
-    public BeanAssembler newBeanAssembler(
-            PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-            PropertyConfiguration targetConfig, BeanDefinition target)
-    {
-        return new TwoStageMapBeanAssembler(store, beanConfig, bean, targetConfig, target);
-    }
+  public BeanAssembler newBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                        PropertyConfiguration targetConfig, BeanDefinition target) {
+    return new TwoStageMapBeanAssembler(store, beanConfig, bean, targetConfig, target);
+  }
 
-    public interface BeanAssemblerStore
-    {
+  public interface BeanAssemblerStore {
 
-        public void saveBeanAssembler(BeanAssembler beanAssembler);
+    public void saveBeanAssembler(BeanAssembler beanAssembler);
 
-    }
+  }
 
 
 }

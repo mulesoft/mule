@@ -26,85 +26,77 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/service-overrides.xml";
-    }
+public class ConnectorServiceOverridesTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testOverrideMessageReceiver() throws Exception
-    {
-        TestConnector connector = lookupDummyConnector();
-        
-        // create an xa-transacted endpoint (this triggers the cration of an
-        // xaTransactedMessageReceiver in the service descriptor impl
-        InboundEndpoint endpoint = MuleEndpointTestUtils.getTestInboundEndpoint("foo", muleContext);
-        endpoint.getTransactionConfig().setAction(MuleTransactionConfig.ACTION_ALWAYS_BEGIN);
-        endpoint.getTransactionConfig().setFactory(new XaTransactionFactory());
-        
-        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/service-overrides.xml";
+  }
 
-        // see if we get the overridden message receiver
-        MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector,
-            getTestFlow(), endpoint);
-        assertEquals(TestMessageReceiver.class, receiver.getClass());
-    }
+  @Test
+  public void testOverrideMessageReceiver() throws Exception {
+    TestConnector connector = lookupDummyConnector();
 
-    private TestConnector lookupDummyConnector()
-    {
-        TestConnector connector = (TestConnector) muleContext.getRegistry().lookupObject("dummyConnector");
-        assertNotNull(connector);
-        return connector;
-    }
-    
-    @Test
-    public void testOverrideMuleMessageFactory() throws Exception
-    {
-        TestConnector connector = lookupDummyConnector();
-        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+    // create an xa-transacted endpoint (this triggers the cration of an
+    // xaTransactedMessageReceiver in the service descriptor impl
+    InboundEndpoint endpoint = MuleEndpointTestUtils.getTestInboundEndpoint("foo", muleContext);
+    endpoint.getTransactionConfig().setAction(MuleTransactionConfig.ACTION_ALWAYS_BEGIN);
+    endpoint.getTransactionConfig().setFactory(new XaTransactionFactory());
 
-        // test if the service override for the message factory works
-        MuleMessageFactory messageFactory = serviceDescriptor.createMuleMessageFactory();
-        assertEquals(MockMuleMessageFactory.class, messageFactory.getClass());
-    }
+    TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
 
-    @Test
-    public void testOverrideInbounExchangePatterns() throws Exception
-    {
-        TestConnector connector = lookupDummyConnector();
-        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
-        
-        List<MessageExchangePattern> meps = serviceDescriptor.getInboundExchangePatterns();
-        
-        List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
-        assertEquals(expected, meps);
-    }
-    
-    @Test
-    public void testOverrideOutboundExchangePatterns() throws Exception
-    {
-        TestConnector connector = lookupDummyConnector();
-        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
-        
-        List<MessageExchangePattern> meps = serviceDescriptor.getOutboundExchangePatterns();
-        
-        List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
-        assertEquals(expected, meps);
-    }
+    // see if we get the overridden message receiver
+    MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector, getTestFlow(), endpoint);
+    assertEquals(TestMessageReceiver.class, receiver.getClass());
+  }
 
-    @Test
-    public void testOverrideDefaultExchangePattern() throws Exception
-    {
-        TestConnector connector = lookupDummyConnector();
-        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
-        
-        MessageExchangePattern defaultMep = serviceDescriptor.getDefaultExchangePattern();
-        
-        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, defaultMep);
-    }
+  private TestConnector lookupDummyConnector() {
+    TestConnector connector = (TestConnector) muleContext.getRegistry().lookupObject("dummyConnector");
+    assertNotNull(connector);
+    return connector;
+  }
+
+  @Test
+  public void testOverrideMuleMessageFactory() throws Exception {
+    TestConnector connector = lookupDummyConnector();
+    TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+
+    // test if the service override for the message factory works
+    MuleMessageFactory messageFactory = serviceDescriptor.createMuleMessageFactory();
+    assertEquals(MockMuleMessageFactory.class, messageFactory.getClass());
+  }
+
+  @Test
+  public void testOverrideInbounExchangePatterns() throws Exception {
+    TestConnector connector = lookupDummyConnector();
+    TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+
+    List<MessageExchangePattern> meps = serviceDescriptor.getInboundExchangePatterns();
+
+    List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
+    assertEquals(expected, meps);
+  }
+
+  @Test
+  public void testOverrideOutboundExchangePatterns() throws Exception {
+    TestConnector connector = lookupDummyConnector();
+    TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+
+    List<MessageExchangePattern> meps = serviceDescriptor.getOutboundExchangePatterns();
+
+    List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
+    assertEquals(expected, meps);
+  }
+
+  @Test
+  public void testOverrideDefaultExchangePattern() throws Exception {
+    TestConnector connector = lookupDummyConnector();
+    TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+
+    MessageExchangePattern defaultMep = serviceDescriptor.getDefaultExchangePattern();
+
+    assertEquals(MessageExchangePattern.REQUEST_RESPONSE, defaultMep);
+  }
 }
 
 

@@ -17,110 +17,84 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * This is an implementation of the ObjectFactory interface which simply delegates to 
- * the Spring ApplicationContext.  Since the delegation happens each time a call to 
- * getOrCreate() is made, this will correctly handle Spring beans which are 
- * non-singletons (factory beans, etc.)
+ * This is an implementation of the ObjectFactory interface which simply delegates to the Spring ApplicationContext. Since the
+ * delegation happens each time a call to getOrCreate() is made, this will correctly handle Spring beans which are non-singletons
+ * (factory beans, etc.)
  * 
  * Singleton usage:
  * 
- *   <model>
- *       <service name="myOrangeService">
- *           <service>
- *               <spring-object bean="myBean"/>
- *           </service>
- *       </service>
- *   </model>
+ * <model> <service name="myOrangeService"> <service> <spring-object bean="myBean"/> </service> </service> </model>
  *
- *   <spring:bean id="myBean" class="com.foo.Bar"/>
- *   
+ * <spring:bean id="myBean" class="com.foo.Bar"/>
+ * 
  * Non-singleton usage:
  * 
- *   <model>
- *       <service name="myOrangeService">
- *           <service>
- *               <spring-object bean="myFactoryBean"/>
- *           </service>
- *       </service>
- *   </model>
+ * <model> <service name="myOrangeService"> <service> <spring-object bean="myFactoryBean"/> </service> </service> </model>
  *
- *   <spring:bean id="myFactoryBean" class="com.foo.BarFactory" factory-method="getNewBar"/>
+ * <spring:bean id="myFactoryBean" class="com.foo.BarFactory" factory-method="getNewBar"/>
  */
-public class SpringBeanLookup extends AbstractObjectFactory implements ApplicationContextAware
-{
-    private ApplicationContext applicationContext;
-    private String bean;
+public class SpringBeanLookup extends AbstractObjectFactory implements ApplicationContextAware {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (bean == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Bean name has not been set."), this);
-        }
-        if (applicationContext == null)
-        {
-            throw new InitialisationException(
-                MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
-        }
+  private ApplicationContext applicationContext;
+  private String bean;
 
-        // Get instance of spring bean to determine bean type.
-        // We do this because the result of org.springframework.beans.factory.BeanFactory.getType(String) when
-        // used before bean initialization does not always return the same type as afterwards. One specific
-        // case when AOP is used, and the actual bean class is returned before initialization but a proxy
-        // afterwards. This affects both prototype beans and lazy-init singletons.
-        objectClass = applicationContext.getBean(bean).getClass();
+  @Override
+  public void initialise() throws InitialisationException {
+    if (bean == null) {
+      throw new InitialisationException(MessageFactory.createStaticMessage("Bean name has not been set."), this);
+    }
+    if (applicationContext == null) {
+      throw new InitialisationException(MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
     }
 
-    @Override
-    public void dispose()
-    {
-        // Not implemented for Spring Beans
-    }
+    // Get instance of spring bean to determine bean type.
+    // We do this because the result of org.springframework.beans.factory.BeanFactory.getType(String) when
+    // used before bean initialization does not always return the same type as afterwards. One specific
+    // case when AOP is used, and the actual bean class is returned before initialization but a proxy
+    // afterwards. This affects both prototype beans and lazy-init singletons.
+    objectClass = applicationContext.getBean(bean).getClass();
+  }
 
-    @Override
-    public Object getInstance(MuleContext muleContext) throws Exception
-    {
-        Object instance = applicationContext.getBean(bean);
-        if(instance instanceof FlowConstructAware)
-        {
-            //The servie cannot be autowired from within Spring, so we do it here
-            ((FlowConstructAware)instance).setFlowConstruct(flowConstruct);
-        }
-        fireInitialisationCallbacks(instance);
-        return instance;
-    }
+  @Override
+  public void dispose() {
+    // Not implemented for Spring Beans
+  }
 
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
-    {
-        this.applicationContext = applicationContext;
+  @Override
+  public Object getInstance(MuleContext muleContext) throws Exception {
+    Object instance = applicationContext.getBean(bean);
+    if (instance instanceof FlowConstructAware) {
+      // The servie cannot be autowired from within Spring, so we do it here
+      ((FlowConstructAware) instance).setFlowConstruct(flowConstruct);
     }
+    fireInitialisationCallbacks(instance);
+    return instance;
+  }
 
-    public String getBean()
-    {
-        return bean;
-    }
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
+  }
 
-    public void setBean(String bean)
-    {
-        this.bean = bean;
-    }
-    
-    @Override
-    public boolean isSingleton()
-    {
-        return applicationContext.isSingleton(bean);
-    }
+  public String getBean() {
+    return bean;
+  }
 
-    @Override
-    public boolean isExternallyManagedLifecycle()
-    {
-        return true;
-    }
+  public void setBean(String bean) {
+    this.bean = bean;
+  }
 
-    public boolean isAutoWireObject()
-    {
-        //Spring does the wiring
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return applicationContext.isSingleton(bean);
+  }
+
+  @Override
+  public boolean isExternallyManagedLifecycle() {
+    return true;
+  }
+
+  public boolean isAutoWireObject() {
+    // Spring does the wiring
+    return false;
+  }
 }

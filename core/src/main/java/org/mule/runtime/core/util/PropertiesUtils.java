@@ -31,362 +31,294 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>PropertiesHelper</code> is a utility class for manipulating and filtering
- * property Maps.
+ * <code>PropertiesHelper</code> is a utility class for manipulating and filtering property Maps.
  */
 // @ThreadSafe
-public final class PropertiesUtils
-{
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
+public final class PropertiesUtils {
 
-    // @GuardedBy(itself)
-    private static final List<String> maskedProperties = new CopyOnWriteArrayList<String>();
+  private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
 
-    static
-    {
-        // When printing property lists mask password fields
-        // Users can register their own fields to mask
-        registerMaskedPropertyName("password");
+  // @GuardedBy(itself)
+  private static final List<String> maskedProperties = new CopyOnWriteArrayList<String>();
+
+  static {
+    // When printing property lists mask password fields
+    // Users can register their own fields to mask
+    registerMaskedPropertyName("password");
+  }
+
+  /** Do not instanciate. */
+  protected PropertiesUtils() {
+    // no-op
+  }
+
+  /**
+   * Register a property name for masking. This will prevent certain values from leaking e.g. into debugging output or logfiles.
+   *
+   * @param name the key of the property to be masked.
+   * @throws IllegalArgumentException is name is null or empty.
+   */
+  public static void registerMaskedPropertyName(String name) {
+    if (StringUtils.isNotEmpty(name)) {
+      maskedProperties.add(name);
+    } else {
+      throw new IllegalArgumentException("Cannot mask empty property name.");
+    }
+  }
+
+  /**
+   * Returns the String representation of the property value or a masked String if the property key has been registered previously
+   * via {@link #registerMaskedPropertyName(String)}.
+   *
+   * @param property a key/value pair
+   * @return String of the property value or a "masked" String that hides the contents, or <code>null</code> if the property, its
+   *         key or its value is <code>null</code>.
+   */
+  public static String maskedPropertyValue(Map.Entry<?, ?> property) {
+    if (property == null) {
+      return null;
     }
 
-    /** Do not instanciate. */
-    protected PropertiesUtils()
-    {
-        // no-op
+    Object key = property.getKey();
+    Object value = property.getValue();
+
+    if (key == null || value == null) {
+      return null;
     }
 
-    /**
-     * Register a property name for masking. This will prevent certain values from
-     * leaking e.g. into debugging output or logfiles.
-     *
-     * @param name the key of the property to be masked.
-     * @throws IllegalArgumentException is name is null or empty.
-     */
-    public static void registerMaskedPropertyName(String name)
-    {
-        if (StringUtils.isNotEmpty(name))
-        {
-            maskedProperties.add(name);
-        }
-        else
-        {
-            throw new IllegalArgumentException("Cannot mask empty property name.");
-        }
+    if (maskedProperties.contains(key)) {
+      return ("*****");
+    } else {
+      return value.toString();
+    }
+  }
+
+  /**
+   * Read in the properties from a properties file. The file may be on the file system or the classpath.
+   *
+   * @param fileName - The name of the properties file
+   * @param callingClass - The Class which is calling this method. This is used to determine the classpath.
+   * @return a java.util.Properties object containing the properties.
+   */
+  public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass) throws IOException {
+    InputStream is = IOUtils.getResourceAsStream(fileName, callingClass, /* tryAsFile */true, /* tryAsUrl */false);
+    if (is == null) {
+      Message error = CoreMessages.cannotLoadFromClasspath(fileName);
+      throw new IOException(error.toString());
     }
 
-    /**
-     * Returns the String representation of the property value or a masked String if
-     * the property key has been registered previously via
-     * {@link #registerMaskedPropertyName(String)}.
-     *
-     * @param property a key/value pair
-     * @return String of the property value or a "masked" String that hides the
-     *         contents, or <code>null</code> if the property, its key or its value
-     *         is <code>null</code>.
-     */
-    public static String maskedPropertyValue(Map.Entry<?, ?> property)
-    {
-        if (property == null)
-        {
-            return null;
-        }
+    return loadProperties(is);
+  }
 
-        Object key = property.getKey();
-        Object value = property.getValue();
-
-        if (key == null || value == null)
-        {
-            return null;
-        }
-
-        if (maskedProperties.contains(key))
-        {
-            return ("*****");
-        }
-        else
-        {
-            return value.toString();
-        }
+  public static Properties loadProperties(URL url) throws IOException {
+    if (url == null) {
+      Message error = CoreMessages.objectIsNull("url");
+      throw new IOException(error.toString());
     }
 
-    /**
-     * Read in the properties from a properties file. The file may be on the file
-     * system or the classpath.
-     *
-     * @param fileName     - The name of the properties file
-     * @param callingClass - The Class which is calling this method. This is used to
-     *                     determine the classpath.
-     * @return a java.util.Properties object containing the properties.
-     */
-    public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass)
-            throws IOException
-    {
-        InputStream is = IOUtils.getResourceAsStream(fileName, callingClass,
-                /* tryAsFile */true, /* tryAsUrl */false);
-        if (is == null)
-        {
-            Message error = CoreMessages.cannotLoadFromClasspath(fileName);
-            throw new IOException(error.toString());
-        }
+    return loadProperties(url.openStream());
+  }
 
-        return loadProperties(is);
+  /**
+   * Load all properties files in the classpath with the given properties file name.
+   */
+  public static Properties loadAllProperties(String fileName, ClassLoader classLoader) {
+    Properties p = new Properties();
+    List<URL> resourcesUrl = new ArrayList<URL>();
+    Enumeration<URL> resources;
+    try {
+      resources = classLoader.getResources(fileName);
+      while (resources.hasMoreElements()) {
+        resourcesUrl.add(resources.nextElement());
+      }
+      Collections.sort(resourcesUrl, new Comparator<URL>() {
+
+        @Override
+        public int compare(URL url, URL url1) {
+          if ("file".equals(url.getProtocol())) {
+            return 1;
+          }
+          return -1;
+        }
+      });
+      for (URL resourceUrl : resourcesUrl) {
+        InputStream in = resourceUrl.openStream();
+        p.load(in);
+        in.close();
+      }
+    } catch (IOException e) {
+      throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
+    }
+    return p;
+  }
+
+  public static Properties loadProperties(InputStream is) throws IOException {
+    if (is == null) {
+      Message error = CoreMessages.objectIsNull("input stream");
+      throw new IOException(error.toString());
     }
 
-    public static Properties loadProperties(URL url) throws IOException
-    {
-        if (url == null)
-        {
-            Message error = CoreMessages.objectIsNull("url");
-            throw new IOException(error.toString());
-        }
+    try {
+      Properties props = new Properties();
+      props.load(is);
+      return props;
+    } finally {
+      is.close();
+    }
+  }
 
-        return loadProperties(url.openStream());
+  public static String removeXmlNamespacePrefix(String eleName) {
+    int i = eleName.indexOf(':');
+    return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+  }
+
+  public static String removeNamespacePrefix(String eleName) {
+    int i = eleName.lastIndexOf('.');
+    return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+  }
+
+  public static Map removeNamespaces(Map properties) {
+    HashMap props = new HashMap(properties.size());
+    Map.Entry entry;
+    for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
+      entry = (Map.Entry) iter.next();
+      props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
+
+    }
+    return props;
+  }
+
+  /**
+   * Will create a map of properties where the names have a prefix Allows the callee to supply the target map so a comparator can
+   * be set
+   *
+   * @param props the source set of properties
+   * @param prefix the prefix to filter on
+   * @param newProps return map containing the filtered list of properties or an empty map if no properties matched the prefix
+   */
+  public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps) {
+    if (props == null) {
+      return;
     }
 
-    /**
-     * Load all properties files in the classpath with the given properties file name.
-     */
-    public static Properties loadAllProperties(String fileName, ClassLoader classLoader)
-    {
-        Properties p = new Properties();
-        List<URL> resourcesUrl = new ArrayList<URL>();
-        Enumeration<URL> resources;
-        try
-        {
-            resources = classLoader.getResources(fileName);
-            while (resources.hasMoreElements())
-            {
-                resourcesUrl.add(resources.nextElement());
-            }
-            Collections.sort(resourcesUrl, new Comparator<URL>()
-            {
-                @Override
-                public int compare(URL url, URL url1)
-                {
-                    if ("file".equals(url.getProtocol()))
-                    {
-                        return 1;
-                    }
-                    return -1;
-                }
-            });
-            for (URL resourceUrl : resourcesUrl)
-            {
-                InputStream in = resourceUrl.openStream();
-                p.load(in);
-                in.close();
-            }
-        }
-        catch (IOException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
-        }
-        return p;
+    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+      Map.Entry entry = (Map.Entry) iterator.next();
+      Object key = entry.getKey();
+      if (key.toString().startsWith(prefix)) {
+        newProps.put(key, entry.getValue());
+      }
+    }
+  }
+
+  public static Map getPropertiesWithoutPrefix(Map props, String prefix) {
+    Map newProps = new HashMap();
+    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+      Map.Entry entry = (Map.Entry) iterator.next();
+      Object key = entry.getKey();
+      if (!key.toString().startsWith(prefix)) {
+        newProps.put(key, entry.getValue());
+      }
+    }
+    return newProps;
+  }
+
+  public static Properties getPropertiesFromQueryString(String query) {
+    Properties props = new Properties();
+
+    if (StringUtils.isEmpty(query)) {
+      return props;
     }
 
-    public static Properties loadProperties(InputStream is) throws IOException
-    {
-        if (is == null)
-        {
-            Message error = CoreMessages.objectIsNull("input stream");
-            throw new IOException(error.toString());
-        }
+    query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
 
-        try
-        {
-            Properties props = new Properties();
-            props.load(is);
-            return props;
-        }
-        finally
-        {
-            is.close();
-        }
+    int x = 0;
+    while ((x = addProperty(query, x, '&', props)) != -1);
+
+    return props;
+  }
+
+  public static Properties getPropertiesFromString(String query, char separator) {
+    Properties props = new Properties();
+
+    if (query == null) {
+      return props;
     }
 
-    public static String removeXmlNamespacePrefix(String eleName)
-    {
-        int i = eleName.indexOf(':');
-        return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+    query = new StringBuilder(query.length() + 1).append(separator).append(query).toString();
+
+    int x = 0;
+    while ((x = addProperty(query, x, separator, props)) != -1) {
+      // run
     }
 
-    public static String removeNamespacePrefix(String eleName)
-    {
-        int i = eleName.lastIndexOf('.');
-        return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+    return props;
+  }
+
+  private static int addProperty(String query, int start, char separator, Properties properties) {
+    int i = query.indexOf(separator, start);
+    int i2 = query.indexOf(separator, i + 1);
+    String pair;
+    if (i > -1 && i2 > -1) {
+      pair = query.substring(i + 1, i2);
+    } else if (i > -1) {
+      pair = query.substring(i + 1);
+    } else {
+      return -1;
+    }
+    int eq = pair.indexOf('=');
+
+    if (eq <= 0) {
+      String key = pair;
+      String value = StringUtils.EMPTY;
+      properties.setProperty(key, value);
+    } else {
+      String key = pair.substring(0, eq);
+      String value = (eq == pair.length() ? StringUtils.EMPTY : pair.substring(eq + 1));
+      properties.setProperty(key, value);
+    }
+    return i2;
+  }
+
+  /**
+   * Discovers properties files available on the classloader that loaded {@link PropertiesUtils} class
+   *
+   * @param resource resource to find. Not empty
+   * @return a non null list of Properties
+   * @throws IOException when a property file cannot be processed
+   */
+  public static List<Properties> discoverProperties(String resource) throws IOException {
+    return discoverProperties(PropertiesUtils.class.getClassLoader(), resource);
+  }
+
+  /**
+   * Discovers properties files available on the given classloader.
+   *
+   * @param classLoader classloader used to find properties resources. Not null.
+   * @param resource resource to find. Not empty
+   * @return a non null list of Properties
+   * @throws IOException when a property file cannot be processed
+   */
+  public static List<Properties> discoverProperties(ClassLoader classLoader, String resource) throws IOException {
+    checkArgument(!StringUtils.isEmpty(resource), "Resource cannot be empty");
+    checkArgument(classLoader != null, "ClassLoader cannot be null");
+
+    List<Properties> result = new LinkedList<Properties>();
+
+    Enumeration<URL> allPropertiesResources = getResources(resource, classLoader);
+    while (allPropertiesResources.hasMoreElements()) {
+      URL propertiesResource = allPropertiesResources.nextElement();
+      if (logger.isDebugEnabled()) {
+        logger.debug("Reading properties from: " + propertiesResource.toString());
+      }
+      Properties properties = new OrderedProperties();
+
+      try (InputStream resourceStream = propertiesResource.openStream()) {
+        properties.load(resourceStream);
+      }
+
+      result.add(properties);
     }
 
-    public static Map removeNamespaces(Map properties)
-    {
-        HashMap props = new HashMap(properties.size());
-        Map.Entry entry;
-        for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();)
-        {
-            entry = (Map.Entry) iter.next();
-            props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
-
-        }
-        return props;
-    }
-
-    /**
-     * Will create a map of properties where the names have a prefix Allows the
-     * callee to supply the target map so a comparator can be set
-     *
-     * @param props    the source set of properties
-     * @param prefix   the prefix to filter on
-     * @param newProps return map containing the filtered list of properties or an
-     *                 empty map if no properties matched the prefix
-     */
-    public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
-    {
-        if (props == null)
-        {
-            return;
-        }
-
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            Object key = entry.getKey();
-            if (key.toString().startsWith(prefix))
-            {
-                newProps.put(key, entry.getValue());
-            }
-        }
-    }
-
-    public static Map getPropertiesWithoutPrefix(Map props, String prefix)
-    {
-        Map newProps = new HashMap();
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            Object key = entry.getKey();
-            if (!key.toString().startsWith(prefix))
-            {
-                newProps.put(key, entry.getValue());
-            }
-        }
-        return newProps;
-    }
-
-    public static Properties getPropertiesFromQueryString(String query)
-    {
-        Properties props = new Properties();
-
-        if (StringUtils.isEmpty(query))
-        {
-            return props;
-        }
-
-        query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
-
-        int x = 0;
-        while ((x = addProperty(query, x, '&', props)) != -1);
-
-        return props;
-    }
-
-    public static Properties getPropertiesFromString(String query, char separator)
-    {
-        Properties props = new Properties();
-
-        if (query == null)
-        {
-            return props;
-        }
-
-        query = new StringBuilder(query.length() + 1).append(separator).append(query).toString();
-
-        int x = 0;
-        while ((x = addProperty(query, x, separator, props)) != -1)
-        {
-            // run
-        }
-
-        return props;
-    }
-
-    private static int addProperty(String query, int start, char separator, Properties properties)
-    {
-        int i = query.indexOf(separator, start);
-        int i2 = query.indexOf(separator, i + 1);
-        String pair;
-        if (i > -1 && i2 > -1)
-        {
-            pair = query.substring(i + 1, i2);
-        }
-        else if (i > -1)
-        {
-            pair = query.substring(i + 1);
-        }
-        else
-        {
-            return -1;
-        }
-        int eq = pair.indexOf('=');
-
-        if (eq <= 0)
-        {
-            String key = pair;
-            String value = StringUtils.EMPTY;
-            properties.setProperty(key, value);
-        }
-        else
-        {
-            String key = pair.substring(0, eq);
-            String value = (eq == pair.length() ? StringUtils.EMPTY : pair.substring(eq + 1));
-            properties.setProperty(key, value);
-        }
-        return i2;
-    }
-
-    /**
-     * Discovers properties files available on the classloader that loaded {@link PropertiesUtils} class
-     *
-     * @param resource resource to find. Not empty
-     * @return a non null list of Properties
-     * @throws IOException when a property file cannot be processed
-     */
-    public static List<Properties> discoverProperties(String resource) throws IOException
-    {
-        return discoverProperties(PropertiesUtils.class.getClassLoader(), resource);
-    }
-
-    /**
-     * Discovers properties files available on the given classloader.
-     *
-     * @param classLoader classloader used to find properties resources. Not null.
-     * @param resource resource to find. Not empty
-     * @return a non null list of Properties
-     * @throws IOException when a property file cannot be processed
-     */
-    public static List<Properties> discoverProperties(ClassLoader classLoader, String resource) throws IOException
-    {
-        checkArgument(!StringUtils.isEmpty(resource), "Resource cannot be empty");
-        checkArgument(classLoader != null, "ClassLoader cannot be null");
-
-        List<Properties> result = new LinkedList<Properties>();
-
-        Enumeration<URL> allPropertiesResources = getResources(resource, classLoader);
-        while (allPropertiesResources.hasMoreElements())
-        {
-            URL propertiesResource = allPropertiesResources.nextElement();
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Reading properties from: " + propertiesResource.toString());
-            }
-            Properties properties = new OrderedProperties();
-
-            try (InputStream resourceStream = propertiesResource.openStream())
-            {
-                properties.load(resourceStream);
-            }
-
-            result.add(properties);
-        }
-
-        return result;
-    }
+    return result;
+  }
 }

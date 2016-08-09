@@ -51,367 +51,352 @@ import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
-public interface MuleContext extends Lifecycle
-{
-    /**
-     * Sets the Jta Transaction Manager to use with this Mule server instance
-     *
-     * @param manager the manager to use
-     * @throws Exception
-     * @deprecated Use only for test cases.
-     */
-    @Deprecated
-    void setTransactionManager(TransactionManager manager) throws Exception;
+public interface MuleContext extends Lifecycle {
 
-    /**
-     * Returns the Jta transaction manager used by this Mule server instance. or
-     * null if a transaction manager has not been set
-     *
-     * @return the Jta transaction manager used by this Mule server instance. or
-     *         null if a transaction manager has not been set
-     */
-    TransactionManager getTransactionManager();
+  /**
+   * Sets the Jta Transaction Manager to use with this Mule server instance
+   *
+   * @param manager the manager to use
+   * @throws Exception
+   * @deprecated Use only for test cases.
+   */
+  @Deprecated
+  void setTransactionManager(TransactionManager manager) throws Exception;
 
-    ServerNotificationManager getNotificationManager();
+  /**
+   * Returns the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
+   *
+   * @return the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
+   */
+  TransactionManager getTransactionManager();
 
-    /**
-     * Determines if the server has been started
-     *
-     * @return true if the server has been started
-     */
-    boolean isStarted();
+  ServerNotificationManager getNotificationManager();
 
-    /**
-     * Determines if the server has been initialised
-     *
-     * @return true if the server has been initialised
-     */
-    boolean isInitialised();
+  /**
+   * Determines if the server has been started
+   *
+   * @return true if the server has been started
+   */
+  boolean isStarted();
 
-    /**
-     * Determines if the server is being initialised
-     *
-     * @return true if the server is beening initialised
-     */
-    boolean isInitialising();
+  /**
+   * Determines if the server has been initialised
+   *
+   * @return true if the server has been initialised
+   */
+  boolean isInitialised();
 
-    boolean isDisposed();
+  /**
+   * Determines if the server is being initialised
+   *
+   * @return true if the server is beening initialised
+   */
+  boolean isInitialising();
 
-    boolean isDisposing();
+  boolean isDisposed();
 
-    /**
-     * Registers an intenal server event listener. The listener will be notified
-     * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an MuleEvent (although there is nothing
-     * stopping the implementation of this class triggering listeners when a
-     * MuleEvent is received).
-     * <p/>
-     * The types of notifications fired is entirely defined by the implementation of
-     * this class
-     *
-     * @param l the listener to register
-     */
-    void registerListener(ServerNotificationListener l) throws NotificationException;
+  boolean isDisposing();
 
-    /**
-     * Registers an intenal server event listener. The listener will be notified
-     * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an MuleEvent (although there is nothing
-     * stopping the implementation of this class triggering listeners when a
-     * MuleEvent is received).
-     * <p/>
-     * The types of notifications fired is entirely defined by the implementation of
-     * this class
-     *
-     * @param l                  the listener to register
-     * @param resourceIdentifier a particular resource name for the given type
-     *                           of listener For example, the resourceName could be the name of
-     *                           a service if the listener was a ServiceNotificationListener
-     */
-    void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException;
+  /**
+   * Registers an intenal server event listener. The listener will be notified when a particular event happens within the server.
+   * Typically this is not an event in the same sense as an MuleEvent (although there is nothing stopping the implementation of
+   * this class triggering listeners when a MuleEvent is received).
+   * <p/>
+   * The types of notifications fired is entirely defined by the implementation of this class
+   *
+   * @param l the listener to register
+   */
+  void registerListener(ServerNotificationListener l) throws NotificationException;
 
-    /**
-     * Unregisters a previously registered listener. If the listener has not
-     * already been registered, this method should return without exception
-     *
-     * @param l the listener to unregister
-     */
-    void unregisterListener(ServerNotificationListener l);
+  /**
+   * Registers an intenal server event listener. The listener will be notified when a particular event happens within the server.
+   * Typically this is not an event in the same sense as an MuleEvent (although there is nothing stopping the implementation of
+   * this class triggering listeners when a MuleEvent is received).
+   * <p/>
+   * The types of notifications fired is entirely defined by the implementation of this class
+   *
+   * @param l the listener to register
+   * @param resourceIdentifier a particular resource name for the given type of listener For example, the resourceName could be
+   *        the name of a service if the listener was a ServiceNotificationListener
+   */
+  void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException;
 
-    /**
-     * Fires a server notification to all regiistered listeners
-     *
-     * @param notification the notification to fire
-     */
-    void fireNotification(ServerNotification notification);
+  /**
+   * Unregisters a previously registered listener. If the listener has not already been registered, this method should return
+   * without exception
+   *
+   * @param l the listener to unregister
+   */
+  void unregisterListener(ServerNotificationListener l);
 
-    /**
-     * Sets the security manager used by this Mule instance to authenticate and
-     * authorise incoming and outgoing event traffic and service invocations
-     *
-     * @param securityManager the security manager used by this Mule instance to
-     *                        authenticate and authorise incoming and outgoing event traffic
-     *                        and service invocations
-     * @throws RegistrationException
-     */
-    void setSecurityManager(SecurityManager securityManager) throws InitialisationException, RegistrationException;
+  /**
+   * Fires a server notification to all regiistered listeners
+   *
+   * @param notification the notification to fire
+   */
+  void fireNotification(ServerNotification notification);
 
-    /**
-     * Gets the security manager used by this Mule instance to authenticate and
-     * authorise incoming and outgoing event traffic and service invocations
-     *
-     * @return he security manager used by this Mule instance to authenticate
-     *         and authorise incoming and outgoing event traffic and service
-     *         invocations
-     */
-    SecurityManager getSecurityManager();
+  /**
+   * Sets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   * service invocations
+   *
+   * @param securityManager the security manager used by this Mule instance to authenticate and authorise incoming and outgoing
+   *        event traffic and service invocations
+   * @throws RegistrationException
+   */
+  void setSecurityManager(SecurityManager securityManager) throws InitialisationException, RegistrationException;
 
-    /**
-     * Obtains a workManager instance that can be used to schedule work in a
-     * thread pool. This will be used primarially by Agents wanting to
-     * schedule work. This work Manager must <b>never</b> be used by provider
-     * implementations as they have their own workManager accible on the
-     * connector.
-     *
-     * @return a workManager instance used by the current MuleManager
-     */
-    WorkManager getWorkManager();
+  /**
+   * Gets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   * service invocations
+   *
+   * @return he security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   *         service invocations
+   */
+  SecurityManager getSecurityManager();
 
-    WorkListener getWorkListener();
+  /**
+   * Obtains a workManager instance that can be used to schedule work in a thread pool. This will be used primarially by Agents
+   * wanting to schedule work. This work Manager must <b>never</b> be used by provider implementations as they have their own
+   * workManager accible on the connector.
+   *
+   * @return a workManager instance used by the current MuleManager
+   */
+  WorkManager getWorkManager();
 
-    /**
-     * Sets the queue manager used by mule for queuing events. This is used for
-     * service queues
-     *
-     * @param queueManager
-     * @throws RegistrationException
-     *
-     */
-    void setQueueManager(QueueManager queueManager) throws RegistrationException;
+  WorkListener getWorkListener();
 
-    /**
-     * Gets the queue manager used by mule for queuing events. This is used for
-     * service queues.
-     */
-    QueueManager getQueueManager();
-    
-    ObjectStoreManager getObjectStoreManager();
+  /**
+   * Sets the queue manager used by mule for queuing events. This is used for service queues
+   *
+   * @param queueManager
+   * @throws RegistrationException
+   *
+   */
+  void setQueueManager(QueueManager queueManager) throws RegistrationException;
 
-    ExtensionManager getExtensionManager();
+  /**
+   * Gets the queue manager used by mule for queuing events. This is used for service queues.
+   */
+  QueueManager getQueueManager();
 
-    /**
-     * The instance of {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
-     * to be used to serialize/deserealize objects
-     *
-     * @return a {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
-     * @since 3.7.0
-     */
-    ObjectSerializer getObjectSerializer();
+  ObjectStoreManager getObjectStoreManager();
 
-    AllStatistics getStatistics();
+  ExtensionManager getExtensionManager();
 
-    LifecycleManager getLifecycleManager();
+  /**
+   * The instance of {@link org.mule.runtime.core.api.serialization.ObjectSerializer} to be used to serialize/deserealize objects
+   *
+   * @return a {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
+   * @since 3.7.0
+   */
+  ObjectSerializer getObjectSerializer();
 
-    MuleRegistry getRegistry();
+  AllStatistics getStatistics();
 
-    /**
-     * Returns a {@link Injector} capable of
-     * injecting dependencies into objects
-     *
-     * @return a {@link Injector}
-     * @since 3.7.0
-     */
-    Injector getInjector();
+  LifecycleManager getLifecycleManager();
 
-    MuleConfiguration getConfiguration();
+  MuleRegistry getRegistry();
 
-    ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
+  /**
+   * Returns a {@link Injector} capable of injecting dependencies into objects
+   *
+   * @return a {@link Injector}
+   * @since 3.7.0
+   */
+  Injector getInjector();
 
-    ThreadingProfile getDefaultMessageRequesterThreadingProfile();
+  MuleConfiguration getConfiguration();
 
-    ThreadingProfile getDefaultMessageReceiverThreadingProfile();
+  ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
 
-    ThreadingProfile getDefaultServiceThreadingProfile();
+  ThreadingProfile getDefaultMessageRequesterThreadingProfile();
 
-    ThreadingProfile getDefaultThreadingProfile();
+  ThreadingProfile getDefaultMessageReceiverThreadingProfile();
 
-    /**
-     * Returns the configured {@link org.mule.runtime.core.api.util.StreamCloserService}
-     *
-     * @return a {@link org.mule.runtime.core.api.util.StreamCloserService}
-     * @since 3.5.0
-     */
-    public StreamCloserService getStreamCloserService();
+  ThreadingProfile getDefaultServiceThreadingProfile();
 
-    /**
-     * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-     */
-    @Deprecated
-    void addRegistry(Registry registry);
+  ThreadingProfile getDefaultThreadingProfile();
 
-    /**
-     * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-     */
-    @Deprecated
-    void removeRegistry(Registry registry);
+  /**
+   * Returns the configured {@link org.mule.runtime.core.api.util.StreamCloserService}
+   *
+   * @return a {@link org.mule.runtime.core.api.util.StreamCloserService}
+   * @since 3.5.0
+   */
+  public StreamCloserService getStreamCloserService();
 
-    /**
-     * Returns the date when the server was started.
-     * @return the date when the server was started.
-     */
-    long getStartDate();
+  /**
+   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+   */
+  @Deprecated
+  void addRegistry(Registry registry);
 
-    /**
-     * Returns the Expression Manager configured for this instance of Mule
-     * @return the Expression Manager configured for this instance of Mule
-     * @see org.mule.runtime.core.api.expression.ExpressionManager
-     */
-    ExpressionManager getExpressionManager();
+  /**
+   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+   */
+  @Deprecated
+  void removeRegistry(Registry registry);
 
-    void setExecutionClassLoader(ClassLoader cl);
+  /**
+   * Returns the date when the server was started.
+   * 
+   * @return the date when the server was started.
+   */
+  long getStartDate();
 
-    ClassLoader getExecutionClassLoader();
+  /**
+   * Returns the Expression Manager configured for this instance of Mule
+   * 
+   * @return the Expression Manager configured for this instance of Mule
+   * @see org.mule.runtime.core.api.expression.ExpressionManager
+   */
+  ExpressionManager getExpressionManager();
 
-    boolean isStopped();
+  void setExecutionClassLoader(ClassLoader cl);
 
-    boolean isStopping();
+  ClassLoader getExecutionClassLoader();
 
-    boolean isStarting();
+  boolean isStopped();
 
-    MuleClient getClient();
+  boolean isStopping();
 
-    SystemExceptionHandler getExceptionListener();
+  boolean isStarting();
 
-    void setExceptionListener(SystemExceptionHandler exceptionListener);
+  MuleClient getClient();
 
-    void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
-    
-    void handleException(Exception e, RollbackSourceCallback rollbackMethod);
+  SystemExceptionHandler getExceptionListener();
 
-    void handleException(Exception e);
+  void setExceptionListener(SystemExceptionHandler exceptionListener);
 
-    /**
-     * @return the ID of the cluster the current instance belongs to.  Returns the empty string if this instance
-     * isn't part of a cluster.
-     */
-    String getClusterId();
+  void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
 
-    /**
-     * @return the cluster node ID for the current instance belongs to.  Returns 0 if this instance
-     * isn't part of a cluster.
-     */
-    int getClusterNodeId();
+  void handleException(Exception e, RollbackSourceCallback rollbackMethod);
 
-    /**
-     * @return true if this instance in the designated poller.  This will always be true unless the instance is part of
-     * a cluster.
-     */
-    boolean isPrimaryPollingInstance();
+  void handleException(Exception e);
 
-    /**
-     * Generate a unique ID string; this will begin with the cluster node ID followed by a
-     * dash, e.g. "3-XXXYYY"
-     */
-    String getUniqueIdString();
+  /**
+   * @return the ID of the cluster the current instance belongs to. Returns the empty string if this instance isn't part of a
+   *         cluster.
+   */
+  String getClusterId();
 
-    /**
-     * Return all annotations seen in the configuration
-     */
-    Map<QName, Set<Object>> getConfigurationAnnotations();
+  /**
+   * @return the cluster node ID for the current instance belongs to. Returns 0 if this instance isn't part of a cluster.
+   */
+  int getClusterNodeId();
 
-    /**
-     * @return default exception strategy. If no default exception strategy was configured it returns {@link org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy}
-     */
-    MessagingExceptionHandler getDefaultExceptionStrategy();
+  /**
+   * @return true if this instance in the designated poller. This will always be true unless the instance is part of a cluster.
+   */
+  boolean isPrimaryPollingInstance();
 
-    /**
-     * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource (i.e jdbc DataSource, jms Connection)
-     */
-    SingleResourceTransactionFactoryManager getTransactionFactoryManager();
+  /**
+   * Generate a unique ID string; this will begin with the cluster node ID followed by a dash, e.g. "3-XXXYYY"
+   */
+  String getUniqueIdString();
 
-    /**
-     * @return a non null {@link org.mule.runtime.core.DataTypeConversionResolver} instance to resolve implicit data type conversions
-     */
-    DataTypeConversionResolver getDataTypeConverterResolver();
-    
-    /**
-     * Expression Language for evaluating expressions using Mule as the context
-     * @return 
-     */
-    ExpressionLanguage getExpressionLanguage();
+  /**
+   * Return all annotations seen in the configuration
+   */
+  Map<QName, Set<Object>> getConfigurationAnnotations();
 
-    /**
-     * Factory for creating locks for synchronizing mule components.
-     *
-     * Synchronization must be done using LockFactory locks in order for mule components to work in single servers as in a cluster
-     *
-     * @return a factory for creating locks
-     */
-    LockFactory getLockFactory();
+  /**
+   * @return default exception strategy. If no default exception strategy was configured it returns
+   *         {@link org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy}
+   */
+  MessagingExceptionHandler getDefaultExceptionStrategy();
 
-    /**
-     * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
-     */
-    ProcessingTimeWatcher getProcessorTimeWatcher();
+  /**
+   * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource
+   *         (i.e jdbc DataSource, jms Connection)
+   */
+  SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
-    /**
-     * Makes the caller wait until the {@link MuleContext} was started
-     *
-     * @param timeout maximum number of milliseconds that will be waiting
-     * @return true if the context started before the timeout, false otherwise
-     * @throws InterruptedException if the current thread is interrupted while waiting
-     */
-    boolean waitUntilStarted(int timeout) throws InterruptedException;
+  /**
+   * @return a non null {@link org.mule.runtime.core.DataTypeConversionResolver} instance to resolve implicit data type
+   *         conversions
+   */
+  DataTypeConversionResolver getDataTypeConverterResolver();
 
-    /**
-     * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
-     */
-    ArtifactType getArtifactType();
+  /**
+   * Expression Language for evaluating expressions using Mule as the context
+   * 
+   * @return
+   */
+  ExpressionLanguage getExpressionLanguage();
 
-    /**
-     * @return the callbacks for notifying when a flow call from another flow is started or completed.
-     * 
-     * @since 3.8.0
-     */
-    FlowTraceManager getFlowTraceManager();
+  /**
+   * Factory for creating locks for synchronizing mule components.
+   *
+   * Synchronization must be done using LockFactory locks in order for mule components to work in single servers as in a cluster
+   *
+   * @return a factory for creating locks
+   */
+  LockFactory getLockFactory();
 
-    /**
-     * @return the providers for additional context information for exceptions.
-     * 
-     * @since 3.8.0
-     */
-    Collection<ExceptionContextProvider> getExceptionContextProviders();
+  /**
+   * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
+   */
+  ProcessingTimeWatcher getProcessorTimeWatcher();
 
-    /**
-     * Gets application wide instance of {@link TransformationService} used for applying
-     * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
-     * representations of the message payload.
-     *
-     * @return transformation service
-     */
-    TransformationService getTransformationService();
+  /**
+   * Makes the caller wait until the {@link MuleContext} was started
+   *
+   * @param timeout maximum number of milliseconds that will be waiting
+   * @return true if the context started before the timeout, false otherwise
+   * @throws InterruptedException if the current thread is interrupted while waiting
+   */
+  boolean waitUntilStarted(int timeout) throws InterruptedException;
 
-    /**
-     * Sets application wide instance of {@link TransformationService}
-     *
-     * @param transformationService transformation service instance
-     */
-    void setTransformationService(TransformationService transformationService);
+  /**
+   * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
+   */
+  ArtifactType getArtifactType();
 
-    /**
-     * @return {@link BootstrapServiceDiscoverer} used to bootstrap this {@link MuleContext}
-     */
-    //TODO(pablo.kraan): remove this reference and use dependency injection (MULE-9157)
-    BootstrapServiceDiscoverer getRegistryBootstrapServiceDiscoverer();
+  /**
+   * @return the callbacks for notifying when a flow call from another flow is started or completed.
+   * 
+   * @since 3.8.0
+   */
+  FlowTraceManager getFlowTraceManager();
 
-    /**
-     * Provides access to a {@link CustomizationService} to change the default services
-     * provided by the {@code MuleContext}.
-     *
-     * Any usage of this service after the {@code MuleContext} initialization will be disregarded.
-     *
-     * @return a customization service.
-     */
-    CustomizationService getCustomizationService();
+  /**
+   * @return the providers for additional context information for exceptions.
+   * 
+   * @since 3.8.0
+   */
+  Collection<ExceptionContextProvider> getExceptionContextProviders();
+
+  /**
+   * Gets application wide instance of {@link TransformationService} used for applying
+   * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
+   * representations of the message payload.
+   *
+   * @return transformation service
+   */
+  TransformationService getTransformationService();
+
+  /**
+   * Sets application wide instance of {@link TransformationService}
+   *
+   * @param transformationService transformation service instance
+   */
+  void setTransformationService(TransformationService transformationService);
+
+  /**
+   * @return {@link BootstrapServiceDiscoverer} used to bootstrap this {@link MuleContext}
+   */
+  // TODO(pablo.kraan): remove this reference and use dependency injection (MULE-9157)
+  BootstrapServiceDiscoverer getRegistryBootstrapServiceDiscoverer();
+
+  /**
+   * Provides access to a {@link CustomizationService} to change the default services provided by the {@code MuleContext}.
+   *
+   * Any usage of this service after the {@code MuleContext} initialization will be disregarded.
+   *
+   * @return a customization service.
+   */
+  CustomizationService getCustomizationService();
 }
 

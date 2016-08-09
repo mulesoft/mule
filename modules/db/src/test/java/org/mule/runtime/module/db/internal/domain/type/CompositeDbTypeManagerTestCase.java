@@ -22,58 +22,53 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class CompositeDbTypeManagerTestCase extends AbstractMuleTestCase
-{
+public class CompositeDbTypeManagerTestCase extends AbstractMuleTestCase {
 
-    public static final int TYPE_ID = 1;
-    public static final String TYPE_NAME = "";
+  public static final int TYPE_ID = 1;
+  public static final String TYPE_NAME = "";
 
-    private final DbConnection connection = mock(DbConnection.class);
-    private final DbTypeManager dbTypeManager1 = mock(DbTypeManager.class);
-    private final DbTypeManager dbTypeManager2 = mock(DbTypeManager.class);
-    private final List<DbTypeManager> typeManagers = Arrays.asList(dbTypeManager1, dbTypeManager2);
-    private final CompositeDbTypeManager composite = new CompositeDbTypeManager(typeManagers);
-    private final DbType dbType = mock(DbType.class);
+  private final DbConnection connection = mock(DbConnection.class);
+  private final DbTypeManager dbTypeManager1 = mock(DbTypeManager.class);
+  private final DbTypeManager dbTypeManager2 = mock(DbTypeManager.class);
+  private final List<DbTypeManager> typeManagers = Arrays.asList(dbTypeManager1, dbTypeManager2);
+  private final CompositeDbTypeManager composite = new CompositeDbTypeManager(typeManagers);
+  private final DbType dbType = mock(DbType.class);
 
-    @Test
-    public void lookupsByNameAndId() throws Exception
-    {
-        when(dbTypeManager1.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_ID, TYPE_NAME));
-        when(dbTypeManager2.lookup(connection, TYPE_ID, TYPE_NAME)).thenReturn(dbType);
+  @Test
+  public void lookupsByNameAndId() throws Exception {
+    when(dbTypeManager1.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_ID, TYPE_NAME));
+    when(dbTypeManager2.lookup(connection, TYPE_ID, TYPE_NAME)).thenReturn(dbType);
 
-        DbType lookup = composite.lookup(connection, TYPE_ID, TYPE_NAME);
+    DbType lookup = composite.lookup(connection, TYPE_ID, TYPE_NAME);
 
-        verify(dbTypeManager1).lookup(connection, TYPE_ID, TYPE_NAME);
-        assertThat(lookup, sameInstance(dbType));
-    }
+    verify(dbTypeManager1).lookup(connection, TYPE_ID, TYPE_NAME);
+    assertThat(lookup, sameInstance(dbType));
+  }
 
-    @Test(expected = UnknownDbTypeException.class)
-    public void failsWhenNoManagerResolvesLookupByNameAndId() throws Exception
-    {
-        when(dbTypeManager1.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
-        when(dbTypeManager2.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
+  @Test(expected = UnknownDbTypeException.class)
+  public void failsWhenNoManagerResolvesLookupByNameAndId() throws Exception {
+    when(dbTypeManager1.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
+    when(dbTypeManager2.lookup(connection, TYPE_ID, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
 
-        composite.lookup(connection, TYPE_ID, TYPE_NAME);
-    }
+    composite.lookup(connection, TYPE_ID, TYPE_NAME);
+  }
 
-    @Test
-    public void lookupsByName() throws Exception
-    {
-        when(dbTypeManager1.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
-        when(dbTypeManager2.lookup(connection, TYPE_NAME)).thenReturn(dbType);
+  @Test
+  public void lookupsByName() throws Exception {
+    when(dbTypeManager1.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
+    when(dbTypeManager2.lookup(connection, TYPE_NAME)).thenReturn(dbType);
 
-        DbType lookup = composite.lookup(connection, TYPE_NAME);
+    DbType lookup = composite.lookup(connection, TYPE_NAME);
 
-        verify(dbTypeManager1).lookup(connection, TYPE_NAME);
-        assertThat(lookup, sameInstance(dbType));
-    }
+    verify(dbTypeManager1).lookup(connection, TYPE_NAME);
+    assertThat(lookup, sameInstance(dbType));
+  }
 
-    @Test(expected = UnknownDbTypeException.class)
-    public void failsWhenNoManagerResolvesLookupByName() throws Exception
-    {
-        when(dbTypeManager1.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
-        when(dbTypeManager2.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
+  @Test(expected = UnknownDbTypeException.class)
+  public void failsWhenNoManagerResolvesLookupByName() throws Exception {
+    when(dbTypeManager1.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
+    when(dbTypeManager2.lookup(connection, TYPE_NAME)).thenThrow(new UnknownDbTypeException(TYPE_NAME));
 
-        composite.lookup(connection, TYPE_NAME);
-    }
+    composite.lookup(connection, TYPE_NAME);
+  }
 }

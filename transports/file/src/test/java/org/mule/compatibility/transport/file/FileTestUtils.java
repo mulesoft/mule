@@ -11,74 +11,66 @@ import org.mule.runtime.core.util.FileUtils;
 import java.io.File;
 import java.nio.charset.Charset;
 
-public class FileTestUtils
-{
+public class FileTestUtils {
 
-    private FileTestUtils()
-    {
-    }
+  private FileTestUtils() {}
 
-    /**
-     * Creates a data file that will be deleted when the JVM finalizes using
-     * the default encoding
-     *
-     * @param folder folder where the file will be created
-     * @param testMessage content of the file
-     * @return the new file
-     * @throws Exception
-     */
-    public static File createDataFile(File folder, final String testMessage) throws Exception
-    {
-        return createDataFile(folder, testMessage, null);
-    }
+  /**
+   * Creates a data file that will be deleted when the JVM finalizes using the default encoding
+   *
+   * @param folder folder where the file will be created
+   * @param testMessage content of the file
+   * @return the new file
+   * @throws Exception
+   */
+  public static File createDataFile(File folder, final String testMessage) throws Exception {
+    return createDataFile(folder, testMessage, null);
+  }
 
-    /**
-     * Creates a data file that will be deleted when the JVM finalizes
-     *
-     * @param folder folder where the file will be created
-     * @param testMessage content of the file
-     * @param encoding encoding used to store the data
-     * @return the new file
-     * @throws Exception
-     */
-    public static File createDataFile(File folder, final String testMessage, Charset encoding) throws Exception
-    {
-        File temp = File.createTempFile("mule-file-test-", ".txt");
-        FileUtils.writeStringToFile(temp, testMessage, encoding);
+  /**
+   * Creates a data file that will be deleted when the JVM finalizes
+   *
+   * @param folder folder where the file will be created
+   * @param testMessage content of the file
+   * @param encoding encoding used to store the data
+   * @return the new file
+   * @throws Exception
+   */
+  public static File createDataFile(File folder, final String testMessage, Charset encoding) throws Exception {
+    File temp = File.createTempFile("mule-file-test-", ".txt");
+    FileUtils.writeStringToFile(temp, testMessage, encoding);
 
-        // Copies temp file to target
-        File target = new File(folder, temp.getName());
-        target.deleteOnExit();
-        FileUtils.renameFile(temp, target);
+    // Copies temp file to target
+    File target = new File(folder, temp.getName());
+    target.deleteOnExit();
+    FileUtils.renameFile(temp, target);
 
-        return target;
-    }
+    return target;
+  }
 
-    /**
-     * Creates a folder that will be deleted when the JVM finalizes
-     *
-     * @param name name of the file
-     * @return the new folder
-     */
-    public static File createFolder(String name)
-    {
-        return createFolder(null, name);
-    }
+  /**
+   * Creates a folder that will be deleted when the JVM finalizes
+   *
+   * @param name name of the file
+   * @return the new folder
+   */
+  public static File createFolder(String name) {
+    return createFolder(null, name);
+  }
 
-    /**
-     * Creates a folder that will be deleted when the JVM finalizes
-     *
-     * @param parent folder that contains the created folder
-     * @param name name of the file
-     * @return the new folder
-     */
-    public static File createFolder(File parent, String name)
-    {
-        File result = FileUtils.newFile(parent, name);
-        result.delete();
-        result.mkdir();
-        result.deleteOnExit();
+  /**
+   * Creates a folder that will be deleted when the JVM finalizes
+   *
+   * @param parent folder that contains the created folder
+   * @param name name of the file
+   * @return the new folder
+   */
+  public static File createFolder(File parent, String name) {
+    File result = FileUtils.newFile(parent, name);
+    result.delete();
+    result.mkdir();
+    result.deleteOnExit();
 
-        return result;
-    }
+    return result;
+  }
 }

@@ -20,97 +20,77 @@ import org.mule.tck.probe.Prober;
 
 import org.junit.Test;
 
-public class PoolingProfileTestCase extends AbstractIntegrationTestCase
-{
+public class PoolingProfileTestCase extends AbstractIntegrationTestCase {
 
-    private static boolean evicted;
+  private static boolean evicted;
+
+  @Override
+  protected String getConfigFile() {
+    return "pooling-profile-test-flow.xml";
+  }
+
+  @Test
+  public void testDefault() {
+    doTest("default", PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION, PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY,
+           PoolingProfile.DEFAULT_MAX_POOL_ACTIVE, PoolingProfile.DEFAULT_MAX_POOL_IDLE, PoolingProfile.DEFAULT_MAX_POOL_WAIT);
+  }
+
+  @Test
+  public void testFailAll() {
+    doTest("fail_all", PoolingProfile.WHEN_EXHAUSTED_FAIL, PoolingProfile.INITIALISE_ALL, 1, 2, 3);
+  }
+
+  @Test
+  public void testGrowOne() {
+    doTest("grow_one", PoolingProfile.WHEN_EXHAUSTED_GROW, PoolingProfile.INITIALISE_ONE, 2, 3, 4);
+  }
+
+  @Test
+  public void testWaitNone() {
+    doTest("wait_none", PoolingProfile.WHEN_EXHAUSTED_WAIT, PoolingProfile.INITIALISE_NONE, 3, 4, 5);
+  }
+
+  @Test
+  public void testEvictOne() {
+    doTest("evict_one", PoolingProfile.WHEN_EXHAUSTED_WAIT, PoolingProfile.INITIALISE_ALL, 1, 1, 0);
+
+
+    Prober prober = new PollingProber(5000, 50);
+    prober.check(new Probe() {
+
+      public boolean isSatisfied() {
+        return evicted;
+      }
+
+      public String describeFailure() {
+        return "Pooled component was not evicted";
+      }
+    });
+  }
+
+  protected void doTest(String serviceFlow, int exhausted, int initialisation, int active, int idle, long wait) {
+    Object o = muleContext.getRegistry().lookupObject(serviceFlow);
+    assertNotNull(serviceFlow, o);
+
+
+    assertTrue(((Flow) o).getMessageProcessors().get(0) instanceof PooledJavaComponent);
+    PooledJavaComponent pjc = (PooledJavaComponent) ((Flow) o).getMessageProcessors().get(0);
+
+    PoolingProfile profile = pjc.getPoolingProfile();
+    assertNotNull(profile);
+    assertEquals("exhausted:", exhausted, profile.getExhaustedAction());
+    assertEquals("initialisation:", initialisation, profile.getInitialisationPolicy());
+    assertEquals("active:", active, profile.getMaxActive());
+    assertEquals("idle:", idle, profile.getMaxIdle());
+    assertEquals("wait:", wait, profile.getMaxWait());
+  }
+
+  public static class EvictablePooledComponent extends FunctionalTestComponent {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "pooling-profile-test-flow.xml";
+    public void dispose() {
+      super.dispose();
+      evicted = true;
     }
-
-    @Test
-    public void testDefault()
-    {
-        doTest("default", PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION,
-                PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY,
-                PoolingProfile.DEFAULT_MAX_POOL_ACTIVE,
-                PoolingProfile.DEFAULT_MAX_POOL_IDLE,
-                PoolingProfile.DEFAULT_MAX_POOL_WAIT);
-    }
-
-    @Test
-    public void testFailAll()
-    {
-        doTest("fail_all", PoolingProfile.WHEN_EXHAUSTED_FAIL,
-                PoolingProfile.INITIALISE_ALL, 1, 2, 3);
-    }
-
-    @Test
-    public void testGrowOne()
-    {
-        doTest("grow_one", PoolingProfile.WHEN_EXHAUSTED_GROW,
-                PoolingProfile.INITIALISE_ONE, 2, 3, 4);
-    }
-
-    @Test
-    public void testWaitNone()
-    {
-        doTest("wait_none", PoolingProfile.WHEN_EXHAUSTED_WAIT,
-                PoolingProfile.INITIALISE_NONE, 3, 4, 5);
-    }
-
-    @Test
-    public void testEvictOne()
-    {
-        doTest("evict_one", PoolingProfile.WHEN_EXHAUSTED_WAIT,
-               PoolingProfile.INITIALISE_ALL, 1, 1, 0);
-
-
-        Prober prober = new PollingProber(5000, 50);
-        prober.check(new Probe()
-        {
-            public boolean isSatisfied()
-            {
-                return evicted;
-            }
-
-            public String describeFailure()
-            {
-                return "Pooled component was not evicted";
-            }
-        });
-    }
-
-    protected void doTest(String serviceFlow, int exhausted, int initialisation,
-                          int active, int idle, long wait)
-    {
-        Object o = muleContext.getRegistry().lookupObject(serviceFlow);
-        assertNotNull(serviceFlow, o);
-
-
-        assertTrue(((Flow) o).getMessageProcessors().get(0) instanceof PooledJavaComponent);
-        PooledJavaComponent pjc = (PooledJavaComponent) ((Flow) o).getMessageProcessors().get(0);
-
-        PoolingProfile profile = pjc.getPoolingProfile();
-        assertNotNull(profile);
-        assertEquals("exhausted:", exhausted, profile.getExhaustedAction());
-        assertEquals("initialisation:", initialisation, profile.getInitialisationPolicy());
-        assertEquals("active:", active, profile.getMaxActive());
-        assertEquals("idle:", idle, profile.getMaxIdle());
-        assertEquals("wait:", wait, profile.getMaxWait());
-    }
-
-    public static class EvictablePooledComponent extends FunctionalTestComponent
-    {
-
-        @Override
-        public void dispose()
-        {
-            super.dispose();
-            evicted = true;
-        }
-    }
+  }
 }
