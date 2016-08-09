@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -54,10 +56,15 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       doHandleException(ex, event);
 
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-      if (RequestContext.getEvent() != null) {
-        RequestContext.setExceptionPayload(exceptionPayload);
+      if (getCurrentEvent() != null) {
+        MuleEvent currentEvent = getCurrentEvent();
+        currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build());
+        setCurrentEvent(currentEvent);
       }
-      event.setMessage(MuleMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build());
+      event.setMessage(MuleMessage.builder(event.getMessage())
+          .nullPayload()
+          .exceptionPayload(exceptionPayload)
+          .build());
       return event;
     } finally {
       muleContext.getNotificationManager()

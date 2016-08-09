@@ -8,10 +8,11 @@ package org.mule.runtime.module.xml.transformers.xml.xquery;
 
 import static java.lang.Runtime.getRuntime;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -68,8 +69,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
     for (int i = 0; i < getParallelThreadCount(); ++i) {
       new Thread(() -> {
         try {
-          RequestContext
-              .setEvent(MuleTestUtils.getTestEvent("test", testFlow, MessageExchangePattern.REQUEST_RESPONSE, muleContext));
+          setCurrentEvent(MuleTestUtils.getTestEvent("test", testFlow, MessageExchangePattern.REQUEST_RESPONSE, muleContext));
         } catch (Exception e1) {
           e1.printStackTrace();
           return;
@@ -93,8 +93,8 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
     checkResult();
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with " + getCallsPerThread()
-          + " calls/thread took " + (endTime - startTime) + " ms.");
+      logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
+          + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
     }
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
@@ -19,7 +20,6 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -169,16 +169,21 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream) throws MuleException {
+  public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
+      throws MuleException {
     return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleMessage message, MuleSession session, Transaction trans, OutputStream outputStream)
+  public final MuleEvent routeMessage(MuleMessage message,
+                                      MuleSession session,
+                                      Transaction trans,
+                                      OutputStream outputStream)
       throws MuleException {
     return routeMessage(message, session, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleMessage message, MuleSession session, OutputStream outputStream) throws MuleException {
+  public final MuleEvent routeMessage(MuleMessage message, MuleSession session, OutputStream outputStream)
+      throws MuleException {
     message = warnIfMuleClientSendUsed(message);
     message = propagateRootMessageIdProperty(message);
 
@@ -205,7 +210,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !endpoint.getExchangePattern().hasResponse()) {
-      logger.warn("MuleClient.send() was used but inbound endpoint " + endpoint.getEndpointURI().getUri().toString()
+      logger.warn("MuleClient.send() was used but inbound endpoint "
+          + endpoint.getEndpointURI().getUri().toString()
           + " is not 'request-response'.  No response will be returned.");
     }
     return messageBuilder.build();
@@ -224,12 +230,14 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     if (logger.isDebugEnabled()) {
       String messageId;
       messageId = message.getUniqueId();
-      logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint + ". Message is being ignored");
+      logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
+          + ". Message is being ignored");
     }
     return message;
   }
 
-  protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream) throws MuleException {
+  protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream)
+      throws MuleException {
     MuleEvent event;
     ResponseOutputStream ros = null;
     if (outputStream != null) {
@@ -253,7 +261,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
-    event = OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {
       session.getSecurityContext().getAuthentication().setEvent(event);
     }
@@ -410,14 +418,17 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
   public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException {
     MuleEvent resultEvent = listener.process(muleEvent);
-    if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent) && resultEvent.getMessage() != null
+    if (resultEvent != null
+        && !VoidMuleEvent.getInstance().equals(resultEvent)
+        && resultEvent.getMessage() != null
         && resultEvent.getMessage().getExceptionPayload() != null
         && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException) {
       handleUnacceptedFilter(muleEvent.getMessage());
       return muleEvent;
     }
 
-    if (endpoint.getExchangePattern().hasResponse() && resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
+    if (endpoint.getExchangePattern().hasResponse() && resultEvent != null
+        && !VoidMuleEvent.getInstance().equals(resultEvent)) {
       // Do not propagate security context back to caller
       MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
       resultSession.setSecurityContext(null);
@@ -428,8 +439,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       }
 
       if (connector.isEnableMessageEvents(muleEvent)) {
-        connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(), endpoint,
-                                                                   resultEvent.getFlowConstruct(), MESSAGE_RESPONSE),
+        connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
+                                                                   endpoint,
+                                                                   resultEvent.getFlowConstruct(),
+                                                                   MESSAGE_RESPONSE),
                                    muleEvent);
       }
     }

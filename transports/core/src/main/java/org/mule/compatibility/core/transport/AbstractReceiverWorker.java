@@ -7,9 +7,10 @@
 package org.mule.compatibility.core.transport;
 
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -144,7 +145,7 @@ public abstract class AbstractReceiverWorker implements Work {
       handleResults(handleEventResults(results));
     } finally {
       messages.clear();
-      RequestContext.clear();
+      setCurrentEvent(null);
       currentThread().setContextClassLoader(originalCl);
     }
   }

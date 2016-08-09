@@ -11,9 +11,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -149,15 +150,15 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
       }
     }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
 
-    OptimizedRequestContext.unsafeSetEvent(mockMuleEventPreviousExecution);
+    setCurrentEvent(mockMuleEventPreviousExecution);
 
     MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
 
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), Is.is(0));
 
-    assertThat(RequestContext.getEvent(), is(mockMuleEvent));
-    assertThat(RequestContext.getEvent(), not(mockMuleEventPreviousExecution));
+    assertThat(getCurrentEvent(), is(mockMuleEvent));
+    assertThat(getCurrentEvent(), not(mockMuleEventPreviousExecution));
   }
 
   /**
@@ -167,8 +168,8 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   @Test
   public void requestContextSetBeforeProcessingEventNonBlockingPrcocessor() throws MuleException {
     final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
-    mockMessageProcessor =
-        Mockito.mock(MessageProcessor.class, Mockito.withSettings().extraInterfaces(NonBlockingMessageProcessor.class));
+    mockMessageProcessor = Mockito.mock(MessageProcessor.class,
+                                        Mockito.withSettings().extraInterfaces(NonBlockingMessageProcessor.class));
 
     Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
     Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
@@ -190,16 +191,16 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
       }
     }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
 
-    OptimizedRequestContext.unsafeSetEvent(mockMuleEventPreviousExecution);
+    setCurrentEvent(mockMuleEventPreviousExecution);
 
     MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
 
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), Is.is(0));
 
-    assertThat(RequestContext.getEvent().getId(), equalTo(muleEventIdToProcess));
-    assertThat(RequestContext.getEvent(), not(mockMuleEvent));
-    assertThat(RequestContext.getEvent(), not(mockMuleEventPreviousExecution));
+    assertThat(getCurrentEvent().getId(), equalTo(muleEventIdToProcess));
+    assertThat(getCurrentEvent(), not(mockMuleEvent));
+    assertThat(getCurrentEvent(), not(mockMuleEventPreviousExecution));
   }
 
   @Test

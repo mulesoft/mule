@@ -17,8 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -59,7 +61,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
     event = getTestEvent(TEST_DATA);
-    RequestContext.clear();
+    setCurrentEvent(null);
   }
 
   @Test(expected = InitialisationException.class)
@@ -91,7 +93,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     } catch (MessagingException e) {
       assertThat(e, instanceOf(RoutingException.class));
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(event);
-      assertThat(RequestContext.getEvent(), sameInstance(e.getEvent()));
+      assertThat(getCurrentEvent(), sameInstance(e.getEvent()));
     }
   }
 
@@ -116,7 +118,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     MuleEvent response = processingStrategy.route(event);
     assertThat(response, is(event));
     verify(mockRoute).process(event);
-    assertThat(RequestContext.getEvent(), sameInstance(response));
+    assertThat(getCurrentEvent(), sameInstance(response));
   }
 
   @Test

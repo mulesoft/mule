@@ -13,12 +13,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -58,7 +58,8 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
     final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
     Map<String, DataHandler> inboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
     MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-        .inboundAttachments(inboundAttachments).build()).build();
+        .inboundAttachments(inboundAttachments)
+        .build()).build();
 
     assertThat(copy.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
     assertThat(copy.getInboundAttachmentNames(), hasSize(1));
@@ -81,7 +82,9 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
     final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
     Map<String, DataHandler> outboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
     MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-        .outboundAttachments(outboundAttachments).build()).build();
+        .outboundAttachments(outboundAttachments)
+        .build())
+            .build();
 
     assertThat(copy.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
     assertThat(copy.getOutboundAttachmentNames(), hasSize(1));
@@ -91,8 +94,9 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
   @Test
   public void inboundAttachment() {
     final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-    MuleMessage message =
-        new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).addInboundAttachment(ATTACHMENT_KEY, attachmentValue).build();
+    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+        .addInboundAttachment(ATTACHMENT_KEY, attachmentValue)
+        .build();
 
     assertThat(message.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
     assertThat(message.getInboundAttachmentNames(), hasSize(1));
@@ -102,8 +106,9 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
   @Test
   public void outboundAttachment() {
     final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-    MuleMessage message =
-        new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).addOutboundAttachment(ATTACHMENT_KEY, attachmentValue).build();
+    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+        .addOutboundAttachment(ATTACHMENT_KEY, attachmentValue)
+        .build();
 
     assertThat(message.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
     assertThat(message.getOutboundAttachmentNames(), hasSize(1));
@@ -134,8 +139,10 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
     message = MuleMessage.builder(message).removeOutboundAttachment("attachment").build();
     assertEquals(0, message.getOutboundAttachmentNames().size());
 
-    message = MuleMessage.builder(message).addOutboundAttachment("spi-props", IOUtils
-        .toDataHandler("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT)).build();
+    message = MuleMessage.builder(message)
+        .addOutboundAttachment("spi-props", IOUtils
+            .toDataHandler("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT))
+        .build();
 
 
     assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
@@ -170,7 +177,7 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
+    setCurrentEvent(new DefaultMuleEvent(message, getTestFlow()));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

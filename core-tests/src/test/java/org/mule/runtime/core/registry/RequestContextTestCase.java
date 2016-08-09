@@ -7,11 +7,11 @@
 package org.mule.runtime.core.registry;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -81,8 +81,9 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public void run() {
       try {
-        OptimizedRequestContext.unsafeSetEvent(event);
-        RequestContext.setExceptionPayload(new DefaultExceptionPayload(new Exception()));
+        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(new Exception()))
+            .build());
+        setCurrentEvent(event);
         success.set(true);
       } catch (RuntimeException e) {
         logger.error("error in thread", e);

@@ -29,6 +29,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
@@ -36,8 +37,6 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -170,8 +169,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
   private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, MuleEvent response) {
     MessagingException e = messagingException;
-    if (response != null && response.getMessage().getExceptionPayload() != null
-        && response.getMessage().getExceptionPayload().getException() instanceof MessagingException) {
+    if (response != null &&
+        response.getMessage().getExceptionPayload() != null &&
+        response.getMessage().getExceptionPayload().getException() instanceof MessagingException) {
       e = (MessagingException) response.getMessage().getExceptionPayload().getException();
     }
     return e;
@@ -223,7 +223,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
               new DefaultMuleEvent(MuleMessage.builder().payload(expected).build(), getFlowConstruct());
           DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
-          RequestContext.setEvent(event);
+          setCurrentEvent(event);
           httpServerConnection.writeResponse(transformResponse(expected));
         }
       }
@@ -250,8 +250,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
     // TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
     // class
-    return (HttpResponse) getMuleContext().getTransformationService()
-        .applyTransformers(message, null, getMessageReceiver().getResponseTransportTransformers()).getPayload();
+    return (HttpResponse) getMuleContext().getTransformationService().applyTransformers(message, null, getMessageReceiver()
+        .getResponseTransportTransformers())
+        .getPayload();
   }
 
   @Override
@@ -351,9 +352,15 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
       String method = requestLine.getMethod();
 
-      if (!(method.equals(METHOD_GET) || method.equals(METHOD_HEAD) || method.equals(METHOD_POST) || method.equals(METHOD_OPTIONS)
-          || method.equals(METHOD_PUT) || method.equals(METHOD_DELETE) || method.equals(METHOD_TRACE)
-          || method.equals(METHOD_CONNECT) || method.equals(METHOD_PATCH))) {
+      if (!(method.equals(METHOD_GET)
+          || method.equals(METHOD_HEAD)
+          || method.equals(METHOD_POST)
+          || method.equals(METHOD_OPTIONS)
+          || method.equals(METHOD_PUT)
+          || method.equals(METHOD_DELETE)
+          || method.equals(METHOD_TRACE)
+          || method.equals(METHOD_CONNECT)
+          || method.equals(METHOD_PATCH))) {
         badRequest = true;
         return false;
       }
@@ -378,7 +385,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     MuleMessage message = getMessageReceiver().createMuleMessage(null);
     DefaultMuleEvent event = new DefaultMuleEvent(message, getFlowConstruct());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
-    OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
     HttpResponse response = new HttpResponse();
     response.setStatusLine(requestLine.getHttpVersion(), SC_BAD_REQUEST);
     response.setBody(HttpMessages.malformedSyntax().toString() + CRLF);
@@ -415,7 +422,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     httpStatus = message.getOutboundProperty(HTTP_STATUS_PROPERTY) != null
         ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
 
-    response.setMessage(MuleMessage.builder(response.getMessage()).payload(exception.getMessage())
+    response.setMessage(MuleMessage.builder(response.getMessage())
+        .payload(exception.getMessage())
         .addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus).build());
     HttpResponse httpResponse = transformResponse(response.getMessage());
     httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());

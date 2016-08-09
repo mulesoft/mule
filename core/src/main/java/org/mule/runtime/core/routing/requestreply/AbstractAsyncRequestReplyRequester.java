@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -91,7 +91,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         if (resultEvent.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null) {
           event.getSession().merge(resultEvent.getSession());
         }
-        resultEvent = org.mule.runtime.core.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(), event));
+        resultEvent = new DefaultMuleEvent(resultEvent.getMessage(), event);
+        setCurrentEvent(resultEvent);
       }
       return resultEvent;
     }
@@ -216,15 +217,19 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       // receiver thread (or the senders dispatcher thread in case of vm
       // with queueEvents="false") and the current thread may need to mutate
       // the even. See MULE-4370
-      return OptimizedRequestContext.criticalSetEvent(result);
+      setCurrentEvent(result);
+      return result;
     } else {
       addProcessed(asyncReplyCorrelationId);
 
       if (failOnTimeout) {
         event.getMuleContext()
-            .fireNotification(new RoutingNotification(event.getMessage(), null, RoutingNotification.ASYNC_REPLY_TIMEOUT));
+            .fireNotification(
+                              new RoutingNotification(event.getMessage(), null,
+                                                      RoutingNotification.ASYNC_REPLY_TIMEOUT));
 
-        throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout, asyncReplyCorrelationId),
+        throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout,
+                                                                                     asyncReplyCorrelationId),
                                            event, null);
       } else {
         return null;
@@ -293,13 +298,14 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
               MuleEvent event = (MuleEvent) store.retrieve(correlationId);
               if (logger.isDebugEnabled()) {
                 logger.debug("An event was received for an event group that has already been processed, "
-                    + "this is probably because the async-reply timed out. Correlation Id is: " + correlationId
-                    + ". Dropping event");
+                    + "this is probably because the async-reply timed out. Correlation Id is: "
+                    + correlationId + ". Dropping event");
               }
               // Fire a notification to say we received this message
-              event.getMuleContext()
-                  .fireNotification(new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
-                                                            RoutingNotification.MISSED_ASYNC_REPLY));
+              event.getMuleContext().fireNotification(
+                                                      new RoutingNotification(event.getMessage(),
+                                                                              event.getMessageSourceURI().toString(),
+                                                                              RoutingNotification.MISSED_ASYNC_REPLY));
             } else {
               Latch l = locks.get(correlationId);
               if (l != null) {

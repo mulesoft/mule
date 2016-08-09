@@ -8,11 +8,11 @@ package org.mule.runtime.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -78,7 +78,9 @@ public class MuleUniversalConduit extends AbstractConduit {
    * @param ei The Endpoint being invoked by this destination.
    * @param t The EPR associated with this Conduit - i.e. the reply destination.
    */
-  public MuleUniversalConduit(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
+  public MuleUniversalConduit(MuleUniversalTransport transport,
+                              CxfConfiguration configuration,
+                              EndpointInfo ei,
                               EndpointReferenceType t) {
     super(getTargetReference(ei, t));
     this.transport = transport;
@@ -216,7 +218,7 @@ public class MuleUniversalConduit extends AbstractConduit {
         });
       }
       // Update RequestContext ThreadLocal for backwards compatibility
-      OptimizedRequestContext.unsafeSetEvent(reqEvent);
+      setCurrentEvent(reqEvent);
 
       MuleEvent resEvent = processNext(reqEvent, m.getExchange());
 
@@ -262,7 +264,8 @@ public class MuleUniversalConduit extends AbstractConduit {
   }
 
   protected InputStream getResponseBody(Message m, MuleEvent result) throws TransformerException, IOException {
-    boolean response = result != null && result.getMessage().getPayload() != null && !isOneway(m.getExchange());
+    boolean response = result != null
+        && result.getMessage().getPayload() != null && !isOneway(m.getExchange());
 
     if (response) {
       // Sometimes there may not actually be a body, in which case
@@ -328,7 +331,8 @@ public class MuleUniversalConduit extends AbstractConduit {
       address.setValue(ei.getAddress());
       ref.setAddress(address);
       if (ei.getService() != null) {
-        EndpointReferenceUtils.setServiceAndPortName(ref, ei.getService().getName(), ei.getName().getLocalPart());
+        EndpointReferenceUtils.setServiceAndPortName(ref, ei.getService().getName(), ei.getName()
+            .getLocalPart());
       }
     } else {
       ref = t;

@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.work;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -41,7 +42,8 @@ public class WorkerContext implements Work {
     @Override
     public void workRejected(WorkEvent event) {
       if (event.getException() != null) {
-        if (event.getException() instanceof WorkCompletedException && event.getException().getCause() != null) {
+        if (event.getException() instanceof WorkCompletedException
+            && event.getException().getCause() != null) {
           logger.error(event.getWork().toString(), event.getException().getCause());
         } else {
           logger.error(event.getWork().toString(), event.getException());
@@ -125,7 +127,10 @@ public class WorkerContext implements Work {
    * @param workListener an object which would be notified when the various Work processing events (work accepted, work rejected,
    *        work started,
    */
-  public WorkerContext(Work aWork, long aStartTimeout, ExecutionContext execContext, WorkListener workListener) {
+  public WorkerContext(Work aWork,
+                       long aStartTimeout,
+                       ExecutionContext execContext,
+                       WorkListener workListener) {
     worker = aWork;
     startTimeOut = aStartTimeout;
     executionContext = execContext;
@@ -198,9 +203,11 @@ public class WorkerContext implements Work {
     if (0 == startTimeOut || startTimeOut == MuleWorkManager.INDEFINITE) {
       return false;
     }
-    boolean isTimeout = acceptedTime + startTimeOut > 0 && System.currentTimeMillis() > acceptedTime + startTimeOut;
+    boolean isTimeout = acceptedTime + startTimeOut > 0
+        && System.currentTimeMillis() > acceptedTime + startTimeOut;
     if (logger.isDebugEnabled()) {
-      logger.debug(this + " accepted at " + acceptedTime + (isTimeout ? " has timed out." : " has not timed out. ") + retryCount
+      logger.debug(this + " accepted at " + acceptedTime
+          + (isTimeout ? " has timed out." : " has not timed out. ") + retryCount
           + " retries have been performed.");
     }
     if (isTimeout) {
@@ -241,11 +248,12 @@ public class WorkerContext implements Work {
       withContextClassLoader(executionClassLoader, worker::run);
       workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_COMPLETED, worker, null));
     } catch (Throwable e) {
-      workException = (WorkException) (e instanceof WorkCompletedException ? e
-          : new WorkCompletedException("Unknown error", WorkCompletedException.UNDEFINED).initCause(e));
+      workException = (WorkException) (e instanceof WorkCompletedException
+          ? e : new WorkCompletedException("Unknown error",
+                                           WorkCompletedException.UNDEFINED).initCause(e));
       workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_REJECTED, worker, workException));
     } finally {
-      RequestContext.clear();
+      setCurrentEvent(null);
       TransactionCoordination.getInstance().clear();
       endLatch.countDown();
     }

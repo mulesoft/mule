@@ -6,8 +6,10 @@
  */
 package org.mule.functional.functional;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -143,7 +145,7 @@ public class FunctionalTestComponent
    */
   @Override
   public Object onReceive(Object data) throws Exception {
-    MuleEventContext context = RequestContext.getEventContext();
+    MuleEventContext context = new DefaultMuleEventContext(getCurrentEvent());
 
     if (isThrowException()) {
       throwException();
@@ -160,7 +162,8 @@ public class FunctionalTestComponent
   protected void throwException() throws Exception {
     if (getExceptionToThrow() != null) {
       if (StringUtils.isNotBlank(exceptionText)) {
-        Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(), new Object[] {exceptionText});
+        Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(),
+                                                          new Object[] {exceptionText});
         throw (Exception) exception;
       } else {
         throw (Exception) getExceptionToThrow().newInstance();
@@ -203,8 +206,9 @@ public class FunctionalTestComponent
     }
 
     if (logger.isInfoEnabled()) {
-      String msg = StringMessageUtils.getBoilerPlate("Message Received in service: " + context.getFlowConstruct().getName()
-          + ". Content is: " + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
+      String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
+          + context.getFlowConstruct().getName() + ". Content is: "
+          + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
 
       logger.info(msg);
     }
@@ -239,8 +243,9 @@ public class FunctionalTestComponent
     }
 
     if (isEnableNotifications()) {
-      muleContext
-          .fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+      muleContext.fireNotification(
+                                   new FunctionalTestNotification(context, replyMessage,
+                                                                  FunctionalTestNotification.EVENT_RECEIVED));
     }
 
     // Time to wait before returning

@@ -21,12 +21,12 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -94,8 +94,11 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header3]",
                                                               "#[message.outboundProperties.myHeader3]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("header1", "test")
-          .addOutboundProperty("header2", "test2").addOutboundProperty("header3", "test3").build());
+      event.setMessage(MuleMessage.builder(event.getMessage())
+          .addOutboundProperty("header1", "test")
+          .addOutboundProperty("header2", "test2")
+          .addOutboundProperty("header3", "test3")
+          .build());
       return event;
     });
 
@@ -135,7 +138,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     } catch (MessagingException e) {
       assertThat(e.getMessage(), is("Expected."));
     }
-    assertThat(RequestContext.getEvent().getReplyToHandler(), nullValue());
+    assertThat(getCurrentEvent().getReplyToHandler(), nullValue());
   }
 
   @Test
@@ -293,8 +296,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in =
-        new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(), MessageExchangePattern.REQUEST_RESPONSE, flow);
+    MuleEvent in = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
+                                        MessageExchangePattern.REQUEST_RESPONSE, flow);
     MuleEvent out = enricher.process(in);
 
     assertThat(out, is(sameInstance(in)));
@@ -354,7 +357,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     } catch (MessagingException e) {
       assertThat(e.getMessage(), is("Expected."));
     }
-    assertThat(RequestContext.getEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
+    assertThat(getCurrentEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
   }
 
   private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler) {
@@ -362,8 +365,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(), MessageExchangePattern.REQUEST_RESPONSE,
-                                nullReplyToHandler, flow);
+    return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
+                                MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
+                                flow);
   }
 
   private MessageEnricher createNonBlockingEnricher(SensingNullMessageProcessor sensingNullMessageProcessor) {

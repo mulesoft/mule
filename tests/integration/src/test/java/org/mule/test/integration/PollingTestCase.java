@@ -9,8 +9,9 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -106,7 +107,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       synchronized (events) {
-        events.add(RequestContext.getEvent());
+        events.add(getCurrentEvent());
         eventIds.add(event.getId());
       }
       return event;

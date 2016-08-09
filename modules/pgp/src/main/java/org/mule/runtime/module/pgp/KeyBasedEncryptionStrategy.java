@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.pgp;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
@@ -58,7 +59,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
     try {
       PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
       PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-      StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey, this.keyManager.getSecretKey(),
+      StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
+                                                                   this.keyManager.getSecretKey(),
                                                                    this.keyManager.getSecretPassphrase(), provider);
       return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
     } catch (Exception e) {
@@ -68,7 +70,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
 
   private PGPCryptInfo safeGetCryptInfo(Object cryptInfo) {
     if (cryptInfo == null) {
-      MuleEvent event = RequestContext.getEvent();
+      MuleEvent event = getCurrentEvent();
       PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
       this.checkKeyExpirity(publicKey);
       return new PGPCryptInfo(publicKey, false);

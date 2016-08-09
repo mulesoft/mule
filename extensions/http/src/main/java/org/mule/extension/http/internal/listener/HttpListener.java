@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -21,7 +22,7 @@ import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -225,7 +226,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                       ExceptionHelper.getTransportErrorMapping(HTTP.getScheme(), messagingException.getClass(), muleContext);
                   Integer statusCodeFromException = exceptionStatusCode != null ? Integer.valueOf(exceptionStatusCode) : 500;
                   final HttpResponseBuilder failureResponseBuilder = new HttpResponseBuilder()
-                      .setStatusCode(statusCodeFromException).setReasonPhrase(messagingException.getMessage());
+                      .setStatusCode(statusCodeFromException)
+                      .setReasonPhrase(messagingException.getMessage());
                   addThrottlingHeaders(failureResponseBuilder);
                   MuleEvent event = messagingException.getEvent();
                   event.setMessage(org.mule.runtime.core.api.MuleMessage.builder(event.getMessage())
@@ -250,28 +252,29 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
           logger.warn("Exception occurred processing request:", e);
           sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
         } finally {
-          RequestContext.clear();
+          setCurrentEvent(null);
         }
       }
 
       private void sendErrorResponse(final HttpConstants.HttpStatus status, String message,
                                      HttpResponseReadyCallback responseCallback) {
-        responseCallback.responseReady(new HttpResponseBuilder().setStatusCode(status.getStatusCode())
-            .setReasonPhrase(status.getReasonPhrase()).setEntity(new ByteArrayHttpEntity(message.getBytes())).build(),
-                                       new ResponseStatusCallback() {
+        responseCallback.responseReady(new HttpResponseBuilder()
+            .setStatusCode(status.getStatusCode())
+            .setReasonPhrase(status.getReasonPhrase())
+            .setEntity(new ByteArrayHttpEntity(message.getBytes()))
+            .build(), new ResponseStatusCallback() {
 
-                                         @Override
-                                         public void responseSendFailure(Throwable exception) {
-                                           logger.warn("Error while sending {} response {}", status.getStatusCode(),
-                                                       exception.getMessage());
-                                           if (logger.isDebugEnabled()) {
-                                             logger.debug("Exception thrown", exception);
-                                           }
-                                         }
+              @Override
+              public void responseSendFailure(Throwable exception) {
+                logger.warn("Error while sending {} response {}", status.getStatusCode(), exception.getMessage());
+                if (logger.isDebugEnabled()) {
+                  logger.debug("Exception thrown", exception);
+                }
+              }
 
-                                         @Override
-                                         public void responseSendSuccessfully() {}
-                                       });
+              @Override
+              public void responseSendSuccessfully() {}
+            });
       }
     };
   }
@@ -280,7 +283,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     return HttpRequestToMuleMessage.transform(requestContext, muleContext, parseRequest, listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
-    // OptimizedRequestContext.unsafeSetEvent(muleEvent);
+    // setCurrentEvent(muleEvent);
     // return muleEvent;
   }
 
@@ -318,7 +321,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
   protected HttpResponse buildErrorResponse() {
     final HttpResponseBuilder errorResponseBuilder = new HttpResponseBuilder();
     final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-        .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()).build();
+        .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+        .build();
     return errorResponse;
   }
 

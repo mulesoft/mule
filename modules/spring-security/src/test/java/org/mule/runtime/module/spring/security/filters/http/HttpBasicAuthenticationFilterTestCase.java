@@ -13,8 +13,10 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -28,10 +30,10 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
 
   @Test
   public void testAuthenticationHeaderFailure() throws Exception {
-    MuleEvent oldEvent = RequestContext.getEvent();
+    MuleEvent oldEvent = getCurrentEvent();
 
     MuleEvent event = getTestEvent(MuleMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build());
-    RequestContext.setEvent(event);
+    setCurrentEvent(event);
 
     HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
 
@@ -48,6 +50,6 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
       assertEquals("Basic realm=", event.getMessage().getOutboundProperty("WWW-Authenticate"));
       verify(manager);
     }
-    RequestContext.setEvent(oldEvent);
+    setCurrentEvent(oldEvent);
   }
 }

@@ -8,11 +8,12 @@ package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.FileUtils;
@@ -38,9 +39,9 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     ((FileConnector) connector).setAutoDelete(false);
 
     MuleEvent event = getTestEvent("TestData");
-    event = RequestContext.setEvent(event);
+    setCurrentEvent(event);
 
-    MuleMessage message = RequestContext.getEventContext()
+    MuleMessage message = new DefaultMuleEventContext(event)
         .requestEvent(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000);
     // read the payload into a string so the file is deleted on InputStream.close()
     assertNotNull(getPayloadAsString(message));
@@ -58,9 +59,9 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     ((FileConnector) connector).setAutoDelete(true);
 
     MuleEvent event = getTestEvent("TestData");
-    event = RequestContext.setEvent(event);
+    setCurrentEvent(event);
 
-    MuleMessage message = RequestContext.getEventContext().requestEvent(getTestEndpointURI() + "/" + tempDirName, 50000);
+    MuleMessage message = new DefaultMuleEventContext(event).requestEvent(getTestEndpointURI() + "/" + tempDirName, 50000);
     assertNotNull(message.getPayload());
     assertTrue(message.getPayload() instanceof InputStream);
 

@@ -7,13 +7,13 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -129,8 +129,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     muleEventToHttpRequest = new MuleEventToHttpRequest(this, muleContext, requestStreamingMode, sendBodyMode);
     httpResponseToMuleEvent = new HttpResponseToMuleEvent(this, muleContext, parseResponse);
 
-    initializeAttributeEvaluators(host, port, method, path, basePath, url, followRedirects, requestStreamingMode, sendBodyMode,
-                                  parseResponse, responseTimeout);
+    initializeAttributeEvaluators(host, port, method, path, basePath, url, followRedirects,
+                                  requestStreamingMode, sendBodyMode, parseResponse, responseTimeout);
 
     notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
@@ -172,14 +172,12 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   private void validateRequiredProperties() throws InitialisationException {
     if (url.getRawValue() == null) {
       if (host.getRawValue() == null) {
-        throw new InitialisationException(CoreMessages
-            .createStaticMessage("No host defined. Set the host attribute " + "either in the request or request-config elements"),
-                                          this);
+        throw new InitialisationException(CoreMessages.createStaticMessage("No host defined. Set the host attribute " +
+            "either in the request or request-config elements"), this);
       }
       if (port.getRawValue() == null) {
-        throw new InitialisationException(CoreMessages
-            .createStaticMessage("No port defined. Set the host attribute " + "either in the request or request-config elements"),
-                                          this);
+        throw new InitialisationException(CoreMessages.createStaticMessage("No port defined. Set the host attribute " +
+            "either in the request or request-config elements"), this);
       }
       if (path.getRawValue() == null) {
         throw new InitialisationException(CoreMessages
@@ -215,13 +213,15 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(),
                                         MESSAGE_REQUEST_BEGIN);
     getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent),
-                         resolveAuthentication(muleEvent), new BlockingCompletionHandler<HttpResponse, Exception, Void>() {
+                         resolveAuthentication(muleEvent),
+                         new BlockingCompletionHandler<HttpResponse, Exception, Void>() {
 
                            @Override
                            public void onFailure(Exception exception) {
                              MessagingException msgException =
                                  new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"),
-                                                        resetMuleEventForNewThread(muleEvent), exception,
+                                                        resetMuleEventForNewThread(muleEvent),
+                                                        exception,
                                                         DefaultHttpRequester.this);
                              checkIfRemotelyClosed(exception);
                              completionHandler.onFailure(msgException);
@@ -250,13 +250,13 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                                completionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent),
                                                                                   muleException, DefaultHttpRequester.this));
                              } finally {
-                               RequestContext.clear();
+                               setCurrentEvent(null);
                              }
                            }
 
                            private MuleEvent resetMuleEventForNewThread(MuleEvent event) {
                              // Set RequestContext ThreadLocal in new thread for backwards compatibility
-                             OptimizedRequestContext.unsafeSetEvent(event);
+                             setCurrentEvent(event);
                              return event;
                            }
                          }, getWorkManager(muleEvent));
@@ -350,8 +350,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     if (url.getRawValue() != null) {
       return url.resolveStringValue(muleEvent);
     } else {
-      String resolvedPath =
-          replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent), path.resolveStringValue(muleEvent)), muleEvent);
+      String resolvedPath = replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent),
+                                                       path.resolveStringValue(muleEvent)),
+                                             muleEvent);
 
       // Encode spaces to generate a valid HTTP request.
       resolvedPath = HttpParser.encodeSpaces(resolvedPath);

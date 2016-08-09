@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.cxf.config;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -52,7 +53,7 @@ public class WsConfig implements MuleContextAware {
     }
 
     private Map<String, Object> getEvaluatedMap() {
-      MuleEvent event = RequestContext.getEvent();
+      MuleEvent event = getCurrentEvent();
       MuleMessage message = (event != null) ? event.getMessage() : null;
       if (map != null && message != null) {
         Map<String, Object> evaluatedMap = new LinkedHashMap<>(map.size());

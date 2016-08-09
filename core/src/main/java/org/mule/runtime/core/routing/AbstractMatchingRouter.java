@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -72,7 +73,8 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
           throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event,
                                        this);
         }
-        eventToRoute = OptimizedRequestContext.criticalSetEvent(event);
+        setCurrentEvent(event);
+        eventToRoute = event;
       } else {
         eventToRoute = event;
       }
@@ -93,8 +95,10 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
       }
       return processDefaultRoute(event);
     } else if (!matchfound) {
-      logger.warn("Message did not match any routers on: " + event.getFlowConstruct().getName()
-          + " and there is no catch all strategy configured on this router.  Disposing message " + message);
+      logger.warn("Message did not match any routers on: "
+          + event.getFlowConstruct().getName()
+          + " and there is no catch all strategy configured on this router.  Disposing message "
+          + message);
     }
     return event;
   }

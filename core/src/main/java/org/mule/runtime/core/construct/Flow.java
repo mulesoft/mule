@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.construct;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -159,7 +159,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
 
   private void resetRequestContextEvent(MuleEvent event) {
     // Update RequestContext ThreadLocal for backwards compatibility
-    OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
   }
 
   @Override
@@ -209,13 +209,14 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
 
   @Override
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    getProcessingStrategy().configureProcessors(getMessageProcessors(), new StageNameSource() {
+    getProcessingStrategy().configureProcessors(getMessageProcessors(),
+                                                new StageNameSource() {
 
-      @Override
-      public String getName() {
-        return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
-      }
-    }, builder, muleContext);
+                                                  @Override
+                                                  public String getName() {
+                                                    return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
+                                                  }
+                                                }, builder, muleContext);
   }
 
   /**

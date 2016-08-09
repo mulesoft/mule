@@ -7,11 +7,13 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -135,11 +137,13 @@ public final class MuleTestUtils {
     return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
   }
 
-  public static MuleEvent getTestEvent(MuleMessage message, MessageExchangePattern mep, MuleContext context) throws Exception {
+  public static MuleEvent getTestEvent(MuleMessage message, MessageExchangePattern mep, MuleContext context)
+      throws Exception {
     return getTestEvent(message, getTestFlow(context), mep, context);
   }
 
-  public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context) throws Exception {
+  public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
+      throws Exception {
     return getTestEvent(data, getTestFlow(context), mep, context);
   }
 
@@ -156,7 +160,9 @@ public final class MuleTestUtils {
   // }
 
 
-  public static MuleEvent getTestEvent(MuleMessage message, FlowConstruct flowConstruct, MessageExchangePattern mep,
+  public static MuleEvent getTestEvent(MuleMessage message,
+                                       FlowConstruct flowConstruct,
+                                       MessageExchangePattern mep,
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
@@ -164,7 +170,10 @@ public final class MuleTestUtils {
     return event;
   }
 
-  public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MessageExchangePattern mep, MuleContext context)
+  public static MuleEvent getTestEvent(Object data,
+                                       FlowConstruct flowConstruct,
+                                       MessageExchangePattern mep,
+                                       MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
     final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
@@ -175,20 +184,23 @@ public final class MuleTestUtils {
   /**
    * Supply endpoint but no service
    */
-  public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context) throws Exception {
+  public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
+      throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
     final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }
 
-  public static MuleEventContext getTestEventContext(Object data, MessageExchangePattern mep, MuleContext context)
+  public static MuleEventContext getTestEventContext(Object data,
+                                                     MessageExchangePattern mep,
+                                                     MuleContext context)
       throws Exception {
     try {
       final MuleEvent event = getTestEvent(data, mep, context);
-      RequestContext.setEvent(event);
-      return RequestContext.getEventContext();
+      setCurrentEvent(event);
+      return new DefaultMuleEventContext(event);
     } finally {
-      RequestContext.setEvent(null);
+      setCurrentEvent(null);
     }
   }
 
@@ -215,7 +227,8 @@ public final class MuleTestUtils {
   }
 
   @Deprecated
-  public static Flow getTestFlow(String name, Class<?> clazz, Map props, MuleContext context) throws Exception {
+  public static Flow getTestFlow(String name, Class<?> clazz, Map props, MuleContext context)
+      throws Exception {
     return getTestFlow(name, clazz, props, context, true);
   }
 
@@ -223,7 +236,11 @@ public final class MuleTestUtils {
     return getTestFlow(name, context, true);
   }
 
-  public static Flow getTestFlow(String name, Class<?> clazz, Map props, MuleContext context, boolean initialize)
+  public static Flow getTestFlow(String name,
+                                 Class<?> clazz,
+                                 Map props,
+                                 MuleContext context,
+                                 boolean initialize)
       throws Exception {
     final SingletonObjectFactory of = new SingletonObjectFactory(clazz, props);
     of.initialise();
@@ -233,7 +250,8 @@ public final class MuleTestUtils {
     return getTestFlow(name, component, initialize, context);
   }
 
-  public static Flow getTestFlow(String name, MuleContext context, boolean initialize) throws Exception {
+  public static Flow getTestFlow(String name, MuleContext context, boolean initialize)
+      throws Exception {
     final Flow flow = new Flow(name, context);
     if (initialize) {
       context.getRegistry().registerFlowConstruct(flow);
@@ -242,7 +260,8 @@ public final class MuleTestUtils {
     return flow;
   }
 
-  public static Flow getTestFlow(String name, Object component, boolean initialize, MuleContext context) throws Exception {
+  public static Flow getTestFlow(String name, Object component, boolean initialize, MuleContext context)
+      throws Exception {
     final Flow flow = new Flow(name, context);
     flow.setMessageProcessors(new ArrayList<MessageProcessor>());
     if (component instanceof Component) {
@@ -272,7 +291,8 @@ public final class MuleTestUtils {
    * @param callback Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
-  public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback) throws Exception {
+  public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
+      throws Exception {
     assert propertyName != null && callback != null;
     String originalPropertyValue = null;
     try {

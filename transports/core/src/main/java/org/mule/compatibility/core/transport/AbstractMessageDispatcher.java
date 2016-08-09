@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.runtime.core.OptimizedRequestContext.unsafeSetEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
@@ -17,7 +17,6 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -41,7 +40,8 @@ import javax.resource.spi.work.WorkListener;
  * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors send messages over over a specific
  * transport. Different implementations may support different Message Exchange Patterns.
  */
-public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler implements MessageDispatcher {
+public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler
+    implements MessageDispatcher {
 
   protected List<Transformer> defaultOutboundTransformers;
   protected List<Transformer> defaultResponseTransformers;
@@ -67,8 +67,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
       connect();
 
       String prop = event.getMessage().getOutboundProperty(MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
-      boolean disableTransportTransformer =
-          (prop != null && Boolean.parseBoolean(prop)) || endpoint.isDisableTransportTransformer();
+      boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop))
+          || endpoint.isDisableTransportTransformer();
 
       if (!disableTransportTransformer) {
         applyOutboundTransformers(event);
@@ -89,7 +89,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
           // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with
           // this
           // thread.
-          RequestContext.clear();
+          setCurrentEvent(null);
           return NonBlockingVoidMuleEvent.getInstance();
         } else {
           return createResponseEvent(doSend(event), event);
@@ -109,11 +109,12 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     if (resultMessage != null) {
       resultMessage = MuleMessage.builder(resultMessage).rootId(requestEvent.getMessage().getMessageRootId()).build();
 
-      MuleSession storedSession =
-          connector.getSessionHandler().retrieveSessionInfoFromMessage(resultMessage, requestEvent.getMuleContext());
+      MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
+                                                                                               resultMessage,
+                                                                                               requestEvent.getMuleContext());
       requestEvent.getSession().merge(storedSession);
       MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
-      unsafeSetEvent(resultEvent);
+      setCurrentEvent(resultEvent);
       return resultEvent;
     } else {
       return null;
@@ -121,8 +122,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   }
 
   private boolean isNonBlocking(MuleEvent event) {
-    return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null
-        && isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
+    return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
+        isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
   }
 
   /**
@@ -227,7 +228,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             try {
               MuleEvent responseEvent = createResponseEvent(result, event);
               // Set RequestContext ThreadLocal in new thread for backwards compatibility
-              unsafeSetEvent(responseEvent);
+              setCurrentEvent(responseEvent);
               event.getReplyToHandler().processReplyTo(responseEvent, null, null);
             } catch (MessagingException messagingException) {
               event.getReplyToHandler().processExceptionReplyTo(messagingException, null);
@@ -255,7 +256,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
           @Override
           public void run() {
             // Set RequestContext ThreadLocal in new thread for backwards compatibility
-            unsafeSetEvent(event);
+            setCurrentEvent(event);
             event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
           }
 

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
@@ -24,7 +25,7 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -98,14 +99,14 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
         });
     usePath("/");
 
-    assertThat(RequestContext.getEvent(), is(nullValue()));
+    assertThat(getCurrentEvent(), is(nullValue()));
 
     HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
     doAnswer(new Answer<Void>() {
 
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        assertThat(RequestContext.getEvent(), not(nullValue()));
+        assertThat(getCurrentEvent(), not(nullValue()));
         return null;
       }
     }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
@@ -116,7 +117,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
 
     requestHandlerRef.get().handleRequest(requestContext, responseCallback);
 
-    assertThat(RequestContext.getEvent(), is(nullValue()));
+    assertThat(getCurrentEvent(), is(nullValue()));
   }
 
   @Test
@@ -133,10 +134,10 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
         });
     useInvalidPath("/");
 
-    assertThat(RequestContext.getEvent(), is(nullValue()));
+    assertThat(getCurrentEvent(), is(nullValue()));
     requestHandlerRef.get().handleRequest(mock(HttpRequestContext.class), mock(HttpResponseReadyCallback.class));
 
-    assertThat(RequestContext.getEvent(), is(nullValue()));
+    assertThat(getCurrentEvent(), is(nullValue()));
   }
 
   /**

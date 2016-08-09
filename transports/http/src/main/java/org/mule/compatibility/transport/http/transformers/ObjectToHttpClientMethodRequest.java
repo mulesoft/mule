@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.http.transformers;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.transport.http.HttpConnector;
@@ -20,7 +21,7 @@ import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -121,7 +122,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         httpMethod.setParams(params);
       } else {
         // TODO we should probably set other properties here
-        final String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+        final String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY,
+                                                           HttpConstants.HTTP11);
         if (HttpConstants.HTTP10.equals(httpVersion)) {
           httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);
         } else {
@@ -257,13 +259,17 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
   protected URI getURI(MuleMessage message) throws URISyntaxException, TransformerException {
     String endpointAddress = message.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
     if (endpointAddress == null) {
-      throw new TransformerException(HttpMessages.eventPropertyNotSetCannotProcessRequest(MuleProperties.MULE_ENDPOINT_PROPERTY),
+      throw new TransformerException(
+                                     HttpMessages.eventPropertyNotSetCannotProcessRequest(MuleProperties.MULE_ENDPOINT_PROPERTY),
                                      this);
     }
     return new URI(endpointAddress);
   }
 
-  protected void setupEntityMethod(Object src, Charset encoding, MuleEvent event, EntityEnclosingMethod postMethod)
+  protected void setupEntityMethod(Object src,
+                                   Charset encoding,
+                                   MuleEvent event,
+                                   EntityEnclosingMethod postMethod)
       throws UnsupportedEncodingException, TransformerException {
     final MuleMessage msg = event.getMessage();
     // Dont set a POST payload if the body is a Null Payload.
@@ -285,13 +291,15 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         }
       }
 
-      if (encoding != null && !UTF_8.equals(encoding) && outboundMimeType.indexOf(CHARSET_PARAM_NAME) == -1) {
+      if (encoding != null && !UTF_8.equals(encoding)
+          && outboundMimeType.indexOf(CHARSET_PARAM_NAME) == -1) {
         outboundMimeType += "; charset=" + encoding.name();
       }
 
       // Ensure that we have a cached representation of the message if we're
       // using HTTP 1.0
-      final String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+      final String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY,
+                                                         HttpConstants.HTTP11);
       if (HttpConstants.HTTP10.equals(httpVersion)) {
         try {
           src = event.getMessageAsBytes();
@@ -309,7 +317,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         }
       }
       if (src instanceof String) {
-        postMethod.setRequestEntity(new StringRequestEntity(src.toString(), outboundMimeType, encoding.name()));
+        postMethod.setRequestEntity(new StringRequestEntity(src.toString(), outboundMimeType,
+                                                            encoding.name()));
         return;
       }
 
@@ -318,7 +327,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
       } else if (src instanceof byte[]) {
         postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src, outboundMimeType));
       } else if (src instanceof OutputHandler) {
-        final MuleEvent eventFromContext = RequestContext.getEvent();
+        final MuleEvent eventFromContext = getCurrentEvent();
         postMethod.setRequestEntity(new StreamPayloadRequestEntity((OutputHandler) src, eventFromContext));
       } else {
         final byte[] buffer = muleContext.getObjectSerializer().serialize(src);
@@ -352,7 +361,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     }
   }
 
-  protected MultipartRequestEntity createMultiPart(MuleEvent event, EntityEnclosingMethod method) throws Exception {
+  protected MultipartRequestEntity createMultiPart(MuleEvent event, EntityEnclosingMethod method)
+      throws Exception {
     final MuleMessage msg = event.getMessage();
     Part[] parts;
     int i = 0;
@@ -393,8 +403,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
           }
         }
 
-        parts[i] = new FilePart(
-                                attachmentName, new ByteArrayPartSource(StringUtils.defaultString(fileName, attachmentName),
+        parts[i] = new FilePart(attachmentName, new ByteArrayPartSource(StringUtils.defaultString(fileName, attachmentName),
                                                                         IOUtils.toByteArray(dh.getInputStream())),
                                 dh.getContentType(), null);
       }

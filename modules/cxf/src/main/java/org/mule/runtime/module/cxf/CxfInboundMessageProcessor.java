@@ -10,6 +10,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -115,8 +115,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   @Override
   public void initialise() throws InitialisationException {
     if (bus == null) {
-      throw new InitialisationException(MessageFactory
-          .createStaticMessage("No CXF bus instance, this component has not been initialized properly."), this);
+      throw new InitialisationException(
+                                        MessageFactory
+                                            .createStaticMessage("No CXF bus instance, this component has not been initialized properly."),
+                                        this);
     }
 
     final HttpRequestPropertyManager httpRequestPropertyManager =
@@ -174,7 +176,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     return uriBase;
   }
 
-  protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req) throws IOException {
+  protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req)
+      throws IOException {
     // TODO: Is there a way to make this not so ugly?
     String ctxUri = requestPropertyManager.getBasePath(event.getMessage());
     String wsdlUri = getUri(event);
@@ -260,7 +263,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
           }
         });
         // Update RequestContext ThreadLocal for backwards compatibility
-        OptimizedRequestContext.unsafeSetEvent(event);
+        setCurrentEvent(event);
       }
 
       MuleEvent responseEvent = sendThroughCxf(event, exchange);
@@ -435,9 +438,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   protected boolean shouldSoapActionHeader() {
     // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
     // we cannot validate the bindings if we're using mule's pass-through invoke proxy service
-    boolean isGenericProxy =
-        "http://support.cxf.module.runtime.mule.org/".equals(getServer().getEndpoint().getService().getName().getNamespaceURI())
-            && "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
+    boolean isGenericProxy = "http://support.cxf.module.runtime.mule.org/"
+        .equals(getServer().getEndpoint().getService().getName().getNamespaceURI()) &&
+        "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
     return !isGenericProxy;
   }
 

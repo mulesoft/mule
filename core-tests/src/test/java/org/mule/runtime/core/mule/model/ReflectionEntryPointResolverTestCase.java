@@ -8,7 +8,10 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver;
@@ -68,8 +71,8 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchSetArrayFail() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[] {new Apple(), new Orange()}));
-    assertEquals("Test should have failed because the arguments were not wrapped properly: ", result.getState(),
-                 InvocationResult.State.FAILED);
+    assertEquals("Test should have failed because the arguments were not wrapped properly: ",
+                 result.getState(), InvocationResult.State.FAILED);
   }
 
   @Test
@@ -86,8 +89,8 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   @Test
   public void testFailEntryPointMultiplePayloadMatches() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
-    RequestContext.setEvent(getTestEvent("Hello"));
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
+    setCurrentEvent(getTestEvent("Hello"));
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), new DefaultMuleEventContext(getCurrentEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
   }
 

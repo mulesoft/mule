@@ -6,7 +6,8 @@
  */
 package org.mule.compatibility.transport.tcp.protocols;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
@@ -29,7 +30,7 @@ class MuleMessageWorker {
 
   public byte[] doWrite() throws IOException {
     // TODO fix the api here so there is no need to use the RequestContext
-    MuleMessage msg = RequestContext.getEvent().getMessage();
+    MuleMessage msg = getCurrentEvent().getMessage();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(null));

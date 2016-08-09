@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
@@ -25,7 +26,7 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -319,10 +320,11 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
   @Override
   public MuleMessage build() {
-    return new MuleMessageImplementation(id != null ? id : UUID.getUUID(), rootId, new TypedValue(payload, resolveDataType()),
-                                         attributes, inboundProperties, outboundProperties, inboundAttachments,
-                                         outboundAttachments, correlationId, correlationGroupSize, correlationSequence,
-                                         exceptionPayload);
+    return new MuleMessageImplementation(id != null ? id : UUID.getUUID(), rootId,
+                                         new TypedValue(payload, resolveDataType()), attributes,
+                                         inboundProperties, outboundProperties, inboundAttachments,
+                                         outboundAttachments, correlationId, correlationGroupSize,
+                                         correlationSequence, exceptionPayload);
   }
 
   private DataType resolveDataType() {
@@ -492,9 +494,9 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
               }
               contents = transformer.transform(theContent);
             } catch (TransformerException ex) {
-              String message =
-                  String.format("Unable to serialize the attachment %s, which is of type %s with contents of type %s", name,
-                                handler.getClass(), theContent.getClass());
+              String message = String.format(
+                                             "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
+                                             name, handler.getClass(), theContent.getClass());
               logger.error(message);
               throw new IOException(message);
             }
@@ -525,7 +527,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
           String name = entry.getKey();
           // TODO MULE-10013 remove this logic from here
-          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), RequestContext.getEvent().getMuleContext()));
+          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), getCurrentEvent().getMuleContext()));
         }
       }
 
@@ -540,7 +542,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       } else {
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
-        byte[] valueAsByteArray = (byte[]) RequestContext.getEvent().getMuleContext().getTransformationService()
+        byte[] valueAsByteArray = (byte[]) getCurrentEvent().getMuleContext().getTransformationService()
             .transform(this, DataType.BYTE_ARRAY).getPayload();
         out.writeInt(valueAsByteArray.length);
         new DataOutputStream(out).write(valueAsByteArray);
