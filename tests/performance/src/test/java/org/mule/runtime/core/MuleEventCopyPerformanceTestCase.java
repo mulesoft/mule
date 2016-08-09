@@ -122,7 +122,8 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   }
 
   protected DefaultMuleEvent createMuleEvent() throws Exception {
-    return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
   }
 
   protected DefaultMuleEvent createMuleEventWithFlowVarsAndProperties(int numProperties) throws Exception {

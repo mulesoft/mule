@@ -17,6 +17,7 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -114,7 +115,8 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
   protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(),
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                             MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(),
                              getTestFlow(), getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
@@ -181,7 +183,8 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
       flow.setExceptionListener(exceptionListener);
     }
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(), flow,
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                             MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils
         .populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));

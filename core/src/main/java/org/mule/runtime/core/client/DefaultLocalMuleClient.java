@@ -9,6 +9,7 @@ package org.mule.runtime.core.client;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -149,11 +150,13 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext));
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext));
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new MuleClientFlowConstruct(muleContext));
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                MessageExchangePattern.ONE_WAY, new MuleClientFlowConstruct(muleContext));
   }
 
   protected MuleMessage returnMessage(MuleEvent event) {

@@ -15,9 +15,9 @@ import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
@@ -77,20 +77,18 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
       return endpointCache.getOutboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern(), null);
     } else {
       final Long timeout = cacheKey.getOperationOptions().getResponseTimeout();
-      return new MessageProcessor() {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException {
-          final InboundEndpoint inboundEndpoint =
-              endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
-          MuleMessage message;
-          try {
-            message = inboundEndpoint.request(timeout);
-          } catch (Exception e) {
-            throw new ReceiveException(inboundEndpoint, timeout, e);
-          }
-          return message != null ? new DefaultMuleEvent(message, new MuleClientFlowConstruct(muleContext)) : null;
+      return event -> {
+        final InboundEndpoint inboundEndpoint =
+            endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
+        MuleMessage message;
+        try {
+          message = inboundEndpoint.request(timeout);
+        } catch (Exception e) {
+          throw new ReceiveException(inboundEndpoint, timeout, e);
         }
+        return message != null ? new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                      message, new MuleClientFlowConstruct(muleContext))
+            : null;
       };
     }
   }

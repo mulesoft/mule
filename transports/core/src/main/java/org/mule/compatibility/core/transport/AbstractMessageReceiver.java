@@ -19,6 +19,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -255,9 +256,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
     if (replyToFromMessage != null) {
-      newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
+      newEvent =
+          new DefaultMuleEvent(new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(), null),
+                               message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
     } else {
-      newEvent = new DefaultMuleEvent(message, flowConstruct, session, null, null, ros);
+      newEvent =
+          new DefaultMuleEvent(new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(), null),
+                               message, flowConstruct, session, null, null, ros);
     }
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -177,7 +178,7 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    setCurrentEvent(new DefaultMuleEvent(message, getTestFlow()));
+    setCurrentEvent(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message, getTestFlow()));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

@@ -8,11 +8,10 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,6 +23,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -75,7 +75,8 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
         MuleEvent event =
-            new DefaultMuleEvent(MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
+            new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                 MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
         events.put(buildQueueKey(event), event);
       }
     }

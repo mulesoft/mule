@@ -15,8 +15,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -58,7 +60,8 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = MuleMessage.builder().payload("").build();
-    muleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
+    muleEvent = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), muleMessage,
+                                     getTestFlow());
   }
 
   @Test

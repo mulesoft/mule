@@ -10,6 +10,7 @@ import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -166,7 +167,8 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(message, mep, flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null),
+                                                        message, mep, flowConstruct, session);
     return event;
   }
 
@@ -176,7 +178,8 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null),
+                                                        MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
     return event;
   }
 
@@ -187,7 +190,8 @@ public final class MuleTestUtils {
   public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null),
+                                                        MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }
 

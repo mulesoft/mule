@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -42,6 +43,11 @@ public class VoidMuleEvent implements MuleEvent {
 
   protected VoidMuleEvent() {
     super();
+  }
+
+  @Override
+  public MessageExecutionContext getExecutionContext() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

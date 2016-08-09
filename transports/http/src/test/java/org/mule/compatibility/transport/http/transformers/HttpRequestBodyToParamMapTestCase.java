@@ -20,6 +20,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -58,25 +59,29 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
   @Test
   public void validGet() throws Exception {
     MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
+    verifyTransformation(transform(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                        msg, getTestFlow())));
   }
 
   @Test
   public void validPost() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
+    verifyTransformation(transform(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                        msg, getTestFlow())));
   }
 
   @Test
   public void validPut() throws Exception {
     MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
+    verifyTransformation(transform(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                        msg, getTestFlow())));
   }
 
   @Test(expected = TransformerException.class)
   public void invalidContentType() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, "application/json");
-    transform(new DefaultMuleEvent(msg, getTestFlow()));
+    transform(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
+                                   getTestFlow()));
   }
 
   private Object transform(MuleEvent event) throws TransformerException {

@@ -9,6 +9,7 @@ package org.mule.runtime.core.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -24,14 +25,16 @@ public class FlowTestCase extends AbstractELTestCase {
   @Test
   public void flowName() throws Exception {
     MuleEvent event =
-        new DefaultMuleEvent(MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                             MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
     assertEquals("flowName", evaluate("flow.name", event));
   }
 
   @Test
   public void assignToFlowName() throws Exception {
     MuleEvent event =
-        new DefaultMuleEvent(MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                             MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
     assertFinalProperty("flow.name='foo'", event);
   }
 

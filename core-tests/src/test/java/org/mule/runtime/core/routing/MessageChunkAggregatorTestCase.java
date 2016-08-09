@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -44,9 +45,12 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
     message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
-    MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
-    MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
-    MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
+    MuleEvent event1 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message1,
+                                            getTestFlow(), session);
+    MuleEvent event2 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message2,
+                                            getTestFlow(), session);
+    MuleEvent event3 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message3,
+                                            getTestFlow(), session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

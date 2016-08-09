@@ -12,6 +12,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -274,7 +275,8 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent((MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                             (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
                              flow, new DefaultMuleSession(), muleContext.getConfiguration().getDefaultResponseTimeout(), null,
                              null, transacted, null, replyToHandler);
 

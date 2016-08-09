@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -484,7 +485,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     final MessageProcessor nested =
         new DefaultMessageProcessorChainBuilder().chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP()).build();
     builder.chain(getAppendingMP("1"), (MessageProcessor) event -> nested
-        .process(new DefaultMuleEvent(event.getMessage(), MessageExchangePattern.REQUEST_RESPONSE, event.getFlowConstruct())),
+        .process(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                      event.getMessage(), MessageExchangePattern.REQUEST_RESPONSE, event.getFlowConstruct())),
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 

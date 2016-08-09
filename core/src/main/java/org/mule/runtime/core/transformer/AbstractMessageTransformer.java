@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
@@ -119,7 +120,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     Object result;
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
     if (event == null) {
-      event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
+      event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                   MessageExchangePattern.REQUEST_RESPONSE,
                                    new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext));
     }
     try {

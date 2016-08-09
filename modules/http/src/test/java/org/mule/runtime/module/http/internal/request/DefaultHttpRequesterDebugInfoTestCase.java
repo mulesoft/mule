@@ -31,6 +31,8 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
@@ -96,7 +98,8 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     requester.setRequestBuilder(createRequestBuilder());
 
     message = MuleMessage.builder().payload(TEST_MESSAGE).build();
-    event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow());
+    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                 MessageExchangePattern.REQUEST_RESPONSE, getTestFlow());
   }
 
   @Test

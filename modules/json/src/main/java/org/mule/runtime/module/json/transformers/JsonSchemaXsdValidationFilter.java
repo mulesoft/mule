@@ -7,6 +7,7 @@
 package org.mule.runtime.module.json.transformers;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -65,7 +66,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
       String xmlString = (String) jToX
           .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
       MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
-      boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
+      boolean accepted = super.accept(new DefaultMuleEvent(event.getExecutionContext(), xmlMessage, event.getFlowConstruct()));
       if (jsonString != null) {
         msg = MuleMessage.builder(msg).payload(jsonString).build();
         event.setMessage(msg);

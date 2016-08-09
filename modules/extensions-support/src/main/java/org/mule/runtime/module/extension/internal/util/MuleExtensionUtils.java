@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -232,34 +233,35 @@ public class MuleExtensionUtils {
   }
 
   public static MuleEvent getInitialiserEvent(MuleContext muleContext) {
-    return new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, new FlowConstruct() {
-      // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, new FlowConstruct() {
+                                  // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
 
-      @Override
-      public MuleContext getMuleContext() {
-        return muleContext;
-      }
+                                  @Override
+                                  public MuleContext getMuleContext() {
+                                    return muleContext;
+                                  }
 
-      @Override
-      public String getName() {
-        return "InitialiserEventFlow";
-      }
+                                  @Override
+                                  public String getName() {
+                                    return "InitialiserEventFlow";
+                                  }
 
-      @Override
-      public LifecycleState getLifecycleState() {
-        return null;
-      }
+                                  @Override
+                                  public LifecycleState getLifecycleState() {
+                                    return null;
+                                  }
 
-      @Override
-      public MessagingExceptionHandler getExceptionListener() {
-        return null;
-      }
+                                  @Override
+                                  public MessagingExceptionHandler getExceptionListener() {
+                                    return null;
+                                  }
 
-      @Override
-      public FlowConstructStatistics getStatistics() {
-        return null;
-      }
-    });
+                                  @Override
+                                  public FlowConstructStatistics getStatistics() {
+                                    return null;
+                                  }
+                                });
   }
 
   /**

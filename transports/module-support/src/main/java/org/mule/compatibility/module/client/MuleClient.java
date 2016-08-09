@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.MuleEvent.TIMEOUT_NOT_SET_VALUE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.core.security.MuleCredentials.createHeader;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -22,6 +23,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -94,8 +96,8 @@ public class MuleClient implements Disposable {
 
   private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 
-  private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<String, InboundEndpoint>();
-  private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<String, OutboundEndpoint>();
+  private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<>();
+  private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<>();
 
   /**
    * Creates a Mule client that will use the default serverEndpoint when connecting to a remote server instance.
@@ -289,13 +291,7 @@ public class MuleClient implements Disposable {
    * @throws org.mule.api.MuleException if the dispatch fails or the components or transfromers cannot be found
    */
   public FutureMessageResult sendAsync(final String url, final MuleMessage message, final int timeout) throws MuleException {
-    Callable<Object> call = new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        return send(url, message, timeout);
-      }
-    };
+    Callable<Object> call = () -> send(url, message, timeout);
 
     FutureMessageResult result = new FutureMessageResult(call, muleContext);
 
@@ -435,7 +431,8 @@ public class MuleClient implements Disposable {
       message = MuleMessage.builder(message)
           .addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
     }
-    return new DefaultMuleEvent(message, exchangePattern, new MuleClientFlowConstruct(muleContext));
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                exchangePattern, new MuleClientFlowConstruct(muleContext));
   }
 
   protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException {

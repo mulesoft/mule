@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -40,6 +41,7 @@ import java.util.Set;
  */
 public class OutboundRoutingTestEvent implements MuleEvent {
 
+  private MessageExecutionContext executionContext;
   private MuleMessage message;
   private MuleSession session;
   private String id = UUID.getUUID();
@@ -47,10 +49,18 @@ public class OutboundRoutingTestEvent implements MuleEvent {
   int timeout = -1;
   private InboundEndpoint endpoint;
 
-  public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext) throws Exception {
+  public OutboundRoutingTestEvent(MessageExecutionContext executionContext, MuleMessage message, MuleSession session,
+                                  MuleContext muleContext)
+      throws Exception {
+    this.executionContext = executionContext;
     this.message = message;
     this.session = session;
     this.endpoint = MuleEndpointTestUtils.getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+  }
+
+  @Override
+  public MessageExecutionContext getExecutionContext() {
+    return executionContext;
   }
 
   @Override

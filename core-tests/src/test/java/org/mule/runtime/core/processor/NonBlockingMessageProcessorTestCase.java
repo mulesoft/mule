@@ -15,6 +15,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -62,7 +63,8 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
   private MuleEvent createNonBlockingTestEvent() throws Exception {
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE,
                                 new SensingNullReplyToHandler(), flow);
   }

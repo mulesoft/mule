@@ -9,6 +9,7 @@ package org.mule.runtime.core.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessagingException;
@@ -45,9 +46,11 @@ public class ExceptionTestCase extends AbstractELTestCase {
   public void exceptionCausedBy() throws Exception {
     MuleEvent event = getTestEvent("");
     MuleMessage message = event.getMessage();
-    MessagingException me = new MessagingException(CoreMessages.createStaticMessage(""),
-                                                   new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow()),
-                                                   new IllegalAccessException());
+    MessagingException me =
+        new MessagingException(CoreMessages.createStaticMessage(""),
+                               new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                    message, MessageExchangePattern.ONE_WAY, getTestFlow()),
+                               new IllegalAccessException());
     event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(me)).build());
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }

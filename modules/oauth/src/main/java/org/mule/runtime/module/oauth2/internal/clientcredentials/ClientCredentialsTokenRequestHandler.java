@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -82,7 +83,8 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
   public void refreshAccessToken() throws MuleException {
     try {
       final DefaultMuleEvent accessTokenEvent =
-          new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), MessageExchangePattern.REQUEST_RESPONSE,
+          new DefaultMuleEvent(new DefaultMessageExecutionContext(getMuleContext().getUniqueIdString(), null),
+                               MuleMessage.builder().nullPayload().build(), MessageExchangePattern.REQUEST_RESPONSE,
                                new Flow("test", getMuleContext()));
       setMapPayloadWithTokenRequestParameters(accessTokenEvent);
       final MuleEvent response;

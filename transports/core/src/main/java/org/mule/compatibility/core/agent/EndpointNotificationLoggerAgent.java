@@ -8,6 +8,7 @@ package org.mule.compatibility.core.agent;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -39,7 +40,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
   private boolean ignoreEndpointMessageNotifications = false;
 
   private OutboundEndpoint endpoint = null;
-  private List<Integer> ignoredNotifications = new ArrayList<Integer>();
+  private List<Integer> ignoredNotifications = new ArrayList<>();
 
   public EndpointNotificationLoggerAgent() {
     super("Endpoint Logger Agent");
@@ -114,7 +115,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           return;
         }
 
-        MuleEvent event = new DefaultMuleEvent(msg, endpoint.getExchangePattern(), (FlowConstruct) null);
+        MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
+                                               endpoint.getExchangePattern(), (FlowConstruct) null);
         event.setEnableNotifications(false);
         endpoint.process(event);
       } catch (Exception e1) {

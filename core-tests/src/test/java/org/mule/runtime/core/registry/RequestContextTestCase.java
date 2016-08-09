@@ -12,6 +12,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -95,6 +96,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
   private class DummyEvent implements MuleEvent {
 
     private MuleMessage message = MuleMessage.builder().payload("").build();
+
+    @Override
+    public MessageExecutionContext getExecutionContext() {
+      return new DefaultMessageExecutionContext("", null);
+    }
 
     @Override
     public MuleMessage getMessage() {

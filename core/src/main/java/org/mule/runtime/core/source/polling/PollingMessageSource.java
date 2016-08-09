@@ -204,7 +204,8 @@ public class PollingMessageSource
 
         @Override
         public MuleEvent process() throws Exception {
-          MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.ONE_WAY, flowConstruct);
+          MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                 request, MessageExchangePattern.ONE_WAY, flowConstruct);
           event = interceptor.prepareSourceEvent(event);
 
           setCurrentEvent(event);

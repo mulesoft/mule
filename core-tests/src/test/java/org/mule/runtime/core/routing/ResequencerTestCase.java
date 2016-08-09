@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -53,9 +54,12 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
     message3 = MuleMessage.builder(message1).correlationId(correlationId).build();
 
-    MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
-    MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
-    MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
+    MuleEvent event1 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message1,
+                                            getTestFlow(), session);
+    MuleEvent event2 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message2,
+                                            getTestFlow(), session);
+    MuleEvent event3 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message3,
+                                            getTestFlow(), session);
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
@@ -89,9 +93,12 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
     message3 = MuleMessage.builder(message3).correlationId(correlationId).build();
 
-    MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
-    MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
-    MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
+    MuleEvent event1 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message1,
+                                            getTestFlow(), session);
+    MuleEvent event2 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message2,
+                                            getTestFlow(), session);
+    MuleEvent event3 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message3,
+                                            getTestFlow(), session);
 
     // set a resequencing comparator. We need to reset the router since it will
     // not process the same event group

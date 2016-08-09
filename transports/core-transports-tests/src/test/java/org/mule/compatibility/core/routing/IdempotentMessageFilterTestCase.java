@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -41,7 +42,8 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
     ir.setStore(new InMemoryObjectStore<String>());
 
     MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                                  okMessage, getTestFlow(), session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
@@ -50,7 +52,8 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
 
     // This will not process, because the ID is a duplicate
     okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), okMessage,
+                                 getTestFlow(), session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNull(processedEvent);

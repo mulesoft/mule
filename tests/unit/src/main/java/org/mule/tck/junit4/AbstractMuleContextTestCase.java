@@ -9,6 +9,7 @@ package org.mule.tck.junit4;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
@@ -527,6 +528,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final Flow flow = new Flow("", muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
     muleContext.getRegistry().registerFlowConstruct(flow);
-    return new DefaultMuleEvent(getTestMuleMessage(payload), MessageExchangePattern.REQUEST_RESPONSE, replyToHandler, flow);
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                getTestMuleMessage(payload), MessageExchangePattern.REQUEST_RESPONSE, replyToHandler, flow);
   }
 }

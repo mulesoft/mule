@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -103,7 +104,8 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   protected MuleEvent createMuleEvent() {
-    return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, (Flow) null);
+    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+                                MuleMessage.builder().payload(payload).build(), ONE_WAY, (Flow) null);
   }
 
 }

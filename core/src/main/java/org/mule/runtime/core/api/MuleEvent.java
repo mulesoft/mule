@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -38,6 +39,11 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   int TIMEOUT_WAIT_FOREVER = 0;
   int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
+
+  /**
+   * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
+   */
+  MessageExecutionContext getExecutionContext();
 
   /**
    * Returns the message payload for this event

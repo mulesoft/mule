@@ -8,6 +8,7 @@ package org.mule.tck;
 
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.MuleTestUtils.getTestSession;
+
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -20,6 +21,7 @@ import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -230,7 +232,8 @@ public final class MuleEndpointTestUtils {
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
     final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
-    final DefaultMuleEvent event = new DefaultMuleEvent(message, flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null),
+                                                        message, flowConstruct, session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

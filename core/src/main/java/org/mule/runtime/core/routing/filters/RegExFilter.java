@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -76,7 +77,8 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   @Override
   public boolean accept(MuleMessage message) {
     // TODO MULE-9341 Remove Filters that are not needed
-    return accept(new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
+    return accept(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                       MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
   }
 
   @Override

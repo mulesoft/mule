@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration;
 
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -28,7 +29,9 @@ public class TestClusterizableMessageSource
   @Override
   public void start() throws MuleException {
     MuleMessage muleMessage = MuleMessage.builder().payload("TEST").build();
-    DefaultMuleEvent defaultMuleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, flowConstruct);
+    DefaultMuleEvent defaultMuleEvent =
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null), muleMessage,
+                             MessageExchangePattern.ONE_WAY, flowConstruct);
     listener.process(defaultMuleEvent);
   }
 

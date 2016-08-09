@@ -8,10 +8,12 @@ package org.mule.compatibility.module.cxf.transport;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -51,7 +53,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
-  private Map<String, OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
+  private Map<String, OutboundEndpoint> endpoints = new HashMap<>();
 
   public EndpointMuleUniversalConduit(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
                                       EndpointReferenceType t) {
@@ -107,7 +109,8 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
       try {
         ep = getEndpoint(muleContext, url);
-        event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
+        event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), muleMsg,
+                                     ep.getExchangePattern(), (FlowConstruct) null);
         // event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
       } catch (Exception e) {
         throw new Fault(e);
