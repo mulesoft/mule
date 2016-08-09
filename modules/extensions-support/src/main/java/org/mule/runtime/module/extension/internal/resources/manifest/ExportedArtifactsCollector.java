@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -193,7 +192,7 @@ final class ExportedArtifactsCollector
             @Override
             public void visitString(StringType stringType)
             {
-                Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
+                Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
                 if (enumAnnotation.isPresent())
                 {
                     clazz.set(getType(stringType));

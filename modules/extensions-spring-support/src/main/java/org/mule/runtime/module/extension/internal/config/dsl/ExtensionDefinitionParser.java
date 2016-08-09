@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -750,7 +749,7 @@ public abstract class ExtensionDefinitionParser
             return false;
         }
 
-        Optional<ClassInformationAnnotation> generics = getSingleAnnotation(metadataType, ClassInformationAnnotation.class);
+        Optional<ClassInformationAnnotation> generics = metadataType.getAnnotation(ClassInformationAnnotation.class);
         if (!generics.isPresent())
         {
             return false;
