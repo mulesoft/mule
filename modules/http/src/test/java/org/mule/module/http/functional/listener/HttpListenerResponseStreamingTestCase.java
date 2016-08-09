@@ -36,6 +36,7 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
     private static final int DEFAULT_TIMEOUT = 1000;
 
     public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
+    public static final String TEST_BODY_MAP = "one=1&two=2";
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
@@ -47,7 +48,27 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
         return "http-listener-response-streaming-config.xml";
     }
 
+    protected String getUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+    }
+
     protected void testResponseIsContentLengthEncoding(String url, HttpVersion httpVersion) throws IOException
+    {
+        testResponseIsContentLengthEncoding(url, httpVersion, TEST_BODY);
+    }
+
+    protected void testResponseIsChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
+    {
+        testResponseIsChunkedEncoding(url, httpVersion, TEST_BODY);
+    }
+
+    protected void testResponseIsNotChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
+    {
+        testResponseIsNotChunkedEncoding(url, httpVersion, TEST_BODY);
+    }
+
+    protected void testResponseIsContentLengthEncoding(String url, HttpVersion httpVersion, String expectedBody) throws IOException
     {
         final Response response = Get(url).version(httpVersion)
                                           .connectTimeout(DEFAULT_TIMEOUT)
@@ -58,20 +79,15 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
         final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
         assertThat(Arrays.asList(httpResponse.getAllHeaders()).toString(), contentLengthHeader, notNullValue());
         assertThat(httpResponse.getAllHeaders().toString(), transferEncodingHeader, nullValue());
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_BODY));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
     }
 
-    protected String getUrl(String path)
-    {
-        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
-    }
-
-    protected void testResponseIsChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
+    protected void testResponseIsChunkedEncoding(String url, HttpVersion httpVersion, String expectedBody) throws IOException
     {
         final Response response = Post(url).version(httpVersion)
                                            .connectTimeout(DEFAULT_TIMEOUT)
                                            .socketTimeout(DEFAULT_TIMEOUT)
-                                           .bodyByteArray(TEST_BODY.getBytes())
+                                           .bodyByteArray(expectedBody.getBytes())
                                            .execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
@@ -79,22 +95,22 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
         assertThat(httpResponse.getAllHeaders().toString(), contentLengthHeader, nullValue());
         assertThat(httpResponse.getAllHeaders().toString(), transferEncodingHeader, notNullValue());
         assertThat(httpResponse.getAllHeaders().toString(), transferEncodingHeader.getValue(), is(CHUNKED));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_BODY));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
     }
 
-    protected void testResponseIsNotChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
+    protected void testResponseIsNotChunkedEncoding(String url, HttpVersion httpVersion, String expectedBody) throws IOException
     {
         final Response response = Post(url).version(httpVersion)
                                            .connectTimeout(DEFAULT_TIMEOUT)
                                            .socketTimeout(DEFAULT_TIMEOUT)
-                                           .bodyByteArray(TEST_BODY.getBytes())
+                                           .bodyByteArray(expectedBody.getBytes())
                                            .execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
         final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
         assertThat(httpResponse.getAllHeaders().toString(), contentLengthHeader, nullValue());
         assertThat(httpResponse.getAllHeaders().toString(), transferEncodingHeader, is(nullValue()));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_BODY));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
     }
 
 }

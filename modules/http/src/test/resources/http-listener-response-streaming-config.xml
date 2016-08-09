@@ -11,6 +11,7 @@
             <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
             <alias name="inputStreamPayload" expression="new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())"/>
             <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
+            <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
         </expression-language>
     </configuration>
 
@@ -182,4 +183,30 @@
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
     </flow>
 
+    <flow name="mapFlow">
+        <http:listener config-ref="listenerConfig" path="/map">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
+
+    <flow name="alwaysMapFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
+
+    <flow name="neverMapFlow">
+        <http:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
 </mule>
