@@ -117,17 +117,9 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     {
         if (event != null || event instanceof VoidMuleEvent)
         {
-            try
-            {
                 return new ProcessorExecutorFactory().createProcessorExecutor(event, Collections.singletonList(next),
                                                                               MessageProcessorExecutionTemplate
                                                                                       .createExceptionTransformerExecutionTemplate(), false).execute();
-            }
-            catch (MessagingException e)
-            {
-                event.getSession().setValid(false);
-                throw e;
-            }
         }
         else
         {

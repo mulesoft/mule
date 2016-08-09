@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.session;
+package org.mule.compatibility.core.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.util.Collections;
 
@@ -56,18 +57,15 @@ public class DefaultMuleSessionTestCase
 
     protected void assertCreate(DefaultMuleSession session)
     {
-        assertNotNull(session.getId());
         assertNull(session.getSecurityContext());
         assertNotNull(session.getPropertyNamesAsSet());
         assertTrue(session.getPropertyNamesAsSet().isEmpty());
-        assertTrue(session.isValid());
     }
 
     @Test
     public void copy() throws Exception
     {
         DefaultMuleSession original = new DefaultMuleSession();
-        original.setValid(false);
         original.setSecurityContext(Mockito.mock(SecurityContext.class));
         original.setProperty("foo", "bar");
 
@@ -83,20 +81,7 @@ public class DefaultMuleSessionTestCase
 
     protected void assertCopy(DefaultMuleSession original, DefaultMuleSession copy)
     {
-        assertSame(copy.getId(), original.getId());
-        assertSame(copy.isValid(), original.isValid());
         assertSame(copy.getSecurityContext(), original.getSecurityContext());
-    }
-
-    @Test
-    public void valid()
-    {
-        DefaultMuleSession session = new DefaultMuleSession();
-        assertTrue(session.isValid());
-        session.setValid(false);
-        assertFalse(session.isValid());
-        session.setValid(true);
-        assertTrue(session.isValid());
     }
 
     @Test
@@ -169,7 +154,6 @@ public class DefaultMuleSessionTestCase
     {
         Flow flow = new Flow("flow", Mockito.mock(MuleContext.class, RETURNS_DEEP_STUBS));
         DefaultMuleSession before = new DefaultMuleSession();
-        before.setValid(false);
         before.setSecurityContext(createTestAuthentication());
         before.setProperty("foo", "bar");
 
@@ -185,8 +169,6 @@ public class DefaultMuleSessionTestCase
         DefaultMuleSession after = serializer.deserialize(serializer.serialize(before));
 
         // assertions
-        assertEquals(before.getId(), after.getId());
-        assertEquals(before.isValid(), after.isValid());
         assertEquals((Object) before.getProperty("foo"), after.getProperty("foo"));
         assertEquals(before.getSecurityContext().getAuthentication().getPrincipal(),
             after.getSecurityContext().getAuthentication().getPrincipal());

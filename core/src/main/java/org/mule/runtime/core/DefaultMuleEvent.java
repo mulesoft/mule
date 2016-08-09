@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
@@ -1101,5 +1102,17 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
         this.synchronous = resolveEventSynchronicity();
         this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
+    }
+
+    @Override
+    public SecurityContext getSecurityContext()
+    {
+        return session.getSecurityContext();
+    }
+
+    @Override
+    public void setSecurityContext(SecurityContext context)
+    {
+        session.setSecurityContext(context);
     }
 }

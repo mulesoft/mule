@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -327,6 +328,18 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public ProcessorsTrace getProcessorsTrace()
         {
             return null;
+        }
+
+        @Override
+        public SecurityContext getSecurityContext()
+        {
+            return null;
+        }
+
+        @Override
+        public void setSecurityContext(SecurityContext context)
+        {
+
         }
     }
 
