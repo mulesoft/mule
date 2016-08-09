@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
@@ -23,12 +24,10 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
-import org.mule.runtime.core.routing.MuleMessageInfoMapping;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.nio.charset.Charset;
@@ -53,8 +52,6 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     // TODO This state info. needs to be incorporated into the ConnectableLifecycleManager
     protected final AtomicBoolean connected = new AtomicBoolean(false);
     
-    protected final MessageInfoMapping defaultMessageInfoMapping = new MuleMessageInfoMapping();
-
     public AbstractTransportMessageHandler(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;

@@ -130,7 +130,6 @@ import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.DynamicAll;
 import org.mule.runtime.core.routing.DynamicFirstSuccessful;
 import org.mule.runtime.core.routing.DynamicRoundRobin;
-import org.mule.runtime.core.routing.ExpressionMessageInfoMapping;
 import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
@@ -472,7 +471,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
 
         //Message Info Mappings
-        registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));
         registerBeanDefinitionParser("custom-message-info-mapping", new ChildDefinitionParser("messageInfoMapping"));
 
         //Common Filters

@@ -173,7 +173,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         MuleMessage message = event.getMessage();
         if (enableCorrelation != CorrelationMode.NEVER)
         {
-            String correlation = service.getMessageInfoMapping().getCorrelationId(event);
+            String correlation = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
             if (logger.isDebugEnabled())
             {
                 logger.debug("Correlation is " + message.getCorrelation().toString());

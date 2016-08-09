@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static java.util.Optional.of;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,11 +21,11 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -60,8 +60,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MessageProcessor mockTimeoutMessageProcessor;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageInfoMapping mockMessagingInfoMapping;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleContext mockMuleContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ObjectStoreManager mockObjectStoreManager;
@@ -83,7 +81,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     {
         when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
         when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
-        when(mockMessageCollection.getDataType()).thenReturn((DataType) DataType.OBJECT);
+        when(mockMessageCollection.getDataType()).thenReturn(DataType.OBJECT);
     }
 
 
@@ -112,7 +110,9 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void initAfterDeserializationAfterProcess() throws Exception
     {
-        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleEvent.class))).thenReturn(TEST_GROUP_ID);
+        final Correlation correlation = mock(Correlation.class);
+        when(correlation.getId()).thenReturn(of(TEST_GROUP_ID));
+        when(mockMessageCollection.getCorrelation()).thenReturn(correlation);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
@@ -198,7 +198,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(MuleEvent.class));
         when(mockFlowConstruct.getName()).thenReturn("flowName");
-        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
+        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMuleContext, mockFlowConstruct, memoryObjectStore,
                 "prefix", mockProcessedGroups);
     }
 

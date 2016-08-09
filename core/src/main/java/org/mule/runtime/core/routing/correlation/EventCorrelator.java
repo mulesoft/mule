@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
@@ -70,8 +69,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private boolean failOnTimeout = true;
 
-    private MessageInfoMapping messageInfoMapping;
-
     private MuleContext muleContext;
 
     private EventCorrelatorCallback callback;
@@ -92,7 +89,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     public EventCorrelator(EventCorrelatorCallback callback,
             MessageProcessor timeoutMessageProcessor,
-            MessageInfoMapping messageInfoMapping,
             MuleContext muleContext,
             FlowConstruct flowConstruct,
             PartitionableObjectStore correlatorStore,
@@ -104,16 +100,11 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback")
                                                        .getMessage());
         }
-        if (messageInfoMapping == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("MessageInfoMapping").getMessage());
-        }
         if (muleContext == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("MuleContext").getMessage());
         }
         this.callback = callback;
-        this.messageInfoMapping = messageInfoMapping;
         this.muleContext = muleContext;
         this.timeoutMessageProcessor = timeoutMessageProcessor;
         name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext),
@@ -148,7 +139,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        final String groupId = messageInfoMapping.getCorrelationId(event);
+        final String groupId = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
 
         if (logger.isTraceEnabled())
         {

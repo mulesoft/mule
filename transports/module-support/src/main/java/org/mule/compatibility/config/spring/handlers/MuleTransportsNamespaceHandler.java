@@ -29,6 +29,7 @@ import org.mule.compatibility.core.transformer.simple.AddSessionVariableTransfor
 import org.mule.compatibility.core.transformer.simple.CopyAttachmentsTransformer;
 import org.mule.compatibility.core.transformer.simple.RemoveAttachmentTransformer;
 import org.mule.compatibility.core.transformer.simple.RemoveSessionVariableTransformer;
+import org.mule.compatibility.core.transformer.simple.SetCorrelationIdTransformer;
 import org.mule.compatibility.module.cxf.builder.WebServiceMessageProcessorWithInboundEndpointBuilder;
 import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
@@ -73,6 +74,7 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
         registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
         // TODO MULE-10192
+        registerBeanDefinitionParser("set-correlation-id", new MessageProcessorDefinitionParser(SetCorrelationIdTransformer.class));
 
         // Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));

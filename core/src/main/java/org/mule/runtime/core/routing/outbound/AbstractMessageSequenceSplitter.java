@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.AbstractSplitter;
@@ -47,7 +46,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected MuleContext muleContext;
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
-    protected MessageInfoMapping messageInfoMapping;
     protected int batchSize;
     protected String counterVariableName;
 
@@ -98,11 +96,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
     protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException
     {
-        if (messageInfoMapping == null)
-        {
-            messageInfoMapping = originalEvent.getFlowConstruct().getMessageInfoMapping();
-        }
-        String correlationId = messageInfoMapping.getCorrelationId(originalEvent);
+        String correlationId = originalEvent.getMessage().getCorrelation().getId().orElse(originalEvent.getMessage().getUniqueId());
         List<MuleEvent> resultEvents = new ArrayList<>();
         int correlationSequence = 0;
         MessageSequence<?> messageSequence = seq;
@@ -176,11 +170,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
-    {
-        this.messageInfoMapping = messageInfoMapping;
     }
 
     /**

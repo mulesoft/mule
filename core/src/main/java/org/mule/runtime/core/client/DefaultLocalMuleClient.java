@@ -8,6 +8,7 @@ package org.mule.runtime.core.client;
 
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -26,11 +27,9 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.routing.MuleMessageInfoMapping;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -206,8 +205,6 @@ public class DefaultLocalMuleClient implements MuleClient
      */
     static public class MuleClientFlowConstruct implements FlowConstruct
     {
-        static MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
-
         MuleContext muleContext;
 
         public MuleClientFlowConstruct(MuleContext muleContext)
@@ -243,12 +240,6 @@ public class DefaultLocalMuleClient implements MuleClient
         public MuleContext getMuleContext()
         {
             return muleContext;
-        }
-
-        @Override
-        public MessageInfoMapping getMessageInfoMapping()
-        {
-            return messageInfoMapping;
         }
 
         public MessageProcessorChain getMessageProcessorChain()

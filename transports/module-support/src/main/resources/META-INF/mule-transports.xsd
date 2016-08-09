@@ -189,6 +189,27 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="set-correlation-id" type="setCorrelationIdType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sets the correlation ID of the current event/message. Replaces message-info-mapping.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="setCorrelationIdType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="correlationId" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The value to be set on the correlation ID. Supports expressions.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!--==============================================================-->
     <!--   Endpoint elements                                          -->
     <!--==============================================================-->
@@ -504,9 +525,6 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractRoutingMessageProcessorType">
-                    <xsd:sequence>
-                       <xsd:element ref="mule:abstract-message-info-mapping" minOccurs="0"/>
-                    </xsd:sequence>
                     <xsd:attributeGroup ref="mule:defaultCorrelationAttributes"/>
                     <xsd:attributeGroup ref="mule:expressionAttributes"/>
                     <!--  See MULE-5069 <xsd:attributeGroup ref="allExchangePatterns" />-->

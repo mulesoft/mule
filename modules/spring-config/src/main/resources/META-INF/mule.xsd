@@ -2055,13 +2055,6 @@
                         <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                         <xsd:element ref="default-exception-strategy" minOccurs="0"/>
                     </xsd:choice>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID. these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="nonBlankString" use="required">
                     <xsd:annotation>
@@ -4648,9 +4641,6 @@
     <xsd:complexType name="baseAggregatorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
-                </xsd:sequence>
                 <xsd:attribute name="timeout" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4760,9 +4750,6 @@
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
-                </xsd:sequence>
                 <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4961,9 +4948,6 @@
     <xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">
         <xsd:complexContent>
             <xsd:extension base="baseSingleRouteRoutingMessageProcessorType">
-                <xsd:sequence>
-                   <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
-                </xsd:sequence>
                 <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -5319,65 +5303,6 @@
             </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
-
-    <!-- Message Info Mappers -->
-
-    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType">
-        <xsd:annotation>
-            <xsd:documentation>Maps the attributes of the current message to known message elements in Mule, namely Message ID and CorrrelationID.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractMessageInfoMappingType"/>
-
-    <xsd:element name="expression-message-info-mapping" type="expressionMessageInfoMappingType"
-                 substitutionGroup="abstract-message-info-mapping">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows expressions to be configured to extract the message information.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="expressionMessageInfoMappingType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageInfoMappingType">
-                <xsd:attribute name="messageIdExpression" type="xsd:string" use="required"/>
-                <xsd:attribute name="correlationIdExpression" type="xsd:string" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-message-info-mapping" type="customMessageInfoMappingType"
-                 substitutionGroup="abstract-message-info-mapping">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows configuraton of a custom implementation of MessageInfoMapping.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customMessageInfoMappingType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageInfoMappingType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An implementation of the MessageInfoMapping interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!--==============================================================-->
     <!--  Lifecycle Adapters                                            -->
