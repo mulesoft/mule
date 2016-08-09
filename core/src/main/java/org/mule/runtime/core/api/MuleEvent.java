@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -44,6 +45,30 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
    */
   MessageExecutionContext getExecutionContext();
+
+  /**
+   * Returns the correlation metadata of this message. See {@link Correlation}.
+   * 
+   * @return the correlation metadata of this message.
+   */
+  Correlation getCorrelation();
+
+  /**
+   * The correlation Id can be used by components in the system to manage message relations.
+   * <p>
+   * The id is associated with the message using the underlying transport protocol. As such not all messages will support the
+   * notion of a id i.e. tcp or file. In this situation the correlation Id is set as a property of the message where it's up to
+   * developer to keep the association with the message. For example if the message is serialised to xml the id will be available
+   * in the message.
+   *
+   * @return the id for this message or null value if one hasn't been set
+   */
+  String getCorrelationId();
+
+  /**
+   * @return the {@link MuleEvent}
+   */
+  MuleEvent getParent();
 
   /**
    * Returns the message payload for this event
@@ -295,5 +320,4 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param context the context for this session or null if the request is not secure.
    */
   void setSecurityContext(SecurityContext context);
-
 }

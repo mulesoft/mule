@@ -44,19 +44,17 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
   @Override
   public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
     MuleEvent results[];
-    if (events == null || events.size() == 0) {
-      results = EventGroup.EMPTY_EVENTS_ARRAY;
-    } else {
-      try {
-        results = events.toArray(false);
-      } catch (ObjectStoreException e) {
-        throw new AggregationException(events, null, e);
-      }
-      Arrays.sort(results, eventComparator);
+
+    try {
+      results = events.toArray(false);
+    } catch (ObjectStoreException e) {
+      throw new AggregationException(events, null, e);
     }
+
+    Arrays.sort(results, eventComparator);
     // This is a bit of a hack since we wrap the the collection of events in a
     // Mule Message to pass back
-    return new DefaultMuleEvent(MuleMessage.builder().payload(results).build(), results[0]);
+    return new DefaultMuleEvent(MuleMessage.builder().payload(results).build(), results[0].getParent());
   }
 
 }

@@ -200,13 +200,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected MulticastingRouter buildRouter() {
     // Create an outbound router with all endpoints configured on the exception strategy
-    MulticastingRouter router = new MulticastingRouter() {
-
-      @Override
-      protected void setMessageProperties(FlowConstruct session, MuleEvent event, MessageProcessor target) {
-        // No reply-to or correlation for exception targets, at least for now anyway.
-      }
-    };
+    MulticastingRouter router = new MulticastingRouter();
     return router;
   }
 

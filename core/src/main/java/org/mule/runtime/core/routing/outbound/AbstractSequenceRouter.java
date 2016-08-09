@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 
 import java.util.ArrayList;
@@ -36,12 +38,8 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
     }
 
-    if (enableCorrelation.doCorrelation(message.getCorrelation())) {
-      // the correlationId will be set by the AbstractOutboundRouter
-      event.setMessage(MuleMessage.builder(message).correlationGroupSize(routes.size()).build());
-    } else {
-      logger.debug("Correlation is " + message.getCorrelation().toString());
-    }
+    ((DefaultMuleEvent) event)
+        .setCorrelation(new Correlation(event.getExecutionContext().getSourceCorrelationId().orElse(null), routes.size(), null));
 
     List<MuleEvent> results = new ArrayList<>(routes.size());
     try {

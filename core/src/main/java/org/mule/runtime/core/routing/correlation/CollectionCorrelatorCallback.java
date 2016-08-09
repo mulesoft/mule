@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleSession;
@@ -66,7 +68,8 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    */
   @Override
   public EventGroup createEventGroup(MuleEvent event, Object groupId) {
-    return new EventGroup(groupId, muleContext, event.getMessage().getCorrelation().getGroupSize(), storePrefix);
+    return new EventGroup(groupId, muleContext, event.getCorrelation() != null ? event.getCorrelation().getGroupSize() : empty(),
+                          storePrefix);
   }
 
   /**

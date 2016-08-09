@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import static java.util.Optional.of;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -25,7 +24,6 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -102,10 +100,11 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void initAfterDeserializationAfterProcess() throws Exception {
-    final Correlation correlation = mock(Correlation.class);
-    when(correlation.getId()).thenReturn(of(TEST_GROUP_ID));
-    when(mockMessageCollection.getCorrelation()).thenReturn(correlation);
+    // final Correlation correlation = mock(Correlation.class);
+    // when(correlation.getId()).thenReturn(of(TEST_GROUP_ID));
+    // when(mockMessageCollection.getCorrelation()).thenReturn(correlation);
     when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
+    when(mockMuleEvent.getCorrelationId()).thenReturn(TEST_GROUP_ID);
     EventCorrelator eventCorrelator = createEventCorrelator();
     eventCorrelator.process(mockMuleEvent);
     verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);

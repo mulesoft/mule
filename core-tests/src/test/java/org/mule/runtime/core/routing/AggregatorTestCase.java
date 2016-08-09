@@ -46,16 +46,16 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).build();
-    message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
-    message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
     MuleEvent event1 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message1, flow, session);
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message1, flow, session);
     MuleEvent event2 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message2, flow, session);
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message2, flow, session);
     MuleEvent event3 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message3, flow, session);
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message3, flow, session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

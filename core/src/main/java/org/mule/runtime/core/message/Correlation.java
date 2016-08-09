@@ -37,7 +37,7 @@ public class Correlation implements Serializable {
    * @param groupSize see {@link #getGroupSize()}.
    * @param sequence see {@link #getSequence()}.
    */
-  Correlation(String id, Integer groupSize, Integer sequence) {
+  public Correlation(String id, Integer groupSize, Integer sequence) {
     this.id = id;
     this.groupSize = groupSize;
     this.sequence = sequence;

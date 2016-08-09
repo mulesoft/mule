@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -41,16 +42,17 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).correlationGroupSize(3).build();
-    message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
-    message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
-    MuleEvent event1 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message1,
-                                            getTestFlow(), session);
-    MuleEvent event2 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message2,
-                                            getTestFlow(), session);
-    MuleEvent event3 = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message3,
-                                            getTestFlow(), session);
+    DefaultMuleEvent event1 =
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message1, getTestFlow(), session);
+    event1.setCorrelation(new Correlation(message1.getUniqueId(), 3, null));
+    MuleEvent event2 =
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message2, getTestFlow(), session);
+    MuleEvent event3 =
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
+                             message3, getTestFlow(), session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

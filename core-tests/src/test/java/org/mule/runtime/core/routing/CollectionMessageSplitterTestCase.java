@@ -184,11 +184,12 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
       MuleMessage msg = event.getMessage();
       assertTrue(msg.getPayload() instanceof String);
       if (counted) {
-        assertThat(msg.getCorrelation().getGroupSize().get(), is(count));
+        assertThat(event.getCorrelation().getGroupSize().get(), is(count));
       } else {
-        assertThat(msg.getCorrelation().getGroupSize().isPresent(), is(false));
+        assertThat(event.getCorrelation().getGroupSize().isPresent(), is(false));
       }
-      actualSequences.add(msg.getCorrelation().getSequence().get());
+      actualSequences.add(event.getCorrelation().getSequence().get());
+      // actualSequences.add(msg.getCorrelation().getSequence().get());
       String str = (String) msg.getPayload();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {

@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -248,6 +249,21 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public void setSecurityContext(SecurityContext context) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Correlation getCorrelation() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getCorrelationId() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public MuleEvent getParent() {
     throw new UnsupportedOperationException();
   }
 }
