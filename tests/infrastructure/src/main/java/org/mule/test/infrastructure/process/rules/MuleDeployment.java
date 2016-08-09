@@ -17,11 +17,15 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
@@ -196,7 +200,37 @@ public class MuleDeployment extends MuleInstallation
         super.before();
         prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
         mule = new MuleProcessController(getMuleHome());
-        if (!mule.isRunning())
+        try
+        {
+            doBefore();
+        }
+        catch (Error e)
+        {
+            logServerError(e);
+        }
+    }
+
+    private void logServerError(Error e) throws IOException
+    {
+        logger.error("====================== Server log ===============================");
+        Files.lines(mule.getLog().toPath()).forEach(logger::error);
+        logger.error("=================================================================");
+        logger.error("Cause: " + e.getMessage());
+    }
+
+    private void doBefore()
+    {
+        if (mule.isRunning())
+        {
+            logger.warn("Mule Server was already running");
+            libraries.forEach((library) -> mule.addLibrary(new File(library)));
+            logger.info("Redeploying domains");
+            domains.forEach((domain) -> redeployDomain(domain));
+            logger.info("Redeploying applications");
+            applications.forEach((application) -> redeploy(application));
+            logger.info("Redeployment successful");
+        }
+        else
         {
             libraries.forEach((library) -> mule.addLibrary(new File(library)));
             domains.forEach((domain) -> mule.deployDomain(domain));
@@ -206,16 +240,6 @@ public class MuleDeployment extends MuleInstallation
             domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
             applications.forEach((application) -> checkAppIsDeployed(getName(application)));
             logger.info("Deployment successful");
-        }
-        else
-        {
-            logger.warn("Mule Server was already running");
-            libraries.forEach((library) -> mule.addLibrary(new File(library)));
-            logger.info("Redeploying domains");
-            domains.forEach((domain) -> redeployDomain(domain));
-            logger.info("Redeploying applications");
-            applications.forEach((application) -> redeploy(application));
-            logger.info("Redeployment successful");
         }
     }
 

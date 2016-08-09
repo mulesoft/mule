@@ -56,7 +56,9 @@ public class MuleServerFailureLogger extends TestWatcher
         String serverLog = new MuleProcessController(installation.getMuleHome()).getLog().getAbsolutePath();
         try (Stream<String> stream = Files.lines(Paths.get(serverLog)))
         {
+            LOGGER.error("====================== Server log ===============================");
             stream.forEach(LOGGER::error);
+            LOGGER.error("=================================================================");
         }
         catch (IOException e1)
         {
