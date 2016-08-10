@@ -10,15 +10,17 @@ import org.mule.runtime.core.api.store.ObjectStore;
 
 import java.io.Serializable;
 
-public class InMemoryStoreContractTestCase extends AbstractObjectStoreContractTestCase {
+public class InMemoryStoreContractTestCase extends AbstractObjectStoreContractTestCase
+{
+    @Override
+    public ObjectStore<Serializable> getObjectStore()
+    {
+        return new InMemoryObjectStore<Serializable>();
+    }
 
-  @Override
-  public ObjectStore<Serializable> getObjectStore() {
-    return new InMemoryObjectStore<Serializable>();
-  }
-
-  @Override
-  public Serializable getStorableValue() {
-    return null;
-  }
+    @Override
+    public Serializable getStorableValue()
+    {
+        return null;
+    }
 }

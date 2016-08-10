@@ -17,23 +17,29 @@ import java.sql.SQLException;
 /**
  * Builds {@link ParameterMetaData} mocks
  */
-public class ParameterMetaDataBuilder {
+public class ParameterMetaDataBuilder
+{
 
-  private final ParameterMetaData parameterMetaData = mock(ParameterMetaData.class);
+    private final ParameterMetaData parameterMetaData = mock(ParameterMetaData.class);
 
-  public ParameterMetaDataBuilder withParameter(int index, DbType type) {
+    public ParameterMetaDataBuilder withParameter(int index, DbType type)
+    {
 
-    try {
-      when(parameterMetaData.getParameterType(index)).thenReturn(type.getId());
-      when(parameterMetaData.getParameterTypeName(index)).thenReturn(type.getName());
-    } catch (SQLException e) {
-      // Not going to happen when building the mock
+        try
+        {
+            when(parameterMetaData.getParameterType(index)).thenReturn(type.getId());
+            when(parameterMetaData.getParameterTypeName(index)).thenReturn(type.getName());
+        }
+        catch (SQLException e)
+        {
+            // Not going to happen when building the mock
+        }
+
+        return this;
     }
 
-    return this;
-  }
-
-  public ParameterMetaData build() {
-    return parameterMetaData;
-  }
+    public ParameterMetaData build()
+    {
+        return parameterMetaData;
+    }
 }

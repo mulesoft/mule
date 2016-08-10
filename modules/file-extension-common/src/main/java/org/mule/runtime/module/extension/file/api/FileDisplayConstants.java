@@ -11,8 +11,9 @@ package org.mule.runtime.module.extension.file.api;
  *
  * @since 4.0
  */
-public final class FileDisplayConstants {
+public final class FileDisplayConstants
+{
 
-  public static final String MATCHER = "Matcher";
-  public static final String MATCH_WITH = "Match with";
+    public static final String MATCHER = "Matcher";
+    public static final String MATCH_WITH = "Match with";
 }

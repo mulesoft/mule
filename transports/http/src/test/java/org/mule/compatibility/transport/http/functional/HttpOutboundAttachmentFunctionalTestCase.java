@@ -17,30 +17,34 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase {
+public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort httpPort = new DynamicPort("port");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-outbound-attachments-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-outbound-attachments-config.xml";
-  }
+    @Test
+    public void sendsStringAttachmentCorrectly() throws Exception
+    {
+        sendMessageAndAssertResponse("vm://inString");
+    }
 
-  @Test
-  public void sendsStringAttachmentCorrectly() throws Exception {
-    sendMessageAndAssertResponse("vm://inString");
-  }
-
-  @Test
-  public void sendsByteArrayAttachmentCorrectly() throws Exception {
-    sendMessageAndAssertResponse("vm://inByteArray");
-  }
+    @Test
+    public void sendsByteArrayAttachmentCorrectly() throws Exception
+    {
+        sendMessageAndAssertResponse("vm://inByteArray");
+    }
 
 
-  private void sendMessageAndAssertResponse(String endpoint) throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage answer = client.send(endpoint, MuleMessage.builder().payload(TEST_MESSAGE).build());
-    assertEquals(TEST_MESSAGE, getPayloadAsString(answer));
-  }
+    private void sendMessageAndAssertResponse(String endpoint) throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage answer = client.send(endpoint, MuleMessage.builder().payload(TEST_MESSAGE).build());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(answer));
+    }
 }

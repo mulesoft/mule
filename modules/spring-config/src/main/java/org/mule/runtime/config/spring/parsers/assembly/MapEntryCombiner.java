@@ -13,106 +13,128 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This is used internally by {@link org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler} along with
- * {@link org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser}. It creates a map with a single
- * key/value pair. This may seem odd, but the result is not manipulated within the assembler - that means that, unlike
- * {@link org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser}, this element can contain nested
- * values. Note that most uses will set
- * {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)} so that
- * several entries can be combined.
+ * This is used internally by {@link org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler}
+ * along with {@link org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser}.
+ * It creates a map with a single key/value pair.  This may seem odd, but the result is not
+ * manipulated within the assembler - that means that, unlike
+ * {@link org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser}, this element
+ * can contain nested values.  Note that most uses will set
+ * {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)}
+ * so that several entries can be combined.
  */
-public class MapEntryCombiner implements Map, Serializable {
+public class MapEntryCombiner implements Map, Serializable
+{
 
-  public static final String KEY = "key";
-  public static final String VALUE = "value";
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
 
-  private Object key;
-  private Object value;
-  private Map cachedMerge = new HashMap();
-  private boolean isMerged = false;
+    private Object key;
+    private Object value;
+    private Map cachedMerge = new HashMap();
+    private boolean isMerged = false;
 
-  private synchronized Map getCachedMerge() {
-    if (!isMerged) {
-      cachedMerge.put(key, value);
-      isMerged = true;
+    private synchronized Map getCachedMerge()
+    {
+        if (!isMerged)
+        {
+            cachedMerge.put(key, value);
+            isMerged = true;
+        }
+        return cachedMerge;
     }
-    return cachedMerge;
-  }
 
-  public Object getKey() {
-    assertNotMerged();
-    return key;
-  }
-
-  public void setKey(Object key) {
-    assertNotMerged();
-    this.key = key;
-  }
-
-  public Object getValue() {
-    assertNotMerged();
-    return value;
-  }
-
-  public void setValue(Object value) {
-    assertNotMerged();
-    this.value = value;
-  }
-
-  private synchronized void assertNotMerged() {
-    if (isMerged) {
-      throw new IllegalStateException("Maps have already been merged");
+    public Object getKey()
+    {
+        assertNotMerged();
+        return key;
     }
-  }
 
-  // map delegates (except hashCode and equals)
+    public void setKey(Object key)
+    {
+        assertNotMerged();
+        this.key = key;
+    }
 
-  public int size() {
-    return getCachedMerge().size();
-  }
+    public Object getValue()
+    {
+        assertNotMerged();
+        return value;
+    }
 
-  public void clear() {
-    getCachedMerge().clear();
-  }
+    public void setValue(Object value)
+    {
+        assertNotMerged();
+        this.value = value;
+    }
 
-  public boolean isEmpty() {
-    return getCachedMerge().isEmpty();
-  }
+    private synchronized void assertNotMerged()
+    {
+        if (isMerged)
+        {
+            throw new IllegalStateException("Maps have already been merged");
+        }
+    }
 
-  public boolean containsKey(Object key) {
-    return getCachedMerge().containsKey(key);
-  }
+    // map delegates (except hashCode and equals)
 
-  public boolean containsValue(Object value) {
-    return getCachedMerge().containsValue(value);
-  }
+    public int size()
+    {
+        return getCachedMerge().size();
+    }
 
-  public Collection values() {
-    return getCachedMerge().values();
-  }
+    public void clear()
+    {
+        getCachedMerge().clear();
+    }
 
-  public void putAll(Map t) {
-    getCachedMerge().putAll(t);
-  }
+    public boolean isEmpty()
+    {
+        return getCachedMerge().isEmpty();
+    }
 
-  public Set entrySet() {
-    return getCachedMerge().entrySet();
-  }
+    public boolean containsKey(Object key)
+    {
+        return getCachedMerge().containsKey(key);
+    }
 
-  public Set keySet() {
-    return getCachedMerge().keySet();
-  }
+    public boolean containsValue(Object value)
+    {
+        return getCachedMerge().containsValue(value);
+    }
 
-  public Object get(Object key) {
-    return getCachedMerge().get(key);
-  }
+    public Collection values()
+    {
+        return getCachedMerge().values();
+    }
 
-  public Object remove(Object key) {
-    return getCachedMerge().remove(key);
-  }
+    public void putAll(Map t)
+    {
+        getCachedMerge().putAll(t);
+    }
 
-  public Object put(Object key, Object value) {
-    return getCachedMerge().put(key, value);
-  }
+    public Set entrySet()
+    {
+        return getCachedMerge().entrySet();
+    }
+
+    public Set keySet()
+    {
+        return getCachedMerge().keySet();
+    }
+
+    public Object get(Object key)
+    {
+        return getCachedMerge().get(key);
+    }
+
+    public Object remove(Object key)
+    {
+        return getCachedMerge().remove(key);
+    }
+
+    public Object put(Object key, Object value)
+    {
+        return getCachedMerge().put(key, value);
+    }
 
 }

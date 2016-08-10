@@ -15,26 +15,32 @@ import java.util.Properties;
 ;
 
 /**
- * <code>UrlEndpointURIBuilder</code> is the default endpointUri strategy suitable for most connectors
+ * <code>UrlEndpointURIBuilder</code> is the default endpointUri strategy suitable for
+ * most connectors
  */
-public class UrlEndpointURIBuilder extends AbstractEndpointURIBuilder {
+public class UrlEndpointURIBuilder extends AbstractEndpointURIBuilder
+{
+    @Override
+    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
+    {
+        address = "";
+        if (uri.getHost() != null)
+        {
+            // set the endpointUri to be a proper url if host and port are set
+            this.address = uri.getScheme() + "://" + uri.getHost();
+            if (uri.getPort() != -1)
+            {
+                address += ":" + uri.getPort();
+            }
+        }
+        if (StringUtils.isNotBlank(uri.getRawPath()))
+        {
+            address += uri.getRawPath();
+        }
 
-  @Override
-  protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException {
-    address = "";
-    if (uri.getHost() != null) {
-      // set the endpointUri to be a proper url if host and port are set
-      this.address = uri.getScheme() + "://" + uri.getHost();
-      if (uri.getPort() != -1) {
-        address += ":" + uri.getPort();
-      }
+        if (StringUtils.isNotBlank(uri.getRawQuery()))
+        {
+            address += "?" + uri.getRawQuery();
+        }
     }
-    if (StringUtils.isNotBlank(uri.getRawPath())) {
-      address += uri.getRawPath();
-    }
-
-    if (StringUtils.isNotBlank(uri.getRawQuery())) {
-      address += "?" + uri.getRawQuery();
-    }
-  }
 }

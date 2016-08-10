@@ -15,35 +15,41 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import java.util.concurrent.locks.Lock;
 
-public class MuleLockFactory implements LockFactory, MuleContextAware, Initialisable, Disposable {
+public class MuleLockFactory implements LockFactory, MuleContextAware, Initialisable, Disposable
+{
+    private LockGroup lockGroup;
+    private LockProvider lockProvider;
+    private MuleContext muleContext;
 
-  private LockGroup lockGroup;
-  private LockProvider lockProvider;
-  private MuleContext muleContext;
-
-  public synchronized Lock createLock(String lockId) {
-    return new LockAdapter(lockId, lockGroup);
-  }
-
-  @Override
-  public void dispose() {
-    lockGroup.dispose();
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (lockProvider == null) {
-      lockProvider = muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER);
+    public synchronized Lock createLock(String lockId)
+    {
+        return new LockAdapter(lockId,lockGroup);
     }
-    lockGroup = new InstanceLockGroup(lockProvider);
-  }
+    
+    @Override
+    public void dispose()
+    {
+        lockGroup.dispose();
+    }
 
-  public void setLockProvider(LockProvider lockProvider) {
-    this.lockProvider = lockProvider;
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (lockProvider == null)
+        {
+            lockProvider = muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER);
+        }
+        lockGroup = new InstanceLockGroup(lockProvider);
+    }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
+    public void setLockProvider(LockProvider lockProvider)
+    {
+        this.lockProvider = lockProvider;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 }

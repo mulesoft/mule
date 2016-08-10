@@ -18,61 +18,74 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase {
+public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase
+{
 
-  public Transformer getTransformer() {
-    return new HexStringToByteArray();
-  }
-
-  public Transformer getRoundTripTransformer() {
-    return new ByteArrayToHexString();
-  }
-
-  public Object getTestData() {
-    return "01020aff";
-  }
-
-  public Object getResultData() {
-    return new byte[] {1, 2, 10, (byte) 0xff};
-  }
-
-  @Override
-  public boolean compareResults(Object src, Object result) {
-    if (src == null && result == null) {
-      return true;
+    public Transformer getTransformer()
+    {
+        return new HexStringToByteArray();
     }
-    if (src == null || result == null) {
-      return false;
+
+    public Transformer getRoundTripTransformer()
+    {
+        return new ByteArrayToHexString();
     }
-    return Arrays.equals((byte[]) src, (byte[]) result);
-  }
 
-  @Override
-  public boolean compareRoundtripResults(Object src, Object result) {
-    if (src == null && result == null) {
-      return true;
+    public Object getTestData()
+    {
+        return "01020aff";
     }
-    if (src == null || result == null) {
-      return false;
+
+    public Object getResultData()
+    {
+        return new byte[]{1, 2, 10, (byte)0xff};
     }
-    return src.equals(result);
-  }
 
-  // extra test for uppercase output
-  @Test
-  public void testUppercase() throws TransformerException {
-    ByteArrayToHexString t = new ByteArrayToHexString();
-    t.setUpperCase(true);
+    @Override
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+        {
+            return true;
+        }
+        if (src == null || result == null)
+        {
+            return false;
+        }
+        return Arrays.equals((byte[])src, (byte[])result);
+    }
 
-    assertEquals(((String) getTestData()).toUpperCase(), t.transform(getResultData()));
-  }
+    @Override
+    public boolean compareRoundtripResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+        {
+            return true;
+        }
+        if (src == null || result == null)
+        {
+            return false;
+        }
+        return src.equals(result);
+    }
 
-  @Test
-  public void testStreaming() throws TransformerException {
-    ByteArrayToHexString transformer = new ByteArrayToHexString();
-    InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
+    // extra test for uppercase output
+    @Test
+    public void testUppercase() throws TransformerException
+    {
+        ByteArrayToHexString t = new ByteArrayToHexString();
+        t.setUpperCase(true);
 
-    assertEquals(this.getTestData(), transformer.transform(input));
-  }
+        assertEquals(((String)getTestData()).toUpperCase(), t.transform(getResultData()));
+    }
+    
+    @Test
+    public void testStreaming() throws TransformerException
+    {
+        ByteArrayToHexString transformer = new ByteArrayToHexString();
+        InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
+        
+        assertEquals(this.getTestData(), transformer.transform(input));
+    }
 
 }

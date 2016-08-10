@@ -11,25 +11,28 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FilterCounter implements Filter {
-
-  public static AtomicInteger counter = new AtomicInteger();
-
-  /**
-   * Increments the counter if it passes the filter
-   */
-  public boolean accept(MuleMessage message) {
-    if ("true".equals(message.getInboundProperty("pass"))) {
-      counter.incrementAndGet();
-      return true;
+public class FilterCounter implements Filter
+{
+    public static AtomicInteger counter = new AtomicInteger();
+    
+    /**
+     * Increments the counter if it passes the filter 
+     */
+    public boolean accept(MuleMessage message)
+    {
+        if ("true".equals(message.getInboundProperty("pass")))
+        {
+            counter.incrementAndGet();
+            return true;
+        }
+        return false;
     }
-    return false;
-  }
 
-  public boolean test(int arg0) {
-    // TODO Auto-generated method stub
-    return false;
-  }
+    public boolean test(int arg0)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
 }
 

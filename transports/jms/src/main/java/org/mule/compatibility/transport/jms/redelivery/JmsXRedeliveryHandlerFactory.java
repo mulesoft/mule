@@ -7,10 +7,12 @@
 package org.mule.compatibility.transport.jms.redelivery;
 
 
-public class JmsXRedeliveryHandlerFactory implements RedeliveryHandlerFactory {
+public class JmsXRedeliveryHandlerFactory implements RedeliveryHandlerFactory
+{
 
-  public RedeliveryHandler create() {
-    return new JmsXRedeliveryHandler();
-  }
+    public RedeliveryHandler create()
+    {
+        return new JmsXRedeliveryHandler();
+    }
 
 }

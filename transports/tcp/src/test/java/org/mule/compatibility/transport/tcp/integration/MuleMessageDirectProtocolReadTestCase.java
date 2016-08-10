@@ -9,15 +9,17 @@ package org.mule.compatibility.transport.tcp.integration;
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.compatibility.transport.tcp.protocols.DirectProtocol;
 
-public class MuleMessageDirectProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase {
+public class MuleMessageDirectProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "mule-message-direct-protocol-read-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "mule-message-direct-protocol-read-config.xml";
-  }
-
-  @Override
-  protected TcpProtocol createMuleMessageProtocol() {
-    return new DirectProtocol();
-  }
+    @Override
+    protected TcpProtocol createMuleMessageProtocol()
+    {
+        return new DirectProtocol();
+    }
 }

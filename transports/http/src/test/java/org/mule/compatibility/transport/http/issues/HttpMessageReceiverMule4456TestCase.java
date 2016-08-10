@@ -26,79 +26,88 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
+public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
+{
+    private static final String MESSAGE = "test message";
 
-  private static final String MESSAGE = "test message";
+    private HttpClient httpClient;
+    private MuleClient muleClient;
 
-  private HttpClient httpClient;
-  private MuleClient muleClient;
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-  @Rule
-  public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-receiver-mule4456-config-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-receiver-mule4456-config-flow.xml";
-  }
+    @Override
+    protected boolean isGracefulShutdown()
+    {
+        return true;
+    }
 
-  @Override
-  protected boolean isGracefulShutdown() {
-    return true;
-  }
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        HttpClientParams params = new HttpClientParams();
+        params.setVersion(HttpVersion.HTTP_1_1);
+        httpClient = new HttpClient(params);
+        muleClient = muleContext.getClient();
+    }
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    HttpClientParams params = new HttpClientParams();
-    params.setVersion(HttpVersion.HTTP_1_1);
-    httpClient = new HttpClient(params);
-    muleClient = muleContext.getClient();
-  }
+    @Test
+    public void testAsyncPost() throws Exception
+    {
+        FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
+        component.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object comp) throws Exception
+            {
+                Thread.sleep(200);
+                context.getMessageAsString();
+            }
+        });
 
-  @Test
-  public void testAsyncPost() throws Exception {
-    FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
-    component.setEventCallback(new EventCallback() {
+        PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
+        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain",
+            muleContext.getConfiguration().getDefaultEncoding());
+        request.setRequestEntity(entity);
+        httpClient.executeMethod(request);
 
-      @Override
-      public void eventReceived(MuleEventContext context, Object comp) throws Exception {
-        Thread.sleep(200);
-        context.getMessageAsString();
-      }
-    });
+        MuleMessage message = muleClient.request("vm://out", 1000);
+        assertNotNull(message);
+        assertEquals(MESSAGE, getPayloadAsString(message));
+    }
 
-    PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
-    RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration().getDefaultEncoding());
-    request.setRequestEntity(entity);
-    httpClient.executeMethod(request);
+    @Test
+    public void testAsyncPostWithPersistentSedaQueue() throws Exception
+    {
+        FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
+        component.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object comp) throws Exception
+            {
+                Thread.sleep(200);
+                context.getMessageAsString();
+            }
+        });
 
-    MuleMessage message = muleClient.request("vm://out", 1000);
-    assertNotNull(message);
-    assertEquals(MESSAGE, getPayloadAsString(message));
-  }
+        PostMethod request = new PostMethod("http://localhost:" + dynamicPort2.getNumber());
+        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
+            .getDefaultEncoding());
+        request.setRequestEntity(entity);
 
-  @Test
-  public void testAsyncPostWithPersistentSedaQueue() throws Exception {
-    FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
-    component.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object comp) throws Exception {
-        Thread.sleep(200);
-        context.getMessageAsString();
-      }
-    });
-
-    PostMethod request = new PostMethod("http://localhost:" + dynamicPort2.getNumber());
-    RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration().getDefaultEncoding());
-    request.setRequestEntity(entity);
-
-    httpClient.executeMethod(request);
-    MuleMessage message = muleClient.request("vm://out", 1000);
-    assertNotNull(message);
-    assertEquals(MESSAGE, getPayloadAsString(message));
-  }
+        httpClient.executeMethod(request);
+        MuleMessage message = muleClient.request("vm://out", 1000);
+        assertNotNull(message);
+        assertEquals(MESSAGE, getPayloadAsString(message));
+    }
 }

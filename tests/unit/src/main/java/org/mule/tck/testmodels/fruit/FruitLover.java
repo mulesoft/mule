@@ -10,25 +10,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FruitLover {
+public class FruitLover
+{
+    private final List<Class<? extends Fruit>> eatList = Collections.synchronizedList(new ArrayList<Class<? extends Fruit>>());
+    private final String catchphrase;
 
-  private final List<Class<? extends Fruit>> eatList = Collections.synchronizedList(new ArrayList<Class<? extends Fruit>>());
-  private final String catchphrase;
+    public FruitLover(String catchphrase)
+    {
+        this.catchphrase = catchphrase;
+    }
 
-  public FruitLover(String catchphrase) {
-    this.catchphrase = catchphrase;
-  }
+    public void eatFruit(Fruit fruit)
+    {
+        fruit.bite();
+        eatList.add(fruit.getClass());
+    }
 
-  public void eatFruit(Fruit fruit) {
-    fruit.bite();
-    eatList.add(fruit.getClass());
-  }
+    public List<Class<? extends Fruit>> getEatList()
+    {
+        return eatList;
+    }
 
-  public List<Class<? extends Fruit>> getEatList() {
-    return eatList;
-  }
-
-  public String speak() {
-    return catchphrase;
-  }
+    public String speak()
+    {
+        return catchphrase;
+    }
 }

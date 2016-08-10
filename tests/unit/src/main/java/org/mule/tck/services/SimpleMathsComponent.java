@@ -8,17 +8,21 @@ package org.mule.tck.services;
 
 import java.rmi.Remote;
 
-public class SimpleMathsComponent implements Remote, AdditionService {
+public class SimpleMathsComponent implements Remote, AdditionService
+{
 
-  public Integer addTen(Integer number) {
-    return new Integer(number.intValue() + 10);
-  }
-
-  public int add(int[] args) {
-    int result = 0;
-    for (int i = 0; i < args.length; i++) {
-      result += args[i];
+    public Integer addTen(Integer number)
+    {
+        return new Integer(number.intValue() + 10);
     }
-    return result;
-  }
+
+    public int add(int[] args)
+    {
+        int result = 0;
+        for (int i = 0; i < args.length; i++)
+        {
+            result += args[i];
+        }
+        return result;
+    }
 }

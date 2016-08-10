@@ -20,17 +20,16 @@ import java.util.concurrent.TimeoutException;
  *
  * @since 4.0
  */
-public interface HttpClient extends Startable, Stoppable {
+public interface HttpClient extends Startable, Stoppable
+{
+    /**
+     * Returns the default parameters for the {@link HttpRequest} URI.
+     */
+    UriParameters getDefaultUriParameters();
 
-  /**
-   * Returns the default parameters for the {@link HttpRequest} URI.
-   */
-  UriParameters getDefaultUriParameters();
-
-  /**
-   * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
-   */
-  HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication)
-      throws IOException, TimeoutException;
+    /**
+     * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
+     */
+    HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException;
 
 }

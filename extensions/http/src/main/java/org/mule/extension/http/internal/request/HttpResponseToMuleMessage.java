@@ -47,82 +47,103 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class HttpResponseToMuleMessage {
+public class HttpResponseToMuleMessage
+{
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleMessage.class);
+    private static final String MULTI_PART_PREFIX = "multipart/";
 
-  private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleMessage.class);
-  private static final String MULTI_PART_PREFIX = "multipart/";
+    private final Boolean parseResponse;
+    private final HttpRequesterConfig config;
 
-  private final Boolean parseResponse;
-  private final HttpRequesterConfig config;
-
-  public HttpResponseToMuleMessage(HttpRequesterConfig config, Boolean parseResponse) {
-    this.config = config;
-    this.parseResponse = parseResponse;
-  }
-
-  public MuleMessage convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
-    String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-    DataType dataType = muleEvent.getMessage().getDataType();
-    if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
-      responseContentType = dataType.getMediaType().toRfcString();
+    public HttpResponseToMuleMessage(HttpRequesterConfig config, Boolean parseResponse)
+    {
+        this.config = config;
+        this.parseResponse = parseResponse;
     }
 
-    InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-    Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getCharset().get();
-
-    Object payload = responseInputStream;
-    if (responseContentType != null && parseResponse) {
-      if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
-        try {
-          payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
-        } catch (IOException e) {
-          throw new MessagingException(muleEvent, e);
+    public MuleMessage convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
+    {
+        String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
+        DataType dataType = muleEvent.getMessage().getDataType();
+        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
+        {
+            responseContentType = dataType.getMediaType().toRfcString();
         }
-      } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-        payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
-      }
+
+        InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
+        Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getCharset().get();
+
+        Object payload = responseInputStream;
+        if (responseContentType != null && parseResponse)
+        {
+            if (responseContentType.startsWith(MULTI_PART_PREFIX))
+            {
+                try
+                {
+                    payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
+                }
+                catch (IOException e)
+                {
+                    throw new MessagingException(muleEvent, e);
+                }
+            }
+            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
+            {
+                payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
+            }
+        }
+
+        if (config.isEnableCookies())
+        {
+            processCookies(response, uri);
+        }
+
+        HttpResponseAttributes responseAttributes = createAttributes(response);
+
+        dataType = DataType.builder(dataType).charset(encoding).build();
+        final Builder builder = MuleMessage.builder(muleEvent.getMessage()).payload(payload);
+
+        if (StringUtils.isEmpty(responseContentType))
+        {
+            builder.mediaType(dataType.getMediaType());
+        }
+        else
+        {
+            builder.mediaType(MediaType.parse(responseContentType));
+        }
+
+        return builder.attributes(responseAttributes).build();
     }
 
-    if (config.isEnableCookies()) {
-      processCookies(response, uri);
+    private HttpResponseAttributes createAttributes(HttpResponse response)
+    {
+        return new HttpResponseAttributesBuilder().setResponse(response).build();
     }
 
-    HttpResponseAttributes responseAttributes = createAttributes(response);
+    private void processCookies(HttpResponse response, String uri)
+    {
+        Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
+        Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
 
-    dataType = DataType.builder(dataType).charset(encoding).build();
-    final Builder builder = MuleMessage.builder(muleEvent.getMessage()).payload(payload);
+        Map<String, List<String>> cookieHeaders = new HashMap<>();
 
-    if (StringUtils.isEmpty(responseContentType)) {
-      builder.mediaType(dataType.getMediaType());
-    } else {
-      builder.mediaType(MediaType.parse(responseContentType));
+        if (setCookieHeader != null)
+        {
+            cookieHeaders.put(SET_COOKIE, new ArrayList<>(setCookieHeader));
+        }
+
+        if (setCookie2Header != null)
+        {
+            cookieHeaders.put(SET_COOKIE2, new ArrayList<>(setCookie2Header));
+        }
+
+        try
+        {
+            config.getCookieManager().put(URI.create(uri), cookieHeaders);
+        }
+        catch (IOException e)
+        {
+            logger.warn("Error storing cookies for URI " + uri, e);
+        }
     }
-
-    return builder.attributes(responseAttributes).build();
-  }
-
-  private HttpResponseAttributes createAttributes(HttpResponse response) {
-    return new HttpResponseAttributesBuilder().setResponse(response).build();
-  }
-
-  private void processCookies(HttpResponse response, String uri) {
-    Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
-    Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
-
-    Map<String, List<String>> cookieHeaders = new HashMap<>();
-
-    if (setCookieHeader != null) {
-      cookieHeaders.put(SET_COOKIE, new ArrayList<>(setCookieHeader));
-    }
-
-    if (setCookie2Header != null) {
-      cookieHeaders.put(SET_COOKIE2, new ArrayList<>(setCookie2Header));
-    }
-
-    try {
-      config.getCookieManager().put(URI.create(uri), cookieHeaders);
-    } catch (IOException e) {
-      logger.warn("Error storing cookies for URI " + uri, e);
-    }
-  }
 }

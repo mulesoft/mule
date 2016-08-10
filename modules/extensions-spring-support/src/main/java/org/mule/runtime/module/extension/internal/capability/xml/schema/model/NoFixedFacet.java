@@ -22,13 +22,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for noFixedFacet complex type.
+ * <p>Java class for noFixedFacet complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="noFixedFacet">
  *   &lt;complexContent>
@@ -44,7 +41,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "noFixedFacet")
-@XmlSeeAlso({Pattern.class})
-public class NoFixedFacet extends Facet {
+@XmlSeeAlso({
+                    Pattern.class
+            })
+public class NoFixedFacet extends Facet
+{
 
 }

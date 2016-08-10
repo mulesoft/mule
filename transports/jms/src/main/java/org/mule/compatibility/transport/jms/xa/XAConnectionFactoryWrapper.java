@@ -11,6 +11,7 @@ import javax.jms.ConnectionFactory;
 /**
  * Wraps a XAConnectionFactory to support integration with XA transaction manager.
  */
-public interface XAConnectionFactoryWrapper extends ConnectionFactory {
+public interface XAConnectionFactoryWrapper extends ConnectionFactory
+{
 
 }

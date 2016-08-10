@@ -17,53 +17,63 @@ import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 /**
  * TODO
  */
-public class ConnectableLifecycleManager<O> extends SimpleLifecycleManager<O> {
-
-  public ConnectableLifecycleManager(String id, O object) {
-    super(id, object);
-  }
-
-  @Override
-  public void fireInitialisePhase(LifecycleCallback<O> callback) throws MuleException {
-    checkPhase(Initialisable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info(String.format("Initialising: '%s'. Object is: %s", lifecycleManagerId,
-                                getLifecycleObject().getClass().getSimpleName()));
+public class ConnectableLifecycleManager<O> extends SimpleLifecycleManager<O>
+{
+    public ConnectableLifecycleManager(String id, O object)
+    {
+        super(id, object);
     }
-    invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
-  }
 
-  @Override
-  public void fireStartPhase(LifecycleCallback<O> callback) throws MuleException {
-    checkPhase(Startable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info(String.format("Starting: '%s'. Object is: %s", lifecycleManagerId,
-                                getLifecycleObject().getClass().getSimpleName()));
+    @Override
+    public void fireInitialisePhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Initialisable.PHASE_NAME);
+        if (logger.isInfoEnabled())
+        {
+            logger.info(String.format("Initialising: '%s'. Object is: %s", lifecycleManagerId,
+                getLifecycleObject().getClass().getSimpleName()));
+        }
+        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
     }
-    invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
-  }
 
-  @Override
-  public void fireStopPhase(LifecycleCallback<O> callback) throws MuleException {
-    // We are sometimes stopped by our owner when already stopped
-    if (currentPhase.equals(Stoppable.PHASE_NAME)) {
-      return;
+    @Override
+    public void fireStartPhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Startable.PHASE_NAME);
+        if (logger.isInfoEnabled())
+        {
+            logger.info(String.format("Starting: '%s'. Object is: %s", lifecycleManagerId,
+                getLifecycleObject().getClass().getSimpleName()));
+        }
+        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
     }
-    checkPhase(Stoppable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info(String.format("Stopping: '%s'. Object is: %s", lifecycleManagerId,
-                                getLifecycleObject().getClass().getSimpleName()));
-    }
-    invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
-  }
 
-  @Override
-  public void fireDisposePhase(LifecycleCallback<O> callback) throws MuleException {
-    checkPhase(Disposable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info(String.format("Disposing: '%s'. Object is: %s", lifecycleManagerId,
-                                getLifecycleObject().getClass().getSimpleName()));
+    @Override
+    public void fireStopPhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        // We are sometimes stopped by our owner when already stopped
+        if (currentPhase.equals(Stoppable.PHASE_NAME))
+        {
+            return;
+        }
+        checkPhase(Stoppable.PHASE_NAME);
+        if (logger.isInfoEnabled())
+        {
+            logger.info(String.format("Stopping: '%s'. Object is: %s", lifecycleManagerId,
+                getLifecycleObject().getClass().getSimpleName()));
+        }
+        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
     }
-    invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
-  }
+
+    @Override
+    public void fireDisposePhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Disposable.PHASE_NAME);
+        if (logger.isInfoEnabled())
+        {
+            logger.info(String.format("Disposing: '%s'. Object is: %s", lifecycleManagerId,
+                getLifecycleObject().getClass().getSimpleName()));
+        }
+        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+    }
 }

@@ -20,153 +20,198 @@ import org.apache.commons.collections.CollectionUtils;
 /**
  * Transaction context for transient queues
  */
-public class TransientQueueTransactionContext implements LocalQueueTransactionContext {
+public class TransientQueueTransactionContext implements LocalQueueTransactionContext
+{
 
-  public static final int CLEAR_POLL_TIMEOUT = 10;
+    public static final int CLEAR_POLL_TIMEOUT = 10;
 
-  private Map<QueueStore, List<Serializable>> added;
-  private Map<QueueStore, List<Serializable>> removed;
+    private Map<QueueStore, List<Serializable>> added;
+    private Map<QueueStore, List<Serializable>> removed;
 
-  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
-    initializeAdded();
+    public boolean offer(QueueStore queue, Serializable item, long offerTimeout)
+            throws InterruptedException
+    {
+        initializeAdded();
 
-    List<Serializable> queueAdded = lookupAddedQueue(queue);
-    // wait for enough room
-    if (queue.offer(null, queueAdded.size(), offerTimeout)) {
-      queueAdded.add(item);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public void untake(QueueStore queue, Serializable item) throws InterruptedException {
-    initializeAdded();
-
-    List<Serializable> queueAdded = lookupAddedQueue(queue);
-    queueAdded.add(item);
-  }
-
-  public void clear(QueueStore queue) throws InterruptedException {
-    this.initializeRemoved();
-    List<Serializable> queueRemoved = this.lookupRemovedQueue(queue);
-    for (Serializable discardedItem = queue.poll(CLEAR_POLL_TIMEOUT); discardedItem != null; discardedItem =
-        queue.poll(CLEAR_POLL_TIMEOUT)) {
-      queueRemoved.add(discardedItem);
-    }
-
-    if (this.added != null) {
-      List<Serializable> queueAdded = this.lookupAddedQueue(queue);
-      if (!CollectionUtils.isEmpty(queueAdded)) {
-        queueRemoved.addAll(queueAdded);
-        queueAdded.clear();
-      }
-    }
-
-  }
-
-  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
-    Serializable value = queue.poll(pollTimeout);
-    if (value != null) {
-      if (removed == null) {
-        removed = new HashMap<QueueStore, List<Serializable>>();
-      }
-      List<Serializable> queueRemoved = removed.get(queue);
-      if (queueRemoved == null) {
-        queueRemoved = new ArrayList<Serializable>();
-        removed.put(queue, queueRemoved);
-      }
-      queueRemoved.add(value);
-    }
-    return value;
-  }
-
-  public Serializable peek(QueueStore queue) throws InterruptedException {
-    return queue.peek();
-  }
-
-  public int size(QueueStore queue) {
-    int sz = queue.getSize();
-    if (added != null) {
-      List<Serializable> queueAdded = added.get(queue);
-      if (queueAdded != null) {
-        sz += queueAdded.size();
-      }
-    }
-    return sz;
-  }
-
-  @Override
-  public void doCommit() throws ResourceManagerException {
-    try {
-      if (added != null) {
-        for (Map.Entry<QueueStore, List<Serializable>> entry : added.entrySet()) {
-          QueueStore queue = entry.getKey();
-          List<Serializable> queueAdded = entry.getValue();
-          if (queueAdded != null && queueAdded.size() > 0) {
-            for (Serializable object : queueAdded) {
-              queue.putNow(object);
-            }
-          }
+        List<Serializable> queueAdded = lookupAddedQueue(queue);
+        // wait for enough room
+        if (queue.offer(null, queueAdded.size(), offerTimeout))
+        {
+            queueAdded.add(item);
+            return true;
         }
-      }
-    } catch (Exception e) {
-      throw new ResourceManagerException(e);
-    } finally {
-      added = null;
-      removed = null;
-    }
-
-  }
-
-  @Override
-  public void doRollback() throws ResourceManagerException {
-    if (removed != null) {
-      for (Map.Entry<QueueStore, List<Serializable>> entry : removed.entrySet()) {
-        QueueStore queue = entry.getKey();
-        List<Serializable> queueRemoved = entry.getValue();
-        if (queueRemoved != null && queueRemoved.size() > 0) {
-          for (Serializable id : queueRemoved) {
-            try {
-              queue.putNow(id);
-            } catch (InterruptedException e) {
-              throw new MuleRuntimeException(e);
-            }
-          }
+        else
+        {
+            return false;
         }
-      }
     }
-    added = null;
-    removed = null;
-  }
 
-  protected void initializeAdded() {
-    if (added == null) {
-      added = new HashMap<QueueStore, List<Serializable>>();
-    }
-  }
+    public void untake(QueueStore queue, Serializable item) throws InterruptedException
+    {
+        initializeAdded();
 
-  protected void initializeRemoved() {
-    if (this.removed == null) {
-      this.removed = new HashMap<QueueStore, List<Serializable>>();
+        List<Serializable> queueAdded = lookupAddedQueue(queue);
+        queueAdded.add(item);
     }
-  }
 
-  protected List<Serializable> lookupAddedQueue(QueueStore queue) {
-    List<Serializable> queueAdded = added.get(queue);
-    if (queueAdded == null) {
-      queueAdded = new ArrayList<Serializable>();
-      added.put(queue, queueAdded);
-    }
-    return queueAdded;
-  }
+    public void clear(QueueStore queue) throws InterruptedException
+    {
+        this.initializeRemoved();
+        List<Serializable> queueRemoved = this.lookupRemovedQueue(queue);
+        for (Serializable discardedItem = queue.poll(CLEAR_POLL_TIMEOUT); discardedItem != null; discardedItem = queue.poll(CLEAR_POLL_TIMEOUT))
+        {
+            queueRemoved.add(discardedItem);
+        }
 
-  protected List<Serializable> lookupRemovedQueue(QueueStore queue) {
-    List<Serializable> queueRemoved = this.removed.get(queue);
-    if (queueRemoved == null) {
-      queueRemoved = new ArrayList<Serializable>();
-      this.removed.put(queue, queueRemoved);
+        if (this.added != null)
+        {
+            List<Serializable> queueAdded = this.lookupAddedQueue(queue);
+            if (!CollectionUtils.isEmpty(queueAdded))
+            {
+                queueRemoved.addAll(queueAdded);
+                queueAdded.clear();
+            }
+        }
+
     }
-    return queueRemoved;
-  }
+
+    public Serializable poll(QueueStore queue, long pollTimeout)
+            throws InterruptedException
+    {
+        Serializable value = queue.poll(pollTimeout);
+        if (value != null)
+        {
+            if (removed == null)
+            {
+                removed = new HashMap<QueueStore, List<Serializable>>();
+            }
+            List<Serializable> queueRemoved = removed.get(queue);
+            if (queueRemoved == null)
+            {
+                queueRemoved = new ArrayList<Serializable>();
+                removed.put(queue, queueRemoved);
+            }
+            queueRemoved.add(value);
+        }
+        return value;
+    }
+
+    public Serializable peek(QueueStore queue) throws InterruptedException
+    {
+        return queue.peek();
+    }
+
+    public int size(QueueStore queue)
+    {
+        int sz = queue.getSize();
+        if (added != null)
+        {
+            List<Serializable> queueAdded = added.get(queue);
+            if (queueAdded != null)
+            {
+                sz += queueAdded.size();
+            }
+        }
+        return sz;
+    }
+
+    @Override
+    public void doCommit() throws ResourceManagerException
+    {
+        try
+        {
+            if (added != null)
+            {
+                for (Map.Entry<QueueStore, List<Serializable>> entry : added.entrySet())
+                {
+                    QueueStore queue = entry.getKey();
+                    List<Serializable> queueAdded = entry.getValue();
+                    if (queueAdded != null && queueAdded.size() > 0)
+                    {
+                        for (Serializable object : queueAdded)
+                        {
+                            queue.putNow(object);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new ResourceManagerException(e);
+        }
+        finally
+        {
+            added = null;
+            removed = null;
+        }
+
+    }
+
+    @Override
+    public void doRollback() throws ResourceManagerException
+    {
+        if (removed != null)
+        {
+            for (Map.Entry<QueueStore, List<Serializable>> entry : removed.entrySet())
+            {
+                QueueStore queue = entry.getKey();
+                List<Serializable> queueRemoved = entry.getValue();
+                if (queueRemoved != null && queueRemoved.size() > 0)
+                {
+                    for (Serializable id : queueRemoved)
+                    {
+                        try
+                        {
+                            queue.putNow(id);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                    }
+                }
+            }
+        }
+        added = null;
+        removed = null;
+    }
+
+    protected void initializeAdded()
+    {
+        if (added == null)
+        {
+            added = new HashMap<QueueStore, List<Serializable>>();
+        }
+    }
+
+    protected void initializeRemoved()
+    {
+        if (this.removed == null)
+        {
+            this.removed = new HashMap<QueueStore, List<Serializable>>();
+        }
+    }
+
+    protected List<Serializable> lookupAddedQueue(QueueStore queue)
+    {
+        List<Serializable> queueAdded = added.get(queue);
+        if (queueAdded == null)
+        {
+            queueAdded = new ArrayList<Serializable>();
+            added.put(queue, queueAdded);
+        }
+        return queueAdded;
+    }
+
+    protected List<Serializable> lookupRemovedQueue(QueueStore queue)
+    {
+        List<Serializable> queueRemoved = this.removed.get(queue);
+        if (queueRemoved == null)
+        {
+            queueRemoved = new ArrayList<Serializable>();
+            this.removed.put(queue, queueRemoved);
+        }
+        return queueRemoved;
+    }
 }

@@ -6,11 +6,13 @@
  */
 package org.mule.compatibility.transport.file;
 
-public class FileRecursiveFileNameFilterTestCase extends AbstractFileRecursiveFilterTestCase {
+public class FileRecursiveFileNameFilterTestCase extends AbstractFileRecursiveFilterTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "file-recursive-filename-filter-config.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "file-recursive-filename-filter-config.xml";
+    }
 
 }

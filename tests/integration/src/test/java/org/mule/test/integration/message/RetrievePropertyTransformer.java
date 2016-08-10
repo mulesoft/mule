@@ -11,21 +11,24 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
-public class RetrievePropertyTransformer extends AbstractMessageTransformer {
+public class RetrievePropertyTransformer extends AbstractMessageTransformer
+{
+    private String property;
+    
+    @Override
+    public Object transformMessage(MuleEvent event, Charset encoding)
+    {
+        Object storedProperty = event.getMessage().getOutboundProperty(property);
+        return storedProperty != null ? storedProperty.getClass().getName() : null;
+    }
 
-  private String property;
+    public String getProperty()
+    {
+        return property;
+    }
 
-  @Override
-  public Object transformMessage(MuleEvent event, Charset encoding) {
-    Object storedProperty = event.getMessage().getOutboundProperty(property);
-    return storedProperty != null ? storedProperty.getClass().getName() : null;
-  }
-
-  public String getProperty() {
-    return property;
-  }
-
-  public void setProperty(String property) {
-    this.property = property;
-  }
+    public void setProperty(String property)
+    {
+        this.property = property;
+    }
 }

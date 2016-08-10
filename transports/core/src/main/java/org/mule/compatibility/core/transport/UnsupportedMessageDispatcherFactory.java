@@ -10,10 +10,12 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.core.api.MuleException;
 
-public final class UnsupportedMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
+public final class UnsupportedMessageDispatcherFactory extends AbstractMessageDispatcherFactory
+{
 
-  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
-    return new UnsupportedMessageDispatcher(endpoint);
-  }
+    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
+    {
+        return new UnsupportedMessageDispatcher(endpoint);
+    }
 
 }

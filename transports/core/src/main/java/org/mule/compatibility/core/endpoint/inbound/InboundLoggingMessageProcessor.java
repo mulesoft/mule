@@ -17,36 +17,45 @@ import org.mule.runtime.core.util.StringMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InboundLoggingMessageProcessor implements MessageProcessor {
+public class InboundLoggingMessageProcessor implements MessageProcessor
+{
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+    protected InboundEndpoint endpoint;
 
-  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-  protected InboundEndpoint endpoint;
-
-  public InboundLoggingMessageProcessor(InboundEndpoint endpoint) {
-    this.endpoint = endpoint;
-  }
-
-  @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage message = event.getMessage();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Message Received on: " + endpoint.getEndpointURI());
-    }
-    if (logger.isTraceEnabled()) {
-      try {
-        logger.trace("Message Payload: \n"
-            + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
-        logger.trace("Message detail: \n" + StringMessageUtils.headersToString(message));
-      } catch (Exception e) {
-        // ignore
-      }
+    public InboundLoggingMessageProcessor(InboundEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
     }
 
-    return event;
-  }
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleMessage message = event.getMessage();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Message Received on: " + endpoint.getEndpointURI());
+        }
+        if (logger.isTraceEnabled())
+        {
+            try
+            {
+                logger.trace("Message Payload: \n"
+                             + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()),
+                                 200, false));
+                logger.trace("Message detail: \n" + StringMessageUtils.headersToString(message));
+            }
+            catch (Exception e)
+            {
+                // ignore
+            }
+        }
 
-  @Override
-  public String toString() {
-    return ObjectUtils.toString(this);
-  }
+        return event;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

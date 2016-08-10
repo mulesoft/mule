@@ -18,82 +18,98 @@ import java.lang.reflect.Constructor;
 /**
  * TODO
  */
-public class NotificationLifecycleObject extends LifecycleObject {
+public class NotificationLifecycleObject extends LifecycleObject
+{
+    private String preNotificationName;
+    private String postNotificationName;
+    private Constructor ctor;
 
-  private String preNotificationName;
-  private String postNotificationName;
-  private Constructor ctor;
-
-  public NotificationLifecycleObject(Class type) {
-    super(type);
-  }
-
-  public NotificationLifecycleObject(Class type, Class notificationClass) {
-    super(type);
-
-    if (notificationClass == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("notificationClass").toString());
+    public NotificationLifecycleObject(Class type)
+    {
+        super(type);
     }
 
-    // MULE-2903: make sure the notifiactionClass is properly loaded and initialized
-    notificationClass = ClassUtils.initializeClass(notificationClass);
+    public NotificationLifecycleObject(Class type, Class notificationClass)
+    {
+        super(type);
 
-    if (!ServerNotification.class.isAssignableFrom(notificationClass)) {
-      throw new ClassCastException("Notification class must be of type: " + ServerNotification.class.getName()
-          + ". Offending class is: " + notificationClass.getName());
+        if (notificationClass==null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("notificationClass").toString());
+        }
+
+        // MULE-2903: make sure the notifiactionClass is properly loaded and initialized
+        notificationClass = ClassUtils.initializeClass(notificationClass);
+
+        if (!ServerNotification.class.isAssignableFrom(notificationClass))
+        {
+            throw new ClassCastException("Notification class must be of type: " + ServerNotification.class.getName() + ". Offending class is: " + notificationClass.getName());
+        }
+
+        ctor = ClassUtils.getConstructor(notificationClass, new Class[]{Object.class, String.class});
+        if(ctor==null)
+        {
+            throw new IllegalArgumentException("No constructor defined in Notification class: " + notificationClass + " with arguments (Object.class, String.class)");
+        }
     }
 
-    ctor = ClassUtils.getConstructor(notificationClass, new Class[] {Object.class, String.class});
-    if (ctor == null) {
-      throw new IllegalArgumentException("No constructor defined in Notification class: " + notificationClass
-          + " with arguments (Object.class, String.class)");
+    public NotificationLifecycleObject(Class type, Class notificationClass, int preNotification, int postNotification)
+    {
+        this(type, notificationClass);
+        setPreNotificationName(MuleContextNotification.getActionName(preNotification));
+        setPostNotificationName(MuleContextNotification.getActionName(postNotification));
     }
-  }
 
-  public NotificationLifecycleObject(Class type, Class notificationClass, int preNotification, int postNotification) {
-    this(type, notificationClass);
-    setPreNotificationName(MuleContextNotification.getActionName(preNotification));
-    setPostNotificationName(MuleContextNotification.getActionName(postNotification));
-  }
-
-  public String getPostNotificationName() {
-    return postNotificationName;
-  }
-
-  public void setPostNotificationName(String postNotificationName) {
-    this.postNotificationName = postNotificationName;
-  }
-
-  public String getPreNotificationName() {
-    return preNotificationName;
-  }
-
-  public void setPreNotificationName(String preNotificationName) {
-    this.preNotificationName = preNotificationName;
-  }
-
-  @Override
-  public void firePreNotification(MuleContext context) {
-    if (getPreNotificationName() != null) {
-      setPreNotification(createNotification(context, getPreNotificationName()));
+    public String getPostNotificationName()
+    {
+        return postNotificationName;
     }
-    super.firePreNotification(context);
 
-  }
-
-  @Override
-  public void firePostNotification(MuleContext context) {
-    if (getPostNotificationName() != null) {
-      setPostNotification(createNotification(context, getPostNotificationName()));
+    public void setPostNotificationName(String postNotificationName)
+    {
+        this.postNotificationName = postNotificationName;
     }
-    super.firePostNotification(context);
-  }
 
-  protected ServerNotification createNotification(MuleContext context, String action) {
-    try {
-      return (ServerNotification) ctor.newInstance(context, action);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(CoreMessages.failedToCreate("Notification:" + action), e);
+    public String getPreNotificationName()
+    {
+        return preNotificationName;
     }
-  }
+
+    public void setPreNotificationName(String preNotificationName)
+    {
+        this.preNotificationName = preNotificationName;
+    }
+
+    @Override
+    public void firePreNotification(MuleContext context)
+    {
+        if(getPreNotificationName()!=null)
+        {
+            setPreNotification(createNotification(context, getPreNotificationName()));
+        }
+        super.firePreNotification(context);
+
+    }
+
+    @Override
+    public void firePostNotification(MuleContext context)
+    {
+        if(getPostNotificationName()!=null)
+        {
+            setPostNotification(createNotification(context, getPostNotificationName()));
+        }
+        super.firePostNotification(context);
+    }
+
+    protected ServerNotification createNotification(MuleContext context, String action)
+    {
+        try
+        {
+            return (ServerNotification)ctor.newInstance(context, action);
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToCreate("Notification:" + action) ,e);
+        }
+    }
 }

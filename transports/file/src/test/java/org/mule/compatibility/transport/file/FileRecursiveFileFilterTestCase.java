@@ -13,28 +13,34 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import java.io.File;
 import java.io.FileFilter;
 
-public class FileRecursiveFileFilterTestCase extends AbstractFileRecursiveFilterTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "file-recursive-file-filter-config.xml";
-  }
-
-  public static class TxtFileFilter implements Filter, FileFilter {
+public class FileRecursiveFileFilterTestCase extends AbstractFileRecursiveFilterTestCase
+{
 
     @Override
-    public boolean accept(MuleMessage message) {
-      String filename = message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
-      return acceptsFile(filename);
+    protected String getConfigFile()
+    {
+        return "file-recursive-file-filter-config.xml";
     }
 
-    @Override
-    public boolean accept(File file) {
-      return acceptsFile(file.getName());
-    }
+    public static class TxtFileFilter implements Filter,FileFilter
+    {
 
-    private boolean acceptsFile(String filename) {
-      return filename.endsWith(".txt");
+        @Override
+        public boolean accept(MuleMessage message)
+        {
+            String filename = message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
+            return acceptsFile(filename);
+        }
+
+        @Override
+        public boolean accept(File file)
+        {
+            return acceptsFile(file.getName());
+        }
+
+        private boolean acceptsFile(String filename)
+        {
+            return filename.endsWith(".txt");
+        }
     }
-  }
 }

@@ -11,32 +11,38 @@ import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 import java.io.Serializable;
 
-public class FakeCredentialAccessor implements CredentialsAccessor {
+public class FakeCredentialAccessor implements CredentialsAccessor
+{
+    private String credentials = "Mule client <mule_client@mule.com>";
+    
+    public FakeCredentialAccessor()
+    {
 
-  private String credentials = "Mule client <mule_client@mule.com>";
+    }
+    
+    public FakeCredentialAccessor(String string)
+    {
+        this.credentials = string;
+    }
 
-  public FakeCredentialAccessor() {
+    public String getCredentials()
+    {
+        return credentials;
+    }
 
-  }
+    public void setCredentials(String credentials)
+    {
+        this.credentials = credentials;
+    }
 
-  public FakeCredentialAccessor(String string) {
-    this.credentials = string;
-  }
+    public Serializable getCredentials(MuleEvent event)
+    {
+        return this.credentials;
+    }
 
-  public String getCredentials() {
-    return credentials;
-  }
-
-  public void setCredentials(String credentials) {
-    this.credentials = credentials;
-  }
-
-  public Serializable getCredentials(MuleEvent event) {
-    return this.credentials;
-  }
-
-  public void setCredentials(MuleEvent event, Serializable credentials) {
-    // dummy
-  }
+    public void setCredentials(MuleEvent event, Serializable credentials)
+    {
+        // dummy
+    }
 
 }

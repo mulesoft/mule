@@ -10,54 +10,66 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
 @Alias("door")
-public class KnockeableDoor {
+public class KnockeableDoor
+{
 
-  public static String knock(String value) {
-    return "Knocked on " + value;
-  }
-
-  @Parameter
-  private String victim;
-
-  @Parameter
-  private String address;
-
-  @Parameter
-  private KnockeableDoor previous;
-
-  public KnockeableDoor() {}
-
-  public KnockeableDoor(String victim) {
-    this.victim = victim;
-  }
-
-  public String knock() {
-    return knock(victim);
-  }
-
-  public String getVictim() {
-    return victim;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public KnockeableDoor getPrevious() {
-    return previous;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof KnockeableDoor) {
-      return victim.equals(((KnockeableDoor) obj).victim);
+    public static String knock(String value)
+    {
+        return "Knocked on " + value;
     }
 
-    return false;
-  }
+    @Parameter
+    private String victim;
 
-  @Override
-  public int hashCode() {
-    return victim.hashCode();
-  }
+    @Parameter
+    private String address;
+
+    @Parameter
+    private KnockeableDoor previous;
+
+    public KnockeableDoor()
+    {
+    }
+
+    public KnockeableDoor(String victim)
+    {
+        this.victim = victim;
+    }
+
+    public String knock()
+    {
+        return knock(victim);
+    }
+
+    public String getVictim()
+    {
+        return victim;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public KnockeableDoor getPrevious()
+    {
+        return previous;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof KnockeableDoor)
+        {
+            return victim.equals(((KnockeableDoor) obj).victim);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return victim.hashCode();
+    }
 }

@@ -36,157 +36,189 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FlowRefTestCase extends AbstractIntegrationTestCase {
+public class FlowRefTestCase extends AbstractIntegrationTestCase
+{
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
-
-  private static String FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingFlow1SensingProcessor";
-  private static String FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingFlow2SensingProcessor";
-  private static String TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow1SensingProcessor";
-  private static String TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow2SensingProcessor";
-  private static String ERROR_MESSAGE = "ERROR";
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/construct/flow-ref.xml";
-  }
-
-  @Before
-  public void before() {
-    ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
-  }
-
-  @Test
-  public void twoFlowRefsToSubFlow() throws Exception {
-    final MuleEvent muleEvent = flowRunner("flow1").withPayload("0").run();
-    assertThat(getPayloadAsString(muleEvent.getMessage()), is("012xyzabc312xyzabc3"));
-  }
-
-  @Test
-  public void dynamicFlowRef() throws Exception {
-    assertEquals("0A", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "A").run().getMessageAsString());
-    assertEquals("0B", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString());
-  }
-
-  public static class ProcessorPathAssertingProcessor implements MessageProcessor {
-
-    private static List<String> traversedProcessorPaths = new ArrayList<>();
+    private static String FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingFlow1SensingProcessor";
+    private static String FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingFlow2SensingProcessor";
+    private static String TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow1SensingProcessor";
+    private static String TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow2SensingProcessor";
+    private static String ERROR_MESSAGE = "ERROR";
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      traversedProcessorPaths
-          .add(((Flow) muleContext.getRegistry().lookupFlowConstruct(event.getFlowConstruct().getName())).getProcessorPath(this));
-      return event;
+    protected String getConfigFile()
+    {
+        return "org/mule/test/construct/flow-ref.xml";
     }
-  }
 
-  @Test
-  public void dynamicFlowRefProcessorPath() throws Exception {
-    flowRunner("flow2").withPayload("0").withFlowVariable("letter", "J").run();
+    @Before
+    public void before()
+    {
+        ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
+    }
 
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(1));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
-               is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
-  }
+    @Test
+    public void twoFlowRefsToSubFlow() throws Exception
+    {
+        final MuleEvent muleEvent = flowRunner("flow1").withPayload("0").run();
+        assertThat(getPayloadAsString(muleEvent.getMessage()), is("012xyzabc312xyzabc3"));
+    }
 
-  @Test
-  public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception {
-    flowRunner("flow3").withPayload("0").withFlowVariable("letter", "J").run();
+    @Test
+    public void dynamicFlowRef() throws Exception
+    {
+        assertEquals("0A", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "A")
+                                              .run()
+                                              .getMessageAsString());
+        assertEquals("0B", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "B")
+                                              .run()
+                                              .getMessageAsString());
+    }
 
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(2));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
-               is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1),
-               is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
-  }
+    public static class ProcessorPathAssertingProcessor implements MessageProcessor
+    {
 
-  @Test
-  public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception {
-    flowRunner("flow2").withPayload("0").withFlowVariable("letter", "J").run();
+        private static List<String> traversedProcessorPaths = new ArrayList<>();
 
-    flowRunner("flow3").withPayload("0").withFlowVariable("letter", "J").run();
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            traversedProcessorPaths.add(((Flow) muleContext.getRegistry().lookupFlowConstruct(event.getFlowConstruct().getName())).getProcessorPath(this));
+            return event;
+        }
+    }
 
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(3));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
-               is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1),
-               is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
-    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(2),
-               is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
-  }
+    @Test
+    public void dynamicFlowRefProcessorPath() throws Exception
+    {
+        flowRunner("flow2").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
-  @Test
-  public void dynamicFlowRefWithChoice() throws Exception {
-    assertEquals("0A", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "C").run().getMessageAsString());
-  }
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(1));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
+    }
 
-  @Test
-  public void dynamicFlowRefWithScatterGather() throws Exception {
-    List<MuleMessage> messageList =
-        (List<MuleMessage>) flowRunner("flow2").withPayload("0").withFlowVariable("letter", "SG").run().getMessage().getPayload();
+    @Test
+    public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception
+    {
+        flowRunner("flow3").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
-    List payloads = messageList.stream().map(MuleMessage::getPayload).collect(toList());
-    assertEquals("0A", payloads.get(0));
-    assertEquals("0B", payloads.get(1));
-  }
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(2));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1), is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
+    }
 
-  @Test(expected = MessagingException.class)
-  public void flowRefNotFound() throws Exception {
-    assertEquals("0C", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "Z").run().getMessageAsString());
-  }
+    @Test
+    public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception
+    {
+        flowRunner("flow2").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
-  @Test
-  public void nonBlockingFlowRef() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefBasic"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
+        flowRunner("flow3").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
-    SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(FLOW1_SENSING_PROCESSOR_NAME);
-    SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(FLOW2_SENSING_PROCESSOR_NAME);
-    assertThat(flow1RequestResponseProcessor.requestThread, not(equalTo(flow1RequestResponseProcessor.responseThread)));
-    assertThat(flow2RequestResponseProcessor.requestThread, not(equalTo(flow2RequestResponseProcessor.responseThread)));
-  }
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(3));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1), is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(2), is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
+    }
 
-  @Test
-  public void nonBlockingFlowRefToAsyncFlow() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToAsyncFlow"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()),
-               containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
-  }
+    @Test
+    public void dynamicFlowRefWithChoice() throws Exception
+    {
+        assertEquals("0A", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "C")
+                                              .run()
+                                              .getMessageAsString());
+    }
 
-  @Test
-  public void nonBlockingFlowRefToSyncFlow() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToSyncFlow"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
+    @Test
+    public void dynamicFlowRefWithScatterGather() throws Exception
+    {
+        List<MuleMessage> messageList = (List<MuleMessage>) flowRunner("flow2").withPayload("0")
+                                                                               .withFlowVariable("letter", "SG")
+                                                                               .run()
+                                                                               .getMessage()
+                                                                               .getPayload();
 
-    SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME);
-    SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME);
-    assertThat(flow1RequestResponseProcessor.requestThread, equalTo(flow1RequestResponseProcessor.responseThread));
-    assertThat(flow2RequestResponseProcessor.requestThread, equalTo(flow2RequestResponseProcessor.responseThread));
-  }
+        List payloads = messageList.stream().map(MuleMessage::getPayload).collect(toList());
+        assertEquals("0A", payloads.get(0));
+        assertEquals("0B", payloads.get(1));
+    }
+
+    @Test(expected=MessagingException.class)
+    public void flowRefNotFound() throws Exception
+    {
+        assertEquals("0C", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "Z")
+                                              .run()
+                                              .getMessageAsString());
+    }
+
+    @Test
+    public void nonBlockingFlowRef() throws Exception
+    {
+        Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefBasic"))
+                .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
+
+        SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor = muleContext.getRegistry()
+                .lookupObject(FLOW1_SENSING_PROCESSOR_NAME);
+        SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor = muleContext.getRegistry()
+                .lookupObject(FLOW2_SENSING_PROCESSOR_NAME);
+        assertThat(flow1RequestResponseProcessor.requestThread, not(equalTo(flow1RequestResponseProcessor.responseThread)));
+        assertThat(flow2RequestResponseProcessor.requestThread, not(equalTo(flow2RequestResponseProcessor
+                                                                                    .responseThread)));
+    }
+
+    @Test
+    public void nonBlockingFlowRefToAsyncFlow() throws Exception
+    {
+        Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToAsyncFlow"))
+                .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void nonBlockingFlowRefToSyncFlow() throws Exception
+    {
+        Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToSyncFlow"))
+                .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
+
+        SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor = muleContext.getRegistry()
+                .lookupObject(TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME);
+        SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor = muleContext.getRegistry()
+                .lookupObject(TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME);
+        assertThat(flow1RequestResponseProcessor.requestThread, equalTo(flow1RequestResponseProcessor.responseThread));
+        assertThat(flow2RequestResponseProcessor.requestThread, equalTo(flow2RequestResponseProcessor.responseThread));
+    }
 
 
-  @Test
-  public void nonBlockingFlowRefErrorHandling() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefErrorHandling"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
+    @Test
+    public void nonBlockingFlowRefErrorHandling() throws Exception
+    {
+        Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefErrorHandling"))
+                .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
+        HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(ERROR_MESSAGE));
-  }
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(ERROR_MESSAGE));
+    }
 
 }

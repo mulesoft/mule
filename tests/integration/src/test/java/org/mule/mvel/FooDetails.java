@@ -6,7 +6,6 @@
  */
 
 package org.mule.mvel;
-
 public class FooDetails {
 
 }

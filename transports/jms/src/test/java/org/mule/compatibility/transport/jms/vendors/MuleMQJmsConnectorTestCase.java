@@ -18,25 +18,28 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class MuleMQJmsConnectorTestCase extends FunctionalTestCase {
+public class MuleMQJmsConnectorTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "mulemq-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "mulemq-config.xml";
-  }
+    @Test
+    public void testDefaultConfig() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+        assertNotNull(c);
+        assertTrue(c instanceof MuleMQJmsConnector);
+        MuleMQJmsConnector mqc = (MuleMQJmsConnector)c;
 
-  @Test
-  public void testDefaultConfig() throws Exception {
-    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-    assertNotNull(c);
-    assertTrue(c instanceof MuleMQJmsConnector);
-    MuleMQJmsConnector mqc = (MuleMQJmsConnector) c;
-
-    assertFalse(mqc.isInCluster());
-
-    assertTrue(c.isEagerConsumer());
-    JmsTopicResolver resolver = c.getTopicResolver();
-    assertNotNull("Topic resolver must not be null.", resolver);
-    assertTrue("Wrong topic resolver configured on the connector.", resolver instanceof DefaultJmsTopicResolver);
-  }
+        assertFalse(mqc.isInCluster());
+        
+        assertTrue(c.isEagerConsumer());
+        JmsTopicResolver resolver = c.getTopicResolver();
+        assertNotNull("Topic resolver must not be null.", resolver);
+        assertTrue("Wrong topic resolver configured on the connector.",
+                   resolver instanceof DefaultJmsTopicResolver);
+    }
 }

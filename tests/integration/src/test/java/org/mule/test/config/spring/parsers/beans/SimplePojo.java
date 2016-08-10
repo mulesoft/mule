@@ -6,41 +6,51 @@
  */
 package org.mule.test.config.spring.parsers.beans;
 
-public class SimplePojo {
+public class SimplePojo
+{
 
-  private String someParameter;
+    private String someParameter;
 
-  public SimplePojo() {}
-
-  public SimplePojo(String someParameter) {
-    this.someParameter = someParameter;
-  }
-
-  public void setSomeParameter(String someParameter) {
-    this.someParameter = someParameter;
-  }
-
-  public String getSomeParameter() {
-    return someParameter;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    public SimplePojo()
+    {
     }
 
-    SimplePojo that = (SimplePojo) o;
+    public SimplePojo(String someParameter)
+    {
+        this.someParameter = someParameter;
+    }
 
-    return someParameter != null ? someParameter.equals(that.someParameter) : that.someParameter == null;
+    public void setSomeParameter(String someParameter)
+    {
+        this.someParameter = someParameter;
+    }
 
-  }
+    public String getSomeParameter()
+    {
+        return someParameter;
+    }
 
-  @Override
-  public int hashCode() {
-    return someParameter != null ? someParameter.hashCode() : 0;
-  }
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        SimplePojo that = (SimplePojo) o;
+
+        return someParameter != null ? someParameter.equals(that.someParameter) : that.someParameter == null;
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return someParameter != null ? someParameter.hashCode() : 0;
+    }
 }

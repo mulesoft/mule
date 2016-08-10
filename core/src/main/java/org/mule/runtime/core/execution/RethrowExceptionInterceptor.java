@@ -10,23 +10,30 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 
-class RethrowExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
+class RethrowExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
+{
 
-  private final ExecutionInterceptor<MuleEvent> next;
+    private final ExecutionInterceptor<MuleEvent> next;
 
-  public RethrowExceptionInterceptor(ExecutionInterceptor<MuleEvent> next) {
-    this.next = next;
-  }
-
-  @Override
-  public MuleEvent execute(ExecutionCallback<MuleEvent> processingCallback, ExecutionContext executionContext) throws Exception {
-    try {
-      return this.next.execute(processingCallback, executionContext);
-    } catch (MessagingException e) {
-      if (e.handled()) {
-        return e.getEvent();
-      }
-      throw e;
+    public RethrowExceptionInterceptor(ExecutionInterceptor<MuleEvent> next)
+    {
+        this.next = next;
     }
-  }
+
+    @Override
+    public MuleEvent execute(ExecutionCallback<MuleEvent> processingCallback, ExecutionContext executionContext) throws Exception
+    {
+        try
+        {
+            return this.next.execute(processingCallback, executionContext);
+        }
+        catch (MessagingException e)
+        {
+            if (e.handled())
+            {
+                return e.getEvent();
+            }
+            throw e;
+        }
+    }
 }

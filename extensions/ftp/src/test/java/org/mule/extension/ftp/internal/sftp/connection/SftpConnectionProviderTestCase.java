@@ -42,131 +42,143 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class SftpConnectionProviderTestCase extends AbstractMuleTestCase {
+public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
+{
 
-  private static final String HOST = "localhost";
-  private static final int TIMEOUT = 10;
-  private static final String PASSPHRASE = "francis";
+    private static final String HOST = "localhost";
+    private static final int TIMEOUT = 10;
+    private static final String PASSPHRASE = "francis";
 
-  private File hostFile;
-  private File identityFile;
+    private File hostFile;
+    private File identityFile;
 
-  @Rule
-  public TemporaryFolder folder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
-  @Mock
-  private FtpConnector config;
+    @Mock
+    private FtpConnector config;
 
-  @Mock
-  private JSch jsch;
+    @Mock
+    private JSch jsch;
 
-  @Mock
-  private Session session;
+    @Mock
+    private Session session;
 
-  @Mock
-  private ChannelSftp channel;
+    @Mock
+    private ChannelSftp channel;
 
-  private SftpConnectionProvider provider = new SftpConnectionProvider();
+    private SftpConnectionProvider provider = new SftpConnectionProvider();
 
 
-  @Before
-  public void before() throws Exception {
-    hostFile = new File(folder.getRoot(), "host");
-    identityFile = new File(folder.getRoot(), "identity");
+    @Before
+    public void before() throws Exception
+    {
+        hostFile = new File(folder.getRoot(), "host");
+        identityFile = new File(folder.getRoot(), "identity");
 
-    write(hostFile, "hostFile");
-    write(identityFile, "jason bourne");
+        write(hostFile, "hostFile");
+        write(identityFile, "jason bourne");
 
-    provider.setHost(HOST);
-    provider.setUsername(USERNAME);
-    provider.setConnectionTimeout(10);
-    provider.setConnectionTimeoutUnit(SECONDS);
-    provider.setPreferredAuthenticationMethods(ImmutableSet.of(GSSAPI_WITH_MIC));
-    provider.setKnownHostsFile(hostFile.getAbsolutePath());
+        provider.setHost(HOST);
+        provider.setUsername(USERNAME);
+        provider.setConnectionTimeout(10);
+        provider.setConnectionTimeoutUnit(SECONDS);
+        provider.setPreferredAuthenticationMethods(ImmutableSet.of(GSSAPI_WITH_MIC));
+        provider.setKnownHostsFile(hostFile.getAbsolutePath());
 
-    provider.setClientFactory(new SftpClientFactory() {
+        provider.setClientFactory(new SftpClientFactory()
+        {
+            @Override
+            public SftpClient createInstance(String host, int port)
+            {
+                return new SftpClient(host, port, () -> jsch);
+            }
+        });
 
-      @Override
-      public SftpClient createInstance(String host, int port) {
-        return new SftpClient(host, port, () -> jsch);
-      }
-    });
+        when(jsch.getSession(USERNAME, HOST)).thenReturn(session);
+        when(session.openChannel("sftp")).thenReturn(channel);
+    }
 
-    when(jsch.getSession(USERNAME, HOST)).thenReturn(session);
-    when(session.openChannel("sftp")).thenReturn(channel);
-  }
+    @Test
+    public void identityFileWithPassPhrase() throws Exception
+    {
+        provider.setIdentityFile(identityFile.getAbsolutePath());
+        provider.setPassphrase(PASSPHRASE);
 
-  @Test
-  public void identityFileWithPassPhrase() throws Exception {
-    provider.setIdentityFile(identityFile.getAbsolutePath());
-    provider.setPassphrase(PASSPHRASE);
+        login();
 
-    login();
+        verify(jsch).addIdentity(identityFile.getAbsolutePath(), PASSPHRASE);
+    }
 
-    verify(jsch).addIdentity(identityFile.getAbsolutePath(), PASSPHRASE);
-  }
+    @Test
+    public void identityFileWithoutPassPhrase() throws Exception
+    {
+        provider.setIdentityFile(identityFile.getAbsolutePath());
 
-  @Test
-  public void identityFileWithoutPassPhrase() throws Exception {
-    provider.setIdentityFile(identityFile.getAbsolutePath());
+        login();
 
-    login();
+        assertSimpleIdentity();
+    }
 
-    assertSimpleIdentity();
-  }
+    private void assertSimpleIdentity() throws JSchException
+    {
+        verify(jsch).addIdentity(identityFile.getAbsolutePath());
+    }
 
-  private void assertSimpleIdentity() throws JSchException {
-    verify(jsch).addIdentity(identityFile.getAbsolutePath());
-  }
+    @Test
+    public void simpleCredentials() throws Exception
+    {
+        provider.setPassword(PASSWORD);
+        login();
 
-  @Test
-  public void simpleCredentials() throws Exception {
-    provider.setPassword(PASSWORD);
-    login();
+        assertPassword();
+    }
 
-    assertPassword();
-  }
+    @Test
+    public void simpleCredentialsPlusIdentity() throws Exception
+    {
+        provider.setIdentityFile(identityFile.getAbsolutePath());
+        provider.setPassword(PASSWORD);
 
-  @Test
-  public void simpleCredentialsPlusIdentity() throws Exception {
-    provider.setIdentityFile(identityFile.getAbsolutePath());
-    provider.setPassword(PASSWORD);
+        login();
 
-    login();
+        assertPassword();
+        assertSimpleIdentity();
+    }
 
-    assertPassword();
-    assertSimpleIdentity();
-  }
+    @Test
+    public void noKnownHosts() throws Exception
+    {
+        provider.setKnownHostsFile(null);
+        provider.connect();
 
-  @Test
-  public void noKnownHosts() throws Exception {
-    provider.setKnownHostsFile(null);
-    provider.connect();
+        Properties properties = captureLoginProperties();
+        assertThat(properties.getProperty(STRICT_HOST_KEY_CHECKING), equalTo("no"));
+    }
 
-    Properties properties = captureLoginProperties();
-    assertThat(properties.getProperty(STRICT_HOST_KEY_CHECKING), equalTo("no"));
-  }
+    private void assertPassword()
+    {
+        verify(session).setPassword(PASSWORD);
+    }
 
-  private void assertPassword() {
-    verify(session).setPassword(PASSWORD);
-  }
+    private void login() throws Exception
+    {
+        provider.connect();
+        verify(jsch).setKnownHosts(hostFile.getAbsolutePath());
+        verify(session).setTimeout(new Long(SECONDS.toMillis(TIMEOUT)).intValue());
+        verify(session).connect();
+        verify(channel).connect();
 
-  private void login() throws Exception {
-    provider.connect();
-    verify(jsch).setKnownHosts(hostFile.getAbsolutePath());
-    verify(session).setTimeout(new Long(SECONDS.toMillis(TIMEOUT)).intValue());
-    verify(session).connect();
-    verify(channel).connect();
+        Properties properties = captureLoginProperties();
+        assertThat(properties.getProperty(PREFERRED_AUTHENTICATION_METHODS), equalTo(GSSAPI_WITH_MIC.toString()));
+        assertThat(properties.getProperty(STRICT_HOST_KEY_CHECKING), equalTo("ask"));
+    }
 
-    Properties properties = captureLoginProperties();
-    assertThat(properties.getProperty(PREFERRED_AUTHENTICATION_METHODS), equalTo(GSSAPI_WITH_MIC.toString()));
-    assertThat(properties.getProperty(STRICT_HOST_KEY_CHECKING), equalTo("ask"));
-  }
+    private Properties captureLoginProperties()
+    {
+        ArgumentCaptor<Properties> propertiesCaptor = forClass(Properties.class);
+        verify(session).setConfig(propertiesCaptor.capture());
 
-  private Properties captureLoginProperties() {
-    ArgumentCaptor<Properties> propertiesCaptor = forClass(Properties.class);
-    verify(session).setConfig(propertiesCaptor.capture());
-
-    return propertiesCaptor.getValue();
-  }
+        return propertiesCaptor.getValue();
+    }
 }

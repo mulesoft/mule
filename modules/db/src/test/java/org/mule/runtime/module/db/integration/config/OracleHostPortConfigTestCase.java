@@ -16,25 +16,31 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleHostPortConfigTestCase extends AbstractHostPortConfigTestCase {
+public class OracleHostPortConfigTestCase extends AbstractHostPortConfigTestCase
+{
 
-  public OracleHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    if (TestDbConfig.getOracleResource().isEmpty()) {
-      return Collections.emptyList();
-    } else {
-      return Collections
-          .singletonList(new Object[] {"integration/config/oracle-host-port-db-config.xml", new OracleTestDatabase()});
+    public OracleHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
-  }
 
-  @Override
-  protected String getDatabasePortPropertyValue() {
-    return "1521";
-  }
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        if (TestDbConfig.getOracleResource().isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Collections.singletonList(new Object[] {"integration/config/oracle-host-port-db-config.xml", new OracleTestDatabase()});
+        }
+    }
+
+    @Override
+    protected String getDatabasePortPropertyValue()
+    {
+        return "1521";
+    }
 
 }

@@ -12,23 +12,24 @@ import java.util.List;
 import javax.jms.ConnectionFactory;
 
 /**
- * Interface for testing JMS reconnections. Implementing classes should extend a particular JMS providers ConnectionFactory and
- * throw a JMS exception when isEnabled() == false and the mule server is trying to connect to it.
+ * Interface for testing JMS reconnections. Implementing classes should extend a
+ * particular JMS providers ConnectionFactory and throw a JMS exception when
+ * isEnabled() == false and the mule server is trying to connect to it.
  */
-public interface TestReconnectionConnectionFactoryWrapper extends ConnectionFactory {
+public interface TestReconnectionConnectionFactoryWrapper extends ConnectionFactory
+{
+    public abstract void init();
 
-  public abstract void init();
+    // For InvocationHandler interface
+    public abstract Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
 
-  // For InvocationHandler interface
-  public abstract Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
+    public abstract Object getTargetObject();
 
-  public abstract Object getTargetObject();
+    public abstract void setEnabled(boolean enabled);
 
-  public abstract void setEnabled(boolean enabled);
-
-  public abstract boolean isEnabled();
-
-  public abstract List getCalledMethods();
-
-  public abstract void closeConnection();
+    public abstract boolean isEnabled();
+    
+    public abstract List getCalledMethods();
+    
+    public abstract void closeConnection();
 }

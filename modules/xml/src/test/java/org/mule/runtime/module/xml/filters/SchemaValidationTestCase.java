@@ -23,45 +23,48 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class SchemaValidationTestCase extends AbstractMuleTestCase {
+public class SchemaValidationTestCase extends AbstractMuleTestCase
+{
+    private static final String SIMPLE_SCHEMA = "schema1.xsd";
 
-  private static final String SIMPLE_SCHEMA = "schema1.xsd";
+    private static final String INCLUDE_SCHEMA = "schema-with-include.xsd";
 
-  private static final String INCLUDE_SCHEMA = "schema-with-include.xsd";
+    private static final String VALID_XML_FILE = "/validation1.xml";
 
-  private static final String VALID_XML_FILE = "/validation1.xml";
+    private static final String INVALID_XML_FILE = "/validation2.xml";
 
-  private static final String INVALID_XML_FILE = "/validation2.xml";
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleContext muleContext;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+    @Test
+    public void testValidate() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
+        filter.initialise();
 
-  @Test
-  public void testValidate() throws Exception {
-    SchemaValidationFilter filter = new SchemaValidationFilter();
-    filter.setSchemaLocations(SIMPLE_SCHEMA);
-    filter.initialise();
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+    }
 
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
-  }
+    @Test
+    public void testDefaultResourceResolverIsPresent() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
+        filter.initialise();
 
-  @Test
-  public void testDefaultResourceResolverIsPresent() throws Exception {
-    SchemaValidationFilter filter = new SchemaValidationFilter();
-    filter.setSchemaLocations(SIMPLE_SCHEMA);
-    filter.initialise();
+        assertThat(filter.getResourceResolver(), is(not(nullValue())));
+    }
 
-    assertThat(filter.getResourceResolver(), is(not(nullValue())));
-  }
+    @Test
+    public void testValidateWithIncludes() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(INCLUDE_SCHEMA);
+        filter.initialise();
 
-  @Test
-  public void testValidateWithIncludes() throws Exception {
-    SchemaValidationFilter filter = new SchemaValidationFilter();
-    filter.setSchemaLocations(INCLUDE_SCHEMA);
-    filter.initialise();
-
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
-  }
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+    }
 }

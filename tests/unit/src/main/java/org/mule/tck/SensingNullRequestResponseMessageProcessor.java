@@ -18,29 +18,33 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 /**
  * Can be used to sense request and response threads used during processing.
  */
-public class SensingNullRequestResponseMessageProcessor extends AbstractRequestResponseMessageProcessor {
+public class SensingNullRequestResponseMessageProcessor extends AbstractRequestResponseMessageProcessor
+{
+    public Thread requestThread;
+    public Thread responseThread;
 
-  public Thread requestThread;
-  public Thread responseThread;
+    @Override
+    protected MuleEvent processRequest(MuleEvent event) throws MuleException
+    {
+        requestThread = Thread.currentThread();
+        return super.processRequest(event);
+    }
 
-  @Override
-  protected MuleEvent processRequest(MuleEvent event) throws MuleException {
-    requestThread = Thread.currentThread();
-    return super.processRequest(event);
-  }
+    @Override
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
+    {
+        responseThread = Thread.currentThread();
+        return super.processRequest(response);
+    }
 
-  @Override
-  protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
-    responseThread = Thread.currentThread();
-    return super.processRequest(response);
-  }
+    public void assertRequestResponseThreadsDifferent()
+    {
+        assertThat(requestThread, not(sameInstance(responseThread)));
+    }
 
-  public void assertRequestResponseThreadsDifferent() {
-    assertThat(requestThread, not(sameInstance(responseThread)));
-  }
-
-  public void assertRequestResponseThreadsSame() {
-    assertThat(requestThread, is(sameInstance(responseThread)));
-  }
+    public void assertRequestResponseThreadsSame()
+    {
+        assertThat(requestThread, is(sameInstance(responseThread)));
+    }
 
 }

@@ -14,28 +14,32 @@ import java.io.InputStream;
 import org.apache.commons.io.input.ProxyInputStream;
 
 /**
- * Used in {@link TcpWorker} as the input parameter for the read() method on the {@link TcpProtocol} interface. If you wish to
- * simply use the InputStream as the message payload that you're reading in, you just call
- * {@link TcpInputStream#setStreaming(boolean)} so that Mule knows to stop listening for more messages on that stream.
+ * Used in {@link TcpWorker} as the input parameter for the read() method on the {@link TcpProtocol}
+ * interface. If you wish to simply use the InputStream as the message payload
+ * that you're reading in, you just call {@link TcpInputStream#setStreaming(boolean)} so
+ * that Mule knows to stop listening for more messages on that stream.
  *
- * Also, the if streaming is activated, the {@link TcpWorker} using this stream will wait until the streaming has been completely
- * sent before closing the {@link InputStream}.
+ * Also, the if streaming is activated, the {@link TcpWorker} using this stream will wait
+ * until the streaming has been completely sent before closing the {@link InputStream}.
  */
-public class TcpInputStream extends ProxyInputStream {
+public class TcpInputStream extends ProxyInputStream
+{
+    private boolean streaming = false;
+    
+    public TcpInputStream(InputStream inputStream)
+    {
+        super(inputStream);
+    }
 
-  private boolean streaming = false;
+    public boolean isStreaming()
+    {
+        return streaming;
+    }
 
-  public TcpInputStream(InputStream inputStream) {
-    super(inputStream);
-  }
-
-  public boolean isStreaming() {
-    return streaming;
-  }
-
-  public void setStreaming(boolean streaming) {
-    this.streaming = streaming;
-  }
+    public void setStreaming(boolean streaming)
+    {
+        this.streaming = streaming;
+    }
 }
 
 

@@ -8,19 +8,20 @@
 package org.mule.runtime.module.launcher.application;
 
 /**
- * Indicates the status of a Mule application that corresponds to the last executed lifecycle phase on the application's
- * {@link org.mule.runtime.core.api.MuleContext}.
+ * Indicates the status of a Mule application that corresponds to the last executed lifecycle phase
+ * on the application's {@link org.mule.runtime.core.api.MuleContext}.
  */
-public enum ApplicationStatus {
-  CREATED,
+public enum ApplicationStatus
+{
+    CREATED,
 
-  INITIALISED,
+    INITIALISED,
 
-  STARTED,
+    STARTED,
 
-  STOPPED,
+    STOPPED,
 
-  DEPLOYMENT_FAILED,
+    DEPLOYMENT_FAILED,
 
-  DESTROYED
+    DESTROYED
 }

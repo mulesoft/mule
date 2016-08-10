@@ -19,63 +19,81 @@ import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
-public class CopyPropertiesTransformer extends AbstractMessageTransformer {
+public class CopyPropertiesTransformer extends AbstractMessageTransformer
+{
+    private AttributeEvaluator propertyNameEvaluator;
+    private WildcardAttributeEvaluator wildcardPropertyNameEvaluator;
 
-  private AttributeEvaluator propertyNameEvaluator;
-  private WildcardAttributeEvaluator wildcardPropertyNameEvaluator;
+    public CopyPropertiesTransformer()
+    {
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.OBJECT);
+    }
 
-  public CopyPropertiesTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
+    }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-    this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
-  }
-
-  @Override
-  public Object transformMessage(final MuleEvent event, Charset outputEncoding) throws TransformerException {
-    MuleMessage message = event.getMessage();
-    if (wildcardPropertyNameEvaluator.hasWildcards()) {
-      final Builder builder = MuleMessage.builder(message);
-      wildcardPropertyNameEvaluator
-          .processValues(message.getInboundPropertyNames(),
-                         matchedValue -> builder.addOutboundProperty(matchedValue, message.getInboundProperty(matchedValue),
-                                                                     message.getInboundPropertyDataType(matchedValue)));
-      event.setMessage(builder.build());
-    } else {
-      Object keyValue = propertyNameEvaluator.resolveValue(event);
-      if (keyValue != null) {
-        String propertyName = keyValue.toString();
-        Serializable propertyValue = message.getInboundProperty(propertyName);
-        if (propertyValue != null) {
-          event.setMessage(MuleMessage.builder(message)
-              .addOutboundProperty(propertyName, propertyValue, message.getInboundPropertyDataType(propertyName)).build());
-        } else {
-          logger.info("Property value for is null, no property will be copied");
+    @Override
+    public Object transformMessage(final MuleEvent event, Charset outputEncoding) throws TransformerException
+    {
+        MuleMessage message = event.getMessage();
+        if (wildcardPropertyNameEvaluator.hasWildcards())
+        {
+            final Builder builder = MuleMessage.builder(message);
+            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(),
+                    matchedValue -> builder.addOutboundProperty(matchedValue,
+                            message.getInboundProperty(matchedValue),
+                            message.getInboundPropertyDataType(matchedValue)));
+            event.setMessage(builder.build());
         }
-      } else {
-        logger.info("Key expression return null, no property will be copied");
-      }
+        else
+        {
+            Object keyValue = propertyNameEvaluator.resolveValue(event);
+            if (keyValue != null)
+            {
+                String propertyName = keyValue.toString();
+                Serializable propertyValue = message.getInboundProperty(propertyName);
+                if (propertyValue != null)
+                {
+                    event.setMessage(MuleMessage.builder(message)
+                                                .addOutboundProperty(propertyName,
+                                                        propertyValue,
+                                                        message.getInboundPropertyDataType(propertyName))
+                                                .build());
+                }
+                else
+                {
+                    logger.info("Property value for is null, no property will be copied");
+                }
+            }
+            else
+            {
+                logger.info("Key expression return null, no property will be copied");
+            }
+        }
+        return event.getMessage();
     }
-    return event.getMessage();
-  }
 
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    CopyPropertiesTransformer clone = (CopyPropertiesTransformer) super.clone();
-    clone.setPropertyName(this.propertyNameEvaluator.getRawValue());
-    return clone;
-  }
-
-  public void setPropertyName(String propertyName) {
-    if (propertyName == null) {
-      throw new IllegalArgumentException("Null propertyName not supported");
+    @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        CopyPropertiesTransformer clone = (CopyPropertiesTransformer) super.clone();
+        clone.setPropertyName(this.propertyNameEvaluator.getRawValue());
+        return clone;
     }
-    this.propertyNameEvaluator = new AttributeEvaluator(propertyName);
-    this.wildcardPropertyNameEvaluator = new WildcardAttributeEvaluator(propertyName);
-  }
+
+    public void setPropertyName(String propertyName)
+    {
+        if (propertyName == null)
+        {
+            throw new IllegalArgumentException("Null propertyName not supported");
+        }
+        this.propertyNameEvaluator = new AttributeEvaluator(propertyName);
+        this.wildcardPropertyNameEvaluator = new WildcardAttributeEvaluator(propertyName);
+    }
 
 }

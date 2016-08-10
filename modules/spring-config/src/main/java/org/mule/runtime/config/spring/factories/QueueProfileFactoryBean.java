@@ -16,47 +16,55 @@ import java.io.Serializable;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class QueueProfileFactoryBean extends AbstractFactoryBean<QueueProfile> implements MuleContextAware {
+public class QueueProfileFactoryBean extends AbstractFactoryBean<QueueProfile> implements MuleContextAware
+{
+    private int maxOutstandingMessages;
+    private MuleContext muleContext;
+    private QueueStore<Serializable> queueStore;
 
-  private int maxOutstandingMessages;
-  private MuleContext muleContext;
-  private QueueStore<Serializable> queueStore;
-
-  @Override
-  public Class<?> getObjectType() {
-    return QueueProfile.class;
-  }
-
-  @Override
-  protected QueueProfile createInstance() throws Exception {
-    QueueStore<Serializable> objectStore = queueStore;
-    if (objectStore == null) {
-      objectStore = muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+    @Override
+    public Class<?> getObjectType()
+    {
+        return QueueProfile.class;
     }
 
-    return new QueueProfile(getMaxOutstandingMessages(), objectStore);
-  }
+    @Override
+    protected QueueProfile createInstance() throws Exception
+    {
+        QueueStore<Serializable> objectStore = queueStore;
+        if (objectStore == null)
+        {
+            objectStore = muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
+        return new QueueProfile(getMaxOutstandingMessages(), objectStore);
+    }
 
-  public int getMaxOutstandingMessages() {
-    return maxOutstandingMessages;
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
 
-  public void setMaxOutstandingMessages(int maxOutstandingMessages) {
-    this.maxOutstandingMessages = maxOutstandingMessages;
-  }
+    public int getMaxOutstandingMessages()
+    {
+        return maxOutstandingMessages;
+    }
 
-  public void setQueueStore(QueueStore<Serializable> queueStore) {
-    this.queueStore = queueStore;
-  }
+    public void setMaxOutstandingMessages(int maxOutstandingMessages)
+    {
+        this.maxOutstandingMessages = maxOutstandingMessages;
+    }
 
-  public QueueStore<Serializable> getQueueStore() {
-    return queueStore;
-  }
+    public void setQueueStore(QueueStore<Serializable> queueStore)
+    {
+        this.queueStore = queueStore;
+    }
+
+    public QueueStore<Serializable> getQueueStore()
+    {
+        return queueStore;
+    }
 }
 
 

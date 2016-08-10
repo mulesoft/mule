@@ -17,35 +17,39 @@ import org.mule.runtime.core.util.ObjectUtils;
 /**
  * Publishes a {@link EndpointMessageNotification}'s when a message is received.
  */
-public class InboundNotificationMessageProcessor implements MessageProcessor {
+public class InboundNotificationMessageProcessor implements MessageProcessor
+{
+    protected InboundEndpoint endpoint;
 
-  protected InboundEndpoint endpoint;
-
-  public InboundNotificationMessageProcessor(InboundEndpoint endpoint) {
-    this.endpoint = endpoint;
-  }
-
-  @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-    if (connector.isEnableMessageEvents(event)) {
-      connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(),
-                                                                 EndpointMessageNotification.MESSAGE_RECEIVED),
-                                 event);
+    public InboundNotificationMessageProcessor(InboundEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
     }
 
-    return event;
-  }
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+        if (connector.isEnableMessageEvents(event))
+        {
+            connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
+                event.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RECEIVED), event);
+        }
 
-  /**
-   * @return underlying {@link InboundEndpoint}
-   */
-  public final InboundEndpoint getInboundEndpoint() {
-    return this.endpoint;
-  }
+        return event;
+    }
 
-  @Override
-  public String toString() {
-    return ObjectUtils.toString(this);
-  }
+    /**
+     * @return underlying {@link InboundEndpoint}
+     */
+    public final InboundEndpoint getInboundEndpoint()
+    {
+        return this.endpoint;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

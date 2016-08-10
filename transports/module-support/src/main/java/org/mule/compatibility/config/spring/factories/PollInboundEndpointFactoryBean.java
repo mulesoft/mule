@@ -16,29 +16,37 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 /**
  * Spring FactoryBean used to create concrete instances of inbound endpoints
  */
-public class PollInboundEndpointFactoryBean extends AbstractEndpointFactoryBean {
+public class PollInboundEndpointFactoryBean extends AbstractEndpointFactoryBean
+{
 
-  public PollInboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException {
-    super(global);
-  }
-
-  public PollInboundEndpointFactoryBean() {
-    super();
-  }
-
-  @Override
-  public Class<?> getObjectType() {
-    return InboundEndpoint.class;
-  }
-
-  @Override
-  public Object doGetObject() throws Exception {
-    EndpointFactory ef = getEndpointFactory();
-    if (ef != null) {
-      return ef.getInboundEndpoint(this);
-    } else {
-      throw new ConfigurationException(MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
+    public PollInboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
+    {
+        super(global);
     }
-  }
+
+    public PollInboundEndpointFactoryBean()
+    {
+        super();
+    }
+
+    @Override
+    public Class<?> getObjectType()
+    {
+        return InboundEndpoint.class;
+    }
+
+    @Override
+    public Object doGetObject() throws Exception
+    {
+        EndpointFactory ef = getEndpointFactory();
+        if (ef != null)
+        {
+            return ef.getInboundEndpoint(this);
+        }
+        else
+        {
+            throw new ConfigurationException(MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
+        }
+    }
 
 }

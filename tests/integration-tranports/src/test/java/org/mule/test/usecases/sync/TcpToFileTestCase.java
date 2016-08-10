@@ -15,22 +15,24 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class TcpToFileTestCase extends FunctionalTestCase {
+public class TcpToFileTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/usecases/sync/tcp-to-file.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/usecases/sync/tcp-to-file.xml";
-  }
+    @Test
+    public void testSyncResponse() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+       String payload = "payload";
 
-  @Test
-  public void testSyncResponse() throws Exception {
-    MuleClient client = muleContext.getClient();
-    String payload = "payload";
+        client.send("tcp://localhost:4444", payload, null);
 
-    client.send("tcp://localhost:4444", payload, null);
-
-    MuleMessage msg = client.request("file://temp/tests/mule", 10000);
-    assertNotNull(msg);
-    assertEquals(payload, getPayloadAsString(msg));
-  }
+        MuleMessage msg = client.request("file://temp/tests/mule", 10000);
+        assertNotNull(msg);
+        assertEquals(payload, getPayloadAsString(msg));
+    }
 }

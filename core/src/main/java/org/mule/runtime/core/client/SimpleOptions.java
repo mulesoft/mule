@@ -11,46 +11,54 @@ import org.mule.runtime.core.api.client.OperationOptions;
 /**
  * Default implementation for {@link org.mule.runtime.core.api.client.OperationOptions}
  */
-public class SimpleOptions implements OperationOptions {
+public class SimpleOptions implements OperationOptions
+{
 
-  private final Long responseTimeout;
-  private final boolean outbound;
+    private final Long responseTimeout;
+    private final boolean outbound;
 
-  public SimpleOptions(Long responseTimeout, boolean outbound) {
-    this.responseTimeout = responseTimeout;
-    this.outbound = outbound;
-  }
-
-  @Override
-  public Long getResponseTimeout() {
-    return responseTimeout;
-  }
-
-  public boolean isOutbound() {
-    return outbound;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    public SimpleOptions(Long responseTimeout, boolean outbound)
+    {
+        this.responseTimeout = responseTimeout;
+        this.outbound = outbound;
     }
-    if (!(o instanceof SimpleOptions)) {
-      return false;
+    @Override
+    public Long getResponseTimeout()
+    {
+        return responseTimeout;
     }
 
-    SimpleOptions that = (SimpleOptions) o;
-
-    if (responseTimeout == null ? that.responseTimeout != null : !responseTimeout.equals(that.responseTimeout)) {
-      return false;
+    public boolean isOutbound()
+    {
+        return outbound;
     }
 
-    return true;
-  }
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof SimpleOptions))
+        {
+            return false;
+        }
 
-  @Override
-  public int hashCode() {
-    final Long responseTimeout = getResponseTimeout();
-    return responseTimeout != null ? responseTimeout.hashCode() : 0;
-  }
+        SimpleOptions that = (SimpleOptions) o;
+
+        if (responseTimeout == null ? that.responseTimeout != null : !responseTimeout.equals(that.responseTimeout))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final Long responseTimeout = getResponseTimeout();
+        return responseTimeout != null ? responseTimeout.hashCode() : 0;
+    }
 }

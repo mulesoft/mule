@@ -10,55 +10,62 @@ import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 
 /**
- * An Enum listing the possible return types defined in the JAXP (JSR-206) without actually coupling to it. The {@link #toQName()}
- * method allows correlating each value to the standard {@link QName} which can be used in the JAXP API.
+ * An Enum listing the possible return types defined in the JAXP (JSR-206) without actually
+ * coupling to it. The {@link #toQName()} method allows correlating each value
+ * to the standard {@link QName} which can be used in the JAXP API.
  *
  * @since 3.6.0
  */
-public enum XPathReturnType {
+public enum XPathReturnType
+{
 
-  BOOLEAN {
+    BOOLEAN
+            {
+                protected QName toQName()
+                {
+                    return XPathConstants.BOOLEAN;
+                }
+            },
+    NUMBER
+            {
+                @Override
+                protected QName toQName()
+                {
+                    return XPathConstants.NUMBER;
+                }
+            },
 
-    protected QName toQName() {
-      return XPathConstants.BOOLEAN;
-    }
-  },
-  NUMBER {
+    STRING
+            {
+                @Override
+                protected QName toQName()
+                {
+                    return XPathConstants.STRING;
+                }
+            },
 
-    @Override
-    protected QName toQName() {
-      return XPathConstants.NUMBER;
-    }
-  },
+    NODESET
+            {
+                @Override
+                protected QName toQName()
+                {
+                    return XPathConstants.NODESET;
+                }
+            },
 
-  STRING {
+    NODE
+            {
+                @Override
+                protected QName toQName()
+                {
+                    return XPathConstants.NODE;
+                }
+            };
 
-    @Override
-    protected QName toQName() {
-      return XPathConstants.STRING;
-    }
-  },
-
-  NODESET {
-
-    @Override
-    protected QName toQName() {
-      return XPathConstants.NODESET;
-    }
-  },
-
-  NODE {
-
-    @Override
-    protected QName toQName() {
-      return XPathConstants.NODE;
-    }
-  };
-
-  /**
-   * Returns the {@link QName} related to each value
-   *
-   * @return a {@link QName}
-   */
-  protected abstract QName toQName();
+    /**
+     * Returns the {@link QName} related to each value
+     *
+     * @return a {@link QName}
+     */
+    protected abstract QName toQName();
 }

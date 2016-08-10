@@ -17,21 +17,23 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpsPollingFunctionalTestCase extends FunctionalTestCase {
+public class HttpsPollingFunctionalTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "https-polling-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "https-polling-config.xml";
-  }
-
-  @Test
-  public void httpsPolling() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://toTest", 60000);
-    assertNotNull(message);
-    assertEquals("/ received", getPayloadAsString(message));
-  }
+    @Test
+    public void httpsPolling() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.request("vm://toTest", 60000);
+        assertNotNull(message);
+        assertEquals("/ received", getPayloadAsString(message));
+    }
 }

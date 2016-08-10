@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-public class SourceWithExpressionConfigReference extends OperationWithExpressionConfigReference {
+public class SourceWithExpressionConfigReference extends OperationWithExpressionConfigReference
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "source-with-expression-config-ref.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "source-with-expression-config-ref.xml";
+    }
 }

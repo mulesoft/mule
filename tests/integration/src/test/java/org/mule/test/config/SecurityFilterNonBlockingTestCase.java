@@ -20,31 +20,38 @@ import org.junit.Test;
 /**
  * Test configuration of security filters
  */
-public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/config/security-filter-config-nb.xml";
-  }
-
-  @Test
-  public void securityFilterShouldAllowNonBlocking() throws Exception {
-    flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
-  }
-
-  /**
-   * Custom security filter class that does nothing at all
-   */
-  public static class CustomSecurityFilter extends AbstractAuthenticationFilter {
+public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCase
+{
 
     @Override
-    protected void doInitialise() throws InitialisationException {}
-
-    @Override
-    public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-        CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-      // TODO Auto-generated method stub
-
+    protected String getConfigFile()
+    {
+        return "org/mule/test/config/security-filter-config-nb.xml";
     }
-  }
+
+    @Test
+    public void securityFilterShouldAllowNonBlocking() throws Exception
+    {
+        flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
+    }
+
+    /**
+     * Custom security filter class that does nothing at all
+     */
+    public static class CustomSecurityFilter extends AbstractAuthenticationFilter
+    {
+        @Override
+        protected void doInitialise() throws InitialisationException
+        {
+        }
+
+        @Override
+        public void authenticate(MuleEvent event)
+                throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+                SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
+        {
+            // TODO Auto-generated method stub
+
+        }
+    }
 }

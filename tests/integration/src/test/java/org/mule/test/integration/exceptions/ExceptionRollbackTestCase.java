@@ -21,48 +21,53 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase {
+public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase
+{
+    private DefaultSystemExceptionStrategy strategy;
+    private Transaction tx;
 
-  private DefaultSystemExceptionStrategy strategy;
-  private Transaction tx;
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        strategy = new DefaultSystemExceptionStrategy();
+        strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
+        strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 
-  @Override
-  protected void doSetUp() throws Exception {
-    strategy = new DefaultSystemExceptionStrategy();
-    strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
-    strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
+        initialiseObject(strategy);
+        tx = new TestTransaction(muleContext);
+        TransactionCoordination.getInstance().bindTransaction(tx);
+    }
 
-    initialiseObject(strategy);
-    tx = new TestTransaction(muleContext);
-    TransactionCoordination.getInstance().bindTransaction(tx);
-  }
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        TransactionCoordination.getInstance().unbindTransaction(tx);
+    }
 
-  @Override
-  protected void doTearDown() throws Exception {
-    TransactionCoordination.getInstance().unbindTransaction(tx);
-  }
+    @Test
+    public void testCommit() throws Exception
+    {
+        strategy.handleException(new FileNotFoundException());
+        assertFalse(tx.isRolledBack());
+        //There is nothing to actually commit the transaction since we are not running in a real tx
+        //assertTrue(tx.isCommitted());
+    }
 
-  @Test
-  public void testCommit() throws Exception {
-    strategy.handleException(new FileNotFoundException());
-    assertFalse(tx.isRolledBack());
-    // There is nothing to actually commit the transaction since we are not running in a real tx
-    // assertTrue(tx.isCommitted());
-  }
+    @Test
+    public void testRollback() throws Exception
+    {
+        strategy.handleException(new DefaultMuleException(CoreMessages.agentsRunning()));
+        assertTrue(tx.isRolledBack());
+        //There is nothing to actually commit the transaction since we are not running in a real tx
+        assertFalse(tx.isCommitted());
+    }
 
-  @Test
-  public void testRollback() throws Exception {
-    strategy.handleException(new DefaultMuleException(CoreMessages.agentsRunning()));
-    assertTrue(tx.isRolledBack());
-    // There is nothing to actually commit the transaction since we are not running in a real tx
-    assertFalse(tx.isCommitted());
-  }
-
-  @Test
-  public void testRollbackByDefault() throws Exception {
-    strategy.handleException(new IllegalAccessException());
-    assertTrue(tx.isRolledBack());
-    // There is nothing to actually commit the transaction since we are not running in a real tx
-    assertFalse(tx.isCommitted());
-  }
+    @Test
+    public void testRollbackByDefault() throws Exception
+    {
+        strategy.handleException(new IllegalAccessException());
+        assertTrue(tx.isRolledBack());
+        //There is nothing to actually commit the transaction since we are not running in a real tx
+        assertFalse(tx.isCommitted());
+    }
 }

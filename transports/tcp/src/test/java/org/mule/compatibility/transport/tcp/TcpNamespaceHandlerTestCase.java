@@ -34,168 +34,184 @@ import java.net.Socket;
 
 import org.junit.Test;
 
-public class TcpNamespaceHandlerTestCase extends FunctionalTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "tcp-namespace-config.xml";
-  }
-
-  @Test
-  public void testConfig() throws Exception {
-    TcpConnector c = lookupTcpConnector("tcpConnector");
-    assertNotNull(c);
-    assertEquals(1024, c.getReceiveBufferSize());
-    assertEquals(2048, c.getSendBufferSize());
-    assertEquals(50, c.getReceiveBacklog());
-    assertFalse(c.isReuseAddress().booleanValue());
-    // this is what we want - i was worried that the client was used as default if the server
-    // wasn't set, but that's not the case
-    assertEquals(-1, c.getServerSoTimeout());
-    assertEquals(-1, c.getConnectionTimeout());
-    assertEquals(3000, c.getClientSoTimeout());
-    assertEquals(3000, c.getSocketMaxWait());
-    assertTrue(c.isKeepAlive());
-    assertTrue(c.isConnected());
-    assertTrue(c.isStarted());
-
-    assertEquals(c.getSocketFactory().getClass(), TcpSocketFactory.class);
-    assertFalse(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
-  }
-
-  @Test
-  public void testSeparateTimeouts() throws Exception {
-    TcpConnector c = lookupTcpConnector("separateTimeouts");
-    assertNotNull(c);
-    assertEquals(4000, c.getServerSoTimeout());
-    assertEquals(3000, c.getClientSoTimeout());
-    assertEquals(2000, c.getConnectionTimeout());
-    assertEquals(-1, c.getSocketMaxWait());
-    assertTrue(c.isConnected());
-    assertTrue(c.isStarted());
-  }
-
-  @Test
-  public void testTcpProtocolWithClass() {
-    TcpConnector connector = lookupTcpConnector("connectorWithProtocolClass");
-    assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
-  }
-
-  @Test
-  public void testTcpProtocolWithRef() {
-    TcpConnector connector = lookupTcpConnector("connectorWithProtocolRef");
-    assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
-  }
-
-  private TcpConnector lookupTcpConnector(String name) {
-    TcpConnector connector = (TcpConnector) muleContext.getRegistry().lookupObject(name);
-    assertNotNull(connector);
-    return connector;
-  }
-
-  public static class MockTcpProtocol implements TcpProtocol {
-
+public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
+{
     @Override
-    public ResponseOutputStream createResponse(Socket socket) throws IOException {
-      throw new UnsupportedOperationException("createResponse");
+    protected String getConfigFile()
+    {
+        return "tcp-namespace-config.xml";
     }
 
-    @Override
-    public Object read(InputStream is) throws IOException {
-      throw new UnsupportedOperationException("read");
+    @Test
+    public void testConfig() throws Exception
+    {
+        TcpConnector c = lookupTcpConnector("tcpConnector");
+        assertNotNull(c);
+        assertEquals(1024, c.getReceiveBufferSize());
+        assertEquals(2048, c.getSendBufferSize());
+        assertEquals(50, c.getReceiveBacklog());
+        assertFalse(c.isReuseAddress().booleanValue());
+        // this is what we want - i was worried that the client was used as default if the server
+        // wasn't set, but that's not the case
+        assertEquals(-1, c.getServerSoTimeout());
+        assertEquals(-1, c.getConnectionTimeout());
+        assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(3000, c.getSocketMaxWait());
+        assertTrue(c.isKeepAlive());
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+
+        assertEquals(c.getSocketFactory().getClass(), TcpSocketFactory.class);
+        assertFalse(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
+    }
+    
+    @Test
+    public void testSeparateTimeouts() throws Exception
+    {
+        TcpConnector c = lookupTcpConnector("separateTimeouts");
+        assertNotNull(c);
+        assertEquals(4000, c.getServerSoTimeout());
+        assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(2000, c.getConnectionTimeout());
+        assertEquals(-1, c.getSocketMaxWait());
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+    
+    @Test
+    public void testTcpProtocolWithClass()
+    {
+        TcpConnector connector = lookupTcpConnector("connectorWithProtocolClass");
+        assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
+    }
+    
+    @Test
+    public void testTcpProtocolWithRef()
+    {
+        TcpConnector connector = lookupTcpConnector("connectorWithProtocolRef");
+        assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
     }
 
-    @Override
-    public void write(OutputStream os, Object data) throws IOException {
-      throw new UnsupportedOperationException("write");
+    private TcpConnector lookupTcpConnector(String name)
+    {
+        TcpConnector connector = (TcpConnector) muleContext.getRegistry().lookupObject(name);
+        assertNotNull(connector);
+        return connector;
     }
-  }
+    
+    public static class MockTcpProtocol implements TcpProtocol
+    {
+        @Override
+        public ResponseOutputStream createResponse(Socket socket) throws IOException
+        {
+            throw new UnsupportedOperationException("createResponse");
+        }
 
-  @Test
-  public void testPollingConnector() {
-    PollingTcpConnector c = (PollingTcpConnector) muleContext.getRegistry().lookupObject("pollingConnector");
-    assertNotNull(c);
-    assertEquals(4000, c.getPollingFrequency());
-    assertEquals(3000, c.getClientSoTimeout());
-    assertEquals(-1, c.getSocketMaxWait());
-    assertTrue(c.isConnected());
-    assertTrue(c.isStarted());
-  }
+        @Override
+        public Object read(InputStream is) throws IOException
+        {
+            throw new UnsupportedOperationException("read");
+        }
 
-  @Test
-  public void testCustomClassLoadingProtocol() throws Exception {
-    TcpConnector c = (TcpConnector) muleContext.getRegistry().lookupObject("custom-class-loading-protocol-connector");
-    assertNotNull(c);
-    CustomClassLoadingLengthProtocol protocol = (CustomClassLoadingLengthProtocol) c.getTcpProtocol();
-    assertEquals(protocol.getClass(), CustomClassLoadingLengthProtocol.class);
-    assertEquals(protocol.getClassLoader(), muleContext.getRegistry().get("classLoader"));
-    assertTrue(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
-  }
+        @Override
+        public void write(OutputStream os, Object data) throws IOException
+        {
+            throw new UnsupportedOperationException("write");
+        }
+    }
+    
+    @Test
+    public void testPollingConnector()
+    {
+        PollingTcpConnector c = (PollingTcpConnector) muleContext.getRegistry().lookupObject("pollingConnector");
+        assertNotNull(c);
+        assertEquals(4000, c.getPollingFrequency());
+        assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(-1, c.getSocketMaxWait());
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+    
+    @Test
+    public void testCustomClassLoadingProtocol() throws Exception
+    {
+        TcpConnector c = (TcpConnector) muleContext.getRegistry().lookupObject("custom-class-loading-protocol-connector");
+        assertNotNull(c);
+        CustomClassLoadingLengthProtocol protocol = (CustomClassLoadingLengthProtocol) c.getTcpProtocol();
+        assertEquals(protocol.getClass(), CustomClassLoadingLengthProtocol.class);
+        assertEquals(protocol.getClassLoader(), muleContext.getRegistry().get("classLoader"));
+        assertTrue(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
+    }
+    
+    @Test
+    public void testMessageDispatcherFactoryConnector() throws Exception {
+        TcpConnector c = (TcpConnector) muleContext.getRegistry().lookupObject("messageDispatcherFactoryConnector");
+        assertNotNull(c);
+        assertEquals(LocalSocketTcpMessageDispatcherFactory.class, c.getDispatcherFactory().getClass());
+    }
 
-  @Test
-  public void testMessageDispatcherFactoryConnector() throws Exception {
-    TcpConnector c = (TcpConnector) muleContext.getRegistry().lookupObject("messageDispatcherFactoryConnector");
-    assertNotNull(c);
-    assertEquals(LocalSocketTcpMessageDispatcherFactory.class, c.getDispatcherFactory().getClass());
-  }
+    @Test
+    public void testDefaultServerSocketProperties()
+    {
+        TcpServerSocketProperties properties = muleContext.getRegistry().get("defaultServerSocketProperties");
 
-  @Test
-  public void testDefaultServerSocketProperties() {
-    TcpServerSocketProperties properties = muleContext.getRegistry().get("defaultServerSocketProperties");
+        assertThat(properties.getKeepAlive(), is(nullValue()));
+        assertThat(properties.getReceiveBacklog(), is(nullValue()));
+        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+        assertThat(properties.getReuseAddress(), equalTo(true));
+        assertThat(properties.getSendBufferSize(), is(nullValue()));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getServerTimeout(), equalTo(0));
+        assertThat(properties.getTimeout(), equalTo(0));
+        assertThat(properties.getLinger(), equalTo(-1));
+    }
 
-    assertThat(properties.getKeepAlive(), is(nullValue()));
-    assertThat(properties.getReceiveBacklog(), is(nullValue()));
-    assertThat(properties.getReceiveBufferSize(), is(nullValue()));
-    assertThat(properties.getReuseAddress(), equalTo(true));
-    assertThat(properties.getSendBufferSize(), is(nullValue()));
-    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-    assertThat(properties.getServerTimeout(), equalTo(0));
-    assertThat(properties.getTimeout(), equalTo(0));
-    assertThat(properties.getLinger(), equalTo(-1));
-  }
+    @Test
+    public void testServerSocketProperties()
+    {
+        TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
 
-  @Test
-  public void testServerSocketProperties() {
-    TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
+        assertThat(properties.getKeepAlive(), equalTo(true));
+        assertThat(properties.getReceiveBacklog(), equalTo(200));
+        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+        assertThat(properties.getReuseAddress(), equalTo(true));
+        assertThat(properties.getSendBufferSize(), equalTo(2048));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getServerTimeout(), equalTo(600));
+        assertThat(properties.getTimeout(), equalTo(800));
+        assertThat(properties.getLinger(), equalTo(700));
+    }
 
-    assertThat(properties.getKeepAlive(), equalTo(true));
-    assertThat(properties.getReceiveBacklog(), equalTo(200));
-    assertThat(properties.getReceiveBufferSize(), equalTo(1024));
-    assertThat(properties.getReuseAddress(), equalTo(true));
-    assertThat(properties.getSendBufferSize(), equalTo(2048));
-    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-    assertThat(properties.getServerTimeout(), equalTo(600));
-    assertThat(properties.getTimeout(), equalTo(800));
-    assertThat(properties.getLinger(), equalTo(700));
-  }
+    @Test
+    public void testDefaultClientSocketProperties()
+    {
+        TcpClientSocketProperties properties = muleContext.getRegistry().get("defaultClientSocketProperties");
 
-  @Test
-  public void testDefaultClientSocketProperties() {
-    TcpClientSocketProperties properties = muleContext.getRegistry().get("defaultClientSocketProperties");
+        assertThat(properties.getKeepAlive(), is(nullValue()));
+        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+        assertThat(properties.getSendBufferSize(), is(nullValue()));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getTimeout(), equalTo(0));
+        assertThat(properties.getLinger(), equalTo(-1));
+        assertThat(properties.getConnectionTimeout(), equalTo(30000));
+    }
 
-    assertThat(properties.getKeepAlive(), is(nullValue()));
-    assertThat(properties.getReceiveBufferSize(), is(nullValue()));
-    assertThat(properties.getSendBufferSize(), is(nullValue()));
-    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-    assertThat(properties.getTimeout(), equalTo(0));
-    assertThat(properties.getLinger(), equalTo(-1));
-    assertThat(properties.getConnectionTimeout(), equalTo(30000));
-  }
+    @Test
+    public void testClientSocketProperties()
+    {
+        TcpClientSocketProperties properties = muleContext.getRegistry().get("clientSocketProperties");
 
-  @Test
-  public void testClientSocketProperties() {
-    TcpClientSocketProperties properties = muleContext.getRegistry().get("clientSocketProperties");
-
-    assertThat(properties.getConnectionTimeout(), equalTo(500));
-    assertThat(properties.getKeepAlive(), equalTo(true));
-    assertThat(properties.getReceiveBufferSize(), equalTo(1024));
-    assertThat(properties.getSendBufferSize(), equalTo(2048));
-    assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-    assertThat(properties.getTimeout(), equalTo(600));
-    assertThat(properties.getLinger(), equalTo(700));
-  }
+        assertThat(properties.getConnectionTimeout(), equalTo(500));
+        assertThat(properties.getKeepAlive(), equalTo(true));
+        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+        assertThat(properties.getSendBufferSize(), equalTo(2048));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getTimeout(), equalTo(600));
+        assertThat(properties.getLinger(), equalTo(700));
+    }
 
 
-  public static class FakeClassLoader extends ClassLoader {
-  }
+    public static class FakeClassLoader extends ClassLoader
+    {
+    }
 }

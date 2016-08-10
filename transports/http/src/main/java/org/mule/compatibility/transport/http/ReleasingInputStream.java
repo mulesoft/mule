@@ -13,23 +13,26 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpMethod;
 
-public class ReleasingInputStream extends DelegatingInputStream {
+public class ReleasingInputStream extends DelegatingInputStream
+{
+    private final HttpMethod method;
 
-  private final HttpMethod method;
-
-  public ReleasingInputStream(InputStream is, HttpMethod method) {
-    super(is);
-
-    this.method = method;
-  }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-
-    if (method != null) {
-      method.releaseConnection();
+    public ReleasingInputStream(InputStream is, HttpMethod method)
+    {
+        super(is);
+        
+        this.method = method;
     }
-  }
+
+    @Override
+    public void close() throws IOException 
+    {
+        super.close();
+        
+        if (method != null)
+        {
+            method.releaseConnection();
+        }
+    }
 }
 

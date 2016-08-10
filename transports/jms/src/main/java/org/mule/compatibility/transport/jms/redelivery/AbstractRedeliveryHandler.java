@@ -17,29 +17,34 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-public abstract class AbstractRedeliveryHandler implements RedeliveryHandler {
+public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
+{
+    protected JmsConnector connector;
 
-  protected JmsConnector connector;
+    @Override
+    public abstract void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 
-  @Override
-  public abstract void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow)
-      throws JMSException, MuleException;
-
-  /**
-   * The connector associated with this handler is set before <code>handleRedelivery()</code> is called
-   * 
-   * @param connector the connector associated with this handler
-   */
-  @Override
-  public void setConnector(JmsConnector connector) {
-    this.connector = connector;
-  }
-
-  protected MuleMessage createMuleMessage(Message message, MuleContext muleContext) {
-    try {
-      return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext));
-    } catch (Exception e) {
-      return MuleMessage.builder().payload(message).build();
+    /**
+     * The connector associated with this handler is set before
+     * <code>handleRedelivery()</code> is called
+     * 
+     * @param connector the connector associated with this handler
+     */
+    @Override
+    public void setConnector(JmsConnector connector)
+    {
+        this.connector = connector;
     }
-  }
+    
+    protected MuleMessage createMuleMessage(Message message, MuleContext muleContext)
+    {
+        try
+        {
+            return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext));
+        }
+        catch (Exception e)
+        {
+            return MuleMessage.builder().payload(message).build();
+        }
+    }
 }

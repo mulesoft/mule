@@ -8,23 +8,27 @@ package org.mule.compatibility.transport.jms.integration.routing;
 
 import java.util.Date;
 
-public class Invoker {
+public class Invoker
+{
+    private HelloInterface hello;
 
-  private HelloInterface hello;
+    public String invoke(String s)
+    {
+        return "Received: " + hello.hello(s, new Integer(0xC0DE));
+    }
 
-  public String invoke(String s) {
-    return "Received: " + hello.hello(s, new Integer(0xC0DE));
-  }
+    public Object returnNull(Date date)
+    {
+        return hello.returnNull();
+    }
+    
+    public void setHello(HelloInterface hello)
+    {
+        this.hello = hello;
+    }
 
-  public Object returnNull(Date date) {
-    return hello.returnNull();
-  }
-
-  public void setHello(HelloInterface hello) {
-    this.hello = hello;
-  }
-
-  public HelloInterface getHello() {
-    return hello;
-  }
+    public HelloInterface getHello()
+    {
+        return hello;
+    }
 }

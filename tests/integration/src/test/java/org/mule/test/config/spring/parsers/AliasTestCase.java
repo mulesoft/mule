@@ -15,38 +15,44 @@ import org.mule.test.config.spring.parsers.beans.AbstractBean;
 
 import org.junit.Test;
 
-public class AliasTestCase extends AbstractNamespaceTestCase {
+public class AliasTestCase extends AbstractNamespaceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/alias-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/alias-test.xml";
-  }
+    protected void assertFooExists(int index)
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+        assertFooExists(orphan, 10 * index + 1);
+        ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
+        assertFooExists(child, 10 * index + 2);
+    }
 
-  protected void assertFooExists(int index) {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-    assertFooExists(orphan, 10 * index + 1);
-    ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
-    assertFooExists(child, 10 * index + 2);
-  }
+    protected void assertFooExists(AbstractBean bean, int value)
+    {
+        assertNotNull(bean);
+        assertEquals(value, bean.getFoo());
+    }
 
-  protected void assertFooExists(AbstractBean bean, int value) {
-    assertNotNull(bean);
-    assertEquals(value, bean.getFoo());
-  }
+    @Test
+    public void testNamed()
+    {
+        assertFooExists(1);
+    }
 
-  @Test
-  public void testNamed() {
-    assertFooExists(1);
-  }
+    @Test
+    public void testOrphan()
+    {
+        assertFooExists(2);
+    }
 
-  @Test
-  public void testOrphan() {
-    assertFooExists(2);
-  }
-
-  @Test
-  public void testParent() {
-    assertFooExists(3);
-  }
+    @Test
+    public void testParent()
+    {
+        assertFooExists(3);
+    }
 
 }

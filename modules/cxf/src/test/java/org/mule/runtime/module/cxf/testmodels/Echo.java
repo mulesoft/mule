@@ -16,21 +16,23 @@ import javax.xml.ws.WebServiceContext;
 import org.junit.Assert;
 
 @WebService
-public class Echo {
+public class Echo
+{
+    @Resource
+    private WebServiceContext context;
 
-  @Resource
-  private WebServiceContext context;
+    @WebResult(name = "text")
+    @WebMethod
+    public String echo(@WebParam(name = "text") String s)
+    {
+        return s;
+    }
 
-  @WebResult(name = "text")
-  @WebMethod
-  public String echo(@WebParam(name = "text") String s) {
-    return s;
-  }
-
-  @WebResult(name = "output")
-  @WebMethod
-  public String ensureWebSerivceContextIsSet(@WebParam(name = "input") String input) {
-    Assert.assertNotNull(context);
-    return input;
-  }
+    @WebResult(name = "output")
+    @WebMethod
+    public String ensureWebSerivceContextIsSet(@WebParam(name = "input") String input)
+    {
+        Assert.assertNotNull(context);
+        return input;
+    }
 }

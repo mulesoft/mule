@@ -14,13 +14,14 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 
-public class TransportsJmxApplicationAgent extends AbstractTransportsJmxAgent implements AbstractJmxAgentExtension {
+public class TransportsJmxApplicationAgent extends AbstractTransportsJmxAgent implements AbstractJmxAgentExtension
+{
 
-  @Override
-  protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException,
-      InstanceAlreadyExistsException, MalformedObjectNameException {
-    registerEndpointServices();
-    registerConnectorServices();
-  }
+    @Override
+    protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
+    {
+        registerEndpointServices();
+        registerConnectorServices();
+    }
 
 }

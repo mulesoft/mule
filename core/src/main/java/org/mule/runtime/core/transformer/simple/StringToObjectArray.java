@@ -16,66 +16,84 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>StringToObjectArray</code> converts a String into an object array. This is useful in certain situations, as when a string
- * needs to be converted into an Object[] in order to be passed to a SOAP service. The input String is parsed into the array based
- * on a configurable delimiter - default is a space.
+ * <code>StringToObjectArray</code> converts a String into an object array. This
+ * is useful in certain situations, as when a string needs to be converted into
+ * an Object[] in order to be passed to a SOAP service. The input String is parsed
+ * into the array based on a configurable delimiter - default is a space.
  */
-public class StringToObjectArray extends AbstractTransformer {
+public class StringToObjectArray extends AbstractTransformer
+{
+    private String delimiter = null;
+    private static final String DEFAULT_DELIMITER = " ";
 
-  private String delimiter = null;
-  private static final String DEFAULT_DELIMITER = " ";
-
-  public StringToObjectArray() {
-    registerSourceType(DataType.STRING);
-    registerSourceType(DataType.BYTE_ARRAY);
-    registerSourceType(DataType.INPUT_STREAM);
-    setReturnDataType(DataType.fromType(Object[].class));
-  }
-
-  @Override
-  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-    String in;
-
-    if (src instanceof byte[]) {
-      in = createStringFromByteArray((byte[]) src, outputEncoding);
-    } else if (src instanceof InputStream) {
-      in = createStringFromInputStream((InputStream) src);
-    } else {
-      in = (String) src;
+    public StringToObjectArray()
+    {
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.INPUT_STREAM);
+        setReturnDataType(DataType.fromType(Object[].class));
     }
 
-    String[] out = StringUtils.splitAndTrim(in, getDelimiter());
-    return out;
-  }
+    @Override
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
+    {
+        String in;
 
-  protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding) throws TransformerException {
-    return new String(bytes, outputEncoding);
-  }
+        if (src instanceof byte[])
+        {
+            in = createStringFromByteArray((byte[]) src, outputEncoding);
+        }
+        else if (src instanceof InputStream)
+        {
+            in = createStringFromInputStream((InputStream) src);
+        }
+        else
+        {
+            in = (String) src;
+        }
 
-  protected String createStringFromInputStream(InputStream input) {
-    try {
-      return IOUtils.toString(input);
-    } finally {
-      IOUtils.closeQuietly(input);
+        String[] out = StringUtils.splitAndTrim(in, getDelimiter());
+        return out;
     }
-  }
 
-  /**
-   * @return the delimiter
-   */
-  public String getDelimiter() {
-    if (delimiter == null) {
-      return DEFAULT_DELIMITER;
-    } else {
-      return delimiter;
+    protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding) throws TransformerException
+    {
+        return new String(bytes, outputEncoding);
     }
-  }
 
-  /**
-   * @param delimiter the delimiter
-   */
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
-  }
+    protected String createStringFromInputStream(InputStream input)
+    {
+        try
+        {
+            return IOUtils.toString(input);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(input);
+        }
+    }
+
+    /**
+     * @return the delimiter
+     */
+    public String getDelimiter()
+    {
+        if (delimiter == null)
+        {
+            return DEFAULT_DELIMITER;
+        }
+        else
+        {
+            return delimiter;
+        }
+    }
+
+    /**
+     * @param delimiter the delimiter
+     */
+    public void setDelimiter(String delimiter)
+    {
+        this.delimiter = delimiter;
+    }
 
 }

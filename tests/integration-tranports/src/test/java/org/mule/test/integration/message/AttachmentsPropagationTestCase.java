@@ -26,81 +26,87 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-public class AttachmentsPropagationTestCase extends FunctionalTestCase implements EventCallback {
+public class AttachmentsPropagationTestCase extends FunctionalTestCase implements EventCallback
+{
+    private static final String ATTACHMENT_CONTENT = "<content>";
 
-  private static final String ATTACHMENT_CONTENT = "<content>";
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/message/attachment-propagation.xml";
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-
-    FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("SINGLE");
-    ftc.setEventCallback(this);
-
-    ftc = (FunctionalTestComponent) getComponent("CHAINED");
-    ftc.setEventCallback(this);
-  }
-
-  @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
-    final MuleMessage message = context.getEvent().getMessage();
-    final Builder builder = MuleMessage.builder(message);
-
-    for (String attachmentName : message.getInboundAttachmentNames()) {
-      DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
-      builder.addOutboundAttachment(attachmentName, inboundAttachment);
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/message/attachment-propagation.xml";
     }
 
-    // add an attachment, named after the componentname...
-    String attachmentName = context.getFlowConstruct().getName();
-    DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", MediaType.TEXT));
-    builder.addOutboundAttachment(attachmentName, dataHandler);
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
 
-    final MuleMessage built = builder.build();
+        FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("SINGLE");
+        ftc.setEventCallback(this);
 
-    // return the list of attachment names
-    FunctionalTestComponent fc = (FunctionalTestComponent) component;
-    fc.setReturnData(built.getOutboundAttachmentNames());
+        ftc = (FunctionalTestComponent) getComponent("CHAINED");
+        ftc.setEventCallback(this);
+    }
 
-    context.getEvent().setMessage(built);
-  }
+    @Override
+    public void eventReceived(MuleEventContext context, Object component) throws Exception
+    {
+        final MuleMessage message = context.getEvent().getMessage();
+        final Builder builder = MuleMessage.builder(message);
 
-  @Test
-  public void singleFlowShouldReceiveAttachment() throws Exception {
-    MuleMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
+        for (String attachmentName : message.getInboundAttachmentNames())
+        {
+            DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
+            builder.addOutboundAttachment(attachmentName, inboundAttachment);
+        }
 
-    assertThat(result, is(notNullValue()));
+        // add an attachment, named after the componentname...
+        String attachmentName = context.getFlowConstruct().getName();
+        DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", MediaType.TEXT));
+        builder.addOutboundAttachment(attachmentName, dataHandler);
 
-    // expect SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
+        final MuleMessage built = builder.build();
 
-    DataHandler attachment = result.getOutboundAttachment("SINGLE");
-    assertThat(attachment, is(notNullValue()));
-    assertThat(attachment.getContent().toString(), is(ATTACHMENT_CONTENT));
-  }
+        // return the list of attachment names
+        FunctionalTestComponent fc = (FunctionalTestComponent) component;
+        fc.setReturnData(built.getOutboundAttachmentNames());
 
-  @Test
-  public void chainedFlowShouldReceiveAttachments() throws Exception {
-    MuleMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
-    assertThat(result, is(notNullValue()));
+        context.getEvent().setMessage(built);
+    }
 
-    // expect CHAINED attachment from CHAINED service
-    // and SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE", "CHAINED"));
+    @Test
+    public void singleFlowShouldReceiveAttachment() throws Exception
+    {
+        MuleMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
 
-    // don't check the attachments now - it seems they're not copied properly from inbound
-    // to outbound on flow boundaries
-    // DataHandler attachment = result.getInboundAttachment("SINGLE");
-    // assertNotNull(attachment);
-    // assertEquals(ATTACHMENT_CONTENT, attachment.getContent().toString());
-    //
-    // attachment = result.getInboundAttachment("CHAINED");
-    // assertNotNull(attachment);
-    // assertEquals(ATTACHMENT_CONTENT, attachment.getContent().toString());
-  }
+        assertThat(result, is(notNullValue()));
+
+        // expect SINGLE attachment from SINGLE service
+        assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
+
+        DataHandler attachment = result.getOutboundAttachment("SINGLE");
+        assertThat(attachment, is(notNullValue()));
+        assertThat(attachment.getContent().toString(), is(ATTACHMENT_CONTENT));
+    }
+
+    @Test
+    public void chainedFlowShouldReceiveAttachments() throws Exception
+    {
+        MuleMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
+        assertThat(result, is(notNullValue()));
+
+        // expect CHAINED attachment from CHAINED service
+        // and SINGLE attachment from SINGLE service
+        assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE", "CHAINED"));
+
+        // don't check the attachments now - it seems they're not copied properly from inbound
+        // to outbound on flow boundaries
+//        DataHandler attachment = result.getInboundAttachment("SINGLE");
+//        assertNotNull(attachment);
+//        assertEquals(ATTACHMENT_CONTENT, attachment.getContent().toString());
+//
+//        attachment = result.getInboundAttachment("CHAINED");
+//        assertNotNull(attachment);
+//        assertEquals(ATTACHMENT_CONTENT, attachment.getContent().toString());
+    }
 }

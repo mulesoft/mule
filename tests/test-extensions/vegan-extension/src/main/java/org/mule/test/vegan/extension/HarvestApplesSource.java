@@ -13,18 +13,21 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Apple;
 
 @Alias("harvest-apples")
-public class HarvestApplesSource extends Source<Apple, Attributes> {
+public class HarvestApplesSource extends Source<Apple, Attributes>
+{
 
-  @UseConfig
-  AppleConfig appleConfig;
+    @UseConfig
+    AppleConfig appleConfig;
 
-  @Override
-  public void start() {
+    @Override
+    public void start()
+    {
 
-  }
+    }
 
-  @Override
-  public void stop() {
+    @Override
+    public void stop()
+    {
 
-  }
+    }
 }

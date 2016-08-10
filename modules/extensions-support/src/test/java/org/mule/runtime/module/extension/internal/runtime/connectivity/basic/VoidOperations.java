@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.basic;
 
-public class VoidOperations {
+public class VoidOperations
+{
 
-  // Dummy operation to avoid errors on the model
-  public void foo() {
+    //Dummy operation to avoid errors on the model
+    public void foo()
+    {
 
-  }
+    }
 }

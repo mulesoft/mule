@@ -29,99 +29,121 @@ import org.slf4j.LoggerFactory;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable {
+public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable
+{
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultInterfaceBinding.class);
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultInterfaceBinding.class);
+    private Class<?> interfaceClass;
 
-  private Class<?> interfaceClass;
+    private String methodName;
 
-  private String methodName;
+    private MessagingExceptionHandler messagingExceptionHandler;
 
-  private MessagingExceptionHandler messagingExceptionHandler;
+    // The router used to actually dispatch the message
+    protected OutboundEndpoint endpoint;
 
-  // The router used to actually dispatch the message
-  protected OutboundEndpoint endpoint;
-
-  @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    OptimizedRequestContext.unsafeRewriteEvent(event.getMessage());
-    return endpoint.process(RequestContext.getEvent());
-  }
-
-  @Override
-  public void setInterface(Class<?> interfaceClass) {
-    this.interfaceClass = interfaceClass;
-  }
-
-  @Override
-  public Class<?> getInterface() {
-    return interfaceClass;
-  }
-
-  @Override
-  public String getMethod() {
-    return methodName;
-  }
-
-  @Override
-  public void setMethod(String methodName) {
-    this.methodName = methodName;
-  }
-
-  @Override
-  public Object createProxy(Object target) {
-    try {
-      Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[] {getInterface()},
-                                            new BindingInvocationHandler(this));
-      if (logger.isDebugEnabled()) {
-        logger.debug("Have proxy?: " + (null != proxy));
-      }
-      return proxy;
-
-    } catch (Exception e) {
-      throw new MuleRuntimeException(TransportCoreMessages.failedToCreateProxyFor(target), e);
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        OptimizedRequestContext.unsafeRewriteEvent(event.getMessage());
+        return endpoint.process(RequestContext.getEvent());
     }
-  }
 
-  @Override
-  public void setEndpoint(ImmutableEndpoint e) throws MuleException {
-    if (e instanceof OutboundEndpoint) {
-      endpoint = (OutboundEndpoint) e;
-    } else {
-      throw new IllegalArgumentException("An outbound endpoint is required for Interface binding");
+    @Override
+    public void setInterface(Class<?> interfaceClass)
+    {
+        this.interfaceClass = interfaceClass;
     }
-  }
 
-  public Class<?> getInterfaceClass() {
-    return interfaceClass;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("DefaultInterfaceBinding");
-    sb.append("{method='").append(methodName).append('\'');
-    sb.append(", interface=").append(interfaceClass);
-    sb.append('}');
-    return sb.toString();
-  }
-
-  @Override
-  public ImmutableEndpoint getEndpoint() {
-    if (endpoint != null) {
-      return endpoint;
-    } else {
-      return null;
+    @Override
+    public Class<?> getInterface()
+    {
+        return interfaceClass;
     }
-  }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
-  }
+    @Override
+    public String getMethod()
+    {
+        return methodName;
+    }
 
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    this.messagingExceptionHandler = messagingExceptionHandler;
-  }
+    @Override
+    public void setMethod(String methodName)
+    {
+        this.methodName = methodName;
+    }
+
+    @Override
+    public Object createProxy(Object target)
+    {
+        try
+        {
+            Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[]{getInterface()},
+                    new BindingInvocationHandler(this));
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Have proxy?: " + (null != proxy));
+            }
+            return proxy;
+
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(TransportCoreMessages.failedToCreateProxyFor(target), e);
+        }
+    }
+
+    @Override
+    public void setEndpoint(ImmutableEndpoint e) throws MuleException
+    {
+        if (e instanceof OutboundEndpoint)
+        {
+            endpoint = (OutboundEndpoint) e;
+        }
+        else
+        {
+            throw new IllegalArgumentException("An outbound endpoint is required for Interface binding");
+        }
+    }
+
+    public Class<?> getInterfaceClass()
+    {
+        return interfaceClass;
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("DefaultInterfaceBinding");
+        sb.append("{method='").append(methodName).append('\'');
+        sb.append(", interface=").append(interfaceClass);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public ImmutableEndpoint getEndpoint()
+    {
+        if (endpoint != null)
+        {
+            return endpoint;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
+    }
 }

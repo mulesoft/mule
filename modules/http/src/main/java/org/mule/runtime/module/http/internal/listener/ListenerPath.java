@@ -8,21 +8,24 @@ package org.mule.runtime.module.http.internal.listener;
 
 import org.mule.runtime.core.util.StringUtils;
 
-public class ListenerPath {
+public class ListenerPath
+{
+    private String basePath;
+    private String resolvedPath;
 
-  private String basePath;
-  private String resolvedPath;
+    public ListenerPath(String basePath, String listenerPath)
+    {
+        this.basePath = basePath;
+        this.resolvedPath = basePath == null ? listenerPath : basePath + listenerPath;
+    }
 
-  public ListenerPath(String basePath, String listenerPath) {
-    this.basePath = basePath;
-    this.resolvedPath = basePath == null ? listenerPath : basePath + listenerPath;
-  }
+    public String getResolvedPath()
+    {
+        return resolvedPath;
+    }
 
-  public String getResolvedPath() {
-    return resolvedPath;
-  }
-
-  public String getRelativePath(String requestPath) {
-    return basePath == null ? requestPath : requestPath.replace(basePath, StringUtils.EMPTY);
-  }
+    public String getRelativePath(String requestPath)
+    {
+        return basePath == null ? requestPath : requestPath.replace(basePath, StringUtils.EMPTY);
+    }
 }

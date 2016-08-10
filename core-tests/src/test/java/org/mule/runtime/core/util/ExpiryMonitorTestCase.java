@@ -20,80 +20,90 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExpiryMonitorTestCase extends AbstractMuleTestCase {
+public class ExpiryMonitorTestCase extends AbstractMuleTestCase
+{
+    private boolean expired = false;
 
-  private boolean expired = false;
+    private ExpiryMonitor monitor;
 
-  private ExpiryMonitor monitor;
+    @Before
+    public void doSetUp() throws Exception
+    {
+        expired = false;
+        monitor = new ExpiryMonitor("test", 100, null, false);
+    }
 
-  @Before
-  public void doSetUp() throws Exception {
-    expired = false;
-    monitor = new ExpiryMonitor("test", 100, null, false);
-  }
+    @After
+    public void after()
+    {
+        monitor.dispose();
+    }
 
-  @After
-  public void after() {
-    monitor.dispose();
-  }
+    @Test
+    public void testExpiry() throws InterruptedException
+    {
+        Expirable e = () -> expired = true;
+        monitor.addExpirable(300, TimeUnit.MILLISECONDS, e);
 
-  @Test
-  public void testExpiry() throws InterruptedException {
-    Expirable e = () -> expired = true;
-    monitor.addExpirable(300, TimeUnit.MILLISECONDS, e);
+        new PollingProber(800, 50).check(new JUnitLambdaProbe(() ->
+        {
+            assertTrue(expired);
+            assertTrue(!monitor.isRegistered(e));
+            return true;
+        }));
+    }
 
-    new PollingProber(800, 50).check(new JUnitLambdaProbe(() -> {
-      assertTrue(expired);
-      assertTrue(!monitor.isRegistered(e));
-      return true;
-    }));
-  }
+    @Test
+    public void testNotExpiry() throws InterruptedException
+    {
+        Expirable e = () -> expired = true;
+        monitor.addExpirable(800, TimeUnit.MILLISECONDS, e);
+        Thread.sleep(300);
+        assertTrue(!expired);
 
-  @Test
-  public void testNotExpiry() throws InterruptedException {
-    Expirable e = () -> expired = true;
-    monitor.addExpirable(800, TimeUnit.MILLISECONDS, e);
-    Thread.sleep(300);
-    assertTrue(!expired);
+        new PollingProber(800, 50).check(new JUnitLambdaProbe(() ->
+        {
+            assertTrue(expired);
+            assertTrue(!monitor.isRegistered(e));
+            return true;
+        }));
+    }
 
-    new PollingProber(800, 50).check(new JUnitLambdaProbe(() -> {
-      assertTrue(expired);
-      assertTrue(!monitor.isRegistered(e));
-      return true;
-    }));
-  }
+    @Test
+    public void testExpiryWithReset() throws InterruptedException
+    {
+        Expirable e = () -> expired = true;
+        monitor.addExpirable(600, TimeUnit.MILLISECONDS, e);
+        Thread.sleep(200);
+        assertTrue(!expired);
+        monitor.resetExpirable(e);
+        Thread.sleep(200);
+        assertTrue(!expired);
 
-  @Test
-  public void testExpiryWithReset() throws InterruptedException {
-    Expirable e = () -> expired = true;
-    monitor.addExpirable(600, TimeUnit.MILLISECONDS, e);
-    Thread.sleep(200);
-    assertTrue(!expired);
-    monitor.resetExpirable(e);
-    Thread.sleep(200);
-    assertTrue(!expired);
+        new PollingProber(600, 50).check(new JUnitLambdaProbe(() ->
+        {
+            assertTrue(expired);
+            assertTrue(!monitor.isRegistered(e));
+            return true;
+        }));
+    }
 
-    new PollingProber(600, 50).check(new JUnitLambdaProbe(() -> {
-      assertTrue(expired);
-      assertTrue(!monitor.isRegistered(e));
-      return true;
-    }));
-  }
+    @Test
+    public void testNotExpiryWithRemove() throws InterruptedException
+    {
+        Expirable e = () -> expired = true;
+        monitor.addExpirable(1000, TimeUnit.MILLISECONDS, e);
+        Thread.sleep(200);
+        assertTrue(!expired);
+        Thread.sleep(200);
+        monitor.removeExpirable(e);
 
-  @Test
-  public void testNotExpiryWithRemove() throws InterruptedException {
-    Expirable e = () -> expired = true;
-    monitor.addExpirable(1000, TimeUnit.MILLISECONDS, e);
-    Thread.sleep(200);
-    assertTrue(!expired);
-    Thread.sleep(200);
-    monitor.removeExpirable(e);
-
-    new PollingProber(800, 50).check(new JUnitLambdaProbe(() -> {
-      assertTrue(!expired);
-      assertTrue(!monitor.isRegistered(e));
-      return true;
-    }));
-  }
+        new PollingProber(800, 50).check(new JUnitLambdaProbe(() ->
+        {
+            assertTrue(!expired);
+            assertTrue(!monitor.isRegistered(e));
+            return true;
+        }));
+    }
 
 }

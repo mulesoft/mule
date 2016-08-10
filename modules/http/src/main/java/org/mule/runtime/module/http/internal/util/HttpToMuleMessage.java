@@ -17,37 +17,49 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpToMuleMessage {
+public class HttpToMuleMessage
+{
+    private static Logger logger = LoggerFactory.getLogger(HttpToMuleMessage.class);
 
-  private static Logger logger = LoggerFactory.getLogger(HttpToMuleMessage.class);
+    /**
+     * 
+     * @param contentTypeValue
+     * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have
+     *            a {@code charset} parameter.
+     * @return
+     */
+    public static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset)
+    {
+        MediaType mediaType = MediaType.ANY;
 
-  /**
-   * 
-   * @param contentTypeValue
-   * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
-   * @return
-   */
-  public static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
-    MediaType mediaType = MediaType.ANY;
-
-    if (contentTypeValue != null) {
-      try {
-        mediaType = MediaType.parse(contentTypeValue);
-      } catch (IllegalArgumentException e) {
-        // need to support invalid Content-Types
-        if (parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"))) {
-          throw e;
-        } else {
-          logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
-          logger.warn(format("Using default encoding: %s", defaultCharset().name()));
+        if (contentTypeValue != null)
+        {
+            try
+            {
+                mediaType = MediaType.parse(contentTypeValue);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // need to support invalid Content-Types
+                if (parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
+                {
+                    throw e;
+                }
+                else
+                {
+                    logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
+                    logger.warn(format("Using default encoding: %s", defaultCharset().name()));
+                }
+            }
         }
-      }
+        if (!mediaType.getCharset().isPresent())
+        {
+            return mediaType.withCharset(defaultCharset);
+        }
+        else
+        {
+            return mediaType;
+        }
     }
-    if (!mediaType.getCharset().isPresent()) {
-      return mediaType.withCharset(defaultCharset);
-    } else {
-      return mediaType;
-    }
-  }
 
 }

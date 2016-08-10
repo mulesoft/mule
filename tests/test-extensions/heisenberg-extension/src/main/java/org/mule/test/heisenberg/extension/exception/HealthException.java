@@ -6,9 +6,11 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
-public class HealthException extends Exception {
+public class HealthException extends Exception
+{
 
-  public HealthException(String message) {
-    super(message);
-  }
+    public HealthException(String message)
+    {
+        super(message);
+    }
 }

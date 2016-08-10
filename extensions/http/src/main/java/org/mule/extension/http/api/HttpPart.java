@@ -18,57 +18,64 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("part")
-public class HttpPart {
+public class HttpPart
+{
+    /**
+     * Name to identify this part.
+     */
+    @Parameter
+    private String id;
 
-  /**
-   * Name to identify this part.
-   */
-  @Parameter
-  private String id;
+    /**
+     * Actual value the part holds.
+     */
+    @Parameter
+    @XmlHints(allowReferences = false)
+    private Object data;
 
-  /**
-   * Actual value the part holds.
-   */
-  @Parameter
-  @XmlHints(allowReferences = false)
-  private Object data;
+    /**
+     * Content type from the data.
+     */
+    @Parameter
+    @Optional
+    private MediaType contentType;
 
-  /**
-   * Content type from the data.
-   */
-  @Parameter
-  @Optional
-  private MediaType contentType;
+    /**
+     * File name of this part, if required.
+     */
+    @Parameter
+    @Optional
+    private String filename;
 
-  /**
-   * File name of this part, if required.
-   */
-  @Parameter
-  @Optional
-  private String filename;
+    public HttpPart()
+    {
+    }
 
-  public HttpPart() {}
+    public HttpPart(String id, Object data, MediaType contentType, String filename)
+    {
+        this.id = id;
+        this.data = data;
+        this.contentType = contentType;
+        this.filename = filename;
+    }
 
-  public HttpPart(String id, Object data, MediaType contentType, String filename) {
-    this.id = id;
-    this.data = data;
-    this.contentType = contentType;
-    this.filename = filename;
-  }
+    public Object getData()
+    {
+        return data;
+    }
 
-  public Object getData() {
-    return data;
-  }
+    public MediaType getContentType()
+    {
+        return contentType;
+    }
 
-  public MediaType getContentType() {
-    return contentType;
-  }
+    public String getId()
+    {
+        return id;
+    }
 
-  public String getId() {
-    return id;
-  }
-
-  public String getFilename() {
-    return filename;
-  }
+    public String getFilename()
+    {
+        return filename;
+    }
 }

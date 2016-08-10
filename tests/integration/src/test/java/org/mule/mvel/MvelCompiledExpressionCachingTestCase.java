@@ -14,17 +14,20 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class MvelCompiledExpressionCachingTestCase extends AbstractIntegrationTestCase {
+public class MvelCompiledExpressionCachingTestCase extends AbstractIntegrationTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "mvel-compiled-expression-caching-config.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "mvel-compiled-expression-caching-config.xml";
+    }
 
-  @Test
-  public void testIssue() throws Exception {
-    MuleMessage response = flowRunner("foo-flow").withPayload(TEST_MESSAGE).run().getMessage();
+    @Test
+    public void testIssue() throws Exception
+    {
+        MuleMessage response = flowRunner("foo-flow").withPayload(TEST_MESSAGE).run().getMessage();
 
-    assertThat(getPayloadAsString(response), equalTo("SUCCESS"));
-  }
+        assertThat(getPayloadAsString(response), equalTo("SUCCESS"));
+    }
 }

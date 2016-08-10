@@ -11,12 +11,13 @@ import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.runtime.core.api.security.AuthenticationFilter;
 
 /**
- * <code>EndpointSecurityFilter</code> is a base filter for secure filtering of inbound and outbout event flow
+ * <code>EndpointSecurityFilter</code> is a base filter for secure filtering of
+ * inbound and outbout event flow
  */
 @Deprecated
-public interface EndpointSecurityFilter extends AuthenticationFilter, EndpointAware {
+public interface EndpointSecurityFilter extends AuthenticationFilter, EndpointAware
+{
+    void setEndpoint(ImmutableEndpoint endpoint);
 
-  void setEndpoint(ImmutableEndpoint endpoint);
-
-  ImmutableEndpoint getEndpoint();
+    ImmutableEndpoint getEndpoint();
 }

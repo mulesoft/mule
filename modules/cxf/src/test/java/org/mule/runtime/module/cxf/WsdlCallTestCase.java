@@ -20,30 +20,32 @@ import org.dom4j.io.SAXReader;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class WsdlCallTestCase extends FunctionalTestCase {
+public class WsdlCallTestCase extends FunctionalTestCase
+{
+    @Rule
+    public final DynamicPort jettyPort = new DynamicPort("jettyPort");
 
-  @Rule
-  public final DynamicPort jettyPort = new DynamicPort("jettyPort");
+    @Rule
+    public final DynamicPort httpPort = new DynamicPort("httpPort");
 
-  @Rule
-  public final DynamicPort httpPort = new DynamicPort("httpPort");
+    @Override
+    protected String getConfigFile()
+    {
+        return "wsdl-conf-flow-httpn.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "wsdl-conf-flow-httpn.xml";
-  }
+    @Test
+    public void testRequestWsdlWithHttp() throws Exception
+    {
+        String location = "http://localhost:" + httpPort.getNumber() + "/cxfService";
+        InputStream wsdlStream = new URL(location + "?wsdl").openStream();
 
-  @Test
-  public void testRequestWsdlWithHttp() throws Exception {
-    String location = "http://localhost:" + httpPort.getNumber() + "/cxfService";
-    InputStream wsdlStream = new URL(location + "?wsdl").openStream();
+        Document document = new SAXReader().read(wsdlStream);
+        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "Callable");
 
-    Document document = new SAXReader().read(wsdlStream);
-    List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-    assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "Callable");
-
-    nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
-    assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
-  }
+        nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
+        assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
+    }
 
 }

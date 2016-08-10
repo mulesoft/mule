@@ -27,76 +27,95 @@ import org.slf4j.LoggerFactory;
 /**
  * Service manager to use in the Mule container.
  */
-public class MuleServiceManager implements ServiceManager {
+public class MuleServiceManager implements ServiceManager
+{
 
-  private static final Logger logger = LoggerFactory.getLogger(MuleServiceManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(MuleServiceManager.class);
 
-  private final ServiceDiscoverer serviceDiscoverer;
-  private List<Service> registeredServices = new ArrayList<>();
-  private List<Service> wrappedServices;
+    private final ServiceDiscoverer serviceDiscoverer;
+    private List<Service> registeredServices = new ArrayList<>();
+    private List<Service> wrappedServices;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param serviceDiscoverer container service discoverer. Non null.
-   */
-  public MuleServiceManager(ServiceDiscoverer serviceDiscoverer) {
-    checkArgument(serviceDiscoverer != null, "serviceDiscoverer cannot be null");
-    this.serviceDiscoverer = serviceDiscoverer;
-  }
-
-  @Override
-  public void start() throws MuleException {
-    File servicesFolder = getServicesFolder();
-    if (!servicesFolder.exists()) {
-      servicesFolder.mkdir();
+    /**
+     * Creates a new instance.
+     *
+     * @param serviceDiscoverer container service discoverer. Non null.
+     */
+    public MuleServiceManager(ServiceDiscoverer serviceDiscoverer)
+    {
+        checkArgument(serviceDiscoverer != null, "serviceDiscoverer cannot be null");
+        this.serviceDiscoverer = serviceDiscoverer;
     }
 
-    try {
-      registeredServices = serviceDiscoverer.discoverServices();
-      wrappedServices = wrapServices(registeredServices);
-
-      startServices();
-    } catch (Exception e) {
-      throw new StartException(e, this);
-    }
-  }
-
-  private List<Service> wrapServices(List<Service> registeredServices) {
-    final List<Service> result = new ArrayList<>(registeredServices.size());
-    for (Service registeredService : registeredServices) {
-      final Service serviceProxy = createServiceProxy(registeredService);
-      result.add(serviceProxy);
-    }
-
-    return unmodifiableList(result);
-  }
-
-  private void startServices() throws MuleException {
-    for (Service service : registeredServices) {
-      if (service instanceof Startable) {
-        ((Startable) service).start();
-      }
-    }
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    for (int i = registeredServices.size() - 1; i >= 0; i--) {
-      Service service = registeredServices.get(i);
-
-      if (service instanceof Stoppable) {
-        try {
-          ((Stoppable) service).stop();
-        } catch (Exception e) {
-          logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
+    @Override
+    public void start() throws MuleException
+    {
+        File servicesFolder = getServicesFolder();
+        if (!servicesFolder.exists())
+        {
+            servicesFolder.mkdir();
         }
-      }
-    }
-  }
 
-  @Override
-  public List<Service> getServices() {
-    return wrappedServices;
-  }
+        try
+        {
+            registeredServices = serviceDiscoverer.discoverServices();
+            wrappedServices = wrapServices(registeredServices);
+
+            startServices();
+        }
+        catch (Exception e)
+        {
+            throw new StartException(e, this);
+        }
+    }
+
+    private List<Service> wrapServices(List<Service> registeredServices)
+    {
+        final List<Service> result = new ArrayList<>(registeredServices.size());
+        for (Service registeredService : registeredServices)
+        {
+            final Service serviceProxy = createServiceProxy(registeredService);
+            result.add(serviceProxy);
+        }
+
+        return unmodifiableList(result);
+    }
+
+    private void startServices() throws MuleException
+    {
+        for (Service service : registeredServices)
+        {
+            if (service instanceof Startable)
+            {
+                ((Startable) service).start();
+            }
+        }
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        for (int i = registeredServices.size()-1; i >= 0; i--)
+        {
+            Service service = registeredServices.get(i);
+
+            if (service instanceof Stoppable)
+            {
+                try
+                {
+                    ((Stoppable) service).stop();
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Service> getServices()
+    {
+        return wrappedServices;
+    }
 }

@@ -9,38 +9,52 @@ package org.mule.runtime.core.util.counters.impl;
 import org.mule.runtime.core.util.counters.Counter;
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Operator extends AggregateCounter {
+public class Operator extends AggregateCounter
+{
+    private final Counter base2;
+    private double val1;
+    private double val2;
 
-  private final Counter base2;
-  private double val1;
-  private double val2;
-
-  public Operator(String name, AbstractCounter base, AbstractCounter base2, Type type) {
-    super(name, type, base);
-    this.base2 = base2;
-    base2.addAggregate(this);
-  }
-
-  @Override
-  public double nextValue() {
-    Type type = this.getType();
-
-    if (type == Type.PLUS) {
-      return val1 + val2;
-    } else if (type == Type.MINUS) {
-      return val1 - val2;
-    } else if (type == Type.MULTIPLY) {
-      return val1 * val2;
-    } else if (type == Type.DIVIDE) {
-      return val2 == 0.0 ? (val1 >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY) : (val1 / val2);
-    } else {
-      throw new IllegalStateException();
+    public Operator(String name, AbstractCounter base, AbstractCounter base2, Type type)
+    {
+        super(name, type, base);
+        this.base2 = base2;
+        base2.addAggregate(this);
     }
-  }
 
-  @Override
-  public void doCompute() {
-    this.val1 = this.getBase().nextValue();
-    this.val2 = base2.nextValue();
-  }
+    @Override
+    public double nextValue()
+    {
+        Type type = this.getType();
+
+        if (type == Type.PLUS)
+        {
+            return val1 + val2;
+        }
+        else if (type == Type.MINUS)
+        {
+            return val1 - val2;
+        }
+        else if (type == Type.MULTIPLY)
+        {
+            return val1 * val2;
+        }
+        else if (type == Type.DIVIDE)
+        {
+            return val2 == 0.0
+                            ? (val1 >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY)
+                            : (val1 / val2);
+        }
+        else
+        {
+            throw new IllegalStateException();
+        }
+    }
+
+    @Override
+    public void doCompute()
+    {
+        this.val1 = this.getBase().nextValue();
+        this.val2 = base2.nextValue();
+    }
 }

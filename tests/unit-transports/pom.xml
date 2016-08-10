@@ -10,10 +10,6 @@
     <name>Mule Unit Test Framework (TCK)</name>
     <description>Mule Unit Test framework (TCK), deprecated Transport/Endpoint support</description>
     
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

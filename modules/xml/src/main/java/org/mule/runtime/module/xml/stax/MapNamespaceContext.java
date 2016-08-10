@@ -12,48 +12,58 @@ import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 
-public final class MapNamespaceContext implements NamespaceContext {
+public final class MapNamespaceContext implements NamespaceContext
+{
+    private Map<String, String> namespaces = new HashMap<String, String>();
 
-  private Map<String, String> namespaces = new HashMap<String, String>();
-
-  public MapNamespaceContext() {
-    super();
-  }
-
-  public MapNamespaceContext(final Map<String, String> ns) {
-    this();
-    this.namespaces = ns;
-  }
-
-  public void addNamespace(final String prefix, final String namespaceURI) {
-    this.namespaces.put(prefix, namespaceURI);
-  }
-
-  public void addNamespaces(final Map<String, String> ns) {
-    this.namespaces.putAll(ns);
-  }
-
-  @Override
-  public String getNamespaceURI(String prefix) {
-    return namespaces.get(prefix);
-  }
-
-  @Override
-  public String getPrefix(String namespaceURI) {
-    for (Map.Entry<String, String> entry : namespaces.entrySet()) {
-      if (entry.getValue().equals(namespaceURI)) {
-        return entry.getKey();
-      }
+    public MapNamespaceContext()
+    {
+        super();
     }
-    return null;
-  }
 
-  @Override
-  public Iterator<String> getPrefixes(String namespaceURI) {
-    return null;
-  }
+    public MapNamespaceContext(final Map<String, String> ns)
+    {
+        this();
+        this.namespaces = ns;
+    }
 
-  public Map<String, String> getUsedNamespaces() {
-    return namespaces;
-  }
+    public void addNamespace(final String prefix, final String namespaceURI)
+    {
+        this.namespaces.put(prefix, namespaceURI);
+    }
+
+    public void addNamespaces(final Map<String, String> ns)
+    {
+        this.namespaces.putAll(ns);
+    }
+
+    @Override
+    public String getNamespaceURI(String prefix)
+    {
+        return namespaces.get(prefix);
+    }
+
+    @Override
+    public String getPrefix(String namespaceURI)
+    {
+        for (Map.Entry<String, String> entry : namespaces.entrySet())
+        {
+            if (entry.getValue().equals(namespaceURI))
+            {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Iterator<String> getPrefixes(String namespaceURI)
+    {
+        return null;
+    }
+
+    public Map<String, String> getUsedNamespaces()
+    {
+        return namespaces;
+    }
 }

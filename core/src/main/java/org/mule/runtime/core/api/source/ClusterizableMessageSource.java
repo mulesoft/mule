@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.source;
 /**
  * Defines a message source that runs in only one node of a cluster.
  */
-public interface ClusterizableMessageSource extends MessageSource {
+public interface ClusterizableMessageSource extends MessageSource
+{
 
 }

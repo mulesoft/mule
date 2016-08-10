@@ -26,32 +26,33 @@ import org.junit.Test;
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class Http10FunctionalTestCase extends FunctionalTestCase {
+public class Http10FunctionalTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-10-config-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-10-config-flow.xml";
-  }
+    private HttpClient setupHttpClient()
+    {
+        HttpClientParams params = new HttpClientParams();
+        params.setVersion(HttpVersion.HTTP_1_0);
+        return new HttpClient(params);
+    }
 
-  private HttpClient setupHttpClient() {
-    HttpClientParams params = new HttpClientParams();
-    params.setVersion(HttpVersion.HTTP_1_0);
-    return new HttpClient(params);
-  }
+    @Test
+    public void testHttp10EnforceNonChunking() throws Exception
+    {
+        HttpClient client = setupHttpClient();
+        GetMethod request = new GetMethod(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Streaming")).getMessageSource()).getAddress());
+        client.executeMethod(request);
+        assertEquals("hello", request.getResponseBodyAsString());
 
-  @Test
-  public void testHttp10EnforceNonChunking() throws Exception {
-    HttpClient client = setupHttpClient();
-    GetMethod request =
-        new GetMethod(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Streaming")).getMessageSource())
-            .getAddress());
-    client.executeMethod(request);
-    assertEquals("hello", request.getResponseBodyAsString());
-
-    assertNull(request.getResponseHeader(HttpConstants.HEADER_TRANSFER_ENCODING));
-    assertNotNull(request.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH));
-  }
+        assertNull(request.getResponseHeader(HttpConstants.HEADER_TRANSFER_ENCODING));
+        assertNotNull(request.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH));
+    }
 }

@@ -11,78 +11,84 @@ import org.mule.compatibility.transport.jms.integration.AbstractJmsSingleTransac
 import org.junit.Test;
 
 /**
- * Test all combinations of (inbound) ALWAYS_JOIN. They should all fail.
+ * Test all combinations of (inbound) ALWAYS_JOIN.  They should all fail.
  */
-public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase
-    extends AbstractJmsSingleTransactionSingleServiceTestCase {
+public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase extends
+    AbstractJmsSingleTransactionSingleServiceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
-  }
+    @Override
+    @Test
+    public void testNone() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
 
-  @Override
-  @Test
-  public void testNone() throws Exception {
-    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
-    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
-    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
+        runTransactionFail("testNone");
+    }
 
-    runTransactionFail("testNone");
-  }
+    @Override
+    @Test
+    public void testAlwaysBegin() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
 
-  @Override
-  @Test
-  public void testAlwaysBegin() throws Exception {
-    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
-    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
-    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
+        runTransactionFail("testAlwaysBegin");
+    }
 
-    runTransactionFail("testAlwaysBegin");
-  }
+    @Override
+    @Test
+    public void testBeginOrJoin() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
 
-  @Override
-  @Test
-  public void testBeginOrJoin() throws Exception {
-    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
-    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
-    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
+        runTransactionFail("testBeginOrJoin");
+    }
 
-    runTransactionFail("testBeginOrJoin");
-  }
+    @Override
+    @Test
+    public void testAlwaysJoin() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
 
-  @Override
-  @Test
-  public void testAlwaysJoin() throws Exception {
-    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
-    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
-    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+        runTransactionFail("testAlwaysJoin");
+    }
 
-    runTransactionFail("testAlwaysJoin");
-  }
+    @Override
+    @Test
+    public void testJoinIfPossible() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
 
-  @Override
-  @Test
-  public void testJoinIfPossible() throws Exception {
-    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
-    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
-    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
-    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
-    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
-    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
-
-    runTransactionFail("testJoinIfPossible");
-  }
+        runTransactionFail("testJoinIfPossible");
+    }
 }

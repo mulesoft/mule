@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.http.api.requester;
 
-public enum HttpSendBodyMode {
-  ALWAYS, AUTO, NEVER;
+public enum HttpSendBodyMode
+{
+    ALWAYS, AUTO, NEVER;
 
 }

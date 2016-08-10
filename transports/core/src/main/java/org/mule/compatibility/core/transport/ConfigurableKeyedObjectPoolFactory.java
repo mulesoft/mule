@@ -9,7 +9,8 @@ package org.mule.compatibility.core.transport;
 /**
  * Simple factory for {@link ConfigurableKeyedObjectPool} instances.
  */
-public interface ConfigurableKeyedObjectPoolFactory {
+public interface ConfigurableKeyedObjectPoolFactory
+{
 
-  ConfigurableKeyedObjectPool createObjectPool();
+    ConfigurableKeyedObjectPool createObjectPool();
 }

@@ -14,46 +14,55 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-public class MuleInstanceContextTestCase extends AbstractELTestCase {
+public class MuleInstanceContextTestCase extends AbstractELTestCase
+{
+    public MuleInstanceContextTestCase(Variant variant, String mvelOptimizer)
+    {
+        super(variant, mvelOptimizer);
+    }
 
-  public MuleInstanceContextTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
-  }
+    @Test
+    public void version() throws UnknownHostException
+    {
+        Assert.assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version"));
+    }
 
-  @Test
-  public void version() throws UnknownHostException {
-    Assert.assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version"));
-  }
+    public void assignValueToMuleVersion()
+    {
+        assertFinalProperty("mule.version='1'");
+    }
 
-  public void assignValueToMuleVersion() {
-    assertFinalProperty("mule.version='1'");
-  }
+    @Test
+    public void home() throws UnknownHostException
+    {
+        Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.home"));
+    }
 
-  @Test
-  public void home() throws UnknownHostException {
-    Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.home"));
-  }
+    public void assignValueToHomeDir()
+    {
+        assertFinalProperty("mule.home='1'");
+    }
 
-  public void assignValueToHomeDir() {
-    assertFinalProperty("mule.home='1'");
-  }
+    @Test
+    public void clusterId() throws UnknownHostException
+    {
+        Assert.assertEquals(muleContext.getClusterId(), evaluate("mule.clusterId"));
+    }
 
-  @Test
-  public void clusterId() throws UnknownHostException {
-    Assert.assertEquals(muleContext.getClusterId(), evaluate("mule.clusterId"));
-  }
+    public void assignValueToClusterId()
+    {
+        assertFinalProperty("mule.clusterId='1'");
+    }
 
-  public void assignValueToClusterId() {
-    assertFinalProperty("mule.clusterId='1'");
-  }
+    @Test
+    public void nodeId() throws UnknownHostException
+    {
+        Assert.assertEquals(muleContext.getClusterNodeId(), evaluate("mule.nodeId"));
+    }
 
-  @Test
-  public void nodeId() throws UnknownHostException {
-    Assert.assertEquals(muleContext.getClusterNodeId(), evaluate("mule.nodeId"));
-  }
-
-  public void assignValueToNodeId() {
-    assertFinalProperty("mule.nodeId='1'");
-  }
+    public void assignValueToNodeId()
+    {
+        assertFinalProperty("mule.nodeId='1'");
+    }
 
 }

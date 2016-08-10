@@ -17,29 +17,32 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * Lookup an {@link ObjectStore} from the registry.
  */
-public class ObjectStoreFromRegistryFactoryBean extends AbstractFactoryBean<ObjectStore<Serializable>>
-    implements MuleContextAware {
+public class ObjectStoreFromRegistryFactoryBean extends AbstractFactoryBean<ObjectStore<Serializable>> implements MuleContextAware
+{
+    private String objectStoreName;
+    private MuleContext muleContext;
 
-  private String objectStoreName;
-  private MuleContext muleContext;
+    public ObjectStoreFromRegistryFactoryBean(String name)
+    {
+        super();
+        objectStoreName = name;
+    }
+    
+    @Override
+    public Class<?> getObjectType()
+    {
+        return ObjectStore.class;
+    }
 
-  public ObjectStoreFromRegistryFactoryBean(String name) {
-    super();
-    objectStoreName = name;
-  }
+    @Override
+    protected ObjectStore<Serializable> createInstance() throws Exception
+    {
+        return muleContext.getRegistry().lookupObject(objectStoreName);
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return ObjectStore.class;
-  }
-
-  @Override
-  protected ObjectStore<Serializable> createInstance() throws Exception {
-    return muleContext.getRegistry().lookupObject(objectStoreName);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
 }

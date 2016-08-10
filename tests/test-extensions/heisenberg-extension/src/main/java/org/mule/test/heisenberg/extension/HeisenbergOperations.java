@@ -45,141 +45,172 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-public class HeisenbergOperations {
+public class HeisenbergOperations
+{
 
-  public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
-  public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
-  public static final String KILL_WITH_GROUP = "KillGroup";
+    public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
+    public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
+    public static final String KILL_WITH_GROUP = "KillGroup";
 
-  public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
-  public static final String OPERATION_WITH_SUMMARY = "knockMany";
-  public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
-  public static final String OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME = "Custom overrided display name";
-  public static final String KNOCKEABLE_DOORS_SUMMARY = "List of Knockeable Doors";
-  public static final String DOOR_PARAMETER = "doors";
+    public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
+    public static final String OPERATION_WITH_SUMMARY = "knockMany";
+    public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
+    public static final String OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME = "Custom overrided display name";
+    public static final String KNOCKEABLE_DOORS_SUMMARY = "List of Knockeable Doors";
+    public static final String DOOR_PARAMETER = "doors";
 
-  @Inject
-  private ExtensionManager extensionManager;
+    @Inject
+    private ExtensionManager extensionManager;
 
-  @DataTypeParameters
-  public String sayMyName(@UseConfig HeisenbergExtension config) {
-    return config.getPersonalInfo().getName();
-  }
-
-  public void die(@UseConfig HeisenbergExtension config) {
-    config.setEndingHealth(HealthStatus.DEAD);
-  }
-
-  @DataTypeParameters
-  public OperationResult<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config,
-                                                             @Optional(defaultValue = "0") int index) {
-    Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-    org.mule.runtime.api.metadata.DataType dt =
-        DataType.builder().type(String.class).mediaType("dead/dead").charset(lastSupportedEncoding.toString()).build();
-
-    return OperationResult.<String, IntegerAttributes>builder().output(config.getEnemies().get(index))
-        .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
-  }
-
-  public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception {
-    return killWithCustomMessage(victim, goodbyeMessage);
-  }
-
-  public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") @Placement(group = KILL_WITH_GROUP,
-      order = 1) String victim, @Placement(group = KILL_WITH_GROUP, order = 2) String goodbyeMessage) {
-    return String.format("%s, %s", goodbyeMessage, victim);
-  }
-
-  public String knock(KnockeableDoor knockedDoor) {
-    return knockedDoor.knock();
-  }
-
-  public List<Ricin> killWithRicins(@Optional(defaultValue = "#[payload]") List<Ricin> ricinList) {
-    return ricinList;
-  }
-
-  public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon) {
-    return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
-  }
-
-  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = "#[payload]") List<Weapon> weaponList) {
-    return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
-  }
-
-  public List<String> killWithMultipleWildCardWeapons(List<? extends Weapon> wildCardWeapons) {
-    return wildCardWeapons.stream().map(Weapon::kill).collect(Collectors.toList());
-  }
-
-  public String killMany(@RestrictedTo(HeisenbergExtension.class) List<NestedProcessor> killOperations, String reason)
-      throws Exception {
-    StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
-    for (NestedProcessor processor : killOperations) {
-      builder.append(processor.process()).append("\n");
+    @DataTypeParameters
+    public String sayMyName(@UseConfig HeisenbergExtension config)
+    {
+        return config.getPersonalInfo().getName();
     }
 
-    return builder.toString();
-  }
+    public void die(@UseConfig HeisenbergExtension config)
+    {
+        config.setEndingHealth(HealthStatus.DEAD);
+    }
 
-  public String killOne(@RestrictedTo(HeisenbergExtension.class) NestedProcessor killOperation, String reason) throws Exception {
-    StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
-    builder.append(killOperation.process()).append("\n");
+    @DataTypeParameters
+    public OperationResult<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
+    {
+        Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
+        org.mule.runtime.api.metadata.DataType dt = DataType.builder()
+                                                            .type(String.class)
+                                                            .mediaType("dead/dead")
+                                                            .charset(lastSupportedEncoding.toString())
+                                                            .build();
 
-    return builder.toString();
-  }
+        return OperationResult.<String, IntegerAttributes> builder()
+                              .output(config.getEnemies().get(index))
+                              .mediaType(dt.getMediaType())
+                              .attributes(new IntegerAttributes(index))
+                              .build();
+    }
 
-  public ExtensionManager getInjectedExtensionManager() {
-    return extensionManager;
-  }
+    public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception
+    {
+        return killWithCustomMessage(victim, goodbyeMessage);
+    }
 
-  public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event) {
-    Long payment = (Long) event.getMessage().getPayload();
-    config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
-  }
+    public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") @Placement(group = KILL_WITH_GROUP, order = 1) String victim,
+                                        @Placement(group = KILL_WITH_GROUP, order = 2) String goodbyeMessage)
+    {
+        return String.format("%s, %s", goodbyeMessage, victim);
+    }
 
-  public String alias(String greeting, @ParameterGroup PersonalInfo info) {
-    return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
-  }
+    public String knock(KnockeableDoor knockedDoor)
+    {
+        return knockedDoor.knock();
+    }
 
-  public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage message) {
-    Long payment = (Long) message.getPayload();
-    config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
-  }
+    public List<Ricin> killWithRicins(@Optional(defaultValue = "#[payload]") List<Ricin> ricinList)
+    {
+        return ricinList;
+    }
 
-  public List<String> knockMany(@Summary(KNOCKEABLE_DOORS_SUMMARY) List<KnockeableDoor> doors) {
-    return doors.stream().map(KnockeableDoor::knock).collect(toList());
-  }
+    public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon)
+    {
+        return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
+    }
 
-  public String callSaul(@Connection HeisenbergConnection connection) {
-    return connection.callSaul();
-  }
+    public List<String> killWithMultiplesWeapons(@Optional(defaultValue = "#[payload]") List<Weapon> weaponList)
+    {
+        return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
+    }
 
-  public String callGusFring() throws HeisenbergException {
-    throw new HeisenbergException(CALL_GUS_MESSAGE);
-  }
+    public List<String> killWithMultipleWildCardWeapons(List<? extends Weapon> wildCardWeapons)
+    {
+        return wildCardWeapons.stream().map(Weapon::kill).collect(Collectors.toList());
+    }
 
-  @OnException(CureCancerExceptionEnricher.class)
-  public String cureCancer() throws HealthException {
-    throw new HealthException(CURE_CANCER_MESSAGE);
-  }
+    public String killMany(@RestrictedTo(HeisenbergExtension.class) List<NestedProcessor> killOperations, String reason) throws Exception
+    {
+        StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
+        for (NestedProcessor processor : killOperations)
+        {
+            builder.append(processor.process()).append("\n");
+        }
 
-  public Map<Integer, HealthStatus> getMedicalHistory(Map<Integer, HealthStatus> healthByYear) {
-    return healthByYear;
-  }
+        return builder.toString();
+    }
 
-  public String getSaulPhone(@Connection HeisenbergConnection connection) {
-    return connection.getSaulPhoneNumber();
-  }
+    public String killOne(@RestrictedTo(HeisenbergExtension.class) NestedProcessor killOperation, String reason) throws Exception
+    {
+        StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
+        builder.append(killOperation.process()).append("\n");
 
-  public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) @Expression(ExpressionSupport.LITERAL) String literalExpression) {
-    return literalExpression;
-  }
+        return builder.toString();
+    }
 
-  public int[][] getGramsInStorage(@Optional(defaultValue = "#[payload]") int[][] grams) {
-    return grams;
-  }
+    public ExtensionManager getInjectedExtensionManager()
+    {
+        return extensionManager;
+    }
 
-  @Ignore
-  public void ignoredOperation() {
+    public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event)
+    {
+        Long payment = (Long) event.getMessage().getPayload();
+        config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
+    }
 
-  }
+    public String alias(String greeting, @ParameterGroup PersonalInfo info)
+    {
+        return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
+    }
+
+    public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage message)
+    {
+        Long payment = (Long) message.getPayload();
+        config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
+    }
+
+    public List<String> knockMany(@Summary(KNOCKEABLE_DOORS_SUMMARY) List<KnockeableDoor> doors)
+    {
+        return doors.stream().map(KnockeableDoor::knock).collect(toList());
+    }
+
+    public String callSaul(@Connection HeisenbergConnection connection)
+    {
+        return connection.callSaul();
+    }
+
+    public String callGusFring() throws HeisenbergException
+    {
+        throw new HeisenbergException(CALL_GUS_MESSAGE);
+    }
+
+    @OnException(CureCancerExceptionEnricher.class)
+    public String cureCancer() throws HealthException
+    {
+        throw new HealthException(CURE_CANCER_MESSAGE);
+    }
+
+    public Map<Integer, HealthStatus> getMedicalHistory(Map<Integer, HealthStatus> healthByYear)
+    {
+        return healthByYear;
+    }
+
+    public String getSaulPhone(@Connection HeisenbergConnection connection)
+    {
+        return connection.getSaulPhoneNumber();
+    }
+
+    public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) @Expression(ExpressionSupport.LITERAL) String literalExpression)
+    {
+        return literalExpression;
+    }
+
+    public int[][] getGramsInStorage(@Optional(defaultValue = "#[payload]") int[][] grams)
+    {
+        return grams;
+    }
+
+    @Ignore
+    public void ignoredOperation()
+    {
+
+    }
 }

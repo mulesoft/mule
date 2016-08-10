@@ -13,18 +13,21 @@ import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 /**
  * Creates {@link QueryExecutor} instances
  */
-public class SelectExecutorFactory implements QueryExecutorFactory {
+public class SelectExecutorFactory implements QueryExecutorFactory
+{
 
-  private final StatementFactory statementFactory;
-  private final ResultSetHandler resultHandler;
+    private final StatementFactory statementFactory;
+    private final ResultSetHandler resultHandler;
 
-  public SelectExecutorFactory(StatementFactory statementFactory, ResultSetHandler resultHandler) {
-    this.statementFactory = statementFactory;
-    this.resultHandler = resultHandler;
-  }
+    public SelectExecutorFactory(StatementFactory statementFactory, ResultSetHandler resultHandler)
+    {
+        this.statementFactory = statementFactory;
+        this.resultHandler = resultHandler;
+    }
 
-  @Override
-  public QueryExecutor create() {
-    return new SelectExecutor(statementFactory, resultHandler);
-  }
+    @Override
+    public QueryExecutor create()
+    {
+        return new SelectExecutor(statementFactory, resultHandler);
+    }
 }

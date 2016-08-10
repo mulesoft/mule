@@ -23,76 +23,88 @@ import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import java.io.File;
 import java.io.IOException;
 
-public class DefaultDomainFactory implements DomainFactory {
+public class DefaultDomainFactory implements DomainFactory
+{
 
-  private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
-  private final DomainManager domainManager;
-  private final DomainDescriptorParser domainDescriptorParser;
+    private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
+    private final DomainManager domainManager;
+    private final DomainDescriptorParser domainDescriptorParser;
 
-  protected DeploymentListener deploymentListener;
-  private final ArtifactClassLoader containerClassLoader;
+    protected DeploymentListener deploymentListener;
+    private final ArtifactClassLoader containerClassLoader;
 
-  public DefaultDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                              DomainManager domainManager, ArtifactClassLoader containerClassLoader) {
-    checkArgument(domainManager != null, "Domain manager cannot be null");
-    checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
-    this.containerClassLoader = containerClassLoader;
-    this.domainClassLoaderFactory = domainClassLoaderFactory;
-    this.domainManager = domainManager;
-    this.domainDescriptorParser = new DomainDescriptorParser();
-  }
-
-  public void setDeploymentListener(DeploymentListener deploymentListener) {
-    this.deploymentListener = deploymentListener;
-  }
-
-  @Override
-  public Domain createArtifact(String artifactName) throws IOException {
-    Domain domain = domainManager.getDomain(artifactName);
-    if (domain != null) {
-      throw new IllegalArgumentException(format("Domain '%s'  already exists", artifactName));
-    }
-    if (artifactName.contains(" ")) {
-      throw new IllegalArgumentException("Mule domain name may not contain spaces: " + artifactName);
-    }
-    DomainDescriptor descriptor = findDomain(artifactName);
-    // TODO MULE-9653 - use the plugins class loader maps when plugins are allowed in domains
-    DefaultMuleDomain defaultMuleDomain =
-        new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(containerClassLoader, descriptor, emptyList()));
-    defaultMuleDomain.setDeploymentListener(deploymentListener);
-    DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
-    domainManager.addDomain(domainWrapper);
-    return domainWrapper;
-  }
-
-  private DomainDescriptor findDomain(String domainName) throws IOException {
-    if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
-      return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
+    public DefaultDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, DomainManager domainManager, ArtifactClassLoader containerClassLoader)
+    {
+        checkArgument(domainManager != null, "Domain manager cannot be null");
+        checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+        this.containerClassLoader = containerClassLoader;
+        this.domainClassLoaderFactory = domainClassLoaderFactory;
+        this.domainManager = domainManager;
+        this.domainDescriptorParser = new DomainDescriptorParser();
     }
 
-    final File deploymentFile = getDeploymentFile(getDomainFolder(domainName));
-
-    DomainDescriptor descriptor;
-
-    if (deploymentFile != null) {
-      descriptor = domainDescriptorParser.parse(deploymentFile, domainName);
-    } else {
-      descriptor = new EmptyDomainDescriptor(domainName);
+    public void setDeploymentListener(DeploymentListener deploymentListener)
+    {
+        this.deploymentListener = deploymentListener;
     }
 
-    return descriptor;
-  }
+    @Override
+    public Domain createArtifact(String artifactName) throws IOException
+    {
+        Domain domain = domainManager.getDomain(artifactName);
+        if (domain != null)
+        {
+            throw new IllegalArgumentException(format("Domain '%s'  already exists", artifactName));
+        }
+        if (artifactName.contains(" "))
+        {
+            throw new IllegalArgumentException("Mule domain name may not contain spaces: " + artifactName);
+        }
+        DomainDescriptor descriptor = findDomain(artifactName);
+        //TODO MULE-9653 - use the plugins class loader maps when plugins are allowed in domains
+        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(containerClassLoader, descriptor, emptyList()));
+        defaultMuleDomain.setDeploymentListener(deploymentListener);
+        DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
+        domainManager.addDomain(domainWrapper);
+        return domainWrapper;
+    }
 
-  @Override
-  public File getArtifactDir() {
-    return MuleContainerBootstrapUtils.getMuleDomainsDir();
-  }
+    private DomainDescriptor findDomain(String domainName) throws IOException
+    {
+        if (DEFAULT_DOMAIN_NAME.equals(domainName))
+        {
+            return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
+        }
 
-  public void dispose(DomainWrapper domain) {
-    domainManager.removeDomain(domain.getArtifactName());
-  }
+        final File deploymentFile = getDeploymentFile(getDomainFolder(domainName));
 
-  public void start(DomainWrapper domainWrapper) {
-    domainManager.addDomain(domainWrapper);
-  }
+        DomainDescriptor descriptor;
+
+        if (deploymentFile != null)
+        {
+            descriptor = domainDescriptorParser.parse(deploymentFile, domainName);
+        }
+        else
+        {
+            descriptor = new EmptyDomainDescriptor(domainName);
+        }
+
+        return descriptor;
+    }
+
+    @Override
+    public File getArtifactDir()
+    {
+        return MuleContainerBootstrapUtils.getMuleDomainsDir();
+    }
+
+    public void dispose(DomainWrapper domain)
+    {
+        domainManager.removeDomain(domain.getArtifactName());
+    }
+
+    public void start(DomainWrapper domainWrapper)
+    {
+        domainManager.addDomain(domainWrapper);
+    }
 }

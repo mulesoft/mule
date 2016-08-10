@@ -12,11 +12,13 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 /**
  * Wire format using Java serialization
  */
-public class SerializationWireFormat extends TransformerPairWireFormat {
+public class SerializationWireFormat extends TransformerPairWireFormat
+{
 
-  public SerializationWireFormat() {
-    setInboundTransformer(new ByteArrayToSerializable());
-    setOutboundTransformer(new SerializableToByteArray());
-  }
-
+    public SerializationWireFormat()
+    {
+        setInboundTransformer(new ByteArrayToSerializable());
+        setOutboundTransformer(new SerializableToByteArray());
+    }
+    
 }

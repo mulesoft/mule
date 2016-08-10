@@ -13,34 +13,40 @@ import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.IOException;
 
-public class TestDomainFactory extends DefaultDomainFactory {
+public class TestDomainFactory extends DefaultDomainFactory
+{
 
-  private boolean failOnStop;
-  private boolean failOnDispose;
+    private boolean failOnStop;
+    private boolean failOnDispose;
 
-  public TestDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                           ArtifactClassLoader containerClassLoader) {
-    super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader);
-  }
-
-  @Override
-  public Domain createArtifact(String artifactName) throws IOException {
-    TestDomainWrapper testDomainWrapper = new TestDomainWrapper(super.createArtifact(artifactName));
-    if (this.failOnStop) {
-      testDomainWrapper.setFailOnStop();
+    public TestDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, ArtifactClassLoader containerClassLoader)
+    {
+        super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader);
     }
-    if (this.failOnDispose) {
-      testDomainWrapper.setFailOnDispose();
+
+    @Override
+    public Domain createArtifact(String artifactName) throws IOException
+    {
+        TestDomainWrapper testDomainWrapper = new TestDomainWrapper(super.createArtifact(artifactName));
+        if (this.failOnStop)
+        {
+            testDomainWrapper.setFailOnStop();
+        }
+        if (this.failOnDispose)
+        {
+            testDomainWrapper.setFailOnDispose();
+        }
+        return testDomainWrapper;
     }
-    return testDomainWrapper;
-  }
 
-  public void setFailOnStopApplication() {
-    failOnStop = true;
-  }
+    public void setFailOnStopApplication()
+    {
+        failOnStop = true;
+    }
 
-  public void setFailOnDisposeApplication() {
-    failOnDispose = true;
-  }
+    public void setFailOnDisposeApplication()
+    {
+        failOnDispose = true;
+    }
 
 }

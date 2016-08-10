@@ -12,9 +12,10 @@ package org.mule.compatibility.core.api.registry;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface ServiceDescriptor {
+public interface ServiceDescriptor
+{
 
-  String getService();
+    String getService();
 
 }
 

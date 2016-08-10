@@ -28,54 +28,58 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-6926: Flaky test")
-public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
+public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
+{
+    @ClassRule
+    public static DynamicPort serverPort = new DynamicPort("serverPort");
 
-  @ClassRule
-  public static DynamicPort serverPort = new DynamicPort("serverPort");
+    public static final long TIMEOUT = 3000;
 
-  public static final long TIMEOUT = 3000;
+    private static BrokerService broker;
 
-  private static BrokerService broker;
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml";
-  }
+    @BeforeClass
+    public static void startBroker() throws Exception
+    {
+        broker = new BrokerService();
+        broker.addConnector("tcp://localhost:" + serverPort.getNumber());
+        broker.start();
+    }
 
-  @BeforeClass
-  public static void startBroker() throws Exception {
-    broker = new BrokerService();
-    broker.addConnector("tcp://localhost:" + serverPort.getNumber());
-    broker.start();
-  }
+    @AfterClass
+    public static void stopBroker() throws Exception
+    {
+        broker.stop();
+    }
 
-  @AfterClass
-  public static void stopBroker() throws Exception {
-    broker.stop();
-  }
+    @Test
+    public void testExchange() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testExchange() throws Exception {
-    MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        assertNotNull(result);
+        assertThat(result.getPayload(), is(nullValue()));
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null);
-    assertNotNull(result);
-    assertThat(result.getPayload(), is(nullValue()));
+        Map<String, Serializable> props = new HashMap<>();
+        props.put("foo", "bar");
+        result = client.send("inboundEndpoint", "some data", props, 20000);
 
-    Map<String, Serializable> props = new HashMap<>();
-    props.put("foo", "bar");
-    result = client.send("inboundEndpoint", "some data", props, 20000);
+        // Give JMS some time to dispatch
+        Thread.sleep(200);
 
-    // Give JMS some time to dispatch
-    Thread.sleep(200);
+        // No temporary queues should have been created, used, or be being waited on
+        // for a result
+        // See MULE-4617
+        assertEquals(0, broker.getAdminView().getTemporaryQueues().length);
 
-    // No temporary queues should have been created, used, or be being waited on
-    // for a result
-    // See MULE-4617
-    assertEquals(0, broker.getAdminView().getTemporaryQueues().length);
+        assertNotNull(result);
 
-    assertNotNull(result);
-
-    assertEquals("foo header received", result.getPayload());
-  }
+        assertEquals("foo header received", result.getPayload());
+    }
 }

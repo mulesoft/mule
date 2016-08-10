@@ -23,261 +23,271 @@ import javax.activation.DataHandler;
 /**
  * MuleMessage
  */
-public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, MessageProperties, MessageAttachments {
-
-  /**
-   * Provides a builder to create {@link MuleMessage} objects.
-   *
-   * @return a new {@link Builder}.
-   */
-  static PayloadBuilder builder() {
-    return DefaultMuleMessageBuilderFactory.getInstance().create();
-  }
-
-  /**
-   * Provides a builder to create {@link MuleMessage} objects based on an existing {@link MuleMessage} instance.
-   *
-   * @param message existing {@link MuleMessage} to use as a template to create a new {@link Builder} instance.
-   * @return a new {@link Builder} based on the template {@code message} provided.
-   */
-  static Builder builder(MuleMessage message) {
-    return DefaultMuleMessageBuilderFactory.getInstance().create(message);
-  }
-
-  static Builder builder(org.mule.runtime.api.message.MuleMessage message) {
-    return DefaultMuleMessageBuilderFactory.getInstance().create(message);
-  }
-
-  /**
-   * Create a new {@link MuleMessage instance} with the given payload.
-   *
-   * @param payload the message payload
-   * @return new message instance
-   */
-  static MuleMessage of(Object payload) {
-    return builder().payload(payload).build();
-  }
-
-  /**
-   * gets the unique identifier for the message. It's up to the implementation to ensure a unique id
-   *
-   * @return a unique message id. The Id should never be null. If the underlying transport does not have the notion of a message
-   *         Id, one should be generated. The generated Id should be a UUID.
-   */
-  String getUniqueId();
-
-  /**
-   * gets an identifier that is the same among parent and child messages
-   *
-   * @return a message id for the group of descendant messages. The Id should never be null.
-   */
-  String getMessageRootId();
-
-  /**
-   * Returns the correlation metadata of this message. See {@link Correlation}.
-   * 
-   * @return the correlation metadata of this message.
-   */
-  Correlation getCorrelation();
-
-  /**
-   * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
-   * and Mule error code, plus any other releated info
-   *
-   * @return The exception payload (if any) attached to this message
-   */
-  ExceptionPayload getExceptionPayload();
-
-  interface PayloadBuilder extends org.mule.runtime.api.message.MuleMessage.PayloadBuilder {
-
-    @Override
-    Builder nullPayload();
-
-    @Override
-    Builder payload(Object payload);
-
-    @Override
-    CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
-
-    @Override
-    CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
-
-    @Override
-    CollectionBuilder collectionPayload(Object[] payload);
-  }
-
-  interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder {
-
-    @Override
-    Builder mediaType(MediaType mediaType);
-
-    @Override
-    Builder attributes(Attributes value);
+public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, MessageProperties, MessageAttachments
+{
 
     /**
-     * @param correlationId
-     * @return this builder.
+     * Provides a builder to create {@link MuleMessage} objects.
+     *
+     * @return a new {@link Builder}.
      */
-    Builder correlationId(String correlationId);
+    static PayloadBuilder builder()
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create();
+    }
 
     /**
-     * @param correlationSequence
-     * @return this builder.
+     * Provides a builder to create {@link MuleMessage} objects based on an existing {@link MuleMessage} instance.
+     *
+     * @param message existing {@link MuleMessage} to use as a template to create a new {@link Builder} instance.
+     * @return a new {@link Builder} based on the template {@code message} provided.
      */
-    Builder correlationSequence(Integer correlationSequence);
+    static Builder builder(MuleMessage message)
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+    }
+
+    static Builder builder(org.mule.runtime.api.message.MuleMessage message)
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+    }
 
     /**
-     * @param correlationGroupSize
-     * @return this builder.
+     * Create a new {@link MuleMessage instance} with the given payload.
+     *
+     * @param payload the message payload
+     * @return new message instance
      */
-    Builder correlationGroupSize(Integer correlationGroupSize);
+    static MuleMessage of(Object payload)
+    {
+        return builder().payload(payload).build();
+    }
 
     /**
-     * @param exceptionPayload
-     * @return this builder.
+     * gets the unique identifier for the message. It's up to the implementation to
+     * ensure a unique id
+     *
+     * @return a unique message id. The Id should never be null. If the underlying
+     * transport does not have the notion of a message Id, one should be
+     * generated. The generated Id should be a UUID.
      */
-    Builder exceptionPayload(ExceptionPayload exceptionPayload);
+    String getUniqueId();
 
     /**
-     * @param id
-     * @return
+     * gets an identifier that is the same among parent and child messages
+     *
+     * @return a message id for the group of descendant messages. The Id should never be null.
      */
-    Builder id(String id);
+    String getMessageRootId();
 
     /**
-     * @param rootId
-     * @return
+     * Returns the correlation metadata of this message. See {@link Correlation}.
+     * 
+     * @return the correlation metadata of this message.
      */
-    Builder rootId(String rootId);
+    Correlation getCorrelation();
 
     /**
-     * @param key
-     * @param value
-     * @return
+     * If an error occurred during the processing of this message this will return a
+     * ErrorPayload that contains the root exception and Mule error code, plus any
+     * other releated info
+     *
+     * @return The exception payload (if any) attached to this message
      */
-    Builder addInboundProperty(String key, Serializable value);
+    ExceptionPayload getExceptionPayload();
 
-    /**
-     * @param key
-     * @param value
-     * @param mediaType
-     * @return
-     */
-    Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
+    interface PayloadBuilder extends org.mule.runtime.api.message.MuleMessage.PayloadBuilder
+    {
 
-    /**
-     * @param key
-     * @param value
-     * @param dataType
-     * @return
-     */
-    Builder addInboundProperty(String key, Serializable value, DataType dataType);
+        @Override
+        Builder nullPayload();
 
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    Builder addOutboundProperty(String key, Serializable value);
+        @Override
+        Builder payload(Object payload);
 
-    /**
-     * @param key
-     * @param value
-     * @param mediaType
-     * @return
-     */
-    Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
+        @Override
+        CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
 
-    /**
-     * @param key
-     * @param value
-     * @param dataType
-     * @return
-     */
-    Builder addOutboundProperty(String key, Serializable value, DataType dataType);
+        @Override
+        CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
 
-    /**
-     * @param key
-     * @return
-     */
-    Builder removeInboundProperty(String key);
+        @Override
+        CollectionBuilder collectionPayload(Object[] payload);
+    }
 
-    /**
-     * @param key
-     * @return
-     */
-    Builder removeOutboundProperty(String key);
+    interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder
+    {
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param key
-     * @param value
-     * @return
-     */
-    @Deprecated
-    Builder addInboundAttachment(String key, DataHandler value);
+        @Override
+        Builder mediaType(MediaType mediaType);
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param key
-     * @param value
-     * @return
-     */
-    @Deprecated
-    Builder addOutboundAttachment(String key, DataHandler value);
+        @Override
+        Builder attributes(Attributes value);
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param key
-     * @return
-     */
-    @Deprecated
-    Builder removeInboundAttachment(String key);
+        /**
+         * @param correlationId
+         * @return this builder.
+         */
+        Builder correlationId(String correlationId);
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param key
-     * @return
-     */
-    @Deprecated
-    Builder removeOutboundAttachment(String key);
+        /**
+         * @param correlationSequence
+         * @return this builder.
+         */
+        Builder correlationSequence(Integer correlationSequence);
 
-    /**
-     * @param inboundProperties
-     * @return
-     */
-    Builder inboundProperties(Map<String, Serializable> inboundProperties);
+        /**
+         * @param correlationGroupSize
+         * @return this builder.
+         */
+        Builder correlationGroupSize(Integer correlationGroupSize);
 
-    /**
-     * @param outboundProperties
-     * @return
-     */
-    Builder outboundProperties(Map<String, Serializable> outboundProperties);
+        /**
+         * @param exceptionPayload
+         * @return this builder.
+         */
+        Builder exceptionPayload(ExceptionPayload exceptionPayload);
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param inboundAttachments
-     * @return
-     */
-    @Deprecated
-    Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
+        /**
+         * @param id
+         * @return
+         */
+        Builder id(String id);
 
-    /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
-     * @param outbundAttachments
-     * @return
-     */
-    @Deprecated
-    Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
+        /**
+         * @param rootId
+         * @return
+         */
+        Builder rootId(String rootId);
 
-    @Override
-    MuleMessage build();
-  }
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder addInboundProperty(String key, Serializable value);
 
-  interface CollectionBuilder extends org.mule.runtime.api.message.MuleMessage.CollectionBuilder, Builder {
+        /**
+         * @param key
+         * @param value
+         * @param mediaType
+         * @return
+         */
+        Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
 
-    @Override
-    CollectionBuilder itemMediaType(MediaType mediaType);
+        /**
+         * @param key
+         * @param value
+         * @param dataType
+         * @return
+         */
+        Builder addInboundProperty(String key, Serializable value, DataType dataType);
 
-  }
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder addOutboundProperty(String key, Serializable value);
+
+        /**
+         * @param key
+         * @param value
+         * @param mediaType
+         * @return
+         */
+        Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
+
+        /**
+         * @param key
+         * @param value
+         * @param dataType
+         * @return
+         */
+        Builder addOutboundProperty(String key, Serializable value, DataType dataType);
+
+        /**
+         * @param key
+         * @return
+         */
+        Builder removeInboundProperty(String key);
+
+        /**
+         * @param key
+         * @return
+         */
+        Builder removeOutboundProperty(String key);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param key
+         * @param value
+         * @return
+         */
+        @Deprecated
+        Builder addInboundAttachment(String key, DataHandler value);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param key
+         * @param value
+         * @return
+         */
+        @Deprecated
+        Builder addOutboundAttachment(String key, DataHandler value);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param key
+         * @return
+         */
+        @Deprecated
+        Builder removeInboundAttachment(String key);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param key
+         * @return
+         */
+        @Deprecated
+        Builder removeOutboundAttachment(String key);
+
+        /**
+         * @param inboundProperties
+         * @return
+         */
+        Builder inboundProperties(Map<String, Serializable> inboundProperties);
+
+        /**
+         * @param outboundProperties
+         * @return
+         */
+        Builder outboundProperties(Map<String, Serializable> outboundProperties);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param inboundAttachments
+         * @return
+         */
+        @Deprecated
+        Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
+
+        /**
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
+         * @param outbundAttachments
+         * @return
+         */
+        @Deprecated
+        Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
+
+        @Override
+        MuleMessage build();
+    }
+
+    interface CollectionBuilder extends org.mule.runtime.api.message.MuleMessage.CollectionBuilder, Builder
+    {
+        @Override
+        CollectionBuilder itemMediaType(MediaType mediaType);
+
+    }
 }

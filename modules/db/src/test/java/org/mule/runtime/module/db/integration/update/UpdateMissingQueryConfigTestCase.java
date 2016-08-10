@@ -9,15 +9,18 @@ package org.mule.runtime.module.db.integration.update;
 
 import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
-public class UpdateMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase {
+public class UpdateMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/update/update-missing-query-config.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/update/update-missing-query-config.xml";
+    }
 
-  @Override
-  protected String getMessageProcessorElement() {
-    return "update";
-  }
+    @Override
+    protected String getMessageProcessorElement()
+    {
+        return "update";
+    }
 }

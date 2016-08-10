@@ -16,18 +16,24 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class DynamicOracleConfigTestCase extends AbstractDynamicDatabaseConfigTestCase {
+public class DynamicOracleConfigTestCase extends AbstractDynamicDatabaseConfigTestCase
+{
 
-  public DynamicOracleConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    if (TestDbConfig.getOracleResource().isEmpty()) {
-      return Collections.emptyList();
-    } else {
-      return Collections.singletonList(new Object[] {"integration/config/oracle-dynamic-config.xml", new OracleTestDatabase()});
+    public DynamicOracleConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
-  }
+
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        if (TestDbConfig.getOracleResource().isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Collections.singletonList(new Object[] {"integration/config/oracle-dynamic-config.xml", new OracleTestDatabase()});
+        }
+    }
 }

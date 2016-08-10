@@ -22,58 +22,71 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * If this attribute is present, no other can be
  */
-public class CheckExclusiveAttribute implements PreProcessor {
+public class CheckExclusiveAttribute implements PreProcessor
+{
 
-  public static final int NONE = -1;
-  private String attribute;
+    public static final int NONE = -1;
+    private String attribute;
 
-  public CheckExclusiveAttribute(String attribute) {
-    this.attribute = attribute;
-  }
+    public CheckExclusiveAttribute(String attribute)
+    {
+        this.attribute = attribute;
+    }
 
-  public void preProcess(PropertyConfiguration config, Element element) {
-    List foundAttributes = new LinkedList();
-    boolean found = false;
+    public void preProcess(PropertyConfiguration config, Element element)
+    {
+        List foundAttributes = new LinkedList();
+        boolean found = false;
 
-    NamedNodeMap attributes = element.getAttributes();
-    for (int i = 0; i < attributes.getLength(); i++) {
-      Attr attribute = (Attr) attributes.item(i);
-      String alias = SpringXMLUtils.attributeName(attribute);
-      if (!config.isIgnored(alias)) {
-        if (attribute.equals(alias)) {
-          found = true;
-        } else if (StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI())) {
-          foundAttributes.add(alias);
+        NamedNodeMap attributes = element.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++)
+        {
+            Attr attribute = (Attr) attributes.item(i);
+            String alias = SpringXMLUtils.attributeName(attribute);
+            if (! config.isIgnored(alias))
+            {
+                if (attribute.equals(alias))
+                {
+                    found = true;
+                }
+                else if (StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI()))
+                {
+                    foundAttributes.add(alias);
+                }
+            }
         }
-      }
+
+        if (found && foundAttributes.size() > 0)
+        {
+            StringBuilder message = new StringBuilder("The attribute '");
+            message.append(attribute);
+            message.append("' cannot appear with the attribute");
+            if (foundAttributes.size() > 1)
+            {
+                message.append("s");
+            }
+            Iterator others = foundAttributes.iterator();
+            while (others.hasNext())
+            {
+                message.append(" '");
+                message.append(others.next());
+                message.append("'");
+            }
+            message.append(" in element ");
+            message.append(SpringXMLUtils.elementToString(element));
+            message.append(".");
+            throw new CheckExclusiveAttributeException(message.toString());
+        }
     }
 
-    if (found && foundAttributes.size() > 0) {
-      StringBuilder message = new StringBuilder("The attribute '");
-      message.append(attribute);
-      message.append("' cannot appear with the attribute");
-      if (foundAttributes.size() > 1) {
-        message.append("s");
-      }
-      Iterator others = foundAttributes.iterator();
-      while (others.hasNext()) {
-        message.append(" '");
-        message.append(others.next());
-        message.append("'");
-      }
-      message.append(" in element ");
-      message.append(SpringXMLUtils.elementToString(element));
-      message.append(".");
-      throw new CheckExclusiveAttributeException(message.toString());
+    public static class CheckExclusiveAttributeException extends IllegalStateException
+    {
+
+        private CheckExclusiveAttributeException(String message)
+        {
+            super(message);
+        }
+
     }
-  }
-
-  public static class CheckExclusiveAttributeException extends IllegalStateException {
-
-    private CheckExclusiveAttributeException(String message) {
-      super(message);
-    }
-
-  }
 
 }

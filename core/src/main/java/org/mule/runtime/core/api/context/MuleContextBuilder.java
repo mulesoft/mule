@@ -14,29 +14,30 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public
- * chainable setters for configuring the builder instance and no public getters.
+ * Builder that is used to build instances of {@link MuleContext}. Implementing
+ * classes are stateful and should provide public chainable setters for configuring
+ * the builder instance and no public getters.
  */
-public interface MuleContextBuilder {
+public interface MuleContextBuilder
+{
+    /**
+     * Builds a new {@link MuleContext} instance using configured builder instance.
+     * Does not initialise or start MuleContext, only constructs the instance.
+     */
+    MuleContext buildMuleContext();
 
-  /**
-   * Builds a new {@link MuleContext} instance using configured builder instance. Does not initialise or start MuleContext, only
-   * constructs the instance.
-   */
-  MuleContext buildMuleContext();
+    void setWorkManager(WorkManager workManager);
 
-  void setWorkManager(WorkManager workManager);
+    void setWorkListener(WorkListener workListener);
+    
+    void setNotificationManager(ServerNotificationManager notificationManager);
 
-  void setWorkListener(WorkListener workListener);
+    void setLifecycleManager(LifecycleManager lifecycleManager);
+    
+    void setMuleConfiguration(MuleConfiguration muleConfiguration);
 
-  void setNotificationManager(ServerNotificationManager notificationManager);
-
-  void setLifecycleManager(LifecycleManager lifecycleManager);
-
-  void setMuleConfiguration(MuleConfiguration muleConfiguration);
-
-  /**
-   * @param executionClassLoader classloader to use on the created context. Non null.
-   */
-  void setExecutionClassLoader(ClassLoader executionClassLoader);
+    /**
+     * @param executionClassLoader classloader to use on the created context. Non null.
+     */
+    void setExecutionClassLoader(ClassLoader executionClassLoader);
 }

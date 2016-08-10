@@ -12,22 +12,25 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class FilterInSubFlowTestCase extends AbstractIntegrationTestCase {
+public class FilterInSubFlowTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/construct/sub-flow-with-filter-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/construct/sub-flow-with-filter-config.xml";
-  }
+    @Test
+    public void filterOnFlow() throws Exception
+    {
+        MuleEvent response = flowRunner("flowWithFilter").withPayload("TEST").run();
+        assertEquals(null, response);
+    }
 
-  @Test
-  public void filterOnFlow() throws Exception {
-    MuleEvent response = flowRunner("flowWithFilter").withPayload("TEST").run();
-    assertEquals(null, response);
-  }
-
-  @Test
-  public void filterOnSubFlow() throws Exception {
-    MuleEvent response = flowRunner("flowWithSubFlowWithFilter").withPayload("TEST").run();
-    assertEquals(null, response);
-  }
+    @Test
+    public void filterOnSubFlow() throws Exception
+    {
+        MuleEvent response = flowRunner("flowWithSubFlowWithFilter").withPayload("TEST").run();
+        assertEquals(null, response);
+    }
 }

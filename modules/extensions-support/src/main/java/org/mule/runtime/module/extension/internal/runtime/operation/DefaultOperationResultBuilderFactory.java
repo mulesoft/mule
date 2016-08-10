@@ -15,14 +15,16 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResultBuilderFa
  *
  * @since 4.0
  */
-public final class DefaultOperationResultBuilderFactory extends OperationResultBuilderFactory {
+public final class DefaultOperationResultBuilderFactory extends OperationResultBuilderFactory
+{
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <Output, A extends Attributes> OperationResult.Builder<Output, A> create() {
-    return new DefaultOperationResultBuilder<>();
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <Output, A extends Attributes> OperationResult.Builder<Output, A> create()
+    {
+        return new DefaultOperationResultBuilder<>();
+    }
 
 }

@@ -13,29 +13,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 
 /**
- * <code>SpringSecurityContext</code> is a SecurityContext wrapper used to interface with an Spring's
- * {@link org.springframework.security.core.context.SecurityContext}.
+ * <code>SpringSecurityContext</code> is a SecurityContext wrapper used to
+ * interface with an Spring's {@link org.springframework.security.core.context.SecurityContext}.
  */
 
-public class SpringSecurityContext implements SecurityContext {
+public class SpringSecurityContext implements SecurityContext
+{
+    private org.springframework.security.core.context.SecurityContext delegate;
+    private SpringAuthenticationAdapter authentication;
 
-  private org.springframework.security.core.context.SecurityContext delegate;
-  private SpringAuthenticationAdapter authentication;
+    public SpringSecurityContext(org.springframework.security.core.context.SecurityContext delegate)
+    
+    {
+        this.delegate = delegate;
+        SecurityContextHolder.setContext(this.delegate);
+    }
 
-  public SpringSecurityContext(org.springframework.security.core.context.SecurityContext delegate)
+    public void setAuthentication(Authentication authentication)
+    {
+        this.authentication = ((SpringAuthenticationAdapter)authentication);
+        delegate.setAuthentication(this.authentication.getDelegate());
+        SecurityContextHolder.setContext(delegate);
+    }
 
-  {
-    this.delegate = delegate;
-    SecurityContextHolder.setContext(this.delegate);
-  }
-
-  public void setAuthentication(Authentication authentication) {
-    this.authentication = ((SpringAuthenticationAdapter) authentication);
-    delegate.setAuthentication(this.authentication.getDelegate());
-    SecurityContextHolder.setContext(delegate);
-  }
-
-  public Authentication getAuthentication() {
-    return this.authentication;
-  }
+    public Authentication getAuthentication()
+    {
+        return this.authentication;
+    }
 }

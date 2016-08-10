@@ -8,10 +8,12 @@ package org.mule.compatibility.transport.tcp.protocols;
 
 import org.mule.compatibility.transport.tcp.protocols.EOFProtocol;
 
-public class EofProtocolTestCase extends DefaultProtocolTestCase {
+public class EofProtocolTestCase extends DefaultProtocolTestCase
+{
 
-  public EofProtocolTestCase() {
-    super(new EOFProtocol(), SlowInputStream.FULL_LENGTH);
-  }
+    public EofProtocolTestCase()
+    {
+        super(new EOFProtocol(), SlowInputStream.FULL_LENGTH);
+    }
 
 }

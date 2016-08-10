@@ -8,15 +8,17 @@ package org.mule.test.config.spring;
 
 import org.junit.Test;
 
-public class BeanProfileOneTestCase extends AbstractBeanProfileTestCase {
+public class BeanProfileOneTestCase extends AbstractBeanProfileTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return getConfigFile("one");
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return getConfigFile("one");
-  }
-
-  @Test
-  public void profileOne() throws Exception {
-    profile("Manzi");
-  }
+    @Test
+    public void profileOne() throws Exception
+    {
+        profile("Manzi");
+    }
 }

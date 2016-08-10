@@ -23,53 +23,58 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class DataTypeTransformersTestCase extends AbstractMuleTestCase {
+public class DataTypeTransformersTestCase extends AbstractMuleTestCase
+{
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
 
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
+    @Test
+    public void validCharset() throws TransformerException
+    {
+        final StringToCharsetTransformer transformer = new StringToCharsetTransformer();
 
-  @Test
-  public void validCharset() throws TransformerException {
-    final StringToCharsetTransformer transformer = new StringToCharsetTransformer();
+        assertThat(transformer.transform(US_ASCII.name()), is(US_ASCII));
+    }
 
-    assertThat(transformer.transform(US_ASCII.name()), is(US_ASCII));
-  }
+    @Test
+    public void invalidCharset() throws TransformerException
+    {
+        final StringToCharsetTransformer transformer = new StringToCharsetTransformer();
 
-  @Test
-  public void invalidCharset() throws TransformerException {
-    final StringToCharsetTransformer transformer = new StringToCharsetTransformer();
+        expected.expect(TransformerException.class);
+        expected.expectCause(instanceOf(UnsupportedCharsetException.class));
+        transformer.transform("invalid");
+    }
 
-    expected.expect(TransformerException.class);
-    expected.expectCause(instanceOf(UnsupportedCharsetException.class));
-    transformer.transform("invalid");
-  }
+    @Test
+    public void validMediaType() throws TransformerException
+    {
+        final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
 
-  @Test
-  public void validMediaType() throws TransformerException {
-    final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
+        final MediaType transformed = (MediaType) transformer.transform("text/plain");
+        assertThat(transformed.getPrimaryType(), is("text"));
+        assertThat(transformed.getSubType(), is("plain"));
+        assertThat(transformed.getCharset().isPresent(), is(false));
+    }
 
-    final MediaType transformed = (MediaType) transformer.transform("text/plain");
-    assertThat(transformed.getPrimaryType(), is("text"));
-    assertThat(transformed.getSubType(), is("plain"));
-    assertThat(transformed.getCharset().isPresent(), is(false));
-  }
+    @Test
+    public void validMediaTypeWithCharset() throws TransformerException
+    {
+        final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
 
-  @Test
-  public void validMediaTypeWithCharset() throws TransformerException {
-    final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
+        final MediaType transformed = (MediaType) transformer.transform("text/plain;charset=" + US_ASCII.name());
+        assertThat(transformed.getPrimaryType(), is("text"));
+        assertThat(transformed.getSubType(), is("plain"));
+        assertThat(transformed.getCharset().get(), is(US_ASCII));
+    }
 
-    final MediaType transformed = (MediaType) transformer.transform("text/plain;charset=" + US_ASCII.name());
-    assertThat(transformed.getPrimaryType(), is("text"));
-    assertThat(transformed.getSubType(), is("plain"));
-    assertThat(transformed.getCharset().get(), is(US_ASCII));
-  }
+    @Test
+    public void invalidMediaType() throws TransformerException
+    {
+        final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
 
-  @Test
-  public void invalidMediaType() throws TransformerException {
-    final StringToMediaTypeTransformer transformer = new StringToMediaTypeTransformer();
-
-    expected.expect(TransformerException.class);
-    expected.expectCause(instanceOf(IllegalArgumentException.class));
-    transformer.transform("invalid");
-  }
+        expected.expect(TransformerException.class);
+        expected.expectCause(instanceOf(IllegalArgumentException.class));
+        transformer.transform("invalid");
+    }
 }

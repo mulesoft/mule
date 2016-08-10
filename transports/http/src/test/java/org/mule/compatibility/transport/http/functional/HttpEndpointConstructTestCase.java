@@ -16,20 +16,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpEndpointConstructTestCase extends FunctionalTestCase {
+public class HttpEndpointConstructTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-endpoint-construct-conf.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-endpoint-construct-conf.xml";
-  }
-
-  @Test
-  public void testHttpEndpointConstruct() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null);
-    assertEquals(TEST_MESSAGE, getPayloadAsString(response));
-  }
+    @Test
+    public void testHttpEndpointConstruct() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE, getPayloadAsString(response));
+    }
 }

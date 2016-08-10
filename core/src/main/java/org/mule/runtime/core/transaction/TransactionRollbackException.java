@@ -10,30 +10,33 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class TransactionRollbackException extends TransactionException {
+public class TransactionRollbackException extends TransactionException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3247455113055556221L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -3247455113055556221L;
+    /**
+     * @param message the exception message
+     */
+    public TransactionRollbackException(Message message)
+    {
+        super(message);
+    }
 
-  /**
-   * @param message the exception message
-   */
-  public TransactionRollbackException(Message message) {
-    super(message);
-  }
+    /**
+     * @param message the exception message
+     * @param cause the exception that cause this exception to be thrown
+     */
+    public TransactionRollbackException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-  /**
-   * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
-   */
-  public TransactionRollbackException(Message message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public TransactionRollbackException(Throwable cause) {
-    super(CoreMessages.transactionRollbackFailed(), cause);
-  }
+    public TransactionRollbackException(Throwable cause)
+    {
+        super(CoreMessages.transactionRollbackFailed(), cause);
+    }
 
 }

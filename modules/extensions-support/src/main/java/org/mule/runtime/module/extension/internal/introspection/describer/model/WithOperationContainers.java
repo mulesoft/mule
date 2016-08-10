@@ -13,10 +13,11 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface WithOperationContainers {
+public interface WithOperationContainers
+{
 
-  /**
-   * @return The list of Operation containers
-   */
-  List<OperationContainerElement> getOperationContainers();
+    /**
+     * @return The list of Operation containers
+     */
+    List<OperationContainerElement> getOperationContainers();
 }

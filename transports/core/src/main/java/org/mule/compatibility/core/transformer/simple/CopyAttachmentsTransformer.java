@@ -18,52 +18,64 @@ import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.nio.charset.Charset;
 
-public class CopyAttachmentsTransformer extends AbstractMessageTransformer {
+public class CopyAttachmentsTransformer extends AbstractMessageTransformer
+{
+    private AttributeEvaluator attachmentNameEvaluator;
+    private WildcardAttributeEvaluator wildcardAttachmentNameEvaluator;
 
-  private AttributeEvaluator attachmentNameEvaluator;
-  private WildcardAttributeEvaluator wildcardAttachmentNameEvaluator;
-
-  public CopyAttachmentsTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-    this.attachmentNameEvaluator.initialize(muleContext.getExpressionManager());
-  }
-
-  @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    final MuleMessage message = event.getMessage();
-    try {
-      if (wildcardAttachmentNameEvaluator.hasWildcards()) {
-        final Builder builder = MuleMessage.builder(message);
-        wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(), matchedValue -> builder
-            .addOutboundAttachment(matchedValue, message.getInboundAttachment(matchedValue)));
-        event.setMessage(builder.build());
-      } else {
-        String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
-        event.setMessage(MuleMessage.builder(message)
-            .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName)).build());
-      }
-    } catch (Exception e) {
-      throw new TransformerException(this, e);
+    public CopyAttachmentsTransformer()
+    {
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.OBJECT);
     }
-    return event.getMessage();
-  }
 
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    CopyAttachmentsTransformer clone = (CopyAttachmentsTransformer) super.clone();
-    clone.setAttachmentName(this.attachmentNameEvaluator.getRawValue());
-    return clone;
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        this.attachmentNameEvaluator.initialize(muleContext.getExpressionManager());
+    }
 
-  public void setAttachmentName(String attachmentName) {
-    this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName);
-    this.wildcardAttachmentNameEvaluator = new WildcardAttributeEvaluator(attachmentName);
-  }
+    @Override
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
+    {
+        final MuleMessage message = event.getMessage();
+        try
+        {
+            if (wildcardAttachmentNameEvaluator.hasWildcards())
+            {
+                final Builder builder = MuleMessage.builder(message);
+                wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(),
+                        matchedValue -> builder.addOutboundAttachment(matchedValue, message.getInboundAttachment(matchedValue)));
+                event.setMessage(builder.build());
+            }
+            else
+            {
+                String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
+                event.setMessage(MuleMessage.builder(message)
+                                            .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName))
+                                            .build());
+            }
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this,e);
+        }
+        return event.getMessage();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        CopyAttachmentsTransformer clone = (CopyAttachmentsTransformer) super.clone();
+        clone.setAttachmentName(this.attachmentNameEvaluator.getRawValue());
+        return clone;
+    }
+
+    public void setAttachmentName(String attachmentName)
+    {
+        this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName);
+        this.wildcardAttachmentNameEvaluator = new WildcardAttributeEvaluator(attachmentName);
+    }
 
 }

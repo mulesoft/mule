@@ -15,21 +15,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>LogComponent</code> simply logs the content (or content length if it is a large message)
+ * <code>LogComponent</code> simply logs the content (or content length if it is a
+ * large message)
  */
-public class LogComponent implements Callable, LogService {
+public class LogComponent implements Callable, LogService
+{
+    private static Logger logger = LoggerFactory.getLogger(LogComponent.class);
 
-  private static Logger logger = LoggerFactory.getLogger(LogComponent.class);
+    public Object onCall(MuleEventContext context) throws Exception
+    {
+        String contents = context.getMessageAsString();
+        String msg = "Message received in service: " + context.getFlowConstruct().getName();
+        msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
+                        + StringMessageUtils.truncate(contents, 100, true) + "'");
+        log(msg);
+        return context.getMessage();
+    }
 
-  public Object onCall(MuleEventContext context) throws Exception {
-    String contents = context.getMessageAsString();
-    String msg = "Message received in service: " + context.getFlowConstruct().getName();
-    msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '" + StringMessageUtils.truncate(contents, 100, true) + "'");
-    log(msg);
-    return context.getMessage();
-  }
-
-  public void log(String message) {
-    logger.info(message);
-  }
+    public void log(String message)
+    {
+        logger.info(message);
+    }
 }

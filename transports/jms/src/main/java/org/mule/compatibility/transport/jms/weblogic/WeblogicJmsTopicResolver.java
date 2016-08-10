@@ -18,48 +18,57 @@ import javax.jms.Queue;
 import javax.jms.Topic;
 
 /**
- * Weblogic-specific JMS topic resolver. Will use reflection and a vendor API to detect topics.
+ * Weblogic-specific JMS topic resolver. Will use reflection and
+ * a vendor API to detect topics.
  */
-public class WeblogicJmsTopicResolver extends DefaultJmsTopicResolver {
+public class WeblogicJmsTopicResolver extends DefaultJmsTopicResolver
+{
+    /**
+     * Cached empty class array, used in the no-args reflective method call.
+     */
+    protected static final Class[] PARAMETER_TYPES_NONE = new Class[0];
 
-  /**
-   * Cached empty class array, used in the no-args reflective method call.
-   */
-  protected static final Class[] PARAMETER_TYPES_NONE = new Class[0];
-
-  /**
-   * Create an instance of the resolver.
-   *
-   * @param connector owning connector
-   */
-  public WeblogicJmsTopicResolver(final JmsConnector connector) {
-    super(connector);
-  }
-
-
-  /**
-   * For Weblogic 8.x (JMS 1.0.2b) will use Weblogic-specific API call to test for topic. For Weblogic 9.x and later (JMS 1.1)
-   * this call is not required due to the unified messaging domains.
-   *
-   * @param destination a jms destination to test
-   * @return {@code true} if the destination is a topic
-   */
-  @Override
-  public boolean isTopic(final Destination destination) {
-    // don't check the invariants, we already handle Weblogic's case here
-
-    boolean topic = destination instanceof Topic;
-
-    if (topic && destination instanceof Queue && getConnector().getJmsSupport() instanceof Jms102bSupport) {
-      try {
-        Method topicMethod = ClassUtils.getPublicMethod(destination.getClass(), "isTopic", PARAMETER_TYPES_NONE);
-
-        topic = (Boolean) topicMethod.invoke(destination);
-      } catch (Exception e) {
-        logger.warn(e.getMessage());
-      }
+    /**
+     * Create an instance of the resolver.
+     *
+     * @param connector owning connector
+     */
+    public WeblogicJmsTopicResolver(final JmsConnector connector)
+    {
+        super(connector);
     }
-    return topic;
-  }
+
+
+    /**
+     * For Weblogic 8.x (JMS 1.0.2b) will use Weblogic-specific API call to test for topic.
+     * For Weblogic 9.x and later (JMS 1.1) this call is not required due to the unified
+     * messaging domains.
+     *
+     * @param destination a jms destination to test
+     * @return {@code true} if the destination is a topic
+     */
+    @Override
+    public boolean isTopic(final Destination destination)
+    {
+        // don't check the invariants, we already handle Weblogic's case here
+
+        boolean topic = destination instanceof Topic;
+
+        if (topic && destination instanceof Queue &&
+            getConnector().getJmsSupport() instanceof Jms102bSupport)
+        {
+            try
+            {
+                Method topicMethod = ClassUtils.getPublicMethod(destination.getClass(), "isTopic", PARAMETER_TYPES_NONE);
+
+                topic = (Boolean) topicMethod.invoke(destination);
+            }
+            catch (Exception e)
+            {
+                logger.warn(e.getMessage()); 
+            }
+        }
+        return topic;
+    }
 
 }

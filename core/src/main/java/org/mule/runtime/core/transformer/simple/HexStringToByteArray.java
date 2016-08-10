@@ -17,24 +17,30 @@ import java.nio.charset.Charset;
 /**
  * Converts a Hex String to a Byte array
  */
-public class HexStringToByteArray extends AbstractTransformer {
-
-  public HexStringToByteArray() {
-    registerSourceType(DataType.STRING);
-    setReturnDataType(DataType.BYTE_ARRAY);
-  }
-
-  @Override
-  protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-    if (src == null) {
-      return ArrayUtils.EMPTY_BYTE_ARRAY;
+public class HexStringToByteArray extends AbstractTransformer
+{
+    public HexStringToByteArray()
+    {
+        registerSourceType(DataType.STRING);
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
 
-    try {
-      return StringUtils.hexStringToByteArray((String) src);
-    } catch (Exception ex) {
-      throw new TransformerException(this, ex);
+    @Override
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
+    {
+        if (src == null)
+        {
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+        }
+
+        try
+        {
+            return StringUtils.hexStringToByteArray((String) src);
+        }
+        catch (Exception ex)
+        {
+            throw new TransformerException(this, ex);
+        }
     }
-  }
 
 }

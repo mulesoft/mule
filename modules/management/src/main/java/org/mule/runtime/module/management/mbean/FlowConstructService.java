@@ -21,135 +21,165 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>FlowConstructService</code> exposes service information about a Mule Managed flow construct.
+ * <code>FlowConstructService</code> exposes service information about a Mule Managed
+ * flow construct.
  */
-public class FlowConstructService implements FlowConstructServiceMBean, MBeanRegistration, FlowConstructStatsMBean {
+public class FlowConstructService implements FlowConstructServiceMBean, MBeanRegistration, FlowConstructStatsMBean
+{
+    private static Logger LOGGER = LoggerFactory.getLogger(FlowConstructService.class);
 
-  private static Logger LOGGER = LoggerFactory.getLogger(FlowConstructService.class);
+    protected FlowConstructStatistics statistics;
 
-  protected FlowConstructStatistics statistics;
+    protected MBeanServer server;
 
-  protected MBeanServer server;
+    protected String name;
 
-  protected String name;
+    protected String type;
 
-  protected String type;
+    protected ObjectName statsName;
 
-  protected ObjectName statsName;
+    protected ObjectName objectName;
 
-  protected ObjectName objectName;
+    protected MuleContext muleContext;
+    
+    // JmxSupport in order to build MBean's ObjectNames properly.
+    protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+    protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
-  protected MuleContext muleContext;
+    public FlowConstructService(String type, String name, MuleContext muleContext, FlowConstructStatistics statistics)
+    {
+        this.muleContext = muleContext;
+        this.type = type;
+        this.name = name;
+        this.statistics = statistics;
+    }
 
-  // JmxSupport in order to build MBean's ObjectNames properly.
-  protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-  protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+    protected FlowConstructService(String type, String name, MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+        this.type = type;
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
 
-  public FlowConstructService(String type, String name, MuleContext muleContext, FlowConstructStatistics statistics) {
-    this.muleContext = muleContext;
-    this.type = type;
-    this.name = name;
-    this.statistics = statistics;
-  }
+    public String getType()
+    {
+        return type;
+    }
 
-  protected FlowConstructService(String type, String name, MuleContext muleContext) {
-    this.muleContext = muleContext;
-    this.type = type;
-    this.name = name;
-  }
+    public ObjectName getStatistics()
+    {
+        return statsName;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void clearStatistics()
+    {
+        statistics.clear();
+    }
 
-  public String getType() {
-    return type;
-  }
+    public long getAsyncEventsReceived()
+    {
+        return statistics.getAsyncEventsReceived();
+    }
 
-  public ObjectName getStatistics() {
-    return statsName;
-  }
+    public long getSyncEventsReceived()
+    {
+        return statistics.getSyncEventsReceived();
+    }
+   
+    public long getTotalEventsReceived()
+    {
+        return statistics.getTotalEventsReceived();
+    }
 
-  public void clearStatistics() {
-    statistics.clear();
-  }
+    public long getAverageProcessingTime()
+    {
+        return statistics.getAverageProcessingTime();
+    }
 
-  public long getAsyncEventsReceived() {
-    return statistics.getAsyncEventsReceived();
-  }
+    public long getProcessedEvents()
+    {
+        return statistics.getProcessedEvents();
+    }
 
-  public long getSyncEventsReceived() {
-    return statistics.getSyncEventsReceived();
-  }
+    public long getMaxProcessingTime()
+    {
+        return statistics.getMaxProcessingTime();
+    }
 
-  public long getTotalEventsReceived() {
-    return statistics.getTotalEventsReceived();
-  }
+    public long getMinProcessingTime()
+    {
+        return statistics.getMinProcessingTime();
+    }
 
-  public long getAverageProcessingTime() {
-    return statistics.getAverageProcessingTime();
-  }
+    public long getTotalProcessingTime()
+    {
+        return statistics.getTotalProcessingTime();
+    }
 
-  public long getProcessedEvents() {
-    return statistics.getProcessedEvents();
-  }
+    public long getExecutionErrors()
+    {
+        return statistics.getExecutionErrors();
+    }
 
-  public long getMaxProcessingTime() {
-    return statistics.getMaxProcessingTime();
-  }
+    public long getFatalErrors()
+    {
+        return statistics.getFatalErrors();
+    }
 
-  public long getMinProcessingTime() {
-    return statistics.getMinProcessingTime();
-  }
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
+    {
+        this.server = server;
+        this.objectName = name;
+        return name;
+    }
 
-  public long getTotalProcessingTime() {
-    return statistics.getTotalProcessingTime();
-  }
+    public void postRegister(Boolean registrationDone)
+    {
+        AbstractFlowConstruct flow = muleContext.getRegistry().lookupObject(getName());
+        try
+        {
+            if (flow.getStatistics() != null)
+            {
+                statsName = jmxSupport.getObjectName(String.format("%s:type=org.mule.Statistics,%s=%s", objectName.getDomain(), 
+                    flow.getConstructType(), jmxSupport.escape(getName())));
+                
+                // unregister old version if exists
+                if (this.server.isRegistered(statsName))
+                {
+                    this.server.unregisterMBean(statsName);
+                }
 
-  public long getExecutionErrors() {
-    return statistics.getExecutionErrors();
-  }
-
-  public long getFatalErrors() {
-    return statistics.getFatalErrors();
-  }
-
-  public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
-    this.server = server;
-    this.objectName = name;
-    return name;
-  }
-
-  public void postRegister(Boolean registrationDone) {
-    AbstractFlowConstruct flow = muleContext.getRegistry().lookupObject(getName());
-    try {
-      if (flow.getStatistics() != null) {
-        statsName = jmxSupport.getObjectName(String.format("%s:type=org.mule.Statistics,%s=%s", objectName.getDomain(),
-                                                           flow.getConstructType(), jmxSupport.escape(getName())));
-
-        // unregister old version if exists
-        if (this.server.isRegistered(statsName)) {
-          this.server.unregisterMBean(statsName);
+                this.server.registerMBean(new FlowConstructStats(flow.getStatistics()), this.statsName);
+            }
         }
-
-        this.server.registerMBean(new FlowConstructStats(flow.getStatistics()), this.statsName);
-      }
-    } catch (Exception e) {
-      LOGGER.error("Error post-registering the MBean", e);
+        catch (Exception e)
+        {
+            LOGGER.error("Error post-registering the MBean", e);
+        }
     }
-  }
 
-  public void preDeregister() throws Exception {
-    try {
-      if (this.server.isRegistered(statsName)) {
-        this.server.unregisterMBean(statsName);
-      }
-    } catch (Exception ex) {
-      LOGGER.error("Error unregistering ServiceService child " + statsName.getCanonicalName(), ex);
+    public void preDeregister() throws Exception
+    {
+        try
+        {
+            if (this.server.isRegistered(statsName))
+            {
+                this.server.unregisterMBean(statsName);
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.error("Error unregistering ServiceService child " + statsName.getCanonicalName(), ex);
+        }
     }
-  }
 
-  public void postDeregister() {
-    // nothing to do
-  }
+    public void postDeregister()
+    {
+        // nothing to do
+    }
 }

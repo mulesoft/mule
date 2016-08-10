@@ -8,7 +8,8 @@ package org.mule.runtime.core.component;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractComponentTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractComponentTestCase extends AbstractMuleContextTestCase
+{
 
 }
 

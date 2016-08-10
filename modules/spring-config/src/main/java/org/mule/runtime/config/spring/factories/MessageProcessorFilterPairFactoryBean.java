@@ -21,61 +21,81 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorFilterPairFactoryBean implements FactoryBean<MessageProcessorFilterPair>, MuleContextAware {
+public class MessageProcessorFilterPairFactoryBean implements FactoryBean<MessageProcessorFilterPair>,
+    MuleContextAware
+{
+    private List<MessageProcessor> messageProcessors;
+    private Filter filter = new ExpressionFilter();
 
-  private List<MessageProcessor> messageProcessors;
-  private Filter filter = new ExpressionFilter();
-
-  public void setFilter(Filter filter) {
-    this.filter = filter;
-  }
-
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors) {
-    this.messageProcessors = messageProcessors;
-  }
-
-  public void setExpression(String expression) {
-    ((ExpressionFilter) filter).setExpression(expression);
-  }
-
-  @Override
-  public MessageProcessorFilterPair getObject() throws Exception {
-    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
-      }
+    public void setFilter(Filter filter)
+    {
+        this.filter = filter;
     }
 
-    return createFilterPair(builder);
-  }
-
-  private MessageProcessorFilterPair createFilterPair(MessageProcessorChainBuilder builder) throws Exception {
-    if (filter == null) {
-      return new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE);
-    } else {
-      return new MessageProcessorFilterPair(builder.build(), filter);
+    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
+    {
+        this.messageProcessors = messageProcessors;
     }
-  }
 
-  @Override
-  public Class<MessageProcessorFilterPair> getObjectType() {
-    return MessageProcessorFilterPair.class;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    if (filter != null && filter instanceof MuleContextAware) {
-      ((MuleContextAware) filter).setMuleContext(context);
+    public void setExpression(String expression)
+    {
+        ((ExpressionFilter) filter).setExpression(expression);
     }
-  }
+
+    @Override
+    public MessageProcessorFilterPair getObject() throws Exception
+    {
+        MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        for (Object processor : messageProcessors)
+        {
+            if (processor instanceof MessageProcessor)
+            {
+                builder.chain((MessageProcessor) processor);
+            }
+            else if (processor instanceof MessageProcessorBuilder)
+            {
+                builder.chain((MessageProcessorBuilder) processor);
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
+            }
+        }
+
+        return createFilterPair(builder);
+    }
+
+    private MessageProcessorFilterPair createFilterPair(MessageProcessorChainBuilder builder) throws Exception
+    {
+        if (filter == null)
+        {
+            return new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE);
+        }
+        else
+        {
+            return new MessageProcessorFilterPair(builder.build(), filter);
+        }
+    }
+
+    @Override
+    public Class<MessageProcessorFilterPair> getObjectType()
+    {
+        return MessageProcessorFilterPair.class;
+    }
+
+    @Override
+    public boolean isSingleton()
+    {
+        return true;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        if (filter != null && filter instanceof MuleContextAware)
+        {
+            ((MuleContextAware) filter).setMuleContext(context);
+        }
+    }
 }

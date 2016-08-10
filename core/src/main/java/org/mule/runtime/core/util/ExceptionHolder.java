@@ -14,30 +14,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** TODO */
-public class ExceptionHolder implements ExceptionListener {
+public class ExceptionHolder implements ExceptionListener
+{
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private List<Exception> exceptions = new ArrayList<Exception>(2);
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private List<Exception> exceptions = new ArrayList<Exception>(2);
-
-  public void exceptionThrown(Exception e) {
-    exceptions.add(e);
-  }
-
-  public List getExceptions() {
-    return exceptions;
-  }
-
-  public boolean isExceptionThrown() {
-    return exceptions.size() > 0;
-  }
-
-  public void clear() {
-    exceptions.clear();
-  }
-
-  public void print() {
-    for (Exception exception : exceptions) {
-      logger.error("Exception thrown", exception);
+    public void exceptionThrown(Exception e)
+    {
+        exceptions.add(e);
     }
-  }
+
+    public List getExceptions()
+    {
+        return exceptions;
+    }
+
+    public boolean isExceptionThrown()
+    {
+        return exceptions.size() > 0;
+    }
+
+    public void clear()
+    {
+        exceptions.clear();
+    }
+
+    public void print()
+    {
+        for (Exception exception : exceptions)
+        {
+            logger.error("Exception thrown", exception);
+        }
+    }
 }

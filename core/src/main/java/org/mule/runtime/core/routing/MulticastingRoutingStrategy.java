@@ -26,48 +26,57 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * Routing strategy that will route a message through a set of {@link MessageProcessor} and return an aggregation of the results.
+ * Routing strategy that will route a message through a set of {@link MessageProcessor}
+ * and return an aggregation of the results.
  *
  */
-public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
+public class MulticastingRoutingStrategy extends AbstractRoutingStrategy
+{
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    private final RouterResultsHandler resultsHandler;
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
-  private final RouterResultsHandler resultsHandler;
-
-  /**
-   * @param muleContext
-   * @param resultAggregator aggregator used to create a response event
-   */
-  public MulticastingRoutingStrategy(MuleContext muleContext, RouterResultsHandler resultAggregator) {
-    super(muleContext);
-    this.resultsHandler = resultAggregator;
-  }
-
-  @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException {
-    MuleMessage message = event.getMessage();
-
-    if (messageProcessors == null || messageProcessors.size() == 0) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
+    /**
+     * @param muleContext
+     * @param resultAggregator aggregator used to create a response event
+     */
+    public MulticastingRoutingStrategy(MuleContext muleContext, RouterResultsHandler resultAggregator)
+    {
+        super(muleContext);
+        this.resultsHandler = resultAggregator;
     }
 
-    List<MuleEvent> results = new ArrayList<>(messageProcessors.size());
+    @Override
+    public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException
+    {
+        MuleMessage message = event.getMessage();
 
-    validateMessageIsNotConsumable(event, message);
-
-    try {
-      for (int i = 0; i < messageProcessors.size(); i++) {
-        MessageProcessor mp = messageProcessors.get(i);
-        MuleEvent result = sendRequest(event, message, mp, true);
-        if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-          results.add(result);
+        if (messageProcessors == null || messageProcessors.size() == 0)
+        {
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
-      }
-    } catch (MuleException e) {
-      throw new CouldNotRouteOutboundMessageException(event, messageProcessors.get(0), e);
+
+        List<MuleEvent> results = new ArrayList<>(messageProcessors.size());
+
+        validateMessageIsNotConsumable(event, message);
+
+        try
+        {
+            for (int i = 0; i < messageProcessors.size(); i++)
+            {
+                MessageProcessor mp = messageProcessors.get(i);
+                MuleEvent result = sendRequest(event, message, mp, true);
+                if (result != null && !VoidMuleEvent.getInstance().equals(result))
+                {
+                    results.add(result);
+                }
+            }
+        }
+        catch (MuleException e)
+        {
+            throw new CouldNotRouteOutboundMessageException(event, messageProcessors.get(0), e);
+        }
+        return resultsHandler.aggregateResults(results, event);
     }
-    return resultsHandler.aggregateResults(results, event);
-  }
 
 
 

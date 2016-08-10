@@ -12,19 +12,21 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class NameAndIdEqualMule2795TestCase extends AbstractIntegrationTestCase {
+public class NameAndIdEqualMule2795TestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/name-id-equal-mule-2795-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/name-id-equal-mule-2795-test.xml";
-  }
-
-  @Test
-  public void testNames() {
-    assertNotNull(muleContext.getRegistry().lookupObject("id"));
-    assertNull(muleContext.getRegistry().lookupObject(".:no-name"));
-    assertNull(muleContext.getRegistry().lookupObject("org.mule.autogen.bean.1"));
-    assertNotNull(muleContext.getRegistry().lookupObject("id2"));
-    assertNull(muleContext.getRegistry().lookupObject(".:no-name-2"));
-  }
+    @Test
+    public void testNames()
+    {
+        assertNotNull(muleContext.getRegistry().lookupObject("id"));
+        assertNull(muleContext.getRegistry().lookupObject(".:no-name"));
+        assertNull(muleContext.getRegistry().lookupObject("org.mule.autogen.bean.1"));
+        assertNotNull(muleContext.getRegistry().lookupObject("id2"));
+        assertNull(muleContext.getRegistry().lookupObject(".:no-name-2"));
+    }
 }

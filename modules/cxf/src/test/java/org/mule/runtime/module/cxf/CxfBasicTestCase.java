@@ -28,51 +28,57 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfBasicTestCase extends FunctionalTestCase {
+public class CxfBasicTestCase extends FunctionalTestCase
+{
+    public static final MediaType APP_SOAP_XML = MediaType.create("application", "soap+xml");
 
-  public static final MediaType APP_SOAP_XML = MediaType.create("application", "soap+xml");
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
+    private String echoWsdl;
 
-  private String echoWsdl;
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected String getConfigFile() {
-    return "basic-conf-flow-httpn.xml";
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
-    XMLUnit.setIgnoreWhitespace(true);
-    try {
-      XMLUnit.getTransformerFactory();
-    } catch (TransformerFactoryConfigurationError e) {
-      XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+    @Override
+    protected String getConfigFile()
+    {
+        return "basic-conf-flow-httpn.xml";
     }
-  }
 
-  @Test
-  public void testEchoService() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                                     MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS);
-    assertTrue(getPayloadAsString(result).contains("Hello!"));
-    String ct = result.getDataType().getMediaType().toRfcString();
-    assertEquals("text/xml; charset=UTF-8", ct);
-  }
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
+        XMLUnit.setIgnoreWhitespace(true);
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
+    }
 
-  @Test
-  public void testEchoWsdl() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
-                                     MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
-    assertNotNull(result.getPayload());
-    XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
-  }
+    @Test
+    public void testEchoService() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
+                MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS);
+        assertTrue(getPayloadAsString(result).contains("Hello!"));
+        String ct = result.getDataType().getMediaType().toRfcString();
+        assertEquals("text/xml; charset=UTF-8", ct);
+    }
+
+    @Test
+    public void testEchoWsdl() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
+        assertNotNull(result.getPayload());
+        XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
+    }
 }

@@ -19,37 +19,40 @@ import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
  *
  * @since 4.0
  */
-public abstract class UsernamePasswordAuthentication implements HttpAuthentication {
+public abstract class UsernamePasswordAuthentication implements HttpAuthentication
+{
+    /**
+     * The username to authenticate.
+     */
+    @Parameter
+    private String username;
 
-  /**
-   * The username to authenticate.
-   */
-  @Parameter
-  private String username;
+    /**
+     * The password to authenticate.
+     */
+    @Parameter
+    @Password
+    private String password;
 
-  /**
-   * The password to authenticate.
-   */
-  @Parameter
-  @Password
-  private String password;
+    @Override
+    public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException
+    {
+        //do nothing
+    }
 
-  @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException {
-    // do nothing
-  }
+    @Override
+    public boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException
+    {
+        return false;
+    }
 
-  @Override
-  public boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException {
-    return false;
-  }
+    public abstract HttpRequestAuthentication buildRequestAuthentication();
 
-  public abstract HttpRequestAuthentication buildRequestAuthentication();
-
-  protected HttpRequestAuthentication getBaseRequestAuthentication(HttpAuthenticationType authType) {
-    HttpRequestAuthentication requestAuthentication = new HttpRequestAuthentication(authType);
-    requestAuthentication.setUsername(username);
-    requestAuthentication.setPassword(password);
-    return requestAuthentication;
-  }
+    protected HttpRequestAuthentication getBaseRequestAuthentication(HttpAuthenticationType authType)
+    {
+        HttpRequestAuthentication requestAuthentication = new HttpRequestAuthentication(authType);
+        requestAuthentication.setUsername(username);
+        requestAuthentication.setPassword(password);
+        return requestAuthentication;
+    }
 }

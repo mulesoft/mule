@@ -24,79 +24,94 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * All attributes from at least one set must be provided
  */
-public class CheckRequiredAttributes implements PreProcessor {
+public class CheckRequiredAttributes implements PreProcessor
+{
+    Collection<List<String>> attributeSets;
+    
+    public CheckRequiredAttributes(String[][] attributeNames)
+    {
+        super();
 
-  Collection<List<String>> attributeSets;
-
-  public CheckRequiredAttributes(String[][] attributeNames) {
-    super();
-
-    attributeSets = new ArrayList<List<String>>();
-    for (int i = 0; i < attributeNames.length; i++) {
-      String[] currentSet = attributeNames[i];
-      if (currentSet.length > 0) {
-        List<String> list = Arrays.asList(currentSet);
-        attributeSets.add(list);
-      }
-    }
-  }
-
-  public void preProcess(PropertyConfiguration config, Element element) {
-    for (List<String> currentSet : attributeSets) {
-      if (containsAllRequiredAttributes(currentSet, element)) {
-        return;
-      }
+        attributeSets = new ArrayList<List<String>>();
+        for (int i = 0; i < attributeNames.length; i++)
+        {
+            String[] currentSet = attributeNames[i];
+            if (currentSet.length > 0)
+            {
+                List<String> list = Arrays.asList(currentSet);
+                attributeSets.add(list);
+            }
+        }
     }
 
-    throw new CheckRequiredAttributesException(element, attributeSets);
-  }
-
-  private boolean containsAllRequiredAttributes(List<String> currentSet, Element element) {
-    Set<String> attributes = collectAttributes(element);
-    if (attributes.size() == 0) {
-      return false;
+    public void preProcess(PropertyConfiguration config, Element element)
+    {
+        for (List<String> currentSet : attributeSets)
+        {
+            if (containsAllRequiredAttributes(currentSet, element))
+            {
+                return;
+            }
+        }
+        
+        throw new CheckRequiredAttributesException(element, attributeSets);
     }
 
-    // Clone the set of attribute names and subtract all the element's attribute names from it.
-    // If the remaining set is empty, all required attributes of this set were present.
-    Set<String> remainingElementNames = new HashSet<String>(currentSet);
-    remainingElementNames.removeAll(attributes);
-    return (remainingElementNames.size() == 0);
-  }
-
-  private Set<String> collectAttributes(Element element) {
-    Set<String> attributeNames = new HashSet<String>();
-
-    NamedNodeMap attributes = element.getAttributes();
-    for (int i = 0; i < attributes.getLength(); i++) {
-      String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-      attributeNames.add(alias);
+    private boolean containsAllRequiredAttributes(List<String> currentSet, Element element)
+    {
+        Set<String> attributes = collectAttributes(element);
+        if (attributes.size() == 0)
+        {
+            return false;
+        }
+        
+        // Clone the set of attribute names and subtract all the element's attribute names from it.
+        // If the remaining set is empty, all required attributes of this set were present.
+        Set<String> remainingElementNames = new HashSet<String>(currentSet);
+        remainingElementNames.removeAll(attributes);
+        return (remainingElementNames.size() == 0);
+    }
+    
+    private Set<String> collectAttributes(Element element)
+    {
+        Set<String> attributeNames = new HashSet<String>();
+        
+        NamedNodeMap attributes = element.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++)
+        {
+            String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+            attributeNames.add(alias);
+        }
+        
+        return attributeNames;
     }
 
-    return attributeNames;
-  }
-
-  public static class CheckRequiredAttributesException extends IllegalStateException {
-
-    private static String summary(Collection<List<String>> attributeSets) {
-      StringBuilder buf = new StringBuilder();
-      for (List<String> set : attributeSets) {
-        if (buf.length() > 0) {
-          buf.append(" ");
+    public static class CheckRequiredAttributesException extends IllegalStateException
+    {
+        private static String summary(Collection<List<String>> attributeSets)
+        {
+            StringBuilder buf = new StringBuilder();
+            for (List<String> set : attributeSets)
+            {
+                if (buf.length() > 0)
+                {
+                    buf.append(" ");
+                }
+                
+                if (set.isEmpty())
+                {
+                    continue;
+                }
+                
+                buf.append(set.toString());
+            }
+            return buf.toString();
         }
 
-        if (set.isEmpty()) {
-          continue;
+        private CheckRequiredAttributesException(Element element, Collection<List<String>> attributeSets)
+        {
+            super("Element " + SpringXMLUtils.elementToString(element) +
+                    " must have all attributes for one of the sets: " + summary(attributeSets) + ".");
         }
-
-        buf.append(set.toString());
-      }
-      return buf.toString();
     }
-
-    private CheckRequiredAttributesException(Element element, Collection<List<String>> attributeSets) {
-      super("Element " + SpringXMLUtils.elementToString(element) + " must have all attributes for one of the sets: "
-          + summary(attributeSets) + ".");
-    }
-  }
 }

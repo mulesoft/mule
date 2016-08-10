@@ -21,23 +21,27 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class Mule5415TestCase extends FunctionalTestCase {
+public class Mule5415TestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/issues/mule-5415-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/issues/mule-5415-config.xml";
-  }
-
-  @Test
-  public void testFirstRequestDoesntFail() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage message =
-        client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
-                    MuleMessage.builder().payload("message").mediaType(APPLICATION_X_WWW_FORM_URLENCODED).build(),
-                    newOptions().method(POST.name()).build());
-    assertThat(message.getExceptionPayload(), nullValue());
-  }
+    @Test
+    public void testFirstRequestDoesntFail() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
+                MuleMessage.builder()
+                           .payload("message")
+                           .mediaType(APPLICATION_X_WWW_FORM_URLENCODED)
+                           .build(),
+                newOptions().method(POST.name()).build());
+        assertThat(message.getExceptionPayload(), nullValue());
+    }
 }

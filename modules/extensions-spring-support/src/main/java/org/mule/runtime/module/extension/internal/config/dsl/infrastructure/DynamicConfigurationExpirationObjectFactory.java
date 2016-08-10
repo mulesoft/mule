@@ -14,18 +14,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * An {@link ObjectFactory} which produces instances of {@link DynamicConfigurationExpiration}
  */
-public class DynamicConfigurationExpirationObjectFactory implements ObjectFactory<DynamicConfigurationExpiration> {
+public class DynamicConfigurationExpirationObjectFactory implements ObjectFactory<DynamicConfigurationExpiration>
+{
+    private final long frequency;
+    private final TimeUnit timeUnit;
 
-  private final long frequency;
-  private final TimeUnit timeUnit;
+    public DynamicConfigurationExpirationObjectFactory(long frequency, TimeUnit timeUnit)
+    {
+        this.frequency = frequency;
+        this.timeUnit = timeUnit;
+    }
 
-  public DynamicConfigurationExpirationObjectFactory(long frequency, TimeUnit timeUnit) {
-    this.frequency = frequency;
-    this.timeUnit = timeUnit;
-  }
-
-  @Override
-  public DynamicConfigurationExpiration getObject() throws Exception {
-    return new DynamicConfigurationExpiration(new Time(frequency, timeUnit));
-  }
+    @Override
+    public DynamicConfigurationExpiration getObject() throws Exception
+    {
+        return new DynamicConfigurationExpiration(new Time(frequency, timeUnit));
+    }
 }

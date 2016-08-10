@@ -11,23 +11,27 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.UUID;
 
 /**
- * Each instance of this service should contain a unique ID. Useful for testing object pools.
+ * Each instance of this service should contain a unique ID.  
+ * Useful for testing object pools.
  */
-public class UniqueComponent implements Callable {
+public class UniqueComponent implements Callable
+{
+    String id = UUID.getUUID();
 
-  String id = UUID.getUUID();
+    public Object onCall(MuleEventContext eventContext) throws Exception
+    {
+        return getId();
+    }
 
-  public Object onCall(MuleEventContext eventContext) throws Exception {
-    return getId();
-  }
+    public String getId()
+    {
+        return id;
+    }
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 }
 
 

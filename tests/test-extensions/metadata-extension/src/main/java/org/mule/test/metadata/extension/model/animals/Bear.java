@@ -6,15 +6,17 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
-public class Bear implements Animal {
+public class Bear implements Animal
+{
+    private String bearName;
 
-  private String bearName;
+    public String getBearName()
+    {
+        return bearName;
+    }
 
-  public String getBearName() {
-    return bearName;
-  }
-
-  public void setBearName(String bearName) {
-    this.bearName = bearName;
-  }
+    public void setBearName(String bearName)
+    {
+        this.bearName = bearName;
+    }
 }

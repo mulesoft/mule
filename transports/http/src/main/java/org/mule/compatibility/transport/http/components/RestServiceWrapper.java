@@ -37,255 +37,324 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This service can used to proxy REST style services as local Mule Components. It can be configured with a service URL plus a
- * number of properties that allow you to configure the parameters and error conditions on the service.
+ * This service can used to proxy REST style services as local Mule Components. It
+ * can be configured with a service URL plus a number of properties that allow you to
+ * configure the parameters and error conditions on the service.
  */
-public class RestServiceWrapper extends AbstractComponent {
+public class RestServiceWrapper extends AbstractComponent
+{
+    public static final String DELETE = HttpConstants.METHOD_DELETE;
+    public static final String GET = HttpConstants.METHOD_GET;
+    public static final String CONTENT_TYPE_VALUE = FORM_URLENCODED_CONTENT_TYPE;
+    public static final String HTTP_METHOD = "http.method";
 
-  public static final String DELETE = HttpConstants.METHOD_DELETE;
-  public static final String GET = HttpConstants.METHOD_GET;
-  public static final String CONTENT_TYPE_VALUE = FORM_URLENCODED_CONTENT_TYPE;
-  public static final String HTTP_METHOD = "http.method";
+    /**
+     * logger used by this class
+     */
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  /**
-   * logger used by this class
-   */
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    private String serviceUrl;
+    private Map requiredParams = new HashMap();
+    private Map optionalParams = new HashMap();
+    private String httpMethod = GET;
+    private List payloadParameterNames;
+    private Filter errorFilter;
 
-  private String serviceUrl;
-  private Map requiredParams = new HashMap();
-  private Map optionalParams = new HashMap();
-  private String httpMethod = GET;
-  private List payloadParameterNames;
-  private Filter errorFilter;
-
-  public String getServiceUrl() {
-    return serviceUrl;
-  }
-
-  public void setServiceUrl(String serviceUrl) {
-    this.serviceUrl = serviceUrl;
-  }
-
-  public Map getRequiredParams() {
-    return requiredParams;
-  }
-
-  /**
-   * Required params that are pulled from the message. If these params don't exist the call will fail Note that you can use
-   * {@link org.mule.api.expression.ExpressionEvaluator} expressions such as xpath, header, xquery, etc
-   *
-   * @param requiredParams
-   */
-  public void setRequiredParams(Map requiredParams) {
-    this.requiredParams = requiredParams;
-  }
-
-  /**
-   * Optional params that are pulled from the message. If these params don't exist execution will continue. Note that you can use
-   * {@link ExpressionEvaluator} expressions such as xpath, header, xquery, etc
-   */
-  public Map getOptionalParams() {
-    return optionalParams;
-  }
-
-  public void setOptionalParams(Map optionalParams) {
-    this.optionalParams = optionalParams;
-  }
-
-  public String getHttpMethod() {
-    return httpMethod;
-  }
-
-  public void setHttpMethod(String httpMethod) {
-    this.httpMethod = httpMethod;
-  }
-
-  public List getPayloadParameterNames() {
-    return payloadParameterNames;
-  }
-
-  public void setPayloadParameterNames(List payloadParameterNames) {
-    this.payloadParameterNames = payloadParameterNames;
-  }
-
-  public Filter getFilter() {
-    return errorFilter;
-  }
-
-  public void setFilter(Filter errorFilter) {
-    this.errorFilter = errorFilter;
-  }
-
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    if (serviceUrl == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
-    } else if (!muleContext.getExpressionManager().isExpression(serviceUrl)) {
-      try {
-        new URL(serviceUrl);
-      } catch (MalformedURLException e) {
-        throw new InitialisationException(e, this);
-      }
+    public String getServiceUrl()
+    {
+        return serviceUrl;
     }
 
-    if (errorFilter == null) {
-      // We'll set a default filter that checks the return code
-      errorFilter = new ExpressionFilter("#[message.inboundProperties['http.status']!=200]");
-      ((ExpressionFilter) errorFilter).setMuleContext(muleContext);
-      logger.info("Setting default error filter to ExpressionFilter('#[message.inboundProperties['http.status']!=200]')");
-    }
-  }
-
-  @Override
-  public Object doInvoke(MuleEvent event) throws Exception {
-    Object requestBody;
-
-    Object request = event.getMessage().getPayload();
-    String tempUrl = serviceUrl;
-    if (muleContext.getExpressionManager().isExpression(serviceUrl)) {
-      muleContext.getExpressionManager().validateExpression(serviceUrl);
-      tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
+    public void setServiceUrl(String serviceUrl)
+    {
+        this.serviceUrl = serviceUrl;
     }
 
-    StringBuilder urlBuffer = new StringBuilder(tempUrl);
-
-    if (GET.equalsIgnoreCase(this.httpMethod) || DELETE.equalsIgnoreCase(this.httpMethod)) {
-      requestBody = null;
-
-      setRESTParams(urlBuffer, event, request, requiredParams, false, null);
-      setRESTParams(urlBuffer, event, request, optionalParams, true, null);
-    }
-    // if post
-    else {
-      if (MediaType.ANY.matches(event.getMessage().getDataType().getMediaType())) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build());
-      }
-
-      StringBuilder requestBodyBuffer = new StringBuilder();
-      setRESTParams(urlBuffer, event, request, requiredParams, false, requestBodyBuffer);
-      setRESTParams(urlBuffer, event, request, optionalParams, true, requestBodyBuffer);
-      requestBody = requestBodyBuffer.toString();
+    public Map getRequiredParams()
+    {
+        return requiredParams;
     }
 
-    tempUrl = urlBuffer.toString();
-    logger.info("Invoking REST service: " + tempUrl);
-
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build());
-
-    EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
-    endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
-    OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
-
-    MuleEventContext eventContext = new DefaultMuleEventContext(event);
-    MuleEvent result =
-        new DefaultMuleEvent(eventContext.sendEvent(MuleMessage.builder(event.getMessage()).payload(requestBody).build(),
-                                                    outboundEndpoint.getEndpointURI().toString()),
-                             flowConstruct);
-
-    if (isErrorPayload(result)) {
-      handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), event, this),
-                      result.getMessage());
+    /**
+     * Required params that are pulled from the message. If these params don't exist
+     * the call will fail Note that you can use
+     * {@link org.mule.api.expression.ExpressionEvaluator} expressions such as
+     * xpath, header, xquery, etc
+     *
+     * @param requiredParams
+     */
+    public void setRequiredParams(Map requiredParams)
+    {
+        this.requiredParams = requiredParams;
     }
 
-    return result.getMessage();
-  }
-
-  private String getSeparator(String url) {
-    String sep;
-
-    if (url.indexOf("?") > -1) {
-      sep = "&";
-    } else {
-      sep = "?";
+    /**
+     * Optional params that are pulled from the message. If these params don't exist
+     * execution will continue. Note that you can use {@link ExpressionEvaluator}
+     * expressions such as xpath, header, xquery, etc
+     */
+    public Map getOptionalParams()
+    {
+        return optionalParams;
     }
 
-    return sep;
-  }
-
-  private String updateSeparator(String sep) {
-    if (sep.compareTo("?") == 0 || sep.compareTo("") == 0) {
-      return ("&");
+    public void setOptionalParams(Map optionalParams)
+    {
+        this.optionalParams = optionalParams;
     }
 
-    return sep;
-  }
-
-  // if requestBodyBuffer is null, it means that the request is a GET, otherwise it
-  // is a POST and
-  // requestBodyBuffer must contain the body of the http method at the end of this
-  // function call
-  private void setRESTParams(StringBuilder url, MuleEvent event, Object body, Map args, boolean optional,
-                             StringBuilder requestBodyBuffer) {
-    String sep;
-
-    if (requestBodyBuffer == null) {
-      sep = getSeparator(url.toString());
-    } else if (requestBodyBuffer.length() > 0) {
-      sep = "&";
-    } else {
-      sep = StringUtils.EMPTY;
+    public String getHttpMethod()
+    {
+        return httpMethod;
     }
 
-    for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();) {
-      Map.Entry entry = (Map.Entry) iterator.next();
-      String name = (String) entry.getKey();
-      String exp = (String) entry.getValue();
-      Object value = null;
+    public void setHttpMethod(String httpMethod)
+    {
+        this.httpMethod = httpMethod;
+    }
 
-      if (muleContext.getExpressionManager().isExpression(exp)) {
-        muleContext.getExpressionManager().validateExpression(exp);
-        value = muleContext.getExpressionManager().evaluate(exp, event);
-      } else {
-        value = exp;
-      }
+    public List getPayloadParameterNames()
+    {
+        return payloadParameterNames;
+    }
 
-      if (value == null) {
-        if (!optional) {
-          throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(exp).toString());
+    public void setPayloadParameterNames(List payloadParameterNames)
+    {
+        this.payloadParameterNames = payloadParameterNames;
+    }
+
+    public Filter getFilter()
+    {
+        return errorFilter;
+    }
+
+    public void setFilter(Filter errorFilter)
+    {
+        this.errorFilter = errorFilter;
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        if (serviceUrl == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
         }
-      } else if (requestBodyBuffer != null) // implies this is a POST
-      {
-        requestBodyBuffer.append(sep);
-        requestBodyBuffer.append(name).append('=').append(value);
-      } else {
-        url.append(sep);
-        url.append(name).append('=').append(value);
-      }
+        else if (!muleContext.getExpressionManager().isExpression(serviceUrl))
+        {
+            try
+            {
+                new URL(serviceUrl);
+            }
+            catch (MalformedURLException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
 
-      sep = updateSeparator(sep);
+        if (errorFilter == null)
+        {
+            // We'll set a default filter that checks the return code
+            errorFilter = new ExpressionFilter("#[message.inboundProperties['http.status']!=200]");
+            ((ExpressionFilter) errorFilter).setMuleContext(muleContext);
+            logger.info("Setting default error filter to ExpressionFilter('#[message.inboundProperties['http.status']!=200]')");
+        }
     }
 
-    if (!optional && payloadParameterNames != null) {
-      if (body instanceof Object[]) {
-        Object[] requestArray = (Object[]) body;
-        for (int i = 0; i < payloadParameterNames.size(); i++) {
-          if (requestBodyBuffer != null) {
-            requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
-          } else {
-            url.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
-          }
+    @Override
+    public Object doInvoke(MuleEvent event) throws Exception
+    {
+        Object requestBody;
 
-          sep = updateSeparator(sep);
+        Object request = event.getMessage().getPayload();
+        String tempUrl = serviceUrl;
+        if (muleContext.getExpressionManager().isExpression(serviceUrl))
+        {
+            muleContext.getExpressionManager().validateExpression(serviceUrl);
+            tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
         }
-      } else {
-        if (payloadParameterNames.get(0) != null) {
-          if (requestBodyBuffer != null) {
-            requestBodyBuffer.append(payloadParameterNames.get(0)).append('=').append(body.toString());
-          } else {
-            url.append(sep).append(payloadParameterNames.get(0)).append('=').append(body.toString());
-          }
+
+        StringBuilder urlBuffer = new StringBuilder(tempUrl);
+
+        if (GET.equalsIgnoreCase(this.httpMethod) || DELETE.equalsIgnoreCase(this.httpMethod))
+        {
+            requestBody = null;
+
+            setRESTParams(urlBuffer, event, request, requiredParams, false, null);
+            setRESTParams(urlBuffer, event, request, optionalParams, true, null);
         }
-      }
+        // if post
+        else
+        {
+            if (MediaType.ANY.matches(event.getMessage().getDataType().getMediaType()))
+            {
+                event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build());
+            }
+
+            StringBuilder requestBodyBuffer = new StringBuilder();
+            setRESTParams(urlBuffer, event, request, requiredParams, false, requestBodyBuffer);
+            setRESTParams(urlBuffer, event, request, optionalParams, true, requestBodyBuffer);
+            requestBody = requestBodyBuffer.toString();
+        }
+
+        tempUrl = urlBuffer.toString();
+        logger.info("Invoking REST service: " + tempUrl);
+
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build());
+
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
+        endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
+        OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
+
+        MuleEventContext eventContext = new DefaultMuleEventContext(event);
+        MuleEvent result = new DefaultMuleEvent(eventContext.sendEvent(
+                MuleMessage.builder(event.getMessage()).payload(requestBody).build(), outboundEndpoint.getEndpointURI().toString()), flowConstruct);
+
+        if (isErrorPayload(result))
+        {
+            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl),
+                    event, this), result.getMessage());
+        }
+
+        return result.getMessage();
     }
-  }
 
-  protected boolean isErrorPayload(MuleEvent event) {
-    return errorFilter != null && errorFilter.accept(event);
-  }
+    private String getSeparator(String url)
+    {
+        String sep;
 
-  protected void handleException(RestServiceException e, MuleMessage result) throws Exception {
-    throw e;
-  }
+        if (url.indexOf("?") > -1)
+        {
+            sep = "&";
+        }
+        else
+        {
+            sep = "?";
+        }
+
+        return sep;
+    }
+
+    private String updateSeparator(String sep)
+    {
+        if (sep.compareTo("?") == 0 || sep.compareTo("") == 0)
+        {
+            return ("&");
+        }
+
+        return sep;
+    }
+
+    // if requestBodyBuffer is null, it means that the request is a GET, otherwise it
+    // is a POST and
+    // requestBodyBuffer must contain the body of the http method at the end of this
+    // function call
+    private void setRESTParams(StringBuilder url,
+                               MuleEvent event,
+                               Object body,
+                               Map args,
+                               boolean optional,
+                               StringBuilder requestBodyBuffer)
+    {
+        String sep;
+
+        if (requestBodyBuffer == null)
+        {
+            sep = getSeparator(url.toString());
+        }
+        else if(requestBodyBuffer.length() > 0)
+        {
+            sep = "&";
+        }
+        else
+        {
+            sep = StringUtils.EMPTY;
+        }
+
+        for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry) iterator.next();
+            String name = (String) entry.getKey();
+            String exp = (String) entry.getValue();
+            Object value = null;
+
+            if (muleContext.getExpressionManager().isExpression(exp))
+            {
+                muleContext.getExpressionManager().validateExpression(exp);
+                value = muleContext.getExpressionManager().evaluate(exp, event);
+            }
+            else
+            {
+                value = exp;
+            }
+
+            if (value == null)
+            {
+                if (!optional)
+                {
+                    throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(exp).toString());
+                }
+            }
+            else if (requestBodyBuffer != null) // implies this is a POST
+            {
+                requestBodyBuffer.append(sep);
+                requestBodyBuffer.append(name).append('=').append(value);
+            }
+            else
+            {
+                url.append(sep);
+                url.append(name).append('=').append(value);
+            }
+
+            sep = updateSeparator(sep);
+        }
+
+        if (!optional && payloadParameterNames != null)
+        {
+            if (body instanceof Object[])
+            {
+                Object[] requestArray = (Object[]) body;
+                for (int i = 0; i < payloadParameterNames.size(); i++)
+                {
+                    if (requestBodyBuffer != null)
+                    {
+                        requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(
+                                requestArray[i].toString());
+                    }
+                    else
+                    {
+                        url.append(sep).append(payloadParameterNames.get(i)).append('=').append(
+                                requestArray[i].toString());
+                    }
+
+                    sep = updateSeparator(sep);
+                }
+            }
+            else
+            {
+                if (payloadParameterNames.get(0) != null)
+                {
+                    if (requestBodyBuffer != null)
+                    {
+                        requestBodyBuffer.append(payloadParameterNames.get(0)).append('=').append(body.toString());
+                    }
+                    else
+                    {
+                        url.append(sep).append(payloadParameterNames.get(0)).append('=').append(body.toString());
+                    }
+                }
+            }
+        }
+    }
+
+    protected boolean isErrorPayload(MuleEvent event)
+    {
+        return errorFilter != null && errorFilter.accept(event);
+    }
+
+    protected void handleException(RestServiceException e, MuleMessage result) throws Exception
+    {
+        throw e;
+    }
 
 }

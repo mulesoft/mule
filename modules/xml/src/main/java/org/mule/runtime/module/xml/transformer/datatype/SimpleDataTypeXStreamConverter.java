@@ -22,34 +22,42 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  *
  * @since 4.0
  */
-public class SimpleDataTypeXStreamConverter implements Converter {
+public class SimpleDataTypeXStreamConverter implements Converter
+{
 
-  @Override
-  public boolean canConvert(Class type) {
-    return SimpleDataType.class.isAssignableFrom(type);
-  }
-
-  @Override
-  public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-    final SimpleDataType dataType = (SimpleDataType) source;
-    writer.addAttribute("type", dataType.getType().getName());
-    writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
-  }
-
-  @Override
-  public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-    Class<?> type;
-    try {
-      type = ClassUtils.getClass(reader.getAttribute("type"));
-    } catch (ClassNotFoundException e) {
-      throw new MuleRuntimeException(e);
+    @Override
+    public boolean canConvert(Class type)
+    {
+        return SimpleDataType.class.isAssignableFrom(type);
     }
-    final String mediaType = reader.getAttribute("mediaType");
-    return createDataType(type, mediaType);
-  }
 
-  protected SimpleDataType createDataType(Class<?> type, String mimeType) {
-    return (SimpleDataType) DataType.builder().type(type).mediaType(mimeType).build();
-  }
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context)
+    {
+        final SimpleDataType dataType = (SimpleDataType) source;
+        writer.addAttribute("type", dataType.getType().getName());
+        writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
+    }
+
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
+    {
+        Class<?> type;
+        try
+        {
+            type = ClassUtils.getClass(reader.getAttribute("type"));
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+        final String mediaType = reader.getAttribute("mediaType");
+        return createDataType(type, mediaType);
+    }
+
+    protected SimpleDataType createDataType(Class<?> type, String mimeType)
+    {
+        return (SimpleDataType) DataType.builder().type(type).mediaType(mimeType).build();
+    }
 
 }

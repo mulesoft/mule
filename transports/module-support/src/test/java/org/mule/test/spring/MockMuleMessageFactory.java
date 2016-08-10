@@ -8,6 +8,7 @@ package org.mule.test.spring;
 
 import org.mule.compatibility.core.transport.DefaultMuleMessageFactory;
 
-public class MockMuleMessageFactory extends DefaultMuleMessageFactory {
+public class MockMuleMessageFactory extends DefaultMuleMessageFactory
+{
 }
 

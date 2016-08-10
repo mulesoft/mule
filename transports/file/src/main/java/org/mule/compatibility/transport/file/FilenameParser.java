@@ -10,9 +10,10 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
- * <code>FilenameParser</code> is a simple expression parser interface for processing filenames
+ * <code>FilenameParser</code> is a simple expression parser interface for
+ * processing filenames
  */
-public interface FilenameParser extends MuleContextAware {
-
-  public String getFilename(MuleEvent event, String pattern);
+public interface FilenameParser extends MuleContextAware
+{
+    public String getFilename(MuleEvent event, String pattern);
 }

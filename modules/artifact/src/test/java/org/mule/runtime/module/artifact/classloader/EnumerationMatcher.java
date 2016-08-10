@@ -16,35 +16,42 @@ import org.hamcrest.TypeSafeMatcher;
 /**
  * Matches a {@link Enumeration} against a collection of expected items.
  */
-public class EnumerationMatcher<T> extends TypeSafeMatcher<Enumeration<T>> {
+public class EnumerationMatcher<T> extends TypeSafeMatcher<Enumeration<T>>
+{
 
-  private final Collection<T> items;
+    private final Collection<T> items;
 
-  public EnumerationMatcher(Collection<T> items) {
-    this.items = items;
-  }
-
-  @Override
-  public boolean matchesSafely(Enumeration<T> item) {
-    int enumerationSize = 0;
-    while (item.hasMoreElements()) {
-      T currentItem = item.nextElement();
-      enumerationSize++;
-
-      if (!items.contains(currentItem)) {
-        return false;
-      }
+    public EnumerationMatcher(Collection<T> items)
+    {
+        this.items = items;
     }
 
-    return items.size() == enumerationSize;
-  }
+    @Override
+    public boolean matchesSafely(Enumeration<T> item)
+    {
+        int enumerationSize = 0;
+        while (item.hasMoreElements())
+        {
+            T currentItem = item.nextElement();
+            enumerationSize++;
 
-  @Override
-  public void describeTo(Description description) {
-    description.appendText("an Enumeration containing " + items.toString());
-  }
+            if (!items.contains(currentItem))
+            {
+                return false;
+            }
+        }
 
-  public static <T> Matcher<Enumeration<T>> equalTo(Collection<T> items) {
-    return new EnumerationMatcher<>(items);
-  }
+        return items.size() == enumerationSize;
+    }
+
+    @Override
+    public void describeTo(Description description)
+    {
+        description.appendText("an Enumeration containing " + items.toString());
+    }
+
+    public static <T> Matcher<Enumeration<T>> equalTo(Collection<T> items)
+    {
+        return new EnumerationMatcher<>(items);
+    }
 }

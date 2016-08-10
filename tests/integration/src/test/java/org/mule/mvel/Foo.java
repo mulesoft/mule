@@ -6,17 +6,16 @@
  */
 
 package org.mule.mvel;
-
 public class Foo {
 
-  private FooDetails stuff;
+    private FooDetails stuff;
 
-  public FooDetails getStuff() {
-    return stuff;
-  }
+    public FooDetails getStuff() {
+        return stuff;
+    }
 
-  public void setStuff(FooDetails stuff) {
-    this.stuff = stuff;
-  }
+    public void setStuff(FooDetails stuff) {
+        this.stuff = stuff;
+    }
 }
 

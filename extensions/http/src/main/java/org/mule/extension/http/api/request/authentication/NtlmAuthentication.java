@@ -16,35 +16,38 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentic
  *
  * @since 4.0
  */
-public class NtlmAuthentication extends UsernamePasswordAuthentication {
+public class NtlmAuthentication extends UsernamePasswordAuthentication
+{
+    /**
+     * The domain to authenticate.
+     */
+    @Parameter
+    @Optional
+    private String domain;
 
-  /**
-   * The domain to authenticate.
-   */
-  @Parameter
-  @Optional
-  private String domain;
+    /**
+     * The workstation to authenticate.
+     */
+    @Parameter
+    @Optional
+    private String workstation;
 
-  /**
-   * The workstation to authenticate.
-   */
-  @Parameter
-  @Optional
-  private String workstation;
+    public String getDomain()
+    {
+        return domain;
+    }
 
-  public String getDomain() {
-    return domain;
-  }
+    public String getWorkstation()
+    {
+        return workstation;
+    }
 
-  public String getWorkstation() {
-    return workstation;
-  }
-
-  @Override
-  public HttpRequestAuthentication buildRequestAuthentication() {
-    HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(NTLM);
-    requestAuthentication.setDomain(domain);
-    requestAuthentication.setWorkstation(workstation);
-    return requestAuthentication;
-  }
+    @Override
+    public HttpRequestAuthentication buildRequestAuthentication()
+    {
+        HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(NTLM);
+        requestAuthentication.setDomain(domain);
+        requestAuthentication.setWorkstation(workstation);
+        return requestAuthentication;
+    }
 }

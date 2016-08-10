@@ -18,34 +18,46 @@ import org.junit.internal.matchers.TypeSafeMatcher;
 /**
  * Provides a base implementation for {@link DataSource} matchers
  */
-public abstract class AbstractDataSourceFeatureMatcher extends TypeSafeMatcher<DataSource> {
+public abstract class AbstractDataSourceFeatureMatcher extends TypeSafeMatcher<DataSource>
+{
 
-  @Override
-  public boolean matchesSafely(DataSource dataSource) {
-    boolean supportFeature = false;
+    @Override
+    public boolean matchesSafely(DataSource dataSource)
+    {
+        boolean supportFeature = false;
 
-    Connection connection = null;
-    try {
-      try {
-        connection = dataSource.getConnection();
-        DatabaseMetaData metaData;
-        metaData = connection.getMetaData();
-        try {
-          supportFeature = supportsFeature(metaData);
-        } catch (Throwable t) {
-          // Ignore
+        Connection connection = null;
+        try
+        {
+            try
+            {
+                connection = dataSource.getConnection();
+                DatabaseMetaData metaData;
+                metaData = connection.getMetaData();
+                try
+                {
+                    supportFeature = supportsFeature(metaData);
+                }
+                catch (Throwable t)
+                {
+                    // Ignore
+                }
+            }
+            finally
+            {
+                if (connection != null)
+                {
+                    connection.close();
+                }
+            }
         }
-      } finally {
-        if (connection != null) {
-          connection.close();
+        catch (Exception e)
+        {
+            // Ignore
         }
-      }
-    } catch (Exception e) {
-      // Ignore
+
+        return supportFeature;
     }
 
-    return supportFeature;
-  }
-
-  protected abstract boolean supportsFeature(DatabaseMetaData metaData) throws SQLException;
+    protected abstract boolean supportsFeature(DatabaseMetaData metaData) throws SQLException;
 }

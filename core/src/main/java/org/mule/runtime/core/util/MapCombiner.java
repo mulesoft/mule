@@ -18,152 +18,187 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This allows a collection (list) of maps to be defined in Spring, via the "list" property, and then presents all the maps as a
- * single combine map at run time. For efficiency the combination of maps is done once and then cached.
+ * This allows a collection (list) of maps to be defined in Spring, via the "list" property, and
+ * then presents all the maps as a single combine map at run time.  For efficiency the combination
+ * of maps is done once and then cached.
  */
-public class MapCombiner implements Map<Object, Object>, Serializable {
+public class MapCombiner implements Map<Object, Object>, Serializable
+{
+    private static final long serialVersionUID = -6291404712112000383L;
+ 
+    public static final String LIST = "list"; // the setter/getter
+    public static final int UNLIMITED_DEPTH = -1;
 
-  private static final long serialVersionUID = -6291404712112000383L;
+    private transient Logger logger = LoggerFactory.getLogger(getClass());
+    private int maxDepth = UNLIMITED_DEPTH;
+    private List list;
+    private Map cachedMerge = new HashMap();
+    private boolean isMerged = false;
 
-  public static final String LIST = "list"; // the setter/getter
-  public static final int UNLIMITED_DEPTH = -1;
-
-  private transient Logger logger = LoggerFactory.getLogger(getClass());
-  private int maxDepth = UNLIMITED_DEPTH;
-  private List list;
-  private Map cachedMerge = new HashMap();
-  private boolean isMerged = false;
-
-  private synchronized Map getCachedMerge() {
-    if (!isMerged) {
-      for (Iterator maps = list.iterator(); maps.hasNext();) {
-        mergeMaps(maxDepth, cachedMerge, (Map) maps.next());
-      }
-      isMerged = true;
-    }
-    return cachedMerge;
-  }
-
-  public void setMaxDepth(int maxDepth) {
-    this.maxDepth = maxDepth;
-  }
-
-  private void mergeMaps(int headroom, Map accumulator, Map extra) {
-    for (Iterator keys = extra.keySet().iterator(); keys.hasNext();) {
-      Object key = keys.next();
-      Object valueExtra = extra.get(key);
-      if (accumulator.containsKey(key)) {
-        Object valueOriginal = accumulator.get(key);
-        if (valueExtra instanceof Map && valueOriginal instanceof Map && headroom != 0) {
-          mergeMaps(headroom - 1, (Map) valueOriginal, (Map) valueExtra);
-        } else if (valueExtra instanceof Collection && valueOriginal instanceof Collection && headroom != 0) {
-          ((Collection) valueOriginal).addAll((Collection) valueExtra);
-        } else {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Overwriting " + valueOriginal + " for " + key + " during map merge");
-          }
-          accumulator.put(key, valueExtra);
+    private synchronized Map getCachedMerge()
+    {
+        if (!isMerged)
+        {
+            for (Iterator maps = list.iterator(); maps.hasNext();)
+            {
+                mergeMaps(maxDepth, cachedMerge, (Map) maps.next());
+            }
+            isMerged = true;
         }
-      } else {
-        accumulator.put(key, valueExtra);
-      }
+        return cachedMerge;
     }
-  }
 
-  public void setList(List list) {
-    assertNotMerged();
-    this.list = list;
-  }
-
-  public List getList() {
-    assertNotMerged();
-    return list;
-  }
-
-  private synchronized void assertNotMerged() {
-    if (isMerged) {
-      throw new IllegalStateException("Maps have already been merged");
+    public void setMaxDepth(int maxDepth)
+    {
+        this.maxDepth = maxDepth;
     }
-  }
 
-  @Override
-  public int hashCode() {
-    // MULE-6607
-    // This was changed from cachedMerge.hashCode() to getCachedMerge().hashCode() since the mutation of MapCombiner (when the
-    // list
-    // of maps was merged into cachedMerge) altered the hash code. Now hashCode() method and, consequently, equals() method,
-    // trigger
-    // the merge in order not to alter equality of MapCombiner instances.
-    // This had impact on instances of classes such as AbstractEndpoint (which are stored on hash based collections) whose
-    // hashCode()
-    // method is defined based on its properties, and this, in turn, defined based on MapCombiner instances.
-    return getCachedMerge().hashCode();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    // MULE-6607
-    // See comment on hashCode() method.
-    return getCachedMerge().equals(o);
-  }
-
-  // toString() doesn't trigger merge.
-
-  @Override
-  public String toString() {
-    if (isMerged) {
-      return "merged: " + cachedMerge.toString();
-    } else {
-      return "unmerged: " + (null == list ? null : list.toString());
+    private void mergeMaps(int headroom, Map accumulator, Map extra)
+    {
+        for (Iterator keys = extra.keySet().iterator(); keys.hasNext();)
+        {
+            Object key = keys.next();
+            Object valueExtra = extra.get(key);
+            if (accumulator.containsKey(key))
+            {
+                Object valueOriginal = accumulator.get(key);
+                if (valueExtra instanceof Map && valueOriginal instanceof Map && headroom != 0)
+                {
+                    mergeMaps(headroom - 1, (Map) valueOriginal, (Map) valueExtra);
+                }
+                else if (valueExtra instanceof Collection && valueOriginal instanceof Collection && headroom != 0)
+                {
+                    ((Collection) valueOriginal).addAll((Collection) valueExtra);
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Overwriting " + valueOriginal + " for " + key + " during map merge");
+                    }
+                    accumulator.put(key, valueExtra);
+                }
+            }
+            else
+            {
+                accumulator.put(key, valueExtra);
+            }
+        }
     }
-  }
 
-  public int size() {
-    return getCachedMerge().size();
-  }
+    public void setList(List list)
+    {
+        assertNotMerged();
+        this.list = list;
+    }
 
-  public void clear() {
-    getCachedMerge().clear();
-  }
+    public List getList()
+    {
+        assertNotMerged();
+        return list;
+    }
 
-  public boolean isEmpty() {
-    return getCachedMerge().isEmpty();
-  }
+    private synchronized void assertNotMerged()
+    {
+        if (isMerged)
+        {
+            throw new IllegalStateException("Maps have already been merged");
+        }
+    }
 
-  public boolean containsKey(Object key) {
-    return getCachedMerge().containsKey(key);
-  }
+    @Override
+    public int hashCode()
+    {
+        // MULE-6607
+        // This was changed from cachedMerge.hashCode() to getCachedMerge().hashCode() since the mutation of MapCombiner (when the list
+        // of maps was merged into cachedMerge) altered the hash code. Now hashCode() method and, consequently, equals() method, trigger
+        // the merge in order not to alter equality of MapCombiner instances.
+        // This had impact on instances of classes such as AbstractEndpoint (which are stored on hash based collections) whose hashCode()
+        // method is defined based on its properties, and this, in turn, defined based on MapCombiner instances.
+        return getCachedMerge().hashCode();
+    }
 
-  public boolean containsValue(Object value) {
-    return getCachedMerge().containsValue(value);
-  }
+    @Override
+    public boolean equals(Object o)
+    {
+        // MULE-6607
+        // See comment on hashCode() method.
+        return getCachedMerge().equals(o);
+    }
 
-  public Collection values() {
-    return getCachedMerge().values();
-  }
+    // toString() doesn't trigger merge.
 
-  public void putAll(Map t) {
-    getCachedMerge().putAll(t);
-  }
+    @Override
+    public String toString()
+    {
+        if (isMerged)
+        {
+            return "merged: " + cachedMerge.toString();
+        }
+        else
+        {
+            return "unmerged: " + (null == list ? null : list.toString());
+        }
+    }
 
-  public Set entrySet() {
-    return getCachedMerge().entrySet();
-  }
+    public int size()
+    {
+        return getCachedMerge().size();
+    }
 
-  public Set keySet() {
-    return getCachedMerge().keySet();
-  }
+    public void clear()
+    {
+        getCachedMerge().clear();
+    }
 
-  public Object get(Object key) {
-    return getCachedMerge().get(key);
-  }
+    public boolean isEmpty()
+    {
+        return getCachedMerge().isEmpty();
+    }
 
-  public Object remove(Object key) {
-    return getCachedMerge().remove(key);
-  }
+    public boolean containsKey(Object key)
+    {
+        return getCachedMerge().containsKey(key);
+    }
 
-  public Object put(Object key, Object value) {
-    return getCachedMerge().put(key, value);
-  }
+    public boolean containsValue(Object value)
+    {
+        return getCachedMerge().containsValue(value);
+    }
+
+    public Collection values()
+    {
+        return getCachedMerge().values();
+    }
+
+    public void putAll(Map t)
+    {
+        getCachedMerge().putAll(t);
+    }
+
+    public Set entrySet()
+    {
+        return getCachedMerge().entrySet();
+    }
+
+    public Set keySet()
+    {
+        return getCachedMerge().keySet();
+    }
+
+    public Object get(Object key)
+    {
+        return getCachedMerge().get(key);
+    }
+
+    public Object remove(Object key)
+    {
+        return getCachedMerge().remove(key);
+    }
+
+    public Object put(Object key, Object value)
+    {
+        return getCachedMerge().put(key, value);
+    }
 
 }

@@ -13,36 +13,43 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * A Spring FactoryBean implementation for unit testing.
  */
-public class FloridaSunnyOrangeFactoryBean implements FactoryBean {
+public class FloridaSunnyOrangeFactoryBean implements FactoryBean
+{
+    Integer segments = new Integer(10);
+    Double radius = new Double(4.34);
+    
+    public Object getObject() throws Exception
+    {
+        return new Orange(segments, radius, "Florida Sunny");
+    }
 
-  Integer segments = new Integer(10);
-  Double radius = new Double(4.34);
+    public Class getObjectType()
+    {
+        return Orange.class;
+    }
 
-  public Object getObject() throws Exception {
-    return new Orange(segments, radius, "Florida Sunny");
-  }
+    public boolean isSingleton()
+    {
+        return false;
+    }
 
-  public Class getObjectType() {
-    return Orange.class;
-  }
+    public Double getRadius()
+    {
+        return radius;
+    }
 
-  public boolean isSingleton() {
-    return false;
-  }
+    public void setRadius(Double radius)
+    {
+        this.radius = radius;
+    }
 
-  public Double getRadius() {
-    return radius;
-  }
+    public Integer getSegments()
+    {
+        return segments;
+    }
 
-  public void setRadius(Double radius) {
-    this.radius = radius;
-  }
-
-  public Integer getSegments() {
-    return segments;
-  }
-
-  public void setSegments(Integer segments) {
-    this.segments = segments;
-  }
+    public void setSegments(Integer segments)
+    {
+        this.segments = segments;
+    }
 }

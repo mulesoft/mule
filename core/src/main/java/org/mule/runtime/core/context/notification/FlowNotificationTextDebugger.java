@@ -11,23 +11,29 @@ import org.mule.runtime.core.api.context.notification.PipelineMessageNotificatio
 /**
  * Listener for PipelineMessageNotification that delegates notifications to NotificationTextDebugger
  */
-public class FlowNotificationTextDebugger implements PipelineMessageNotificationListener<PipelineMessageNotification> {
+public class FlowNotificationTextDebugger implements PipelineMessageNotificationListener<PipelineMessageNotification>
+{
 
-  private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
+    private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
 
-  public FlowNotificationTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager) {
-    this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
-  }
-
-
-  @Override
-  public void onNotification(PipelineMessageNotification notification) {
-    if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
-      messageProcessingFlowTraceManager.onPipelineNotificationComplete(notification);
-    } else if (notification.getAction() == PipelineMessageNotification.PROCESS_START) {
-      messageProcessingFlowTraceManager.onPipelineNotificationStart(notification);
+    public FlowNotificationTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager)
+    {
+        this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
     }
-  }
+
+
+    @Override
+    public void onNotification(PipelineMessageNotification notification)
+    {
+        if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE)
+        {
+            messageProcessingFlowTraceManager.onPipelineNotificationComplete(notification);
+        }
+        else if (notification.getAction() == PipelineMessageNotification.PROCESS_START)
+        {
+            messageProcessingFlowTraceManager.onPipelineNotificationStart(notification);
+        }
+    }
 
 
 }

@@ -21,55 +21,68 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.ArrayList;
 
-public class CxfEndpointBuilder extends AbstractMetaEndpointBuilder {
+public class CxfEndpointBuilder extends AbstractMetaEndpointBuilder
+{
 
-  public CxfEndpointBuilder() {
-    super();
-  }
-
-  public CxfEndpointBuilder(EndpointURI endpointURI) {
-    super(endpointURI);
-  }
-
-  public CxfEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException {
-    super(global);
-  }
-
-  public CxfEndpointBuilder(ImmutableEndpoint source) {
-    super(source);
-  }
-
-  public CxfEndpointBuilder(String address, MuleContext muleContext) {
-    super(getEndpointAddressWithoutMetaScheme(address), muleContext);
-  }
-
-  public CxfEndpointBuilder(URIBuilder builder) {
-    super(builder);
-  }
-
-  @Override
-  public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException {
-    throw new UnsupportedOperationException("Inbound meta CXF endpoints not supported");
-  }
-
-  @Override
-  public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException {
-    LocalClientMessageProcessorBuilder builder = new LocalClientMessageProcessorBuilder();
-    builder.setMuleContext(muleContext);
-    builder.setAddress(getEndpointBuilder().getEndpoint().toString());
-
-    try {
-      ArrayList<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-      processors.add(builder.build());
-      if (messageProcessors != null) {
-        processors.addAll(messageProcessors);
-      }
-      messageProcessors = processors;
-    } catch (Exception e) {
-      throw new EndpointException(e);
+    public CxfEndpointBuilder()
+    {
+        super();
     }
 
-    return super.buildOutboundEndpoint();
-  }
+    public CxfEndpointBuilder(EndpointURI endpointURI)
+    {
+        super(endpointURI);
+    }
+
+    public CxfEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
+    {
+        super(global);
+    }
+
+    public CxfEndpointBuilder(ImmutableEndpoint source)
+    {
+        super(source);
+    }
+
+    public CxfEndpointBuilder(String address, MuleContext muleContext)
+    {
+        super(getEndpointAddressWithoutMetaScheme(address), muleContext);
+    }
+
+    public CxfEndpointBuilder(URIBuilder builder)
+    {
+        super(builder);
+    }
+
+    @Override
+    public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
+    {
+        throw new UnsupportedOperationException("Inbound meta CXF endpoints not supported");
+    }
+
+    @Override
+    public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
+    {
+        LocalClientMessageProcessorBuilder builder = new LocalClientMessageProcessorBuilder();
+        builder.setMuleContext(muleContext);
+        builder.setAddress(getEndpointBuilder().getEndpoint().toString());
+        
+        try
+        {
+            ArrayList<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+            processors.add(builder.build());
+            if (messageProcessors != null) 
+            {
+                processors.addAll(messageProcessors);
+            }
+            messageProcessors = processors;
+        }
+        catch (Exception e)
+        {
+            throw new EndpointException(e);
+        }
+
+        return super.buildOutboundEndpoint();
+    }
 
 }

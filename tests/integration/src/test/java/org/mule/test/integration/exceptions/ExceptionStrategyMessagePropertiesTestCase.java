@@ -15,42 +15,53 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrationTestCase {
-
-  private final int numMessages = 100;
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml";
-  }
-
-  @Test
-  public void testException() throws Exception {
-    Thread tester1 = new Tester();
-    Thread tester2 = new Tester();
-    tester1.start();
-    tester2.start();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage msg;
-    for (int i = 0; i < numMessages; ++i) {
-      msg = client.request("test://out", 5000);
-      assertNotNull(msg);
-      assertEquals("bar", msg.getOutboundProperty("prop"));
-    }
-  }
-
-  class Tester extends Thread {
+public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrationTestCase
+{
+    private final int numMessages = 100;
 
     @Override
-    public void run() {
-      try {
-        for (int i = 0; i < numMessages; ++i) {
-          flowRunner("inbound").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "bar").asynchronously().run();
-        }
-      } catch (Exception e) {
-        fail(e.getMessage());
-      }
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml";
     }
-  }
+
+    @Test
+    public void testException() throws Exception
+    {
+        Thread tester1 = new Tester();
+        Thread tester2 = new Tester();
+        tester1.start();
+        tester2.start();
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage msg;
+        for (int i = 0; i < numMessages; ++i)
+        {
+            msg = client.request("test://out", 5000);
+            assertNotNull(msg);
+            assertEquals("bar", msg.getOutboundProperty("prop"));
+        }
+    }
+
+    class Tester extends Thread
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                for (int i = 0; i < numMessages; ++i)
+                {
+                    flowRunner("inbound").withPayload(TEST_PAYLOAD)
+                                         .withInboundProperty("foo", "bar")
+                                         .asynchronously()
+                                         .run();
+                }
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
+        }
+    }
 }

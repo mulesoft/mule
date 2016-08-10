@@ -15,34 +15,40 @@ import java.util.Map;
 /**
  *
  */
-public class SingleResourceTransactionFactoryManager {
+public class SingleResourceTransactionFactoryManager
+{
+    private Map<Class,TransactionFactory> transactionFactories = new HashMap<>();
+    private Map<Class,TransactionFactory> transactionFactoriesCache = new HashMap<>();
 
-  private Map<Class, TransactionFactory> transactionFactories = new HashMap<>();
-  private Map<Class, TransactionFactory> transactionFactoriesCache = new HashMap<>();
-
-  public void registerTransactionFactory(Class supportedType, TransactionFactory transactionFactory) {
-    this.transactionFactories.put(supportedType, transactionFactory);
-  }
-
-  public boolean supports(Class type) {
-    return this.transactionFactories.containsKey(type);
-  }
-
-  public TransactionFactory getTransactionFactoryFor(Class type) {
-    TransactionFactory transactionFactory = transactionFactoriesCache.get(type);
-    if (transactionFactory == null) {
-      for (Class transactionResourceType : transactionFactories.keySet()) {
-        if (transactionResourceType.isAssignableFrom(type)) {
-          transactionFactory = transactionFactories.get(transactionResourceType);
-          this.transactionFactoriesCache.put(type, transactionFactory);
-          break;
+    public void registerTransactionFactory(Class supportedType, TransactionFactory transactionFactory)
+    {
+        this.transactionFactories.put(supportedType, transactionFactory);
+    }
+    
+    public boolean supports(Class type)
+    {
+        return this.transactionFactories.containsKey(type);
+    }
+    
+    public TransactionFactory getTransactionFactoryFor(Class type)
+    {
+        TransactionFactory transactionFactory = transactionFactoriesCache.get(type);
+        if (transactionFactory == null)
+        {
+            for (Class transactionResourceType : transactionFactories.keySet())
+            {
+                if (transactionResourceType.isAssignableFrom(type))
+                {
+                    transactionFactory = transactionFactories.get(transactionResourceType);
+                    this.transactionFactoriesCache.put(type, transactionFactory);
+                    break;
+                }
+            }
         }
-      }
+        if (transactionFactory == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No %s for transactional resource %s",TransactionFactory.class.getName(),type.getName())));
+        }
+        return transactionFactory;
     }
-    if (transactionFactory == null) {
-      throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-          .format("No %s for transactional resource %s", TransactionFactory.class.getName(), type.getName())));
-    }
-    return transactionFactory;
-  }
 }

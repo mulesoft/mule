@@ -25,131 +25,164 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This allows a definition parsers to be dynamically represented by different definition parsers, depending on the context. For
- * example, a single model may be defined across file - the first use defines the model and subsequent uses extend it (for this
- * particular case, see {@link InheritDefinitionParser}).
+ * This allows a definition parsers to be dynamically represented by different
+ * definition parsers, depending on the context.  For example, a single model may
+ * be defined across file - the first use defines the model and subsequent uses
+ * extend it (for this particular case, see {@link InheritDefinitionParser}).
  *
- * <p>
- * Note that the sub-parsers must be consistent. That includes matching the same schema, for example.
- * </p>
+ * <p>Note that the sub-parsers must be consistent.  That includes matching the
+ * same schema, for example.</p>
  */
-public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDefinitionParser implements MuleDefinitionParser {
+public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDefinitionParser
+    implements MuleDefinitionParser
+{
 
-  protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+    
+    private MuleDefinitionParser[] delegates;
 
-  private MuleDefinitionParser[] delegates;
-
-  protected AbstractDelegatingDefinitionParser() {
-    this(new MuleDefinitionParser[0]);
-  }
-
-  protected AbstractDelegatingDefinitionParser(MuleDefinitionParser[] delegates) {
-    this.delegates = delegates;
-    addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE);
-  }
-
-  protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-    return muleParse(element, parserContext);
-  }
-
-  protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate) {
-    delegates = (MuleDefinitionParser[]) ArrayUtils.add(delegates, delegate);
-    return delegate;
-  }
-
-  protected int size() {
-    return delegates.length;
-  }
-
-  protected MuleDefinitionParser getDelegate(int index) {
-    return delegates[index];
-  }
-
-  public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].registerPreProcessor(preProcessor);
+    protected AbstractDelegatingDefinitionParser()
+    {
+        this(new MuleDefinitionParser[0]);
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].registerPostProcessor(postProcessor);
+    protected AbstractDelegatingDefinitionParser(MuleDefinitionParser[] delegates)
+    {
+        this.delegates = delegates;
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE);
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addReference(String propertyName) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addReference(propertyName);
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        return muleParse(element, parserContext);
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addMapping(propertyName, mappings);
+    protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)
+    {
+        delegates = (MuleDefinitionParser[]) ArrayUtils.add(delegates, delegate);
+        return delegate;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addMapping(propertyName, mappings);
+    protected int size()
+    {
+        return delegates.length;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addMapping(propertyName, mappings);
+    protected MuleDefinitionParser getDelegate(int index)
+    {
+        return delegates[index];
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addAlias(alias, propertyName);
+    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].registerPreProcessor(preProcessor);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addCollection(String propertyName) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addCollection(propertyName);
+    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].registerPostProcessor(postProcessor);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration addIgnored(String propertyName) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addIgnored(propertyName);
+    public MuleDefinitionParserConfiguration addReference(String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addReference(propertyName);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration removeIgnored(String propertyName) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].removeIgnored(propertyName);
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addMapping(propertyName, mappings);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].setIgnoredDefault(ignoreAll);
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addMapping(propertyName, mappings);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public String getBeanName(Element element) {
-    return AutoIdUtils.getUniqueName(element, "delegate");
-  }
-
-  public MuleDefinitionParserConfiguration addBeanFlag(String flag) {
-    for (int i = 0; i < delegates.length; ++i) {
-      delegates[i].addBeanFlag(flag);
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addMapping(propertyName, mappings);
+        }
+        return this;
     }
-    return this;
-  }
+
+    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addAlias(alias, propertyName);
+        }
+        return this;
+    }
+
+    public MuleDefinitionParserConfiguration addCollection(String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addCollection(propertyName);
+        }
+        return this;
+    }
+
+    public MuleDefinitionParserConfiguration addIgnored(String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addIgnored(propertyName);
+        }
+        return this;
+    }
+
+    public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].removeIgnored(propertyName);
+        }
+        return this;
+    }
+
+    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].setIgnoredDefault(ignoreAll);
+        }
+        return this;
+    }
+
+    public String getBeanName(Element element)
+    {
+        return AutoIdUtils.getUniqueName(element, "delegate");
+    }
+
+    public MuleDefinitionParserConfiguration addBeanFlag(String flag)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addBeanFlag(flag);
+        }
+        return this;
+    }
 }

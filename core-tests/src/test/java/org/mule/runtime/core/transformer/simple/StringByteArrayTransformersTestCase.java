@@ -11,43 +11,54 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.util.Arrays;
 
-public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase {
+public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase
+{
 
-  public Transformer getTransformer() throws Exception {
-    return new ObjectToByteArray();
-  }
-
-  public Transformer getRoundTripTransformer() throws Exception {
-    return new ByteArrayToObject();
-  }
-
-  public Object getTestData() {
-    return "Test";
-  }
-
-  public Object getResultData() {
-    return "Test".getBytes();
-  }
-
-  @Override
-  public boolean compareResults(Object src, Object result) {
-    if (src == null && result == null) {
-      return true;
+    public Transformer getTransformer() throws Exception
+    {
+        return new ObjectToByteArray();
     }
-    if (src == null || result == null) {
-      return false;
-    }
-    return Arrays.equals((byte[]) src, (byte[]) result);
-  }
 
-  @Override
-  public boolean compareRoundtripResults(Object src, Object result) {
-    if (src == null && result == null) {
-      return true;
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return new ByteArrayToObject();
     }
-    if (src == null || result == null) {
-      return false;
+
+    public Object getTestData()
+    {
+        return "Test";
     }
-    return src.equals(result);
-  }
+
+    public Object getResultData()
+    {
+        return "Test".getBytes();
+    }
+
+    @Override
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+        {
+            return true;
+        }
+        if (src == null || result == null)
+        {
+            return false;
+        }
+        return Arrays.equals((byte[]) src, (byte[]) result);
+    }
+
+    @Override
+    public boolean compareRoundtripResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+        {
+            return true;
+        }
+        if (src == null || result == null)
+        {
+            return false;
+        }
+        return src.equals(result);
+    }
 }

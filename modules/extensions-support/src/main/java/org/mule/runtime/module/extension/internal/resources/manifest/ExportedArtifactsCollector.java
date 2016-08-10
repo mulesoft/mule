@@ -34,146 +34,172 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Utility class which calculates the default set of java package names and resources that a given extension should export in
- * order to properly function
+ * Utility class which calculates the default set of java package
+ * names and resources that a given extension should export in order
+ * to properly function
  *
  * @since 4.0
  */
-final class ExportedArtifactsCollector {
+final class ExportedArtifactsCollector
+{
 
-  private static final String META_INF_PREFIX = "/META-INF";
-  private final Set<String> filteredPackages = ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.").build();
+    private static final String META_INF_PREFIX = "/META-INF";
+    private final Set<String> filteredPackages = ImmutableSet.<String>builder()
+            .add("java.", "javax.", "org.mule.runtime.").build();
 
-  private final ExtensionModel extensionModel;
-  private final ImmutableSet.Builder<Class> exportedClasses = ImmutableSet.builder();
-  private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
+    private final ExtensionModel extensionModel;
+    private final ImmutableSet.Builder<Class> exportedClasses = ImmutableSet.builder();
+    private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
 
-  /**
-   * Creates a new instance
-   *
-   * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
-   */
-  ExportedArtifactsCollector(ExtensionModel extensionModel) {
-    this.extensionModel = extensionModel;
-  }
-
-  /**
-   * @return The {@link Set} of default resource paths that the extension should export
-   */
-  Set<String> getExportedResources() {
-    // TODO: remove at Kraan's notice
-    addMetaInfResource("");
-
-    addMetaInfResource(EXTENSION_MANIFEST_FILE_NAME);
-    collectXmlSupportResources();
-
-    return exportedResources.build();
-  }
-
-  /**
-   * @return The {@link Set} of default java package names that the extension should export
-   */
-  Set<String> getExportedPackages() {
-    collectDefault();
-    collectManuallyExportedPackages();
-
-    Set<String> exportedPackages = exportedClasses.build().stream().filter(type -> type.getPackage() != null)
-        .map(type -> type.getPackage().getName()).collect(toSet());
-
-    return filterExportedPackages(exportedPackages);
-  }
-
-  private void collectXmlSupportResources() {
-    XmlModelProperty xml = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
-    if (xml == null) {
-      return;
+    /**
+     * Creates a new instance
+     *
+     * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
+     */
+    ExportedArtifactsCollector(ExtensionModel extensionModel)
+    {
+        this.extensionModel = extensionModel;
     }
 
-    addMetaInfResource(xml.getXsdFileName());
-    addMetaInfResource("spring.handlers");
-    addMetaInfResource("spring.schemas");
+    /**
+     * @return The {@link Set} of default resource paths that the extension should export
+     */
+    Set<String> getExportedResources()
+    {
+        // TODO: remove at Kraan's notice
+        addMetaInfResource("");
 
-    Optional<ExportModelProperty> exportProperty = getExportModelProperty();
-    if (exportProperty.isPresent()) {
-      exportedResources.addAll(exportProperty.get().getExportedResources());
+        addMetaInfResource(EXTENSION_MANIFEST_FILE_NAME);
+        collectXmlSupportResources();
+
+        return exportedResources.build();
     }
-  }
 
-  private void addMetaInfResource(String resource) {
-    exportedResources.add(META_INF_PREFIX + "/" + resource);
-  }
+    /**
+     * @return The {@link Set} of default java package names that the extension should export
+     */
+    Set<String> getExportedPackages()
+    {
+        collectDefault();
+        collectManuallyExportedPackages();
 
-  private Set<String> filterExportedPackages(Set<String> exportedPackages) {
-    return exportedPackages.stream()
-        .filter(packageName -> filteredPackages.stream().noneMatch(filtered -> packageName.startsWith(filtered)))
-        .collect(toSet());
-  }
+        Set<String> exportedPackages = exportedClasses.build().stream()
+                .filter(type -> type.getPackage() != null)
+                .map(type -> type.getPackage().getName())
+                .collect(toSet());
 
-  private void collectManuallyExportedPackages() {
-    getExportModelProperty().map(ExportModelProperty::getExportedTypes)
-        .ifPresent(types -> types.forEach(c -> exportedClasses.add(getType(c))));
-  }
+        return filterExportedPackages(exportedPackages);
+    }
 
-  private Optional<ExportModelProperty> getExportModelProperty() {
-    return extensionModel.getModelProperty(ExportModelProperty.class);
-  }
-
-  private void collectDefault() {
-    new ExtensionWalker() {
-
-      @Override
-      public void onParameter(ParameterizedModel owner, ParameterModel model) {
-        getParameterClass(model).ifPresent(exportedClasses::add);
-      }
-
-      @Override
-      public void onOperation(HasOperationModels owner, OperationModel model) {
-        collectReturnTypes(model);
-      }
-
-      @Override
-      public void onSource(HasSourceModels owner, SourceModel model) {
-        collectReturnTypes(model);
-      }
-
-    }.walk(extensionModel);
-  }
-
-  private void collectReturnTypes(ComponentModel model) {
-    exportedClasses.add(getType(model.getOutput().getType()));
-    exportedClasses.add(getType(model.getOutputAttributes().getType()));
-  }
-
-  private Optional<Class<?>> getParameterClass(ParameterModel parameter) {
-    ValueHolder<Class<?>> clazz = new ValueHolder<>(null);
-
-    parameter.getType().accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        dictionaryType.getKeyType().accept(this);
-        dictionaryType.getValueType().accept(this);
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        clazz.set(getType(objectType));
-      }
-
-      @Override
-      public void visitString(StringType stringType) {
-        Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
-        if (enumAnnotation.isPresent()) {
-          clazz.set(getType(stringType));
+    private void collectXmlSupportResources()
+    {
+        XmlModelProperty xml = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
+        if (xml == null)
+        {
+            return;
         }
-      }
-    });
 
-    return Optional.ofNullable(clazz.get());
-  }
+        addMetaInfResource(xml.getXsdFileName());
+        addMetaInfResource("spring.handlers");
+        addMetaInfResource("spring.schemas");
+
+        Optional<ExportModelProperty> exportProperty = getExportModelProperty();
+        if (exportProperty.isPresent())
+        {
+            exportedResources.addAll(exportProperty.get().getExportedResources());
+        }
+    }
+
+    private void addMetaInfResource(String resource)
+    {
+        exportedResources.add(META_INF_PREFIX + "/" + resource);
+    }
+
+    private Set<String> filterExportedPackages(Set<String> exportedPackages)
+    {
+        return exportedPackages.stream()
+                .filter(packageName -> filteredPackages.stream().noneMatch(filtered -> packageName.startsWith(filtered)))
+                .collect(toSet());
+    }
+
+    private void collectManuallyExportedPackages()
+    {
+        getExportModelProperty().map(ExportModelProperty::getExportedTypes)
+                .ifPresent(types -> types.forEach( c -> exportedClasses.add(getType(c))));
+    }
+
+    private Optional<ExportModelProperty> getExportModelProperty()
+    {
+        return extensionModel.getModelProperty(ExportModelProperty.class);
+    }
+
+    private void collectDefault()
+    {
+        new ExtensionWalker()
+        {
+            @Override
+            public void onParameter(ParameterizedModel owner, ParameterModel model)
+            {
+                getParameterClass(model).ifPresent(exportedClasses::add);
+            }
+
+            @Override
+            public void onOperation(HasOperationModels owner, OperationModel model)
+            {
+                collectReturnTypes(model);
+            }
+
+            @Override
+            public void onSource(HasSourceModels owner, SourceModel model)
+            {
+                collectReturnTypes(model);
+            }
+
+        }.walk(extensionModel);
+    }
+
+    private void collectReturnTypes(ComponentModel model)
+    {
+        exportedClasses.add(getType(model.getOutput().getType()));
+        exportedClasses.add(getType(model.getOutputAttributes().getType()));
+    }
+
+    private Optional<Class<?>> getParameterClass(ParameterModel parameter)
+    {
+        ValueHolder<Class<?>> clazz = new ValueHolder<>(null);
+
+        parameter.getType().accept(new MetadataTypeVisitor()
+        {
+            @Override
+            public void visitDictionary(DictionaryType dictionaryType)
+            {
+                dictionaryType.getKeyType().accept(this);
+                dictionaryType.getValueType().accept(this);
+            }
+
+            @Override
+            public void visitArrayType(ArrayType arrayType)
+            {
+                arrayType.getType().accept(this);
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType)
+            {
+                clazz.set(getType(objectType));
+            }
+
+            @Override
+            public void visitString(StringType stringType)
+            {
+                Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
+                if (enumAnnotation.isPresent())
+                {
+                    clazz.set(getType(stringType));
+                }
+            }
+        });
+
+        return Optional.ofNullable(clazz.get());
+    }
 }

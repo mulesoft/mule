@@ -16,63 +16,73 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutRequestResponseTestCase {
+public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
+{
+    @Rule
+    public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
 
-  @Rule
-  public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
+    @Override
+    protected String getConfigFile()
+    {
+        return "shutdown-timeout-one-way-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "shutdown-timeout-one-way-config.xml";
-  }
+    @Override
+    protected boolean isGracefulShutdown()
+    {
+        return true;
+    }
 
-  @Override
-  protected boolean isGracefulShutdown() {
-    return true;
-  }
+    @Test
+    public void testStaticComponent() throws Exception
+    {
+        doShutDownTest("staticComponentResponse", "staticComponentFlow");
+    }
 
-  @Test
-  public void testStaticComponent() throws Exception {
-    doShutDownTest("staticComponentResponse", "staticComponentFlow");
-  }
+    @Test
+    public void testScriptComponent() throws Exception
+    {
+        doShutDownTest("scriptComponentResponse", "scriptComponentFlow");
+    }
 
-  @Test
-  public void testScriptComponent() throws Exception {
-    doShutDownTest("scriptComponentResponse", "scriptComponentFlow");
-  }
+    @Test
+    public void testExpressionTransformer() throws Exception
+    {
+        doShutDownTest("expressionTransformerResponse", "expressionTransformerFlow");
+    }
 
-  @Test
-  public void testExpressionTransformer() throws Exception {
-    doShutDownTest("expressionTransformerResponse", "expressionTransformerFlow");
-  }
+    private void doShutDownTest(final String payload, final String flowName) throws MuleException, InterruptedException
+    {
+        final MuleClient client = muleContext.getClient();
+        final boolean[] results = new boolean[] {false};
 
-  private void doShutDownTest(final String payload, final String flowName) throws MuleException, InterruptedException {
-    final MuleClient client = muleContext.getClient();
-    final boolean[] results = new boolean[] {false};
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    flowRunner(flowName).withPayload(payload).asynchronously().run();
 
-    Thread t = new Thread() {
+                    MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);
+                    results[0] = payload.equals(getPayloadAsString(response));
+                }
+                catch (Exception e)
+                {
+                    // Ignore
+                }
+            }
+        };
+        t.start();
 
-      @Override
-      public void run() {
-        try {
-          flowRunner(flowName).withPayload(payload).asynchronously().run();
+        // Make sure to give the request enough time to get to the waiting portion of the feed.
+        waitLatch.await();
 
-          MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);
-          results[0] = payload.equals(getPayloadAsString(response));
-        } catch (Exception e) {
-          // Ignore
-        }
-      }
-    };
-    t.start();
+        muleContext.stop();
 
-    // Make sure to give the request enough time to get to the waiting portion of the feed.
-    waitLatch.await();
+        t.join();
 
-    muleContext.stop();
-
-    t.join();
-
-    assertTrue("Was not able to process message ", results[0]);
-  }
+        assertTrue("Was not able to process message ", results[0]);
+    }
 }

@@ -32,87 +32,99 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
+public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase
+{
 
-  public static String SERVICE_DOWN_MESSAGE = "Service Down";
-  public static String CATCH_SENSING_PROCESSOR_NAME = "catchSensingMessageProcessor";
-  public static String ROLLBACK_SENSING_PROCESSOR_NAME = "rollbackSensingMessageProcessor";
+    public static String SERVICE_DOWN_MESSAGE = "Service Down";
+    public static String CATCH_SENSING_PROCESSOR_NAME = "catchSensingMessageProcessor";
+    public static String ROLLBACK_SENSING_PROCESSOR_NAME = "rollbackSensingMessageProcessor";
 
-  @Rule
-  public DynamicPort proxyPort = new DynamicPort("proxyPort");
+    @Rule
+    public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
-  @Rule
-  public SystemProperty systemProperty;
+    @Rule
+    public SystemProperty systemProperty;
 
-  private String configFile;
-  private boolean nonBlocking;
+    private String configFile;
+    private boolean nonBlocking;
 
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"http-proxy-template-error-handling-config.xml", false}// ,
-        // {"http-proxy-template-error-handling-config.xml", true}
-    });
-  }
-
-  public HttpProxyTemplateErrorHandlingTestCase(String configFile, boolean nonBlocking) {
-    this.configFile = configFile;
-    this.nonBlocking = nonBlocking;
-    if (nonBlocking) {
-      systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
-                                          ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-proxy-template-error-handling-config.xml", false}//,
+                //{"http-proxy-template-error-handling-config.xml", true}
+        });
     }
-  }
 
-  @Override
-  protected String getConfigFile() {
-    return configFile;
-  }
+    public HttpProxyTemplateErrorHandlingTestCase(String configFile, boolean nonBlocking)
+    {
+        this.configFile = configFile;
+        this.nonBlocking = nonBlocking;
+        if (nonBlocking)
+        {
+            systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
+                                                ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+        }
+    }
 
-  @Before
-  public void startServer() throws Exception {
-    // Don't start server so that requests fail
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return configFile;
+    }
 
-  @After
-  public void stopServer() throws Exception {
-    // No server to stop
-  }
+    @Before
+    public void startServer() throws Exception
+    {
+        // Don't start server so that requests fail
+    }
 
-  @Test
-  public void noExceptionStrategy() throws Exception {
-    HttpResponse response =
-        Request.Get(getProxyUrl("noExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT).execute().returnResponse();
+    @After
+    public void stopServer() throws Exception
+    {
+        // No server to stop
+    }
 
-    assertThat(response.getStatusLine().getStatusCode(), is(500));
-  }
+    @Test
+    public void noExceptionStrategy() throws Exception
+    {
+        HttpResponse response = Request.Get(getProxyUrl("noExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT)
+                .execute().returnResponse();
 
-  @Test
-  public void catchExceptionStrategy() throws Exception {
-    HttpResponse response =
-        Request.Get(getProxyUrl("catchExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT).execute().returnResponse();
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+    }
 
-    assertThat(response.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo(SERVICE_DOWN_MESSAGE));
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        HttpResponse response = Request.Get(getProxyUrl("catchExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT)
+                .execute().returnResponse();
 
-    SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(CATCH_SENSING_PROCESSOR_NAME);
-    assertThat(processor.event, is(notNullValue()));
-  }
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo(SERVICE_DOWN_MESSAGE));
 
-  @Test
-  public void rollbackExceptionStrategy() throws Exception {
-    HttpResponse response =
-        Request.Get(getProxyUrl("rollbackExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT).execute().returnResponse();
+        SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(CATCH_SENSING_PROCESSOR_NAME);
+        assertThat(processor.event, is(notNullValue()));
+    }
 
-    assertThat(response.getStatusLine().getStatusCode(), is(500));
-    assertThat(IOUtils.toString(response.getEntity().getContent()), not(equalTo(SERVICE_DOWN_MESSAGE)));
+    @Test
+    public void rollbackExceptionStrategy() throws Exception
+    {
+        HttpResponse response = Request.Get(getProxyUrl("rollbackExceptionStrategy")).connectTimeout(RECEIVE_TIMEOUT)
+                .execute().returnResponse();
 
-    SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(ROLLBACK_SENSING_PROCESSOR_NAME);
-    assertThat(processor.event, is(notNullValue()));
-  }
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+        assertThat(IOUtils.toString(response.getEntity().getContent()), not(equalTo(SERVICE_DOWN_MESSAGE)));
 
-  private String getProxyUrl(String path) {
-    return String.format("http://localhost:%s/%s", proxyPort.getNumber(), path);
-  }
+        SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(ROLLBACK_SENSING_PROCESSOR_NAME);
+        assertThat(processor.event, is(notNullValue()));
+    }
+
+    private String getProxyUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", proxyPort.getNumber(), path);
+    }
 
 }

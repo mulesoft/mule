@@ -15,17 +15,20 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 /**
  * Used for configuration testing
  */
-public class DummyConverter implements Converter {
+public class DummyConverter implements Converter
+{
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context)
+    {
+        //do nothing
+    }
 
-  public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-    // do nothing
-  }
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
+    {
+        return null;
+    }
 
-  public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-    return null;
-  }
-
-  public boolean canConvert(Class type) {
-    return false;
-  }
+    public boolean canConvert(Class type)
+    {
+        return false;
+    }
 }

@@ -15,23 +15,25 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class ExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase {
+public class ExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase
+{
+    public static final String MESSAGE = "some message";
+    public static final int TIMEOUT = 5000;
 
-  public static final String MESSAGE = "some message";
-  public static final int TIMEOUT = 5000;
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/exceptions/exception-strategy-flow-ref.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/exception-strategy-flow-ref.xml";
-  }
-
-  @Test
-  public void testExceptionInFlowCalledWithFlowRef() throws Exception {
-    flowRunner("exceptionHandlingBlock").runExpectingException();
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://dlq", RECEIVE_TIMEOUT);
-    assertThat(response, notNullValue());
-    assertThat(response.<String>getOutboundProperty("mainEs"), is("yes"));
-    assertThat(response.<String>getOutboundProperty("flowRefEs"), is("yes"));
-  }
+    @Test
+    public void testExceptionInFlowCalledWithFlowRef() throws Exception
+    {
+        flowRunner("exceptionHandlingBlock").runExpectingException();
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://dlq", RECEIVE_TIMEOUT);
+        assertThat(response, notNullValue());
+        assertThat(response.<String> getOutboundProperty("mainEs"), is("yes"));
+        assertThat(response.<String> getOutboundProperty("flowRefEs"), is("yes"));
+    }
 }

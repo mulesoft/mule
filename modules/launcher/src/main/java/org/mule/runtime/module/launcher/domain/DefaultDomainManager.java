@@ -15,25 +15,29 @@ import java.util.Map;
 /**
  * Manages {@link Domain} instances created on the container.
  */
-public class DefaultDomainManager implements DomainRepository, DomainManager {
+public class DefaultDomainManager implements DomainRepository, DomainManager
+{
+    private Map<String, Domain> domains = new HashMap();
 
-  private Map<String, Domain> domains = new HashMap();
-
-  @Override
-  public Domain getDomain(String name) {
-    return domains.get(name);
-  }
-
-  @Override
-  public void addDomain(Domain domain) {
-    if (domains.containsKey(domain.getArtifactName())) {
-      throw new IllegalArgumentException(format("Domain '%s' already exists", domain.getArtifactName()));
+    @Override
+    public Domain getDomain(String name)
+    {
+        return domains.get(name);
     }
-    domains.put(domain.getArtifactName(), domain);
-  }
 
-  @Override
-  public void removeDomain(String name) {
-    domains.remove(name);
-  }
+    @Override
+    public void addDomain(Domain domain)
+    {
+        if (domains.containsKey(domain.getArtifactName()))
+        {
+            throw new IllegalArgumentException(format("Domain '%s' already exists", domain.getArtifactName()));
+        }
+        domains.put(domain.getArtifactName(), domain);
+    }
+
+    @Override
+    public void removeDomain(String name)
+    {
+        domains.remove(name);
+    }
 }

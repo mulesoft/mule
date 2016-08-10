@@ -25,55 +25,78 @@ import org.slf4j.LoggerFactory;
  */
 public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNotificationListener {
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
-  private Startable startMeOnPrimaryNodeNotification;
-  private MuleContext muleContext;
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    private Startable startMeOnPrimaryNodeNotification;
+    private MuleContext muleContext;
 
-  public PrimaryNodeLifecycleNotificationListener(Startable startMeOnPrimaryNodeNotification, MuleContext muleContext) {
-    this.startMeOnPrimaryNodeNotification = startMeOnPrimaryNodeNotification;
-    this.muleContext = muleContext;
-  }
-
-  public void register() {
-    try {
-      if (muleContext != null) {
-        muleContext.registerListener(this);
-      }
-    } catch (NotificationException e) {
-      throw new RuntimeException("Unable to register listener", e);
+    public PrimaryNodeLifecycleNotificationListener(Startable startMeOnPrimaryNodeNotification, MuleContext muleContext) {
+        this.startMeOnPrimaryNodeNotification = startMeOnPrimaryNodeNotification;
+        this.muleContext = muleContext;
     }
-  }
 
-  @Override
-  public void onNotification(ServerNotification notification) {
-    try {
-      if (startMeOnPrimaryNodeNotification instanceof LifecycleState) {
-        if (((LifecycleState) startMeOnPrimaryNodeNotification).isStarted()) {
-          startMeOnPrimaryNodeNotification.start();
-        } else {
-          logStartableNotStartedMessage();
+    public void register()
+    {
+        try
+        {
+            if (muleContext != null)
+            {
+                muleContext.registerListener(this);
+            }
         }
-      } else if (startMeOnPrimaryNodeNotification instanceof LifecycleStateEnabled) {
-        if (((LifecycleStateEnabled) startMeOnPrimaryNodeNotification).getLifecycleState().isStarted()) {
-          startMeOnPrimaryNodeNotification.start();
-        } else {
-          logStartableNotStartedMessage();
+        catch (NotificationException e)
+        {
+            throw new RuntimeException("Unable to register listener", e);
         }
-      } else {
-        startMeOnPrimaryNodeNotification.start();
-      }
-    } catch (MuleException e) {
-      throw new RuntimeException("Error starting wrapped message source", e);
     }
-  }
 
-  private void logStartableNotStartedMessage() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Not starting Startable since it's not in started state");
+    @Override
+    public void onNotification(ServerNotification notification)
+    {
+        try
+        {
+            if (startMeOnPrimaryNodeNotification instanceof LifecycleState)
+            {
+                if (((LifecycleState)startMeOnPrimaryNodeNotification).isStarted())
+                {
+                    startMeOnPrimaryNodeNotification.start();
+                }
+                else
+                {
+                    logStartableNotStartedMessage();
+                }
+            }
+            else if (startMeOnPrimaryNodeNotification instanceof LifecycleStateEnabled)
+            {
+                if (((LifecycleStateEnabled)startMeOnPrimaryNodeNotification).getLifecycleState().isStarted())
+                {
+                    startMeOnPrimaryNodeNotification.start();
+                }
+                else
+                {
+                    logStartableNotStartedMessage();
+                }
+            }
+            else 
+            {
+                startMeOnPrimaryNodeNotification.start();
+            }
+        }
+        catch (MuleException e)
+        {
+            throw new RuntimeException("Error starting wrapped message source", e);
+        }
     }
-  }
 
-  public void unregister() {
-    muleContext.unregisterListener(this);
-  }
+    private void logStartableNotStartedMessage()
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Not starting Startable since it's not in started state");
+        }
+    }
+
+    public void unregister()
+    {
+        muleContext.unregisterListener(this);
+    }
 }

@@ -16,28 +16,31 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class InOnlyOutOnlyTestCase extends AbstractIntegrationTestCase {
+public class InOnlyOutOnlyTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-flow.xml";
-  }
+    @Test
+    public void testExchange() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testExchange() throws Exception {
-    MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Only_Out-Only-Service").withPayload("some data")
+                                                                      .asynchronously();
+        baseRunner.run();
+        baseRunner.reset();
+        baseRunner.withInboundProperty("foo", "bar").run();
 
-    FlowRunner baseRunner = flowRunner("In-Only_Out-Only-Service").withPayload("some data").asynchronously();
-    baseRunner.run();
-    baseRunner.reset();
-    baseRunner.withInboundProperty("foo", "bar").run();
+        MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
-    assertNotNull(result);
-    assertThat(getPayloadAsString(result), is("foo header received"));
-
-    result = client.request("test://notReceived", RECEIVE_TIMEOUT);
-    assertNotNull(result);
-    assertThat(getPayloadAsString(result), is("foo header not received"));
-  }
+        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertThat(getPayloadAsString(result), is("foo header not received"));
+    }
 }

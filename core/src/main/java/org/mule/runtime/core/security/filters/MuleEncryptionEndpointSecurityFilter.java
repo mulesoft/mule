@@ -26,60 +26,75 @@ import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.security.MuleHeaderCredentialsAccessor;
 
 /**
- * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based encryption
+ * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based
+ * encryption
  */
-public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecurityFilter {
+public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecurityFilter
+{
+    private EncryptionStrategy strategy;
 
-  private EncryptionStrategy strategy;
-
-  public MuleEncryptionEndpointSecurityFilter() {
-    setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
-  }
-
-  @Override
-  protected void authenticateInbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException,
-      CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
-    String userHeader = (String) getCredentialsAccessor().getCredentials(event);
-    if (userHeader == null) {
-      throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(), this);
+    public MuleEncryptionEndpointSecurityFilter()
+    {
+        setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
-    Credentials user = new MuleCredentials(userHeader, getSecurityManager());
+    @Override
+    protected void authenticateInbound(MuleEvent event)
+            throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
+    {
+        String userHeader = (String) getCredentialsAccessor().getCredentials(event);
+        if (userHeader == null)
+        {
+            throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(), this);
+        }
 
-    Authentication authentication;
-    try {
-      authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user, event));
-    } catch (Exception e) {
-      // Authentication failed
-      if (logger.isDebugEnabled()) {
-        logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
-      }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(user.getUsername()), event, e);
+        Credentials user = new MuleCredentials(userHeader, getSecurityManager());
+
+        Authentication authentication;
+        try
+        {
+            authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user, event));
+        }
+        catch (Exception e)
+        {
+            // Authentication failed
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Authentication request for user: " + user.getUsername()
+                             + " failed: " + e.toString());
+            }
+            throw new UnauthorisedException(
+                    CoreMessages.authFailedForUser(user.getUsername()), event, e);
+        }
+
+        // Authentication success
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Authentication success: " + authentication.toString());
+        }
+
+        SecurityContext context = getSecurityManager().createSecurityContext(authentication);
+        context.setAuthentication(authentication);
+        event.getSession().setSecurityContext(context);
     }
 
-    // Authentication success
-    if (logger.isDebugEnabled()) {
-      logger.debug("Authentication success: " + authentication.toString());
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        if (strategy == null)
+        {
+            throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
+        }
     }
 
-    SecurityContext context = getSecurityManager().createSecurityContext(authentication);
-    context.setAuthentication(authentication);
-    event.getSession().setSecurityContext(context);
-  }
-
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    if (strategy == null) {
-      throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
+    public EncryptionStrategy getStrategy()
+    {
+        return strategy;
     }
-  }
 
-  public EncryptionStrategy getStrategy() {
-    return strategy;
-  }
-
-  public void setStrategy(EncryptionStrategy strategy) {
-    this.strategy = strategy;
-  }
+    public void setStrategy(EncryptionStrategy strategy)
+    {
+        this.strategy = strategy;
+    }
 
 }

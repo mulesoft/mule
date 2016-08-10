@@ -8,9 +8,10 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 
-public class SimpleMemoryQueueStoreFactoryBean extends AbstractQueueStoreFactoryBean {
-
-  public SimpleMemoryQueueStoreFactoryBean() {
-    super(MuleProperties.OBJECT_STORE_SIMPLE_MEMORY_NAME);
-  }
+public class SimpleMemoryQueueStoreFactoryBean extends AbstractQueueStoreFactoryBean
+{
+    public SimpleMemoryQueueStoreFactoryBean()
+    {
+        super(MuleProperties.OBJECT_STORE_SIMPLE_MEMORY_NAME);
+    }
 }

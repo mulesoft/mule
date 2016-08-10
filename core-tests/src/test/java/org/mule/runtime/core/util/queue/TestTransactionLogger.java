@@ -9,24 +9,29 @@ package org.mule.runtime.core.util.queue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
 
-public class TestTransactionLogger extends LocalTxQueueTransactionJournal {
+public class TestTransactionLogger extends LocalTxQueueTransactionJournal
+{
 
-  private boolean failDuringLogCommit;
+    private boolean failDuringLogCommit;
 
-  public TestTransactionLogger(String logFilesDirectory, MuleContext muleContext) {
-    super(logFilesDirectory, muleContext);
-  }
-
-  public TestTransactionLogger failDuringLogCommit() {
-    this.failDuringLogCommit = true;
-    return this;
-  }
-
-  @Override
-  public void logCommit(Integer txId) {
-    if (failDuringLogCommit) {
-      throw new RuntimeException("faked failure");
+    public TestTransactionLogger(String logFilesDirectory, MuleContext muleContext)
+    {
+        super(logFilesDirectory, muleContext);
     }
-    super.logCommit(txId);
-  }
+
+    public TestTransactionLogger failDuringLogCommit()
+    {
+        this.failDuringLogCommit = true;
+        return this;
+    }
+
+    @Override
+    public void logCommit(Integer txId)
+    {
+        if (failDuringLogCommit)
+        {
+            throw new RuntimeException("faked failure");
+        }
+        super.logCommit(txId);
+    }
 }

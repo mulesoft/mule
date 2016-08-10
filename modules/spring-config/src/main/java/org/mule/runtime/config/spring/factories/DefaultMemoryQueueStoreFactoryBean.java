@@ -8,9 +8,10 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 
-public class DefaultMemoryQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean {
-
-  public DefaultMemoryQueueStoreFactoryBean() {
-    super(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
-  }
+public class DefaultMemoryQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
+{
+    public DefaultMemoryQueueStoreFactoryBean()
+    {
+        super(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+    }
 }

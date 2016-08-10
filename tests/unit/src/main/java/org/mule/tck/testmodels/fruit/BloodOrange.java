@@ -13,15 +13,20 @@ import java.util.HashMap;
 /**
  * A specialisation of Orange
  */
-public class BloodOrange extends Orange {
+public class BloodOrange extends Orange
+{
+    public BloodOrange()
+    {
+    }
 
-  public BloodOrange() {}
+    public BloodOrange(HashMap props)
+            throws MuleException
+    {
+        super(props);
+    }
 
-  public BloodOrange(HashMap props) throws MuleException {
-    super(props);
-  }
-
-  public BloodOrange(Integer segments, Double radius, String brand) {
-    super(segments, radius, brand);
-  }
+    public BloodOrange(Integer segments, Double radius, String brand)
+    {
+        super(segments, radius, brand);
+    }
 }

@@ -15,27 +15,29 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
-public class SpringRemotingTestCase extends FunctionalTestCase {
+public class SpringRemotingTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "spring-remoting-mule-config-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "spring-remoting-mule-config-flow.xml";
-  }
-
-  @Test
-  public void testHttpInvokeSpringService() throws Exception {
-    ComplexData cd = new ComplexData("Foo", new Integer(13));
-    HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
-    invoker.setServiceInterface(WorkInterface.class);
-    invoker.setServiceUrl(String.format("http://localhost:%s/springService", port.getNumber()));
-    invoker.afterPropertiesSet();
-    WorkInterface worker = (WorkInterface) invoker.getObject();
-    ComplexData data = worker.executeComplexity(cd);
-    assertNotNull(data);
-    assertEquals(data.getSomeString(), "Foo Received");
-    assertEquals(data.getSomeInteger(), new Integer(14));
-  }
+    @Test
+    public void testHttpInvokeSpringService() throws Exception
+    {
+        ComplexData cd = new ComplexData("Foo", new Integer(13));
+        HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
+        invoker.setServiceInterface(WorkInterface.class);
+        invoker.setServiceUrl(String.format("http://localhost:%s/springService", port.getNumber()));
+        invoker.afterPropertiesSet();
+        WorkInterface worker = (WorkInterface)invoker.getObject();
+        ComplexData data = worker.executeComplexity(cd);
+        assertNotNull(data);
+        assertEquals(data.getSomeString(), "Foo Received");
+        assertEquals(data.getSomeInteger(), new Integer(14));
+    }
 }

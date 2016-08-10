@@ -31,140 +31,153 @@ import java.util.Arrays;
 import org.junit.Test;
 
 @SmallTest
-public class CompositeConverterTestCase {
+public class CompositeConverterTestCase
+{
+    private Converter mockConverterA = mock(Converter.class);
+    private Converter mockConverterB = mock(Converter.class);
 
-  private Converter mockConverterA = mock(Converter.class);
-  private Converter mockConverterB = mock(Converter.class);
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsEmptyCompositeTransformer() throws Exception
+    {
+        new CompositeConverter();
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void rejectsEmptyCompositeTransformer() throws Exception {
-    new CompositeConverter();
-  }
+    @Test
+    public void isSourceDataTypeSupported()
+    {
+        Converter converter = mock(Converter.class);
+        when(converter.isSourceDataTypeSupported(DataType.STRING)).thenReturn(true);
+        CompositeConverter chain = new CompositeConverter(converter);
 
-  @Test
-  public void isSourceDataTypeSupported() {
-    Converter converter = mock(Converter.class);
-    when(converter.isSourceDataTypeSupported(DataType.STRING)).thenReturn(true);
-    CompositeConverter chain = new CompositeConverter(converter);
+        assertTrue(chain.isSourceDataTypeSupported(DataType.STRING));
+    }
 
-    assertTrue(chain.isSourceDataTypeSupported(DataType.STRING));
-  }
+    @Test
+    public void getSourceDataTypes()
+    {
+        DataType[] dataTypes = new DataType[] {DataType.STRING};
+        Converter converter = mock(Converter.class);
+        when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
+        CompositeConverter chain = new CompositeConverter(converter);
 
-  @Test
-  public void getSourceDataTypes() {
-    DataType[] dataTypes = new DataType[] {DataType.STRING};
-    Converter converter = mock(Converter.class);
-    when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
-    CompositeConverter chain = new CompositeConverter(converter);
+        assertEquals(DataType.STRING, chain.getSourceDataTypes().get(0));
+    }
 
-    assertEquals(DataType.STRING, chain.getSourceDataTypes().get(0));
-  }
+    @Test
+    public void isAcceptNull()
+    {
+        Converter converter = mock(Converter.class);
+        when(converter.isAcceptNull()).thenReturn(true);
+        CompositeConverter chain = new CompositeConverter(converter);
 
-  @Test
-  public void isAcceptNull() {
-    Converter converter = mock(Converter.class);
-    when(converter.isAcceptNull()).thenReturn(true);
-    CompositeConverter chain = new CompositeConverter(converter);
+        assertTrue(chain.isAcceptNull());
+    }
 
-    assertTrue(chain.isAcceptNull());
-  }
+    @Test
+    public void isIgnoreBadInput()
+    {
+        Converter converter = mock(Converter.class);
+        when(converter.isIgnoreBadInput()).thenReturn(true);
+        CompositeConverter chain = new CompositeConverter(converter);
 
-  @Test
-  public void isIgnoreBadInput() {
-    Converter converter = mock(Converter.class);
-    when(converter.isIgnoreBadInput()).thenReturn(true);
-    CompositeConverter chain = new CompositeConverter(converter);
+        assertTrue(chain.isIgnoreBadInput());
+    }
 
-    assertTrue(chain.isIgnoreBadInput());
-  }
+    @Test
+    public void setReturnDataType()
+    {
+        Converter converter = mock(Converter.class);
+        CompositeConverter chain = new CompositeConverter(converter);
+        chain.setReturnDataType(DataType.STRING);
 
-  @Test
-  public void setReturnDataType() {
-    Converter converter = mock(Converter.class);
-    CompositeConverter chain = new CompositeConverter(converter);
-    chain.setReturnDataType(DataType.STRING);
+        verify(converter, atLeastOnce()).setReturnDataType(DataType.STRING);
+    }
 
-    verify(converter, atLeastOnce()).setReturnDataType(DataType.STRING);
-  }
+    @Test
+    public void getReturnDataType()
+    {
+        doReturn(DataType.STRING).when(mockConverterB).getReturnDataType();
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-  @Test
-  public void getReturnDataType() {
-    doReturn(DataType.STRING).when(mockConverterB).getReturnDataType();
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        assertEquals(DataType.STRING, compositeConverter.getReturnDataType());
+    }
 
-    assertEquals(DataType.STRING, compositeConverter.getReturnDataType());
-  }
+    @Test
+    public void priorityWeighting() throws Exception
+    {
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        when(mockConverterA.getPriorityWeighting()).thenReturn(1);
+        when(mockConverterB.getPriorityWeighting()).thenReturn(2);
 
-  @Test
-  public void priorityWeighting() throws Exception {
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-    when(mockConverterA.getPriorityWeighting()).thenReturn(1);
-    when(mockConverterB.getPriorityWeighting()).thenReturn(2);
+        int priorityWeighting = compositeConverter.getPriorityWeighting();
 
-    int priorityWeighting = compositeConverter.getPriorityWeighting();
+        assertEquals(3, priorityWeighting);
+    }
 
-    assertEquals(3, priorityWeighting);
-  }
+    @Test
+    public void initialise() throws Exception
+    {
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-  @Test
-  public void initialise() throws Exception {
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        compositeConverter.initialise();
 
-    compositeConverter.initialise();
+        verify(mockConverterA, atLeastOnce()).initialise();
+        verify(mockConverterB, atLeastOnce()).initialise();
+    }
 
-    verify(mockConverterA, atLeastOnce()).initialise();
-    verify(mockConverterB, atLeastOnce()).initialise();
-  }
+    @Test
+    public void dispose() throws Exception
+    {
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-  @Test
-  public void dispose() throws Exception {
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        compositeConverter.dispose();
 
-    compositeConverter.dispose();
+        verify(mockConverterA, atLeastOnce()).dispose();
+        verify(mockConverterB, atLeastOnce()).dispose();
+    }
 
-    verify(mockConverterA, atLeastOnce()).dispose();
-    verify(mockConverterB, atLeastOnce()).dispose();
-  }
+    @Test
+    public void setMuleContext()
+    {
+        MuleContext mockMuleContext = mock(MuleContext.class);
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-  @Test
-  public void setMuleContext() {
-    MuleContext mockMuleContext = mock(MuleContext.class);
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        compositeConverter.setMuleContext(mockMuleContext);
 
-    compositeConverter.setMuleContext(mockMuleContext);
+        verify(mockConverterA, atLeastOnce()).setMuleContext(mockMuleContext);
+        verify(mockConverterB, atLeastOnce()).setMuleContext(mockMuleContext);
+    }
 
-    verify(mockConverterA, atLeastOnce()).setMuleContext(mockMuleContext);
-    verify(mockConverterB, atLeastOnce()).setMuleContext(mockMuleContext);
-  }
+    @Test
+    public void transform() throws Exception
+    {
+        doReturn("MyOutput1").when(mockConverterA).transform(any());
+        doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterA).getReturnDataType();
+        doReturn("MyOutput2").when(mockConverterB).transform(eq("MyOutput1"), eq(UTF_8));
+        doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterB).getReturnDataType();
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-  @Test
-  public void transform() throws Exception {
-    doReturn("MyOutput1").when(mockConverterA).transform(any());
-    doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterA).getReturnDataType();
-    doReturn("MyOutput2").when(mockConverterB).transform(eq("MyOutput1"), eq(UTF_8));
-    doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterB).getReturnDataType();
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        Object output = compositeConverter.transform("MyInput");
 
-    Object output = compositeConverter.transform("MyInput");
+        verify(mockConverterA, times(1)).transform("MyInput");
+        verify(mockConverterB, times(1)).transform("MyOutput1", UTF_8);
+        assertEquals("MyOutput2", output);
+    }
 
-    verify(mockConverterA, times(1)).transform("MyInput");
-    verify(mockConverterB, times(1)).transform("MyOutput1", UTF_8);
-    assertEquals("MyOutput2", output);
-  }
+    @Test
+    public void appliesTransformerChainOnMessage() throws Exception
+    {
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+        MuleEvent event = mock(MuleEvent.class);
+        MuleMessage message = mock(MuleMessage.class);
+        MuleContext muleContext = mock(MuleContext.class);
+        TransformationService transformationService = mock(TransformationService.class);
+        doReturn(message).when(event).getMessage();
+        doReturn(muleContext).when(event).getMuleContext();
+        doReturn(transformationService).when(muleContext).getTransformationService();
 
-  @Test
-  public void appliesTransformerChainOnMessage() throws Exception {
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-    MuleEvent event = mock(MuleEvent.class);
-    MuleMessage message = mock(MuleMessage.class);
-    MuleContext muleContext = mock(MuleContext.class);
-    TransformationService transformationService = mock(TransformationService.class);
-    doReturn(message).when(event).getMessage();
-    doReturn(muleContext).when(event).getMuleContext();
-    doReturn(transformationService).when(muleContext).getTransformationService();
+        compositeConverter.process(event);
 
-    compositeConverter.process(event);
-
-    verify(transformationService, times(1)).applyTransformers(event.getMessage(), event, compositeConverter);
-  }
+        verify(transformationService, times(1)).applyTransformers(event.getMessage(), event, compositeConverter);
+    }
 }

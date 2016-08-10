@@ -12,23 +12,28 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * An extension to {@link ChildDefinitionParser} which recurses up the DOM tree until it finds a named parent.
+ * An extension to {@link ChildDefinitionParser} which recurses up the DOM
+ * tree until it finds a named parent.
  */
-public class DescendentDefinitionParser extends ChildDefinitionParser {
-
-  public DescendentDefinitionParser(String setterMethod, Class clazz) {
-    super(setterMethod, clazz);
-  }
-
-  protected String getParentBeanName(Element element) {
-    Node node = element;
-    while (null != node && node instanceof Element) {
-      String name = super.getParentBeanName((Element) node);
-      if (!StringUtils.isBlank(name)) {
-        return name;
-      }
-      node = element.getParentNode();
+public class DescendentDefinitionParser extends ChildDefinitionParser
+{
+    public DescendentDefinitionParser(String setterMethod, Class clazz)
+    {
+        super(setterMethod, clazz);
     }
-    throw new IllegalStateException("Bean: " + element.getNodeName() + " has no grandparent");
-  }
+
+    protected String getParentBeanName(Element element)
+    {
+        Node node = element;
+        while (null != node && node instanceof Element)
+        {
+            String name = super.getParentBeanName((Element) node);
+            if (!StringUtils.isBlank(name))
+            {
+                return name;
+            }
+            node = element.getParentNode();
+        }
+        throw new IllegalStateException("Bean: " + element.getNodeName() + " has no grandparent");
+    }
 }

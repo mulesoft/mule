@@ -13,14 +13,16 @@ import org.mule.runtime.core.api.MuleMessage;
 /**
  * TODO
  */
-public class TestMessageRequester extends AbstractMessageRequester {
+public class TestMessageRequester extends AbstractMessageRequester
+{
+    public TestMessageRequester(InboundEndpoint endpoint)
+    {
+        super(endpoint);
+    }
 
-  public TestMessageRequester(InboundEndpoint endpoint) {
-    super(endpoint);
-  }
-
-  @Override
-  protected MuleMessage doRequest(long timeout) throws Exception {
-    return null;
-  }
+    @Override
+    protected MuleMessage doRequest(long timeout) throws Exception
+    {
+        return null;
+    }
 }

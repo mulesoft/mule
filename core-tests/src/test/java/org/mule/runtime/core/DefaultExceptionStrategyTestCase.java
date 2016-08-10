@@ -21,63 +21,70 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase {
+public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase
+{
+    // MULE-1404
+    @Test
+    public void testExceptions() throws Exception
+    {
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
+        strategy.setMuleContext(muleContext);
+        strategy.handleException(new IllegalArgumentException("boom"));
+        assertEquals(1, strategy.getCount());
+    }
 
-  // MULE-1404
-  @Test
-  public void testExceptions() throws Exception {
-    InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
-    strategy.setMuleContext(muleContext);
-    strategy.handleException(new IllegalArgumentException("boom"));
-    assertEquals(1, strategy.getCount());
-  }
+    // MULE-1627
+    @Test
+    public void testExceptionNotifications() throws Exception
+    {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicInteger notificationCount = new AtomicInteger(0);
 
-  // MULE-1627
-  @Test
-  public void testExceptionNotifications() throws Exception {
-    final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicInteger notificationCount = new AtomicInteger(0);
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
+        {
+            @Override
+            public void onNotification(ExceptionNotification notification)
+            {
+                if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION)
+                {
+                    assertEquals("exception", notification.getActionName());
+                    assertEquals("Wrong info type", ServerNotification.TYPE_ERROR, notification.getType());
+                    notificationCount.incrementAndGet();
+                    latch.countDown();
+                }
+            }
+        });
 
-    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+        // throwing exception
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
+        strategy.setMuleContext(muleContext);
+        strategy.handleException(new IllegalArgumentException("boom"));
 
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION) {
-          assertEquals("exception", notification.getActionName());
-          assertEquals("Wrong info type", ServerNotification.TYPE_ERROR, notification.getType());
-          notificationCount.incrementAndGet();
-          latch.countDown();
+        // Wait for the notifcation event to be fired as they are queue
+        latch.await(2000, TimeUnit.MILLISECONDS);
+        assertEquals(1, notificationCount.get());
+
+    }
+
+    private static class InstrumentedExceptionStrategy extends DefaultSystemExceptionStrategy
+    {
+        private volatile int count = 0;
+
+        public InstrumentedExceptionStrategy(MuleContext muleContext)
+        {
+            super();
         }
-      }
-    });
 
-    // throwing exception
-    InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
-    strategy.setMuleContext(muleContext);
-    strategy.handleException(new IllegalArgumentException("boom"));
+        @Override
+        public void handleException(Exception exception)
+        {
+            count++;
+            super.handleException(exception);
+        }
 
-    // Wait for the notifcation event to be fired as they are queue
-    latch.await(2000, TimeUnit.MILLISECONDS);
-    assertEquals(1, notificationCount.get());
-
-  }
-
-  private static class InstrumentedExceptionStrategy extends DefaultSystemExceptionStrategy {
-
-    private volatile int count = 0;
-
-    public InstrumentedExceptionStrategy(MuleContext muleContext) {
-      super();
+        public int getCount()
+        {
+            return count;
+        }
     }
-
-    @Override
-    public void handleException(Exception exception) {
-      count++;
-      super.handleException(exception);
-    }
-
-    public int getCount() {
-      return count;
-    }
-  }
 }

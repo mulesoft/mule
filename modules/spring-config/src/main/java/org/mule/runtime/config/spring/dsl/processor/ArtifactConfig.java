@@ -12,73 +12,74 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the application configuration files that describe the integrations. It does not include resource files or
- * application descriptors.
+ * Represents the application configuration files that describe the integrations. It does not include resource files or application descriptors.
  *
- * An application configuration is defined by an application name and a set of configuration files containing the integration
- * required components.
+ * An application configuration is defined by an application name and a set of configuration files containing the integration required components.
  *
  * @since 4.0
  */
-public class ArtifactConfig {
+public class ArtifactConfig
+{
 
-  private String artifactName;
-  private List<ConfigFile> configFiles = new ArrayList<>();
-  private Map<String, String> applicationProperties;
+    private String artifactName;
+    private List<ConfigFile> configFiles = new ArrayList<>();
+    private Map<String, String> applicationProperties;
 
-  private ArtifactConfig() {}
+    private ArtifactConfig()
+    {}
 
-  public String getArtifactName() {
-    return artifactName;
-  }
+    public String getArtifactName() {
+        return artifactName;
+    }
 
-  public List<ConfigFile> getConfigFiles() {
-    return Collections.unmodifiableList(configFiles);
-  }
-
-  /**
-   * @return properties associated to the configuration.
-   */
-  public Map<String, String> getApplicationProperties() {
-    return applicationProperties;
-  }
-
-  /**
-   * Builder for {@link ArtifactConfig} instances.
-   */
-  public static class Builder {
-
-    private ArtifactConfig applicationConfig = new ArtifactConfig();
-
-    /**
-     * @param applicationName the artifact name
-     * @return the builder
-     */
-    public Builder setApplicationName(String applicationName) {
-      this.applicationConfig.artifactName = applicationName;
-      return this;
+    public List<ConfigFile> getConfigFiles() {
+        return Collections.unmodifiableList(configFiles);
     }
 
     /**
-     * @param configFile a {@code ConfigFile} to be added to the application.
-     * @return the builder
+     * @return properties associated to the configuration.
      */
-    public Builder addConfigFile(ConfigFile configFile) {
-      this.applicationConfig.configFiles.add(configFile);
-      return this;
+    public Map<String, String> getApplicationProperties()
+    {
+        return applicationProperties;
     }
 
     /**
-     * @param applicationProperties properties associated to the configuration.
-     * @return the builder
+     * Builder for {@link ArtifactConfig} instances.
      */
-    public Builder setApplicationProperties(Map<String, String> applicationProperties) {
-      this.applicationConfig.applicationProperties = applicationProperties;
-      return this;
-    }
+    public static class Builder {
+        private ArtifactConfig applicationConfig = new ArtifactConfig();
 
-    public ArtifactConfig build() {
-      return this.applicationConfig;
+        /**
+         * @param applicationName the artifact name
+         * @return the builder
+         */
+        public Builder setApplicationName(String applicationName) {
+            this.applicationConfig.artifactName = applicationName;
+            return this;
+        }
+
+        /**
+         * @param configFile a {@code ConfigFile} to be added to the application.
+         * @return the builder
+         */
+        public Builder addConfigFile(ConfigFile configFile) {
+            this.applicationConfig.configFiles.add(configFile);
+            return this;
+        }
+
+        /**
+         * @param applicationProperties properties associated to the configuration.
+         * @return the builder
+         */
+        public Builder setApplicationProperties(Map<String, String> applicationProperties)
+        {
+            this.applicationConfig.applicationProperties = applicationProperties;
+            return this;
+        }
+
+        public ArtifactConfig build() {
+            return this.applicationConfig;
+        }
     }
-  }
 }

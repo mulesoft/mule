@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.model.types;
 
-public enum WeaponType {
-  FIRE_WEAPON, MELEE_WEAPON
+public enum WeaponType
+{
+    FIRE_WEAPON, MELEE_WEAPON
 }

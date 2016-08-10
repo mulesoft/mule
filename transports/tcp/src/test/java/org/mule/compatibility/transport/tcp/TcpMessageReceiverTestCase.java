@@ -15,16 +15,18 @@ import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
 import org.mule.compatibility.transport.tcp.TcpMessageReceiver;
 import org.mule.runtime.core.construct.Flow;
 
-public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
+public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+{
+    @Override
+    public MessageReceiver getMessageReceiver() throws Exception
+    {
+        AbstractConnector connector = (AbstractConnector)endpoint.getConnector();
+        return new TcpMessageReceiver(connector,  mock(Flow.class), endpoint);
+    }
 
-  @Override
-  public MessageReceiver getMessageReceiver() throws Exception {
-    AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-    return new TcpMessageReceiver(connector, mock(Flow.class), endpoint);
-  }
-
-  @Override
-  public InboundEndpoint getEndpoint() throws Exception {
-    return getEndpointFactory().getInboundEndpoint("tcp://localhost:1234");
-  }
+    @Override
+    public InboundEndpoint getEndpoint() throws Exception
+    {
+        return getEndpointFactory().getInboundEndpoint("tcp://localhost:1234");
+    }
 }

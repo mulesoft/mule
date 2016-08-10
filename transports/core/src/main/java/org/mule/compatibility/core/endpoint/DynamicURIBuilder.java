@@ -24,56 +24,65 @@ import org.slf4j.LoggerFactory;
 /**
  * Builds dynamic string URI from a template {@link URIBuilder}
  */
-public class DynamicURIBuilder {
+public class DynamicURIBuilder
+{
 
-  protected transient final Logger logger = LoggerFactory.getLogger(DynamicURIBuilder.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(DynamicURIBuilder.class);
 
-  private final URIBuilder templateUriBuilder;
+    private final URIBuilder templateUriBuilder;
 
-  public DynamicURIBuilder(URIBuilder templateUriBuilder) throws MalformedEndpointException {
-    validateTemplate(templateUriBuilder.toString());
+    public DynamicURIBuilder(URIBuilder templateUriBuilder) throws MalformedEndpointException
+    {
+        validateTemplate(templateUriBuilder.toString());
 
-    this.templateUriBuilder = templateUriBuilder;
-  }
-
-  private void validateTemplate(String address) throws MalformedEndpointException {
-    if (address.indexOf(":") > address.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX)) {
-      throw new MalformedEndpointException(TransportCoreMessages.dynamicEndpointsMustSpecifyAScheme(), address);
-    }
-  }
-
-  public String build(MuleEvent event) throws URISyntaxException, UnsupportedEncodingException {
-    String resolvedUri = resolveAddress(event);
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Resolved URI from template '%s' to '%s'", templateUriBuilder.getEncodedConstructor(),
-                                 resolvedUri.toString()));
+        this.templateUriBuilder = templateUriBuilder;
     }
 
-    return resolvedUri;
-  }
+    private void validateTemplate(String address) throws MalformedEndpointException
+    {
+        if (address.indexOf(":") > address.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
+        {
+            throw new MalformedEndpointException(TransportCoreMessages.dynamicEndpointsMustSpecifyAScheme(), address);
+        }
+    }
 
-  private String resolveAddress(final MuleEvent event) throws URISyntaxException, UnsupportedEncodingException {
-    final MuleContext muleContext = templateUriBuilder.getMuleContext();
-    String resolvedAddress = templateUriBuilder.getTransformedConstructor(new Transformer() {
+    public String build(MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
+    {
+        String resolvedUri = resolveAddress(event);
 
-      @Override
-      public Object transform(Object input) {
-        String token = (String) input;
-
-        if (muleContext.getExpressionManager().isExpression(token)) {
-          token = muleContext.getExpressionManager().parse(token, event, true);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("Resolved URI from template '%s' to '%s'", templateUriBuilder.getEncodedConstructor(), resolvedUri.toString()));
         }
 
-        return token;
-      }
-    }, URL_ENCODER);
+        return resolvedUri;
+    }
 
-    return resolvedAddress;
-  }
+    private String resolveAddress(final MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
+    {
+        final MuleContext muleContext = templateUriBuilder.getMuleContext();
+        String resolvedAddress = templateUriBuilder.getTransformedConstructor(new Transformer()
+        {
+            @Override
+            public Object transform(Object input)
+            {
+                String token = (String) input;
 
-  public String getUriTemplate() {
-    return templateUriBuilder.getAddress();
-  }
+                if (muleContext.getExpressionManager().isExpression(token))
+                {
+                    token = muleContext.getExpressionManager().parse(token, event, true);
+                }
+
+                return token;
+            }
+        }, URL_ENCODER);
+
+        return resolvedAddress;
+    }
+
+    public String getUriTemplate()
+    {
+        return templateUriBuilder.getAddress();
+    }
 
 }

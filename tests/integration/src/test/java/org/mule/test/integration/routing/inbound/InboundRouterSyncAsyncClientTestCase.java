@@ -15,28 +15,35 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTestCase {
+public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/routing/inbound/inbound-router-sync-async-client-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/routing/inbound/inbound-router-sync-async-client-test.xml";
-  }
+    @Test
+    public void testSync() throws Exception
+    {
+        MuleMessage result = flowRunner("SyncAsync").withPayload("testSync")
+                                                    .withInboundProperty("messageType", "sync")
+                                                    .run()
+                                                    .getMessage();
 
-  @Test
-  public void testSync() throws Exception {
-    MuleMessage result =
-        flowRunner("SyncAsync").withPayload("testSync").withInboundProperty("messageType", "sync").run().getMessage();
+        assertThat(result.getPayload(), is("OK"));
+    }
 
-    assertThat(result.getPayload(), is("OK"));
-  }
+    @Test
+    public void testAsync() throws Exception
+    {
+        flowRunner("SyncAsync").withPayload("testAsync")
+                               .withInboundProperty("messageType", "async")
+                               .run();
 
-  @Test
-  public void testAsync() throws Exception {
-    flowRunner("SyncAsync").withPayload("testAsync").withInboundProperty("messageType", "async").run();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
-    assertNotNull(result);
-    assertThat(result.getPayload(), is("Response sent to asyncResponse"));
-  }
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertThat(result.getPayload(), is("Response sent to asyncResponse"));
+    }
 }

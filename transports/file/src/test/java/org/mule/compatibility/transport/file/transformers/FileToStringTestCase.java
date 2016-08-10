@@ -19,44 +19,50 @@ import java.io.FileWriter;
 /**
  * Test case for FileToString transformer
  */
-public class FileToStringTestCase extends AbstractTransformerTestCase {
+public class FileToStringTestCase extends AbstractTransformerTestCase
+{
+    FileToString _fts;
+    File _testData = null;
+    final String _resultData = "The dog is on the table, where's the dog?";
 
-  FileToString _fts;
-  File _testData = null;
-  final String _resultData = "The dog is on the table, where's the dog?";
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        _testData = FileUtils.newFile(SystemUtils.JAVA_IO_TMPDIR, "FileToStringTestData");
+        FileWriter fw = new FileWriter(_testData);
+        fw.write(_resultData);
+        fw.close();
+    }
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    _testData = FileUtils.newFile(SystemUtils.JAVA_IO_TMPDIR, "FileToStringTestData");
-    FileWriter fw = new FileWriter(_testData);
-    fw.write(_resultData);
-    fw.close();
-  }
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        assertTrue(_testData.delete());
+        super.doTearDown();
+    }
 
-  @Override
-  protected void doTearDown() throws Exception {
-    assertTrue(_testData.delete());
-    super.doTearDown();
-  }
+    @Override
+    public Object getResultData()
+    {
+        return _resultData;
+    }
 
-  @Override
-  public Object getResultData() {
-    return _resultData;
-  }
+    @Override
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return null;
+    }
 
-  @Override
-  public Transformer getRoundTripTransformer() throws Exception {
-    return null;
-  }
+    @Override
+    public Object getTestData()
+    {
+        return _testData;
+    }
 
-  @Override
-  public Object getTestData() {
-    return _testData;
-  }
-
-  @Override
-  public Transformer getTransformer() throws Exception {
-    return new FileToString();
-  }
+    @Override
+    public Transformer getTransformer() throws Exception
+    {
+        return new FileToString();
+    }
 }

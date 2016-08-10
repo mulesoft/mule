@@ -25,36 +25,43 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase {
+public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase
+{
 
-  public UpdateJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    List<Object[]> params = new LinkedList<>();
-    if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+    public UpdateJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
 
-    if (!getDerbyResource().isEmpty()) {
-      params.add(getDerbyResource().get(0));
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        List<Object[]> params = new LinkedList<>();
+        if (!getOracleResource().isEmpty())
+        {
+            params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+        }
+
+        if (!getDerbyResource().isEmpty())
+        {
+            params.add(getDerbyResource().get(0));
+        }
+
+        return params;
     }
 
-    return params;
-  }
+    @Override
+    protected String[] getFlowConfigurationResources()
+    {
+        return new String[] {"integration/update/update-udt-config.xml"};
+    }
 
-  @Override
-  protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/update/update-udt-config.xml"};
-  }
+    @Test
+    public void updatesObject() throws Exception
+    {
+        final MuleEvent responseEvent = flowRunner("updatesObject").withPayload(TEST_MESSAGE).run();
+        final MuleMessage response = responseEvent.getMessage();
 
-  @Test
-  public void updatesObject() throws Exception {
-    final MuleEvent responseEvent = flowRunner("updatesObject").withPayload(TEST_MESSAGE).run();
-    final MuleMessage response = responseEvent.getMessage();
-
-    assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
-  }
+        assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    }
 }

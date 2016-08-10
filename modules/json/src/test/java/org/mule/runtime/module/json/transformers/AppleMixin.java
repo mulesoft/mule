@@ -15,15 +15,16 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * TODO
  */
 
-public abstract class AppleMixin {
+public abstract class AppleMixin
+{
+    AppleMixin(@JsonProperty("bitten") boolean bitten)
+    {
+        super();
+    }
 
-  AppleMixin(@JsonProperty("bitten") boolean bitten) {
-    super();
-  }
+    @JsonIgnore
+    abstract FruitCleaner getAppleCleaner();
 
-  @JsonIgnore
-  abstract FruitCleaner getAppleCleaner();
-
-  @JsonIgnore
-  abstract void setAppleCleaner(FruitCleaner fc);
+    @JsonIgnore
+    abstract void setAppleCleaner(FruitCleaner fc);
 }

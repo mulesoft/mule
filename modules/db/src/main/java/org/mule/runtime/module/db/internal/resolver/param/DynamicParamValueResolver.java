@@ -18,32 +18,39 @@ import java.util.List;
 /**
  * Resolves query parameters evaluating expression using a given event
  */
-public class DynamicParamValueResolver implements ParamValueResolver {
+public class DynamicParamValueResolver implements ParamValueResolver
+{
 
-  private final ExpressionManager expressionManager;
+    private final ExpressionManager expressionManager;
 
-  public DynamicParamValueResolver(ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
-  }
-
-  @Override
-  public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams) {
-    List<QueryParamValue> params = new LinkedList<QueryParamValue>();
-
-    if (templateParams != null) {
-      for (QueryParamValue templateParam : templateParams) {
-        if (templateParam != null && templateParam.getValue() instanceof String
-            && expressionManager.isExpression((String) templateParam.getValue())) {
-          Object newValue = expressionManager.evaluate((String) templateParam.getValue(), muleEvent);
-          QueryParamValue queryParamValue = new QueryParamValue(templateParam.getName(), newValue);
-
-          params.add(queryParamValue);
-        } else {
-          params.add(templateParam);
-        }
-      }
+    public DynamicParamValueResolver(ExpressionManager expressionManager)
+    {
+        this.expressionManager = expressionManager;
     }
 
-    return params;
-  }
+    @Override
+    public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams)
+    {
+        List<QueryParamValue> params = new LinkedList<QueryParamValue>();
+
+        if (templateParams != null)
+        {
+            for (QueryParamValue templateParam : templateParams)
+            {
+                if (templateParam != null && templateParam.getValue() instanceof String && expressionManager.isExpression((String) templateParam.getValue()))
+                {
+                    Object newValue = expressionManager.evaluate((String) templateParam.getValue(), muleEvent);
+                    QueryParamValue queryParamValue = new QueryParamValue(templateParam.getName(), newValue);
+
+                    params.add(queryParamValue);
+                }
+                else
+                {
+                    params.add(templateParam);
+                }
+            }
+        }
+
+        return params;
+    }
 }

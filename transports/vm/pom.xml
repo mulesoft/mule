@@ -13,10 +13,6 @@
         queues can be persistent or transient.
     </description>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

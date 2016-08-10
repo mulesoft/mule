@@ -19,22 +19,25 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor {
-
-  public CopyAttachmentInInterceptor() {
-    super(Phase.PRE_INVOKE);
-  }
-
-  public void handleMessage(Message message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-    Collection<Attachment> atts = message.getAttachments();
-
-    if (atts != null && !atts.isEmpty()) {
-      event.setFlowVariable(CxfConstants.ATTACHMENTS, atts);
-      event.setMessage(MuleMessage.builder(event.getMessage())
-          .addOutboundProperty(CONTENT_TYPE, event.getMessage().getInboundProperty(CONTENT_TYPE)).build());
+public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
+{
+    public CopyAttachmentInInterceptor()
+    {
+        super(Phase.PRE_INVOKE);
     }
-  }
+
+    public void handleMessage(Message message) throws Fault
+    {
+        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+        Collection<Attachment> atts = message.getAttachments();
+
+        if (atts != null && !atts.isEmpty())
+        {
+            event.setFlowVariable(CxfConstants.ATTACHMENTS, atts);
+            event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(CONTENT_TYPE, event
+                    .getMessage().getInboundProperty(CONTENT_TYPE)).build());
+        }
+    }
 
 }
 

@@ -17,99 +17,116 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 
-public class DefaultHttpAuthentication implements HttpAuthentication, MuleContextAware, Initialisable {
+public class DefaultHttpAuthentication implements HttpAuthentication, MuleContextAware, Initialisable
+{
+    private final HttpAuthenticationType type;
 
-  private final HttpAuthenticationType type;
+    private AttributeEvaluator username = new AttributeEvaluator(null);
+    private AttributeEvaluator password = new AttributeEvaluator(null);
+    private AttributeEvaluator domain = new AttributeEvaluator(null);
+    private AttributeEvaluator workstation = new AttributeEvaluator(null);
+    private AttributeEvaluator preemptive = new AttributeEvaluator(String.valueOf(false));
 
-  private AttributeEvaluator username = new AttributeEvaluator(null);
-  private AttributeEvaluator password = new AttributeEvaluator(null);
-  private AttributeEvaluator domain = new AttributeEvaluator(null);
-  private AttributeEvaluator workstation = new AttributeEvaluator(null);
-  private AttributeEvaluator preemptive = new AttributeEvaluator(String.valueOf(false));
+    private MuleContext muleContext;
 
-  private MuleContext muleContext;
+    public DefaultHttpAuthentication(HttpAuthenticationType type)
+    {
+        this.type = type;
+    }
 
-  public DefaultHttpAuthentication(HttpAuthenticationType type) {
-    this.type = type;
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        username.initialize(muleContext.getExpressionManager());
+        password.initialize(muleContext.getExpressionManager());
+        domain.initialize(muleContext.getExpressionManager());
+        workstation.initialize(muleContext.getExpressionManager());
+        preemptive.initialize(muleContext.getExpressionManager());
+    }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    username.initialize(muleContext.getExpressionManager());
-    password.initialize(muleContext.getExpressionManager());
-    domain.initialize(muleContext.getExpressionManager());
-    workstation.initialize(muleContext.getExpressionManager());
-    preemptive.initialize(muleContext.getExpressionManager());
-  }
+    public String getUsername()
+    {
+        return username.getRawValue();
+    }
 
-  public String getUsername() {
-    return username.getRawValue();
-  }
+    public void setUsername(String username)
+    {
+        this.username = new AttributeEvaluator(username);
+    }
 
-  public void setUsername(String username) {
-    this.username = new AttributeEvaluator(username);
-  }
+    public String getPassword()
+    {
+        return password.getRawValue();
+    }
 
-  public String getPassword() {
-    return password.getRawValue();
-  }
+    public void setPassword(String password)
+    {
+        this.password = new AttributeEvaluator(password);
+    }
 
-  public void setPassword(String password) {
-    this.password = new AttributeEvaluator(password);
-  }
+    public String getDomain()
+    {
+        return domain.getRawValue();
+    }
 
-  public String getDomain() {
-    return domain.getRawValue();
-  }
+    public void setDomain(String domain)
+    {
+        this.domain = new AttributeEvaluator(domain);
+    }
 
-  public void setDomain(String domain) {
-    this.domain = new AttributeEvaluator(domain);
-  }
+    public HttpAuthenticationType getType()
+    {
+        return type;
+    }
 
-  public HttpAuthenticationType getType() {
-    return type;
-  }
+    public String getWorkstation()
+    {
+        return workstation.getRawValue();
+    }
 
-  public String getWorkstation() {
-    return workstation.getRawValue();
-  }
+    public void setWorkstation(String workstation)
+    {
+        this.workstation = new AttributeEvaluator(workstation);
+    }
 
-  public void setWorkstation(String workstation) {
-    this.workstation = new AttributeEvaluator(workstation);
-  }
+    public String getPreemptive()
+    {
+        return preemptive.getRawValue();
+    }
 
-  public String getPreemptive() {
-    return preemptive.getRawValue();
-  }
+    public void setPreemptive(String preemptive)
+    {
+        this.preemptive = new AttributeEvaluator(preemptive);
+    }
 
-  public void setPreemptive(String preemptive) {
-    this.preemptive = new AttributeEvaluator(preemptive);
-  }
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
+    public HttpRequestAuthentication resolveRequestAuthentication(MuleEvent event)
+    {
+        HttpRequestAuthentication authentication = new HttpRequestAuthentication(type);
+        authentication.setUsername(username.resolveStringValue(event));
+        authentication.setPassword(password.resolveStringValue(event));
+        authentication.setDomain(domain.resolveStringValue(event));
+        authentication.setWorkstation(workstation.resolveStringValue(event));
+        authentication.setPreemptive(preemptive.resolveBooleanValue(event));
+        return authentication;
+    }
 
-  public HttpRequestAuthentication resolveRequestAuthentication(MuleEvent event) {
-    HttpRequestAuthentication authentication = new HttpRequestAuthentication(type);
-    authentication.setUsername(username.resolveStringValue(event));
-    authentication.setPassword(password.resolveStringValue(event));
-    authentication.setDomain(domain.resolveStringValue(event));
-    authentication.setWorkstation(workstation.resolveStringValue(event));
-    authentication.setPreemptive(preemptive.resolveBooleanValue(event));
-    return authentication;
-  }
+    @Override
+    public void authenticate(MuleEvent muleEvent, HttpRequestBuilder requestBuilder)
+    {
 
-  @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder requestBuilder) {
+    }
 
-  }
-
-  @Override
-  public boolean shouldRetry(MuleEvent firstAttemptResponseEvent) {
-    return false;
-  }
+    @Override
+    public boolean shouldRetry(MuleEvent firstAttemptResponseEvent)
+    {
+        return false;
+    }
 
 
 }

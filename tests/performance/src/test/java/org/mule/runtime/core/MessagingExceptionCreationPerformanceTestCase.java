@@ -20,49 +20,58 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MessagingExceptionCreationPerformanceTestCase extends AbstractMuleTestCase {
+public class MessagingExceptionCreationPerformanceTestCase extends AbstractMuleTestCase
+{
+    @Rule
+    public ContiPerfRule rule = new ContiPerfRule();
 
-  @Rule
-  public ContiPerfRule rule = new ContiPerfRule();
+    @Mock
+    private MuleContext muleContext;
 
-  @Mock
-  private MuleContext muleContext;
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 120;
-  }
-
-  @Test
-  @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void stringSingleThread() {
-    for (int i = 0; i < 1000; i++) {
-      new DefaultMuleException("customMessage");
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        return 120;
     }
-  }
 
-  @Test
-  @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void messageSingleThead() {
-    for (int i = 0; i < 1000; i++) {
-      new DefaultMuleException(CoreMessages.agentsRunning());
+    @Test
+    @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+    public void stringSingleThread()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            new DefaultMuleException("customMessage");
+        }
     }
-  }
 
-  @Test
-  @PerfTest(duration = 15000, threads = 4, warmUp = 5000)
-  public void messageMultiThread() {
-    for (int i = 0; i < 1000; i++) {
-      new DefaultMuleException(CoreMessages.agentsRunning());
+    @Test
+    @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+    public void messageSingleThead()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            new DefaultMuleException(CoreMessages.agentsRunning());
+        }
     }
-  }
 
-  @Test
-  @PerfTest(duration = 15000, threads = 4, warmUp = 5000)
-  public void stringMultiThread() {
-    for (int i = 0; i < 1000; i++) {
-      new DefaultMuleException("customMessage");
+    @Test
+    @PerfTest(duration = 15000, threads = 4, warmUp = 5000)
+    public void messageMultiThread()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            new DefaultMuleException(CoreMessages.agentsRunning());
+        }
     }
-  }
+
+    @Test
+    @PerfTest(duration = 15000, threads = 4, warmUp = 5000)
+    public void stringMultiThread()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            new DefaultMuleException("customMessage");
+        }
+    }
 
 }

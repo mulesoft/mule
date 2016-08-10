@@ -20,139 +20,170 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.transaction.Status;
 
 /**
- * This abstract class can be used as a base class for transactions that can enlist only one resource (such as a JMS session or
- * JDBC connection).
+ * This abstract class can be used as a base class for transactions that can enlist
+ * only one resource (such as a JMS session or JDBC connection).
  */
-public abstract class AbstractSingleResourceTransaction extends AbstractTransaction {
+public abstract class AbstractSingleResourceTransaction extends AbstractTransaction
+{
 
-  /**
-   * TX status code to human-readable string mappings.
-   *
-   * @see javax.transaction.Status
-   */
-  protected static Map<Integer, String> txStatusMappings = new HashMap<Integer, String>(10); // populated later
+    /**
+     * TX status code to human-readable string mappings.
+     *
+     * @see javax.transaction.Status
+     */
+    protected static Map<Integer, String> txStatusMappings = new HashMap<Integer, String>(10); // populated later
 
-  protected volatile Object key;
-  protected volatile Object resource;
+    protected volatile Object key;
+    protected volatile Object resource;
 
-  protected final AtomicBoolean started = new AtomicBoolean(false);
-  protected final AtomicBoolean committed = new AtomicBoolean(false);
-  protected final AtomicBoolean rolledBack = new AtomicBoolean(false);
-  protected final AtomicBoolean rollbackOnly = new AtomicBoolean(false);
+    protected final AtomicBoolean started = new AtomicBoolean(false);
+    protected final AtomicBoolean committed = new AtomicBoolean(false);
+    protected final AtomicBoolean rolledBack = new AtomicBoolean(false);
+    protected final AtomicBoolean rollbackOnly = new AtomicBoolean(false);
 
-  static {
-    Field[] fields = Status.class.getFields();
-    for (Field field : fields) {
-      try {
-        txStatusMappings.put(field.getInt(Status.class), field.getName());
-      } catch (IllegalAccessException e) {
-        // ignore
-      }
+    static
+    {
+        Field[] fields = Status.class.getFields();
+        for (Field field : fields)
+        {
+            try
+            {
+                txStatusMappings.put(field.getInt(Status.class), field.getName());
+            }
+            catch (IllegalAccessException e)
+            {
+                // ignore
+            }
+        }
+
+        txStatusMappings = Collections.unmodifiableMap(txStatusMappings);
     }
 
-    txStatusMappings = Collections.unmodifiableMap(txStatusMappings);
-  }
-
-  protected AbstractSingleResourceTransaction(MuleContext muleContext) {
-    super(muleContext);
-  }
-
-  public void begin() throws TransactionException {
-    super.begin();
-    started.compareAndSet(false, true);
-  }
-
-  public void commit() throws TransactionException {
-    super.commit();
-    committed.compareAndSet(false, true);
-  }
-
-  public void rollback() throws TransactionException {
-    super.rollback();
-    rolledBack.compareAndSet(false, true);
-  }
-
-  public int getStatus() throws TransactionStatusException {
-    if (rolledBack.get()) {
-      return STATUS_ROLLEDBACK;
-    }
-    if (committed.get()) {
-      return STATUS_COMMITTED;
-    }
-    if (rollbackOnly.get()) {
-      return STATUS_MARKED_ROLLBACK;
-    }
-    if (started.get()) {
-      return STATUS_ACTIVE;
-    }
-    return STATUS_NO_TRANSACTION;
-  }
-
-  public Object getResource(Object key) {
-    return key != null && this.key == key ? this.resource : null;
-  }
-
-  public boolean hasResource(Object key) {
-    return key != null && this.key == key;
-  }
-
-  public void bindResource(Object key, Object resource) throws TransactionException {
-    if (key == null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindToNullKey());
-    }
-    if (resource == null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindNullResource());
-    }
-    if (this.key != null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionSingleResourceOnly());
+    protected AbstractSingleResourceTransaction(MuleContext muleContext)
+    {
+        super(muleContext);
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Binding " + resource + " to " + key);
+    public void begin() throws TransactionException
+    {
+        super.begin();
+        started.compareAndSet(false, true);
     }
 
-    this.key = key;
-    this.resource = resource;
-  }
-
-  public void setRollbackOnly() {
-    rollbackOnly.set(true);
-  }
-
-  @Override
-  public String toString() {
-    int status;
-    try {
-      status = getStatus();
-    } catch (TransactionException e) {
-      status = -1;
+    public void commit() throws TransactionException
+    {
+        super.commit();
+        committed.compareAndSet(false, true);
     }
 
-    // map status to a human-readable string
-
-    String statusName = txStatusMappings.get(status);
-    if (statusName == null) {
-      statusName = "*undefined*";
+    public void rollback() throws TransactionException
+    {
+        super.rollback();
+        rolledBack.compareAndSet(false, true);
     }
 
-    return new StringBuilder().append(getClass().getName()).append('@').append(id).append("[status=").append(statusName)
-        .append(", key=").append(key).append(", resource=").append(resource).append("]").toString();
-  }
+    public int getStatus() throws TransactionStatusException
+    {
+        if (rolledBack.get())
+        {
+            return STATUS_ROLLEDBACK;
+        }
+        if (committed.get())
+        {
+            return STATUS_COMMITTED;
+        }
+        if (rollbackOnly.get())
+        {
+            return STATUS_MARKED_ROLLBACK;
+        }
+        if (started.get())
+        {
+            return STATUS_ACTIVE;
+        }
+        return STATUS_NO_TRANSACTION;
+    }
 
-  @Override
-  public boolean supports(Object key, Object resource) {
-    return (this.key == null
-        && (getKeyType().isAssignableFrom(key.getClass()) && getResourceType().isAssignableFrom(resource.getClass())))
-        || (this.key != null && (this.key == key && this.resource == resource));
-  }
+    public Object getResource(Object key)
+    {
+        return key != null && this.key == key ? this.resource : null;
+    }
 
-  protected Class getResourceType() {
-    throw new MuleRuntimeException(CoreMessages
-        .createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
-  }
+    public boolean hasResource(Object key)
+    {
+        return key != null && this.key == key;
+    }
 
-  protected Class getKeyType() {
-    throw new MuleRuntimeException(CoreMessages
-        .createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
-  }
+    public void bindResource(Object key, Object resource) throws TransactionException
+    {
+        if (key == null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindToNullKey());
+        }
+        if (resource == null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindNullResource());
+        }
+        if (this.key != null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.transactionSingleResourceOnly());
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Binding " + resource + " to " + key);
+        }
+        
+        this.key = key;
+        this.resource = resource;
+    }
+
+    public void setRollbackOnly()
+    {
+        rollbackOnly.set(true);
+    }
+
+    @Override
+    public String toString()
+    {
+        int status;
+        try
+        {
+            status = getStatus();
+        }
+        catch (TransactionException e)
+        {
+            status = -1;
+        }
+
+        // map status to a human-readable string
+
+        String statusName = txStatusMappings.get(status);
+        if (statusName == null)
+        {
+            statusName = "*undefined*";
+        }
+
+        return new StringBuilder().append(getClass().getName())
+                .append('@').append(id)
+                .append("[status=").append(statusName)
+                .append(", key=").append(key)
+                .append(", resource=").append(resource)
+                .append("]").toString();
+    }
+
+    @Override
+    public boolean supports(Object key, Object resource)
+    {
+        return (this.key == null && (getKeyType().isAssignableFrom(key.getClass()) && getResourceType().isAssignableFrom(resource.getClass()))) || (this.key != null && (this.key == key && this.resource == resource));
+    }
+
+    protected Class getResourceType()
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+    }
+
+    protected Class getKeyType()
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+    }
 }

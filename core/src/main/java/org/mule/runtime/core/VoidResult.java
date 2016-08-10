@@ -10,43 +10,49 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 // @Immutable
-public final class VoidResult implements Serializable {
+public final class VoidResult implements Serializable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3828573682818093673L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -3828573682818093673L;
+    private static class VoidResultHolder
+    {
+        private static final VoidResult instance = new VoidResult();
+    }
 
-  private static class VoidResultHolder {
+    public static VoidResult getInstance()
+    {
+        return VoidResultHolder.instance;
+    }
 
-    private static final VoidResult instance = new VoidResult();
-  }
+    private VoidResult()
+    {
+        super();
+    }
 
-  public static VoidResult getInstance() {
-    return VoidResultHolder.instance;
-  }
+    private Object readResolve() throws ObjectStreamException
+    {
+        return VoidResultHolder.instance;
+    }
 
-  private VoidResult() {
-    super();
-  }
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj instanceof VoidResult;
+    }
 
-  private Object readResolve() throws ObjectStreamException {
-    return VoidResultHolder.instance;
-  }
+    @Override
+    public int hashCode ()
+    {
+        return 0;
+    }
 
-  @Override
-  public boolean equals(Object obj) {
-    return obj instanceof VoidResult;
-  }
-
-  @Override
-  public int hashCode() {
-    return 0;
-  }
-
-  @Override
-  public String toString() {
-    return "{VoidResult}";
-  }
+    @Override
+    public String toString()
+    {
+        return "{VoidResult}";
+    }
 
 }

@@ -10,24 +10,28 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>CredentialsNotSetException</code> is thrown when user credentials cannot be obtained from the current message
+ * <code>CredentialsNotSetException</code> is thrown when user credentials cannot
+ * be obtained from the current message
  */
-public class CredentialsNotSetException extends UnauthorisedException {
+public class CredentialsNotSetException extends UnauthorisedException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -6271648179641734580L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -6271648179641734580L;
+    public CredentialsNotSetException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
 
-  public CredentialsNotSetException(Message message, MuleEvent event) {
-    super(message, event);
-  }
+    public CredentialsNotSetException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
+    }
 
-  public CredentialsNotSetException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
-  }
-
-  public CredentialsNotSetException(MuleEvent event, SecurityContext context, SecurityFilter filter) {
-    super(event, context, filter);
-  }
+    public CredentialsNotSetException(MuleEvent event, SecurityContext context, SecurityFilter filter)
+    {
+        super(event, context, filter);
+    }
 }

@@ -18,44 +18,47 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase {
+public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
+{
+    private FormTransformer transformer;
 
-  private FormTransformer transformer;
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
+        transformer = new FormTransformer();
+        transformer.setMuleContext(muleContext);
+    }
 
-    transformer = new FormTransformer();
-    transformer.setMuleContext(muleContext);
-  }
+    @Test
+    public void testFormTransformer() throws TransformerException
+    {
+        MuleMessage msg = MuleMessage.builder().payload("test1=value1&test2=value2&test3").build();
+        Object result = transformer.transform(msg);
+        assertTrue(result instanceof Map);
+        
+        Map<String,String> m = (Map<String,String>) result;
+        assertEquals("value1", m.get("test1"));
+        assertEquals("value2", m.get("test2"));
+        assertNull(m.get("test3"));
+    }
 
-  @Test
-  public void testFormTransformer() throws TransformerException {
-    MuleMessage msg = MuleMessage.builder().payload("test1=value1&test2=value2&test3").build();
-    Object result = transformer.transform(msg);
-    assertTrue(result instanceof Map);
+    @Test
+    public void testMultipleValues() throws TransformerException
+    {
+        MuleMessage msg = MuleMessage.builder().payload("test1=value1&test1=value2").build();
+        Object result = transformer.transform(msg);
+        assertTrue(result instanceof Map);
+        
+        Map<String,Object> m = (Map<String,Object>) result;
+        Object o = m.get("test1");
+        assertTrue(o instanceof List);
 
-    Map<String, String> m = (Map<String, String>) result;
-    assertEquals("value1", m.get("test1"));
-    assertEquals("value2", m.get("test2"));
-    assertNull(m.get("test3"));
-  }
-
-  @Test
-  public void testMultipleValues() throws TransformerException {
-    MuleMessage msg = MuleMessage.builder().payload("test1=value1&test1=value2").build();
-    Object result = transformer.transform(msg);
-    assertTrue(result instanceof Map);
-
-    Map<String, Object> m = (Map<String, Object>) result;
-    Object o = m.get("test1");
-    assertTrue(o instanceof List);
-
-    List list = (List) o;
-    assertTrue(list.contains("value1"));
-    assertTrue(list.contains("value2"));
-
-  }
+        List list = (List) o;
+        assertTrue(list.contains("value1"));
+        assertTrue(list.contains("value2"));
+        
+    }
 
 }

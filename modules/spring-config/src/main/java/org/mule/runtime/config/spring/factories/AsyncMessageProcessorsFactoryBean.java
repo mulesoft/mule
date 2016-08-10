@@ -20,58 +20,74 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean, MuleContextAware, NameableObject {
+public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware, NameableObject
+{
 
-  protected MuleContext muleContext;
+    protected MuleContext muleContext;
 
-  protected List messageProcessors;
-  protected ProcessingStrategy processingStrategy;
-  protected String name;
+    protected List messageProcessors;
+    protected ProcessingStrategy processingStrategy;
+    protected String name;
 
-  public Class getObjectType() {
-    return MessageProcessor.class;
-  }
-
-  public void setMessageProcessors(List messageProcessors) {
-    this.messageProcessors = messageProcessors;
-  }
-
-  public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.setName("'async' child chain");
-
-    for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
+    public Class getObjectType()
+    {
+        return MessageProcessor.class;
     }
-    AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), processingStrategy, name);
-    delegate.setAnnotations(getAnnotations());
-    return delegate;
-  }
 
-  public boolean isSingleton() {
-    return false;
-  }
+    public void setMessageProcessors(List messageProcessors)
+    {
+        this.messageProcessors = messageProcessors;
+    }
 
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
+    public Object getObject() throws Exception
+    {
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        builder.setName("'async' child chain");
 
-  public String getName() {
-    return name;
-  }
+        for (Object processor : messageProcessors)
+        {
+            if (processor instanceof MessageProcessor)
+            {
+                builder.chain((MessageProcessor) processor);
+            }
+            else if (processor instanceof MessageProcessorBuilder)
+            {
+                builder.chain((MessageProcessorBuilder) processor);
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
+        }
+        AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(),
+            processingStrategy, name);
+        delegate.setAnnotations(getAnnotations());
+        return delegate;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public boolean isSingleton()
+    {
+        return false;
+    }
 
-  public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
-    this.processingStrategy = processingStrategy;
-  }
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setProcessingStrategy(ProcessingStrategy processingStrategy)
+    {
+        this.processingStrategy = processingStrategy;
+    }
 }

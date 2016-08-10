@@ -12,15 +12,16 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HideExceptions implements MessagingExceptionHandler {
+public class HideExceptions implements MessagingExceptionHandler
+{
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
-
-  public MuleEvent handleException(Exception exception, MuleEvent event) {
-    logger.debug("Hiding exception: " + exception);
-    logger.debug("(see config for test - some exceptions expected)");
-    return null;
-  }
+    public MuleEvent handleException(Exception exception, MuleEvent event)
+    {
+        logger.debug("Hiding exception: " + exception);
+        logger.debug("(see config for test - some exceptions expected)");
+        return null;
+    }
 
 }
 

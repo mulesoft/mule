@@ -8,28 +8,31 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class TimeAverage extends AggregateCounter {
+public class TimeAverage extends AggregateCounter
+{
+    private double sum = 0.0;
+    private double lastValue = 0.0;
+    private final long firstTime = System.currentTimeMillis();
+    private long lastTime = firstTime;
 
-  private double sum = 0.0;
-  private double lastValue = 0.0;
-  private final long firstTime = System.currentTimeMillis();
-  private long lastTime = firstTime;
+    public TimeAverage(String name, AbstractCounter base)
+    {
+        super(name, Type.AVERAGE, base);
+    }
 
-  public TimeAverage(String name, AbstractCounter base) {
-    super(name, Type.AVERAGE, base);
-  }
+    @Override
+    public double nextValue()
+    {
+        long current = System.currentTimeMillis();
+        return (sum + lastValue * (current - this.lastTime)) / (current - firstTime);
+    }
 
-  @Override
-  public double nextValue() {
-    long current = System.currentTimeMillis();
-    return (sum + lastValue * (current - this.lastTime)) / (current - firstTime);
-  }
-
-  @Override
-  public void doCompute() {
-    long current = System.currentTimeMillis();
-    this.sum += this.lastValue * (current - this.lastTime);
-    this.lastValue = getBase().nextValue();
-    this.lastTime = current;
-  }
+    @Override
+    public void doCompute()
+    {
+        long current = System.currentTimeMillis();
+        this.sum += this.lastValue * (current - this.lastTime);
+        this.lastValue = getBase().nextValue();
+        this.lastTime = current;
+    }
 }

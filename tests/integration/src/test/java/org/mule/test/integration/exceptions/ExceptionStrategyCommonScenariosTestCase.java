@@ -19,60 +19,68 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegrationTestCase {
+public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegrationTestCase
+{
+    public static final String MESSAGE_TO_SEND = "A message";
+    public static final String MESSAGE_MODIFIED = "A message with some text added";
+    public static final int TIMEOUT = 5000;
 
-  public static final String MESSAGE_TO_SEND = "A message";
-  public static final String MESSAGE_MODIFIED = "A message with some text added";
-  public static final int TIMEOUT = 5000;
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-  @Rule
-  public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-  @Rule
-  public DynamicPort dynamicPort3 = new DynamicPort("port3");
+    @Rule
+    public DynamicPort dynamicPort4 = new DynamicPort("port4");
 
-  @Rule
-  public DynamicPort dynamicPort4 = new DynamicPort("port4");
+    @Rule
+    public DynamicPort dynamicPort5 = new DynamicPort("port5");
 
-  @Rule
-  public DynamicPort dynamicPort5 = new DynamicPort("port5");
-
-  @Rule
-  public DynamicPort dynamicPort6 = new DynamicPort("port6");
-
-
-  @Rule
-  public DynamicPort dynamicPort7 = new DynamicPort("port7");
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-flow.xml";
-  }
-
-  @Test
-  public void testPreservePayloadExceptionStrategy() throws Exception {
-    try {
-      flowRunner("PreservePayloadExceptionStrategy").withPayload(MESSAGE_TO_SEND).run();
-    } catch (ComponentException e) {
-      assertThat(e.getEvent().getMessage(), notNullValue());
-      assertThat(getPayloadAsString(e.getEvent().getMessage()), is(MESSAGE_MODIFIED));
-    }
-  }
+    @Rule
+    public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
 
-  public static class PreservePayloadExceptionStrategy extends AbstractMessagingExceptionStrategy {
-
-    public PreservePayloadExceptionStrategy() {}
+    @Rule
+    public DynamicPort dynamicPort7 = new DynamicPort("port7");
 
     @Override
-    public MuleEvent handleException(Exception e, MuleEvent event) {
-      Object payloadBeforeException = event.getMessage().getPayload();
-      MuleEvent resultEvent = super.handleException(e, event);
-      resultEvent.setMessage(MuleMessage.builder(event.getMessage()).payload(payloadBeforeException).build());
-      return resultEvent;
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-flow.xml";
     }
-  }
+
+    @Test
+    public void testPreservePayloadExceptionStrategy() throws Exception
+    {
+        try
+        {
+            flowRunner("PreservePayloadExceptionStrategy").withPayload(MESSAGE_TO_SEND).run();
+        }
+        catch(ComponentException e)
+        {
+            assertThat(e.getEvent().getMessage(), notNullValue());
+            assertThat(getPayloadAsString(e.getEvent().getMessage()), is(MESSAGE_MODIFIED));
+        }
+    }
+
+
+    public static class PreservePayloadExceptionStrategy extends AbstractMessagingExceptionStrategy
+    {
+        public PreservePayloadExceptionStrategy()
+        {
+        }
+
+        @Override
+        public MuleEvent handleException(Exception e, MuleEvent event)
+        {
+            Object payloadBeforeException = event.getMessage().getPayload();
+            MuleEvent resultEvent = super.handleException(e, event);
+            resultEvent.setMessage(MuleMessage.builder(event.getMessage()).payload(payloadBeforeException).build());
+            return resultEvent;
+        }
+    }
 }

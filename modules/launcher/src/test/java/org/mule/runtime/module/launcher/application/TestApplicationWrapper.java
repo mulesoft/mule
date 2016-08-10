@@ -15,39 +15,47 @@ import java.io.IOException;
 /**
  * Adds a way to simulate errors on application deployment phases
  */
-public class TestApplicationWrapper extends ApplicationWrapper {
+public class TestApplicationWrapper extends ApplicationWrapper
+{
 
-  private boolean failOnStopApplication;
+    private boolean failOnStopApplication;
 
-  private boolean failOnDisposeApplication;
+    private boolean failOnDisposeApplication;
 
-  protected TestApplicationWrapper(Application delegate) throws IOException {
-    super(delegate);
-  }
-
-  @Override
-  public void dispose() {
-    if (failOnDisposeApplication) {
-      throw new DeploymentException(MessageFactory.createStaticMessage("Error disposing application"));
+    protected TestApplicationWrapper(Application delegate) throws IOException
+    {
+        super(delegate);
     }
 
-    getDelegate().dispose();
-  }
+    @Override
+    public void dispose()
+    {
+        if (failOnDisposeApplication)
+        {
+            throw new DeploymentException(MessageFactory.createStaticMessage("Error disposing application"));
+        }
 
-  @Override
-  public void stop() {
-    if (failOnStopApplication) {
-      throw new DeploymentStopException(MessageFactory.createStaticMessage("Error stopping application"));
+        getDelegate().dispose();
     }
 
-    getDelegate().stop();
-  }
+    @Override
+    public void stop()
+    {
+        if (failOnStopApplication)
+        {
+            throw new DeploymentStopException(MessageFactory.createStaticMessage("Error stopping application"));
+        }
 
-  public void setFailOnStopApplication(boolean failOnStopApplication) {
-    this.failOnStopApplication = failOnStopApplication;
-  }
+        getDelegate().stop();
+    }
 
-  public void setFailOnDisposeApplication(boolean failOnDisposeApplication) {
-    this.failOnDisposeApplication = failOnDisposeApplication;
-  }
+    public void setFailOnStopApplication(boolean failOnStopApplication)
+    {
+        this.failOnStopApplication = failOnStopApplication;
+    }
+
+    public void setFailOnDisposeApplication(boolean failOnDisposeApplication)
+    {
+        this.failOnDisposeApplication = failOnDisposeApplication;
+    }
 }

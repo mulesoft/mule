@@ -16,31 +16,35 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 /**
- * Exception thrown by the Web Services Consumer when processing a SOAP fault. The exception contains the details about the fault.
+ * Exception thrown by the Web Services Consumer when processing a SOAP fault.
+ * The exception contains the details about the fault.
  */
-public class SoapFaultException extends MessagingException {
+public class SoapFaultException extends MessagingException
+{
+    private final QName faultCode;
+    private final QName subCode;
+    private final Element detail;
 
-  private final QName faultCode;
-  private final QName subCode;
-  private final Element detail;
+    public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail, MessageProcessor failingMessageProcessor)
+    {
+        super(CoreMessages.createStaticMessage(message), event, failingMessageProcessor);
+        this.faultCode = faultCode;
+        this.subCode = subCode;
+        this.detail = detail;
+    }
 
-  public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail,
-                            MessageProcessor failingMessageProcessor) {
-    super(CoreMessages.createStaticMessage(message), event, failingMessageProcessor);
-    this.faultCode = faultCode;
-    this.subCode = subCode;
-    this.detail = detail;
-  }
+    public QName getFaultCode()
+    {
+        return faultCode;
+    }
 
-  public QName getFaultCode() {
-    return faultCode;
-  }
+    public QName getSubCode()
+    {
+        return subCode;
+    }
 
-  public QName getSubCode() {
-    return subCode;
-  }
-
-  public Element getDetail() {
-    return detail;
-  }
+    public Element getDetail()
+    {
+        return detail;
+    }
 }

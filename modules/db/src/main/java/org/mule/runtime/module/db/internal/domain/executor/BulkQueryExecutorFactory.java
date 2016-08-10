@@ -10,10 +10,11 @@ package org.mule.runtime.module.db.internal.domain.executor;
 /**
  * Creates {@link BulkExecutor} instances
  */
-public interface BulkQueryExecutorFactory {
+public interface BulkQueryExecutorFactory
+{
 
-  /**
-   * @return a non null bulk query executor
-   */
-  BulkExecutor create();
+    /**
+     * @return a non null bulk query executor
+     */
+    BulkExecutor create();
 }

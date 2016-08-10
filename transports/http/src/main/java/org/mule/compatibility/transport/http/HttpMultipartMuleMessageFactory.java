@@ -20,68 +20,88 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory {
+public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
+{
 
-  private Collection<Part> parts;
+    private Collection<Part> parts;
 
-  @Override
-  protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException {
-    Object body = null;
+    @Override
+    protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException
+    {
+        Object body = null;
 
-    if (httpRequest.getContentType().contains("multipart/form-data")) {
-      MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
+        if (httpRequest.getContentType().contains("multipart/form-data"))
+        {
+            MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
 
-      // We need to store this so that the headers for the part can be read
-      parts = in.getParts();
-      for (Part part : parts) {
-        if (part.getName().equals("payload")) {
-          body = part.getInputStream();
-          break;
-        }
-      }
-    } else {
-      body = super.extractPayloadFromHttpRequest(httpRequest);
-    }
-
-    return body;
-  }
-
-  @Override
-  protected void addAttachments(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
-    if (parts != null) {
-      try {
-        for (Part part : parts) {
-          if (!part.getName().equals("payload")) {
-            messageBuilder.addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
-          }
-        }
-      } finally {
-        // Attachments are the last thing to get processed
-        parts.clear();
-        parts = null;
-      }
-    }
-  }
-
-  @Override
-  protected void convertMultiPartHeaders(Map<String, Serializable> headers) {
-    if (parts != null) {
-      for (Part part : parts) {
-        if (part.getName().equals("payload")) {
-          for (String name : part.getHeaderNames()) {
-            if (HEADER_CONTENT_TYPE.equalsIgnoreCase(name)) {
-              // TODO MULE-9986 need MuleMessage to support multipart payload
-              headers.put("multipart_" + HEADER_CONTENT_TYPE, headers.get(name));
+            // We need to store this so that the headers for the part can be read
+            parts = in.getParts();
+            for (Part part : parts)
+            {
+                if (part.getName().equals("payload"))
+                {
+                    body = part.getInputStream();
+                    break;
+                }
             }
-            headers.put(name, part.getHeader(name));
-          }
-          break;
         }
-      }
+        else
+        {
+            body = super.extractPayloadFromHttpRequest(httpRequest);
+        }
 
+        return body;
     }
 
-  }
+    @Override
+    protected void addAttachments(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
+    {
+        if (parts != null)
+        {
+            try
+            {
+                for (Part part : parts)
+                {
+                    if (!part.getName().equals("payload"))
+                    {
+                        messageBuilder.addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
+                    }
+                }
+            }
+            finally
+            {
+                // Attachments are the last thing to get processed
+                parts.clear();
+                parts = null;
+            }
+        }
+    }
+
+    @Override
+    protected void convertMultiPartHeaders(Map<String, Serializable> headers)
+    {
+        if (parts != null)
+        {
+            for (Part part : parts)
+            {
+                if (part.getName().equals("payload"))
+                {
+                    for (String name : part.getHeaderNames())
+                    {
+                        if (HEADER_CONTENT_TYPE.equalsIgnoreCase(name))
+                        {
+                            // TODO MULE-9986 need MuleMessage to support multipart payload
+                            headers.put("multipart_" + HEADER_CONTENT_TYPE, headers.get(name));
+                        }
+                        headers.put(name, part.getHeader(name));
+                    }
+                    break;
+                }
+            }
+
+        }
+
+    }
 
 }
 

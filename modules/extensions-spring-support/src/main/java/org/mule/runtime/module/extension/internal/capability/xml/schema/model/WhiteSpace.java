@@ -22,13 +22,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for anonymous complex type.
+ * <p>Java class for anonymous complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -54,6 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "whiteSpace")
-public class WhiteSpace extends Facet {
+public class WhiteSpace extends Facet
+{
 
 }

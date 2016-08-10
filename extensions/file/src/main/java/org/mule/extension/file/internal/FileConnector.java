@@ -37,10 +37,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * File connector used to manipulate file systems mounted on the host operation system.
+ * File connector used to manipulate file systems mounted on the host
+ * operation system.
  * <p>
- * This class serves as both extension definition and configuration. Operations are based on the standard
- * {@link StandardFileSystemOperations}
+ * This class serves as both extension definition and configuration.
+ * Operations are based on the standard {@link StandardFileSystemOperations}
  *
  * @since 4.0
  */
@@ -49,56 +50,58 @@ import org.slf4j.LoggerFactory;
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @Providers(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)
-@Export(classes = {LocalFileAttributes.class, FileEventType.class, ListenerFileAttributes.class, EventedFileAttributes.class,
-    DeletedFileAttributes.class})
-public class FileConnector extends FileConnectorConfig {
+@Export(classes = {LocalFileAttributes.class, FileEventType.class, ListenerFileAttributes.class, EventedFileAttributes.class, DeletedFileAttributes.class})
+public class FileConnector extends FileConnectorConfig
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileConnector.class);
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileConnector.class);
+    /**
+     * The directory to be considered as the root of every
+     * relative path used with this connector. If not provided,
+     * it will default to the value of the {@code user.home}
+     * system property. If that system property is not set,
+     * then the connector will fail to initialise.
+     */
+    @Parameter
+    @Optional
+    @DisplayName("Working Directory")
+    @Summary("Directory to be considered as the root of every relative path used with this connector")
+    private String workingDir;
 
-  /**
-   * The directory to be considered as the root of every relative path used with this connector. If not provided, it will default
-   * to the value of the {@code user.home} system property. If that system property is not set, then the connector will fail to
-   * initialise.
-   */
-  @Parameter
-  @Optional
-  @DisplayName("Working Directory")
-  @Summary("Directory to be considered as the root of every relative path used with this connector")
-  private String workingDir;
-
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    validateWorkingDir();
-  }
-
-  private void validateWorkingDir() throws InitialisationException {
-    if (workingDir == null) {
-      workingDir = System.getProperty("user.home");
-      if (workingDir == null) {
-        throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the workingDir parameter"),
-                                          this);
-      }
-
-      LOGGER.warn("File connector '{}' does not specify the workingDir property. Defaulting to '{}'", getConfigName(),
-                  workingDir);
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        validateWorkingDir();
     }
-    Path workingDirPath = Paths.get(workingDir);
-    if (Files.notExists(workingDirPath)) {
-      throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' does not exists",
-                                                                   workingDirPath.toAbsolutePath())),
-                                        this);
-    }
-    if (!Files.isDirectory(workingDirPath)) {
-      throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' is not a directory",
-                                                                   workingDirPath.toAbsolutePath())),
-                                        this);
-    }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getWorkingDir() {
-    return workingDir;
-  }
+    private void validateWorkingDir() throws InitialisationException
+    {
+        if (workingDir == null)
+        {
+            workingDir = System.getProperty("user.home");
+            if (workingDir == null)
+            {
+                throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the workingDir parameter"), this);
+            }
+
+            LOGGER.warn("File connector '{}' does not specify the workingDir property. Defaulting to '{}'", getConfigName(), workingDir);
+        }
+        Path workingDirPath = Paths.get(workingDir);
+        if (Files.notExists(workingDirPath))
+        {
+            throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' does not exists", workingDirPath.toAbsolutePath())), this);
+        }
+        if (!Files.isDirectory(workingDirPath))
+        {
+            throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' is not a directory", workingDirPath.toAbsolutePath())), this);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getWorkingDir()
+    {
+        return workingDir;
+    }
 }

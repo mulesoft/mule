@@ -20,37 +20,41 @@ import java.util.Map;
  * @since 4.0
  */
 @Alias("request-builder")
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+public class HttpRequesterRequestBuilder extends HttpMessageBuilder
+{
+    /**
+     * Query parameters the request should include.
+     */
+    @Parameter
+    @Optional
+    private Map<String, String> queryParams = new HashMap<>();
 
-  /**
-   * Query parameters the request should include.
-   */
-  @Parameter
-  @Optional
-  private Map<String, String> queryParams = new HashMap<>();
+    /**
+     * URI parameters that should be used to create the request.
+     */
+    @Parameter
+    @Optional
+    private Map<String, String> uriParams = new HashMap<>();
 
-  /**
-   * URI parameters that should be used to create the request.
-   */
-  @Parameter
-  @Optional
-  private Map<String, String> uriParams = new HashMap<>();
+    //For now, only handle single params
+    public String replaceUriParams(String path)
+    {
+        for (String uriParamName : uriParams.keySet())
+        {
+            String uriParamValue = uriParams.get(uriParamName);
 
-  // For now, only handle single params
-  public String replaceUriParams(String path) {
-    for (String uriParamName : uriParams.keySet()) {
-      String uriParamValue = uriParams.get(uriParamName);
+            if (uriParamValue == null)
+            {
+                throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+            }
 
-      if (uriParamValue == null) {
-        throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
-      }
-
-      path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
+            path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
+        }
+        return path;
     }
-    return path;
-  }
 
-  public Map<String, String> getQueryParams() {
-    return queryParams;
-  }
+    public Map<String, String> getQueryParams()
+    {
+        return queryParams;
+    }
 }

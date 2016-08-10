@@ -13,23 +13,23 @@ import org.mule.runtime.core.api.MuleException;
  *
  * This template allows to validate a message and discard it in case is invalid.
  */
-public interface ValidationPhaseTemplate extends MessageProcessTemplate {
+public interface ValidationPhaseTemplate extends MessageProcessTemplate
+{
+    /**
+     * Validates the message content.
+     *
+     * In case that the message is not valid then {@link #discardInvalidMessage()}
+     * will be executed so the implementation can save the reason why the message is invalid
+     * to report why the message has been discarded when {@link #discardInvalidMessage()} is called
+     *
+     * @return false if the message is invalid, true otherwise
+     */
+    boolean validateMessage();
 
-  /**
-   * Validates the message content.
-   *
-   * In case that the message is not valid then {@link #discardInvalidMessage()} will be executed so the implementation can save
-   * the reason why the message is invalid to report why the message has been discarded when {@link #discardInvalidMessage()} is
-   * called
-   *
-   * @return false if the message is invalid, true otherwise
-   */
-  boolean validateMessage();
-
-  /**
-   * Discards the message because the validation failed
-   *
-   * @throws org.mule.runtime.core.api.MuleException
-   */
-  void discardInvalidMessage() throws MuleException;
+    /**
+     * Discards the message because the validation failed
+     *
+     * @throws org.mule.runtime.core.api.MuleException
+     */
+    void discardInvalidMessage() throws MuleException;
 }

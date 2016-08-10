@@ -25,33 +25,39 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase {
+public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
+{
 
-  public UpdateStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    List<Object[]> params = new LinkedList<>();
-
-    if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+    public UpdateStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
 
-    return params;
-  }
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        List<Object[]> params = new LinkedList<>();
 
-  @Override
-  protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/update/update-udt-config.xml"};
-  }
+        if (!getOracleResource().isEmpty())
+        {
+            params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+        }
 
-  @Test
-  public void returnObject() throws Exception {
-    final MuleEvent responseEvent = flowRunner("updatesObject").withPayload(TEST_MESSAGE).run();
-    final MuleMessage response = responseEvent.getMessage();
+        return params;
+    }
 
-    assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
-  }
+    @Override
+    protected String[] getFlowConfigurationResources()
+    {
+        return new String[] {"integration/update/update-udt-config.xml"};
+    }
+
+    @Test
+    public void returnObject() throws Exception
+    {
+        final MuleEvent responseEvent = flowRunner("updatesObject").withPayload(TEST_MESSAGE).run();
+        final MuleMessage response = responseEvent.getMessage();
+
+        assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+    }
 }

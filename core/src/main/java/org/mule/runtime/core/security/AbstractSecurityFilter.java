@@ -28,80 +28,102 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>AbstractSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the
- * SecurityManager for this instance
+ * <code>AbstractSecurityFilter</code> provides basic initialisation for
+ * all security filters, namely configuring the SecurityManager for this instance
  */
-public abstract class AbstractSecurityFilter implements MuleContextAware, SecurityFilter {
+public abstract class AbstractSecurityFilter implements MuleContextAware, SecurityFilter
+{
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected SecurityManager securityManager;
-  protected MuleContext muleContext;
+    protected SecurityManager securityManager;
+    protected MuleContext muleContext;
 
-  private String securityProviders;
+    private String securityProviders;
 
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
-  public final void initialise() throws InitialisationException {
-    if (securityManager == null) {
-      securityManager = muleContext.getSecurityManager();
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
-    if (securityManager == null) {
-      throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
-    }
-
-    // This filter may only allow authentication on a subset of registered
-    // security providers
-    if (securityProviders != null) {
-      SecurityManager localManager = new MuleSecurityManager();
-      String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
-      for (String sp : securityProviders) {
-        SecurityProvider provider = securityManager.getProvider(sp);
-        if (provider != null) {
-          localManager.addProvider(provider);
-        } else {
-          throw new InitialisationException(CoreMessages.objectNotRegistered("Security Provider", sp), this);
+    public final void initialise() throws InitialisationException
+    {
+        if (securityManager == null)
+        {
+            securityManager = muleContext.getSecurityManager();
         }
-      }
-      securityManager = localManager;
+        
+        if (securityManager == null)
+        {
+            throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
+        }
+
+        // This filter may only allow authentication on a subset of registered
+        // security providers
+        if (securityProviders != null)
+        {
+            SecurityManager localManager = new MuleSecurityManager();
+            String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
+            for (String sp : securityProviders)
+            {
+                SecurityProvider provider = securityManager.getProvider(sp);
+                if (provider != null)
+                {
+                    localManager.addProvider(provider);
+                }
+                else
+                {
+                    throw new InitialisationException(
+                            CoreMessages.objectNotRegistered(
+                                    "Security Provider", sp), this);
+                }
+            }
+            securityManager = localManager;
+        }
+        
+        doInitialise();
     }
 
-    doInitialise();
-  }
+    protected void doInitialise() throws InitialisationException
+    {
+    }
 
-  protected void doInitialise() throws InitialisationException {}
+    /** @param manager  */
+    public void setSecurityManager(SecurityManager manager)
+    {
+        securityManager = manager;
+    }
 
-  /** @param manager */
-  public void setSecurityManager(SecurityManager manager) {
-    securityManager = manager;
-  }
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
 
-  public SecurityManager getSecurityManager() {
-    return securityManager;
-  }
+    public String getSecurityProviders()
+    {
+        return securityProviders;
+    }
 
-  public String getSecurityProviders() {
-    return securityProviders;
-  }
+    public void setSecurityProviders(String providers)
+    {
+        securityProviders = providers;
+    }
 
-  public void setSecurityProviders(String providers) {
-    securityProviders = providers;
-  }
+    public abstract void doFilter(MuleEvent event)
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
+            InitialisationException;
+    
+    protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException
+    {
+        TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback()
+        {
+            public Object doTransform(MuleMessage message) throws Exception
+            {
+                return payload;
+            }
+        });
 
-  public abstract void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-      CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
-
-  protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
-    TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback() {
-
-      public Object doTransform(MuleMessage message) throws Exception {
-        return payload;
-      }
-    });
-
-    event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans));
-  }
+        event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans));
+    }
 }

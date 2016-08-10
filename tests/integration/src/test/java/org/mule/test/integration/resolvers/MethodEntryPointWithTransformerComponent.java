@@ -6,15 +6,16 @@
  */
 package org.mule.test.integration.resolvers;
 
-public class MethodEntryPointWithTransformerComponent {
-
-  /**
-   * Transforms a message for testing purposes.
-   * <p>
-   * Is referenced by the test configuration because it implements the test component method which should be call by the
-   * MethodEntryPointResolver.
-   */
-  public String transformMessage(String message) {
-    return "Transformed " + message;
-  }
+public class MethodEntryPointWithTransformerComponent
+{
+    /**
+     * Transforms a message for testing purposes.
+     * <p>
+     * Is referenced by the test configuration because it implements the test
+     * component method which should be call by the MethodEntryPointResolver.
+     */
+    public String transformMessage(String message)
+    {
+        return "Transformed " + message;
+    }
 }

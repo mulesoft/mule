@@ -26,64 +26,78 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCase {
+public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCase
+{
 
-  private MuleContext muleContext = mock(MuleContext.class);
-  private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
-  @Before
-  public void setUp() throws Exception {
-    when(muleConfiguration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-  }
-
-  @Test
-  public void rejectsBadInputIfEnforcementOn() throws TransformerException {
-    AbstractTransformer transformer = createDummyTransformer(true);
-
-    try {
-      transformer.transform("TEST");
-      fail("Transformation should fail because source type is not supported");
-    } catch (TransformerException expected) {
+    @Before
+    public void setUp() throws Exception
+    {
+        when(muleConfiguration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     }
-  }
 
-  @Test
-  public void rejectsBadInputUsingDefaultEnforcement() throws TransformerException {
-    AbstractTransformer transformer = createDummyTransformer(true);
+    @Test
+    public void rejectsBadInputIfEnforcementOn() throws TransformerException
+    {
+        AbstractTransformer transformer = createDummyTransformer(true);
 
-    try {
-      transformer.transform("TEST");
-      fail("Transformation should fail because source type is not supported");
-    } catch (TransformerException expected) {
+        try
+        {
+            transformer.transform("TEST");
+            fail("Transformation should fail because source type is not supported");
+        }
+        catch (TransformerException expected)
+        {
+        }
     }
-  }
 
-  @Test
-  public void transformsValidSourceTypeWithNoCheckForEnforcement() throws TransformerException {
-    AbstractTransformer transformer = createDummyTransformer(true);
-    transformer.sourceTypes.add(DataType.STRING);
-    transformer.setReturnDataType(DataType.STRING);
+    @Test
+    public void rejectsBadInputUsingDefaultEnforcement() throws TransformerException
+    {
+        AbstractTransformer transformer = createDummyTransformer(true);
 
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        try
+        {
+            transformer.transform("TEST");
+            fail("Transformation should fail because source type is not supported");
+        }
+        catch (TransformerException expected)
+        {
+        }
+    }
 
-    Object result = transformer.transform("TEST");
-    assertEquals("TRANSFORMED", result);
-  }
+    @Test
+    public void transformsValidSourceTypeWithNoCheckForEnforcement() throws TransformerException
+    {
+        AbstractTransformer transformer = createDummyTransformer(true);
+        transformer.sourceTypes.add(DataType.STRING);
+        transformer.setReturnDataType(DataType.STRING);
 
-  private AbstractTransformer createDummyTransformer(boolean ignoreBadInput) {
-    AbstractTransformer result = new AbstractTransformer() {
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
-      @Override
-      protected Object doTransform(Object src, Charset enc) throws TransformerException {
-        return "TRANSFORMED";
-      }
-    };
+        Object result = transformer.transform("TEST");
+        assertEquals("TRANSFORMED", result);
+    }
 
-    result.sourceTypes.add(DataType.BYTE_ARRAY);
-    result.setMuleContext(muleContext);
-    result.setIgnoreBadInput(ignoreBadInput);
+    private AbstractTransformer createDummyTransformer(boolean ignoreBadInput)
+    {
+        AbstractTransformer result = new AbstractTransformer()
+        {
 
-    return result;
-  }
+            @Override
+            protected Object doTransform(Object src, Charset enc) throws TransformerException
+            {
+                return "TRANSFORMED";
+            }
+        };
+
+        result.sourceTypes.add(DataType.BYTE_ARRAY);
+        result.setMuleContext(muleContext);
+        result.setIgnoreBadInput(ignoreBadInput);
+
+        return result;
+    }
 }

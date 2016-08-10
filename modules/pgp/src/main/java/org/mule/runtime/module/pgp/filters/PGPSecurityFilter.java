@@ -25,121 +25,152 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 
-public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
+public class PGPSecurityFilter extends AbstractOperationSecurityFilter
+{
+    private EncryptionStrategy strategy;
 
-  private EncryptionStrategy strategy;
+    private String strategyName;
 
-  private String strategyName;
+    private boolean signRequired;
 
-  private boolean signRequired;
+    private PGPKeyRing keyManager;
 
-  private PGPKeyRing keyManager;
+    @Override
+    protected void authenticateInbound(MuleEvent event)
+        throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException
+    {
+        MuleMessage message = event.getMessage();
 
-  @Override
-  protected void authenticateInbound(MuleEvent event)
-      throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException {
-    MuleMessage message = event.getMessage();
+        String userId = (String)getCredentialsAccessor().getCredentials(event);
 
-    String userId = (String) getCredentialsAccessor().getCredentials(event);
+        byte[] creds = null;
+        try
+        {
+            creds = event.getMessageAsBytes();
+            creds = strategy.decrypt(creds, null);
+        }
+        catch (Exception e1)
+        {
+            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+        }
 
-    byte[] creds = null;
-    try {
-      creds = event.getMessageAsBytes();
-      creds = strategy.decrypt(creds, null);
-    } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+        Authentication authentication;
+        try
+        {
+            authentication = new PGPAuthentication(userId, decodeMsgRaw(creds), event);
+        }
+        catch (Exception e1)
+        {
+            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+        }
+
+        final Authentication authResult;
+        try
+        {
+            authResult = getSecurityManager().authenticate(authentication);
+        }
+        catch (Exception e)
+        {
+            // Authentication failed
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
+            }
+
+            throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), event, e);
+        }
+
+        // Authentication success
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Authentication success: " + authResult.toString());
+        }
+
+        SecurityContext context = getSecurityManager().createSecurityContext(authResult);
+        event.getSession().setSecurityContext(context);
+
+        try
+        {
+            updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult), event);
+//            TODO RequestContext.rewriteEvent(new DefaultMuleMessage(
+//                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
+        }
+        catch (Exception e2)
+        {
+            throw new UnauthorisedException(event, context, this);
+        }
     }
 
-    Authentication authentication;
-    try {
-      authentication = new PGPAuthentication(userId, decodeMsgRaw(creds), event);
-    } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+    private Message decodeMsgRaw(byte[] raw) throws Exception
+    {
+        return MessageFactory.getMessage(raw);
     }
 
-    final Authentication authResult;
-    try {
-      authResult = getSecurityManager().authenticate(authentication);
-    } catch (Exception e) {
-      // Authentication failed
-      if (logger.isDebugEnabled()) {
-        logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
-      }
+    private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception
+    {
+        Message msg = (Message)auth.getCredentials();
 
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), event, e);
+        if (msg instanceof SignedMessage)
+        {
+            msg = ((SignedMessage)msg).getContents();
+        }
+
+        if (msg instanceof LiteralMessage)
+        {
+            return ((LiteralMessage)msg).getTextData();
+        }
+        else
+        {
+            throw new Exception("Wrong data");
+        }
     }
 
-    // Authentication success
-    if (logger.isDebugEnabled()) {
-      logger.debug("Authentication success: " + authResult.toString());
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        if (strategyName != null)
+        {
+            strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
+        }
+
+        if (strategy == null)
+        {
+            throw new InitialisationException(PGPMessages.encryptionStrategyNotSet(), this);
+        }
     }
 
-    SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-    event.getSession().setSecurityContext(context);
-
-    try {
-      updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult), event);
-      // TODO RequestContext.rewriteEvent(new DefaultMuleMessage(
-      // getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
-    } catch (Exception e2) {
-      throw new UnauthorisedException(event, context, this);
-    }
-  }
-
-  private Message decodeMsgRaw(byte[] raw) throws Exception {
-    return MessageFactory.getMessage(raw);
-  }
-
-  private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception {
-    Message msg = (Message) auth.getCredentials();
-
-    if (msg instanceof SignedMessage) {
-      msg = ((SignedMessage) msg).getContents();
+    public EncryptionStrategy getStrategy()
+    {
+        return strategy;
     }
 
-    if (msg instanceof LiteralMessage) {
-      return ((LiteralMessage) msg).getTextData();
-    } else {
-      throw new Exception("Wrong data");
-    }
-  }
-
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    if (strategyName != null) {
-      strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
+    public void setStrategy(EncryptionStrategy strategy)
+    {
+        this.strategy = strategy;
     }
 
-    if (strategy == null) {
-      throw new InitialisationException(PGPMessages.encryptionStrategyNotSet(), this);
+    public void setStrategyName(String name)
+    {
+        strategyName = name;
     }
-  }
 
-  public EncryptionStrategy getStrategy() {
-    return strategy;
-  }
+    public boolean isSignRequired()
+    {
+        return signRequired;
+    }
 
-  public void setStrategy(EncryptionStrategy strategy) {
-    this.strategy = strategy;
-  }
+    public void setSignRequired(boolean signRequired)
+    {
+        this.signRequired = signRequired;
+    }
 
-  public void setStrategyName(String name) {
-    strategyName = name;
-  }
+    public PGPKeyRing getKeyManager()
+    {
+        return keyManager;
+    }
 
-  public boolean isSignRequired() {
-    return signRequired;
-  }
-
-  public void setSignRequired(boolean signRequired) {
-    this.signRequired = signRequired;
-  }
-
-  public PGPKeyRing getKeyManager() {
-    return keyManager;
-  }
-
-  public void setKeyManager(PGPKeyRing keyManager) {
-    this.keyManager = keyManager;
-  }
+    public void setKeyManager(PGPKeyRing keyManager)
+    {
+        this.keyManager = keyManager;
+    }
 }

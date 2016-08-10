@@ -9,15 +9,18 @@ package org.mule.runtime.core.config;
 /**
  * Empty cluster configuration to be used when the instance does not belong to a cluster
  */
-public class NullClusterConfiguration implements ClusterConfiguration {
+public class NullClusterConfiguration implements ClusterConfiguration
+{
 
-  @Override
-  public String getClusterId() {
-    return "";
-  }
+    @Override
+    public String getClusterId()
+    {
+        return "";
+    }
 
-  @Override
-  public int getClusterNodeId() {
-    return 0;
-  }
+    @Override
+    public int getClusterNodeId()
+    {
+        return 0;
+    }
 }

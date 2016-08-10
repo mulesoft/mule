@@ -26,94 +26,117 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> implements MuleContextAware, AnnotatedObject {
+public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark>
+    implements MuleContextAware, AnnotatedObject
+{
 
-  public static final String MULE_WATERMARK_PARTITION = "mule.watermark";
-  private static final String DEFAULT_SELECTOR_EXPRESSION = "#[payload]";
+    public static final String MULE_WATERMARK_PARTITION = "mule.watermark";
+    private static final String DEFAULT_SELECTOR_EXPRESSION = "#[payload]";
 
-  private String variable;
-  private String defaultExpression;
-  private String updateExpression;
-  private WatermarkSelectorBroker selector;
-  private String selectorExpression;
-  private ObjectStore<Serializable> objectStore;
+    private String variable;
+    private String defaultExpression;
+    private String updateExpression;
+    private WatermarkSelectorBroker selector;
+    private String selectorExpression;
+    private ObjectStore<Serializable> objectStore;
 
-  private Map<QName, Object> annotations = new HashMap<QName, Object>();
-  private MuleContext muleContext;
+    private Map<QName, Object> annotations = new HashMap<QName, Object>();
+    private MuleContext muleContext;
 
-  @Override
-  public Class<?> getObjectType() {
-    return Watermark.class;
-  }
-
-  @Override
-  protected Watermark createInstance() throws Exception {
-    if (this.selector != null) {
-      if (!StringUtils.isEmpty(this.updateExpression)) {
-        throw new IllegalArgumentException("You specified a watermark with both an update expression and a selector and/or a selector.\n"
-            + "Those cannot co-exist. You have to either specify an updateExpression or selector options");
-      }
-      String selectorExpression =
-          StringUtils.isEmpty(this.selectorExpression) ? DEFAULT_SELECTOR_EXPRESSION : this.selectorExpression;
-
-      return new SelectorWatermark(this.acquireObjectStore(), this.variable, this.defaultExpression, this.selector,
-                                   selectorExpression);
-    } else {
-      return new UpdateExpressionWatermark(this.acquireObjectStore(), this.variable, this.defaultExpression, updateExpression);
+    @Override
+    public Class<?> getObjectType()
+    {
+        return Watermark.class;
     }
 
-  }
+    @Override
+    protected Watermark createInstance() throws Exception
+    {
+        if (this.selector != null)
+        {
+            if (!StringUtils.isEmpty(this.updateExpression))
+            {
+                throw new IllegalArgumentException(
+                    "You specified a watermark with both an update expression and a selector and/or a selector.\n"
+                                    + "Those cannot co-exist. You have to either specify an updateExpression or selector options");
+            }
+            String selectorExpression = StringUtils.isEmpty(this.selectorExpression)
+                                                                                    ? DEFAULT_SELECTOR_EXPRESSION
+                                                                                    : this.selectorExpression;
 
-  private ObjectStore<Serializable> acquireObjectStore() {
-    ObjectStore<Serializable> os = this.objectStore;
-    if (os == null) {
-      MuleObjectStoreManager mgr = (MuleObjectStoreManager) this.muleContext.getObjectStoreManager();
-      os = mgr.getUserObjectStore(MULE_WATERMARK_PARTITION, true);
+            return new SelectorWatermark(this.acquireObjectStore(), this.variable, this.defaultExpression,
+                this.selector, selectorExpression);
+        }
+        else
+        {
+            return new UpdateExpressionWatermark(this.acquireObjectStore(), this.variable,
+                this.defaultExpression, updateExpression);
+        }
+
     }
-    return os;
-  }
 
-  public void setObjectStore(ObjectStore<Serializable> objectStore) {
-    this.objectStore = objectStore;
-  }
+    private ObjectStore<Serializable> acquireObjectStore()
+    {
+        ObjectStore<Serializable> os = this.objectStore;
+        if (os == null)
+        {
+            MuleObjectStoreManager mgr = (MuleObjectStoreManager) this.muleContext.getObjectStoreManager();
+            os = mgr.getUserObjectStore(MULE_WATERMARK_PARTITION, true);
+        }
+        return os;
+    }
 
-  public void setVariable(String variable) {
-    this.variable = variable;
-  }
+    public void setObjectStore(ObjectStore<Serializable> objectStore)
+    {
+        this.objectStore = objectStore;
+    }
 
-  public void setDefaultExpression(String defaultExpression) {
-    this.defaultExpression = defaultExpression;
-  }
+    public void setVariable(String variable)
+    {
+        this.variable = variable;
+    }
 
-  public void setUpdateExpression(String updateExpression) {
-    this.updateExpression = updateExpression;
-  }
+    public void setDefaultExpression(String defaultExpression)
+    {
+        this.defaultExpression = defaultExpression;
+    }
 
-  public void setSelector(WatermarkSelectorBroker selector) {
-    this.selector = selector;
-  }
+    public void setUpdateExpression(String updateExpression)
+    {
+        this.updateExpression = updateExpression;
+    }
 
-  public void setSelectorExpression(String selectorExpression) {
-    this.selectorExpression = selectorExpression;
-  }
+    public void setSelector(WatermarkSelectorBroker selector)
+    {
+        this.selector = selector;
+    }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
+    public void setSelectorExpression(String selectorExpression)
+    {
+        this.selectorExpression = selectorExpression;
+    }
 
-  @Override
-  public Object getAnnotation(QName name) {
-    return annotations.get(name);
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
-  @Override
-  public Map<QName, Object> getAnnotations() {
-    return annotations;
-  }
+    @Override
+    public Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
 
-  @Override
-  public void setAnnotations(Map<QName, Object> annotations) {
-    this.annotations = annotations;
-  }
+    @Override
+    public Map<QName, Object> getAnnotations()
+    {
+        return annotations;
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> annotations)
+    {
+        this.annotations = annotations;
+    }
 }

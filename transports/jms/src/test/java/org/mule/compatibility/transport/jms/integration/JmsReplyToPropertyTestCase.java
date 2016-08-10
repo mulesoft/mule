@@ -20,30 +20,32 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase {
+public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/jms-replyto-property.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-replyto-property.xml";
-  }
+    @Test
+    @Ignore("MULE-9628")
+    public void testReplyTo() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        Map<String, Serializable> props = new HashMap<>();
+        props.put("JMSReplyTo", "middle");
+        client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);
 
-  @Test
-  @Ignore("MULE-9628")
-  public void testReplyTo() throws Exception {
-    MuleClient client = muleContext.getClient();
-    Map<String, Serializable> props = new HashMap<>();
-    props.put("JMSReplyTo", "middle");
-    client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);
+        // Check that the property is still on the outbound message
+        MuleMessage output = client.request("out", 2000);
+        assertNotNull(output);
+        final Object o = output.getOutboundProperty("JMSReplyTo");
+        assertTrue(o.toString().contains("middle"));
 
-    // Check that the property is still on the outbound message
-    MuleMessage output = client.request("out", 2000);
-    assertNotNull(output);
-    final Object o = output.getOutboundProperty("JMSReplyTo");
-    assertTrue(o.toString().contains("middle"));
-
-    // Check that the reply message was generated
-    output = client.request("middle", 2000);
-    assertNotNull(output);
-    assertEquals(DEFAULT_OUTPUT_MESSAGE, output.getPayload());
-  }
+        // Check that the reply message was generated
+        output = client.request("middle", 2000);
+        assertNotNull(output);
+        assertEquals(DEFAULT_OUTPUT_MESSAGE, output.getPayload());
+    }
 }

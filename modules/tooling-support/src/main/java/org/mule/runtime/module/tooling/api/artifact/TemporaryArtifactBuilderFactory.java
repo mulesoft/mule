@@ -11,11 +11,12 @@ package org.mule.runtime.module.tooling.api.artifact;
  *
  * @since 4.0
  */
-public interface TemporaryArtifactBuilderFactory {
+public interface TemporaryArtifactBuilderFactory
+{
 
-  /**
-   * @return a {@code ToolingArtifactBuilder} used to construct instance of {@link TemporaryArtifact}
-   */
-  TemporaryArtifactBuilder newBuilder();
+    /**
+     * @return a {@code ToolingArtifactBuilder} used to construct instance of {@link TemporaryArtifact}
+     */
+    TemporaryArtifactBuilder newBuilder();
 
 }

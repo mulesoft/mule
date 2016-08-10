@@ -8,8 +8,9 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.management.stats.RouterStatistics;
 
-public interface RouterStatisticsRecorder {
+public interface RouterStatisticsRecorder
+{
 
-  void setRouterStatistics(RouterStatistics stats);
+    void setRouterStatistics(RouterStatistics stats);
 
 }

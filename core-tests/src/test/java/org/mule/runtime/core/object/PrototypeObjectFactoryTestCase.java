@@ -9,29 +9,33 @@ package org.mule.runtime.core.object;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
-public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase {
+public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase
+{
 
-  @Override
-  public AbstractObjectFactory getUninitialisedObjectFactory() {
-    return new PrototypeObjectFactory();
-  }
+    @Override
+    public AbstractObjectFactory getUninitialisedObjectFactory()
+    {
+        return new PrototypeObjectFactory();
+    }
 
-  @Override
-  public void testGetObjectClass() throws Exception {
-    PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
-    factory.setObjectClass(Object.class);
-    muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
+    @Override
+    public void testGetObjectClass() throws Exception
+    {
+        PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
+        factory.setObjectClass(Object.class);
+        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
+        
+        assertEquals(Object.class, factory.getObjectClass());
+    }
 
-    assertEquals(Object.class, factory.getObjectClass());
-  }
-
-  @Override
-  public void testGet() throws Exception {
-    PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
-    factory.setObjectClass(Object.class);
-    muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
-
-    assertNotSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
-  }
+    @Override
+    public void testGet() throws Exception
+    {
+        PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
+        factory.setObjectClass(Object.class);
+        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
+        
+        assertNotSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
+    }
 
 }

@@ -15,41 +15,38 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleArtifactTestCase extends AbstractMuleTestCase {
+public class DefaultMuleArtifactTestCase extends AbstractMuleTestCase
+{
+    
+    private interface MyCapability extends Capability{}
+    
+    private class BaseClassWithCapability implements MyCapability {}
+    
+    private class SubClassInheritingCapability extends BaseClassWithCapability {}
+    
+    private class BaseClassWithoutCapability {}
+    
+    private class SubClassImplementingCapability extends BaseClassWithoutCapability implements MyCapability {}
 
-  private interface MyCapability extends Capability {
-  }
+    @Test
+    public void testCapabilityHierarchies()
+    {
+        DefaultMuleArtifact artifact = new DefaultMuleArtifact(new BaseClassWithCapability());
+        assertTrue(artifact.hasCapability(MyCapability.class));
+        assertNotNull(artifact.getCapability(MyCapability.class));
+        
+        artifact = new DefaultMuleArtifact(new SubClassInheritingCapability());
+        assertTrue(artifact.hasCapability(MyCapability.class));
+        assertNotNull(artifact.getCapability(MyCapability.class));
+        
+        artifact = new DefaultMuleArtifact(new BaseClassWithoutCapability());
+        assertFalse(artifact.hasCapability(MyCapability.class));
+        assertNull(artifact.getCapability(MyCapability.class));
 
-  private class BaseClassWithCapability implements MyCapability {
-  }
-
-  private class SubClassInheritingCapability extends BaseClassWithCapability {
-  }
-
-  private class BaseClassWithoutCapability {
-  }
-
-  private class SubClassImplementingCapability extends BaseClassWithoutCapability implements MyCapability {
-  }
-
-  @Test
-  public void testCapabilityHierarchies() {
-    DefaultMuleArtifact artifact = new DefaultMuleArtifact(new BaseClassWithCapability());
-    assertTrue(artifact.hasCapability(MyCapability.class));
-    assertNotNull(artifact.getCapability(MyCapability.class));
-
-    artifact = new DefaultMuleArtifact(new SubClassInheritingCapability());
-    assertTrue(artifact.hasCapability(MyCapability.class));
-    assertNotNull(artifact.getCapability(MyCapability.class));
-
-    artifact = new DefaultMuleArtifact(new BaseClassWithoutCapability());
-    assertFalse(artifact.hasCapability(MyCapability.class));
-    assertNull(artifact.getCapability(MyCapability.class));
-
-    artifact = new DefaultMuleArtifact(new SubClassImplementingCapability());
-    assertTrue(artifact.hasCapability(MyCapability.class));
-    assertNotNull(artifact.getCapability(MyCapability.class));
-  }
+        artifact = new DefaultMuleArtifact(new SubClassImplementingCapability());
+        assertTrue(artifact.hasCapability(MyCapability.class));
+        assertNotNull(artifact.getCapability(MyCapability.class));
+    }
 
 }
 

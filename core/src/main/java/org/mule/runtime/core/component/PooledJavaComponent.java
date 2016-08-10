@@ -22,118 +22,142 @@ import org.mule.runtime.core.util.pool.ObjectPool;
 /**
  * <code>PooledJavaComponent</code> implements pooling.
  */
-public class PooledJavaComponent extends AbstractJavaComponent {
+public class PooledJavaComponent extends AbstractJavaComponent
+{
 
-  protected PoolingProfile poolingProfile;
-  protected LifecyleEnabledObjectPool lifecycleAdapterPool;
+    protected PoolingProfile poolingProfile;
+    protected LifecyleEnabledObjectPool lifecycleAdapterPool;
 
-  public PooledJavaComponent() {
-    super();
-  }
-
-  public PooledJavaComponent(ObjectFactory objectFactory) {
-    this(objectFactory, null);
-  }
-
-  public PooledJavaComponent(ObjectFactory objectFactory, PoolingProfile poolingProfile) {
-    super(objectFactory);
-    this.poolingProfile = poolingProfile;
-  }
-
-  public PooledJavaComponent(ObjectFactory objectFactory, PoolingProfile poolingProfile,
-                             EntryPointResolverSet entryPointResolverSet) {
-    super(objectFactory, entryPointResolverSet);
-    this.poolingProfile = poolingProfile;
-  }
-
-  @Override
-  protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception {
-    return (LifecycleAdapter) lifecycleAdapterPool.borrowObject();
-  }
-
-  @Override
-  protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter) {
-    lifecycleAdapterPool.returnObject(lifecycleAdapter);
-  }
-
-  @Override
-  protected void doStart() throws MuleException {
-    super.doStart();
-    // Wrap pool's objectFactory with a LifeCycleAdaptor factory so we pool
-    // LifeCycleAdaptor's and not just pojo instances.
-    lifecycleAdapterPool = new DefaultLifecycleEnabledObjectPool(new LifeCycleAdapterFactory(), poolingProfile, muleContext);
-    lifecycleAdapterPool.initialise();
-    lifecycleAdapterPool.start();
-  }
-
-  @Override
-  protected void doStop() throws MuleException {
-    super.doStop();
-    if (lifecycleAdapterPool != null) {
-      lifecycleAdapterPool.stop();
-      lifecycleAdapterPool.close();
-      lifecycleAdapterPool = null;
+    public PooledJavaComponent()
+    {
+        super();
     }
-  }
 
-  public void setPoolingProfile(PoolingProfile poolingProfile) {
-    // TODO What happens if this is set while component is started? Should we i)
-    // do nothing ii) issue warning iii) stop/start the pool
-    // (!!) iv) throw exception?
-    this.poolingProfile = poolingProfile;
-  }
+    public PooledJavaComponent(ObjectFactory objectFactory)
+    {
+        this(objectFactory, null);
+    }
 
-  public PoolingProfile getPoolingProfile() {
-    return poolingProfile;
-  }
+    public PooledJavaComponent(ObjectFactory objectFactory, PoolingProfile poolingProfile)
+    {
+        super(objectFactory);
+        this.poolingProfile = poolingProfile;
+    }
 
-  /**
-   * <code>LifeCycleAdaptorFactory</code> wraps the Component' s {@link ObjectFactory}. The LifeCycleAdaptorFactory
-   * <code>getInstance()</code> method creates a new {@link LifecycleAdapter} wrapping the object instance obtained for the
-   * component instance {@link ObjectFactory} set on the {@link Component}. <br/>
-   * This allows us to keep {@link LifecycleAdapter} creation in the Component and out of the
-   * {@link DefaultLifecycleEnabledObjectPool} and to use the generic {@link ObjectPool} interface.
-   */
-  protected class LifeCycleAdapterFactory implements ObjectFactory {
-
-    @Override
-    public Object getInstance(MuleContext context) throws Exception {
-      return createLifecycleAdaptor();
+    public PooledJavaComponent(ObjectFactory objectFactory,
+                               PoolingProfile poolingProfile,
+            EntryPointResolverSet entryPointResolverSet)
+    {
+        super(objectFactory, entryPointResolverSet);
+        this.poolingProfile = poolingProfile;
     }
 
     @Override
-    public Class<?> getObjectClass() {
-      return LifecycleAdapter.class;
+    protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception
+    {
+        return (LifecycleAdapter) lifecycleAdapterPool.borrowObject();
     }
 
     @Override
-    public void initialise() throws InitialisationException {
-      objectFactory.initialise();
+    protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter)
+    {
+        lifecycleAdapterPool.returnObject(lifecycleAdapter);
     }
 
     @Override
-    public void dispose() {
-      objectFactory.dispose();
+    protected void doStart() throws MuleException
+    {
+        super.doStart();
+        // Wrap pool's objectFactory with a LifeCycleAdaptor factory so we pool
+        // LifeCycleAdaptor's and not just pojo instances.
+        lifecycleAdapterPool = new DefaultLifecycleEnabledObjectPool(new LifeCycleAdapterFactory(), poolingProfile, muleContext);
+        lifecycleAdapterPool.initialise();
+        lifecycleAdapterPool.start();
     }
 
     @Override
-    public void addObjectInitialisationCallback(InitialisationCallback callback) {
-      objectFactory.addObjectInitialisationCallback(callback);
+    protected void doStop() throws MuleException
+    {
+        super.doStop();
+        if (lifecycleAdapterPool != null)
+        {
+            lifecycleAdapterPool.stop();
+            lifecycleAdapterPool.close();
+            lifecycleAdapterPool = null;
+        }
     }
 
-    @Override
-    public boolean isSingleton() {
-      return false;
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        // TODO What happens if this is set while component is started? Should we i)
+        // do nothing ii) issue warning iii) stop/start the pool
+        // (!!) iv) throw exception?
+        this.poolingProfile = poolingProfile;
     }
 
-    @Override
-    public boolean isExternallyManagedLifecycle() {
-      return objectFactory.isExternallyManagedLifecycle();
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
     }
 
-    @Override
-    public boolean isAutoWireObject() {
-      return objectFactory.isAutoWireObject();
+    /**
+     * <code>LifeCycleAdaptorFactory</code> wraps the Component' s
+     * {@link ObjectFactory}. The LifeCycleAdaptorFactory <code>getInstance()</code> method
+     * creates a new {@link LifecycleAdapter} wrapping the object instance obtained
+     * for the component instance {@link ObjectFactory} set on the {@link Component}.
+     * <br/>
+     * This allows us to keep {@link LifecycleAdapter} creation in the Component and
+     * out of the {@link DefaultLifecycleEnabledObjectPool} and to use the generic
+     * {@link ObjectPool} interface.
+     */
+    protected class LifeCycleAdapterFactory implements ObjectFactory
+    {
+        @Override
+        public Object getInstance(MuleContext context) throws Exception
+        {
+            return createLifecycleAdaptor();
+        }
+
+        @Override
+        public Class<?> getObjectClass()
+        {
+            return LifecycleAdapter.class;
+        }
+
+        @Override
+        public void initialise() throws InitialisationException
+        {
+            objectFactory.initialise();
+        }
+
+        @Override
+        public void dispose()
+        {
+            objectFactory.dispose();
+        }
+
+        @Override
+        public void addObjectInitialisationCallback(InitialisationCallback callback)
+        {
+            objectFactory.addObjectInitialisationCallback(callback);
+        }
+
+        @Override
+        public boolean isSingleton()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean isExternallyManagedLifecycle()
+        {
+            return objectFactory.isExternallyManagedLifecycle();
+        }
+
+        @Override
+        public boolean isAutoWireObject()
+        {
+            return objectFactory.isAutoWireObject();
+        }
     }
-  }
 }

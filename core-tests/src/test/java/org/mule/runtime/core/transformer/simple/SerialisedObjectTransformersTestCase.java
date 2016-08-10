@@ -12,24 +12,28 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
 
-public class SerialisedObjectTransformersTestCase extends AbstractTransformerTestCase {
+public class SerialisedObjectTransformersTestCase extends AbstractTransformerTestCase
+{
+    private Orange testObject = new Orange(new Integer(4), new Double(14.3), "nice!");
 
-  private Orange testObject = new Orange(new Integer(4), new Double(14.3), "nice!");
+    public Transformer getTransformer() throws Exception
+    {
+        return createObject(SerializableToByteArray.class);
+    }
 
-  public Transformer getTransformer() throws Exception {
-    return createObject(SerializableToByteArray.class);
-  }
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return createObject(ByteArrayToSerializable.class);
+    }
 
-  public Transformer getRoundTripTransformer() throws Exception {
-    return createObject(ByteArrayToSerializable.class);
-  }
+    public Object getTestData()
+    {
+        return testObject;
+    }
 
-  public Object getTestData() {
-    return testObject;
-  }
-
-  public Object getResultData() {
-    return SerializationUtils.serialize(testObject);
-  }
+    public Object getResultData()
+    {
+        return SerializationUtils.serialize(testObject);
+    }
 
 }

@@ -26,42 +26,48 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureStructArrayUdtTestCase extends AbstractDbIntegrationTestCase {
-
-  public StoredProcedureStructArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    List<Object[]> params = new LinkedList<>();
-
-    if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+public class StoredProcedureStructArrayUdtTestCase extends AbstractDbIntegrationTestCase
+{
+    public StoredProcedureStructArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
 
-    return params;
-  }
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        List<Object[]> params = new LinkedList<>();
 
-  @Override
-  protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/storedprocedure/stored-procedure-udt-array-config.xml"};
-  }
+        if (!getOracleResource().isEmpty())
+        {
+            params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+        }
 
-  @Before
-  public void setupStoredProcedure() throws Exception {
-    testDatabase.createStoredProcedureGetContactDetails(getDefaultDataSource());
-  }
+        return params;
+    }
 
-  @Test
-  public void returnsCustomArray() throws Exception {
-    final MuleEvent responseEvent = flowRunner("returnsCustomArrayValue").withPayload(TEST_MESSAGE).run();
-    final MuleMessage response = responseEvent.getMessage();
+    @Override
+    protected String[] getFlowConfigurationResources()
+    {
+        return new String[] {"integration/storedprocedure/stored-procedure-udt-array-config.xml"};
+    }
 
-    assertThat(response.getPayload(), instanceOf(Object[].class));
-    final Object[] arrayPayload = (Object[]) response.getPayload();
-    assertThat(arrayPayload.length, equalTo(1));
-    assertThat(arrayPayload[0], instanceOf(Struct.class));
-    assertThat(((Struct) arrayPayload[0]).getAttributes(), equalTo(CONTACT1.getDetailsAsObjectArray()[0]));
-  }
+    @Before
+    public void setupStoredProcedure() throws Exception
+    {
+        testDatabase.createStoredProcedureGetContactDetails(getDefaultDataSource());
+    }
+
+    @Test
+    public void returnsCustomArray() throws Exception
+    {
+        final MuleEvent responseEvent = flowRunner("returnsCustomArrayValue").withPayload(TEST_MESSAGE).run();
+        final MuleMessage response = responseEvent.getMessage();
+
+        assertThat(response.getPayload(), instanceOf(Object[].class));
+        final Object[] arrayPayload = (Object[]) response.getPayload();
+        assertThat(arrayPayload.length, equalTo(1));
+        assertThat(arrayPayload[0], instanceOf(Struct.class));
+        assertThat(((Struct) arrayPayload[0]).getAttributes(),  equalTo(CONTACT1.getDetailsAsObjectArray()[0]));
+    }
 }

@@ -11,20 +11,22 @@ import java.io.IOException;
 /**
  * <code>CompressionException</code> TODO document
  */
-public class CompressionException extends IOException {
+public class CompressionException extends IOException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 8587532237749889185L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 8587532237749889185L;
+    public CompressionException(String message)
+    {
+        super(message);
+    }
 
-  public CompressionException(String message) {
-    super(message);
-  }
-
-  public CompressionException(String message, Throwable cause) {
-    super(message);
-    initCause(cause);
-  }
+    public CompressionException(String message, Throwable cause)
+    {
+        super(message);
+        initCause(cause);
+    }
 
 }

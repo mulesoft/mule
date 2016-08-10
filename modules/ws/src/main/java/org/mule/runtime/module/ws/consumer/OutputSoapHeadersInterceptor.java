@@ -25,43 +25,53 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 
 /**
- * CXF interceptor that adds inbound properties to the Mule message based on the SOAP headers received in the response.
+ * CXF interceptor that adds inbound properties to the Mule message based on the SOAP headers
+ * received in the response.
  */
-public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
+public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
+{
 
-  private final MuleContext muleContext;
+    private final MuleContext muleContext;
 
-  public OutputSoapHeadersInterceptor(MuleContext muleContext) {
-    super(Phase.PRE_PROTOCOL);
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public void handleMessage(SoapMessage message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-
-    if (event == null || event instanceof NonBlockingVoidMuleEvent) {
-      return;
+    public OutputSoapHeadersInterceptor(MuleContext muleContext)
+    {
+        super(Phase.PRE_PROTOCOL);
+        this.muleContext = muleContext;
     }
 
-    for (Header header : message.getHeaders()) {
-      if (header instanceof SoapHeader) {
-        Transformer transformer = null;
+    @Override
+    public void handleMessage(SoapMessage message) throws Fault
+    {
+        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
 
-        try {
-          DataType sourceType = DataType.fromObject(header.getObject());
-          transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING);
-
-          String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
-          String value = (String) transformer.transform(header.getObject());
-
-          event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build());
-        } catch (TransformerException e) {
-          throw new Fault(new TransformerMessagingException(CoreMessages
-              .createStaticMessage("Cannot parse content of SOAP header %s in the response", header.getName().getLocalPart()),
-                                                            event, transformer, e.getCause()));
+        if (event == null || event instanceof NonBlockingVoidMuleEvent)
+        {
+            return;
         }
-      }
+
+        for (Header header : message.getHeaders())
+        {
+            if (header instanceof SoapHeader)
+            {
+                Transformer transformer = null;
+
+                try
+                {
+                    DataType sourceType = DataType.fromObject(header.getObject());
+                    transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING);
+
+                    String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
+                    String value = (String) transformer.transform(header.getObject());
+
+                    event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build());
+                }
+                catch (TransformerException e)
+                {
+                    throw new Fault(new TransformerMessagingException(
+                            CoreMessages.createStaticMessage("Cannot parse content of SOAP header %s in the response",
+                                                             header.getName().getLocalPart()), event, transformer, e.getCause()));
+                }
+            }
+        }
     }
-  }
 }

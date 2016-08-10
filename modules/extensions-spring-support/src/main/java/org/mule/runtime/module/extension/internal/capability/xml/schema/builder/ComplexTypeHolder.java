@@ -14,36 +14,43 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Co
  *
  * @since 4.0
  */
-final class ComplexTypeHolder {
+final class ComplexTypeHolder
+{
 
-  private final ComplexType complexType;
-  private final MetadataType type;
+    private final ComplexType complexType;
+    private final MetadataType type;
 
-  ComplexTypeHolder(ComplexType complexType, MetadataType type) {
-    this.complexType = complexType;
-    this.type = type;
-  }
-
-  public ComplexType getComplexType() {
-    return complexType;
-  }
-
-  public MetadataType getType() {
-    return type;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof ComplexTypeHolder) {
-      ComplexTypeHolder other = (ComplexTypeHolder) obj;
-      return type.equals(other.getType());
+    ComplexTypeHolder(ComplexType complexType, MetadataType type)
+    {
+        this.complexType = complexType;
+        this.type = type;
     }
 
-    return false;
-  }
+    public ComplexType getComplexType()
+    {
+        return complexType;
+    }
 
-  @Override
-  public int hashCode() {
-    return type.hashCode();
-  }
+    public MetadataType getType()
+    {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof ComplexTypeHolder)
+        {
+            ComplexTypeHolder other = (ComplexTypeHolder) obj;
+            return type.equals(other.getType());
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return type.hashCode();
+    }
 }

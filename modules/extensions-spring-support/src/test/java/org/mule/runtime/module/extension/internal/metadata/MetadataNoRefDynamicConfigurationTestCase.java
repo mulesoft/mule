@@ -19,19 +19,20 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Test;
 
-public class MetadataNoRefDynamicConfigurationTestCase extends MetadataExtensionFunctionalTestCase {
+public class MetadataNoRefDynamicConfigurationTestCase extends MetadataExtensionFunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION;
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION;
-  }
-
-  @Test
-  public void resolveMetadataWithNoRefDynamicConfig() throws Exception {
-    componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
-    MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-    final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
-    assertFailure(metadataResult, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION,
-                  MetadataResolvingException.class.getName());
-  }
+    @Test
+    public void resolveMetadataWithNoRefDynamicConfig() throws Exception
+    {
+        componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
+        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
+        assertFailure(metadataResult, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
+    }
 }

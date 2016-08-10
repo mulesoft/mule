@@ -9,19 +9,21 @@ package org.mule.runtime.core.util.file;
 import java.io.File;
 import java.io.IOException;
 
-public class DeleteException extends IOException {
+public class DeleteException extends IOException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6725758458721277194L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 6725758458721277194L;
+    public DeleteException()
+    {
+        super();
+    }
 
-  public DeleteException() {
-    super();
-  }
-
-  public DeleteException(File f) {
-    super(f != null ? f.toString() : "null");
-  }
+    public DeleteException(File f)
+    {
+        super(f != null ? f.toString() : "null");
+    }
 
 }

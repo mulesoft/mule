@@ -23,38 +23,45 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PetStoreTlsConnectionTestCase extends ExtensionFunctionalTestCase {
+public class PetStoreTlsConnectionTestCase extends ExtensionFunctionalTestCase
+{
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data()
+    {
+        return asList(new Object[][] {
+                {"global tls", "globalTls"},
+                {"inline tls", "inlineTls"}});
+    }
 
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Object[]> data() {
-    return asList(new Object[][] {{"global tls", "globalTls"}, {"inline tls", "inlineTls"}});
-  }
+    private String name;
+    private String configName;
 
-  private String name;
-  private String configName;
+    @Rule
+    public SystemProperty systemProperty;
 
-  @Rule
-  public SystemProperty systemProperty;
+    public PetStoreTlsConnectionTestCase(String name, String configName)
+    {
+        this.name = name;
+        this.configName = configName;
+        systemProperty = new SystemProperty("config", configName);
+    }
 
-  public PetStoreTlsConnectionTestCase(String name, String configName) {
-    this.name = name;
-    this.configName = configName;
-    systemProperty = new SystemProperty("config", configName);
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "petstore-tls-connection.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "petstore-tls-connection.xml";
-  }
+    @Override
+    protected Class<?>[] getAnnotatedExtensionClasses()
+    {
+        return new Class<?>[] {PetStoreConnector.class};
+    }
 
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class<?>[] {PetStoreConnector.class};
-  }
-
-  @Test
-  public void tls() throws Exception {
-    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
-    assertThat(client.getTlsContext(), is(notNullValue()));
-  }
+    @Test
+    public void tls() throws Exception
+    {
+        PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
+        assertThat(client.getTlsContext(), is(notNullValue()));
+    }
 }

@@ -15,18 +15,21 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractQueryParamResolverTestCase extends AbstractMuleTestCase {
+public class AbstractQueryParamResolverTestCase extends AbstractMuleTestCase
+{
 
-  protected final MuleEvent muleEvent = mock(MuleEvent.class);
+    protected final MuleEvent muleEvent = mock(MuleEvent.class);
 
-  protected List<QueryParamValue> getQueryParamValues(Object... values) {
-    List<QueryParamValue> paramValues = new ArrayList<QueryParamValue>();
-    int paramIndex = 1;
-    for (Object value : values) {
-      QueryParamValue paramValue = new QueryParamValue("param" + paramIndex++, value);
-      paramValues.add(paramValue);
+    protected List<QueryParamValue> getQueryParamValues(Object... values)
+    {
+        List<QueryParamValue> paramValues = new ArrayList<QueryParamValue>();
+        int paramIndex =1;
+        for (Object value : values)
+        {
+            QueryParamValue paramValue = new QueryParamValue("param" + paramIndex++, value);
+            paramValues.add(paramValue);
+        }
+
+        return paramValues;
     }
-
-    return paramValues;
-  }
 }

@@ -13,19 +13,24 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class TcpSendAndReceiveStringTestCase extends ParameterizedProtocolTestCase {
+public class TcpSendAndReceiveStringTestCase extends ParameterizedProtocolTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "tcp-send-and-receive-string-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "tcp-send-and-receive-string-config.xml";
-  }
+    @Test
+    public void sendStringAndReceiveModifiedString() throws Exception
+    {
+        InputStream inputStream = (InputStream) flowRunner("tcp-send-and-receive").
+                withPayload(TEST_STRING)
+                .run()
+                .getMessage()
+                .getPayload();
 
-  @Test
-  public void sendStringAndReceiveModifiedString() throws Exception {
-    InputStream inputStream =
-        (InputStream) flowRunner("tcp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload();
-
-    String response = IOUtils.toString(inputStream);
-    assertEquals(response, RESPONSE_TEST_STRING);
-  }
+        String response = IOUtils.toString(inputStream);
+        assertEquals(response, RESPONSE_TEST_STRING);
+    }
 }

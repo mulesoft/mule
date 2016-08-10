@@ -15,15 +15,19 @@ import javax.xml.stream.XMLStreamReader;
  * {@link org.mule.runtime.module.xml.transformer.XmlToDomDocument} transformer, but narrowing down the source types to only
  * support XMLStreamReader.
  */
-public class XMLStreamReaderToByteArray extends XmlToDomDocument {
+public class XMLStreamReaderToByteArray extends XmlToDomDocument
+{
 
-  public XMLStreamReaderToByteArray() {
-    for (DataType type : getSourceDataTypes()) {
-      if (!type.getType().equals(XMLStreamReader.class)) {
-        unregisterSourceType(type);
-      }
+    public XMLStreamReaderToByteArray()
+    {
+        for (DataType type : getSourceDataTypes())
+        {
+            if (!type.getType().equals(XMLStreamReader.class))
+            {
+                unregisterSourceType(type);
+            }
+        }
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
-    setReturnDataType(DataType.BYTE_ARRAY);
-  }
 
 }

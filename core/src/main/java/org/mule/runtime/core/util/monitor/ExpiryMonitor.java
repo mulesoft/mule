@@ -21,176 +21,210 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can invoke a callback method once the object time
- * has expired. If the object does expire it is removed from this monitor.
+ * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can
+ * invoke a callback method once the object time has expired. If the object does
+ * expire it is removed from this monitor.
  */
-public class ExpiryMonitor implements Runnable, Disposable {
+public class ExpiryMonitor implements Runnable, Disposable
+{
+    /**
+     * logger used by this class
+     */
+    protected static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
 
-  /**
-   * logger used by this class
-   */
-  protected static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
+    protected ScheduledThreadPoolExecutor scheduler;
 
-  protected ScheduledThreadPoolExecutor scheduler;
+    private Map monitors;
 
-  private Map monitors;
+    private int monitorFrequency;
 
-  private int monitorFrequency;
+    private String name;
+    
+    private ClassLoader contextClassLoader;
 
-  private String name;
+    private MuleContext muleContext;
 
-  private ClassLoader contextClassLoader;
+    private boolean onPollingNodeOnly;
 
-  private MuleContext muleContext;
-
-  private boolean onPollingNodeOnly;
-
-  public ExpiryMonitor(MuleContext muleContext, boolean onPollingNodeOnly) {
-    this.muleContext = muleContext;
-    this.onPollingNodeOnly = onPollingNodeOnly;
-  }
-
-  public ExpiryMonitor(String name, MuleContext muleContext, boolean onPollingNodeOnly) {
-    this(name, 1000, muleContext, onPollingNodeOnly);
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, MuleContext muleContext, boolean onPollingNodeOnly) {
-    this(muleContext, onPollingNodeOnly);
-    this.name = name;
-    this.monitorFrequency = monitorFrequency;
-    init();
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, ClassLoader contextClassLoader, MuleContext muleContext,
-                       boolean onPollingNodeOnly) {
-    this(muleContext, onPollingNodeOnly);
-    this.name = name;
-    this.monitorFrequency = monitorFrequency;
-    this.contextClassLoader = contextClassLoader;
-    init();
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler, MuleContext muleContext,
-                       boolean onPollingNodeOnly) {
-    this(muleContext, onPollingNodeOnly);
-    this.name = name;
-    this.monitorFrequency = monitorFrequency;
-    this.scheduler = scheduler;
-    init();
-  }
-
-  protected void init() {
-    if (monitorFrequency <= 0) {
-      throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("monitorFrequency", new Integer(monitorFrequency))
-          .toString());
+    public ExpiryMonitor(MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this.muleContext = muleContext;
+        this.onPollingNodeOnly = onPollingNodeOnly;
     }
-    monitors = new ConcurrentHashMap();
-    if (scheduler == null) {
-      this.scheduler = new ScheduledThreadPoolExecutor(1);
-      scheduler.setThreadFactory(new DaemonThreadFactory(name + ".expiry.monitor", contextClassLoader));
-      scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency, TimeUnit.MILLISECONDS);
+
+    public ExpiryMonitor(String name, MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this(name, 1000, muleContext, onPollingNodeOnly);
     }
-  }
 
-  /**
-   * Adds an expirable object to monitor. If the Object is already being monitored it will be reset and the millisecond timeout
-   * will be ignored
-   *
-   * @param value the expiry value
-   * @param timeUnit The time unit of the Expiry value
-   * @param expirable the objec that will expire
-   */
-  public void addExpirable(long value, TimeUnit timeUnit, Expirable expirable) {
-    if (isRegistered(expirable)) {
-      resetExpirable(expirable);
-    } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Adding new expirable: " + expirable);
-      }
-      monitors.put(expirable, new ExpirableHolder(timeUnit.toMillis(value), expirable));
+    public ExpiryMonitor(String name, int monitorFrequency, MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this(muleContext, onPollingNodeOnly);
+        this.name = name;
+        this.monitorFrequency = monitorFrequency;
+        init();
     }
-  }
 
-  public boolean isRegistered(Expirable expirable) {
-    return (monitors.get(expirable) != null);
-  }
-
-  public void removeExpirable(Expirable expirable) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Removing expirable: " + expirable);
+    public ExpiryMonitor(String name, int monitorFrequency, ClassLoader contextClassLoader, MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this(muleContext, onPollingNodeOnly);
+        this.name = name;
+        this.monitorFrequency = monitorFrequency;
+        this.contextClassLoader = contextClassLoader;
+        init();
     }
-    monitors.remove(expirable);
-  }
-
-  public void resetExpirable(Expirable expirable) {
-    ExpirableHolder eh = (ExpirableHolder) monitors.get(expirable);
-    if (eh != null) {
-      eh.reset();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Reset expirable: " + expirable);
-      }
+    
+    public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler, MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this(muleContext, onPollingNodeOnly);
+        this.name = name;
+        this.monitorFrequency = monitorFrequency;
+        this.scheduler = scheduler;
+        init();
     }
-  }
 
-  /**
-   * The action to be performed by this timer task.
-   */
-  public void run() {
-    ExpirableHolder holder;
-
-    if (!onPollingNodeOnly || muleContext == null || muleContext.isPrimaryPollingInstance()) {
-      for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
-        holder = (ExpirableHolder) iterator.next();
-        if (holder.isExpired()) {
-          removeExpirable(holder.getExpirable());
-          holder.getExpirable().expired();
+    protected void init()
+    {
+        if (monitorFrequency <= 0)
+        {
+            throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("monitorFrequency",
+                    new Integer(monitorFrequency)).toString());
         }
-      }
-    }
-  }
-
-  public void dispose() {
-    logger.info("disposing monitor");
-    scheduler.shutdown();
-    ExpirableHolder holder;
-    for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
-      holder = (ExpirableHolder) iterator.next();
-      removeExpirable(holder.getExpirable());
-      try {
-        holder.getExpirable().expired();
-      } catch (Exception e) {
-        // TODO MULE-863: What should we really do?
-        logger.debug(e.getMessage());
-      }
-    }
-  }
-
-  private static class ExpirableHolder {
-
-    private Expirable expirable;
-    private long milliseconds;
-    private long created;
-
-    public ExpirableHolder(long milliseconds, Expirable expirable) {
-      this.milliseconds = milliseconds;
-      this.expirable = expirable;
-      created = System.currentTimeMillis();
+        monitors = new ConcurrentHashMap();
+        if (scheduler == null)
+        {
+            this.scheduler = new ScheduledThreadPoolExecutor(1);
+            scheduler.setThreadFactory(new DaemonThreadFactory(name + ".expiry.monitor", contextClassLoader));
+            scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency,
+                                             TimeUnit.MILLISECONDS);
+        }
     }
 
-    public long getMilliSeconds() {
-      return milliseconds;
+    /**
+     * Adds an expirable object to monitor. If the Object is already being monitored
+     * it will be reset and the millisecond timeout will be ignored
+     *
+     * @param value     the expiry value
+     * @param timeUnit  The time unit of the Expiry value
+     * @param expirable the objec that will expire
+     */
+    public void addExpirable(long value, TimeUnit timeUnit, Expirable expirable)
+    {
+        if (isRegistered(expirable))
+        {
+            resetExpirable(expirable);
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Adding new expirable: " + expirable);
+            }
+            monitors.put(expirable, new ExpirableHolder(timeUnit.toMillis(value), expirable));
+        }
     }
 
-    public Expirable getExpirable() {
-      return expirable;
+    public boolean isRegistered(Expirable expirable)
+    {
+        return (monitors.get(expirable) != null);
     }
 
-    public boolean isExpired() {
-      return (System.currentTimeMillis() - milliseconds) > created;
+    public void removeExpirable(Expirable expirable)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Removing expirable: " + expirable);
+        }
+        monitors.remove(expirable);
     }
 
-    public void reset() {
-      created = System.currentTimeMillis();
+    public void resetExpirable(Expirable expirable)
+    {
+        ExpirableHolder eh = (ExpirableHolder) monitors.get(expirable);
+        if (eh != null)
+        {
+            eh.reset();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Reset expirable: " + expirable);
+            }
+        }
     }
-  }
+
+    /**
+     * The action to be performed by this timer task.
+     */
+    public void run()
+    {
+        ExpirableHolder holder;
+
+        if (!onPollingNodeOnly || muleContext == null || muleContext.isPrimaryPollingInstance())
+        {
+            for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
+            {
+                holder = (ExpirableHolder) iterator.next();
+                if (holder.isExpired())
+                {
+                    removeExpirable(holder.getExpirable());
+                    holder.getExpirable().expired();
+                }
+            }
+        }
+    }
+
+    public void dispose()
+    {
+        logger.info("disposing monitor");
+        scheduler.shutdown();
+        ExpirableHolder holder;
+        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
+        {
+            holder = (ExpirableHolder) iterator.next();
+            removeExpirable(holder.getExpirable());
+            try
+            {
+                holder.getExpirable().expired();
+            }
+            catch (Exception e)
+            {
+                // TODO MULE-863: What should we really do?
+                logger.debug(e.getMessage());
+            }
+        }
+    }
+
+    private static class ExpirableHolder
+    {
+
+        private Expirable expirable;
+        private long milliseconds;
+        private long created;
+
+        public ExpirableHolder(long milliseconds, Expirable expirable)
+        {
+            this.milliseconds = milliseconds;
+            this.expirable = expirable;
+            created = System.currentTimeMillis();
+        }
+
+        public long getMilliSeconds()
+        {
+            return milliseconds;
+        }
+
+        public Expirable getExpirable()
+        {
+            return expirable;
+        }
+
+        public boolean isExpired()
+        {
+            return (System.currentTimeMillis() - milliseconds) > created;
+        }
+
+        public void reset()
+        {
+            created = System.currentTimeMillis();
+        }
+    }
 }

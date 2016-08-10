@@ -14,37 +14,43 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler> {
+public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler>
+{
+    private MuleEvent event;
 
-  private MuleEvent event;
+    public OutboundAttachmentMapContext(MuleEvent event)
+    {
+        this.event = event;
+    }
 
-  public OutboundAttachmentMapContext(MuleEvent event) {
-    this.event = event;
-  }
+    @Override
+    public DataHandler doGet(String key)
+    {
+        return event.getMessage().getOutboundAttachment(key);
+    }
 
-  @Override
-  public DataHandler doGet(String key) {
-    return event.getMessage().getOutboundAttachment(key);
-  }
+    @Override
+    public void doPut(String key, DataHandler value)
+    {
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
+    }
 
-  @Override
-  public void doPut(String key, DataHandler value) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
-  }
+    @Override
+    public void doRemove(String key)
+    {
+        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
+    }
 
-  @Override
-  public void doRemove(String key) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
-  }
+    @Override
+    public Set<String> keySet()
+    {
+        return event.getMessage().getOutboundAttachmentNames();
+    }
 
-  @Override
-  public Set<String> keySet() {
-    return event.getMessage().getOutboundAttachmentNames();
-  }
-
-  @Override
-  public void clear() {
-    event.setMessage(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
-  }
+    @Override
+    public void clear()
+    {
+        event.setMessage(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
+    }
 
 }

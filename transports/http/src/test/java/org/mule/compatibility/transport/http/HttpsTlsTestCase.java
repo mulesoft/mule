@@ -16,21 +16,23 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class HttpsTlsTestCase extends FunctionalTestCase {
+public class HttpsTlsTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "https-tls-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "https-tls-config.xml";
-  }
-
-  @Test
-  public void testConfig() throws Exception {
-    Connector connector = muleContext.getRegistry().lookupObject("httpsConnector");
-    assertNotNull(connector);
-    assertTrue(connector instanceof HttpsConnector);
-    HttpsConnector https = (HttpsConnector) connector;
-    assertEquals("jks", https.getClientKeyStoreType());
-    assertEquals("JkS", https.getKeyStoreType());
-    assertEquals("JKS", https.getTrustStoreType());
-  }
+    @Test
+    public void testConfig() throws Exception
+    {
+        Connector connector = muleContext.getRegistry().lookupObject("httpsConnector");
+        assertNotNull(connector);
+        assertTrue(connector instanceof HttpsConnector);
+        HttpsConnector https = (HttpsConnector) connector;
+        assertEquals("jks", https.getClientKeyStoreType());
+        assertEquals("JkS", https.getKeyStoreType());
+        assertEquals("JKS", https.getTrustStoreType());
+    }
 }

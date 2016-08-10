@@ -24,59 +24,71 @@ import java.util.List;
 /**
  * Executes bulk queries
  */
-public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor {
+public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor
+{
 
-  public BulkUpdateExecutor(StatementFactory statementFactory) {
-    super(statementFactory);
-  }
-
-  @Override
-  public Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException {
-    Statement statement = statementFactory.create(connection, bulkQuery.getQueryTemplates().get(0));
-
-    try {
-      BulkQueryLogger queryLogger = queryLoggerFactory.createBulkQueryLogger(logger);
-
-      for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates()) {
-        String sql = queryTemplate.getSqlText();
-
-        statement.addBatch(sql);
-        queryLogger.addQuery(sql);
-      }
-
-      queryLogger.logQuery();
-
-      return statement.executeBatch();
-    } finally {
-      statement.clearBatch();
-      statement.close();
-    }
-  }
-
-  @Override
-  public Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException {
-    Statement statement = statementFactory.create(connection, query.getQueryTemplate());
-
-    if (!(statement instanceof PreparedStatement)) {
-      throw new IllegalArgumentException("Bulk update must be executed on a prepared statement");
+    public BulkUpdateExecutor(StatementFactory statementFactory)
+    {
+        super(statementFactory);
     }
 
-    PreparedStatement preparedStatement = (PreparedStatement) statement;
-    PreparedBulkQueryLogger queryLogger =
-        queryLoggerFactory.createBulkQueryLogger(logger, query.getQueryTemplate(), paramValues.size());
-    try {
-      for (List<QueryParamValue> params : paramValues) {
-        doProcessParameters(preparedStatement, query.getQueryTemplate(), params, queryLogger);
-        preparedStatement.addBatch();
-        queryLogger.addParameterSet();
-      }
+    @Override
+    public Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException
+    {
+        Statement statement = statementFactory.create(connection, bulkQuery.getQueryTemplates().get(0));
 
-      queryLogger.logQuery();
+        try
+        {
+            BulkQueryLogger queryLogger = queryLoggerFactory.createBulkQueryLogger(logger);
 
-      return preparedStatement.executeBatch();
-    } finally {
-      preparedStatement.clearParameters();
-      statement.close();
+            for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates())
+            {
+                String sql = queryTemplate.getSqlText();
+
+                statement.addBatch(sql);
+                queryLogger.addQuery(sql);
+            }
+
+            queryLogger.logQuery();
+
+            return statement.executeBatch();
+        }
+        finally
+        {
+            statement.clearBatch();
+            statement.close();
+        }
     }
-  }
+
+    @Override
+    public Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException
+    {
+        Statement statement = statementFactory.create(connection, query.getQueryTemplate());
+
+        if (!(statement instanceof PreparedStatement))
+        {
+            throw new IllegalArgumentException("Bulk update must be executed on a prepared statement");
+        }
+
+        PreparedStatement preparedStatement = (PreparedStatement) statement;
+        PreparedBulkQueryLogger queryLogger = queryLoggerFactory.createBulkQueryLogger(logger, query.getQueryTemplate(), paramValues.size());
+        try
+        {
+            for (List<QueryParamValue> params : paramValues)
+            {
+                doProcessParameters(preparedStatement, query.getQueryTemplate(), params, queryLogger);
+                preparedStatement.addBatch();
+                queryLogger.addParameterSet();
+            }
+
+            queryLogger.logQuery();
+
+            return preparedStatement.executeBatch();
+        }
+        finally
+        {
+            preparedStatement.clearParameters();
+            statement.close();
+        }
+    }
 }

@@ -10,10 +10,6 @@
     <artifactId>mule-module-db</artifactId>
     <name>Mule Database Connector</name>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

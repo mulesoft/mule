@@ -27,24 +27,23 @@ import java.net.URL;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultArtifactPluginFactoryTestCase extends AbstractMuleTestCase {
+public class DefaultArtifactPluginFactoryTestCase extends AbstractMuleTestCase
+{
+    @Test
+    public void createApplicationPlugin() throws MalformedURLException, ClassNotFoundException
+    {
+        ArtifactPluginDescriptor descriptor = mock(ArtifactPluginDescriptor.class);
+        when(descriptor.getName()).thenReturn("aPlugin");
+        URL[] urls = new URL[] { getClass().getClassLoader().getResource("lib/bar-1.0.jar") };
+        when(descriptor.getRuntimeLibs()).thenReturn(urls);
+        when(descriptor.getRuntimeClassesDir()).thenReturn(getClass().getClassLoader().getResource("org/foo/"));
 
-  @Test
-  public void createApplicationPlugin() throws MalformedURLException, ClassNotFoundException {
-    ArtifactPluginDescriptor descriptor = mock(ArtifactPluginDescriptor.class);
-    when(descriptor.getName()).thenReturn("aPlugin");
-    URL[] urls = new URL[] {getClass().getClassLoader().getResource("lib/bar-1.0.jar")};
-    when(descriptor.getRuntimeLibs()).thenReturn(urls);
-    when(descriptor.getRuntimeClassesDir()).thenReturn(getClass().getClassLoader().getResource("org/foo/"));
+        ArtifactClassLoader parentClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
+        ArtifactPlugin appPlugin = new DefaultArtifactPluginFactory(new ArtifactPluginClassLoaderFactory()).create(descriptor, parentClassLoader);
 
-    ArtifactClassLoader parentClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(),
-                                                                        new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
-    ArtifactPlugin appPlugin =
-        new DefaultArtifactPluginFactory(new ArtifactPluginClassLoaderFactory()).create(descriptor, parentClassLoader);
-
-    // Look for a class in bar-1.0.jar to check classloader has been correctly set
-    assertThat(Class.forName("org.bar.BarUtils", true, appPlugin.getArtifactClassLoader().getClassLoader()), is(notNullValue()));
-    assertThat(appPlugin.getArtifactName(), is("aPlugin"));
-    assertThat(appPlugin.getDescriptor(), is(descriptor));
-  }
+        // Look for a class in bar-1.0.jar to check classloader has been correctly set
+        assertThat(Class.forName("org.bar.BarUtils", true, appPlugin.getArtifactClassLoader().getClassLoader()), is(notNullValue()));
+        assertThat(appPlugin.getArtifactName(), is("aPlugin"));
+        assertThat(appPlugin.getDescriptor(), is(descriptor));
+    }
 }

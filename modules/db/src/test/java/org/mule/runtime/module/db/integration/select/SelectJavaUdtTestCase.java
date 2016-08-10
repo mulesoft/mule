@@ -26,42 +26,44 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
-
-  public SelectJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    List<Object[]> params = new LinkedList<>();
-    if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase
+{
+    public SelectJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
 
-    if (!getDerbyResource().isEmpty()) {
-      params.add(getDerbyResource().get(0));
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        List<Object[]> params = new LinkedList<>();
+        if (!getOracleResource().isEmpty())
+        {
+            params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+        }
+
+        if (!getDerbyResource().isEmpty())
+        {
+            params.add(getDerbyResource().get(0));
+        }
+
+        return params;
     }
 
-    return params;
-  }
+    @Override
+    protected String[] getFlowConfigurationResources()
+    {
+        return new String[] {"integration/select/select-udt-config.xml"};
+    }
 
-  @Override
-  protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/select/select-udt-config.xml"};
-  }
+    @Test
+    public void returnsMappedObject() throws Exception
+    {
+        final MuleEvent responseEvent = flowRunner("returnsUDT").withPayload(TEST_MESSAGE).run();
+        final MuleMessage response = responseEvent.getMessage();
 
-  @Test
-  public void returnsMappedObject() throws Exception {
-    final MuleEvent responseEvent = flowRunner("returnsUDT").withPayload(TEST_MESSAGE).run();
-    final MuleMessage response = responseEvent.getMessage();
-
-    assertRecords(response.getPayload(),
-                  new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()),
-                             new Field("MANAGER_NAME", SOUTHWEST_MANAGER.getName()),
-                             new Field("DETAILS", SOUTHWEST_MANAGER.getContactDetails())),
-                  new Record(new Field("REGION_NAME", NORTHWEST_MANAGER.getRegionName()),
-                             new Field("MANAGER_NAME", NORTHWEST_MANAGER.getName()),
-                             new Field("DETAILS", NORTHWEST_MANAGER.getContactDetails())));
-  }
+        assertRecords(response.getPayload(),
+                      new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()), new Field("MANAGER_NAME", SOUTHWEST_MANAGER.getName()), new Field("DETAILS", SOUTHWEST_MANAGER.getContactDetails())),
+                      new Record(new Field("REGION_NAME", NORTHWEST_MANAGER.getRegionName()), new Field("MANAGER_NAME", NORTHWEST_MANAGER.getName()), new Field("DETAILS", NORTHWEST_MANAGER.getContactDetails())));
+    }
 }

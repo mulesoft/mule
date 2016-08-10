@@ -15,37 +15,44 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * TODO
  */
-public class JaxbContextFactoryBean extends AbstractFactoryBean<JAXBContext> {
+public class JaxbContextFactoryBean extends AbstractFactoryBean<JAXBContext>
+{
+    private String packageNames;
+    private String name;
 
-  private String packageNames;
-  private String name;
-
-  @Override
-  public Class<?> getObjectType() {
-    return JAXBContext.class;
-  }
-
-  @Override
-  protected JAXBContext createInstance() throws Exception {
-    if (packageNames == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("packageNames").getMessage());
+    @Override
+    public Class<?> getObjectType()
+    {
+        return JAXBContext.class;
     }
-    return JAXBContext.newInstance(packageNames);
-  }
 
-  public String getPackageNames() {
-    return packageNames;
-  }
+    @Override
+    protected JAXBContext createInstance() throws Exception
+    {
+        if (packageNames == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("packageNames").getMessage());
+        }
+        return JAXBContext.newInstance(packageNames);
+    }
 
-  public void setPackageNames(String packageNames) {
-    this.packageNames = packageNames;
-  }
+    public String getPackageNames()
+    {
+        return packageNames;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setPackageNames(String packageNames)
+    {
+        this.packageNames = packageNames;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 }

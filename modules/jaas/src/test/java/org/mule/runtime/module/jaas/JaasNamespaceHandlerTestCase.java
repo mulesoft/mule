@@ -18,48 +18,55 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class JaasNamespaceHandlerTestCase extends FunctionalTestCase {
+public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "jaas-namespace-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "jaas-namespace-config.xml";
-  }
+    @Test
+    public void testJaasProvider()
+    {
+        knownProperties(getProvider("jaasSecurityProvider"));
+    }
 
-  @Test
-  public void testJaasProvider() {
-    knownProperties(getProvider("jaasSecurityProvider"));
-  }
+    @Test
+    public void testPasswordBasedEncryption()
+    {
+        knownProperties(getEncryptionStrategy("PBE"));
+    }
 
-  @Test
-  public void testPasswordBasedEncryption() {
-    knownProperties(getEncryptionStrategy("PBE"));
-  }
+    protected void knownProperties(EncryptionStrategy encryptionStrategy)
+    {
+        assertNotNull(encryptionStrategy);
+        assertTrue(encryptionStrategy instanceof PasswordBasedEncryptionStrategy);
+        PasswordBasedEncryptionStrategy pbe = (PasswordBasedEncryptionStrategy) encryptionStrategy;
+        assertNotNull(pbe.getName());
+        assertEquals("PBE", pbe.getName());
+    }
 
-  protected void knownProperties(EncryptionStrategy encryptionStrategy) {
-    assertNotNull(encryptionStrategy);
-    assertTrue(encryptionStrategy instanceof PasswordBasedEncryptionStrategy);
-    PasswordBasedEncryptionStrategy pbe = (PasswordBasedEncryptionStrategy) encryptionStrategy;
-    assertNotNull(pbe.getName());
-    assertEquals("PBE", pbe.getName());
-  }
+    protected void knownProperties(SecurityProvider provider)
+    {
+        assertNotNull(provider);
+        assertTrue(provider instanceof JaasSimpleAuthenticationProvider);
+        JaasSimpleAuthenticationProvider jaasProvider = (JaasSimpleAuthenticationProvider) provider;
+        assertNotNull(jaasProvider.getLoginContextName());
+        assertEquals("jaasTest", jaasProvider.getLoginContextName());
+        assertNotNull(jaasProvider.getLoginConfig());
+        assertEquals("jaas.conf", jaasProvider.getLoginConfig());
+    }
 
-  protected void knownProperties(SecurityProvider provider) {
-    assertNotNull(provider);
-    assertTrue(provider instanceof JaasSimpleAuthenticationProvider);
-    JaasSimpleAuthenticationProvider jaasProvider = (JaasSimpleAuthenticationProvider) provider;
-    assertNotNull(jaasProvider.getLoginContextName());
-    assertEquals("jaasTest", jaasProvider.getLoginContextName());
-    assertNotNull(jaasProvider.getLoginConfig());
-    assertEquals("jaas.conf", jaasProvider.getLoginConfig());
-  }
+    protected SecurityProvider getProvider(String providerName)
+    {
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getProvider(providerName);
+    }
 
-  protected SecurityProvider getProvider(String providerName) {
-    SecurityManager securityManager = muleContext.getSecurityManager();
-    return securityManager.getProvider(providerName);
-  }
-
-  protected EncryptionStrategy getEncryptionStrategy(String strategyName) {
-    SecurityManager securityManager = muleContext.getSecurityManager();
-    return securityManager.getEncryptionStrategy(strategyName);
-  }
+    protected EncryptionStrategy getEncryptionStrategy(String strategyName)
+    {
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getEncryptionStrategy(strategyName);
+    }
 }

@@ -9,23 +9,23 @@ package org.mule.compatibility.module.management.agent.mbean;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 
-public interface ConnectorServiceMBean extends Initialisable {
+public interface ConnectorServiceMBean extends Initialisable
+{
+    String DEFAULT_JMX_NAME_PREFIX = "type=Connector,name=";
 
-  String DEFAULT_JMX_NAME_PREFIX = "type=Connector,name=";
+    boolean isStarted();
 
-  boolean isStarted();
+    boolean isDisposed();
 
-  boolean isDisposed();
+    String getName();
 
-  String getName();
+    String getProtocol();
 
-  String getProtocol();
+    void startConnector() throws MuleException;
 
-  void startConnector() throws MuleException;
+    void stopConnector() throws MuleException;
 
-  void stopConnector() throws MuleException;
-
-  void dispose();
+    void dispose();
 
 
 }

@@ -15,59 +15,77 @@ import org.mule.runtime.core.util.StringUtils;
 import java.nio.charset.Charset;
 
 /**
- * <code>ObjectArrayToString</code> transformer is the opposite of StringToObjectArray - it simply converts Object[] to a String
- * in which each element is separated by a configurable delimiter (default is a space).
+ * <code>ObjectArrayToString</code> transformer is the opposite of
+ * StringToObjectArray - it simply converts Object[] to a String in which each
+ * element is separated by a configurable delimiter (default is a space).
  */
 
-public class ObjectArrayToString extends AbstractTransformer implements DiscoverableTransformer {
+public class ObjectArrayToString extends AbstractTransformer implements DiscoverableTransformer
+{
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-  /** Give core transformers a slighty higher priority */
-  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+    private static final String DEFAULT_DELIMITER = " ";
 
-  private static final String DEFAULT_DELIMITER = " ";
+    private String delimiter = null;
 
-  private String delimiter = null;
-
-  public ObjectArrayToString() {
-    registerSourceType(DataType.fromType(Object[].class));
-    setReturnDataType(DataType.STRING);
-  }
-
-  @Override
-  public Object doTransform(Object src, Charset encoding) throws TransformerException {
-    if (src == null) {
-      return src;
+    public ObjectArrayToString()
+    {
+        registerSourceType(DataType.fromType(Object[].class));
+        setReturnDataType(DataType.STRING);
     }
 
-    Object[] in = (Object[]) src;
-    String out = StringUtils.join(in, getDelimiter());
+    @Override
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
+    {
+        if (src == null)
+        {
+            return src;
+        }
 
-    /*
-     * for (int i = 0; i < in.length; i++) { if (in[i] != null) { if (i > 0) out += getDelimiter(); out += in[i].toString(); } }
-     */
+        Object[] in = (Object[]) src;
+        String out = StringUtils.join(in, getDelimiter());
 
-    return out;
-  }
+        /*
+        for (int i = 0; i < in.length; i++)
+        {
+            if (in[i] != null)
+            {
+                if (i > 0) out += getDelimiter();
+                out += in[i].toString();
+            }
+        }
+        */
 
-  public String getDelimiter() {
-    if (delimiter == null) {
-      return DEFAULT_DELIMITER;
-    } else {
-      return delimiter;
+        return out;
     }
-  }
 
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
-  }
+    public String getDelimiter()
+    {
+        if (delimiter == null)
+        {
+            return DEFAULT_DELIMITER;
+        }
+        else
+        {
+            return delimiter;
+        }
+    }
 
-  @Override
-  public int getPriorityWeighting() {
-    return priorityWeighting;
-  }
+    public void setDelimiter(String delimiter)
+    {
+        this.delimiter = delimiter;
+    }
 
-  @Override
-  public void setPriorityWeighting(int priorityWeighting) {
-    this.priorityWeighting = priorityWeighting;
-  }
+    @Override
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    @Override
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

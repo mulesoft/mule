@@ -13,76 +13,89 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Statistics common to flows and services
  */
-public abstract class AbstractFlowConstructStatistics implements Statistics {
+public abstract class AbstractFlowConstructStatistics implements Statistics
+{
+    private static final long serialVersionUID = 5337576392583767442L;
 
-  private static final long serialVersionUID = 5337576392583767442L;
+    protected final String flowConstructType;
+    protected String name;
+    protected boolean enabled = false;
+    private long samplePeriod = 0;
+    protected final AtomicLong receivedEventSync = new AtomicLong(0);
+    protected final AtomicLong receivedEventASync = new AtomicLong(0);
 
-  protected final String flowConstructType;
-  protected String name;
-  protected boolean enabled = false;
-  private long samplePeriod = 0;
-  protected final AtomicLong receivedEventSync = new AtomicLong(0);
-  protected final AtomicLong receivedEventASync = new AtomicLong(0);
+    public AbstractFlowConstructStatistics(String flowConstructType, String name)
+    {
+        this.name = name;
+        this.flowConstructType = flowConstructType;
+    }
 
-  public AbstractFlowConstructStatistics(String flowConstructType, String name) {
-    this.name = name;
-    this.flowConstructType = flowConstructType;
-  }
+    /**
+     * Enable statistics logs (this is a dynamic parameter)
+     */
+    public synchronized void setEnabled(boolean b)
+    {
+        enabled = b;
+    }
 
-  /**
-   * Enable statistics logs (this is a dynamic parameter)
-   */
-  public synchronized void setEnabled(boolean b) {
-    enabled = b;
-  }
+    /**
+     * Are statistics logged
+     */
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
 
-  /**
-   * Are statistics logged
-   */
-  public boolean isEnabled() {
-    return enabled;
-  }
+    public synchronized String getName()
+    {
+        return name;
+    }
 
-  public synchronized String getName() {
-    return name;
-  }
+    public synchronized void setName(String name)
+    {
+        this.name = name;
+    }
 
-  public synchronized void setName(String name) {
-    this.name = name;
-  }
-
-  public synchronized void clear() {
-    receivedEventSync.set(0);
-    receivedEventASync.set(0);
-    samplePeriod = System.currentTimeMillis();
-  }
+    public synchronized void clear()
+    {
+        receivedEventSync.set(0);
+        receivedEventASync.set(0);
+        samplePeriod = System.currentTimeMillis();
+    }
 
 
-  public void incReceivedEventSync() {
-    receivedEventSync.addAndGet(1);
-  }
+    public void incReceivedEventSync()
+    {
+        receivedEventSync.addAndGet(1);
+    }
 
-  public void incReceivedEventASync() {
-    receivedEventASync.addAndGet(1);
-  }
+    public void incReceivedEventASync()
+    {
+        receivedEventASync.addAndGet(1);
+    }
 
-  public long getAsyncEventsReceived() {
-    return receivedEventASync.get();
-  }
+    public long getAsyncEventsReceived()
+    {
+        return receivedEventASync.get();
+    }
 
-  public long getSyncEventsReceived() {
-    return receivedEventSync.get();
-  }
+    public long getSyncEventsReceived()
+    {
+        return receivedEventSync.get();
+    }
 
-  public long getTotalEventsReceived() {
-    return getSyncEventsReceived() + getAsyncEventsReceived();
-  }
+    public long getTotalEventsReceived()
+    {
+        return getSyncEventsReceived() + getAsyncEventsReceived();
+    }
 
-  public String getFlowConstructType() {
-    return flowConstructType;
-  }
+    public String getFlowConstructType()
+    {
+        return flowConstructType;
+    }
 
-  public long getSamplePeriod() {
-    return System.currentTimeMillis() - samplePeriod;
-  }
+    public long getSamplePeriod()
+    {
+        return System.currentTimeMillis() - samplePeriod;
+    }
 }

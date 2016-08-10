@@ -21,13 +21,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for simpleRestrictionType complex type.
+ * <p>Java class for simpleRestrictionType complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="simpleRestrictionType">
  *   &lt;complexContent>
@@ -47,6 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "simpleRestrictionType")
-public class SimpleRestrictionType extends RestrictionType {
+public class SimpleRestrictionType extends RestrictionType
+{
 
 }

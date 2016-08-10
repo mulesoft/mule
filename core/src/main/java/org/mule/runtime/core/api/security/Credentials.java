@@ -9,11 +9,11 @@ package org.mule.runtime.core.api.security;
 /**
  * <code>Credentials</code> holds credentials information for a user.
  */
-public interface Credentials {
+public interface Credentials
+{
+    String getUsername();
 
-  String getUsername();
+    char[] getPassword();
 
-  char[] getPassword();
-
-  Object getRoles();
+    Object getRoles();
 }

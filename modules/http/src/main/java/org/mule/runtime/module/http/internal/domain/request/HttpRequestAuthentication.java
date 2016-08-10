@@ -9,63 +9,75 @@ package org.mule.runtime.module.http.internal.domain.request;
 import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
 
 
-public class HttpRequestAuthentication {
+public class HttpRequestAuthentication
+{
+    private final HttpAuthenticationType type;
 
-  private final HttpAuthenticationType type;
+    private String username;
+    private String password;
+    private String domain;
+    private String workstation;
+    private boolean preemptive;
 
-  private String username;
-  private String password;
-  private String domain;
-  private String workstation;
-  private boolean preemptive;
+    public HttpRequestAuthentication(HttpAuthenticationType type)
+    {
+        this.type = type;
+    }
 
-  public HttpRequestAuthentication(HttpAuthenticationType type) {
-    this.type = type;
-  }
+    public String getUsername()
+    {
+        return username;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public String getPassword()
+    {
+        return password;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public String getDomain()
+    {
+        return domain;
+    }
 
-  public String getDomain() {
-    return domain;
-  }
+    public void setDomain(String domain)
+    {
+        this.domain = domain;
+    }
 
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
+    public HttpAuthenticationType getType()
+    {
+        return type;
+    }
 
-  public HttpAuthenticationType getType() {
-    return type;
-  }
+    public String getWorkstation()
+    {
+        return workstation;
+    }
 
-  public String getWorkstation() {
-    return workstation;
-  }
+    public void setWorkstation(String workstation)
+    {
+        this.workstation = workstation;
+    }
 
-  public void setWorkstation(String workstation) {
-    this.workstation = workstation;
-  }
+    public boolean isPreemptive()
+    {
+        return preemptive;
+    }
 
-  public boolean isPreemptive() {
-    return preemptive;
-  }
-
-  public void setPreemptive(boolean preemptive) {
-    this.preemptive = preemptive;
-  }
+    public void setPreemptive(boolean preemptive)
+    {
+        this.preemptive = preemptive;
+    }
 
 
 }

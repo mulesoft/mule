@@ -20,25 +20,27 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TransformationContentTypeTestCase extends AbstractIntegrationTestCase {
+public class TransformationContentTypeTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "content-type-setting-transformer-configs.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "content-type-setting-transformer-configs.xml";
-  }
+    @Test
+    public void testReturnType() throws Exception
+    {
+        Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
+        assertNotNull(trans);
+        String inputMessage = "ABCDEF";
+        byte[] array = (byte[]) trans.transform(inputMessage);
 
-  @Test
-  public void testReturnType() throws Exception {
-    Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
-    assertNotNull(trans);
-    String inputMessage = "ABCDEF";
-    byte[] array = (byte[]) trans.transform(inputMessage);
-
-    MuleMessage message = MuleMessage.builder().payload(inputMessage).build();
-    List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
-    message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));
-    assertThat(message.getDataType().getMediaType().getSubType(), is("plain"));
-    assertThat(message.getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
-  }
+        MuleMessage message = MuleMessage.builder().payload(inputMessage).build();
+        List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
+        message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
+        assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));
+        assertThat(message.getDataType().getMediaType().getSubType(), is("plain"));
+        assertThat(message.getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
+    }
 }

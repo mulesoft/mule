@@ -8,23 +8,27 @@ package org.mule.runtime.core.api.store;
 
 import org.mule.runtime.core.config.i18n.Message;
 
-public class ObjectDoesNotExistException extends ObjectStoreException {
+public class ObjectDoesNotExistException extends ObjectStoreException
+{
+    public ObjectDoesNotExistException()
+    {
+        super();
+    }
 
-  public ObjectDoesNotExistException() {
-    super();
-  }
+    public ObjectDoesNotExistException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-  public ObjectDoesNotExistException(Message message, Throwable cause) {
-    super(message, cause);
-  }
+    public ObjectDoesNotExistException(Message message)
+    {
+        super(message);
+    }
 
-  public ObjectDoesNotExistException(Message message) {
-    super(message);
-  }
-
-  public ObjectDoesNotExistException(Throwable cause) {
-    super(cause);
-  }
+    public ObjectDoesNotExistException(Throwable cause)
+    {
+        super(cause);
+    }
 }
 
 

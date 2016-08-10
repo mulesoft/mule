@@ -9,18 +9,21 @@ package org.mule.runtime.core.transaction.constraints;
 import org.mule.runtime.core.api.MuleEvent;
 
 // @ThreadSafe
-public class ConstraintFilter implements Cloneable {
+public class ConstraintFilter implements Cloneable
+{
+    public ConstraintFilter()
+    {
+        super();
+    }
 
-  public ConstraintFilter() {
-    super();
-  }
+    public boolean accept(MuleEvent event)
+    {
+        return true;
+    }
 
-  public boolean accept(MuleEvent event) {
-    return true;
-  }
-
-  public Object clone() throws CloneNotSupportedException {
-    return super.clone();
-  }
+    public Object clone() throws CloneNotSupportedException
+    {
+        return super.clone();
+    }
 
 }

@@ -6,25 +6,30 @@
  */
 package org.mule.test.integration.transaction.xa;
 
-public class CompositeTransactionalTestSetUp implements TransactionalTestSetUp {
+public class CompositeTransactionalTestSetUp implements TransactionalTestSetUp
+{
+    private final TransactionalTestSetUp[] testSetUps;
 
-  private final TransactionalTestSetUp[] testSetUps;
-
-  public CompositeTransactionalTestSetUp(TransactionalTestSetUp... testSetUps) {
-    this.testSetUps = testSetUps;
-  }
-
-  @Override
-  public void initialize() throws Exception {
-    for (TransactionalTestSetUp setUp : testSetUps) {
-      setUp.initialize();
+    public CompositeTransactionalTestSetUp(TransactionalTestSetUp... testSetUps)
+    {
+        this.testSetUps = testSetUps;
     }
-  }
 
-  @Override
-  public void finalice() throws Exception {
-    for (TransactionalTestSetUp setUp : testSetUps) {
-      setUp.finalice();
+    @Override
+    public void initialize() throws Exception
+    {
+        for (TransactionalTestSetUp setUp : testSetUps)
+        {
+            setUp.initialize();
+        }
     }
-  }
+
+    @Override
+    public void finalice() throws Exception
+    {
+        for (TransactionalTestSetUp setUp : testSetUps)
+        {
+            setUp.finalice();
+        }
+    }
 }

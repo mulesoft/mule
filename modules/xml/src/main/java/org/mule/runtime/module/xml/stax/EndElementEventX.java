@@ -13,16 +13,18 @@ import javanet.staxutils.events.EndElementEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Namespace;
 
-public class EndElementEventX extends EndElementEvent {
+public class EndElementEventX extends EndElementEvent
+{
+    private List<Namespace> namespaces2;
 
-  private List<Namespace> namespaces2;
+    public EndElementEventX(QName name, List<Namespace> namespaces)
+    {
+        super(name, namespaces.iterator());
+        this.namespaces2 = namespaces;
+    }
 
-  public EndElementEventX(QName name, List<Namespace> namespaces) {
-    super(name, namespaces.iterator());
-    this.namespaces2 = namespaces;
-  }
-
-  public List<Namespace> getNamespaceList() {
-    return namespaces2;
-  }
+    public List<Namespace> getNamespaceList()
+    {
+        return namespaces2;
+    }
 }

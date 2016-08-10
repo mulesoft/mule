@@ -13,29 +13,33 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.SystemPropertyUtils;
 import org.w3c.dom.Element;
 
-public class GlobalPropertyDefinitionParser extends MuleOrphanDefinitionParser {
+public class GlobalPropertyDefinitionParser extends MuleOrphanDefinitionParser
+{
+    private final String VALUE_ATTR = "value";
+    private final String NAME_ATTR = "name";
 
-  private final String VALUE_ATTR = "value";
-  private final String NAME_ATTR = "name";
-
-  public GlobalPropertyDefinitionParser() {
-    super(true);
-    addIgnored(NAME_ATTR);
-    addIgnored(VALUE_ATTR);
-  }
-
-  protected Class getBeanClass(Element element) {
-    return String.class;
-  }
-
-  protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
-    String name = element.getAttribute(NAME_ATTR);
-    if (name.indexOf(' ') != -1) {
-      logger.warn("Environment property name should not contain spaces: \"" + name + "\"");
+    public GlobalPropertyDefinitionParser()
+    {
+        super(true);
+        addIgnored(NAME_ATTR);
+        addIgnored(VALUE_ATTR);
     }
 
-    String value = element.getAttribute(VALUE_ATTR);
-    assembler.getBean().addConstructorArgValue(SystemPropertyUtils.resolvePlaceholders(value));
-    super.postProcess(context, assembler, element);
-  }
+    protected Class getBeanClass(Element element)
+    {
+        return String.class;
+    }
+
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
+    {
+        String name = element.getAttribute(NAME_ATTR);
+        if(name.indexOf(' ') != -1)
+        {
+            logger.warn("Environment property name should not contain spaces: \"" + name + "\"");
+        }
+
+        String value = element.getAttribute(VALUE_ATTR);
+        assembler.getBean().addConstructorArgValue(SystemPropertyUtils.resolvePlaceholders(value));
+        super.postProcess(context, assembler, element);
+    }
 }

@@ -17,10 +17,6 @@
     <name>Mule Sockets Extension</name>
     <description>A Mule extension that provides functionality to manage TCP and UDP connections</description>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

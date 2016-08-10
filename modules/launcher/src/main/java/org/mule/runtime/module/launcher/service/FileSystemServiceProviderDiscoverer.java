@@ -31,80 +31,93 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 /**
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
  */
-public class FileSystemServiceProviderDiscoverer implements ServiceProviderDiscoverer {
+public class FileSystemServiceProviderDiscoverer implements ServiceProviderDiscoverer
+{
 
-  private final ArtifactClassLoader apiClassLoader;
-  private ServiceClassLoaderFactory serviceClassLoaderFactory = new ServiceClassLoaderFactory();
+    private final ArtifactClassLoader apiClassLoader;
+    private ServiceClassLoaderFactory serviceClassLoaderFactory = new ServiceClassLoaderFactory();
 
-  /**
-   * Creates a new instance.
-   *
-   * @param containerClassLoader container artifact classLoader. Non null.
-   * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
-   */
-  public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
-                                             ServiceClassLoaderFactory serviceClassLoaderFactory) {
-    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
-    this.apiClassLoader = containerClassLoader;
-    this.serviceClassLoaderFactory = serviceClassLoaderFactory;
-  }
-
-  @Override
-  public List<ServiceProvider> discover() throws ServiceResolutionError {
-    final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory();
-
-    final List<ServiceDescriptor> serviceDescriptors = new LinkedList<>();
-
-    for (String serviceFile : getServicesFolder().list(new SuffixFileFilter(".zip"))) {
-      final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
-      try {
-        unzip(new File(getServicesFolder(), serviceFile), tempFolder);
-      } catch (IOException e) {
-        throw new ServiceResolutionError("Error processing service ZIP file", e);
-      }
-
-      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder);
-      serviceDescriptors.add(serviceDescriptor);
+    /**
+     * Creates a new instance.
+     *
+     * @param containerClassLoader container artifact classLoader. Non null.
+     * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
+     */
+    public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader, ServiceClassLoaderFactory serviceClassLoaderFactory)
+    {
+        checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+        checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
+        this.apiClassLoader = containerClassLoader;
+        this.serviceClassLoaderFactory = serviceClassLoaderFactory;
     }
 
-    return createServiceProviders(serviceDescriptors, serviceClassLoaderFactory);
-  }
+    @Override
+    public List<ServiceProvider> discover() throws ServiceResolutionError
+    {
+        final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory();
 
-  private List<ServiceProvider> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                       ServiceClassLoaderFactory serviceClassLoaderFactory)
-      throws ServiceResolutionError {
-    List<ServiceProvider> serviceProviders = new LinkedList<>();
-    for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
-      final ArtifactClassLoader serviceClassLoader = serviceClassLoaderFactory.create(apiClassLoader, serviceDescriptor);
-      final ServiceProvider serviceProvider =
-          instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
+        final List<ServiceDescriptor> serviceDescriptors = new LinkedList<>();
 
-      serviceProviders.add(serviceProvider);
-    }
-    return serviceProviders;
-  }
+        for (String serviceFile : getServicesFolder().list(new SuffixFileFilter(".zip")))
+        {
+            final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
+            try
+            {
+                unzip(new File(getServicesFolder(), serviceFile), tempFolder);
+            }
+            catch (IOException e)
+            {
+                throw new ServiceResolutionError("Error processing service ZIP file", e);
+            }
 
-  private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {
-    Object reflectedObject;
-    try {
-      reflectedObject = withContextClassLoader(classLoader, () -> {
-        try {
-          return instanciateClass(className);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
+            final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder);
+            serviceDescriptors.add(serviceDescriptor);
         }
-      });
-    } catch (RuntimeException e) {
-      throw new ServiceResolutionError(e.getMessage());
+
+        return createServiceProviders(serviceDescriptors, serviceClassLoaderFactory);
     }
 
-    if (!(reflectedObject instanceof ServiceProvider)) {
-      throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className,
-                                              ServiceProvider.class.getName()));
+    private List<ServiceProvider> createServiceProviders(List<ServiceDescriptor> serviceDescriptors, ServiceClassLoaderFactory serviceClassLoaderFactory) throws ServiceResolutionError
+    {
+        List<ServiceProvider> serviceProviders = new LinkedList<>();
+        for (ServiceDescriptor serviceDescriptor : serviceDescriptors)
+        {
+            final ArtifactClassLoader serviceClassLoader = serviceClassLoaderFactory.create(apiClassLoader, serviceDescriptor);
+            final ServiceProvider serviceProvider = instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
+
+            serviceProviders.add(serviceProvider);
+        }
+        return serviceProviders;
     }
 
-    return (ServiceProvider) reflectedObject;
-  }
+    private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError
+    {
+        Object reflectedObject;
+        try
+        {
+            reflectedObject = withContextClassLoader(classLoader, () ->
+            {
+                try
+                {
+                    return instanciateClass(className);
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
+                }
+            });
+        }
+        catch (RuntimeException e)
+        {
+            throw new ServiceResolutionError(e.getMessage());
+        }
+
+        if (!(reflectedObject instanceof ServiceProvider))
+        {
+            throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className, ServiceProvider.class.getName()));
+        }
+
+        return (ServiceProvider) reflectedObject;
+    }
 
 }

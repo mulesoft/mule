@@ -21,40 +21,48 @@ import org.hamcrest.Matcher;
 import org.junit.internal.matchers.TypeSafeMatcher;
 
 
-public class FileContainsInLine extends TypeSafeMatcher<File> {
+public class FileContainsInLine extends TypeSafeMatcher<File>
+{
+    private final Matcher<String> stringMatcher;
 
-  private final Matcher<String> stringMatcher;
-
-  @Factory
-  public static Matcher<File> hasLine(Matcher<String> matcher) {
-    return new FileContainsInLine(matcher);
-  }
-
-  private FileContainsInLine(Matcher<String> matcher) {
-    stringMatcher = matcher;
-  }
-
-
-  @Override
-  public void describeTo(Description description) {
-    description.appendText("a file where a line ").appendDescriptionOf(stringMatcher);
-  }
-
-  @Override
-  public boolean matchesSafely(File file) {
-    String line;
-    try (BufferedReader reader = Files.newBufferedReader(file.toPath(), defaultCharset())) {
-
-      while ((line = reader.readLine()) != null) {
-        if (stringMatcher.matches(line)) {
-          return true;
-        }
-      }
-    } catch (IOException e) {
-      fail(String.format("Exception %s caught while reading the file %s trying to match its line with the matcher %s",
-                         e.getMessage(), file.getAbsolutePath(), stringMatcher.toString()));
-      return false;
+    @Factory
+    public static Matcher<File> hasLine(Matcher<String> matcher)
+    {
+        return new FileContainsInLine(matcher);
     }
-    return false;
-  }
+
+    private FileContainsInLine(Matcher<String> matcher)
+    {
+        stringMatcher = matcher;
+    }
+
+
+    @Override
+    public void describeTo(Description description)
+    {
+       description.appendText("a file where a line ").appendDescriptionOf(stringMatcher);
+    }
+
+    @Override
+    public boolean matchesSafely(File file)
+    {
+        String line;
+        try(BufferedReader reader = Files.newBufferedReader(file.toPath(), defaultCharset()))
+        {
+
+            while ((line = reader.readLine()) != null)
+            {
+                if (stringMatcher.matches(line))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            fail(String.format("Exception %s caught while reading the file %s trying to match its line with the matcher %s",e.getMessage(),file.getAbsolutePath(),stringMatcher.toString()));
+            return false;
+        }
+        return false;
+    }
 }

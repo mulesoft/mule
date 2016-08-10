@@ -14,23 +14,30 @@ import java.sql.SQLException;
 /**
  * Defines a data type that was resolved for a database instance
  */
-public class ResolvedDbType extends AbstractDbType {
+public class ResolvedDbType extends AbstractDbType
+{
 
-  public ResolvedDbType(int id, String name) {
-    super(id, name);
-  }
-
-  @Override
-  public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
-    if (value == null) {
-      statement.setNull(index, id);
-    } else {
-      statement.setObject(index, value, id);
+    public ResolvedDbType(int id, String name)
+    {
+        super(id, name);
     }
-  }
 
-  @Override
-  public Object getParameterValue(CallableStatement statement, int index) throws SQLException {
-    return statement.getObject(index);
-  }
+    @Override
+    public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
+    {
+        if (value == null)
+        {
+            statement.setNull(index, id);
+        }
+        else
+        {
+            statement.setObject(index, value, id);
+        }
+    }
+
+    @Override
+    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
+    {
+        return statement.getObject(index);
+    }
 }

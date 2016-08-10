@@ -9,10 +9,11 @@ package org.mule.runtime.core.api.util;
 /**
  * Closes a stream. A stream closer can close multiple stream types.
  */
-public interface StreamCloser {
+public interface StreamCloser
+{
 
-  boolean canClose(Class<?> streamType);
+    boolean canClose(Class<?> streamType);
 
-  void close(Object stream) throws Exception;
+    void close(Object stream) throws Exception;
 
 }

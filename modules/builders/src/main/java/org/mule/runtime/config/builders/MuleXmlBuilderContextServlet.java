@@ -13,36 +13,45 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class MuleXmlBuilderContextServlet extends HttpServlet {
+public class MuleXmlBuilderContextServlet extends HttpServlet
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2446689032349402434L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -2446689032349402434L;
+    private MuleXmlBuilderContextListener contextListener;
 
-  private MuleXmlBuilderContextListener contextListener;
-
-  @Override
-  public void init() throws ServletException {
-    if (contextListener != null) {
-      contextListener.destroy();
-      contextListener = null;
+    @Override
+    public void init() throws ServletException
+    {
+        if (contextListener != null)
+        {
+            contextListener.destroy();
+            contextListener = null;
+        }
+        contextListener = new MuleXmlBuilderContextListener();
+        contextListener.initialize(getServletContext());
     }
-    contextListener = new MuleXmlBuilderContextListener();
-    contextListener.initialize(getServletContext());
-  }
 
-  @Override
-  protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    getServletContext().log("(" + request.getRequestURI() + ")"
-        + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
-    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-  }
-
-  @Override
-  public void destroy() {
-    if (contextListener != null) {
-      contextListener.destroy();
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        getServletContext().log(
+            "("
+            + request.getRequestURI()
+            + ")"
+            + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
-  }
+
+    @Override
+    public void destroy()
+    {
+        if (contextListener != null)
+        {
+            contextListener.destroy();
+        }
+    }
 }

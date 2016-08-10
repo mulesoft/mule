@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.transaction.lookup;
 
-public class WeblogicTransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory {
-
-  public WeblogicTransactionManagerLookupFactory() {
-    setJndiName("javax.transaction.TransactionManager");
-  }
+public class WeblogicTransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
+{
+    public WeblogicTransactionManagerLookupFactory()
+    {
+        setJndiName("javax.transaction.TransactionManager");
+    }
 }

@@ -13,31 +13,36 @@ import org.mule.runtime.core.api.MuleEventContext;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SaveCertificateCallback implements EventCallback {
+public class SaveCertificateCallback implements EventCallback
+{
+    private AtomicReference<Object> certificates;
+    private AtomicBoolean called;
 
-  private AtomicReference<Object> certificates;
-  private AtomicBoolean called;
+    public SaveCertificateCallback()
+    {
+        clear();
+    }
 
-  public SaveCertificateCallback() {
-    clear();
-  }
+    @Override
+    public void eventReceived(MuleEventContext context, Object component) throws Exception
+    {
+        certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
+        called.set(true);
+    }
 
-  @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
-    certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
-    called.set(true);
-  }
+    public void clear()
+    {
+        certificates = new AtomicReference<Object>();
+        called = new AtomicBoolean(false);
+    }
 
-  public void clear() {
-    certificates = new AtomicReference<Object>();
-    called = new AtomicBoolean(false);
-  }
+    public boolean isCalled()
+    {
+        return called.get();
+    }
 
-  public boolean isCalled() {
-    return called.get();
-  }
-
-  public Object getCertificates() {
-    return certificates.get();
-  }
+    public Object getCertificates()
+    {
+        return certificates.get();
+    }
 }

@@ -10,9 +10,10 @@ import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityContextFactory;
 
-public class DefaultSecurityContextFactory implements SecurityContextFactory {
-
-  public final SecurityContext create(Authentication authentication) {
-    return new DefaultSecurityContext(authentication);
-  }
+public class DefaultSecurityContextFactory implements SecurityContextFactory
+{
+    public final SecurityContext create(Authentication authentication)
+    {
+        return new DefaultSecurityContext(authentication);
+    }
 }

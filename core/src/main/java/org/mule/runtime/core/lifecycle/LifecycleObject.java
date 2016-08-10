@@ -10,55 +10,68 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.util.ClassUtils;
 
-public class LifecycleObject {
+public class LifecycleObject
+{
+    
+    private Class type;
+    private ServerNotification preNotification;
+    private ServerNotification postNotification;
 
-  private Class type;
-  private ServerNotification preNotification;
-  private ServerNotification postNotification;
-
-  public LifecycleObject(Class type) {
-    this.type = type;
-  }
-
-  public ServerNotification getPostNotification() {
-    return postNotification;
-  }
-
-  public void setPostNotification(ServerNotification postNotification) {
-    this.postNotification = postNotification;
-  }
-
-  public ServerNotification getPreNotification() {
-    return preNotification;
-  }
-
-  public void setPreNotification(ServerNotification preNotification) {
-    this.preNotification = preNotification;
-  }
-
-  public Class getType() {
-    return type;
-  }
-
-  public void setType(Class type) {
-    this.type = type;
-  }
-
-  public void firePreNotification(MuleContext context) {
-    if (preNotification != null) {
-      context.fireNotification(preNotification);
+    public LifecycleObject(Class type)
+    {
+        this.type = type;
     }
-  }
 
-  public void firePostNotification(MuleContext context) {
-    if (postNotification != null) {
-      context.fireNotification(postNotification);
+    public ServerNotification getPostNotification()
+    {
+        return postNotification;
     }
-  }
 
-  @Override
-  public String toString() {
-    return super.toString() + " (" + ClassUtils.getSimpleName(type) + ")";
-  }
+    public void setPostNotification(ServerNotification postNotification)
+    {
+        this.postNotification = postNotification;
+    }
 
+    public ServerNotification getPreNotification()
+    {
+        return preNotification;
+    }
+
+    public void setPreNotification(ServerNotification preNotification)
+    {
+        this.preNotification = preNotification;
+    }
+
+    public Class getType()
+    {
+        return type;
+    }
+
+    public void setType(Class type)
+    {
+        this.type = type;
+    }
+
+    public void firePreNotification(MuleContext context)
+    {
+        if(preNotification!=null)
+        {
+            context.fireNotification(preNotification);
+        }
+    }
+
+    public void firePostNotification(MuleContext context)
+    {
+        if(postNotification!=null)
+        {
+            context.fireNotification(postNotification);
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " (" + ClassUtils.getSimpleName(type) + ")";
+    }
+        
 }

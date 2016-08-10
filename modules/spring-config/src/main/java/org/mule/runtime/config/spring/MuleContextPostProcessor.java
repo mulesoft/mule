@@ -13,34 +13,40 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * Responsible for passing in the MuleContext instance for all objects in the registry that want it. For an object to get an
- * instance of the MuleContext it must implement MuleContextAware.
+ * Responsible for passing in the MuleContext instance for all objects in the
+ * registry that want it. For an object to get an instance of the MuleContext
+ * it must implement MuleContextAware.
  * 
  * @see MuleContextAware
  * @see org.mule.runtime.core.api.MuleContext
  */
-public class MuleContextPostProcessor implements BeanPostProcessor {
+public class MuleContextPostProcessor implements BeanPostProcessor
+{
+    private MuleContext muleContext;
 
-  private MuleContext muleContext;
-
-  public MuleContextPostProcessor(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-    if (bean instanceof MuleContextAware) {
-      if (muleContext == null) {
-        return bean;
-      }
-
-      ((MuleContextAware) bean).setMuleContext(muleContext);
+    public MuleContextPostProcessor(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
-    return bean;
-  }
 
-  @Override
-  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-    return bean;
-  }
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
+    {
+        if (bean instanceof MuleContextAware)
+        {
+            if (muleContext == null)
+            {
+                return bean;
+            }
+
+            ((MuleContextAware) bean).setMuleContext(muleContext);
+        }
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
+    {
+        return bean;
+    }
 }

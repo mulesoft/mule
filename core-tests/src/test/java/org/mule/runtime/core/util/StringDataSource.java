@@ -13,43 +13,50 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class StringDataSource implements DataSource {
+public class StringDataSource implements DataSource
+{
+    protected String content;
+    protected String contentType = "text/plain";
+    protected String name = "StringDataSource";
 
-  protected String content;
-  protected String contentType = "text/plain";
-  protected String name = "StringDataSource";
+    public StringDataSource(String payload)
+    {
+        super();
+        content = payload;
+    }
 
-  public StringDataSource(String payload) {
-    super();
-    content = payload;
-  }
+    public StringDataSource(String payload, String name)
+    {
+        super();
+        content = payload;
+        this.name = name;
+    }
 
-  public StringDataSource(String payload, String name) {
-    super();
-    content = payload;
-    this.name = name;
-  }
+    public StringDataSource(String content, String name, String contentType)
+    {
+        this.content = content;
+        this.contentType = contentType;
+        this.name = name;
+    }
 
-  public StringDataSource(String content, String name, String contentType) {
-    this.content = content;
-    this.contentType = contentType;
-    this.name = name;
-  }
+    public InputStream getInputStream() throws IOException
+    {
+        return new ByteArrayInputStream(content.getBytes());
+    }
 
-  public InputStream getInputStream() throws IOException {
-    return new ByteArrayInputStream(content.getBytes());
-  }
+    public OutputStream getOutputStream()
+    {
+        throw new UnsupportedOperationException("Read-only javax.activation.DataSource");
+    }
 
-  public OutputStream getOutputStream() {
-    throw new UnsupportedOperationException("Read-only javax.activation.DataSource");
-  }
+    public String getContentType()
+    {
+        return contentType;
+    }
 
-  public String getContentType() {
-    return contentType;
-  }
-
-  public String getName() {
-    return name;
-  }
+    public String getName()
+    {
+        return name;
+    }
 }
 

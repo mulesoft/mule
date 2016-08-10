@@ -12,23 +12,27 @@ import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 /**
  * Restrict exceptions to debug log messages
  */
-public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy {
+public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
+{
+    public QuietExceptionStrategy()
+    {
+        super(null);
+    }
 
-  public QuietExceptionStrategy() {
-    super(null);
-  }
+    @Override
+    protected void doHandleException(Exception e, MuleEvent event)
+    {
+        logger.debug("Ignoring", e);
+    }
 
-  @Override
-  protected void doHandleException(Exception e, MuleEvent event) {
-    logger.debug("Ignoring", e);
-  }
+    @Override
+    protected void doLogException(Throwable t)
+    {
+        logger.debug("Ignoring", t);
+    }
 
-  @Override
-  protected void doLogException(Throwable t) {
-    logger.debug("Ignoring", t);
-  }
-
-  public boolean isRedeliver() {
-    return false;
-  }
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }

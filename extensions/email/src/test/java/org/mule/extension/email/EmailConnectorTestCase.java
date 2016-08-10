@@ -25,38 +25,42 @@ import com.icegreen.greenmail.util.ServerSetup;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestCase
+{
+    @Rule
+    public DynamicPort PORT = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort PORT = new DynamicPort("port");
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+    protected GreenMail server;
+    protected GreenMailUser user;
 
-  protected GreenMail server;
-  protected GreenMailUser user;
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        ServerSetup serverSetup = setUpServer(PORT.getNumber(), getProtocol());
+        server = new GreenMail(serverSetup);
+        server.start();
+        user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, "password");
+    }
 
-  @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    ServerSetup serverSetup = setUpServer(PORT.getNumber(), getProtocol());
-    server = new GreenMail(serverSetup);
-    server.start();
-    user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, "password");
-  }
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
+        assertThat(server, is(not(nullValue())));
+        server.stop();
+    }
 
-  @Override
-  protected void doTearDownAfterMuleContextDispose() throws Exception {
-    assertThat(server, is(not(nullValue())));
-    server.stop();
-  }
+    protected void assertBodyContent(String content)
+    {
+        assertThat(content, is(EMAIL_CONTENT));
+    }
 
-  protected void assertBodyContent(String content) {
-    assertThat(content, is(EMAIL_CONTENT));
-  }
+    protected void assertSubject(String content)
+    {
+        assertThat(content, is(EMAIL_SUBJECT));
+    }
 
-  protected void assertSubject(String content) {
-    assertThat(content, is(EMAIL_SUBJECT));
-  }
-
-  public abstract String getProtocol();
+    public abstract String getProtocol();
 }

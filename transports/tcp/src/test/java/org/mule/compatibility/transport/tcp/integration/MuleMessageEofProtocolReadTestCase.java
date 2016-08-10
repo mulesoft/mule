@@ -9,15 +9,17 @@ package org.mule.compatibility.transport.tcp.integration;
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.compatibility.transport.tcp.protocols.EOFProtocol;
 
-public class MuleMessageEofProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase {
+public class MuleMessageEofProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "mule-message-eof-protocol-read-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "mule-message-eof-protocol-read-config.xml";
-  }
-
-  @Override
-  protected TcpProtocol createMuleMessageProtocol() {
-    return new EOFProtocol();
-  }
+    @Override
+    protected TcpProtocol createMuleMessageProtocol()
+    {
+        return new EOFProtocol();
+    }
 }

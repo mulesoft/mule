@@ -9,22 +9,25 @@ package org.mule.compatibility.transport.http;
 /**
  * A wrapper exceptin for any http client return codes over the 400 range
  */
-public class HttpResponseException extends Exception {
+public class HttpResponseException extends Exception
+{
+    private String responseText;
+    private int responseCode;
 
-  private String responseText;
-  private int responseCode;
+    public HttpResponseException(String responseText, int responseCode)
+    {
+        super(responseText + ", code: " + responseCode);
+        this.responseCode = responseCode;
+        this.responseText = responseText;
+    }
 
-  public HttpResponseException(String responseText, int responseCode) {
-    super(responseText + ", code: " + responseCode);
-    this.responseCode = responseCode;
-    this.responseText = responseText;
-  }
+    public String getResponseText()
+    {
+        return responseText;
+    }
 
-  public String getResponseText() {
-    return responseText;
-  }
-
-  public int getResponseCode() {
-    return responseCode;
-  }
+    public int getResponseCode()
+    {
+        return responseCode;
+    }
 }

@@ -15,22 +15,25 @@ import java.io.ObjectStreamException;
  * 
  * @since 4.0
  */
-public final class NullAttributes implements Attributes {
+public final class NullAttributes implements Attributes
+{
+    public static NullAttributes NULL_ATTRIBUTES = new NullAttributes();
 
-  public static NullAttributes NULL_ATTRIBUTES = new NullAttributes();
+    private NullAttributes()
+    {
+        // Nothing to do
+    }
 
-  private NullAttributes() {
-    // Nothing to do
-  }
+    private static final long serialVersionUID = 1201393762712713465L;
 
-  private static final long serialVersionUID = 1201393762712713465L;
+    private Object readResolve() throws ObjectStreamException
+    {
+        return NULL_ATTRIBUTES;
+    }
 
-  private Object readResolve() throws ObjectStreamException {
-    return NULL_ATTRIBUTES;
-  }
-
-  @Override
-  public String toString() {
-    return "{NullAttributes}";
-  }
+    @Override
+    public String toString()
+    {
+        return "{NullAttributes}";
+    }
 }

@@ -23,74 +23,85 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
-
-  @Override
-  protected void doSetUp() throws Exception {
-    muleContext.getRegistry().registerTransformer(new StringToApple());
-    muleContext.getRegistry().registerTransformer(new StringToOrange());
-  }
-
-  @Test
-  public void testSimpleDiscovery() throws Exception {
-    Transformer t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Apple.class));
-    assertNotNull(t);
-    assertEquals(StringToApple.class, t.getClass());
-
-    t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Orange.class));
-    assertNotNull(t);
-    assertEquals(StringToOrange.class, t.getClass());
-
-
-    try {
-      muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Banana.class));
-      fail("There is no transformer to go from String to Banana");
-    } catch (TransformerException e) {
-      // expected
-    }
-
-
-    muleContext.getRegistry().registerTransformer(new StringToRedApple());
-
-    t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(RedApple.class));
-    assertNotNull(t);
-    assertEquals(StringToRedApple.class, t.getClass());
-  }
-
-  protected class StringToApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer {
-
-    public StringToApple() {
-      setReturnDataType(DataType.fromType(Apple.class));
-    }
-
+public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
+{
     @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException {
-      return new Apple();
-    }
-  }
-
-  protected class StringToRedApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer {
-
-    public StringToRedApple() {
-      setReturnDataType(DataType.fromType(RedApple.class));
-      setPriorityWeighting(MAX_PRIORITY_WEIGHTING);
+    protected void doSetUp() throws Exception
+    {
+        muleContext.getRegistry().registerTransformer(new StringToApple());
+        muleContext.getRegistry().registerTransformer(new StringToOrange());
     }
 
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException {
-      return new RedApple();
-    }
-  }
+    @Test
+    public void testSimpleDiscovery() throws Exception
+    {
+        Transformer t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Apple.class));
+        assertNotNull(t);
+        assertEquals(StringToApple.class, t.getClass());
 
-  protected class StringToOrange extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer {
+        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Orange.class));
+        assertNotNull(t);
+        assertEquals(StringToOrange.class, t.getClass());
 
-    public StringToOrange() {
-      setReturnDataType(DataType.fromType(Orange.class));
+
+        try
+        {
+            muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Banana.class));
+            fail("There is no transformer to go from String to Banana");
+        }
+        catch (TransformerException e)
+        {
+            //expected
+        }
+
+
+        muleContext.getRegistry().registerTransformer(new StringToRedApple());
+
+        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(RedApple.class));
+        assertNotNull(t);
+        assertEquals(StringToRedApple.class, t.getClass());
     }
 
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException {
-      return new Orange();
+    protected class StringToApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
+    {
+        public StringToApple()
+        {
+            setReturnDataType(DataType.fromType(Apple.class));
+        }
+
+        @Override
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
+        {
+            return new Apple();
+        }
     }
-  }
+
+    protected class StringToRedApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
+    {
+        public StringToRedApple()
+        {
+            setReturnDataType(DataType.fromType(RedApple.class));
+            setPriorityWeighting(MAX_PRIORITY_WEIGHTING);
+        }
+
+        @Override
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
+        {
+            return new RedApple();
+        }
+    }
+
+    protected class StringToOrange extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
+    {
+        public StringToOrange()
+        {
+            setReturnDataType(DataType.fromType(Orange.class));
+        }
+
+        @Override
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
+        {
+            return new Orange();
+        }
+    }
 }

@@ -19,35 +19,41 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class StringToEnumTestCase extends AbstractMuleTestCase {
+public class StringToEnumTestCase extends AbstractMuleTestCase
+{
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-  enum TestEnum {
-    A, B
-  }
-
-  private StringToEnum transformer = new StringToEnum(TestEnum.class);
-
-  @Test
-  public void transform() throws Exception {
-    for (TestEnum value : TestEnum.values()) {
-      assertThat(transformer.transform(value.name()), is(value));
+    enum TestEnum
+    {
+        A, B
     }
-  }
 
-  @Test
-  public void illegalValue() throws Exception {
-    expectedException.expect(TransformerException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    private StringToEnum transformer = new StringToEnum(TestEnum.class);
 
-    transformer.transform("NOT ENUM VALUE");
-  }
+    @Test
+    public void transform() throws Exception
+    {
+        for (TestEnum value : TestEnum.values())
+        {
+            assertThat(transformer.transform(value.name()), is(value));
+        }
+    }
 
-  @Test
-  public void nullClass() {
-    expectedException.expect(IllegalArgumentException.class);
-    new StringToEnum(null);
-  }
+    @Test
+    public void illegalValue() throws Exception
+    {
+        expectedException.expect(TransformerException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+
+        transformer.transform("NOT ENUM VALUE");
+    }
+
+    @Test
+    public void nullClass()
+    {
+        expectedException.expect(IllegalArgumentException.class);
+        new StringToEnum(null);
+    }
 }

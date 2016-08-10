@@ -15,16 +15,18 @@ import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
 import org.mule.compatibility.transport.ssl.SslMessageReceiver;
 import org.mule.runtime.core.construct.Flow;
 
-public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
+public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+{
+    @Override
+    public MessageReceiver getMessageReceiver() throws Exception
+    {
+        Connector connector = endpoint.getConnector();
+        return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
+    }
 
-  @Override
-  public MessageReceiver getMessageReceiver() throws Exception {
-    Connector connector = endpoint.getConnector();
-    return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
-  }
-
-  @Override
-  public InboundEndpoint getEndpoint() throws Exception {
-    return getEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
-  }
+    @Override
+    public InboundEndpoint getEndpoint() throws Exception
+    {
+        return getEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
+    }
 }

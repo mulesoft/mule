@@ -18,32 +18,35 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MapMule2478TestCase extends AbstractNamespaceTestCase {
+public class MapMule2478TestCase extends AbstractNamespaceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/map-mule-2478-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/map-mule-2478-test.xml";
-  }
+    @Test
+    public void testDirectChild()
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+        ChildBean child1 = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
+        assertEquals("string1", child1.getString());
+        assertNotNull(child1.getList());
+        assertEquals("list1", child1.getList().get(0));
+    }
 
-  @Test
-  public void testDirectChild() {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-    ChildBean child1 = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
-    assertEquals("string1", child1.getString());
-    assertNotNull(child1.getList());
-    assertEquals("list1", child1.getList().get(0));
-  }
-
-  @Test
-  public void testMappedChild() {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-    Map<?, ?> map = orphan.getMap();
-    assertNotNull(map);
-    assertTrue(map.containsKey("string"));
-    assertEquals("string2", map.get("string"));
-    assertTrue(map.containsKey("name"));
-    assertEquals("child2", map.get("name"));
-    assertTrue(map.containsKey("list"));
-    assertEquals("list2", ((List<?>) map.get("list")).get(0));
-  }
+    @Test
+    public void testMappedChild()
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+        Map<?, ?> map = orphan.getMap();
+        assertNotNull(map);
+        assertTrue(map.containsKey("string"));
+        assertEquals("string2", map.get("string"));
+        assertTrue(map.containsKey("name"));
+        assertEquals("child2", map.get("name"));
+        assertTrue(map.containsKey("list"));
+        assertEquals("list2", ((List<?>) map.get("list")).get(0));
+    }
 }

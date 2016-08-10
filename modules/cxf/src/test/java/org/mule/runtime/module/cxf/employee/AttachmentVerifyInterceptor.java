@@ -11,18 +11,20 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-public class AttachmentVerifyInterceptor extends AbstractPhaseInterceptor<Message> {
+public class AttachmentVerifyInterceptor extends AbstractPhaseInterceptor<Message>
+{
+    public static boolean HasAttachments;
+    
+    public AttachmentVerifyInterceptor()
+    {
+        super(Phase.PRE_STREAM_ENDING);
+    }
 
-  public static boolean HasAttachments;
-
-  public AttachmentVerifyInterceptor() {
-    super(Phase.PRE_STREAM_ENDING);
-  }
-
-  public void handleMessage(Message message) throws Fault {
-    HasAttachments = message.getAttachments() != null && message.getAttachments().size() > 0;
-  }
-
+    public void handleMessage(Message message) throws Fault
+    {
+        HasAttachments = message.getAttachments() != null && message.getAttachments().size() > 0;
+    }
+    
 
 }
 

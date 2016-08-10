@@ -14,34 +14,40 @@ import java.util.List;
  * A Person object
  */
 @JsonSerialize
-public class Person {
+public class Person
+{
+    private String name;
+    private String dob;
 
-  private String name;
-  private String dob;
+    private List<EmailAddress> emailAddresses;
 
-  private List<EmailAddress> emailAddresses;
+    public String getName()
+    {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getDob()
+    {
+        return dob;
+    }
 
-  public String getDob() {
-    return dob;
-  }
+    public void setDob(String dob)
+    {
+        this.dob = dob;
+    }
 
-  public void setDob(String dob) {
-    this.dob = dob;
-  }
+    public List<EmailAddress> getEmailAddresses()
+    {
+        return emailAddresses;
+    }
 
-  public List<EmailAddress> getEmailAddresses() {
-    return emailAddresses;
-  }
-
-  public void setEmailAddresses(List<EmailAddress> emailAddresses) {
-    this.emailAddresses = emailAddresses;
-  }
+    public void setEmailAddresses(List<EmailAddress> emailAddresses)
+    {
+        this.emailAddresses = emailAddresses;
+    }
 }

@@ -6,39 +6,48 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-public abstract class RangeStatusCodeValidator implements ResponseValidator {
+public abstract class RangeStatusCodeValidator implements ResponseValidator
+{
+    private String values;
 
-  private String values;
+    protected boolean belongs(int value)
+    {
+        String[] valueParts = values.split(",");
 
-  protected boolean belongs(int value) {
-    String[] valueParts = values.split(",");
+        for (String valuePart : valueParts)
+        {
+            if (valuePart.contains(".."))
+            {
+                String[] limits = valuePart.split("\\.\\.");
+                int lower = Integer.parseInt(limits[0]);
+                int upper = Integer.parseInt(limits[1]) ;
 
-    for (String valuePart : valueParts) {
-      if (valuePart.contains("..")) {
-        String[] limits = valuePart.split("\\.\\.");
-        int lower = Integer.parseInt(limits[0]);
-        int upper = Integer.parseInt(limits[1]);
+                if (value >= lower && value <= upper)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                int code = Integer.parseInt(valuePart);
 
-        if (value >= lower && value <= upper) {
-          return true;
+                if (code == value)
+                {
+                    return true;
+                }
+            }
         }
-      } else {
-        int code = Integer.parseInt(valuePart);
 
-        if (code == value) {
-          return true;
-        }
-      }
+        return false;
     }
 
-    return false;
-  }
+    public String getValues()
+    {
+        return values;
+    }
 
-  public String getValues() {
-    return values;
-  }
-
-  public void setValues(String values) {
-    this.values = values;
-  }
+    public void setValues(String values)
+    {
+        this.values = values;
+    }
 }

@@ -10,11 +10,13 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-public class TransportsTestNamespaceHandler extends AbstractMuleNamespaceHandler {
+public class TransportsTestNamespaceHandler extends AbstractMuleNamespaceHandler
+{
 
-  @Override
-  public void init() {
-    registerStandardTransportEndpoints(TestConnector.TEST, URIBuilder.PATH_ATTRIBUTES);
-    registerConnectorDefinitionParser(TestConnector.class);
-  }
+    @Override
+    public void init()
+    {
+        registerStandardTransportEndpoints(TestConnector.TEST, URIBuilder.PATH_ATTRIBUTES);
+        registerConnectorDefinitionParser(TestConnector.class);
+    }
 }

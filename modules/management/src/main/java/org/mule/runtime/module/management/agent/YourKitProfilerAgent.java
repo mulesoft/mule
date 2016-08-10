@@ -32,120 +32,148 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class YourKitProfilerAgent implements Agent, MuleContextAware {
+public class YourKitProfilerAgent implements Agent, MuleContextAware
+{
+    /**
+     * MBean name to register under.
+     */
+    public static final String PROFILER_OBJECT_NAME = "name=Profiler";
 
-  /**
-   * MBean name to register under.
-   */
-  public static final String PROFILER_OBJECT_NAME = "name=Profiler";
+    private String name = "yourkit-profiler";
+    private MBeanServer mBeanServer;
+    private ObjectName profilerName;
 
-  private String name = "yourkit-profiler";
-  private MBeanServer mBeanServer;
-  private ObjectName profilerName;
+    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+    private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
-  private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-  private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+    /**
+     * Logger used by this class
+     */
+    protected static final Logger logger = LoggerFactory.getLogger(YourKitProfilerAgent.class);
 
-  /**
-   * Logger used by this class
-   */
-  protected static final Logger logger = LoggerFactory.getLogger(YourKitProfilerAgent.class);
+    protected MuleContext muleContext;
 
-  protected MuleContext muleContext;
-
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getDescription() {
-    return "Profiler JMX Agent";
-  }
-
-  public List<Class<? extends Agent>> getDependentAgents() {
-    return Collections.emptyList();
-  }
-
-  public void initialise() throws InitialisationException {
-    if (!isApiAvailable()) {
-      logger.warn("Cannot find YourKit API. Profiler JMX Agent will be unregistered.");
-      unregisterMeQuietly();
-      return;
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
     }
 
-    final List servers = MBeanServerFactory.findMBeanServer(null);
-    if (servers.isEmpty()) {
-      throw new InitialisationException(ManagementMessages.noMBeanServerAvailable(), this);
+    public String getName()
+    {
+        return this.name;
     }
 
-    try {
-      mBeanServer = (MBeanServer) servers.get(0);
-
-      profilerName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + PROFILER_OBJECT_NAME);
-
-      // unregister existing YourKit MBean first if required
-      unregisterMBeansIfNecessary();
-      mBeanServer.registerMBean(new YourKitProfilerService(), profilerName);
-    } catch (Exception e) {
-      throw new InitialisationException(CoreMessages.failedToStart(this.getName()), e, this);
+    public void setName(String name)
+    {
+        this.name = name;
     }
-  }
 
-  /**
-   * Unregister Profiler MBean if there are any left over the old deployment
-   */
-  protected void unregisterMBeansIfNecessary()
-      throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
-    if (mBeanServer == null || profilerName == null) {
-      return;
+    public String getDescription()
+    {
+        return "Profiler JMX Agent";
     }
-    if (mBeanServer.isRegistered(profilerName)) {
-      mBeanServer.unregisterMBean(profilerName);
+
+    public List<Class<? extends Agent>> getDependentAgents()
+    {
+        return Collections.emptyList();
     }
-  }
 
-  /**
-   * Quietly unregister ourselves.
-   */
-  protected void unregisterMeQuietly() {
-    try {
-      // remove the agent from the list, it's not functional
-      muleContext.getRegistry().unregisterAgent(this.getName());
-    } catch (MuleException e) {
-      // not interested, really
+    public void initialise() throws InitialisationException
+    {
+        if(!isApiAvailable())
+        {
+            logger.warn("Cannot find YourKit API. Profiler JMX Agent will be unregistered.");
+            unregisterMeQuietly();
+            return;
+        }
+
+        final List servers = MBeanServerFactory.findMBeanServer(null);
+        if(servers.isEmpty())
+        {
+            throw new InitialisationException(ManagementMessages.noMBeanServerAvailable(), this);
+        }
+
+        try
+        {
+            mBeanServer = (MBeanServer) servers.get(0);
+
+            profilerName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + PROFILER_OBJECT_NAME);
+
+            // unregister existing YourKit MBean first if required
+            unregisterMBeansIfNecessary();
+            mBeanServer.registerMBean(new YourKitProfilerService(), profilerName);
+        }
+        catch(Exception e)
+        {
+            throw new InitialisationException(CoreMessages.failedToStart(this.getName()), e, this);
+        }
     }
-  }
 
-  private boolean isApiAvailable() {
-    try {
-      ClassUtils.getClass("com.yourkit.api.Controller");
-      return true;
-    } catch (ClassNotFoundException e) {
-      return false;
+    /**
+     * Unregister Profiler MBean if there are any left over the old deployment
+     */
+    protected void unregisterMBeansIfNecessary()
+            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+    {
+        if(mBeanServer == null || profilerName == null)
+        {
+            return;
+        }
+        if(mBeanServer.isRegistered(profilerName))
+        {
+            mBeanServer.unregisterMBean(profilerName);
+        }
     }
-  }
 
-  public void start() throws MuleException {
-    // nothing to do
-  }
-
-  public void stop() throws MuleException {
-    // nothing to do
-  }
-
-  public void dispose() {
-    try {
-      unregisterMBeansIfNecessary();
-    } catch (Exception e) {
-      logger.error("Couldn't unregister MBean: " + (profilerName != null ? profilerName.getCanonicalName() : "null"), e);
+    /**
+     * Quietly unregister ourselves.
+     */
+    protected void unregisterMeQuietly()
+    {
+        try
+        {
+            // remove the agent from the list, it's not functional
+            muleContext.getRegistry().unregisterAgent(this.getName());
+        }
+        catch (MuleException e)
+        {
+            // not interested, really
+        }
     }
-  }
+
+    private boolean isApiAvailable()
+    {
+        try{
+            ClassUtils.getClass("com.yourkit.api.Controller");
+            return true;
+        }
+        catch(ClassNotFoundException e)
+        {
+            return false;
+        }
+    }
+
+    public void start() throws MuleException
+    {
+        // nothing to do
+    }
+
+    public void stop() throws MuleException
+    {
+        // nothing to do
+    }
+
+    public void dispose()
+    {
+        try
+        {
+            unregisterMBeansIfNecessary();
+        }
+        catch (Exception e)
+        {
+            logger.error("Couldn't unregister MBean: "
+                         + (profilerName != null ? profilerName.getCanonicalName() : "null"), e);
+        }
+    }
 
 }

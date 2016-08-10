@@ -14,34 +14,40 @@ import java.util.Map;
 /**
  * Provides a {@link java.util.HashMap} view of values stored in the registry
  */
-public class RegistryMap extends CaseInsensitiveHashMap {
+public class RegistryMap extends CaseInsensitiveHashMap
+{
+    private Registry registry;
 
-  private Registry registry;
-
-  public RegistryMap(Registry registry) {
-    this.registry = registry;
-  }
-
-  public RegistryMap(int i, Registry registry) {
-    super(i);
-    this.registry = registry;
-  }
-
-  public RegistryMap(int i, float v, Registry registry) {
-    super(i, v);
-    this.registry = registry;
-  }
-
-  public RegistryMap(Map map, Registry registry) {
-    super(map);
-    this.registry = registry;
-  }
-
-  public Object get(Object key) {
-    Object val = super.get(key);
-    if (val == null) {
-      val = registry.lookupObject(key.toString());
+    public RegistryMap(Registry registry)
+    {
+        this.registry = registry;
     }
-    return val;
-  }
+
+    public RegistryMap(int i, Registry registry)
+    {
+        super(i);
+        this.registry = registry;
+    }
+
+    public RegistryMap(int i, float v, Registry registry)
+    {
+        super(i, v);
+        this.registry = registry;
+    }
+
+    public RegistryMap(Map map, Registry registry)
+    {
+        super(map);
+        this.registry = registry;
+    }
+
+    public Object get(Object key)
+    {
+        Object val = super.get(key);
+        if (val == null)
+        {
+            val = registry.lookupObject(key.toString());
+        }
+        return val;
+    }
 }

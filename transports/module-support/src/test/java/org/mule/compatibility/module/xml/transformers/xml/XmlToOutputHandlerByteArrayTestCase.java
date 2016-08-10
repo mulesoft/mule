@@ -32,74 +32,85 @@ import java.io.InputStream;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DOMWriter;
 
-public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerTestCase {
+public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerTestCase
+{
+    private byte[] srcData;
+    private String resultData;
 
-  private byte[] srcData;
-  private String resultData;
-
-  @Override
-  protected void doSetUp() throws Exception {
-    InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass());
-    resultData = IOUtils.toString(resourceStream, "UTF-8");
-
-    srcData = resultData.getBytes("UTF-8");
-  }
-
-  @Override
-  public Transformer getTransformer() throws Exception {
-    EndpointAwareTransformer trans =
-        new DefaultEndpointAwareTransformer(createObject(XmlToOutputHandler.class), SystemUtils.getDefaultEncoding(muleContext));
-    trans.setReturnDataType(DataType.fromType(OutputHandler.class));
-
-    EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-    builder.setEncoding(UTF_8);
-    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(builder);
-
-    trans.setEndpoint(endpoint);
-    return trans;
-  }
-
-  @Override
-  public Transformer getRoundTripTransformer() throws Exception {
-    return null;
-  }
-
-  @Override
-  public Object getTestData() {
-    return srcData;
-  }
-
-  @Override
-  public Object getResultData() {
-    return resultData;
-  }
-
-  @Override
-  public boolean compareResults(Object expected, Object result) {
-    if (result instanceof OutputHandler) {
-      OutputHandler handler = (OutputHandler) result;
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        handler.write(null, bos);
-        org.dom4j.Document dom4jDoc = null;
-        dom4jDoc = DocumentHelper.parseText((String) expected);
-        expected = new DOMWriter().write(dom4jDoc);
-        dom4jDoc = DocumentHelper.parseText(new String(bos.toByteArray(), "UTF-8"));
-        result = new DOMWriter().write(dom4jDoc);
-      } catch (Exception e) {
-        fail();
-      }
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass());
+        resultData = IOUtils.toString(resourceStream, "UTF-8");
+        
+        srcData = resultData.getBytes("UTF-8");
     }
-    return super.compareResults(expected, result);
-  }
 
-  public EndpointFactory getEndpointFactory() {
-    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-  }
+    @Override
+    public Transformer getTransformer() throws Exception
+    {
+        EndpointAwareTransformer trans = new DefaultEndpointAwareTransformer(createObject(XmlToOutputHandler.class), SystemUtils.getDefaultEncoding(muleContext));
+        trans.setReturnDataType(DataType.fromType(OutputHandler.class));
 
-  @Override
-  protected ConfigurationBuilder getBuilder() throws Exception {
-    return new TransportsConfigurationBuilder();
-  }
+        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
+        builder.setEncoding(UTF_8);
+        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(builder);
+
+        trans.setEndpoint(endpoint);
+        return trans;
+    }
+
+    @Override
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return null;
+    }
+
+    @Override
+    public Object getTestData()
+    {
+        return srcData;
+    }
+
+    @Override
+    public Object getResultData()
+    {
+        return resultData;
+    }
+
+    @Override
+    public boolean compareResults(Object expected, Object result)
+    {
+        if (result instanceof OutputHandler)
+        {
+            OutputHandler handler = (OutputHandler)result;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try
+            {
+                handler.write(null, bos);
+                org.dom4j.Document dom4jDoc = null;
+                dom4jDoc = DocumentHelper.parseText((String)expected);
+                expected = new DOMWriter().write(dom4jDoc);
+                dom4jDoc = DocumentHelper.parseText(new String(bos.toByteArray(), "UTF-8"));
+                result = new DOMWriter().write(dom4jDoc);
+            }
+            catch (Exception e)
+            {
+                fail();
+            }
+        }
+        return super.compareResults(expected, result);
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+    }
+
+    @Override
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        return new TransportsConfigurationBuilder();
+    }
 
 }

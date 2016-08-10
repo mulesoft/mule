@@ -22,130 +22,161 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Base class for {@link org.mule.runtime.core.api.model.EntryPointResolver}. It provides parameters for detemining if the
- * payload of the message should be transformed first and whether void methods are acceptible. It also provides a method cashe for
- * those resolvers that use reflection to discover methods on the service.
+ * A Base class for {@link org.mule.runtime.core.api.model.EntryPointResolver}. It provides parameters for
+ * detemining if the payload of the message should be transformed first and whether void methods are
+ * acceptible. It also provides a method cashe for those resolvers that use reflection to discover methods
+ * on the service.
  */
-public abstract class AbstractEntryPointResolver implements EntryPointResolver {
+public abstract class AbstractEntryPointResolver implements EntryPointResolver
+{
+    private static final Logger logger = LoggerFactory.getLogger(AbstractEntryPointResolver.class);
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractEntryPointResolver.class);
+    private boolean acceptVoidMethods = false;
 
-  private boolean acceptVoidMethods = false;
+    private boolean synchronizeCall = false;
 
-  private boolean synchronizeCall = false;
+    // @GuardedBy(itself)
+    private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> methodCache =
+        new ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>>(4);
 
-  // @GuardedBy(itself)
-  private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> methodCache =
-      new ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>>(4);
-
-  public boolean isAcceptVoidMethods() {
-    return acceptVoidMethods;
-  }
-
-  public void setAcceptVoidMethods(boolean acceptVoidMethods) {
-    this.acceptVoidMethods = acceptVoidMethods;
-  }
-
-  protected ConcurrentHashMap<String, Method> getMethodCache(Object component) {
-    Class<?> componentClass = component.getClass();
-    ConcurrentHashMap<String, Method> cache = methodCache.get(componentClass);
-    if (cache == null) {
-      methodCache.putIfAbsent(componentClass, new ConcurrentHashMap<String, Method>(4));
-    }
-    return methodCache.get(componentClass);
-  }
-
-  protected Method getMethodByName(Object component, String methodName, MuleEventContext context) {
-    return getMethodCache(component).get(methodName);
-  }
-
-  protected Method addMethodByName(Object component, Method method, MuleEventContext context) {
-    Method previousMethod = getMethodCache(component).putIfAbsent(method.getName(), method);
-    return (previousMethod != null ? previousMethod : method);
-  }
-
-  protected Method addMethodByArguments(Object component, Method method, Object[] payload) {
-    Method previousMethod = getMethodCache(component).putIfAbsent(getCacheKeyForPayload(component, payload), method);
-    return (previousMethod != null ? previousMethod : method);
-  }
-
-
-  protected Method getMethodByArguments(Object component, Object[] payload) {
-    Method method = getMethodCache(component).get(getCacheKeyForPayload(component, payload));
-    return method;
-  }
-
-  protected String getCacheKeyForPayload(Object component, Object[] payload) {
-    StringBuilder key = new StringBuilder(48);
-    for (int i = 0; i < payload.length; i++) {
-      Object o = payload[i];
-      if (o != null) {
-        key.append(o.getClass().getName());
-      } else {
-        key.append("null");
-      }
-    }
-    key.append(".").append(ClassUtils.getClassName(component.getClass()));
-    return key.toString();
-  }
-
-
-  protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException {
-    Object temp = context.getMessage().getPayload();
-    if (temp instanceof Object[]) {
-      return (Object[]) temp;
-    } else if (temp == null) {
-      return ClassUtils.NO_ARGS;
-    } else {
-      return new Object[] {temp};
-    }
-  }
-
-  protected InvocationResult invokeMethod(Object component, Method method, Object[] arguments)
-      throws InvocationTargetException, IllegalAccessException {
-    String methodCall = null;
-
-    if (logger.isDebugEnabled()) {
-      methodCall = component.getClass().getName() + "." + method.getName() + "("
-          + StringMessageUtils.toString(ClassUtils.getClassTypes(arguments)) + ")";
-      logger.debug("Invoking " + methodCall);
+    public boolean isAcceptVoidMethods()
+    {
+        return acceptVoidMethods;
     }
 
-    Object result;
-
-    if (isSynchronizeCall()) {
-      synchronized (component) {
-        result = method.invoke(component, arguments);
-      }
-    } else {
-      result = method.invoke(component, arguments);
+    public void setAcceptVoidMethods(boolean acceptVoidMethods)
+    {
+        this.acceptVoidMethods = acceptVoidMethods;
     }
 
-    if (method.getReturnType().equals(Void.TYPE)) {
-      result = VoidResult.getInstance();
+    protected ConcurrentHashMap<String, Method> getMethodCache(Object component)
+    {
+        Class<?> componentClass = component.getClass();
+        ConcurrentHashMap<String, Method> cache = methodCache.get(componentClass);
+        if (cache == null)
+        {
+            methodCache.putIfAbsent(componentClass, new ConcurrentHashMap<String, Method>(4));
+        }
+        return methodCache.get(componentClass);
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Result of call " + methodCall + " is " + (result == null ? "null" : "not null"));
+    protected Method getMethodByName(Object component, String methodName, MuleEventContext context)
+    {
+        return getMethodCache(component).get(methodName);
     }
 
-    return new InvocationResult(this, result, method);
-  }
+    protected Method addMethodByName(Object component, Method method, MuleEventContext context)
+    {
+        Method previousMethod = getMethodCache(component).putIfAbsent(method.getName(), method);
+        return (previousMethod != null ? previousMethod : method);
+    }
 
-  public boolean isSynchronizeCall() {
-    return synchronizeCall;
-  }
+    protected Method addMethodByArguments(Object component, Method method, Object[] payload)
+    {
+        Method previousMethod = getMethodCache(component).putIfAbsent(getCacheKeyForPayload(component, payload), method);
+        return (previousMethod != null ? previousMethod : method);
+    }
 
-  public void setSynchronizeCall(boolean synchronizeCall) {
-    this.synchronizeCall = synchronizeCall;
-  }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("AbstractEntryPointResolver");
-    sb.append(", acceptVoidMethods=").append(acceptVoidMethods);
-    sb.append('}');
-    return sb.toString();
-  }
+    protected Method getMethodByArguments(Object component, Object[] payload)
+    {
+        Method method = getMethodCache(component).get(getCacheKeyForPayload(component, payload));
+        return method;
+    }
+
+    protected String getCacheKeyForPayload(Object component, Object[] payload)
+    {
+        StringBuilder key = new StringBuilder(48);
+        for (int i = 0; i < payload.length; i++)
+        {
+            Object o = payload[i];
+            if (o != null)
+            {
+                key.append(o.getClass().getName());
+            }
+            else
+            {
+                key.append("null");
+            }
+        }
+        key.append(".").append(ClassUtils.getClassName(component.getClass()));
+        return key.toString();
+    }
+
+
+    protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
+    {
+        Object temp = context.getMessage().getPayload();
+        if (temp instanceof Object[])
+        {
+            return (Object[]) temp;
+        }
+        else if (temp == null)
+        {
+            return ClassUtils.NO_ARGS;
+        }
+        else
+        {
+            return new Object[]{temp};
+        }
+    }
+
+    protected InvocationResult invokeMethod(Object component, Method method, Object[] arguments)
+            throws InvocationTargetException, IllegalAccessException
+    {
+        String methodCall = null;
+
+        if (logger.isDebugEnabled())
+        {
+            methodCall = component.getClass().getName() + "." + method.getName() + "("
+                    + StringMessageUtils.toString(ClassUtils.getClassTypes(arguments)) + ")";
+            logger.debug("Invoking " + methodCall);
+        }
+
+        Object result;
+
+        if(isSynchronizeCall())
+        {
+            synchronized (component)
+            {
+                result = method.invoke(component, arguments);
+            }
+        }
+        else
+        {
+            result = method.invoke(component, arguments);
+        }
+
+        if (method.getReturnType().equals(Void.TYPE))
+        {
+            result = VoidResult.getInstance();
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Result of call " + methodCall + " is " + (result == null ? "null" : "not null"));
+        }
+
+        return new InvocationResult(this, result, method);
+    }
+
+    public boolean isSynchronizeCall()
+    {
+        return synchronizeCall;
+    }
+
+    public void setSynchronizeCall(boolean synchronizeCall)
+    {
+        this.synchronizeCall = synchronizeCall;
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("AbstractEntryPointResolver");
+        sb.append(", acceptVoidMethods=").append(acceptVoidMethods);
+        sb.append('}');
+        return sb.toString();
+    }
 }

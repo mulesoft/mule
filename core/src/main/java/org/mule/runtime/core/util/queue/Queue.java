@@ -16,47 +16,48 @@ import java.io.Serializable;
 /**
  * Interface for mule queues used for VM.
  */
-public interface Queue extends NamedObject {
+public interface Queue extends NamedObject
+{
+    /**
+     * Returns the number of elements in this queue.
+     */
+    int size();
 
-  /**
-   * Returns the number of elements in this queue.
-   */
-  int size();
+    /**
+     * Puts a new object in this queue and wait if necessary.
+     */
+    void put(Serializable object) throws InterruptedException, ObjectStoreException;
 
-  /**
-   * Puts a new object in this queue and wait if necessary.
-   */
-  void put(Serializable object) throws InterruptedException, ObjectStoreException;
+    /**
+     * Blocks and retrieves an object from this queue.
+     * 
+     * @return an object.
+     */
+    Serializable take() throws InterruptedException;
 
-  /**
-   * Blocks and retrieves an object from this queue.
-   * 
-   * @return an object.
-   */
-  Serializable take() throws InterruptedException;
+    void untake(Serializable item) throws InterruptedException, ObjectStoreException;
 
-  void untake(Serializable item) throws InterruptedException, ObjectStoreException;
+    Serializable peek() throws InterruptedException;
 
-  Serializable peek() throws InterruptedException;
+    Serializable poll(long timeout) throws InterruptedException;
 
-  Serializable poll(long timeout) throws InterruptedException;
+    boolean offer(Serializable object, long timeout) throws InterruptedException, ObjectStoreException;
 
-  boolean offer(Serializable object, long timeout) throws InterruptedException, ObjectStoreException;
+    /**
+     * Discards all the elements in the queue
+     * 
+     * @throws InterruptedException
+     */
+    public void clear() throws InterruptedException;
 
-  /**
-   * Discards all the elements in the queue
-   * 
-   * @throws InterruptedException
-   */
-  public void clear() throws InterruptedException;
-
-  /**
-   * Disposes this queue by releasing it's storage and associated memory and storage. If after disposing the queue you try go get
-   * it back, you'll get a fresh new one which maintains none of the original one's data
-   * 
-   * @throws MuleException
-   * @throws InterruptedException
-   */
-  public void dispose() throws MuleException, InterruptedException;
+    /**
+     * Disposes this queue by releasing it's storage and associated memory and
+     * storage. If after disposing the queue you try go get it back, you'll get a
+     * fresh new one which maintains none of the original one's data
+     * 
+     * @throws MuleException
+     * @throws InterruptedException
+     */
+    public void dispose() throws MuleException, InterruptedException;
 
 }

@@ -16,34 +16,40 @@ import java.net.URL;
 import java.util.Enumeration;
 
 /**
- * Filtering artifact classLoader that to use as the parent classloader for all mule tops artifact (domains, server plugins, etc).
+ * Filtering artifact classLoader that to use as the parent classloader for
+ * all mule tops artifact (domains, server plugins, etc).
  * <p>
- * Differs from the base class is that exposes all the resources available in the delegate classLoader and the delegate's parent
- * classLoader.
+ * Differs from the base class is that exposes all the resources available in the
+ * delegate classLoader and the delegate's parent classLoader.
  */
-public class FilteringContainerClassLoader extends FilteringArtifactClassLoader {
+public class FilteringContainerClassLoader extends FilteringArtifactClassLoader
+{
+    static
+    {
+        registerAsParallelCapable();
+    }
 
-  static {
-    registerAsParallelCapable();
-  }
+    /**
+     * Creates a new instance
+     *
+     * @param containerClassLoader delegate classLoader. Not null.
+     * @param filter filter used to determine which classes and resources are exported
+     *               on the delegate classLoader.
+     */
+    public FilteringContainerClassLoader(ArtifactClassLoader containerClassLoader, ClassLoaderFilter filter)
+    {
+        super(containerClassLoader, filter);
+    }
 
-  /**
-   * Creates a new instance
-   *
-   * @param containerClassLoader delegate classLoader. Not null.
-   * @param filter filter used to determine which classes and resources are exported on the delegate classLoader.
-   */
-  public FilteringContainerClassLoader(ArtifactClassLoader containerClassLoader, ClassLoaderFilter filter) {
-    super(containerClassLoader, filter);
-  }
+    @Override
+    protected URL getResourceFromDelegate(ArtifactClassLoader artifactClassLoader, String name)
+    {
+        return artifactClassLoader.getClassLoader().getResource(name);
+    }
 
-  @Override
-  protected URL getResourceFromDelegate(ArtifactClassLoader artifactClassLoader, String name) {
-    return artifactClassLoader.getClassLoader().getResource(name);
-  }
-
-  @Override
-  protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException {
-    return artifactClassLoader.getClassLoader().getResources(name);
-  }
+    @Override
+    protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException
+    {
+        return artifactClassLoader.getClassLoader().getResources(name);
+    }
 }

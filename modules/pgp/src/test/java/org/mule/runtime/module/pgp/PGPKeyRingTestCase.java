@@ -12,17 +12,19 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase {
+public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
+{
+    @Test
+    public void testClientKey()
+    {
+        PGPPublicKey clientKey = keyManager.getPublicKey("Mule client <mule_client@mule.com>");
+        assertNotNull(clientKey);
+    }
 
-  @Test
-  public void testClientKey() {
-    PGPPublicKey clientKey = keyManager.getPublicKey("Mule client <mule_client@mule.com>");
-    assertNotNull(clientKey);
-  }
-
-  @Test
-  public void testServerKey() {
-    PGPSecretKey serverKey = keyManager.getSecretKey();
-    assertNotNull(serverKey);
-  }
+    @Test
+    public void testServerKey()
+    {
+        PGPSecretKey serverKey = keyManager.getSecretKey();
+        assertNotNull(serverKey);
+    }
 }

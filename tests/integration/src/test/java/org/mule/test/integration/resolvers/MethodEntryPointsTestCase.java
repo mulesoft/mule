@@ -17,45 +17,55 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase {
+public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml";
-  }
-
-  @Test
-  public void testTooManySatisfiableMethods() throws Exception {
-    try {
-      flowRunner("Service").withPayload("hello").run().getMessage();
-    } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
-      assertThat(e.getMessage(), containsString("Found too many possible methods on object"));
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml";
     }
-  }
 
-  @Test
-  public void testBadMethodName() throws Exception {
-    try {
-      flowRunner("Service").withPayload("hello").withInboundProperty("method", "foo").run().getMessage();
-    } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+    @Test
+    public void testTooManySatisfiableMethods() throws Exception
+    {
+        try
+        {
+            flowRunner("Service").withPayload("hello").run().getMessage();
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+            assertThat(e.getMessage(), containsString("Found too many possible methods on object"));
+        }
     }
-  }
 
-  @Test
-  public void testValidCallToReverse() throws Exception {
-    MuleMessage message =
-        flowRunner("Service").withPayload("hello").withInboundProperty("method", "reverseString").run().getMessage();
-    assertNotNull(message);
-    assertEquals("olleh", getPayloadAsString(message));
-  }
+    @Test
+    public void testBadMethodName() throws Exception
+    {
+        try
+        {
+            flowRunner("Service").withPayload("hello").withInboundProperty("method", "foo").run().getMessage();
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+        }
+    }
 
-  @Test
-  public void testValidCallToUpperCase() throws Exception {
-    MuleMessage message =
-        flowRunner("Service").withPayload("hello").withInboundProperty("method", "upperCaseString").run().getMessage();
-    assertNotNull(message);
-    assertEquals("HELLO", getPayloadAsString(message));
-  }
+    @Test
+    public void testValidCallToReverse() throws Exception
+    {
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "reverseString").run().getMessage();
+        assertNotNull(message);
+        assertEquals("olleh", getPayloadAsString(message));
+    }
+
+    @Test
+    public void testValidCallToUpperCase() throws Exception
+    {
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "upperCaseString").run().getMessage();
+        assertNotNull(message);
+        assertEquals("HELLO", getPayloadAsString(message));
+    }
 }

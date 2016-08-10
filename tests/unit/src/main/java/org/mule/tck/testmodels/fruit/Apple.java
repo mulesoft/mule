@@ -13,123 +13,148 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Apple implements Fruit, Callable {
+public class Apple implements Fruit, Callable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -7631993371500076921L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -7631993371500076921L;
+    /**
+     * logger used by this class
+     */
+    private static final Logger logger = LoggerFactory.getLogger(Apple.class);
 
-  /**
-   * logger used by this class
-   */
-  private static final Logger logger = LoggerFactory.getLogger(Apple.class);
+    private boolean bitten = false;
+    private boolean washed = false;
 
-  private boolean bitten = false;
-  private boolean washed = false;
+    private FruitCleaner cleaner;
 
-  private FruitCleaner cleaner;
+    private Seed seed;
 
-  private Seed seed;
-
-  public Apple() {}
-
-  public Apple(boolean bitten) {
-    this.bitten = bitten;
-  }
-
-  public void wash() {
-    if (cleaner != null) {
-      cleaner.wash(this);
-    }
-    washed = true;
-  }
-
-  public void polish() {
-    cleaner.polish(this);
-  }
-
-  public boolean isWashed() {
-    return washed;
-  }
-
-  @Override
-  public void bite() {
-    bitten = true;
-  }
-
-  @Override
-  public boolean isBitten() {
-    return bitten;
-  }
-
-  public Seed getSeed() {
-    return seed;
-  }
-
-  public void setSeed(Seed seed) {
-    this.seed = seed;
-  }
-
-  @Override
-  public Object onCall(MuleEventContext context) throws MuleException {
-    logger.debug("Apple received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString());
-    wash();
-    return null;
-  }
-
-
-  public FruitCleaner getAppleCleaner() {
-    return cleaner;
-  }
-
-  public void setAppleCleaner(FruitCleaner cleaner) {
-    this.cleaner = cleaner;
-  }
-
-  public Object methodReturningNull() {
-    return null;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    public Apple()
+    {
     }
 
-    final Apple apple = (Apple) o;
-
-    if (bitten != apple.bitten) {
-      return false;
-    }
-    if (washed != apple.washed) {
-      return false;
+    public Apple(boolean bitten)
+    {
+        this.bitten = bitten;
     }
 
-    return true;
-  }
+    public void wash()
+    {
+        if (cleaner != null)
+        {
+            cleaner.wash(this);
+        }
+        washed = true;
+    }
 
-  @Override
-  public int hashCode() {
-    int result;
-    result = (bitten ? 1 : 0);
-    result = 29 * result + (washed ? 1 : 0);
-    return result;
-  }
+    public void polish()
+    {
+        cleaner.polish(this);
+    }
 
-  @Override
-  public String toString() {
-    return "Just an apple.";
-  }
+    public boolean isWashed()
+    {
+        return washed;
+    }
 
-  public void setBitten(boolean bitten) {
-    this.bitten = bitten;
-  }
+    @Override
+    public void bite()
+    {
+        bitten = true;
+    }
 
-  public void setWashed(boolean washed) {
-    this.washed = washed;
-  }
+    @Override
+    public boolean isBitten()
+    {
+        return bitten;
+    }
+
+    public Seed getSeed()
+    {
+        return seed;
+    }
+
+    public void setSeed(Seed seed)
+    {
+        this.seed = seed;
+    }
+
+    @Override
+    public Object onCall(MuleEventContext context) throws MuleException
+    {
+        logger.debug("Apple received an event in Callable.onEvent! MuleEvent says: "
+                        + context.getMessageAsString());
+        wash();
+        return null;
+    }
+
+
+    public FruitCleaner getAppleCleaner()
+    {
+        return cleaner;
+    }
+
+    public void setAppleCleaner(FruitCleaner cleaner)
+    {
+        this.cleaner = cleaner;
+    }
+
+    public Object methodReturningNull()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        final Apple apple = (Apple) o;
+
+        if (bitten != apple.bitten)
+        {
+            return false;
+        }
+        if (washed != apple.washed)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result;
+        result = (bitten ? 1 : 0);
+        result = 29 * result + (washed ? 1 : 0);
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Just an apple.";
+    }
+
+    public void setBitten(boolean bitten)
+    {
+        this.bitten = bitten;
+    }
+
+    public void setWashed(boolean washed)
+    {
+        this.washed = washed;
+    }
 }

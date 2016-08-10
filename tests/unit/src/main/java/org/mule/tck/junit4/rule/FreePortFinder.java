@@ -18,85 +18,107 @@ import org.slf4j.LoggerFactory;
 /**
  * Finds available port numbers in a specified range.
  */
-public class FreePortFinder {
+public class FreePortFinder
+{
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final int minPortNumber;
-  private final int portRange;
-  private final Set<Integer> selectedPorts = new HashSet<Integer>();
-  private final Random random = new Random();
+    private final int minPortNumber;
+    private final int portRange;
+    private final Set<Integer> selectedPorts = new HashSet<Integer>();
+    private final Random random  = new Random();
 
-  public FreePortFinder(int minPortNumber, int maxPortNumber) {
-    this.minPortNumber = minPortNumber;
-    this.portRange = maxPortNumber - minPortNumber;
-  }
+    public FreePortFinder(int minPortNumber, int maxPortNumber)
+    {
+        this.minPortNumber = minPortNumber;
+        this.portRange = maxPortNumber - minPortNumber;
+    }
 
-  public synchronized Integer find() {
-    for (int i = 0; i < portRange; i++) {
-      int port = minPortNumber + random.nextInt(portRange);
+    public synchronized Integer find()
+    {
+        for (int i = 0; i < portRange; i++)
+        {
+            int port = minPortNumber + random.nextInt(portRange);
 
-      if (selectedPorts.contains(port)) {
-        continue;
-      }
+            if (selectedPorts.contains(port))
+            {
+                continue;
+            }
 
-      if (isPortFree(port)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Found free port: " + port);
+            if (isPortFree(port))
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Found free port: " + port);
+                }
+
+                selectedPorts.add(port);
+
+                return port;
+            }
         }
 
-        selectedPorts.add(port);
-
-        return port;
-      }
+        throw new IllegalStateException("Unable to find an available port");
     }
 
-    throw new IllegalStateException("Unable to find an available port");
-  }
-
-  /**
-   * Indicates that the port is free from the point of view of the caller.
-   * <p/>
-   * Checks that the port was released, if it was not, then it would be marked as in use, so no other client receives the same
-   * port again.
-   *
-   * @param port the port number to release.
-   */
-  public synchronized void releasePort(int port) {
-    if (isPortFree(port)) {
-      selectedPorts.remove(port);
-    } else {
-      if (logger.isInfoEnabled()) {
-        logger.info(String.format("Port %d was is not correctly released", port));
-      }
-    }
-  }
-
-  /**
-   * Check and log is a given port is available
-   *
-   * @param port the port number to check
-   * @return true if the port is available, false otherwise
-   */
-  public boolean isPortFree(int port) {
-    boolean portIsFree = true;
-
-    ServerSocket server = null;
-    try {
-      server = new ServerSocket(port);
-      server.setReuseAddress(true);
-    } catch (IOException e) {
-      portIsFree = false;
-    } finally {
-      if (server != null) {
-        try {
-          server.close();
-        } catch (IOException e) {
-          // ignore
+    /**
+     * Indicates that the port is free from the point of view of the caller.
+     * <p/>
+     * Checks that the port was released, if it was not, then it would be
+     * marked as in use, so no other client receives the same port again.
+     *
+     * @param port the port number to release.
+     */
+    public synchronized void releasePort(int port)
+    {
+        if (isPortFree(port))
+        {
+            selectedPorts.remove(port);
         }
-      }
+        else
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info(String.format("Port %d was is not correctly released", port));
+            }
+        }
     }
 
-    return portIsFree;
-  }
+    /**
+     * Check and log is a given port is available
+     *
+     * @param port the port number to check
+     * @return true if the port is available, false otherwise
+     */
+    public boolean isPortFree(int port)
+    {
+        boolean portIsFree = true;
+
+        ServerSocket server = null;
+        try
+        {
+            server = new ServerSocket(port);
+            server.setReuseAddress(true);
+        }
+        catch (IOException e)
+        {
+            portIsFree = false;
+        }
+        finally
+        {
+            if (server != null)
+            {
+                try
+                {
+                    server.close();
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+        }
+
+        return portIsFree;
+    }
 }

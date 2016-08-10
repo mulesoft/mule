@@ -9,15 +9,16 @@ package org.mule.runtime.module.management.mbean;
 import org.mule.runtime.core.api.management.stats.Statistics;
 
 /**
- * <code>StatisticsServiceMBean</code> is a JMX interfaces for querying Mule event processing statistics.
+ * <code>StatisticsServiceMBean</code> is a JMX interfaces for querying Mule event
+ * processing statistics.
  */
-public interface StatisticsServiceMBean extends Statistics {
+public interface StatisticsServiceMBean extends Statistics
+{
+    String DEFAULT_JMX_NAME = "type=Statistics,name=AllStatistics";
 
-  String DEFAULT_JMX_NAME = "type=Statistics,name=AllStatistics";
+    String printCSVSummary ();
 
-  String printCSVSummary();
+    String printHtmlSummary ();
 
-  String printHtmlSummary();
-
-  String printXmlSummary();
+    String printXmlSummary ();
 }

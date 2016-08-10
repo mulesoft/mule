@@ -16,51 +16,61 @@ import java.util.Collection;
 /**
  * Resolves the default database configuration defined in an application
  */
-public class DefaultDbConfigResolver extends AbstractDbConfigResolver {
+public class DefaultDbConfigResolver extends AbstractDbConfigResolver
+{
 
-  private final MuleRegistry registry;
+    private final MuleRegistry registry;
 
-  private DbConfigResolver defaultConfigResolver;
+    private DbConfigResolver defaultConfigResolver;
 
-  public DefaultDbConfigResolver(MuleRegistry registry) {
-    this.registry = registry;
-  }
-
-  private DbConfigResolver getDefaultConfigResolver() {
-
-    Collection<DbConfigResolver> dbConfigResolvers = registry.lookupObjects(DbConfigResolver.class);
-
-    if (dbConfigResolvers.isEmpty()) {
-      throw new UnresolvableDbConfigException("There is no database config defined");
+    public DefaultDbConfigResolver(MuleRegistry registry)
+    {
+        this.registry = registry;
     }
 
-    if (dbConfigResolvers.size() > 1) {
-      StringBuilder stringBuilder = new StringBuilder();
-      for (DbConfigResolver dbConfigResolver : dbConfigResolvers) {
-        if (stringBuilder.length() != 0) {
-          stringBuilder.append(", ");
+    private DbConfigResolver getDefaultConfigResolver()
+    {
+
+        Collection<DbConfigResolver> dbConfigResolvers = registry.lookupObjects(DbConfigResolver.class);
+
+        if (dbConfigResolvers.isEmpty())
+        {
+            throw new UnresolvableDbConfigException("There is no database config defined");
         }
 
-        stringBuilder.append(dbConfigResolver.resolve(null).getName());
-      }
+        if (dbConfigResolvers.size() > 1)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (DbConfigResolver dbConfigResolver : dbConfigResolvers)
+            {
+                if (stringBuilder.length() != 0)
+                {
+                    stringBuilder.append(", ");
+                }
 
-      throw new UnresolvableDbConfigException("Database config must be explicitly defined using 'config-ref' attribute there are multiple database configs defined: "
-          + stringBuilder);
-    }
+                stringBuilder.append(dbConfigResolver.resolve(null).getName());
+            }
 
-    return dbConfigResolvers.iterator().next();
-  }
-
-  @Override
-  public DbConfig resolve(MuleEvent muleEvent) {
-    if (defaultConfigResolver == null) {
-      synchronized (this) {
-        if (defaultConfigResolver == null) {
-          defaultConfigResolver = getDefaultConfigResolver();
+            throw new UnresolvableDbConfigException("Database config must be explicitly defined using 'config-ref' attribute there are multiple database configs defined: " + stringBuilder);
         }
-      }
+
+        return dbConfigResolvers.iterator().next();
     }
 
-    return defaultConfigResolver.resolve(muleEvent);
-  }
+    @Override
+    public DbConfig resolve(MuleEvent muleEvent)
+    {
+        if (defaultConfigResolver == null)
+        {
+            synchronized (this)
+            {
+                if (defaultConfigResolver == null)
+                {
+                    defaultConfigResolver = getDefaultConfigResolver();
+                }
+            }
+        }
+
+        return defaultConfigResolver.resolve(muleEvent);
+    }
 }

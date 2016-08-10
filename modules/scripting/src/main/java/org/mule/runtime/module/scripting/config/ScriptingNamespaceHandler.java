@@ -15,21 +15,22 @@ import org.mule.runtime.module.scripting.filter.ScriptFilter;
 import org.mule.runtime.module.scripting.transformer.ScriptTransformer;
 
 
-public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler {
+public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
+{
+    @Override
+    public void init()
+    {
+        registerBeanDefinitionParser("script", new ScriptDefinitionParser());
+        registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
+        registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
 
-  @Override
-  public void init() {
-    registerBeanDefinitionParser("script", new ScriptDefinitionParser());
-    registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
-    registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
+        registerBeanDefinitionParser("transformer", new MessageProcessorDefinitionParser(ScriptTransformer.class));
+        registerBeanDefinitionParser("filter", new MessageProcessorDefinitionParser(ScriptFilter.class));
 
-    registerBeanDefinitionParser("transformer", new MessageProcessorDefinitionParser(ScriptTransformer.class));
-    registerBeanDefinitionParser("filter", new MessageProcessorDefinitionParser(ScriptFilter.class));
-
-    // For Spring-based scripting support
-    registerIgnoredElement("lang");
-    registerBeanDefinitionParser("groovy-refreshable", new GroovyRefreshableBeanBuilderParser(false));
-  }
+        // For Spring-based scripting support
+        registerIgnoredElement("lang");
+        registerBeanDefinitionParser("groovy-refreshable", new GroovyRefreshableBeanBuilderParser(false));
+    }
 }
 
 

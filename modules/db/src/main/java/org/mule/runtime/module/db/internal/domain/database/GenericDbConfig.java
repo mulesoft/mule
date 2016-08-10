@@ -28,72 +28,90 @@ import java.util.List;
 import javax.sql.DataSource;
 
 /**
- * Defines a database configuration that is not customized for any particular database vendor
+ * Defines a database configuration that is not customized for any particular
+ * database vendor
  */
-public class GenericDbConfig extends AbstractAnnotatedObject implements DbConfig {
+public class GenericDbConfig extends AbstractAnnotatedObject implements DbConfig
+{
 
-  private final DataSource dataSource;
-  private final String name;
-  private final DbConnectionFactory dbConnectionFactory;
-  private final DbTypeManager dbTypeManager;
+    private final DataSource dataSource;
+    private final String name;
+    private final DbConnectionFactory dbConnectionFactory;
+    private final DbTypeManager dbTypeManager;
 
-  public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager,
-                         DbConnectionFactory dbConnectionFactory) {
-    this.name = name;
-    this.dataSource = dataSource;
-    this.dbTypeManager = dbTypeManager;
-    this.dbConnectionFactory = dbConnectionFactory;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public DataSource getDataSource() {
-    return dataSource;
-  }
-
-  @Override
-  public DbConnectionFactory getConnectionFactory() {
-    return dbConnectionFactory;
-  }
-
-  public DbTypeManager getDbTypeManager() {
-    return dbTypeManager;
-  }
-
-  @Override
-  public TestResult test() {
-    Connection connection = null;
-
-    try {
-      connection = dbConnectionFactory.createConnection(NOT_SUPPORTED);
-
-      return new DefaultTestResult(SUCCESS);
-    } catch (SQLException e) {
-      return new DefaultTestResult(FAILURE, e.getMessage());
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          // Ignore
-        }
-      }
+    public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory)
+    {
+        this.name = name;
+        this.dataSource = dataSource;
+        this.dbTypeManager = dbTypeManager;
+        this.dbConnectionFactory = dbConnectionFactory;
     }
-  }
 
-  @Override
-  public Result<List<MetaDataKey>> getMetaDataKeys() {
-    List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
+    @Override
+    public String getName()
+    {
+        return name;
+    }
 
-    return new DefaultResult<>(keys, SUCCESS, "Successfully obtained metadata");
-  }
+    @Override
+    public DataSource getDataSource()
+    {
+        return dataSource;
+    }
 
-  @Override
-  public Result<MetaData> getMetaData(MetaDataKey metaDataKey) {
-    return new DefaultResult<>(null, SUCCESS, "No metadata obtained");
-  }
+    @Override
+    public DbConnectionFactory getConnectionFactory()
+    {
+        return dbConnectionFactory;
+    }
+
+    public DbTypeManager getDbTypeManager()
+    {
+        return dbTypeManager;
+    }
+
+    @Override
+    public TestResult test()
+    {
+        Connection connection = null;
+
+        try
+        {
+            connection = dbConnectionFactory.createConnection(NOT_SUPPORTED);
+
+            return new DefaultTestResult(SUCCESS);
+        }
+        catch (SQLException e)
+        {
+            return new DefaultTestResult(FAILURE, e.getMessage());
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch (SQLException e)
+                {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+    @Override
+    public Result<List<MetaDataKey>> getMetaDataKeys()
+    {
+        List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
+
+        return new DefaultResult<>(keys, SUCCESS, "Successfully obtained metadata");
+    }
+
+    @Override
+    public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
+    {
+        return new DefaultResult<>(null, SUCCESS, "No metadata obtained");
+    }
 }

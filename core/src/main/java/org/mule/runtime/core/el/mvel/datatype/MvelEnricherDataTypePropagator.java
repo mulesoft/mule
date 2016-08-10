@@ -19,38 +19,46 @@ import java.util.List;
 /**
  * Propagates {@link DataType} on enrichment expressions using a list of {@link EnricherDataTypePropagator}
  */
-public class MvelEnricherDataTypePropagator {
+public class MvelEnricherDataTypePropagator
+{
 
-  private final List<EnricherDataTypePropagator> propagators;
+    private final List<EnricherDataTypePropagator> propagators;
 
-  public MvelEnricherDataTypePropagator() {
-    this(getDefaultDataTypePropagators());
-  }
-
-  public MvelEnricherDataTypePropagator(List<EnricherDataTypePropagator> propagators) {
-    this.propagators = new LinkedList<>(propagators);
-  }
-
-  private static List<EnricherDataTypePropagator> getDefaultDataTypePropagators() {
-    List<EnricherDataTypePropagator> propagators;
-    propagators = new LinkedList<>();
-    propagators.add(new PayloadEnricherDataTypePropagator());
-    propagators.add(new PropertyEnricherDataTypePropagator());
-    propagators.add(new FlowVarEnricherDataTypePropagator());
-    propagators.add(new SessionVarEnricherDataTypePropagator());
-
-    return propagators;
-  }
-
-  public void propagate(TypedValue typedValue, MuleEvent event, Serializable serializedExpression) {
-    if (serializedExpression instanceof CompiledExpression) {
-      CompiledExpression compiledExpression = (CompiledExpression) serializedExpression;
-
-      for (EnricherDataTypePropagator propagator : propagators) {
-        if (propagator.propagate(event, typedValue, compiledExpression)) {
-          return;
-        }
-      }
+    public MvelEnricherDataTypePropagator()
+    {
+        this(getDefaultDataTypePropagators());
     }
-  }
+
+    public MvelEnricherDataTypePropagator(List<EnricherDataTypePropagator> propagators)
+    {
+        this.propagators = new LinkedList<>(propagators);
+    }
+
+    private static List<EnricherDataTypePropagator> getDefaultDataTypePropagators()
+    {
+        List<EnricherDataTypePropagator> propagators;
+        propagators = new LinkedList<>();
+        propagators.add(new PayloadEnricherDataTypePropagator());
+        propagators.add(new PropertyEnricherDataTypePropagator());
+        propagators.add(new FlowVarEnricherDataTypePropagator());
+        propagators.add(new SessionVarEnricherDataTypePropagator());
+
+        return propagators;
+    }
+
+    public void propagate(TypedValue typedValue, MuleEvent event, Serializable serializedExpression)
+    {
+        if (serializedExpression instanceof CompiledExpression)
+        {
+            CompiledExpression compiledExpression = (CompiledExpression) serializedExpression;
+
+            for (EnricherDataTypePropagator propagator : propagators)
+            {
+                if (propagator.propagate(event, typedValue, compiledExpression))
+                {
+                    return;
+                }
+            }
+        }
+    }
 }

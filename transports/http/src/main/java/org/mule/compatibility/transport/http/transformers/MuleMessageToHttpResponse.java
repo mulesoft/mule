@@ -46,229 +46,290 @@ import org.joda.time.format.DateTimeFormatter;
 /**
  * Converts a {@link MuleMessage} into an Http response.
  */
-public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
-
-  private static DateTimeFormatter dateFormatter =
-      DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT_RFC822).withLocale(Locale.US);
-
-  public static String formatDate(long time) {
-    return dateFormatter.print(time);
-  }
-
-  private String server;
-
-  public MuleMessageToHttpResponse() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.fromType(HttpResponse.class));
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    // When running with the source code, Meta information is not set
-    // so product name and version are not available, hence we hard code
-    if (MuleManifest.getProductName() == null) {
-      server = "Mule/SNAPSHOT";
-    } else {
-      server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
+public class MuleMessageToHttpResponse extends AbstractMessageTransformer
+{
+    
+    private static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT_RFC822).withLocale(Locale.US);
+    
+    public static String formatDate(long time)
+    {
+        return dateFormatter.print(time);
     }
 
-    dateFormatter = dateFormatter.withZone(DateTimeZone.forID("GMT"));
-  }
+    private String server;
 
-  @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
-
-    // Note this transformer excepts Null as we must always return a result
-    // from the Http
-    // connector if a response transformer is present
-    if (src == null) {
-      src = StringUtils.EMPTY;
+    public MuleMessageToHttpResponse()
+    {
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.fromType(HttpResponse.class));
     }
 
-    try {
-      HttpResponse response;
-      if (src instanceof HttpResponse) {
-        response = (HttpResponse) src;
-      } else {
-        response = createResponse(src, outputEncoding, event.getMessage());
-      }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        // When running with the source code, Meta information is not set
+        // so product name and version are not available, hence we hard code
+        if (MuleManifest.getProductName() == null)
+        {
+            server = "Mule/SNAPSHOT";
+        }
+        else
+        {
+            server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
+        }
 
-      // Ensure there's a content type header
-      if (!response.containsHeader(HttpConstants.HEADER_CONTENT_TYPE)) {
-        response.addHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
-      }
+        dateFormatter = dateFormatter.withZone(DateTimeZone.forID("GMT"));
+    }
 
-      // Ensure there's a content length or transfer encoding header
-      if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH)
-          && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING)) {
-        if (response.hasBody()) {
-          long len = response.getContentLength();
-          if (len < 0) {
-            if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0)) {
-              // Ensure that we convert the payload to an in memory representation
-              // so we don't end up with a chunked response
-              len = event.getMessageAsBytes().length;
+    @Override
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
+    {
+        Object src = event.getMessage().getPayload();
 
-              response.setBody(event.getMessage(), muleContext);
+        // Note this transformer excepts Null as we must always return a result
+        // from the Http
+        // connector if a response transformer is present
+        if (src == null)
+        {
+            src = StringUtils.EMPTY;
+        }
 
-              Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
-              response.setHeader(header);
-            } else {
-              Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
-              response.addHeader(header);
+        try
+        {
+            HttpResponse response;
+            if (src instanceof HttpResponse)
+            {
+                response = (HttpResponse) src;
             }
-          } else {
-            Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
-            response.setHeader(header);
-          }
-        } else {
-          Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0");
-          response.addHeader(header);
+            else
+            {
+                response = createResponse(src, outputEncoding, event.getMessage());
+            }
+
+            // Ensure there's a content type header
+            if (!response.containsHeader(HttpConstants.HEADER_CONTENT_TYPE))
+            {
+                response.addHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE,
+                        HttpConstants.DEFAULT_CONTENT_TYPE));
+            }
+
+            // Ensure there's a content length or transfer encoding header
+            if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH)
+                    && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
+            {
+                if (response.hasBody())
+                {
+                    long len = response.getContentLength();
+                    if (len < 0)
+                    {
+                        if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0))
+                        {
+                            // Ensure that we convert the payload to an in memory representation
+                            // so we don't end up with a chunked response
+                            len = event.getMessageAsBytes().length;
+
+                            response.setBody(event.getMessage(), muleContext);
+
+                            Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
+                            response.setHeader(header);
+                        }
+                        else
+                        {
+                            Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
+                            response.addHeader(header);
+                        }
+                    }
+                    else
+                    {
+                        Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
+                        response.setHeader(header);
+                    }
+                }
+                else
+                {
+                    Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0");
+                    response.addHeader(header);
+                }
+            }
+
+            // See if the the client explicitly handles connection persistence
+            String connHeader = event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONNECTION);
+            if (connHeader != null)
+            {
+                if (connHeader.equalsIgnoreCase("keep-alive"))
+                {
+                    response.setKeepAlive(true);
+                }
+                if (connHeader.equalsIgnoreCase("close"))
+                {
+                    response.setKeepAlive(false);
+                }
+            }
+
+            final String method = event.getMessage().getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            if ("HEAD".equalsIgnoreCase(method))
+            {
+                // this is a head request, we don't want to send the actual content
+                response.setBody((MuleMessage) null, muleContext);
+            }
+            return response;
         }
-      }
-
-      // See if the the client explicitly handles connection persistence
-      String connHeader = event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONNECTION);
-      if (connHeader != null) {
-        if (connHeader.equalsIgnoreCase("keep-alive")) {
-          response.setKeepAlive(true);
-        }
-        if (connHeader.equalsIgnoreCase("close")) {
-          response.setKeepAlive(false);
-        }
-      }
-
-      final String method = event.getMessage().getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
-      if ("HEAD".equalsIgnoreCase(method)) {
-        // this is a head request, we don't want to send the actual content
-        response.setBody((MuleMessage) null, muleContext);
-      }
-      return response;
-    } catch (Exception e) {
-      throw new TransformerException(this, e);
-    }
-
-  }
-
-  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg) throws IOException, TransformerException {
-    HttpResponse response = new HttpResponse();
-
-    Object tmp = msg.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-    int status = HttpConstants.SC_OK;
-
-    if (tmp != null) {
-      status = Integer.valueOf(tmp.toString());
-    } else if (msg.getExceptionPayload() != null) {
-      status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
-    }
-
-    String version = msg.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
-    if (version == null) {
-      version = HttpConstants.HTTP11;
-    }
-
-    String contentType = msg.getDataType().getMediaType().toRfcString();
-    if (contentType == null) {
-      DataType dataType = msg.getDataType();
-      if (!MediaType.ANY.matches(dataType.getMediaType())) {
-        contentType = dataType.getMediaType().toRfcString();
-      }
-    }
-
-    response.setStatusLine(HttpVersion.parse(version), status);
-    if (contentType != null) {
-      response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
-    }
-    setDateHeader(response, System.currentTimeMillis());
-    response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
-
-    String etag = msg.getOutboundProperty(HttpConstants.HEADER_ETAG);
-    if (etag != null) {
-      response.setHeader(new Header(HttpConstants.HEADER_ETAG, etag));
-    }
-    response.setFallbackCharset(encoding);
-
-    Collection<String> headerNames = new LinkedList<>();
-    headerNames.addAll(HttpConstants.RESPONSE_HEADER_NAMES.values());
-    headerNames.addAll(HttpConstants.GENERAL_AND_ENTITY_HEADER_NAMES.values());
-    headerNames.remove(HttpConstants.HEADER_CONTENT_TYPE);
-
-    for (String headerName : headerNames) {
-      if (HttpConstants.HEADER_COOKIE_SET.equals(headerName)) {
-        // TODO This have to be improved. We shouldn't have to look in all
-        // scopes
-        Serializable cookiesObject = msg.getOutboundProperty(headerName);
-        if (cookiesObject == null) {
-          cookiesObject = msg.getInboundProperty(headerName);
-        }
-        if (cookiesObject == null) {
-          continue;
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
         }
 
-        if (!(cookiesObject instanceof Cookie[])) {
-          response.addHeader(new Header(headerName, cookiesObject.toString()));
-        } else {
-          Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookiesObject);
-          for (Cookie cookie : arrayOfCookies) {
-            response.addHeader(new Header(headerName, CookieHelper.formatCookieForASetCookieHeader(cookie)));
-          }
+    }
+
+    protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg)
+            throws IOException, TransformerException
+    {
+        HttpResponse response = new HttpResponse();
+
+        Object tmp = msg.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        int status = HttpConstants.SC_OK;
+
+        if (tmp != null)
+        {
+            status = Integer.valueOf(tmp.toString());
         }
-      } else {
-        Object value = msg.getOutboundProperty(headerName);
-        if (value != null) {
-          response.setHeader(new Header(headerName, value.toString()));
+        else if (msg.getExceptionPayload() != null)
+        {
+            status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
         }
-      }
-    }
 
-    Map customHeaders = msg.getOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-    if (customHeaders != null) {
-      throw new TransformerException(HttpMessages.customHeaderMapDeprecated(), this);
-    }
-
-    // attach the outbound properties to the message
-    for (String headerName : msg.getOutboundPropertyNames()) {
-      if (response.getFirstHeader(headerName) != null) {
-        // keep headers already set
-        continue;
-      }
-      Object v = msg.getOutboundProperty(headerName);
-      if (v != null) {
-        if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
-          headerName = HttpConstants.CUSTOM_HEADER_PREFIX + headerName;
+        String version = msg.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+        if (version == null)
+        {
+            version = HttpConstants.HTTP11;
         }
-        response.setHeader(new Header(headerName, v.toString()));
-      }
+
+        String contentType = msg.getDataType().getMediaType().toRfcString();
+        if (contentType == null)
+        {
+            DataType dataType = msg.getDataType();
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
+            {
+                contentType = dataType.getMediaType().toRfcString();
+            }
+        }
+
+        response.setStatusLine(HttpVersion.parse(version), status);
+        if (contentType != null)
+        {
+            response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
+        }
+        setDateHeader(response, System.currentTimeMillis());
+        response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
+
+        String etag = msg.getOutboundProperty(HttpConstants.HEADER_ETAG);
+        if (etag != null)
+        {
+            response.setHeader(new Header(HttpConstants.HEADER_ETAG, etag));
+        }
+        response.setFallbackCharset(encoding);
+
+        Collection<String> headerNames = new LinkedList<>();
+        headerNames.addAll(HttpConstants.RESPONSE_HEADER_NAMES.values());
+        headerNames.addAll(HttpConstants.GENERAL_AND_ENTITY_HEADER_NAMES.values());
+        headerNames.remove(HttpConstants.HEADER_CONTENT_TYPE);
+
+        for (String headerName : headerNames)
+        {
+            if (HttpConstants.HEADER_COOKIE_SET.equals(headerName))
+            {
+                // TODO This have to be improved. We shouldn't have to look in all
+                // scopes
+                Serializable cookiesObject = msg.getOutboundProperty(headerName);
+                if (cookiesObject == null)
+                {
+                    cookiesObject = msg.getInboundProperty(headerName);
+                }
+                if (cookiesObject == null)
+                {
+                    continue;
+                }
+
+                if (!(cookiesObject instanceof Cookie[]))
+                {
+                    response.addHeader(new Header(headerName, cookiesObject.toString()));
+                }
+                else
+                {
+                    Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookiesObject);
+                    for (Cookie cookie : arrayOfCookies)
+                    {
+                        response.addHeader(new Header(headerName,
+                            CookieHelper.formatCookieForASetCookieHeader(cookie)));
+                    }
+                }
+            }
+            else
+            {
+                Object value = msg.getOutboundProperty(headerName);
+                if (value != null)
+                {
+                    response.setHeader(new Header(headerName, value.toString()));
+                }
+            }
+        }
+        
+        Map customHeaders = msg.getOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        if (customHeaders != null)
+        {
+            throw new TransformerException(HttpMessages.customHeaderMapDeprecated(), this);
+        }
+
+        //attach the outbound properties to the message
+        for (String headerName : msg.getOutboundPropertyNames())
+        {
+            if (response.getFirstHeader(headerName) != null)
+            {
+                //keep headers already set
+                continue;
+            }
+            Object v = msg.getOutboundProperty(headerName);
+            if (v != null)
+            {
+                if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
+                {
+                    headerName = HttpConstants.CUSTOM_HEADER_PREFIX + headerName;
+                }
+                response.setHeader(new Header(headerName, v.toString()));
+            }
+        }
+
+        msg.getCorrelation().getId().ifPresent(v ->
+        {
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, v));
+            msg.getCorrelation().getGroupSize().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
+            msg.getCorrelation().getSequence().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
+        });
+        if (msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY) != null)
+        {
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY, msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY).toString()));
+        }
+
+        try
+        {
+            response.setBody(msg, muleContext);
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
+
+        return response;
     }
 
-    msg.getCorrelation().getId().ifPresent(v -> {
-      response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, v));
-      msg.getCorrelation().getGroupSize().ifPresent(s -> response
-          .setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
-      msg.getCorrelation().getSequence()
-          .ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
-    });
-    if (msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY) != null) {
-      response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY,
-                                    msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY).toString()));
+    protected void setDateHeader(HttpResponse response, long millis)
+    {
+        response.setHeader(new Header(HttpConstants.HEADER_DATE, formatDate(millis)));
     }
 
-    try {
-      response.setBody(msg, muleContext);
-    } catch (Exception e) {
-      throw new TransformerException(this, e);
+    @Override
+    public boolean isAcceptNull()
+    {
+        return true;
     }
-
-    return response;
-  }
-
-  protected void setDateHeader(HttpResponse response, long millis) {
-    response.setHeader(new Header(HttpConstants.HEADER_DATE, formatDate(millis)));
-  }
-
-  @Override
-  public boolean isAcceptNull() {
-    return true;
-  }
 }

@@ -16,76 +16,91 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * * Finds native libraries in an application's lib folder and creates a copy of each found library inside a temporal application
- * folder.
+ * * Finds native libraries in an application's lib folder and creates a copy of
+ * each found library inside a temporal application folder.
  */
-public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder {
+public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder
+{
 
-  protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final File perAppNativeLibs;
+    private final File perAppNativeLibs;
 
-  public PerAppCopyNativeLibraryFinder(File libDir, File perAppNativeLibs) {
-    super(libDir);
+    public PerAppCopyNativeLibraryFinder(File libDir, File perAppNativeLibs)
+    {
+        super(libDir);
 
-    this.perAppNativeLibs = perAppNativeLibs;
+        this.perAppNativeLibs = perAppNativeLibs;
 
-    if (this.perAppNativeLibs.exists()) {
-      cleanNativeLibs();
-    } else {
-      if (!this.perAppNativeLibs.mkdirs()) {
-        throw new IllegalStateException(String.format("Unable to create application '%s' folder",
-                                                      this.perAppNativeLibs.getAbsolutePath()));
-      }
-    }
-  }
-
-  @Override
-  public String findLibrary(String name, String parentLibraryPath) {
-    String libraryPath = parentLibraryPath;
-
-    if (null == libraryPath) {
-      libraryPath = findLibraryLocally(name);
+        if (this.perAppNativeLibs.exists())
+        {
+            cleanNativeLibs();
+        }
+        else
+        {
+            if (!this.perAppNativeLibs.mkdirs())
+            {
+                throw new IllegalStateException(String.format("Unable to create application '%s' folder", this.perAppNativeLibs.getAbsolutePath()));
+            }
+        }
     }
 
-    if (libraryPath != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("Found native library for '%s' on '%s", name, libraryPath));
-      }
+    @Override
+    public String findLibrary(String name, String parentLibraryPath)
+    {
+        String libraryPath = parentLibraryPath;
 
-      final File tempLibrary = copyNativeLibrary(name, libraryPath);
-      libraryPath = tempLibrary.getAbsolutePath();
+        if (null == libraryPath)
+        {
+            libraryPath = findLibraryLocally(name);
+        }
 
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("Created native library copy for '%s' on '%s", name, libraryPath));
-      }
+        if (libraryPath != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Found native library for '%s' on '%s", name, libraryPath));
+            }
+
+            final File tempLibrary = copyNativeLibrary(name, libraryPath);
+            libraryPath = tempLibrary.getAbsolutePath();
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Created native library copy for '%s' on '%s", name, libraryPath));
+            }
+        }
+        return libraryPath;
     }
-    return libraryPath;
-  }
 
-  private void cleanNativeLibs() {
-    String[] list = perAppNativeLibs.list();
+    private void cleanNativeLibs()
+    {
+        String[] list = perAppNativeLibs.list();
 
-    if (list != null) {
-      for (String library : list) {
-        new File(perAppNativeLibs, library).delete();
-      }
+        if (list != null)
+        {
+            for (String library : list)
+            {
+                new File(perAppNativeLibs, library).delete();
+            }
+        }
     }
-  }
 
-  private File copyNativeLibrary(String name, String libraryPath) {
-    final String nativeLibName = System.mapLibraryName(name);
-    final File tempLibrary = new File(perAppNativeLibs, nativeLibName + System.currentTimeMillis());
+    private File copyNativeLibrary(String name, String libraryPath)
+    {
+        final String nativeLibName = System.mapLibraryName(name);
+        final File tempLibrary = new File(perAppNativeLibs, nativeLibName + System.currentTimeMillis());
 
-    try {
-      final File library = new File(libraryPath);
-      FileUtils.copyFile(library, tempLibrary);
+        try
+        {
+            final File library = new File(libraryPath);
+            FileUtils.copyFile(library, tempLibrary);
 
-      return tempLibrary;
-    } catch (IOException e) {
-      throw new IllegalStateException(String.format("Unable to generate copy for native library '%s' at '%s'", nativeLibName,
-                                                    tempLibrary.getAbsolutePath()),
-                                      e);
+            return tempLibrary;
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(String.format("Unable to generate copy for native library '%s' at '%s'", nativeLibName, tempLibrary.getAbsolutePath()), e);
+        }
     }
-  }
 }

@@ -20,49 +20,56 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
- * A {@link AbstractExtensionObjectFactory} that produces {@link ConnectionProviderResolver} instances
+ * A {@link AbstractExtensionObjectFactory} that produces {@link ConnectionProviderResolver}
+ * instances
  *
  * @since 4.0
  */
-public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver> {
+public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver>
+{
+    private final RuntimeConnectionProviderModel providerModel;
+    private MuleContext muleContext;
 
-  private final RuntimeConnectionProviderModel providerModel;
-  private MuleContext muleContext;
+    private PoolingProfile poolingProfile = null;
+    private RetryPolicyTemplate retryPolicyTemplate = null;
+    private boolean disableValidation = false;
 
-  private PoolingProfile poolingProfile = null;
-  private RetryPolicyTemplate retryPolicyTemplate = null;
-  private boolean disableValidation = false;
-
-  public ConnectionProviderObjectFactory(RuntimeConnectionProviderModel providerModel, MuleContext muleContext) {
-    this.providerModel = providerModel;
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public ConnectionProviderResolver getObject() throws Exception {
-    ResolverSet resolverSet = getParametersAsResolverSet(providerModel);
-    return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                                              disableValidation, retryPolicyTemplate,
-                                                                              getConnectionManager()));
-  }
-
-  private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {
-    try {
-      return muleContext.getRegistry().lookupObject(ConnectionManagerAdapter.class);
-    } catch (RegistrationException e) {
-      throw new ConfigurationException(createStaticMessage("Could not obtain connection manager adapter form registry"), e);
+    public ConnectionProviderObjectFactory(RuntimeConnectionProviderModel providerModel, MuleContext muleContext)
+    {
+        this.providerModel = providerModel;
+        this.muleContext = muleContext;
     }
-  }
 
-  public void setPoolingProfile(PoolingProfile poolingProfile) {
-    this.poolingProfile = poolingProfile;
-  }
+    @Override
+    public ConnectionProviderResolver getObject() throws Exception
+    {
+        ResolverSet resolverSet = getParametersAsResolverSet(providerModel);
+        return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, getConnectionManager()));
+    }
 
-  public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
-    this.retryPolicyTemplate = retryPolicyTemplate;
-  }
+    private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {
+        try
+        {
+            return muleContext.getRegistry().lookupObject(ConnectionManagerAdapter.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ConfigurationException(createStaticMessage("Could not obtain connection manager adapter form registry"), e);
+        }
+    }
 
-  public void setDisableValidation(boolean disableValidation) {
-    this.disableValidation = disableValidation;
-  }
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        this.poolingProfile = poolingProfile;
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
+    }
+
+    public void setDisableValidation(boolean disableValidation)
+    {
+        this.disableValidation = disableValidation;
+    }
 }

@@ -18,25 +18,26 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class XsltWithParamsTransformerTestCase extends AbstractIntegrationTestCase {
+public class XsltWithParamsTransformerTestCase extends AbstractIntegrationTestCase
+{
+    @Rule
+    public SystemProperty useXalan = new ForceXalanTransformerFactory();
 
-  @Rule
-  public SystemProperty useXalan = new ForceXalanTransformerFactory();
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/module/xml/xml-namespace-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/module/xml/xml-namespace-test.xml";
-  }
-
-  @Test
-  public void testTransformWithParameter() throws Exception {
-    Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
-    assertNotNull(trans);
-    MuleMessage message = MuleMessage.builder().payload("<testing/>").addOutboundProperty("Welcome", "hello").build();
-    Object result = trans.transform(message);
-    assertNotNull(result);
-    XMLUnit.setIgnoreWhitespace(true);
-    XMLAssert.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><echo-value xmlns=\"http://test.com\">hello</echo-value>",
-                           result);
-  }
+    @Test
+    public void testTransformWithParameter() throws Exception
+    {
+        Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
+        assertNotNull(trans);
+        MuleMessage message = MuleMessage.builder().payload("<testing/>").addOutboundProperty("Welcome", "hello").build();
+        Object result = trans.transform(message);
+        assertNotNull(result);
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLAssert.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><echo-value xmlns=\"http://test.com\">hello</echo-value>", result);
+    }
 }

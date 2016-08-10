@@ -11,42 +11,47 @@ import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /**
- * <code>TestEntryPointResolver</code> is a test EntryPointResolver that doesn't provide any functionality. It is usually used to
- * test confguration options
+ * <code>TestEntryPointResolver</code> is a test EntryPointResolver that doesn't provide
+ * any functionality. It is usually used to test confguration options
  */
-public class TestEntryPointResolverSet implements EntryPointResolverSet {
+public class TestEntryPointResolverSet implements EntryPointResolverSet
+{
+    private String testProperty;
 
-  private String testProperty;
+    /**
+     * Will add a resolver to the list of resolvers to invoke on a compoent.
+     * Implementations must maintain an ordered list of resolvers
+     *
+     * @param resolver the resolver to add
+     */
+    public void addEntryPointResolver(EntryPointResolver resolver)
+    {
 
-  /**
-   * Will add a resolver to the list of resolvers to invoke on a compoent. Implementations must maintain an ordered list of
-   * resolvers
-   *
-   * @param resolver the resolver to add
-   */
-  public void addEntryPointResolver(EntryPointResolver resolver) {
+    }
 
-  }
+    public Object invoke(Object component, MuleEventContext context) throws Exception
+    {
+        return null;
+    }
 
-  public Object invoke(Object component, MuleEventContext context) throws Exception {
-    return null;
-  }
+    /**
+     * Removes a resolver from the list
+     *
+     * @param resolver the resolver to remove
+     * @return true if the resolver was found and removed from the list
+     */
+    public boolean removeEntryPointResolver(EntryPointResolver resolver)
+    {
+        return false;
+    }
 
-  /**
-   * Removes a resolver from the list
-   *
-   * @param resolver the resolver to remove
-   * @return true if the resolver was found and removed from the list
-   */
-  public boolean removeEntryPointResolver(EntryPointResolver resolver) {
-    return false;
-  }
+    public String getTestProperty()
+    {
+        return testProperty;
+    }
 
-  public String getTestProperty() {
-    return testProperty;
-  }
-
-  public void setTestProperty(String testProperty) {
-    this.testProperty = testProperty;
-  }
+    public void setTestProperty(String testProperty)
+    {
+        this.testProperty = testProperty;
+    }
 }

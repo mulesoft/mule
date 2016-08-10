@@ -23,57 +23,68 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
  */
-public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<ServiceDescriptor> {
+public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<ServiceDescriptor>
+{
 
-  public static final String CLASSES_DIR = "classes";
-  public static final String LIB_DIR = "lib";
-  private static final String JAR_FILE = "*.jar";
+    public static final String CLASSES_DIR = "classes";
+    public static final String LIB_DIR = "lib";
+    private static final String JAR_FILE = "*.jar";
 
-  /**
-   * @inherited
-   */
-  @Override
-  public ArtifactClassLoader create(ArtifactClassLoader parent, ServiceDescriptor descriptor) {
-    File rootFolder = descriptor.getRootFolder();
-    if (rootFolder == null || !rootFolder.exists()) {
-      throw new IllegalArgumentException("Service folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
+    /**
+     * @inherited
+     */
+    @Override
+    public ArtifactClassLoader create(ArtifactClassLoader parent, ServiceDescriptor descriptor)
+    {
+        File rootFolder = descriptor.getRootFolder();
+        if (rootFolder == null || !rootFolder.exists())
+        {
+            throw new IllegalArgumentException("Service folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
+        }
+
+        List<URL> urls = new LinkedList<>();
+
+        addDirectoryToClassLoader(urls, new File(rootFolder, CLASSES_DIR));
+        loadJarsFromFolder(urls, new File(rootFolder, LIB_DIR));
+
+        return new MuleArtifactClassLoader(descriptor.getName(), urls.toArray(new URL[0]), parent.getClassLoader(), parent.getClassLoaderLookupPolicy());
     }
 
-    List<URL> urls = new LinkedList<>();
+    private void loadJarsFromFolder(List<URL> urls, File folder)
+    {
+        if (!folder.exists())
+        {
+            return;
+        }
 
-    addDirectoryToClassLoader(urls, new File(rootFolder, CLASSES_DIR));
-    loadJarsFromFolder(urls, new File(rootFolder, LIB_DIR));
+        FilenameFilter fileFilter = new WildcardFileFilter(JAR_FILE);
+        File[] files = folder.listFiles(fileFilter);
+        for (File jarFile : files)
+        {
+            urls.add(getFileUrl(jarFile));
 
-    return new MuleArtifactClassLoader(descriptor.getName(), urls.toArray(new URL[0]), parent.getClassLoader(),
-                                       parent.getClassLoaderLookupPolicy());
-  }
-
-  private void loadJarsFromFolder(List<URL> urls, File folder) {
-    if (!folder.exists()) {
-      return;
+        }
     }
 
-    FilenameFilter fileFilter = new WildcardFileFilter(JAR_FILE);
-    File[] files = folder.listFiles(fileFilter);
-    for (File jarFile : files) {
-      urls.add(getFileUrl(jarFile));
-
+    private URL getFileUrl(File jarFile)
+    {
+        try
+        {
+            return jarFile.toURI().toURL();
+        }
+        catch (MalformedURLException e)
+        {
+            // Should not happen as folder already exists
+            throw new IllegalStateException("Cannot create service class loader", e);
+        }
     }
-  }
 
-  private URL getFileUrl(File jarFile) {
-    try {
-      return jarFile.toURI().toURL();
-    } catch (MalformedURLException e) {
-      // Should not happen as folder already exists
-      throw new IllegalStateException("Cannot create service class loader", e);
+    private void addDirectoryToClassLoader(List<URL> urls, File classesFolder)
+    {
+        if (classesFolder.exists())
+        {
+            urls.add(getFileUrl(classesFolder));
+        }
     }
-  }
-
-  private void addDirectoryToClassLoader(List<URL> urls, File classesFolder) {
-    if (classesFolder.exists()) {
-      urls.add(getFileUrl(classesFolder));
-    }
-  }
 
 }

@@ -10,21 +10,27 @@ import org.mule.runtime.core.work.DefaultWorkListener;
 
 import javax.resource.spi.work.WorkEvent;
 
-public class TestingWorkListener extends DefaultWorkListener {
+public class TestingWorkListener extends DefaultWorkListener
+{
+    protected void handleWorkException(WorkEvent event, String type)
+    {
+        super.handleWorkException(event, type);
+        if (event.getException() != null)
+        {
+            Throwable t = event.getException().getCause();
+            if (t != null)
+            {
 
-  protected void handleWorkException(WorkEvent event, String type) {
-    super.handleWorkException(event, type);
-    if (event.getException() != null) {
-      Throwable t = event.getException().getCause();
-      if (t != null) {
+                if (t instanceof Error)
+                {
+                    throw (Error)t;
+                }
+                else if (t instanceof RuntimeException)
+                {
+                    throw (RuntimeException)t;
+                }
+            }
 
-        if (t instanceof Error) {
-          throw (Error) t;
-        } else if (t instanceof RuntimeException) {
-          throw (RuntimeException) t;
         }
-      }
-
     }
-  }
 }

@@ -13,29 +13,34 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-public class JmsTestContextFactory extends TestContextFactory {
+public class JmsTestContextFactory extends TestContextFactory
+{
+    public static boolean failWhenRetrievingInitialContext = false;
 
-  public static boolean failWhenRetrievingInitialContext = false;
-
-  @Override
-  protected void populateTestData(Context context) throws NamingException {
-    super.populateTestData(context);
-    context.bind("jms/connectionFactory", new TestConnectionFactory());
-  }
-
-  @Override
-  public Context getInitialContext(Hashtable environment) throws NamingException {
-    if (failWhenRetrievingInitialContext) {
-      throw new NamingException("Initial context not ready");
+    @Override
+    protected void populateTestData(Context context) throws NamingException
+    {
+        super.populateTestData(context);
+        context.bind("jms/connectionFactory", new TestConnectionFactory());
     }
-    return super.getInitialContext(environment);
-  }
 
-  @Override
-  public Context getInitialContext() throws NamingException {
-    if (failWhenRetrievingInitialContext) {
-      throw new NamingException("Initial context not ready");
+    @Override
+    public Context getInitialContext(Hashtable environment) throws NamingException
+    {
+        if (failWhenRetrievingInitialContext)
+        {
+            throw new NamingException("Initial context not ready");
+        }
+        return super.getInitialContext(environment);
     }
-    return super.getInitialContext();
-  }
+
+    @Override
+    public Context getInitialContext() throws NamingException
+    {
+        if (failWhenRetrievingInitialContext)
+        {
+            throw new NamingException("Initial context not ready");
+        }
+        return super.getInitialContext();
+    }
 }

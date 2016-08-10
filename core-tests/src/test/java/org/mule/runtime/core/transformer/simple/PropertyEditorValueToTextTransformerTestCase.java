@@ -12,29 +12,34 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 
-public class PropertyEditorValueToTextTransformerTestCase extends AbstractTransformerTestCase {
+public class PropertyEditorValueToTextTransformerTestCase extends AbstractTransformerTestCase
+{
+    @Override
+    public Object getResultData()
+    {
+        return "True";
+    }
 
-  @Override
-  public Object getResultData() {
-    return "True";
-  }
+    @Override
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return new PropertyEditorTextToValueTransformer(createBooleanPropertyEditor(), Boolean.class);
+    }
 
-  @Override
-  public Transformer getRoundTripTransformer() throws Exception {
-    return new PropertyEditorTextToValueTransformer(createBooleanPropertyEditor(), Boolean.class);
-  }
+    @Override
+    public Object getTestData()
+    {
+        return new Boolean(true);
+    }
 
-  @Override
-  public Object getTestData() {
-    return new Boolean(true);
-  }
+    @Override
+    public Transformer getTransformer() throws Exception
+    {
+        return new PropertyEditorValueToTextTransformer(createBooleanPropertyEditor(), Boolean.class);
+    }
 
-  @Override
-  public Transformer getTransformer() throws Exception {
-    return new PropertyEditorValueToTextTransformer(createBooleanPropertyEditor(), Boolean.class);
-  }
-
-  private PropertyEditor createBooleanPropertyEditor() throws Exception {
-    return PropertyEditorManager.findEditor(boolean.class);
-  }
+    private PropertyEditor createBooleanPropertyEditor() throws Exception
+    {
+        return PropertyEditorManager.findEditor(boolean.class);
+    }
 }

@@ -27,78 +27,94 @@ import org.junit.Test;
 /**
  * Tests configuration and creation of XStream-based transformers
  */
-public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCase {
+public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCase
+{
 
-  public static volatile boolean MyDriverDidInitialize;
+    public static volatile boolean MyDriverDidInitialize;
 
-  protected static class MyDOMDriver extends DomDriver {
+    protected static class MyDOMDriver extends DomDriver
+    {
 
-    public MyDOMDriver() {
-      super();
-      XStreamTransformerConfigurationTestCase.MyDriverDidInitialize = true;
+        public MyDOMDriver()
+        {
+            super();
+            XStreamTransformerConfigurationTestCase.MyDriverDidInitialize = true;
+        }
     }
-  }
 
-  @Before
-  public void doSetUp() {
-    MyDriverDidInitialize = true;
-  }
-
-  @After
-  public void doTearDown() {
-    MyDriverDidInitialize = false;
-  }
-
-  @Test
-  public void testDefaultDriver() throws Exception {
-    XmlToObject transformer = new XmlToObject();
-    // check for XStream's default
-    assertEquals(XStreamFactory.XSTREAM_XPP_DRIVER, transformer.getDriverClass());
-  }
-
-  @Test
-  public void testCustomDriver() throws Exception {
-    XmlToObject transformer = new XmlToObject();
-    // set custom driver
-    transformer.setDriverClass(MyDOMDriver.class.getName());
-    XStream xs = transformer.getXStream();
-
-    assertNotNull(xs);
-    assertSame(xs, transformer.getXStream());
-    assertTrue(MyDriverDidInitialize);
-  }
-
-  @Test
-  public void testBadDriver() throws Exception {
-    XmlToObject transformer = new XmlToObject();
-    // set nonexisting driver class
-    transformer.setDriverClass("DudeWhereIsMyDriver");
-
-    try {
-      assertNotNull(transformer.getXStream());
-      fail();
-    } catch (TransformerException tex) {
-      // OK
-      assertTrue(tex.getCause() instanceof ClassNotFoundException);
+    @Before
+    public void doSetUp()
+    {
+        MyDriverDidInitialize = true;
     }
-  }
 
-  @Test
-  public void testClassLoader() {
-    TestClassLoader classLoader = new TestClassLoader();
-    withContextClassLoader(classLoader, () -> {
-      try {
+    @After
+    public void doTearDown()
+    {
+        MyDriverDidInitialize = false;
+    }
+
+    @Test
+    public void testDefaultDriver() throws Exception
+    {
         XmlToObject transformer = new XmlToObject();
-        transformer.initialise();
-        assertEquals(classLoader, transformer.getXStream().getClassLoader());
-      } catch (Exception e) {
-        fail(e.getMessage());
-      }
-    });
-  }
+        // check for XStream's default
+        assertEquals(XStreamFactory.XSTREAM_XPP_DRIVER, transformer.getDriverClass());
+    }
 
-  private static class TestClassLoader extends ClassLoader {
+    @Test
+    public void testCustomDriver() throws Exception
+    {
+        XmlToObject transformer = new XmlToObject();
+        // set custom driver
+        transformer.setDriverClass(MyDOMDriver.class.getName());
+        XStream xs = transformer.getXStream();
 
-  }
+        assertNotNull(xs);
+        assertSame(xs, transformer.getXStream());
+        assertTrue(MyDriverDidInitialize);
+    }
+
+    @Test
+    public void testBadDriver() throws Exception
+    {
+        XmlToObject transformer = new XmlToObject();
+        // set nonexisting driver class
+        transformer.setDriverClass("DudeWhereIsMyDriver");
+
+        try
+        {
+            assertNotNull(transformer.getXStream());
+            fail();
+        }
+        catch (TransformerException tex)
+        {
+            // OK
+            assertTrue(tex.getCause() instanceof ClassNotFoundException);
+        }
+    }
+
+    @Test
+    public void testClassLoader()
+    {
+        TestClassLoader classLoader = new TestClassLoader();
+        withContextClassLoader(classLoader, () -> {
+            try
+            {
+                XmlToObject transformer = new XmlToObject();
+                transformer.initialise();
+                assertEquals(classLoader, transformer.getXStream().getClassLoader());
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
+        });
+    }
+
+    private static class TestClassLoader extends ClassLoader
+    {
+
+    }
 
 }

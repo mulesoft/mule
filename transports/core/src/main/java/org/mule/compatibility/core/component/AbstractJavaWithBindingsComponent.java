@@ -23,66 +23,81 @@ import java.util.List;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public abstract class AbstractJavaWithBindingsComponent extends AbstractJavaComponent implements JavaWithBindingsComponent {
+public abstract class AbstractJavaWithBindingsComponent extends AbstractJavaComponent implements JavaWithBindingsComponent
+{
+    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
-  protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
-
-  /**
-   * For Spring only
-   */
-  public AbstractJavaWithBindingsComponent() {
-    super();
-  }
-
-  public AbstractJavaWithBindingsComponent(ObjectFactory objectFactory) {
-    this(objectFactory, null, null);
-  }
-
-  public AbstractJavaWithBindingsComponent(ObjectFactory objectFactory, EntryPointResolverSet entryPointResolverSet,
-                                           List<InterfaceBinding> bindings) {
-    super(objectFactory, entryPointResolverSet);
-    if (bindings != null) {
-      this.bindings = bindings;
+    /**
+     * For Spring only
+     */
+    public AbstractJavaWithBindingsComponent()
+    {
+        super();
     }
-  }
 
-  @Override
-  public List<InterfaceBinding> getInterfaceBindings() {
-    return bindings;
-  }
-
-  @Override
-  public void setInterfaceBindings(List<InterfaceBinding> bindings) {
-    this.bindings = bindings;
-  }
-
-  /**
-   * Creates and initialises a new LifecycleAdaptor instance wrapped the component object instance obtained from the configured
-   * object factory.
-   *
-   * @throws MuleException
-   * @throws Exception
-   */
-  @Override
-  protected LifecycleAdapter createLifecycleAdaptor() throws Exception {
-    // Todo this could be moved to the LCAFactory potentially
-    Object object = objectFactory.getInstance(muleContext);
-
-    LifecycleAdapter lifecycleAdapter;
-    if (lifecycleAdapterFactory != null) {
-      // Custom lifecycleAdapterFactory set on component
-      lifecycleAdapter = lifecycleAdapterFactory.create(object, this, flowConstruct, entryPointResolverSet, muleContext);
-    } else if (objectFactory.isExternallyManagedLifecycle()) {
-      // If no lifecycleAdapterFactory is configured explicitly and object factory returns
-      // externally managed instance then use NullLifecycleAdapter so that lifecycle
-      // is not propagated
-      lifecycleAdapter = new NullLifecycleAdapterWithBindings(object, this, flowConstruct, entryPointResolverSet, muleContext);
-    } else {
-      lifecycleAdapter = new DefaultComponentLifecycleAdapterWithBindingsFactory().create(object, this, flowConstruct,
-                                                                                          entryPointResolverSet, muleContext);
+    public AbstractJavaWithBindingsComponent(ObjectFactory objectFactory)
+    {
+        this(objectFactory, null, null);
     }
-    lifecycleAdapter.initialise();
-    return lifecycleAdapter;
-  }
+
+    public AbstractJavaWithBindingsComponent(ObjectFactory objectFactory,
+                                 EntryPointResolverSet entryPointResolverSet,
+                                 List<InterfaceBinding> bindings)
+    {
+        super(objectFactory, entryPointResolverSet);
+        if (bindings != null)
+        {
+            this.bindings = bindings;
+        }
+    }
+
+    @Override
+    public List<InterfaceBinding> getInterfaceBindings()
+    {
+        return bindings;
+    }
+
+    @Override
+    public void setInterfaceBindings(List<InterfaceBinding> bindings)
+    {
+        this.bindings = bindings;
+    }
+
+    /**
+     * Creates and initialises a new LifecycleAdaptor instance wrapped the component object instance obtained from the
+     * configured object factory.
+     *
+     * @throws MuleException
+     * @throws Exception
+     */
+    @Override
+    protected LifecycleAdapter createLifecycleAdaptor() throws Exception
+    {
+        // Todo this could be moved to the LCAFactory potentially
+        Object object = objectFactory.getInstance(muleContext);
+
+        LifecycleAdapter lifecycleAdapter;
+        if (lifecycleAdapterFactory != null)
+        {
+            // Custom lifecycleAdapterFactory set on component
+            lifecycleAdapter =
+                    lifecycleAdapterFactory.create(object, this, flowConstruct, entryPointResolverSet, muleContext);
+        }
+        else if (objectFactory.isExternallyManagedLifecycle())
+        {
+            // If no lifecycleAdapterFactory is configured explicitly and object factory returns
+            // externally managed instance then use NullLifecycleAdapter so that lifecycle
+            // is not propagated
+            lifecycleAdapter =
+                    new NullLifecycleAdapterWithBindings(object, this, flowConstruct, entryPointResolverSet, muleContext);
+        }
+        else
+        {
+            lifecycleAdapter = new DefaultComponentLifecycleAdapterWithBindingsFactory().create(object, this,
+                    flowConstruct, entryPointResolverSet, muleContext);
+        }
+        lifecycleAdapter.initialise();
+        return lifecycleAdapter;
+    }
 
 }

@@ -20,8 +20,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This definition parser introduces the notion of Hierarchical processing to nested XML elements. Definition parsers that extend
- * this can refer to parent beans. It does not assume that the parser is restricted to a single property.
+ * This definition parser introduces the notion of Hierarchical processing to nested XML elements. Definition
+ * parsers that extend this can refer to parent beans.  It does not assume that the parser is restricted
+ * to a single property.
  * <p>
  * Calling classes must set the registry at the start of processing.
  *
@@ -29,73 +30,92 @@ import org.w3c.dom.Element;
  * @see org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
  * @see org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser
  */
-public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser {
+public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser
+{
 
-  private ReusablePropertyConfiguration targetPropertyConfiguration =
-      new ReusablePropertyConfiguration(new TempWrapperPropertyConfiguration(beanPropertyConfiguration, false));
-  private BeanDefinition forcedParent = null;
+    private ReusablePropertyConfiguration targetPropertyConfiguration =
+            new ReusablePropertyConfiguration(
+                    new TempWrapperPropertyConfiguration(beanPropertyConfiguration, false));
+    private BeanDefinition forcedParent = null;
 
-  public PropertyConfiguration getTargetPropertyConfiguration() {
-    return targetPropertyConfiguration;
-  }
-
-  protected String getParentBeanName(Element element) {
-    return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
-  }
-
-  protected Element getParentElement(Element element) {
-    return ((Element) element.getParentNode());
-  }
-
-  public BeanDefinition getParentBeanDefinition(Element element) {
-    if (null != forcedParent) {
-      return forcedParent;
-    } else {
-      String parentBean = getParentBeanName(element);
-      try {
-        return getRegistry().getBeanDefinition(parentBean);
-      } catch (NoSuchBeanDefinitionException e) {
-        // TODO MULE-9638: Do nothing since this is possible due to new parsing model.
-        return null;
-      }
+    public PropertyConfiguration getTargetPropertyConfiguration()
+    {
+        return targetPropertyConfiguration;
     }
-  }
 
-  /**
-   * The bean assembler gives more reliable/automatic processing of collections, maps, etc.
-   *
-   * @param element The current element
-   * @param bean The bean being constructed
-   * @return An assembler that includes Mule-specific construction logic
-   */
-  protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean) {
-    BeanDefinition target = getParentBeanDefinition(element);
-    return getBeanAssemblerFactory().newBeanAssembler(beanPropertyConfiguration, bean, targetPropertyConfiguration, target);
-  }
+    protected String getParentBeanName(Element element)
+    {
+        return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
+    }
 
-  /**
-   * Provide access to bean assembler from non-hierarchical case. Legacy support for "mixed" definition parsers.
-   *
-   * @param element
-   * @param bean
-   * @deprecated
-   */
-  protected BeanAssembler getOrphanBeanAssembler(Element element, BeanDefinitionBuilder bean) {
-    return super.getBeanAssembler(element, bean);
-  }
+    protected Element getParentElement(Element element)
+    {
+        return ((Element) element.getParentNode());
+    }
 
-  public void forceParent(BeanDefinition parent) {
-    forcedParent = parent;
-  }
+    public BeanDefinition getParentBeanDefinition(Element element)
+    {
+        if (null != forcedParent)
+        {
+            return forcedParent;
+        }
+        else
+        {
+            String parentBean = getParentBeanName(element);
+            try
+            {
+                return getRegistry().getBeanDefinition(parentBean);
+            }
+            catch (NoSuchBeanDefinitionException e)
+            {
+                //TODO MULE-9638: Do nothing since this is possible due to new parsing model.
+                return null;
+            }
+        }
+    }
 
-  protected void preProcess(Element element) {
-    super.preProcess(element);
-    targetPropertyConfiguration.reset();
-  }
+    /**
+     * The bean assembler gives more reliable/automatic processing of collections, maps, etc.
+     *
+     * @param element The current element
+     * @param bean    The bean being constructed
+     * @return An assembler that includes Mule-specific construction logic
+     */
+    protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
+    {
+        BeanDefinition target = getParentBeanDefinition(element);
+        return getBeanAssemblerFactory().newBeanAssembler(
+                beanPropertyConfiguration, bean, targetPropertyConfiguration, target);
+    }
 
-  // reset the forced parent
-  protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
-    super.postProcess(context, assembler, element);
-    forcedParent = null;
-  }
+    /**
+     * Provide access to bean assembler from non-hierarchical case.  Legacy support for
+     * "mixed" definition parsers.
+     *
+     * @param element
+     * @param bean
+     * @deprecated
+     */
+    protected BeanAssembler getOrphanBeanAssembler(Element element, BeanDefinitionBuilder bean)
+    {
+        return super.getBeanAssembler(element, bean);
+    }
+
+    public void forceParent(BeanDefinition parent)
+    {
+        forcedParent = parent;
+    }
+
+    protected void preProcess(Element element)
+    {
+        super.preProcess(element);
+        targetPropertyConfiguration.reset();
+    }
+
+    // reset the forced parent
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
+    {
+        super.postProcess(context, assembler, element);
+        forcedParent = null;
+    }
 }

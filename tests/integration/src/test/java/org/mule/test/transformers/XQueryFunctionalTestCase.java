@@ -21,37 +21,38 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
-public class XQueryFunctionalTestCase extends AbstractIntegrationTestCase {
+public class XQueryFunctionalTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/xml/xquery-functional-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/xml/xquery-functional-test.xml";
-  }
+    @Test
+    public void testMessageTransform() throws Exception
+    {
+        //We're using Xml Unit to compare results
+        //Ignore whitespace and comments
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
 
-  @Test
-  public void testMessageTransform() throws Exception {
-    // We're using Xml Unit to compare results
-    // Ignore whitespace and comments
-    XMLUnit.setIgnoreWhitespace(true);
-    XMLUnit.setIgnoreComments(true);
+        //Read in src and result data
+        String srcData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog.xml", getClass());
+        String resultData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-    // Read in src and result data
-    String srcData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog.xml", getClass());
-    String resultData =
-        IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
+        //These are the message properties that will get passed into the XQuery context
+        Map<String, Serializable> props = new HashMap<>();
+        props.put("ListTitle", "MyList");
+        props.put("ListRating", new Integer(6));
 
-    // These are the message properties that will get passed into the XQuery context
-    Map<String, Serializable> props = new HashMap<>();
-    props.put("ListTitle", "MyList");
-    props.put("ListRating", new Integer(6));
+        //Invoke the service
+        final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
 
-    // Invoke the service
-    final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
-
-    MuleMessage message = muleEvent.getMessage();
-    assertNotNull(message);
-    assertNull(message.getExceptionPayload());
-    // Compare results
-    assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
-  }
+        MuleMessage message = muleEvent.getMessage();
+        assertNotNull(message);
+        assertNull(message.getExceptionPayload());
+        //Compare results
+        assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
+    }
 }

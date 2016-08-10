@@ -23,23 +23,28 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class InvalidSetVariableTestCase extends AbstractMuleTestCase {
+public class InvalidSetVariableTestCase extends AbstractMuleTestCase
+{
+    private String muleConfigPath;
 
-  private String muleConfigPath;
+    @Parameterized.Parameters
+    public static Collection<Object[]> data()
+    {
+        return Arrays.asList(new Object[][] {
+                                             {"org/mule/properties/invalid-set-property.xml"},
+                                             {"org/mule/properties/invalid-set-variable.xml"}
+        });
+    }
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{"org/mule/properties/invalid-set-property.xml"},
-        {"org/mule/properties/invalid-set-variable.xml"}});
-  }
+    public InvalidSetVariableTestCase(String muleConfigPath)
+    {
+        this.muleConfigPath = muleConfigPath;
+    }
 
-  public InvalidSetVariableTestCase(String muleConfigPath) {
-    this.muleConfigPath = muleConfigPath;
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void emptyVariableNameValidatedBySchema() throws Exception {
-    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-    new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(muleConfigPath));
-  }
+    @Test(expected = InitialisationException.class)
+    public void emptyVariableNameValidatedBySchema() throws Exception
+    {
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(muleConfigPath));
+    }
 }

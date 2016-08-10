@@ -26,36 +26,41 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.5.0
  */
-public class CronSchedulerFactory extends SchedulerFactory<PollingWorker> {
+public class CronSchedulerFactory extends SchedulerFactory<PollingWorker>
+{
+    private static final Logger logger = LoggerFactory.getLogger(CronSchedulerFactory.class);
 
-  private static final Logger logger = LoggerFactory.getLogger(CronSchedulerFactory.class);
+    private static final String TZ_GMT_ID = "GMT";
 
-  private static final String TZ_GMT_ID = "GMT";
+    private String expression;
 
-  private String expression;
+    private String timeZone;
 
-  private String timeZone;
-
-  @Override
-  protected Scheduler doCreate(String name, PollingWorker job) {
-    CronScheduler cronScheduler = new CronScheduler(name, job, expression, resolveTimeZone(name));
-    cronScheduler.setMuleContext(context);
-    return cronScheduler;
-  }
-
-  protected TimeZone resolveTimeZone(String name) {
-    TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
-    if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID))) {
-      logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+    @Override
+    protected Scheduler doCreate(String name, PollingWorker job)
+    {
+        CronScheduler cronScheduler = new CronScheduler(name, job, expression, resolveTimeZone(name));
+        cronScheduler.setMuleContext(context);
+        return cronScheduler;
     }
-    return resolvedTimeZone;
-  }
 
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
+    protected TimeZone resolveTimeZone(String name)
+    {
+        TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
+        if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
+        {
+            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+        }
+        return resolvedTimeZone;
+    }
 
-  public void setTimeZone(String timeZone) {
-    this.timeZone = timeZone;
-  }
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
+
+    public void setTimeZone(String timeZone)
+    {
+        this.timeZone = timeZone;
+    }
 }

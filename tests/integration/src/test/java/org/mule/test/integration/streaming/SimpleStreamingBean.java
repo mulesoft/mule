@@ -15,12 +15,13 @@ import org.apache.commons.io.IOUtils;
 /**
  * A simple bridge service for testing entry point resolution
  */
-public class SimpleStreamingBean {
-
-  public byte[] doit(InputStream in) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    IOUtils.copy(in, out);
-    in.close();
-    return out.toByteArray();
-  }
+public class SimpleStreamingBean
+{
+    public byte[] doit(InputStream in) throws IOException
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOUtils.copy(in, out);
+        in.close();
+        return out.toByteArray();
+    }
 }

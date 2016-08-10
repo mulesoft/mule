@@ -11,58 +11,66 @@ import org.junit.Test;
 /**
  * Testing durable topic with external subscriber
  */
-public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-durable-topic-single-tx.xml";
-  }
-
-  /**
-   * @throws Exception
-   */
-  @Override
-  @Test
-  public void testProviderDurableSubscriber() throws Exception {
-    setClientId("Client1");
-    receive(scenarioNotReceive);
-    setClientId("Client2");
-    receive(scenarioNotReceive);
-
-    setClientId("Sender");
-    send(scenarioCommit);
-
-    setClientId("Client1");
-    receive(scenarioCommit);
-    receive(scenarioNotReceive);
-    setClientId("Client2");
-    receive(scenarioRollback);
-    receive(scenarioCommit);
-    receive(scenarioNotReceive);
-
-  }
-
-  Scenario scenarioCommit = new ScenarioCommit() {
-
+public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
+{
     @Override
-    public String getOutputDestinationName() {
-      return getJmsConfig().getBroadcastDestinationName();
+    protected String getConfigFile()
+    {
+        return "integration/jms-durable-topic-single-tx.xml";
     }
-  };
 
-  Scenario scenarioRollback = new ScenarioRollback() {
-
+    /**
+     * @throws Exception
+     */
     @Override
-    public String getOutputDestinationName() {
-      return getJmsConfig().getBroadcastDestinationName();
-    }
-  };
+    @Test
+    public void testProviderDurableSubscriber() throws Exception
+    {
+        setClientId("Client1");
+        receive(scenarioNotReceive);
+        setClientId("Client2");
+        receive(scenarioNotReceive);
 
-  Scenario scenarioNotReceive = new ScenarioNotReceive() {
+        setClientId("Sender");
+        send(scenarioCommit);
 
-    @Override
-    public String getOutputDestinationName() {
-      return getJmsConfig().getBroadcastDestinationName();
+        setClientId("Client1");
+        receive(scenarioCommit);
+        receive(scenarioNotReceive);
+        setClientId("Client2");
+        receive(scenarioRollback);
+        receive(scenarioCommit);
+        receive(scenarioNotReceive);
+
     }
-  };
+
+    Scenario scenarioCommit = new ScenarioCommit()
+    {
+
+        @Override
+        public String getOutputDestinationName()
+        {
+            return getJmsConfig().getBroadcastDestinationName();
+        }
+    };
+
+    Scenario scenarioRollback = new ScenarioRollback()
+    {
+
+        @Override
+        public String getOutputDestinationName()
+        {
+            return getJmsConfig().getBroadcastDestinationName();
+        }
+    };
+
+    Scenario scenarioNotReceive = new ScenarioNotReceive()
+    {
+
+        @Override
+        public String getOutputDestinationName()
+        {
+            return getJmsConfig().getBroadcastDestinationName();
+        }
+    };
 }

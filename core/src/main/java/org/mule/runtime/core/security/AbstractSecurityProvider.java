@@ -13,53 +13,64 @@ import org.mule.runtime.core.api.security.SecurityContextFactory;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 
-public abstract class AbstractSecurityProvider implements SecurityProvider {
+public abstract class AbstractSecurityProvider implements SecurityProvider
+{
+    private String name;
+    private SecurityContextFactory securityContextFactory;
 
-  private String name;
-  private SecurityContextFactory securityContextFactory;
-
-  public AbstractSecurityProvider(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public final void initialise() throws InitialisationException {
-    doInitialise();
-
-    if (securityContextFactory == null) {
-      securityContextFactory = new DefaultSecurityContextFactory();
+    public AbstractSecurityProvider(String name)
+    {
+        this.name = name;
     }
-  }
 
-  protected void doInitialise() throws InitialisationException {
-    // do nothing by default
-  }
+    @Override
+    public final void initialise() throws InitialisationException
+    {
+        doInitialise();
 
-  @Override
-  public boolean supports(Class<?> aClass) {
-    return Authentication.class.isAssignableFrom(aClass);
-  }
+        if (securityContextFactory == null)
+        {
+            securityContextFactory = new DefaultSecurityContextFactory();
+        }
+    }
 
-  @Override
-  public SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException {
-    return securityContextFactory.create(authentication);
-  }
+    protected void doInitialise() throws InitialisationException
+    {
+        // do nothing by default
+    }
 
-  @Override
-  public String getName() {
-    return name;
-  }
+    @Override
+    public boolean supports(Class<?> aClass)
+    {
+        return Authentication.class.isAssignableFrom(aClass);
+    }
 
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
+    @Override
+    public SecurityContext createSecurityContext(Authentication authentication)
+        throws UnknownAuthenticationTypeException
+    {
+        return securityContextFactory.create(authentication);
+    }
 
-  public SecurityContextFactory getSecurityContextFactory() {
-    return securityContextFactory;
-  }
+    @Override
+    public String getName()
+    {
+        return name;
+    }
 
-  public void setSecurityContextFactory(SecurityContextFactory securityContextFactory) {
-    this.securityContextFactory = securityContextFactory;
-  }
+    @Override
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public SecurityContextFactory getSecurityContextFactory()
+    {
+        return securityContextFactory;
+    }
+
+    public void setSecurityContextFactory(SecurityContextFactory securityContextFactory)
+    {
+        this.securityContextFactory = securityContextFactory;
+    }
 }

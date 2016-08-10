@@ -10,13 +10,13 @@ package org.mule.functional.testmodels.services;
  * <code>PeopleService</code> is a test service that returns complex types
  */
 
-public interface PeopleService {
+public interface PeopleService
+{
+    public Person getPerson(String firstName);
 
-  public Person getPerson(String firstName);
+    public Person[] getPeople();
 
-  public Person[] getPeople();
+    public void addPerson(Person person) throws Exception;
 
-  public void addPerson(Person person) throws Exception;
-
-  public Person addPerson(String firstname, String surname) throws Exception;
+    public Person addPerson(String firstname, String surname) throws Exception;
 }

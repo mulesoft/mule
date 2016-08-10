@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
-public class OAuthAuthenticationHeader {
+public class OAuthAuthenticationHeader
+{
 
 
 
