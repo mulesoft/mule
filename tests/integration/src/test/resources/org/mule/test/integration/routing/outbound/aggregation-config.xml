@@ -9,7 +9,7 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <flow name="SplitterFlow">
-        <message-chunk-splitter messageSize="2" enableCorrelation="NEVER" />
+        <message-chunk-splitter messageSize="2"/>
         <flow-ref name="AggregationFlow"/>
     </flow>
 
@@ -20,7 +20,7 @@
     </flow>
 
     <flow name="SplitterFlow2">
-        <message-chunk-splitter messageSize="2" enableCorrelation="NEVER" />
+        <message-chunk-splitter messageSize="2"/>
         <flow-ref name="AggregationFlow2"/>
     </flow>
 

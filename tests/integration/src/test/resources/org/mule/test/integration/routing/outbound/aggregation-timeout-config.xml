@@ -7,7 +7,7 @@
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="main">
-        <collection-splitter enableCorrelation="ALWAYS"/>
+        <collection-splitter/>
         <component class="org.mule.test.core.routing.outbound.AggregationTimeoutTestCase$BlockExecutionComponent" />
         <collection-aggregator timeout="1" failOnTimeout="false" persistentStores="true"/>
 
