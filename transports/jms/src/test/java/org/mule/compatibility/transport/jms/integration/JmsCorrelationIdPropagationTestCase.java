@@ -43,8 +43,8 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
 
   @Test
   public void testNoCorrelationIdPropagation() throws Exception {
-    flowRunner("withNoCorrelationId").withPayload(MuleMessage.builder().payload(TEST_PAYLOAD).id("custom-cid").build()).run();
-    verifyPropagation();
+    flowRunner("withNoCorrelationId").withPayload(TEST_PAYLOAD).run();
+    verify("withCorrelationIdOut");
   }
 
   protected void verifyPropagation() throws Exception {
@@ -81,5 +81,4 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
       return "custom-cid-3";
     }
   }
-
 }

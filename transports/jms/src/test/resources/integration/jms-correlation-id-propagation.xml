@@ -27,19 +27,19 @@
 
     <flow name="withCorrelationIdBridge">
         <transports:inbound-endpoint ref="in" />
-        <test:assert expression="#[message.correlation.id.get() == 'custom-cid']"/>
+        <test:assert expression="#[message.correlationId == 'custom-cid']"/>
         <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid']"/>
         <!-- MULE Correlation ID can be overwritten and will be propagated forward -->
         <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsCorrelationIdPropagationTestCase$SetCorrelationId2Transformer"/>
         <transports:outbound-endpoint ref="out" exchange-pattern="request-response"/>
-        <test:assert expression="#[message.correlation.id.get() == 'custom-cid-2']"/>
+        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
         <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
     </flow>
 
     <flow name="withCorrelationIdOut">
         <transports:inbound-endpoint ref="out" />
         <logger level="WARN" message="withCorrelationIdOut: #[message]"/>
-        <test:assert expression="#[message.correlation.id.get() == 'custom-cid-2']"/>
+        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
         <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
         <!-- Overwritten MULE Correlation ID is not used in ReplyTo message -->
         <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsCorrelationIdPropagationTestCase$SetCorrelationId3Transformer"/>
