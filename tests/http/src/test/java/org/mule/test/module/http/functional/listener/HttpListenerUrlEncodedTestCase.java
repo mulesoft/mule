@@ -7,6 +7,8 @@
 package org.mule.test.module.http.functional.listener;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static org.apache.http.HttpVersion.HTTP_1_0;
+import static org.apache.http.HttpVersion.HTTP_1_1;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -17,14 +19,18 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.test.module.http.functional.matcher.ParamMapMatcher.isEqual;
-
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -120,6 +126,31 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
     assertNullPayloadAndEmptyResponse(response);
   }
 
+  @Test
+  public void serverClosesConnectionAfterSendingData() throws Exception {
+    // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
+    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+    AsyncHttpClient asyncHttpClient =
+        new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
+    ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.preparePost(getListenerUrl())
+        .setBody("a=1&b=2").addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()).execute();
+    com.ning.http.client.Response response = responseFuture.get();
+
+    assertThat(response.getStatusCode(), is(200));
+  }
+
+  @Test
+  public void emptyParameterMapHttp10() throws Exception {
+    final Response response = Request.Post(getListenerUrl("map")).version(HTTP_1_0).execute();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+  }
+
+  @Test
+  public void emptyParameterMapHttp11() throws Exception {
+    final Response response = Request.Post(getListenerUrl("map")).version(HTTP_1_1).execute();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+  }
+
   private void assertNullPayloadAndEmptyResponse(Response response) throws Exception {
     final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
     assertThat(receivedMessage.getPayload(), is(nullValue()));
@@ -136,8 +167,11 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
     assertThat(payloadAsMap, isEqual(HttpParser.decodeUrlEncodedBody(responseContent, UTF_8).toListValuesMap()));
   }
 
-  private String getListenerUrl() {
-    return String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
+  private String getListenerUrl(String path) {
+    return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
   }
 
+  private String getListenerUrl() {
+    return getListenerUrl(path.getValue());
+  }
 }

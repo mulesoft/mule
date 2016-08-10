@@ -148,6 +148,17 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
           warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
         }
         httpEntity = createUrlEncodedEntity(event, (Map) payload);
+
+        if (responseStreaming == ALWAYS && supportsTransferEncoding(event)) {
+          setupChunkedEncoding(httpResponseHeaderBuilder);
+        } else {
+          if (httpEntity instanceof EmptyHttpEntity) {
+            setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
+          } else {
+            ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
+            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+          }
+        }
       } else if (payload instanceof InputStream) {
         if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
           if (supportsTransferEncoding(event)) {

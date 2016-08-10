@@ -124,4 +124,23 @@ public class HttpListenerResponseStreaming11TestCase extends HttpListenerRespons
     testResponseIsChunkedEncoding(url, getHttpVersion());
   }
 
+  // Map
+
+  @Test
+  public void map() throws Exception {
+    final String url = getUrl("map");
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+  }
+
+  @Test
+  public void alwaysMap() throws Exception {
+    final String url = getUrl("alwaysMap");
+    testResponseIsChunkedEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+  }
+
+  @Test
+  public void neverMap() throws Exception {
+    final String url = getUrl("neverMap");
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+  }
 }
