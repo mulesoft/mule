@@ -8,43 +8,49 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Number extends AbstractCounter {
+public class Number extends AbstractCounter
+{
+    private double value = 0.0;
 
-  private double value = 0.0;
+    public Number(String name)
+    {
+        super(name, Type.NUMBER);
+    }
 
-  public Number(String name) {
-    super(name, Type.NUMBER);
-  }
+    @Override
+    public synchronized double increment()
+    {
+        this.value++;
+        propagate();
+        return this.value;
+    }
 
-  @Override
-  public synchronized double increment() {
-    this.value++;
-    propagate();
-    return this.value;
-  }
+    @Override
+    public synchronized double incrementBy(double value)
+    {
+        this.value += value;
+        propagate();
+        return this.value;
+    }
 
-  @Override
-  public synchronized double incrementBy(double value) {
-    this.value += value;
-    propagate();
-    return this.value;
-  }
+    @Override
+    public synchronized double decrement()
+    {
+        this.value--;
+        propagate();
+        return this.value;
+    }
 
-  @Override
-  public synchronized double decrement() {
-    this.value--;
-    propagate();
-    return this.value;
-  }
+    @Override
+    public synchronized void setRawValue(double value)
+    {
+        this.value = value;
+        propagate();
+    }
 
-  @Override
-  public synchronized void setRawValue(double value) {
-    this.value = value;
-    propagate();
-  }
-
-  @Override
-  public synchronized double nextValue() {
-    return this.value;
-  }
+    @Override
+    public synchronized double nextValue()
+    {
+        return this.value;
+    }
 }

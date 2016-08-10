@@ -10,10 +10,6 @@
     <artifactId>mule-module-oauth</artifactId>
     <name>Mule OAuth module</name>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

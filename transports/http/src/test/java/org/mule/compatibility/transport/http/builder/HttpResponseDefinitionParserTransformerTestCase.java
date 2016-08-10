@@ -19,32 +19,36 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class HttpResponseDefinitionParserTransformerTestCase extends AbstractMuleTestCase {
+public class HttpResponseDefinitionParserTransformerTestCase extends AbstractMuleTestCase
+{
+    private HttpResponseDefinitionParser httpResponseDefinitionParser;
 
-  private HttpResponseDefinitionParser httpResponseDefinitionParser;
-
-  @Before
-  public void setUp() {
-    httpResponseDefinitionParser = new HttpResponseDefinitionParser("header");
-  }
-
-  @Test
-  public void testProcessHeaderName() {
-    Map<String, String> headerNameMapping = populateHeaderNamesMapping();
-
-    for (String headerName : headerNameMapping.keySet()) {
-      String processedHeaderName = httpResponseDefinitionParser.processHeaderName(headerName);
-      assertEquals(headerNameMapping.get(headerName), processedHeaderName);
+    @Before
+    public void setUp()
+    {
+        httpResponseDefinitionParser = new HttpResponseDefinitionParser("header");
     }
-  }
 
-  private Map<String, String> populateHeaderNamesMapping() {
-    Map<String, String> headerNameMapping = new HashMap<String, String>();
-    headerNameMapping.put("cache-control", "Cache-Control");
-    headerNameMapping.put("location", "Location");
-    headerNameMapping.put("expires", "Expires");
-    return headerNameMapping;
-  }
+    @Test
+    public void testProcessHeaderName()
+    {
+        Map<String, String> headerNameMapping = populateHeaderNamesMapping();
+
+        for(String headerName : headerNameMapping.keySet())
+        {
+            String processedHeaderName = httpResponseDefinitionParser.processHeaderName(headerName);
+            assertEquals(headerNameMapping.get(headerName), processedHeaderName);
+        }
+    }
+
+    private Map<String, String> populateHeaderNamesMapping()
+    {
+        Map<String, String> headerNameMapping = new HashMap<String, String>();
+        headerNameMapping.put("cache-control", "Cache-Control");
+        headerNameMapping.put("location", "Location");
+        headerNameMapping.put("expires", "Expires");
+        return headerNameMapping;
+    }
 
 
 }

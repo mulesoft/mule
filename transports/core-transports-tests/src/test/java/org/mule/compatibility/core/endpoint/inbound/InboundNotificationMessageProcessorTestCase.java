@@ -21,22 +21,24 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class InboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
+public class InboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase
+{
+    @Test
+    public void testProcess() throws Exception
+    {
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
+        muleContext.registerListener(listener);
 
-  @Test
-  public void testProcess() throws Exception {
-    TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
-    muleContext.registerListener(listener);
+        InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
+        MessageProcessor mp = new InboundNotificationMessageProcessor(endpoint);
+        MuleEvent event = createTestInboundEvent(endpoint);
+        mp.process(event);
 
-    InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
-    MessageProcessor mp = new InboundNotificationMessageProcessor(endpoint);
-    MuleEvent event = createTestInboundEvent(endpoint);
-    mp.process(event);
-
-    assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-    assertEquals(EndpointMessageNotification.MESSAGE_RECEIVED, listener.messageNotification.getAction());
-    assertEquals(endpoint.getEndpointURI().getUri().toString(), listener.messageNotification.getEndpoint());
-    assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-    assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
-  }
+        assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertEquals(EndpointMessageNotification.MESSAGE_RECEIVED, listener.messageNotification.getAction());
+        assertEquals(endpoint.getEndpointURI().getUri().toString(),
+            listener.messageNotification.getEndpoint());
+        assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
+        assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
+    }
 }

@@ -15,20 +15,22 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
-public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJmsFunctionalTestCase {
+public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJmsFunctionalTestCase
+{
+    public static final int TIMEOUT = 3000;
 
-  public static final int TIMEOUT = 3000;
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/jms-object-to-message-transformer-test-case.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-object-to-message-transformer-test-case.xml";
-  }
-
-  @Test
-  public void testObjectToMessageDoesntFail() throws Exception {
-    MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT);
-    assertThat(response, IsNull.<Object>notNullValue());
-    assertThat(getPayloadAsString(response), is("A message with something more"));
-  }
+    @Test
+    public void testObjectToMessageDoesntFail() throws Exception
+    {
+        MuleClient muleClient = muleContext.getClient();
+        MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT);
+        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(getPayloadAsString(response), is("A message with something more"));
+    }
 }

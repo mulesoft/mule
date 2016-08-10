@@ -7,24 +7,27 @@
 
 package org.mule.runtime.module.db.integration.model;
 
-public class Region {
+public class Region
+{
+    public static final Region SOUTHWEST = new Region("Southwest", new String[] {"94105", "90049", "92027"});
+    public static final Region NORTHWEST = new Region("Northwest", new String[] {"93101", "97201", "99210"});
 
-  public static final Region SOUTHWEST = new Region("Southwest", new String[] {"94105", "90049", "92027"});
-  public static final Region NORTHWEST = new Region("Northwest", new String[] {"93101", "97201", "99210"});
+    private String name;
+    private String[] zips;
 
-  private String name;
-  private String[] zips;
+    public Region(String name, String[] zips)
+    {
+        this.name = name;
+        this.zips = zips;
+    }
 
-  public Region(String name, String[] zips) {
-    this.name = name;
-    this.zips = zips;
-  }
+    public String getName()
+    {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
-
-  public String[] getZips() {
-    return zips;
-  }
+    public String[] getZips()
+    {
+        return zips;
+    }
 }

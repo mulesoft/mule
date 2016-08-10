@@ -16,21 +16,17 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
  * @since 4.0
  */
 @Alias("ntlm-proxy")
-public class NtlmProxyConfig extends DefaultProxyConfig {
+public class NtlmProxyConfig extends DefaultProxyConfig
+{
+    /**
+     * The domain to authenticate against the proxy.
+     */
+    @Parameter
+    @DisplayName("NTLM Domain")
+    private String ntlmDomain;
 
-  /**
-   * The domain to authenticate against the proxy.
-   */
-  @Parameter
-  @DisplayName("NTLM Domain")
-  private String ntlmDomain;
+    public String getNtlmDomain() { return ntlmDomain; }
 
-  public String getNtlmDomain() {
-    return ntlmDomain;
-  }
-
-  public void setNtlmDomain(String ntlmDomain) {
-    this.ntlmDomain = ntlmDomain;
-  }
+    public void setNtlmDomain(String ntlmDomain) { this.ntlmDomain = ntlmDomain; }
 
 }

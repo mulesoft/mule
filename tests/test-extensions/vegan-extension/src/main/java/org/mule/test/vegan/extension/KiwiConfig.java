@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Configuration(name = KIWI)
 @Operations(EatKiwiOperation.class)
 @Providers(VeganKiwiConnectionProvider.class)
-public class KiwiConfig {
+public class KiwiConfig
+{
 
 }

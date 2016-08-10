@@ -19,34 +19,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration.
+ * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-// TODO(gfernandes): MULE-10183 remove this class and use the one from IT tests once transport IT test are migrated to use
-// isolation runner
-public abstract class AbstractBadConfigTestCase extends FunctionalTestCase {
+//TODO(gfernandes): MULE-10183 remove this class and use the one from IT tests once transport IT test are migrated to use isolation runner
+public abstract class AbstractBadConfigTestCase extends FunctionalTestCase
+{
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Override
-  protected MuleContext createMuleContext() throws Exception {
-    return null;
-  }
-
-  public void assertErrorContains(String phrase) throws Exception {
-    try {
-      parseConfig();
-      fail("expected error");
-    } catch (Exception e) {
-      logger.debug("Caught " + e);
-      assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'", e.toString().indexOf(phrase) > -1);
+    @Override
+    protected MuleContext createMuleContext() throws Exception
+    {
+        return null;
     }
-  }
 
-  protected void parseConfig() throws Exception {
-    new DefaultMuleContextFactory().createMuleContext(getConfigurationBuilder());
-  }
+    public void assertErrorContains(String phrase) throws Exception
+    {
+        try 
+        {
+            parseConfig();
+            fail("expected error");
+        } 
+        catch (Exception e) 
+        {            
+            logger.debug("Caught " + e);
+            assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'",
+                    e.toString().indexOf(phrase) > -1);
+        }
+    }
+    
+    protected void parseConfig() throws Exception
+    {
+        new DefaultMuleContextFactory().createMuleContext(getConfigurationBuilder());
+    }
 
-  protected ConfigurationBuilder getConfigurationBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(getConfigFile());
-  }
+    protected ConfigurationBuilder getConfigurationBuilder() throws Exception
+    {
+        return new SpringXmlConfigurationBuilder(getConfigFile());
+    }
 }

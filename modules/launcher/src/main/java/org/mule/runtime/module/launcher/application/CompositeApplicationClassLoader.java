@@ -14,22 +14,22 @@ import java.util.List;
 /**
  * Defines a composite classloader for applications
  */
-public class CompositeApplicationClassLoader extends CompositeArtifactClassLoader implements ApplicationClassLoader {
+public class CompositeApplicationClassLoader extends CompositeArtifactClassLoader implements ApplicationClassLoader
+{
+    static
+    {
+        registerAsParallelCapable();
+    }
 
-  static {
-    registerAsParallelCapable();
-  }
-
-  /**
-   * Creates a new instance
-   * 
-   * @param appName name of the artifact owning the created instance.
-   * @param parent parent class loader used to delegate the lookup process. Can be null.
-   * @param artifactClassLoaders artifact classLoaders to compose. Non empty.
-   * @param lookupPolicy policy used to guide the lookup process. Non null
-   */
-  public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders,
-                                         ClassLoaderLookupPolicy lookupPolicy) {
-    super(appName, parent, artifactClassLoaders, lookupPolicy);
-  }
+    /**
+     * Creates a new instance
+     *  @param appName name of the artifact owning the created instance.
+     * @param parent parent class loader used to delegate the lookup process. Can be null.
+     * @param artifactClassLoaders artifact classLoaders to compose. Non empty.
+     * @param lookupPolicy policy used to guide the lookup process. Non null
+     */
+    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders, ClassLoaderLookupPolicy lookupPolicy)
+    {
+        super(appName, parent, artifactClassLoaders, lookupPolicy);
+    }
 }

@@ -9,44 +9,45 @@ package org.mule.runtime.config.spring.parsers;
 import java.util.Map;
 
 /**
- * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the application.
+ * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the
+ * application.
  */
-public interface XmlMetadataAnnotations {
+public interface XmlMetadataAnnotations
+{
+    public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
+    
+    /**
+     * Builds the opening tag of the xml element.
+     * 
+     * @param qName the qualified name of the element
+     * @param atts the attributes of the element, with the qualified name as key
+     */
+    void appendElementStart(String qName, Map<String, String> atts);
 
-  public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
+    /**
+     * Adds the body of the xml tag.
+     * 
+     * @param elementBody the body content to be added
+     */
+    void appendElementBody(String elementBody);
 
-  /**
-   * Builds the opening tag of the xml element.
-   * 
-   * @param qName the qualified name of the element
-   * @param atts the attributes of the element, with the qualified name as key
-   */
-  void appendElementStart(String qName, Map<String, String> atts);
+    /**
+     * Builds the closing tag of the xml element.
+     * 
+     * @param qName the qualified name of the element
+     */
+    void appendElementEnd(String qName);
 
-  /**
-   * Adds the body of the xml tag.
-   * 
-   * @param elementBody the body content to be added
-   */
-  void appendElementBody(String elementBody);
+    /**
+     * @return the reconstruction of the declaration of the element in its source xml file.
+     *         <p/>
+     *         Note that the order of the elements may be different, and any implicit attributes with default values
+     *         will be included.
+     */
+    String getElementString();
 
-  /**
-   * Builds the closing tag of the xml element.
-   * 
-   * @param qName the qualified name of the element
-   */
-  void appendElementEnd(String qName);
-
-  /**
-   * @return the reconstruction of the declaration of the element in its source xml file.
-   *         <p/>
-   *         Note that the order of the elements may be different, and any implicit attributes with default values will be
-   *         included.
-   */
-  String getElementString();
-
-  /**
-   * @return the line where the declaration of the element starts in its source xml file.
-   */
-  int getLineNumber();
+    /**
+     * @return the line where the declaration of the element starts in its source xml file.
+     */
+    int getLineNumber();
 }

@@ -11,31 +11,34 @@ import org.junit.Test;
 /**
  * Message is put to topic with two subscribers
  */
-public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase {
+public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/jms-topic.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-topic.xml";
-  }
+    @Test
+    public void testJmsTopic() throws Exception
+    {
+        // One message is sent.
+        dispatchMessage();
+        // The same message is read twice from the same JMS topic.
+        receiveMessage();
+        receiveMessage();
+    }
 
-  @Test
-  public void testJmsTopic() throws Exception {
-    // One message is sent.
-    dispatchMessage();
-    // The same message is read twice from the same JMS topic.
-    receiveMessage();
-    receiveMessage();
-  }
-
-  @Test
-  public void testMultipleSend() throws Exception {
-    // One message is sent.
-    dispatchMessage();
-    dispatchMessage();
-    // The same message is read twice from the same JMS topic.
-    receiveMessage();
-    receiveMessage();
-    receiveMessage();
-    receiveMessage();
-  }
+    @Test
+    public void testMultipleSend() throws Exception
+    {
+        // One message is sent.
+        dispatchMessage();
+        dispatchMessage();
+        // The same message is read twice from the same JMS topic.
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+    }
 }

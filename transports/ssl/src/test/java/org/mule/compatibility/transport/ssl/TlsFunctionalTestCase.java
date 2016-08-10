@@ -9,10 +9,11 @@ package org.mule.compatibility.transport.ssl;
 import org.junit.Ignore;
 
 @Ignore("MULE-9628")
-public class TlsFunctionalTestCase extends SslFunctionalTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "tls-functional-test.xml";
-  }
+public class TlsFunctionalTestCase extends SslFunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "tls-functional-test.xml";
+    }
 }

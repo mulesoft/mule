@@ -8,16 +8,18 @@ package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
-public class ExtendedPersonalInfo extends PersonalInfo {
+public class ExtendedPersonalInfo extends PersonalInfo
+{
+    @ParameterGroup
+    private LifetimeInfo lifetimeInfo = new LifetimeInfo();
 
-  @ParameterGroup
-  private LifetimeInfo lifetimeInfo = new LifetimeInfo();
+    public LifetimeInfo getLifetimeInfo()
+    {
+        return lifetimeInfo;
+    }
 
-  public LifetimeInfo getLifetimeInfo() {
-    return lifetimeInfo;
-  }
-
-  public void setLifetimeInfo(LifetimeInfo lifetimeInfo) {
-    this.lifetimeInfo = lifetimeInfo;
-  }
+    public void setLifetimeInfo(LifetimeInfo lifetimeInfo)
+    {
+        this.lifetimeInfo = lifetimeInfo;
+    }
 }

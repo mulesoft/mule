@@ -16,49 +16,57 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class JBossArjunaConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase {
+public class JBossArjunaConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase
+{
 
-  private static final String TEMP_OBJECTSTORE_DIR_PROPERTY = "objectstore.dir";
+    private static final String TEMP_OBJECTSTORE_DIR_PROPERTY = "objectstore.dir";
 
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private File objectStoreFolder;
-  private String previousTempObjectDirProperty;
+    private File objectStoreFolder;
+    private String previousTempObjectDirProperty;
 
-  @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    objectStoreFolder = temporaryFolder.newFolder("os_dir");
-    previousTempObjectDirProperty = System.getProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
-    System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, objectStoreFolder.getAbsolutePath());
-    super.doSetUpBeforeMuleContextCreation();
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-
-    if (previousTempObjectDirProperty != null) {
-      System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, previousTempObjectDirProperty);
-    } else {
-      System.clearProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        objectStoreFolder = temporaryFolder.newFolder("os_dir");
+        previousTempObjectDirProperty = System.getProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
+        System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, objectStoreFolder.getAbsolutePath());
+        super.doSetUpBeforeMuleContextCreation();
     }
 
-    previousTempObjectDirProperty = null;
-  }
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
 
-  @Override
-  protected String getConfigResources() {
-    return "jbossts-configuration.xml";
-  }
+        if (previousTempObjectDirProperty != null)
+        {
+            System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, previousTempObjectDirProperty);
+        }
+        else
+        {
+            System.clearProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
+        }
 
-  @Test
-  public void testConfiguration() {
-    assertTransactionManagerPresent();
+        previousTempObjectDirProperty = null;
+    }
 
-    assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperTimeout() == 108000);
-    assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout() == 47);
+    @Override
+    protected String getConfigResources()
+    {
+        return "jbossts-configuration.xml";
+    }
 
-    assertObjectStoreDir(objectStoreFolder.getAbsolutePath(), muleContext.getConfiguration().getWorkingDirectory());
-  }
+    @Test
+    public void testConfiguration()
+    {
+        assertTransactionManagerPresent();
+
+        assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperTimeout() == 108000);
+        assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout() == 47);
+
+        assertObjectStoreDir(objectStoreFolder.getAbsolutePath(), muleContext.getConfiguration().getWorkingDirectory());
+    }
 }

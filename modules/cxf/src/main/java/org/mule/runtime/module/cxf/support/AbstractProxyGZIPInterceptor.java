@@ -18,24 +18,28 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 
-public abstract class AbstractProxyGZIPInterceptor extends AbstractPhaseInterceptor<Message> {
-
-  public AbstractProxyGZIPInterceptor(String phase) {
-    super(phase);
-  }
-
-  protected boolean isEncoded(MuleMessage message) {
-    boolean isEncoded = false;
-
-    String contentEncoding = message.getInboundProperty(CONTENT_ENCODING);
-    if (contentEncoding == null) {
-      contentEncoding = message.getInboundProperty(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);
-    }
-    if (contentEncoding != null) {
-      List<String> encodings = Arrays.asList(GZIPOutInterceptor.ENCODINGS.split(contentEncoding.trim()));
-      isEncoded = encodings.contains("gzip") || encodings.contains("x-gzip");
+public abstract class AbstractProxyGZIPInterceptor extends AbstractPhaseInterceptor<Message>
+{
+    public AbstractProxyGZIPInterceptor(String phase)
+    {
+        super(phase);
     }
 
-    return isEncoded;
-  }
+    protected boolean isEncoded(MuleMessage message)
+    {
+        boolean isEncoded = false;
+
+        String contentEncoding = message.getInboundProperty(CONTENT_ENCODING);
+        if(contentEncoding == null)
+        {
+            contentEncoding = message.getInboundProperty(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);
+        }
+        if(contentEncoding != null)
+        {
+            List<String> encodings = Arrays.asList(GZIPOutInterceptor.ENCODINGS.split(contentEncoding.trim()));
+            isEncoded = encodings.contains("gzip") || encodings.contains("x-gzip");
+        }
+
+        return isEncoded;
+    }
 }

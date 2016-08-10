@@ -30,65 +30,84 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class LocalDeleteCommand extends LocalFileCommand implements DeleteCommand {
+public final class LocalDeleteCommand extends LocalFileCommand implements DeleteCommand
+{
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LocalDeleteCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalDeleteCommand.class);
 
-  /**
-   * {@inheritDoc}
-   */
-  public LocalDeleteCommand(LocalFileSystem fileSystem) {
-    super(fileSystem);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void delete(FileConnectorConfig config, String filePath) {
-    Path path = resolveExistingPath(config, filePath);
-
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Preparing to delete '{}'", path);
+    /**
+     * {@inheritDoc}
+     */
+    public LocalDeleteCommand(LocalFileSystem fileSystem)
+    {
+        super(fileSystem);
     }
 
-    try {
-      if (isDirectory(path)) {
-        walkFileTree(path, new SimpleFileVisitor<Path>() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void delete(FileConnectorConfig config, String filePath)
+    {
+        Path path = resolveExistingPath(config, filePath);
 
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            doDelete(file);
-            return CONTINUE;
-          }
+        if (LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Preparing to delete '{}'", path);
+        }
 
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            if (super.postVisitDirectory(dir, exc) == CONTINUE) {
-              doDelete(dir);
+        try
+        {
+            if (isDirectory(path))
+            {
+                walkFileTree(path, new SimpleFileVisitor<Path>()
+                {
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+                    {
+                        doDelete(file);
+                        return CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
+                    {
+                        if (super.postVisitDirectory(dir, exc) == CONTINUE)
+                        {
+                            doDelete(dir);
+                        }
+
+                        return CONTINUE;
+                    }
+                });
             }
-
-            return CONTINUE;
-          }
-        });
-      } else {
-        doDelete(path);
-      }
-    } catch (AccessDeniedException e) {
-      throw exception(format("Could not delete file '%s' because access was denied by the operating system", path), e);
-    } catch (IOException e) {
-      throw exception(format("Could not delete '%s'", path), e);
+            else
+            {
+                doDelete(path);
+            }
+        }
+        catch (AccessDeniedException e)
+        {
+            throw exception(format("Could not delete file '%s' because access was denied by the operating system", path), e);
+        }
+        catch (IOException e)
+        {
+            throw exception(format("Could not delete '%s'", path), e);
+        }
     }
-  }
 
-  private void doDelete(Path path) throws IOException {
-    Files.delete(path);
-    logDeletion(path);
-  }
-
-  private void logDeletion(Path path) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Successfully deleted '{}'", path);
+    private void doDelete(Path path) throws IOException
+    {
+        Files.delete(path);
+        logDeletion(path);
     }
-  }
+
+    private void logDeletion(Path path)
+    {
+        if (LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Successfully deleted '{}'", path);
+        }
+    }
 }

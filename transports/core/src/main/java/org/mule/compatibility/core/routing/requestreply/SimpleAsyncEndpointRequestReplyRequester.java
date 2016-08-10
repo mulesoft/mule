@@ -12,23 +12,28 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 
-public class SimpleAsyncEndpointRequestReplyRequester extends SimpleAsyncRequestReplyRequester implements Startable, Stoppable {
-
-  @Override
-  protected String getReplyTo() {
-    InboundEndpoint endpoint = ((InboundEndpoint) replyMessageSource);
-    return endpoint.getConnector().getCanonicalURI(endpoint.getEndpointURI());
-  }
-
-  /**
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  @Override
-  protected void verifyReplyMessageSource(MessageSource messageSource) {
-    if (!(messageSource instanceof InboundEndpoint)) {
-      throw new IllegalArgumentException("Only an InboundEndpoint reply MessageSource is supported with SimpleAsyncEndpointRequestReplyRequester");
+public class SimpleAsyncEndpointRequestReplyRequester extends SimpleAsyncRequestReplyRequester
+    implements Startable, Stoppable
+{
+    @Override
+    protected String getReplyTo()
+    {
+        InboundEndpoint endpoint = ((InboundEndpoint) replyMessageSource);
+        return endpoint.getConnector().getCanonicalURI(endpoint.getEndpointURI());
     }
-  }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    protected void verifyReplyMessageSource(MessageSource messageSource)
+    {
+        if (!(messageSource instanceof InboundEndpoint))
+        {
+            throw new IllegalArgumentException(
+                    "Only an InboundEndpoint reply MessageSource is supported with SimpleAsyncEndpointRequestReplyRequester");
+        }
+    }
 
 }

@@ -10,7 +10,8 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Logs a query
  */
-public interface QueryLogger {
+public interface QueryLogger
+{
 
-  void logQuery();
+    void logQuery();
 }

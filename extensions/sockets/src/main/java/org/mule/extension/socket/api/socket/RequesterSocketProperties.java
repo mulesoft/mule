@@ -15,10 +15,11 @@ import org.mule.extension.socket.api.ConnectionSettings;
  *
  * @since 4.0
  */
-public interface RequesterSocketProperties {
+public interface RequesterSocketProperties
+{
 
-  /**
-   * @return {@link ConnectionSettings} with the address parameters to where the requester socket should bind to.
-   */
-  ConnectionSettings getLocalAddress();
+    /**
+     * @return {@link ConnectionSettings} with the address parameters to where the requester socket should bind to.
+     */
+    ConnectionSettings getLocalAddress();
 }

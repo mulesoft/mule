@@ -20,87 +20,105 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class GraphTransformerResolutionTestCase extends AbstractIntegrationTestCase {
+public class GraphTransformerResolutionTestCase extends AbstractIntegrationTestCase
+{
+    public static class A
+    {
 
-  public static class A {
+        private final String value;
 
-    private final String value;
-
-    public A(String value) {
-      this.value = value;
+        public A(String value)
+        {
+            this.value = value;
+        }
     }
-  }
 
-  public static class B {
+    public static class B
+    {
 
-    private final String value;
+        private final String value;
 
-    public B(String value) {
-      this.value = value;
+        public B(String value)
+        {
+            this.value = value;
+        }
     }
-  }
 
-  public static class C {
+    public static class C
+    {
+        private final String value;
 
-    private final String value;
-
-    public C(String value) {
-      this.value = value;
-    }
-  }
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/transformers/graph-transformer-resolution-config.xml";
-  }
-
-  @Test
-  public void resolvesNonDirectTransformation() throws Exception {
-    final MuleEvent muleEvent = flowRunner("stringEchoService").withPayload(new A("Hello")).run();
-    MuleMessage response = muleEvent.getMessage();
-    assertTrue(response.getPayload() instanceof C);
-    assertEquals("HelloAFromB", ((C) response.getPayload()).value);
-  }
-
-  public static class AtoBConverter extends AbstractTransformer implements DiscoverableTransformer {
-
-    public AtoBConverter() {
-      registerSourceType(DataType.fromType(A.class));
-      setReturnDataType(DataType.fromType(B.class));
+        public C(String value)
+        {
+            this.value = value;
+        }
     }
 
     @Override
-    protected Object doTransform(Object src, Charset enc) throws TransformerException {
-      return new B(((A) src).value + "A");
+    protected String getConfigFile()
+    {
+        return "org/mule/test/transformers/graph-transformer-resolution-config.xml";
     }
 
-    @Override
-    public int getPriorityWeighting() {
-      return 10;
+    @Test
+    public void resolvesNonDirectTransformation() throws Exception
+    {
+        final MuleEvent muleEvent = flowRunner("stringEchoService").withPayload(new A("Hello")).run();
+        MuleMessage response = muleEvent.getMessage();
+        assertTrue(response.getPayload() instanceof C);
+        assertEquals("HelloAFromB", ((C)response.getPayload()).value);
     }
 
-    @Override
-    public void setPriorityWeighting(int weighting) {}
-  }
+    public static class AtoBConverter extends AbstractTransformer implements DiscoverableTransformer
+    {
+        public AtoBConverter()
+        {
+            registerSourceType(DataType.fromType(A.class));
+            setReturnDataType(DataType.fromType(B.class));
+        }
 
-  public static class BtoCConverter extends AbstractTransformer implements DiscoverableTransformer {
+        @Override
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
+        {
+            return new B(((A) src).value + "A");
+        }
 
-    public BtoCConverter() {
-      registerSourceType(DataType.fromType(B.class));
-      setReturnDataType(DataType.fromType(C.class));
+        @Override
+        public int getPriorityWeighting()
+        {
+            return 10;
+        }
+
+        @Override
+        public void setPriorityWeighting(int weighting)
+        {
+        }
     }
 
-    @Override
-    protected Object doTransform(Object src, Charset enc) throws TransformerException {
-      return new C(((B) src).value + "FromB");
-    }
+    public static class BtoCConverter extends AbstractTransformer implements DiscoverableTransformer
+    {
 
-    @Override
-    public int getPriorityWeighting() {
-      return 10;
-    }
+        public BtoCConverter()
+        {
+            registerSourceType(DataType.fromType(B.class));
+            setReturnDataType(DataType.fromType(C.class));
+        }
 
-    @Override
-    public void setPriorityWeighting(int weighting) {}
-  }
+        @Override
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
+        {
+            return new C(((B) src).value + "FromB");
+        }
+
+        @Override
+        public int getPriorityWeighting()
+        {
+            return 10;
+        }
+
+        @Override
+        public void setPriorityWeighting(int weighting)
+        {
+        }
+    }
 }

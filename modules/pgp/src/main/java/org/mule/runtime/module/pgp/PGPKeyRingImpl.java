@@ -29,118 +29,142 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class PGPKeyRingImpl implements PGPKeyRing, Initialisable {
+public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
+{
+    protected static final Logger logger = LoggerFactory.getLogger(PGPKeyRingImpl.class);
 
-  protected static final Logger logger = LoggerFactory.getLogger(PGPKeyRingImpl.class);
+    private String publicKeyRingFileName;
 
-  private String publicKeyRingFileName;
+    private HashMap<String, PGPPublicKey> principalsKeyBundleMap;
 
-  private HashMap<String, PGPPublicKey> principalsKeyBundleMap;
+    private String secretKeyRingFileName;
 
-  private String secretKeyRingFileName;
+    private String secretAliasId;
 
-  private String secretAliasId;
+    private PGPSecretKey secretKey;
 
-  private PGPSecretKey secretKey;
+    private String secretPassphrase;
 
-  private String secretPassphrase;
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            if (!SecurityUtils.isFipsSecurityModel())
+            {
+                java.security.Security.addProvider(new BouncyCastleProvider());
+            }
 
-  public void initialise() throws InitialisationException {
-    try {
-      if (!SecurityUtils.isFipsSecurityModel()) {
-        java.security.Security.addProvider(new BouncyCastleProvider());
-      }
+            principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
 
-      principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
-
-      readPublicKeyRing();
-      readPrivateKeyBundle();
-    } catch (Exception e) {
-      logger.error("Error in initialise:" + e.getMessage(), e);
-      throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
-    }
-  }
-
-  private void readPublicKeyRing() throws Exception {
-    InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-    PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
-    in.close();
-
-    for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();) {
-      PGPPublicKeyRing ring = (PGPPublicKeyRing) iterator.next();
-      String userID = "";
-      for (Iterator iterator2 = ring.getPublicKeys(); iterator2.hasNext();) {
-        PGPPublicKey publicKey = (PGPPublicKey) iterator2.next();
-        Iterator userIDs = publicKey.getUserIDs();
-        if (userIDs.hasNext()) {
-          userID = (String) userIDs.next();
+            readPublicKeyRing();
+            readPrivateKeyBundle();
         }
-        principalsKeyBundleMap.put(userID, publicKey);
-      }
-    }
-  }
-
-  private void readPrivateKeyBundle() throws Exception {
-    InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-    PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
-    in.close();
-    secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
-
-    if (secretKey == null) {
-      StringBuilder message = new StringBuilder();
-      message.append('\n');
-      Iterator iterator = collection.getKeyRings();
-      while (iterator.hasNext()) {
-        PGPSecretKeyRing ring = (PGPSecretKeyRing) iterator.next();
-        Iterator secretKeysIterator = ring.getSecretKeys();
-        while (secretKeysIterator.hasNext()) {
-          PGPSecretKey k = (PGPSecretKey) secretKeysIterator.next();
-          message.append("Key: ");
-          message.append(k.getKeyID());
-          message.append('\n');
+        catch (Exception e)
+        {
+            logger.error("Error in initialise:" + e.getMessage(), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
         }
-      }
-      throw new InitialisationException(PGPMessages.noSecretKeyFoundButAvailable(message.toString()), this);
     }
-  }
 
-  public String getSecretKeyRingFileName() {
-    return secretKeyRingFileName;
-  }
+    private void readPublicKeyRing() throws Exception
+    {
+        InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
+        in.close();
 
-  public void setSecretKeyRingFileName(String value) {
-    this.secretKeyRingFileName = value;
-  }
+        for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
+        {
+            PGPPublicKeyRing ring = (PGPPublicKeyRing) iterator.next();
+            String userID = "";
+            for (Iterator iterator2 = ring.getPublicKeys(); iterator2.hasNext();)
+            {
+                PGPPublicKey publicKey = (PGPPublicKey) iterator2.next();
+                Iterator userIDs = publicKey.getUserIDs();
+                if (userIDs.hasNext())
+                {
+                    userID = (String) userIDs.next();
+                }
+                principalsKeyBundleMap.put(userID, publicKey);
+            }
+        }
+    }
 
-  public String getSecretAliasId() {
-    return secretAliasId;
-  }
+    private void readPrivateKeyBundle() throws Exception
+    {
+        InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
+        in.close();
+        secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
+        
+        if (secretKey == null)
+        {
+            StringBuilder message = new StringBuilder();
+            message.append('\n');
+            Iterator iterator = collection.getKeyRings();
+            while (iterator.hasNext())
+            {
+                PGPSecretKeyRing ring = (PGPSecretKeyRing) iterator.next();
+                Iterator secretKeysIterator = ring.getSecretKeys();
+                while (secretKeysIterator.hasNext())
+                {
+                    PGPSecretKey k = (PGPSecretKey) secretKeysIterator.next();
+                    message.append("Key: ");
+                    message.append(k.getKeyID());
+                    message.append('\n');
+                }
+            }
+            throw new InitialisationException(PGPMessages.noSecretKeyFoundButAvailable(message.toString()),
+                this);
+        }
+    }
 
-  public void setSecretAliasId(String value) {
-    this.secretAliasId = value;
-  }
+    public String getSecretKeyRingFileName()
+    {
+        return secretKeyRingFileName;
+    }
 
-  public String getSecretPassphrase() {
-    return secretPassphrase;
-  }
+    public void setSecretKeyRingFileName(String value)
+    {
+        this.secretKeyRingFileName = value;
+    }
 
-  public void setSecretPassphrase(String value) {
-    this.secretPassphrase = value;
-  }
+    public String getSecretAliasId()
+    {
+        return secretAliasId;
+    }
 
-  public PGPSecretKey getSecretKey() {
-    return secretKey;
-  }
+    public void setSecretAliasId(String value)
+    {
+        this.secretAliasId = value;
+    }
 
-  public String getPublicKeyRingFileName() {
-    return publicKeyRingFileName;
-  }
+    public String getSecretPassphrase()
+    {
+        return secretPassphrase;
+    }
 
-  public void setPublicKeyRingFileName(String value) {
-    this.publicKeyRingFileName = value;
-  }
+    public void setSecretPassphrase(String value)
+    {
+        this.secretPassphrase = value;
+    }
 
-  public PGPPublicKey getPublicKey(String principalId) {
-    return principalsKeyBundleMap.get(principalId);
-  }
+    public PGPSecretKey getSecretKey()
+    {
+        return secretKey;
+    }
+
+    public String getPublicKeyRingFileName()
+    {
+        return publicKeyRingFileName;
+    }
+
+    public void setPublicKeyRingFileName(String value)
+    {
+        this.publicKeyRingFileName = value;
+    }
+
+    public PGPPublicKey getPublicKey(String principalId)
+    {
+        return principalsKeyBundleMap.get(principalId);
+    }
 }

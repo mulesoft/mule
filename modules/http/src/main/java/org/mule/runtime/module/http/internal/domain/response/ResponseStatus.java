@@ -6,35 +6,41 @@
  */
 package org.mule.runtime.module.http.internal.domain.response;
 
-public class ResponseStatus {
+public class ResponseStatus
+{
+    private int statusCode;
+    private String reasonPhrase;
 
-  private int statusCode;
-  private String reasonPhrase;
+    public ResponseStatus()
+    {
+        this.statusCode = 200;
+        this.reasonPhrase = "";
+    }
 
-  public ResponseStatus() {
-    this.statusCode = 200;
-    this.reasonPhrase = "";
-  }
+    public ResponseStatus(final int statusCode, final String reasonPhrase)
+    {
+        this.statusCode = statusCode;
+        this.reasonPhrase = reasonPhrase;
+    }
 
-  public ResponseStatus(final int statusCode, final String reasonPhrase) {
-    this.statusCode = statusCode;
-    this.reasonPhrase = reasonPhrase;
-  }
+    public int getStatusCode()
+    {
+        return statusCode;
+    }
 
-  public int getStatusCode() {
-    return statusCode;
-  }
+    public String getReasonPhrase()
+    {
+        return reasonPhrase;
+    }
 
-  public String getReasonPhrase() {
-    return reasonPhrase;
-  }
+    public void setStatusCode(int statusCode)
+    {
+        this.statusCode = statusCode;
+    }
 
-  public void setStatusCode(int statusCode) {
-    this.statusCode = statusCode;
-  }
-
-  public void setReasonPhrase(String reasonPhrase) {
-    this.reasonPhrase = reasonPhrase;
-  }
+    public void setReasonPhrase(String reasonPhrase)
+    {
+        this.reasonPhrase = reasonPhrase;
+    }
 
 }

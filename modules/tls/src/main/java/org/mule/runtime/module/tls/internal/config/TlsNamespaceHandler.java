@@ -11,12 +11,14 @@ import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.
  */
-public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler {
-
-  public void init() {
-    registerBeanDefinitionParser("key-store", new KeyStoreParentContextDefinitionParser());
-    registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
-    registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
-  }
+public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler
+{
+    
+    public void init()
+    {
+        registerBeanDefinitionParser("key-store", new KeyStoreParentContextDefinitionParser());
+        registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
+        registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
+    }
 
 }

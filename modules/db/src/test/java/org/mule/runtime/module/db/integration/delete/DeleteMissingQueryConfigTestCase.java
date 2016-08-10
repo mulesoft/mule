@@ -9,15 +9,18 @@ package org.mule.runtime.module.db.integration.delete;
 
 import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
-public class DeleteMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase {
+public class DeleteMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/delete/delete-missing-query-config.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/delete/delete-missing-query-config.xml";
+    }
 
-  @Override
-  protected String getMessageProcessorElement() {
-    return "delete";
-  }
+    @Override
+    protected String getMessageProcessorElement()
+    {
+        return "delete";
+    }
 }

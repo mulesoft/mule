@@ -21,76 +21,89 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware {
+public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware
+{
 
-  private long timeout = 0;
-  private List<MessageProcessor> messageProcessors;
-  private AggregationStrategy aggregationStrategy;
-  private ThreadingProfile threadingProfile;
-  private MuleContext muleContext;
-  private FlowConstruct flowConstruct;
+    private long timeout = 0;
+    private List<MessageProcessor> messageProcessors;
+    private AggregationStrategy aggregationStrategy;
+    private ThreadingProfile threadingProfile;
+    private MuleContext muleContext;
+    private FlowConstruct flowConstruct;
 
-  @Override
-  public ScatterGatherRouter getObject() throws Exception {
-    ScatterGatherRouter sg = new ScatterGatherRouter();
-    sg.setTimeout(timeout);
-    sg.setMuleContext(muleContext);
-    sg.setFlowConstruct(flowConstruct);
+    @Override
+    public ScatterGatherRouter getObject() throws Exception
+    {
+        ScatterGatherRouter sg = new ScatterGatherRouter();
+        sg.setTimeout(timeout);
+        sg.setMuleContext(muleContext);
+        sg.setFlowConstruct(flowConstruct);
 
-    for (MessageProcessor mp : this.messageProcessors) {
-      sg.addRoute(mp);
+        for (MessageProcessor mp : this.messageProcessors)
+        {
+            sg.addRoute(mp);
+        }
+
+        if (this.aggregationStrategy != null)
+        {
+            sg.setAggregationStrategy(this.aggregationStrategy);
+        }
+
+        if (this.threadingProfile != null)
+        {
+            sg.setThreadingProfile(this.threadingProfile);
+        }
+
+        sg.setAnnotations(getAnnotations());
+        return sg;
     }
 
-    if (this.aggregationStrategy != null) {
-      sg.setAggregationStrategy(this.aggregationStrategy);
+    @Override
+    public Class<?> getObjectType()
+    {
+        return ScatterGatherRouter.class;
     }
 
-    if (this.threadingProfile != null) {
-      sg.setThreadingProfile(this.threadingProfile);
+    @Override
+    public boolean isSingleton()
+    {
+        return false;
     }
 
-    sg.setAnnotations(getAnnotations());
-    return sg;
-  }
+    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
+    {
+        this.messageProcessors = messageProcessors;
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return ScatterGatherRouter.class;
-  }
+    public void setTimeout(long timeout)
+    {
+        this.timeout = timeout;
+    }
 
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
+    public void setAggregationStrategy(AggregationStrategy aggregationStrategy)
+    {
+        this.aggregationStrategy = aggregationStrategy;
+    }
 
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors) {
-    this.messageProcessors = messageProcessors;
-  }
+    public ThreadingProfile getThreadingProfile()
+    {
+        return this.threadingProfile;
+    }
 
-  public void setTimeout(long timeout) {
-    this.timeout = timeout;
-  }
+    public void setThreadingProfile(ThreadingProfile threadingProfile)
+    {
+        this.threadingProfile = threadingProfile;
+    }
 
-  public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
-    this.aggregationStrategy = aggregationStrategy;
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
-  public ThreadingProfile getThreadingProfile() {
-    return this.threadingProfile;
-  }
-
-  public void setThreadingProfile(ThreadingProfile threadingProfile) {
-    this.threadingProfile = threadingProfile;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
 }

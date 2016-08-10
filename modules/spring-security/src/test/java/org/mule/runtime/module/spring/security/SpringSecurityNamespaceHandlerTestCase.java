@@ -17,39 +17,45 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "spring-security-namespace-config.xml";
-  }
-
-  @Test
-  public void testProvider() {
-    knownProperties(getProvider("memory-dao"));
-  }
-
-  protected SecurityProvider getProvider(String providerName) {
-    SecurityManager securityManager = muleContext.getSecurityManager();
-    return securityManager.getProvider(providerName);
-  }
-
-  @Test
-  public void testCustom() {
-    Iterator<SecurityProvider> providers = muleContext.getSecurityManager().getProviders().iterator();
-    while (providers.hasNext()) {
-      SecurityProvider provider = providers.next();
-      logger.debug(provider.getName());
+public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "spring-security-namespace-config.xml";
     }
-    knownProperties(getProvider("customProvider"));
-    knownProperties(getProvider("willOverwriteName"));
-  }
 
-  protected void knownProperties(SecurityProvider provider) {
-    assertNotNull(provider);
-    assertTrue(provider instanceof SpringProviderAdapter);
-    SpringProviderAdapter adapter = (SpringProviderAdapter) provider;
-    assertNotNull(adapter.getDelegate());
-  }
+    @Test
+    public void testProvider()
+    {
+        knownProperties(getProvider("memory-dao"));
+    }
+
+    protected SecurityProvider getProvider(String providerName)
+    {
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getProvider(providerName);
+    }
+
+    @Test
+    public void testCustom()
+    {
+        Iterator<SecurityProvider> providers = muleContext.getSecurityManager().getProviders().iterator();
+        while (providers.hasNext())
+        {
+            SecurityProvider provider = providers.next();
+            logger.debug(provider.getName());
+        }
+        knownProperties(getProvider("customProvider"));
+        knownProperties(getProvider("willOverwriteName"));
+    }
+
+    protected void knownProperties(SecurityProvider provider)
+    {
+        assertNotNull(provider);
+        assertTrue(provider instanceof SpringProviderAdapter);
+        SpringProviderAdapter adapter = (SpringProviderAdapter) provider;
+        assertNotNull(adapter.getDelegate());
+    }
 
 }

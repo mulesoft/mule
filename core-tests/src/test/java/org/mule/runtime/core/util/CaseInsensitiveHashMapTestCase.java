@@ -19,48 +19,53 @@ import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
 @SmallTest
-public class CaseInsensitiveHashMapTestCase extends AbstractMuleTestCase {
+public class CaseInsensitiveHashMapTestCase extends AbstractMuleTestCase
+{
+    protected Map createTestMap()
+    {
+        Map map = new CaseInsensitiveHashMap();
+        map.put("FOO", "BAR");
+        map.put("doo", Integer.valueOf(3));
+        return map;
+    }
 
-  protected Map createTestMap() {
-    Map map = new CaseInsensitiveHashMap();
-    map.put("FOO", "BAR");
-    map.put("doo", Integer.valueOf(3));
-    return map;
-  }
+    @Test
+    public void keysCaseSensitive() throws Exception
+    {
+        Map<String, Object> map = createTestMap();
 
-  @Test
-  public void keysCaseSensitive() throws Exception {
-    Map<String, Object> map = createTestMap();
+        assertEquals(2, map.keySet().size());
+        assertTrue(map.keySet().toArray()[0].equals("FOO") || map.keySet().toArray()[0].equals("doo"));
+        assertTrue(map.keySet().toArray()[1].equals("FOO") || map.keySet().toArray()[1].equals("doo"));
+    }
 
-    assertEquals(2, map.keySet().size());
-    assertTrue(map.keySet().toArray()[0].equals("FOO") || map.keySet().toArray()[0].equals("doo"));
-    assertTrue(map.keySet().toArray()[1].equals("FOO") || map.keySet().toArray()[1].equals("doo"));
-  }
+    @Test
+    public void testMap() throws Exception
+    {
+        Map map = createTestMap();
+        doTestMap(map);
+    }
 
-  @Test
-  public void testMap() throws Exception {
-    Map map = createTestMap();
-    doTestMap(map);
-  }
+    @Test
+    public void testMapSerialization() throws Exception
+    {
+        Map map = createTestMap();
+        doTestMap(map);
 
-  @Test
-  public void testMapSerialization() throws Exception {
-    Map map = createTestMap();
-    doTestMap(map);
+        byte[] bytes = SerializationUtils.serialize((Serializable) map);
+        Map resultMap = (Map) SerializationUtils.deserialize(bytes);
+        doTestMap(resultMap);
+    }
 
-    byte[] bytes = SerializationUtils.serialize((Serializable) map);
-    Map resultMap = (Map) SerializationUtils.deserialize(bytes);
-    doTestMap(resultMap);
-  }
+    public void doTestMap(Map map) throws Exception
+    {
+        assertEquals("BAR", map.get("FOO"));
+        assertEquals("BAR", map.get("foo"));
+        assertEquals("BAR", map.get("Foo"));
 
-  public void doTestMap(Map map) throws Exception {
-    assertEquals("BAR", map.get("FOO"));
-    assertEquals("BAR", map.get("foo"));
-    assertEquals("BAR", map.get("Foo"));
+        assertEquals(Integer.valueOf(3), map.get("DOO"));
+        assertEquals(Integer.valueOf(3), map.get("doo"));
+        assertEquals(Integer.valueOf(3), map.get("Doo"));
 
-    assertEquals(Integer.valueOf(3), map.get("DOO"));
-    assertEquals(Integer.valueOf(3), map.get("doo"));
-    assertEquals(Integer.valueOf(3), map.get("Doo"));
-
-  }
+    }
 }

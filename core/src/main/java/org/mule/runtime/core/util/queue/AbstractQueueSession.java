@@ -8,40 +8,47 @@ package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
 
-public abstract class AbstractQueueSession implements QueueSession {
+public abstract class AbstractQueueSession implements QueueSession
+{
 
-  private final QueueProvider queueProvider;
-  private final MuleContext muleContext;
+    private final QueueProvider queueProvider;
+    private final MuleContext muleContext;
 
-  public AbstractQueueSession(QueueProvider queueProvider, MuleContext muleContext) {
-    this.queueProvider = queueProvider;
-    this.muleContext = muleContext;
-  }
+    public AbstractQueueSession(QueueProvider queueProvider, MuleContext muleContext)
+    {
+        this.queueProvider = queueProvider;
+        this.muleContext = muleContext;
+    }
 
-  @Override
-  public Queue getQueue(String name) {
-    QueueStore queueStore = queueProvider.getQueue(name);
-    return new TransactionAwareQueueStore(queueStore, new TransactionContextProvider() {
+    @Override
+    public Queue getQueue(String name)
+    {
+        QueueStore queueStore = queueProvider.getQueue(name);
+        return new TransactionAwareQueueStore(queueStore, new TransactionContextProvider()
+        {
+            @Override
+            public boolean isTransactional()
+            {
+                return getTransactionalContext() != null;
+            }
 
-      @Override
-      public boolean isTransactional() {
-        return getTransactionalContext() != null;
-      }
+            @Override
+            public QueueTransactionContext getTransactionalContext()
+            {
+                return AbstractQueueSession.this.getTransactionalContext();
+            }
+        }, muleContext);
+    }
 
-      @Override
-      public QueueTransactionContext getTransactionalContext() {
-        return AbstractQueueSession.this.getTransactionalContext();
-      }
-    }, muleContext);
-  }
+    protected QueueProvider getQueueProvider()
+    {
+        return queueProvider;
+    }
 
-  protected QueueProvider getQueueProvider() {
-    return queueProvider;
-  }
+    protected MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
 
-  protected MuleContext getMuleContext() {
-    return muleContext;
-  }
-
-  protected abstract QueueTransactionContext getTransactionalContext();
+    protected abstract QueueTransactionContext getTransactionalContext();
 }

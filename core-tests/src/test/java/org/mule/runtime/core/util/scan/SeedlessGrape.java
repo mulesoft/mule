@@ -9,10 +9,11 @@ package org.mule.runtime.core.util.scan;
 /**
  * A grape without seeds
  */
-public class SeedlessGrape extends Grape {
-
-  @Override
-  public final int getSeeds() {
-    return 0;
-  }
+public class SeedlessGrape extends Grape
+{
+    @Override
+    public final int getSeeds()
+    {
+        return 0;
+    }
 }

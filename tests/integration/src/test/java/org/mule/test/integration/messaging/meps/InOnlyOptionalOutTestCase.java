@@ -16,25 +16,32 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class InOnlyOptionalOutTestCase extends AbstractIntegrationTestCase {
+public class InOnlyOptionalOutTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml";
-  }
+    @Test
+    public void testExchange() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testExchange() throws Exception {
-    MuleClient client = muleContext.getClient();
+        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
+                                                   .asynchronously()
+                                                   .run();
+        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
+                                                   .withInboundProperty("foo", "bar")
+                                                   .asynchronously()
+                                                   .run();
 
-    flowRunner("In-Only_Optional-Out--Service").withPayload("some data").asynchronously().run();
-    flowRunner("In-Only_Optional-Out--Service").withPayload("some data").withInboundProperty("foo", "bar").asynchronously().run();
+        MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
-    assertNotNull(result);
-    assertThat(getPayloadAsString(result), is("foo header received"));
-
-    result = client.request("test://notReceived", RECEIVE_TIMEOUT);
-    assertNull(result);
-  }
+        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
+        assertNull(result);
+    }
 }

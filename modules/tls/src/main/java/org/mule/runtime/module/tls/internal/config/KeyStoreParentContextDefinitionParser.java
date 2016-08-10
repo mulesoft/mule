@@ -10,11 +10,13 @@ import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionPa
 import org.mule.runtime.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 
 
-public class KeyStoreParentContextDefinitionParser extends ParentContextDefinitionParser {
+public class KeyStoreParentContextDefinitionParser extends ParentContextDefinitionParser
+{
 
-  public KeyStoreParentContextDefinitionParser() {
-    super("context", new KeyStoreTlsContextDefinitionParser());
-    otherwise(new KeyStoreDefinitionParser());
-  }
+    public KeyStoreParentContextDefinitionParser()
+    {
+        super("context", new KeyStoreTlsContextDefinitionParser());
+        otherwise(new KeyStoreDefinitionParser());
+    }
 
 }

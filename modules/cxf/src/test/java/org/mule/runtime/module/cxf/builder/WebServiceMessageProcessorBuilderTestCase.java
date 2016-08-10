@@ -35,89 +35,98 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class WebServiceMessageProcessorBuilderTestCase extends AbstractMuleContextTestCase {
+public class WebServiceMessageProcessorBuilderTestCase extends AbstractMuleContextTestCase
+{
+    private WebServiceMessageProcessorBuilder serviceMessageProcessorBuilder;
+    private static final String SERVICE_NAME = "Echo";
+    private static final String NAMESPACE = "http://cxf.apache.org/";
 
-  private WebServiceMessageProcessorBuilder serviceMessageProcessorBuilder;
-  private static final String SERVICE_NAME = "Echo";
-  private static final String NAMESPACE = "http://cxf.apache.org/";
-
-  @Before
-  public void setUp() {
-    serviceMessageProcessorBuilder = new WebServiceMessageProcessorBuilder();
-  }
-
-  @Test
-  public void testBuildServiceAttribute() throws MuleException {
-    serviceMessageProcessorBuilder.setService(SERVICE_NAME);
-    serviceMessageProcessorBuilder.setNamespace(NAMESPACE);
-    serviceMessageProcessorBuilder.setMuleContext(muleContext);
-    serviceMessageProcessorBuilder.setServiceClass(Echo.class);
-
-    CxfInboundMessageProcessor messageProcessor = serviceMessageProcessorBuilder.build();
-    assertNotNull(messageProcessor);
-    QName serviceName = messageProcessor.getServer().getEndpoint().getService().getName();
-    assertEquals(new QName(NAMESPACE, SERVICE_NAME), serviceName);
-  }
-
-  @Test
-  public void testWsSecurityConfig() throws MuleException {
-    WsSecurity wsSecurity = new WsSecurity();
-    addConfigProperties(wsSecurity);
-    addSecurityManager(wsSecurity);
-    addCustomValidator(wsSecurity);
-    serviceMessageProcessorBuilder.setWsSecurity(wsSecurity);
-    serviceMessageProcessorBuilder.setService(SERVICE_NAME);
-    serviceMessageProcessorBuilder.setNamespace(NAMESPACE);
-    serviceMessageProcessorBuilder.setMuleContext(muleContext);
-    serviceMessageProcessorBuilder.setServiceClass(Echo.class);
-
-    CxfInboundMessageProcessor messageProcessor = serviceMessageProcessorBuilder.build();
-
-    assertNotNull(messageProcessor);
-    WSS4JInInterceptor wss4JInInterceptor = getInterceptor(messageProcessor.getServer().getEndpoint().getInInterceptors());
-    assertNotNull(wss4JInInterceptor);
-
-    Map<String, Object> wss4jProperties = wss4JInInterceptor.getProperties();
-    assertFalse(wss4jProperties.isEmpty());
-
-    assertEquals(WSHandlerConstants.USERNAME_TOKEN, wss4jProperties.get(WSHandlerConstants.ACTION));
-
-    Map<String, Object> properties = serviceMessageProcessorBuilder.getProperties();
-    assertNotNull(properties);
-
-    assertTrue(properties.get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof MuleSecurityManagerValidator);
-    assertTrue(properties.get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
-
-  }
-
-  private WSS4JInInterceptor getInterceptor(List<Interceptor<? extends Message>> interceptors) {
-    for (Interceptor interceptor : interceptors) {
-      if (interceptor instanceof WSS4JInInterceptor) {
-        return (WSS4JInInterceptor) interceptor;
-      }
+    @Before
+    public void setUp()
+    {
+        serviceMessageProcessorBuilder = new WebServiceMessageProcessorBuilder();
     }
-    return null;
-  }
 
-  private void addConfigProperties(WsSecurity wsSecurity) {
-    Map<String, Object> configProperties = new HashMap<>();
-    configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+    @Test
+    public void testBuildServiceAttribute() throws MuleException
+    {
+        serviceMessageProcessorBuilder.setService(SERVICE_NAME);
+        serviceMessageProcessorBuilder.setNamespace(NAMESPACE);
+        serviceMessageProcessorBuilder.setMuleContext(muleContext);
+        serviceMessageProcessorBuilder.setServiceClass(Echo.class);
 
-    final WsConfig wsConfig = new WsConfig(configProperties);
-    wsConfig.setMuleContext(muleContext);
-    wsSecurity.setWsConfig(wsConfig);
-  }
+        CxfInboundMessageProcessor messageProcessor = serviceMessageProcessorBuilder.build();
+        assertNotNull(messageProcessor);
+        QName serviceName = messageProcessor.getServer().getEndpoint().getService().getName();
+        assertEquals(new QName(NAMESPACE, SERVICE_NAME), serviceName);
+    }
 
-  private void addSecurityManager(WsSecurity wsSecurity) {
-    wsSecurity.setSecurityManager(new MuleSecurityManagerValidator());
-  }
+    @Test
+    public void testWsSecurityConfig() throws MuleException
+    {
+        WsSecurity wsSecurity = new WsSecurity();     
+        addConfigProperties(wsSecurity);
+        addSecurityManager(wsSecurity);
+        addCustomValidator(wsSecurity);
+        serviceMessageProcessorBuilder.setWsSecurity(wsSecurity);
+        serviceMessageProcessorBuilder.setService(SERVICE_NAME);
+        serviceMessageProcessorBuilder.setNamespace(NAMESPACE);
+        serviceMessageProcessorBuilder.setMuleContext(muleContext);
+        serviceMessageProcessorBuilder.setServiceClass(Echo.class);
 
-  private void addCustomValidator(WsSecurity wsSecurity) {
-    Map<String, Object> customValidator = new HashMap<>();
-    customValidator.put(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, new NoOpValidator());
+        CxfInboundMessageProcessor messageProcessor = serviceMessageProcessorBuilder.build();
 
-    wsSecurity.setCustomValidator(customValidator);
-  }
+        assertNotNull(messageProcessor);
+        WSS4JInInterceptor wss4JInInterceptor = getInterceptor(messageProcessor.getServer().getEndpoint().getInInterceptors());
+        assertNotNull(wss4JInInterceptor);
+        
+        Map<String, Object> wss4jProperties = wss4JInInterceptor.getProperties();
+        assertFalse(wss4jProperties.isEmpty());
+        
+        assertEquals(WSHandlerConstants.USERNAME_TOKEN, wss4jProperties.get(WSHandlerConstants.ACTION));
+        
+        Map<String, Object> properties = serviceMessageProcessorBuilder.getProperties();
+        assertNotNull(properties);
+        
+        assertTrue(properties.get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof MuleSecurityManagerValidator);
+        assertTrue(properties.get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
+
+    }
+
+    private WSS4JInInterceptor getInterceptor(List<Interceptor<? extends Message>> interceptors)
+    {
+        for(Interceptor interceptor : interceptors)
+        {
+            if(interceptor instanceof WSS4JInInterceptor)
+            {
+                return (WSS4JInInterceptor)interceptor;
+            }
+        }
+        return null;
+    }
+
+    private void addConfigProperties(WsSecurity wsSecurity)
+    {
+        Map<String, Object> configProperties = new HashMap<>();
+        configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        
+        final WsConfig wsConfig = new WsConfig(configProperties);
+        wsConfig.setMuleContext(muleContext);
+        wsSecurity.setWsConfig(wsConfig);
+    }
+
+    private void addSecurityManager(WsSecurity wsSecurity)
+    {
+        wsSecurity.setSecurityManager(new MuleSecurityManagerValidator());
+    }
+    
+    private void addCustomValidator(WsSecurity wsSecurity)
+    {
+        Map<String, Object> customValidator = new HashMap<>();
+        customValidator.put(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, new NoOpValidator());
+
+        wsSecurity.setCustomValidator(customValidator);
+    }
 
 
 }

@@ -16,16 +16,18 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  *
  * @since 4.0
  */
-public class MessageProcessorWrapperObjectFactory implements ObjectFactory<MessageProcessor> {
+public class MessageProcessorWrapperObjectFactory implements ObjectFactory<MessageProcessor>
+{
+    private MessageProcessor messageProcessor;
 
-  private MessageProcessor messageProcessor;
+    @Override
+    public MessageProcessor getObject() throws Exception
+    {
+        return messageProcessor;
+    }
 
-  @Override
-  public MessageProcessor getObject() throws Exception {
-    return messageProcessor;
-  }
-
-  public void setMessageProcessor(MessageProcessor messageProcessor) {
-    this.messageProcessor = messageProcessor;
-  }
+    public void setMessageProcessor(MessageProcessor messageProcessor)
+    {
+        this.messageProcessor = messageProcessor;
+    }
 }

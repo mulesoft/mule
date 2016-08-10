@@ -17,16 +17,18 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class DefaultExtensionConfig implements ExtensionConfig {
+public final class DefaultExtensionConfig implements ExtensionConfig
+{
+    private Optional<Time> dynamicConfigExpirationFrequency = empty();
 
-  private Optional<Time> dynamicConfigExpirationFrequency = empty();
+    @Override
+    public Optional<Time> getDynamicConfigExpirationFrequency()
+    {
+        return dynamicConfigExpirationFrequency;
+    }
 
-  @Override
-  public Optional<Time> getDynamicConfigExpirationFrequency() {
-    return dynamicConfigExpirationFrequency;
-  }
-
-  public void setDynamicConfigExpirationFrequency(Time dynamicConfigExpirationFrequency) {
-    this.dynamicConfigExpirationFrequency = ofNullable(dynamicConfigExpirationFrequency);
-  }
+    public void setDynamicConfigExpirationFrequency(Time dynamicConfigExpirationFrequency)
+    {
+        this.dynamicConfigExpirationFrequency = ofNullable(dynamicConfigExpirationFrequency);
+    }
 }

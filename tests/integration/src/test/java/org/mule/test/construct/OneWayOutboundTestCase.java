@@ -14,47 +14,54 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class OneWayOutboundTestCase extends AbstractIntegrationTestCase {
+public abstract class OneWayOutboundTestCase extends AbstractIntegrationTestCase
+{
 
-  private MuleClient client;
+    private MuleClient client;
+    
+    @Before
+    public void setUp() throws Exception
+    {
+        client = muleContext.getClient();
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    client = muleContext.getClient();
-  }
+    @Test
+    public void noOutbound() throws Exception
+    {
+        MuleMessage response = flowRunner("noOutbound").withPayload("TEST").run().getMessage();
+        assertEquals("TEST processed", response.getPayload());
+    }
 
-  @Test
-  public void noOutbound() throws Exception {
-    MuleMessage response = flowRunner("noOutbound").withPayload("TEST").run().getMessage();
-    assertEquals("TEST processed", response.getPayload());
-  }
+    @Test
+    public void noOutboundEndpointAsync() throws Exception
+    {
+        MuleMessage response = flowRunner("noOutboundAsync").withPayload("TEST").run().getMessage();
+        assertEquals("TEST", response.getPayload());
+    }
 
-  @Test
-  public void noOutboundEndpointAsync() throws Exception {
-    MuleMessage response = flowRunner("noOutboundAsync").withPayload("TEST").run().getMessage();
-    assertEquals("TEST", response.getPayload());
-  }
+    @Test
+    public void oneWayOutbound() throws Exception
+    {
+        MuleMessage response = flowRunner("oneWayOutbound").withPayload("TEST").run().getMessage();
+        assertOneWayOutboundResponse(response);
+    }
 
-  @Test
-  public void oneWayOutbound() throws Exception {
-    MuleMessage response = flowRunner("oneWayOutbound").withPayload("TEST").run().getMessage();
-    assertOneWayOutboundResponse(response);
-  }
+    protected abstract void assertOneWayOutboundResponse(MuleMessage response);
 
-  protected abstract void assertOneWayOutboundResponse(MuleMessage response);
+    @Test
+    public void oneWayOutboundAfterComponent() throws Exception
+    {
+        MuleMessage response = flowRunner("oneWayOutboundAfterComponent").withPayload("TEST").run().getMessage();
+        assertOneWayOutboundAfterComponentResponse(response);
+    }
 
-  @Test
-  public void oneWayOutboundAfterComponent() throws Exception {
-    MuleMessage response = flowRunner("oneWayOutboundAfterComponent").withPayload("TEST").run().getMessage();
-    assertOneWayOutboundAfterComponentResponse(response);
-  }
+    protected  abstract void assertOneWayOutboundAfterComponentResponse(MuleMessage response);
 
-  protected abstract void assertOneWayOutboundAfterComponentResponse(MuleMessage response);
-
-  @Test
-  public void oneWayOutboundBeforeComponent() throws Exception {
-    MuleMessage response = flowRunner("oneWayOutboundBeforeComponent").withPayload("TEST").run().getMessage();
-    assertEquals("TEST processed", response.getPayload());
-  }
+    @Test
+    public void oneWayOutboundBeforeComponent() throws Exception
+    {
+        MuleMessage response = flowRunner("oneWayOutboundBeforeComponent").withPayload("TEST").run().getMessage();
+        assertEquals("TEST processed", response.getPayload());
+    }
 }
 

@@ -33,77 +33,88 @@ import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ListableObjectStoreProducerTestCase {
+public class ListableObjectStoreProducerTestCase
+{
 
-  @Mock
-  private ListableObjectStore<Serializable> objectStore;
+    @Mock
+    private ListableObjectStore<Serializable> objectStore;
 
-  private Map<String, String> values;
+    private Map<String, String> values;
 
-  private ListableObjectStoreProducer<Serializable> producer;
+    private ListableObjectStoreProducer<Serializable> producer;
 
-  @Before
-  public void setUp() throws Exception {
-    this.values = new HashMap<String, String>();
-    this.values.put("fruit", "banana");
-    this.values.put("icecream", "chocolate");
-    this.values.put("drink", "coke");
+    @Before
+    public void setUp() throws Exception
+    {
+        this.values = new HashMap<String, String>();
+        this.values.put("fruit", "banana");
+        this.values.put("icecream", "chocolate");
+        this.values.put("drink", "coke");
 
-    Mockito.when(this.objectStore.retrieve(Mockito.anyString())).thenAnswer(new Answer<Serializable>() {
+        Mockito.when(this.objectStore.retrieve(Mockito.anyString())).thenAnswer(new Answer<Serializable>()
+        {
+            @Override
+            public Serializable answer(InvocationOnMock invocation) throws Throwable
+            {
+                Serializable value = values.get(invocation.getArguments()[0]);
+                if (value == null)
+                {
+                    throw new ObjectDoesNotExistException();
+                }
 
-      @Override
-      public Serializable answer(InvocationOnMock invocation) throws Throwable {
-        Serializable value = values.get(invocation.getArguments()[0]);
-        if (value == null) {
-          throw new ObjectDoesNotExistException();
+                return value;
+            }
+        });
+
+        Mockito.when(this.objectStore.allKeys())
+            .thenReturn(new ArrayList<Serializable>(this.values.keySet()));
+
+        this.producer = new ListableObjectStoreProducer<Serializable>(this.objectStore);
+    }
+
+    @Test
+    public void happyPath() throws Exception
+    {
+        Set<Serializable> returnedValues = new HashSet<Serializable>();
+
+        Serializable item = this.producer.produce();
+        while (item != null)
+        {
+            returnedValues.add(item);
+            item = this.producer.produce();
         }
 
-        return value;
-      }
-    });
+        Assert.assertEquals(returnedValues.size(), this.values.size());
 
-    Mockito.when(this.objectStore.allKeys()).thenReturn(new ArrayList<Serializable>(this.values.keySet()));
+        for (String value : this.values.values())
+        {
+            Assert.assertTrue(returnedValues.contains(value));
+        }
 
-    this.producer = new ListableObjectStoreProducer<Serializable>(this.objectStore);
-  }
-
-  @Test
-  public void happyPath() throws Exception {
-    Set<Serializable> returnedValues = new HashSet<Serializable>();
-
-    Serializable item = this.producer.produce();
-    while (item != null) {
-      returnedValues.add(item);
-      item = this.producer.produce();
+        Assert.assertNull(this.producer.produce());
     }
 
-    Assert.assertEquals(returnedValues.size(), this.values.size());
-
-    for (String value : this.values.values()) {
-      Assert.assertTrue(returnedValues.contains(value));
+    @Test
+    public void concurrentlyRemoved() throws Exception
+    {
+        this.values.remove("icecream");
+        this.happyPath();
     }
 
-    Assert.assertNull(this.producer.produce());
-  }
+    @Test
+    public void size() throws Exception
+    {
+        Assert.assertEquals(this.values.size(), this.producer.size());
+    }
 
-  @Test
-  public void concurrentlyRemoved() throws Exception {
-    this.values.remove("icecream");
-    this.happyPath();
-  }
+    @Test
+    @SuppressWarnings("unchecked")
+    public void earlyClose() throws Exception
+    {
+        this.producer.produce();
+        this.producer.close();
 
-  @Test
-  public void size() throws Exception {
-    Assert.assertEquals(this.values.size(), this.producer.size());
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void earlyClose() throws Exception {
-    this.producer.produce();
-    this.producer.close();
-
-    Assert.assertTrue(CollectionUtils.isEmpty((List<Serializable>) this.producer.produce()));
-  }
+        Assert.assertTrue(CollectionUtils.isEmpty((List<Serializable>) this.producer.produce()));
+    }
 
 }

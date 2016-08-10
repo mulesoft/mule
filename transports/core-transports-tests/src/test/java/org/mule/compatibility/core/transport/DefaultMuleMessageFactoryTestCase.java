@@ -9,22 +9,25 @@ package org.mule.compatibility.core.transport;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.DefaultMuleMessageFactory;
 
-public class DefaultMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase {
+public class DefaultMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
+{
+    public DefaultMuleMessageFactoryTestCase()
+    {
+        super();
+        runUnsuppoprtedTransportMessageTest = false;
+    }
+    
+    @Override
+    protected MuleMessageFactory doCreateMuleMessageFactory()
+    {
+        return new DefaultMuleMessageFactory();
+    }
 
-  public DefaultMuleMessageFactoryTestCase() {
-    super();
-    runUnsuppoprtedTransportMessageTest = false;
-  }
-
-  @Override
-  protected MuleMessageFactory doCreateMuleMessageFactory() {
-    return new DefaultMuleMessageFactory();
-  }
-
-  @Override
-  protected Object getValidTransportMessage() {
-    return TEST_MESSAGE;
-  }
+    @Override
+    protected Object getValidTransportMessage()
+    {
+        return TEST_MESSAGE;
+    }
 }
 
 

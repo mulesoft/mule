@@ -21,32 +21,37 @@ import javax.activation.DataHandler;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpAttachmentDataTypeTestCase extends FunctionalTestCase {
+public class HttpAttachmentDataTypeTestCase extends FunctionalTestCase
+{
 
-  private static final List<String> contentTypes = new ArrayList();
+    private static final List<String> contentTypes = new ArrayList();
 
-  @Rule
-  public DynamicPort httpPort = new DynamicPort("httpPort");
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("httpPort");
 
-  @Override
-  protected String getConfigFile() {
-    return "http-attachment-datatype-config.xml";
-  }
-
-  @Test
-  public void testContentType() throws Exception {
-    runFlow("testFlow");
-
-    assertThat(contentTypes.size(), equalTo(2));
-    assertThat(contentTypes, containsInAnyOrder("text/html; charset=US-ASCII", "application/xml; charset=UTF-8"));
-  }
-
-  public static class AttachmentListener {
-
-    public DataHandler process(DataHandler dataHandler) {
-      contentTypes.add(dataHandler.getContentType());
-
-      return dataHandler;
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-attachment-datatype-config.xml";
     }
-  }
+
+    @Test
+    public void testContentType() throws Exception
+    {
+        runFlow("testFlow");
+
+        assertThat(contentTypes.size(), equalTo(2));
+        assertThat(contentTypes, containsInAnyOrder("text/html; charset=US-ASCII", "application/xml; charset=UTF-8"));
+    }
+
+    public static class AttachmentListener
+    {
+
+        public DataHandler process(DataHandler dataHandler)
+        {
+            contentTypes.add(dataHandler.getContentType());
+
+            return dataHandler;
+        }
+    }
 }

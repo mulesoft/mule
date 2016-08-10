@@ -10,34 +10,40 @@ package org.mule.runtime.core.util.queue;
 import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;
 
-public class QueueTestComponent {
+public class QueueTestComponent
+{
 
-  public void testDisposal(QueueManager mgr, boolean transactional) throws Exception {
-    final String queueName = "myQueue";
-    mgr.start();
-    QueueSession session = mgr.getQueueSession();
+    public void testDisposal(QueueManager mgr, boolean transactional) throws Exception
+    {
+        final String queueName = "myQueue";
+        mgr.start();
+        QueueSession session = mgr.getQueueSession();
 
-    if (transactional) {
-      session.begin();
+        if (transactional)
+        {
+            session.begin();
+        }
+
+        Queue queue = mgr.getQueueSession().getQueue(queueName);
+        this.assertQueueDisposal(mgr, queue, transactional ? session : null, queueName);
     }
 
-    Queue queue = mgr.getQueueSession().getQueue(queueName);
-    this.assertQueueDisposal(mgr, queue, transactional ? session : null, queueName);
-  }
+    private void assertQueueDisposal(QueueManager mgr, Queue queue, QueueSession session, String queueName)
+        throws Exception
+    {
+        queue.put("some value");
+        assertEquals(1, queue.size());
 
-  private void assertQueueDisposal(QueueManager mgr, Queue queue, QueueSession session, String queueName) throws Exception {
-    queue.put("some value");
-    assertEquals(1, queue.size());
+        if (session != null)
+        {
+            session.commit();
+        }
 
-    if (session != null) {
-      session.commit();
+        queue.dispose();
+
+        Queue queue2 = mgr.getQueueSession().getQueue(queueName);
+        assertNotSame(queue, queue2);
+        assertEquals(0, queue2.size());
     }
-
-    queue.dispose();
-
-    Queue queue2 = mgr.getQueueSession().getQueue(queueName);
-    assertNotSame(queue, queue2);
-    assertEquals(0, queue2.size());
-  }
 
 }

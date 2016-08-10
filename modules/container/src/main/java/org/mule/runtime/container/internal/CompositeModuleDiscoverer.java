@@ -13,31 +13,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Composes a group of {@link ModuleDiscoverer} and discovers the modules discovered by each of them.
+ * Composes a group of {@link ModuleDiscoverer} and discovers the modules
+ * discovered by each of them.
  *
  * @since 4.0
  */
-public class CompositeModuleDiscoverer implements ModuleDiscoverer {
+public class CompositeModuleDiscoverer implements ModuleDiscoverer
+{
 
-  private final ModuleDiscoverer[] moduleDiscoverers;
+    private final ModuleDiscoverer[] moduleDiscoverers;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param moduleDiscoverers module discoveres to compose. Non empty.
-   */
-  public CompositeModuleDiscoverer(ModuleDiscoverer... moduleDiscoverers) {
-    checkArgument(moduleDiscoverers.length > 0, "moduleDiscoverers cannot be empty");
-    this.moduleDiscoverers = moduleDiscoverers;
-  }
-
-  @Override
-  public List<MuleModule> discover() {
-    final List<MuleModule> muleModules = new ArrayList<>();
-    for (ModuleDiscoverer discoverer : moduleDiscoverers) {
-      muleModules.addAll(discoverer.discover());
+    /**
+     * Creates a new instance.
+     *
+     * @param moduleDiscoverers module discoveres to compose. Non empty.
+     */
+    public CompositeModuleDiscoverer(ModuleDiscoverer... moduleDiscoverers)
+    {
+        checkArgument(moduleDiscoverers.length >0, "moduleDiscoverers cannot be empty");
+        this.moduleDiscoverers = moduleDiscoverers;
     }
 
-    return muleModules;
-  }
+    @Override
+    public List<MuleModule> discover()
+    {
+        final List<MuleModule> muleModules = new ArrayList<>();
+        for (ModuleDiscoverer discoverer : moduleDiscoverers)
+        {
+            muleModules.addAll(discoverer.discover());
+        }
+
+        return muleModules;
+    }
 }

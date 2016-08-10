@@ -9,19 +9,22 @@ package org.mule.runtime.module.spring.remoting;
 /**
  * A server-side service to receive and process ComplexData.
  */
-public class DoSomeWork implements WorkInterface {
+public class DoSomeWork implements WorkInterface
+{
+    public String executeByteArray(byte[] input)
+    {
+        return executeString(new String(input));
+    }
 
-  public String executeByteArray(byte[] input) {
-    return executeString(new String(input));
-  }
+    public String executeString(String input)
+    {
+        return "You said " + input;
+    }
 
-  public String executeString(String input) {
-    return "You said " + input;
-  }
-
-  public ComplexData executeComplexity(ComplexData input) {
-    input.setSomeString(input.getSomeString() + " Received");
-    input.setSomeInteger(new Integer(input.getSomeInteger().intValue() + 1));
-    return input;
-  }
+    public ComplexData executeComplexity(ComplexData input)
+    {
+        input.setSomeString(input.getSomeString() + " Received");
+        input.setSomeInteger(new Integer(input.getSomeInteger().intValue() + 1));
+        return input;
+    }
 }

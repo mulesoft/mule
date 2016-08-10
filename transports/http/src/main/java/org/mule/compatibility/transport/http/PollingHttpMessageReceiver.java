@@ -36,107 +36,124 @@ import org.mule.runtime.core.util.StringUtils;
 /**
  * Will poll an http URL and use the response as the input for a service request.
  */
-public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
+public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
+{
+    protected String etag = null;
+    protected boolean checkEtag;
+    protected boolean discardEmptyContent;
 
-  protected String etag = null;
-  protected boolean checkEtag;
-  protected boolean discardEmptyContent;
+    //The outbound endpoint to poll
+    private OutboundEndpoint outboundEndpoint;
 
-  // The outbound endpoint to poll
-  private OutboundEndpoint outboundEndpoint;
-
-  public PollingHttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, final InboundEndpoint endpoint)
-      throws CreateException {
-    super(connector, flowConstruct, endpoint);
-    setupFromConnector(connector);
-  }
-
-  @Override
-  protected boolean pollOnPrimaryInstanceOnly() {
-    return true;
-  }
-
-  protected void setupFromConnector(Connector connector) throws CreateException {
-    if (!(connector instanceof HttpPollingConnector)) {
-      throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
+    public PollingHttpMessageReceiver(Connector connector,
+                                      FlowConstruct flowConstruct,
+                                      final InboundEndpoint endpoint) throws CreateException
+    {
+        super(connector, flowConstruct, endpoint);
+        setupFromConnector(connector);
     }
 
-    HttpPollingConnector pollingConnector = (HttpPollingConnector) connector;
-    long pollingFrequency =
-        MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", pollingConnector.getPollingFrequency());
-    if (pollingFrequency > 0) {
-      setFrequency(pollingFrequency);
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly() {
+        return true;
     }
 
-    checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", pollingConnector.isCheckEtag());
-    discardEmptyContent =
-        MapUtils.getBooleanValue(endpoint.getProperties(), "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
-  }
+    protected void setupFromConnector(Connector connector) throws CreateException
+    {
+        if (!(connector instanceof HttpPollingConnector))
+        {
+            throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
+        }
 
-  @Override
-  protected void doDispose() {
-    // nothing to do
-  }
+        HttpPollingConnector pollingConnector = (HttpPollingConnector) connector;
+        long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
+                pollingConnector.getPollingFrequency());
+        if (pollingFrequency > 0)
+        {
+            setFrequency(pollingFrequency);
+        }
 
-  @Override
-  protected void doConnect() throws Exception {
-    // nothing to do
-  }
-
-  @Override
-  public void doDisconnect() throws Exception {
-    // nothing to do
-  }
-
-  @Override
-  public void poll() throws Exception {
-    MuleContext muleContext = getEndpoint().getMuleContext();
-
-    if (outboundEndpoint == null) {
-      // We need to create an outbound endpoint to do the polled request using
-      // send() as thats the only way we can customize headers and use eTags
-      EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
-      // Must not use inbound endpoint processors
-      endpointBuilder.setMessageProcessors(emptyList());
-      endpointBuilder.setResponseMessageProcessors(emptyList());
-      endpointBuilder.setMessageProcessors(emptyList());
-      endpointBuilder.setResponseMessageProcessors(emptyList());
-      endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
-
-      outboundEndpoint = getEndpointFactory(muleContext).getOutboundEndpoint(endpointBuilder);
+        checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", pollingConnector.isCheckEtag());
+        discardEmptyContent = MapUtils.getBooleanValue(endpoint.getProperties(), "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
     }
 
-    MuleMessage.Builder requestBuider =
-        MuleMessage.builder().payload(StringUtils.EMPTY).inboundProperties(outboundEndpoint.getProperties());
-    if (etag != null && checkEtag) {
-      requestBuider.addOutboundProperty(HEADER_IF_NONE_MATCH, etag);
-    }
-    requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
-
-    MuleEvent event = new DefaultMuleEvent(requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
-
-    MuleEvent result = outboundEndpoint.process(event);
-    MuleMessage message = null;
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-      message = result.getMessage();
+    @Override
+    protected void doDispose()
+    {
+        // nothing to do
     }
 
-    final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);
-    if (contentLength == 0 && discardEmptyContent) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Received empty message and ignoring from: " + endpoint.getEndpointURI());
-      }
-      return;
+    @Override
+    protected void doConnect() throws Exception
+    {
+        // nothing to do
     }
-    int status = message.getOutboundProperty(HTTP_STATUS_PROPERTY, 0);
-    etag = message.getOutboundProperty(HEADER_ETAG);
 
-    if ((status != SC_NOT_MODIFIED || !checkEtag)) {
-      routeMessage(message);
+    @Override
+    public void doDisconnect() throws Exception
+    {
+        // nothing to do
     }
-  }
 
-  public EndpointFactory getEndpointFactory(MuleContext muleContext) {
-    return (EndpointFactory) muleContext.getRegistry().lookupObject(OBJECT_MULE_ENDPOINT_FACTORY);
-  }
+    @Override
+    public void poll() throws Exception
+    {
+        MuleContext muleContext = getEndpoint().getMuleContext();
+
+        if (outboundEndpoint == null)
+        {
+            // We need to create an outbound endpoint to do the polled request using
+            // send() as thats the only way we can customize headers and use eTags
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
+            // Must not use inbound endpoint processors
+            endpointBuilder.setMessageProcessors(emptyList());
+            endpointBuilder.setResponseMessageProcessors(emptyList());
+            endpointBuilder.setMessageProcessors(emptyList());
+            endpointBuilder.setResponseMessageProcessors(emptyList());
+            endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
+
+            outboundEndpoint = getEndpointFactory(muleContext).getOutboundEndpoint(
+                    endpointBuilder);
+        }
+
+        MuleMessage.Builder requestBuider = MuleMessage.builder()
+                .payload(StringUtils.EMPTY)
+                .inboundProperties(outboundEndpoint.getProperties());
+        if (etag != null && checkEtag)
+        {
+            requestBuider.addOutboundProperty(HEADER_IF_NONE_MATCH, etag);
+        }
+        requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
+
+        MuleEvent event = new DefaultMuleEvent(requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
+
+        MuleEvent result = outboundEndpoint.process(event);
+        MuleMessage message = null;
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
+        {
+            message = result.getMessage();
+        }
+
+        final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);
+        if (contentLength == 0 && discardEmptyContent)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Received empty message and ignoring from: " + endpoint.getEndpointURI());
+            }
+            return;
+        }
+        int status = message.getOutboundProperty(HTTP_STATUS_PROPERTY, 0);
+        etag = message.getOutboundProperty(HEADER_ETAG);
+
+        if ((status != SC_NOT_MODIFIED || !checkEtag))
+        {
+            routeMessage(message);
+        }
+    }
+
+    public EndpointFactory getEndpointFactory(MuleContext muleContext)
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(OBJECT_MULE_ENDPOINT_FACTORY);
+    }
 }

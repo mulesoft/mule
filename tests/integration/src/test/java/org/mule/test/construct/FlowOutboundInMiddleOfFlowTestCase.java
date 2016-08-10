@@ -13,28 +13,30 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class FlowOutboundInMiddleOfFlowTestCase extends AbstractIntegrationTestCase {
+public class FlowOutboundInMiddleOfFlowTestCase extends AbstractIntegrationTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/construct/flow-outbound-in-middle-of-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/construct/flow-outbound-in-middle-of-flow.xml";
-  }
-
-  @Test
-  public void testOutboundInMiddleOfFlow() throws Exception {
-    MuleClient client = muleContext.getClient();
-
-    flowRunner("flowTest").withPayload("message").asynchronously().run();
-
-    MuleMessage msg = client.request("test://test.out.1", 1000);
-    assertEquals("messagehello", getPayloadAsString(msg));
-
-    MuleMessage msg2 = client.request("test://test.out.2", RECEIVE_TIMEOUT);
-    assertEquals("messagebye", getPayloadAsString(msg2));
-
-    MuleMessage msg3 = client.request("test://test.out.3", RECEIVE_TIMEOUT);
-    assertEquals("egassem", getPayloadAsString(msg3));
-  }
+    @Test
+    public void testOutboundInMiddleOfFlow() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        
+        flowRunner("flowTest").withPayload("message").asynchronously().run();
+        
+        MuleMessage msg = client.request("test://test.out.1", 1000);
+        assertEquals("messagehello", getPayloadAsString(msg));
+        
+        MuleMessage msg2 = client.request("test://test.out.2", RECEIVE_TIMEOUT);
+        assertEquals("messagebye", getPayloadAsString(msg2));
+        
+        MuleMessage msg3 = client.request("test://test.out.3", RECEIVE_TIMEOUT);
+        assertEquals("egassem", getPayloadAsString(msg3));
+    }
 }
 
 

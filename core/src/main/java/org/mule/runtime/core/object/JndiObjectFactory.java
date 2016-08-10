@@ -22,158 +22,198 @@ import javax.naming.NamingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JndiObjectFactory implements ObjectFactory {
+public class JndiObjectFactory implements ObjectFactory
+{
+    /**
+     * If true, the object is looked up from JNDI each time create() is called, otherwise it
+     * is looked up once and stored locally.  Default value is false.
+     */
+    private boolean lookupOnEachCall = false;
+    
+    private String objectName;
 
-  /**
-   * If true, the object is looked up from JNDI each time create() is called, otherwise it is looked up once and stored locally.
-   * Default value is false.
-   */
-  private boolean lookupOnEachCall = false;
+    private String initialFactory;
 
-  private String objectName;
+    private String url;
 
-  private String initialFactory;
+    private Map properties;
+    
+    private Context _context;
+    
+    private Object _object;
 
-  private String url;
-
-  private Map properties;
-
-  private Context _context;
-
-  private Object _object;
-
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-  public JndiObjectFactory() {
-    // for IoC only
-  }
-
-  public JndiObjectFactory(String objectName, String initialFactory, String url) {
-    this(objectName, initialFactory, url, null);
-  }
-
-  public JndiObjectFactory(String objectName, String initialFactory, String url, Map properties) {
-    this.objectName = objectName;
-    this.initialFactory = initialFactory;
-    this.url = url;
-    this.properties = properties;
-  }
-
-  public void initialise() throws InitialisationException {
-    if (_context == null) {
-      Hashtable props = new Hashtable();
-
-      if (initialFactory != null) {
-        props.put(Context.INITIAL_CONTEXT_FACTORY, initialFactory);
-      } else if (properties == null || !properties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
-        throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
-      }
-
-      if (url != null) {
-        props.put(Context.PROVIDER_URL, url);
-      }
-
-      if (properties != null) {
-        props.putAll(properties);
-      }
-
-      try {
-        _context = new InitialContext(props);
-      } catch (NamingException e) {
-        throw new InitialisationException(e, this);
-      }
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    
+    public JndiObjectFactory()
+    {
+        // for IoC only
     }
-  }
-
-  public void dispose() {
-    if (_context != null) {
-      try {
-        _context.close();
-      } catch (NamingException e) {
-        logger.error("JNDI Context failed to dispose properly: ", e);
-      } finally {
-        _context = null;
-      }
+    
+    public JndiObjectFactory(String objectName, String initialFactory, String url)
+    {
+        this(objectName, initialFactory, url, null);
     }
-  }
-
-  public Object getInstance(MuleContext muleContext) throws Exception {
-    if (_object == null || lookupOnEachCall == true) {
-      _object = _context.lookup(objectName);
+    
+    public JndiObjectFactory(String objectName, String initialFactory, String url, Map properties)
+    {
+        this.objectName = objectName;
+        this.initialFactory = initialFactory;
+        this.url = url;
+        this.properties = properties;
     }
-    return _object;
-  }
+    
+    public void initialise() throws InitialisationException
+    {
+        if (_context == null)
+        {
+            Hashtable props = new Hashtable();
 
-  /** {@inheritDoc} */
-  public Class<?> getObjectClass() {
-    throw new UnsupportedOperationException();
-  }
+            if (initialFactory != null)
+            {
+                props.put(Context.INITIAL_CONTEXT_FACTORY, initialFactory);
+            }
+            else if (properties == null
+                    || !properties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
+            {
+                throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
+            }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////
-  // Getters and Setters
-  ///////////////////////////////////////////////////////////////////////////////////////////
+            if (url != null)
+            {
+                props.put(Context.PROVIDER_URL, url);
+            }
 
-  public String getInitialFactory() {
-    return initialFactory;
-  }
+            if (properties != null)
+            {
+                props.putAll(properties);
+            }
+            
+            try
+            {
+                _context = new InitialContext(props);
+            }
+            catch (NamingException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+    }
+    
+    public void dispose() 
+    {
+        if (_context != null)
+        {
+            try
+            {
+                _context.close();
+            }
+            catch (NamingException e)
+            {
+                logger.error("JNDI Context failed to dispose properly: ", e);
+            }
+            finally
+            {
+                _context = null;
+            }
+        }
+    }
+    
+    public Object getInstance(MuleContext muleContext) throws Exception
+    {
+        if (_object == null || lookupOnEachCall == true)
+        {
+            _object = _context.lookup(objectName);
+        }    
+        return _object;
+    }
+    
+    /** {@inheritDoc} */
+    public Class<?> getObjectClass()
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  public void setInitialFactory(String initialFactory) {
-    this.initialFactory = initialFactory;
-  }
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Getters and Setters
+    ///////////////////////////////////////////////////////////////////////////////////////////    
 
-  public boolean isLookupOnEachCall() {
-    return lookupOnEachCall;
-  }
+    public String getInitialFactory()
+    {
+        return initialFactory;
+    }
 
-  public void setLookupOnEachCall(boolean lookupOnEachCall) {
-    this.lookupOnEachCall = lookupOnEachCall;
-  }
+    public void setInitialFactory(String initialFactory)
+    {
+        this.initialFactory = initialFactory;
+    }
 
-  public String getObjectName() {
-    return objectName;
-  }
+    public boolean isLookupOnEachCall()
+    {
+        return lookupOnEachCall;
+    }
 
-  public void setObjectName(String objectName) {
-    this.objectName = objectName;
-  }
+    public void setLookupOnEachCall(boolean lookupOnEachCall)
+    {
+        this.lookupOnEachCall = lookupOnEachCall;
+    }
 
-  public Map getProperties() {
-    return properties;
-  }
+    public String getObjectName()
+    {
+        return objectName;
+    }
 
-  public void setProperties(Map properties) {
-    this.properties = properties;
-  }
+    public void setObjectName(String objectName)
+    {
+        this.objectName = objectName;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public Map getProperties()
+    {
+        return properties;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setProperties(Map properties)
+    {
+        this.properties = properties;
+    }
 
-  public Context getContext() {
-    return _context;
-  }
+    public String getUrl()
+    {
+        return url;
+    }
 
-  protected void setContext(Context context) {
-    this._context = context;
-  }
+    public void setUrl(String url)
+    {
+        this.url = url;
+    }
 
-  public void addObjectInitialisationCallback(InitialisationCallback callback) {
-    throw new UnsupportedOperationException();
-  }
+    public Context getContext()
+    {
+        return _context;
+    }
 
-  public boolean isSingleton() {
-    return false;
-  }
+    protected void setContext(Context context)
+    {
+        this._context = context;
+    }
 
-  public boolean isExternallyManagedLifecycle() {
-    return false;
-  }
+    public void addObjectInitialisationCallback(InitialisationCallback callback)
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  public boolean isAutoWireObject() {
-    return true;
-  }
+    public boolean isSingleton()
+    {
+        return false;
+    }
+
+    public boolean isExternallyManagedLifecycle()
+    {
+        return false;
+    }
+
+    public boolean isAutoWireObject()
+    {
+        return true;
+    }
 }

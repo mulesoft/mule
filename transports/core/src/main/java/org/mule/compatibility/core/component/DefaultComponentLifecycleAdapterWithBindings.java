@@ -20,19 +20,20 @@ import org.slf4j.LoggerFactory;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class DefaultComponentLifecycleAdapterWithBindings extends DefaultComponentLifecycleAdapter {
+public class DefaultComponentLifecycleAdapterWithBindings extends DefaultComponentLifecycleAdapter
+{
+    /**
+     * logger used by this class
+     */
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultComponentLifecycleAdapterWithBindings.class);
 
-  /**
-   * logger used by this class
-   */
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultComponentLifecycleAdapterWithBindings.class);
+    public DefaultComponentLifecycleAdapterWithBindings(Object componentObject,
+            JavaWithBindingsComponent component,
+                                            FlowConstruct flowConstruct,
+                                            EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
+    {
 
-  public DefaultComponentLifecycleAdapterWithBindings(Object componentObject, JavaWithBindingsComponent component,
-                                                      FlowConstruct flowConstruct, EntryPointResolverSet entryPointResolver,
-                                                      MuleContext muleContext)
-      throws MuleException {
-
-    super(componentObject, component, flowConstruct, muleContext);
-    BindingUtils.configureBinding(component, componentObject);
-  }
+        super(componentObject, component, flowConstruct, muleContext);
+        BindingUtils.configureBinding(component, componentObject);
+    }
 }

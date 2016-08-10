@@ -8,16 +8,17 @@ package org.mule.compatibility.transport.tcp.integration;
 
 import java.io.Serializable;
 
-public class MessageObject implements Serializable {
+public class MessageObject implements Serializable
+{
+    private static final long serialVersionUID = 6623028039115997808L;
+    public int i;
+    public String s;
+    public boolean b;
 
-  private static final long serialVersionUID = 6623028039115997808L;
-  public int i;
-  public String s;
-  public boolean b;
-
-  public MessageObject(int i, String s, boolean b) {
-    this.i = i;
-    this.s = s;
-    this.b = b;
-  }
+    public MessageObject(int i, String s, boolean b)
+    {
+        this.i = i;
+        this.s = s;
+        this.b = b;
+    }
 }

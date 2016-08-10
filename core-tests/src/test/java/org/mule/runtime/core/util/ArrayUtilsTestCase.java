@@ -19,57 +19,68 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class ArrayUtilsTestCase extends AbstractMuleTestCase {
+public class ArrayUtilsTestCase extends AbstractMuleTestCase
+{
 
-  @Test
-  public void testToArrayOfComponentType() {
-    // null array
-    assertNull(ArrayUtils.toArrayOfComponentType(null, String.class));
+    @Test
+    public void testToArrayOfComponentType()
+    {
+        // null array
+        assertNull(ArrayUtils.toArrayOfComponentType(null, String.class));
 
-    // empty array, same result
-    String[] a = new String[] {};
-    String[] a2 = (String[]) ArrayUtils.toArrayOfComponentType(a, String.class);
-    assertSame(a2, a);
+        // empty array, same result
+        String[] a = new String[]{};
+        String[] a2 = (String[])ArrayUtils.toArrayOfComponentType(a, String.class);
+        assertSame(a2, a);
 
-    // null service type is not allowed
-    try {
-      ArrayUtils.toArrayOfComponentType(a, null);
-      fail();
-    } catch (IllegalArgumentException iex) {
-      // ok
+        // null service type is not allowed
+        try
+        {
+            ArrayUtils.toArrayOfComponentType(a, null);
+            fail();
+        }
+        catch (IllegalArgumentException iex)
+        {
+            // ok
+        }
+
+        // single element
+        a = new String[]{":-)"};
+        CharSequence[] cs = (CharSequence[])ArrayUtils.toArrayOfComponentType(a, CharSequence.class);
+        assertEquals(a.length, cs.length);
+        assertSame(a[0], cs[0]);
+
+        // incompatible element types are not a good idea either
+        try
+        {
+            ArrayUtils.toArrayOfComponentType(a, List.class);
+            fail();
+        }
+        catch (ArrayStoreException asx)
+        {
+            // ok
+        }
+
     }
 
-    // single element
-    a = new String[] {":-)"};
-    CharSequence[] cs = (CharSequence[]) ArrayUtils.toArrayOfComponentType(a, CharSequence.class);
-    assertEquals(a.length, cs.length);
-    assertSame(a[0], cs[0]);
+    @Test
+    public void testToStringMaxLength()
+    {
+        Object test = new byte[100];
+        for (int i = 0; i < ((byte[])test).length; i++)
+        {
+            ((byte[])test)[i] = (byte)i;
+        }
 
-    // incompatible element types are not a good idea either
-    try {
-      ArrayUtils.toArrayOfComponentType(a, List.class);
-      fail();
-    } catch (ArrayStoreException asx) {
-      // ok
+        // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
+        String result = ArrayUtils.toString(test, 10);
+        assertTrue(result.endsWith("[..]}"));
+        assertEquals(9, StringUtils.countMatches(result, ","));
     }
 
-  }
-
-  @Test
-  public void testToStringMaxLength() {
-    Object test = new byte[100];
-    for (int i = 0; i < ((byte[]) test).length; i++) {
-      ((byte[]) test)[i] = (byte) i;
+    @Test(expected = IllegalArgumentException.class)
+    public void getLengthOfNonArray()
+    {
+        ArrayUtils.getLength(new Object());
     }
-
-    // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
-    String result = ArrayUtils.toString(test, 10);
-    assertTrue(result.endsWith("[..]}"));
-    assertEquals(9, StringUtils.countMatches(result, ","));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void getLengthOfNonArray() {
-    ArrayUtils.getLength(new Object());
-  }
 }

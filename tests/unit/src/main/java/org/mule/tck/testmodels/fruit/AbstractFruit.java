@@ -9,6 +9,7 @@ package org.mule.tck.testmodels.fruit;
 /**
  * <code>AbstractFruit</code> is a base class for fruity test objects. yum!
  */
-public abstract class AbstractFruit implements Fruit {
-  // abstract class for test objects
+public abstract class AbstractFruit implements Fruit
+{
+    // abstract class for test objects
 }

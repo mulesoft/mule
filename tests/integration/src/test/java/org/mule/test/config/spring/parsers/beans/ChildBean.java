@@ -6,5 +6,6 @@
  */
 package org.mule.test.config.spring.parsers.beans;
 
-public class ChildBean extends AbstractBean {
+public class ChildBean extends AbstractBean
+{
 }

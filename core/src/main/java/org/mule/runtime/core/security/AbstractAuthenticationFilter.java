@@ -17,36 +17,44 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 
 /**
- * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound or outbound authentication for messages.
+ * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound
+ * or outbound authentication for messages.
  */
-public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilter implements AuthenticationFilter {
+public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilter implements AuthenticationFilter
+{
+    private boolean authenticate;
+    private CredentialsAccessor credentialsAccessor;
 
-  private boolean authenticate;
-  private CredentialsAccessor credentialsAccessor;
+    public CredentialsAccessor getCredentialsAccessor()
+    {
+        return credentialsAccessor;
+    }
 
-  public CredentialsAccessor getCredentialsAccessor() {
-    return credentialsAccessor;
-  }
+    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor)
+    {
+        this.credentialsAccessor = credentialsAccessor;
+    }
+    public boolean isAuthenticate()
+    {
+        return authenticate;
+    }
 
-  public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
-    this.credentialsAccessor = credentialsAccessor;
-  }
+    public void setAuthenticate(boolean authenticate)
+    {
+        this.authenticate = authenticate;
+    }
 
-  public boolean isAuthenticate() {
-    return authenticate;
-  }
+    @Override
+    public void doFilter(MuleEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
+    {
+        authenticate(event);
+    }
 
-  public void setAuthenticate(boolean authenticate) {
-    this.authenticate = authenticate;
-  }
-
-  @Override
-  public void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-      SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-    authenticate(event);
-  }
-
-  public abstract void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-      CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
+    public abstract void authenticate(MuleEvent event)
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
+            InitialisationException;
 
 }

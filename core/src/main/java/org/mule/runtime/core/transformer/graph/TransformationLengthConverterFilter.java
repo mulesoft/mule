@@ -14,44 +14,55 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Filters a list of {@link Converter} returning a new list containing only the converters with the lower transformation path
- * length.
+ * Filters a list of {@link Converter} returning a new list containing only the
+ * converters with the lower transformation path length.
  */
-public class TransformationLengthConverterFilter implements ConverterFilter {
+public class TransformationLengthConverterFilter implements ConverterFilter
+{
 
-  @Override
-  public List<Converter> filter(List<Converter> converters, DataType source, DataType result) {
-    if (converters.size() == 0) {
-      return Collections.emptyList();
+    @Override
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
+    {
+        if (converters.size() ==0)
+        {
+            return Collections.emptyList();
+        }
+
+        sortByTransformationLength(converters);
+
+        int shortestLength = getTransformationLength(converters.get(0));
+        int index = 1;
+        for (; index < converters.size(); index++)
+        {
+            if (getTransformationLength(converters.get(index)) > shortestLength)
+            {
+                break;
+            }
+        }
+
+        return converters.subList(0, index);
     }
 
-    sortByTransformationLength(converters);
+    private void sortByTransformationLength(List<Converter> converterss)
+    {
+        Collections.sort(converterss, (converter, converter1) ->
+        {
+            int length = getTransformationLength(converter);
+            int length1 = getTransformationLength(converter1);
 
-    int shortestLength = getTransformationLength(converters.get(0));
-    int index = 1;
-    for (; index < converters.size(); index++) {
-      if (getTransformationLength(converters.get(index)) > shortestLength) {
-        break;
-      }
+            return length - length1;
+        });
     }
 
-    return converters.subList(0, index);
-  }
-
-  private void sortByTransformationLength(List<Converter> converterss) {
-    Collections.sort(converterss, (converter, converter1) -> {
-      int length = getTransformationLength(converter);
-      int length1 = getTransformationLength(converter1);
-
-      return length - length1;
-    });
-  }
-
-  private int getTransformationLength(Converter converter) {
-    if (converter instanceof CompositeConverter) {
-      return ((CompositeConverter) converter).getConverters().size();
-    } else {
-      return 1;
+    private int getTransformationLength(Converter converter)
+    {
+        if (converter instanceof CompositeConverter)
+        {
+            return ((CompositeConverter) converter).getConverters().size();
+        }
+        else
+        {
+            return 1;
+        }
     }
-  }
 }

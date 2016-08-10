@@ -18,39 +18,43 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 
-public class ConnectorMessageNotificationTestCase extends AbstractNotificationTestCase {
+public class ConnectorMessageNotificationTestCase extends AbstractNotificationTestCase
+{
+    private static final String FLOW_ID = "testFlow";
+    private static final String MULE_CLIENT_ID = "MuleClient";
 
-  private static final String FLOW_ID = "testFlow";
-  private static final String MULE_CLIENT_ID = "MuleClient";
+    private static final int TIMEOUT = 1000;
+    private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions().method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
-  private static final int TIMEOUT = 1000;
-  private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions()
-      .method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/notifications/connector-message-notification-test-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/notifications/connector-message-notification-test-flow.xml";
-  }
+    @Override
+    public void doTest() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/path", port.getNumber());
+        muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
+    }
 
-  @Override
-  public void doTest() throws Exception {
-    final String url = String.format("http://localhost:%s/path", port.getNumber());
-    muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
-  }
+    @Override
+    public RestrictedNode getSpecification()
+    {
+        return new Node()
+                .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_BEGIN, MULE_CLIENT_ID))
+                .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_END, MULE_CLIENT_ID))
+                .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RECEIVED, FLOW_ID))
+                .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RESPONSE, FLOW_ID));
+    }
 
-  @Override
-  public RestrictedNode getSpecification() {
-    return new Node().parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_BEGIN, MULE_CLIENT_ID))
-        .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_END, MULE_CLIENT_ID))
-        .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RECEIVED, FLOW_ID))
-        .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RESPONSE, FLOW_ID));
-  }
-
-  @Override
-  public void validateSpecification(RestrictedNode spec) throws Exception {
-    // Nothing to validate
-  }
+    @Override
+    public void validateSpecification(RestrictedNode spec) throws Exception
+    {
+        // Nothing to validate
+    }
 }

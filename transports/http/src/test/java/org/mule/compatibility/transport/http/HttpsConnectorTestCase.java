@@ -23,58 +23,67 @@ import java.io.IOException;
 import org.junit.Test;
 
 
-public class HttpsConnectorTestCase extends AbstractConnectorTestCase {
+public class HttpsConnectorTestCase extends AbstractConnectorTestCase
+{
 
-  @Override
-  public Connector createConnector() throws Exception {
-    return createConnector(muleContext, false);
-  }
-
-  public static HttpsConnector createConnector(MuleContext context, boolean initialised)
-      throws IOException, InitialisationException {
-    HttpsConnector cnn = new HttpsConnector(muleContext);
-    cnn.setName("HttpsConnector");
-    cnn.setKeyStore("serverKeystore");
-    cnn.setClientKeyStore("clientKeystore");
-    cnn.setClientKeyStorePassword("mulepassword");
-    cnn.setKeyPassword("mulepassword");
-    cnn.setKeyStorePassword("mulepassword");
-    cnn.setTrustStore("trustStore");
-    cnn.setTrustStorePassword("mulepassword");
-    cnn.getDispatcherThreadingProfile().setDoThreading(false);
-
-    if (initialised) {
-      cnn.initialise();
+    @Override
+    public Connector createConnector() throws Exception
+    {
+        return createConnector(muleContext, false);
     }
-    return cnn;
-  }
 
-  @Override
-  public String getTestEndpointURI() {
-    return "https://localhost:60127";
-  }
+    public static HttpsConnector createConnector(MuleContext context, boolean initialised)
+        throws IOException, InitialisationException
+    {
+        HttpsConnector cnn = new HttpsConnector(muleContext);
+        cnn.setName("HttpsConnector");
+        cnn.setKeyStore("serverKeystore");
+        cnn.setClientKeyStore("clientKeystore");
+        cnn.setClientKeyStorePassword("mulepassword");
+        cnn.setKeyPassword("mulepassword");
+        cnn.setKeyStorePassword("mulepassword");
+        cnn.setTrustStore("trustStore");
+        cnn.setTrustStorePassword("mulepassword");
+        cnn.getDispatcherThreadingProfile().setDoThreading(false);
 
-  @Override
-  public Object getValidMessage() throws Exception {
-    return "Hello".getBytes();
-  }
+        if (initialised)
+        {
+            cnn.initialise();
+        }
+        return cnn;
+    }
 
-  @Test
-  public void testValidListener() throws Exception {
-    InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(getTestEndpointURI());
+    @Override
+    public String getTestEndpointURI()
+    {
+        return "https://localhost:60127";
+    }
 
-    getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));
-  }
+    @Override
+    public Object getValidMessage() throws Exception
+    {
+        return "Hello".getBytes();
+    }
 
-  @Test
-  public void testProperties() throws Exception {
-    HttpsConnector c = (HttpsConnector) getConnector();
+    @Test
+    public void testValidListener() throws Exception
+    {
+        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
+            getTestEndpointURI());
 
-    c.setSendBufferSize(1024);
-    assertEquals(1024, c.getSendBufferSize());
-    c.setSendBufferSize(0);
-    assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
+        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));
+    }
 
-    // all kinds of timeouts are tested in TcpConnectorTestCase now
-  }
+    @Test
+    public void testProperties() throws Exception
+    {
+        HttpsConnector c = (HttpsConnector)getConnector();
+
+        c.setSendBufferSize(1024);
+        assertEquals(1024, c.getSendBufferSize());
+        c.setSendBufferSize(0);
+        assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
+
+        // all kinds of timeouts are tested in TcpConnectorTestCase now
+    }
 }

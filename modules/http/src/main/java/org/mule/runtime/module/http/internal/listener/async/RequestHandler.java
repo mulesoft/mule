@@ -11,14 +11,15 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 /**
  * Handler for an incoming http request that allows to send the http response asynchronously.
  */
-public interface RequestHandler {
+public interface RequestHandler
+{
 
-  /**
-   * Called to handle an incoming http request
-   *
-   * @param requestContext http request content
-   * @param responseCallback callback to call when the response content is ready.
-   */
-  void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback);
+    /**
+     * Called to handle an incoming http request
+     *
+     * @param requestContext http request content
+     * @param responseCallback callback to call when the response content is ready.
+     */
+    void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback);
 
 }

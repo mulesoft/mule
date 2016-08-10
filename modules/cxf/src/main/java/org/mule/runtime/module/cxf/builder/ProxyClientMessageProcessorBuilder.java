@@ -32,86 +32,98 @@ import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 
 /**
- * Creates an outbound proxy based on a specially configure CXF Client. This allows you to send raw XML to your MessageProcessor
- * and have it sent through CXF for SOAP processing, WS-Security, etc.
+ * Creates an outbound proxy based on a specially configure CXF Client.
+ * This allows you to send raw XML to your MessageProcessor and have it sent
+ * through CXF for SOAP processing, WS-Security, etc.
  * <p>
- * The input to the resulting MessageProcessor can be either a SOAP Body or a SOAP Envelope depending on how the payload attribute
- * is configured. Valid values are "body" or "envelope".
+ * The input to the resulting MessageProcessor can be either a SOAP Body
+ * or a SOAP Envelope depending on how the payload attribute is configured.
+ * Valid values are "body" or "envelope". 
  */
-public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageProcessorBuilder {
+public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageProcessorBuilder
+{
+    private String payload;
+    
+    @Override
+    protected void configureClient(Client client)
+    {
+        MuleUniversalConduit conduit = (MuleUniversalConduit)client.getConduit();
 
-  private String payload;
-
-  @Override
-  protected void configureClient(Client client) {
-    MuleUniversalConduit conduit = (MuleUniversalConduit) client.getConduit();
-
-    // add interceptors to handle Mule proxy specific stuff
-    client.getInInterceptors().add(new CopyAttachmentInInterceptor());
-    client.getInInterceptors().add(new StreamClosingInterceptor());
-    client.getOutInterceptors().add(new OutputPayloadInterceptor(muleContext.getTransformationService()));
-    client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
-
-    // Don't close the input because people need to be able to work with the live stream
-    conduit.setCloseInput(false);
-  }
-
-  public boolean isProxyEnvelope() {
-    return CxfConstants.PAYLOAD_ENVELOPE.equals(payload);
-  }
-
-  @Override
-  protected void configureMessageProcessor(CxfOutboundMessageProcessor processor) {
-    processor.setProxy(true);
-  }
-
-  @Override
-  protected Client createClient() throws CreateException, Exception {
-    ClientFactoryBean cpf = new ClientFactoryBean();
-    cpf.setServiceClass(ProxyService.class);
-    cpf.setDataBinding(new StaxDataBinding());
-    cpf.getFeatures().add(new StaxDataBindingFeature());
-    cpf.setAddress(getAddress());
-    cpf.setBus(getBus());
-    cpf.setProperties(properties);
-
-    // If there's a soapVersion defined then the corresponding bindingId will be set
-    if (soapVersion != null) {
-      cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+        // add interceptors to handle Mule proxy specific stuff
+        client.getInInterceptors().add(new CopyAttachmentInInterceptor());
+        client.getInInterceptors().add(new StreamClosingInterceptor());
+        client.getOutInterceptors().add(new OutputPayloadInterceptor(muleContext.getTransformationService()));
+        client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
+        
+        // Don't close the input because people need to be able to work with the live stream
+        conduit.setCloseInput(false);
     }
 
-    if (wsdlLocation != null) {
-      cpf.setWsdlURL(wsdlLocation);
+    public boolean isProxyEnvelope()
+    {
+        return CxfConstants.PAYLOAD_ENVELOPE.equals(payload);
+    }
+    
+    @Override
+    protected void configureMessageProcessor(CxfOutboundMessageProcessor processor)
+    {
+        processor.setProxy(true);
     }
 
-    Client client = cpf.create();
+    @Override
+    protected Client createClient() throws CreateException, Exception
+    {
+        ClientFactoryBean cpf = new ClientFactoryBean();
+        cpf.setServiceClass(ProxyService.class);
+        cpf.setDataBinding(new StaxDataBinding());
+        cpf.getFeatures().add(new StaxDataBindingFeature());
+        cpf.setAddress(getAddress());
+        cpf.setBus(getBus());
+        cpf.setProperties(properties);
 
-    Binding binding = client.getEndpoint().getBinding();
-    CxfUtils.removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
-    CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap11FaultInInterceptor.class.getName());
-    CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap12FaultInInterceptor.class.getName());
-    CxfUtils.removeInterceptor(binding.getInInterceptors(), CheckFaultInterceptor.class.getName());
+        // If there's a soapVersion defined then the corresponding bindingId will be set
+        if(soapVersion != null)
+        {
+            cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+        }
+        
+        if (wsdlLocation != null) 
+        {
+            cpf.setWsdlURL(wsdlLocation);
+        }
 
-    if (isProxyEnvelope()) {
-      CxfUtils.removeInterceptor(binding.getOutInterceptors(), SoapOutInterceptor.class.getName());
-      client.getInInterceptors().add(new ReversibleStaxInInterceptor());
-      client.getInInterceptors().add(new ResetStaxInterceptor());
+        Client client = cpf.create();
+
+        Binding binding = client.getEndpoint().getBinding();
+        CxfUtils.removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap11FaultInInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap12FaultInInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), CheckFaultInterceptor.class.getName());
+
+        if (isProxyEnvelope()) 
+        {
+            CxfUtils.removeInterceptor(binding.getOutInterceptors(), SoapOutInterceptor.class.getName());
+            client.getInInterceptors().add(new ReversibleStaxInInterceptor());
+            client.getInInterceptors().add(new ResetStaxInterceptor());
+        }
+
+        return client;
     }
 
-    return client;
-  }
+    public String getPayload()
+    {
+        return payload;
+    }
 
-  public String getPayload() {
-    return payload;
-  }
+    public void setPayload(String payload)
+    {
+        this.payload = payload;
+    }
 
-  public void setPayload(String payload) {
-    this.payload = payload;
-  }
-
-  @Override
-  protected MediaType getMimeType() {
-    return MediaType.XML;
-  }
+    @Override
+    protected MediaType getMimeType()
+    {
+        return MediaType.XML;
+    }
 
 }

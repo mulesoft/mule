@@ -9,8 +9,9 @@ package org.mule.compatibility.transport.jms.test;
 import org.mule.compatibility.transport.jms.redelivery.CountingRedeliveryHandler;
 
 
-public class TestRedeliveryHandler extends CountingRedeliveryHandler {
-  // nop
+public class TestRedeliveryHandler extends CountingRedeliveryHandler
+{
+    // nop
 }
 
 

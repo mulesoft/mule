@@ -10,20 +10,26 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class ConsumerProducerInvocationHandler implements InvocationHandler {
+public class ConsumerProducerInvocationHandler implements InvocationHandler
+{
 
-  private Object target;
+    private Object target;
 
-  public ConsumerProducerInvocationHandler(SessionInvocationHandler sessionInvocationHandler, Object target) {
-    this.target = target;
-  }
-
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    try {
-      return method.invoke(target, args);
-    } catch (InvocationTargetException e) {
-      throw e.getCause();
+    public ConsumerProducerInvocationHandler(SessionInvocationHandler sessionInvocationHandler, Object target)
+    {
+        this.target = target;
     }
-  }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+    {
+        try
+        {
+            return method.invoke(target, args);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw e.getCause();
+        }
+    }
 
 }

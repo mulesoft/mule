@@ -15,34 +15,40 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class TcpSendNoDelayConfigurationTestCase extends FunctionalTestCase {
+public class TcpSendNoDelayConfigurationTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "send-tcp-no-delay-configuration-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "send-tcp-no-delay-configuration-test.xml";
-  }
+    @Test
+    public void tcpNoDelay() throws Exception
+    {
+        assertEquals(getDefaultSendTcpNoDelay(), lookupConnector("tcpConnector").isSendTcpNoDelay());
+    }
 
-  @Test
-  public void tcpNoDelay() throws Exception {
-    assertEquals(getDefaultSendTcpNoDelay(), lookupConnector("tcpConnector").isSendTcpNoDelay());
-  }
+    @Test
+    public void tcpNoDelayTrue() throws Exception
+    {
+        assertTrue(lookupConnector("tcpConnectorSendTcpNoDelayTrue").isSendTcpNoDelay());
+    }
 
-  @Test
-  public void tcpNoDelayTrue() throws Exception {
-    assertTrue(lookupConnector("tcpConnectorSendTcpNoDelayTrue").isSendTcpNoDelay());
-  }
+    @Test
+    public void tcpNoDelayFalse() throws Exception
+    {
+        assertFalse(lookupConnector("tcpConnectorSendTcpNoDelayFalse").isSendTcpNoDelay());
+    }
 
-  @Test
-  public void tcpNoDelayFalse() throws Exception {
-    assertFalse(lookupConnector("tcpConnectorSendTcpNoDelayFalse").isSendTcpNoDelay());
-  }
+    protected TcpConnector lookupConnector(String name)
+    {
+        return (TcpConnector) muleContext.getRegistry().lookupObject(name);
+    }
 
-  protected TcpConnector lookupConnector(String name) {
-    return (TcpConnector) muleContext.getRegistry().lookupObject(name);
-  }
-
-  protected boolean getDefaultSendTcpNoDelay() {
-    return false;
-  }
+    protected boolean getDefaultSendTcpNoDelay()
+    {
+        return false;
+    }
 
 }

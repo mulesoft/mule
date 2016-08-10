@@ -15,44 +15,54 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>CompressionHelper</code> a static class that provides facilities for compressing and uncompressing byte arrays
+ * <code>CompressionHelper</code> a static class that provides facilities for
+ * compressing and uncompressing byte arrays
  */
 
-public final class CompressionHelper {
+public final class CompressionHelper
+{
+    /**
+     * logger used by this class
+     */
+    private static Logger logger = LoggerFactory.getLogger(CompressionHelper.class);
 
-  /**
-   * logger used by this class
-   */
-  private static Logger logger = LoggerFactory.getLogger(CompressionHelper.class);
+    private static CompressionStrategy defaultStrategy;
 
-  private static CompressionStrategy defaultStrategy;
-
-  /** Do not instanciate. */
-  private CompressionHelper() {
-    // no-op
-  }
-
-  public static synchronized CompressionStrategy getDefaultCompressionStrategy() {
-    if (defaultStrategy == null) {
-      defaultStrategy = AccessController.doPrivileged(new PrivilegedAction<CompressionStrategy>() {
-
-        @Override
-        public CompressionStrategy run() {
-          try {
-            Object o = ClassUtils.loadClass(CompressionStrategy.COMPRESSION_DEFAULT, CompressionHelper.class).newInstance();
-            if (logger.isDebugEnabled()) {
-              logger.debug("Found CompressionStrategy: " + o.getClass().getName());
-            }
-            return (CompressionStrategy) o;
-          } catch (Exception e) {
-            // TODO MULE-863: What should we really do? Document this?
-            logger.warn("Failed to build compression strategy: " + e.getMessage());
-          }
-          return null;
-        }
-      });
+    /** Do not instanciate. */
+    private CompressionHelper ()
+    {
+        // no-op
     }
-    return defaultStrategy;
-  }
+
+    public static synchronized CompressionStrategy getDefaultCompressionStrategy()
+    {
+        if (defaultStrategy == null)
+        {
+            defaultStrategy = AccessController.doPrivileged(new PrivilegedAction<CompressionStrategy>()
+            {
+                @Override
+                public CompressionStrategy run()
+                {
+                    try
+                    {
+                        Object o = ClassUtils.loadClass(CompressionStrategy.COMPRESSION_DEFAULT,
+                            CompressionHelper.class).newInstance();
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Found CompressionStrategy: " + o.getClass().getName());
+                        }
+                        return (CompressionStrategy) o;
+                    }
+                    catch (Exception e)
+                    {
+                        // TODO MULE-863: What should we really do?  Document this?
+                        logger.warn("Failed to build compression strategy: " + e.getMessage());
+                    }
+                    return null;
+                }
+            });
+        }
+        return defaultStrategy;
+    }
 
 }

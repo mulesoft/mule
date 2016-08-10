@@ -15,92 +15,104 @@ import org.mule.runtime.module.http.internal.listener.Server;
  *
  * @since 4.0
  */
-public class HttpServerConfiguration {
+public class HttpServerConfiguration
+{
+    private final String host;
+    private final int port;
+    private final TlsContextFactory tlsContextFactory;
+    private final boolean usePersistentConnections;
+    private final int connectionIdleTimeout;
+    private final WorkManagerSource workManagerSource;
 
-  private final String host;
-  private final int port;
-  private final TlsContextFactory tlsContextFactory;
-  private final boolean usePersistentConnections;
-  private final int connectionIdleTimeout;
-  private final WorkManagerSource workManagerSource;
-
-  public HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                                 int connectionIdleTimeout, WorkManagerSource workManagerSource) {
-    this.host = host;
-    this.port = port;
-    this.tlsContextFactory = tlsContextFactory;
-    this.usePersistentConnections = usePersistentConnections;
-    this.connectionIdleTimeout = connectionIdleTimeout;
-    this.workManagerSource = workManagerSource;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public TlsContextFactory getTlsContextFactory() {
-    return tlsContextFactory;
-  }
-
-  public boolean isUsePersistentConnections() {
-    return usePersistentConnections;
-  }
-
-  public int getConnectionIdleTimeout() {
-    return connectionIdleTimeout;
-  }
-
-  public WorkManagerSource getWorkManagerSource() {
-    return workManagerSource;
-  }
-
-  public static class Builder {
-
-    private String host;
-    private int port;
-    private TlsContextFactory tlsContextFactory;
-    private boolean usePersistentConnections;
-    private int connectionIdleTimeout;
-    private WorkManagerSource workManagerSource;
-
-
-    public Builder setHost(String host) {
-      this.host = host;
-      return this;
+    public HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections, int connectionIdleTimeout, WorkManagerSource workManagerSource)
+    {
+        this.host = host;
+        this.port = port;
+        this.tlsContextFactory = tlsContextFactory;
+        this.usePersistentConnections = usePersistentConnections;
+        this.connectionIdleTimeout = connectionIdleTimeout;
+        this.workManagerSource = workManagerSource;
     }
 
-    public Builder setPort(int port) {
-      this.port = port;
-      return this;
+    public String getHost()
+    {
+        return host;
     }
 
-    public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory) {
-      this.tlsContextFactory = tlsContextFactory;
-      return this;
+    public int getPort()
+    {
+        return port;
     }
 
-    public Builder setUsePersistentConnections(boolean usePersistentConnections) {
-      this.usePersistentConnections = usePersistentConnections;
-      return this;
+    public TlsContextFactory getTlsContextFactory()
+    {
+        return tlsContextFactory;
     }
 
-    public Builder setConnectionIdleTimeout(int connectionIdleTimeout) {
-      this.connectionIdleTimeout = connectionIdleTimeout;
-      return this;
+    public boolean isUsePersistentConnections()
+    {
+        return usePersistentConnections;
     }
 
-    public Builder setWorkManagerSource(WorkManagerSource workManagerSource) {
-      this.workManagerSource = workManagerSource;
-      return this;
+    public int getConnectionIdleTimeout()
+    {
+        return connectionIdleTimeout;
     }
 
-    public HttpServerConfiguration build() {
-      return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout,
-                                         workManagerSource);
+    public WorkManagerSource getWorkManagerSource()
+    {
+        return workManagerSource;
     }
-  }
+
+    public static class Builder
+    {
+        private String host;
+        private int port;
+        private TlsContextFactory tlsContextFactory;
+        private boolean usePersistentConnections;
+        private int connectionIdleTimeout;
+        private WorkManagerSource workManagerSource;
+
+
+        public Builder setHost(String host)
+        {
+            this.host = host;
+            return this;
+        }
+
+        public Builder setPort(int port)
+        {
+            this.port = port;
+            return this;
+        }
+
+        public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
+        {
+            this.tlsContextFactory = tlsContextFactory;
+            return this;
+        }
+
+        public Builder setUsePersistentConnections(boolean usePersistentConnections)
+        {
+            this.usePersistentConnections = usePersistentConnections;
+            return this;
+        }
+
+        public Builder setConnectionIdleTimeout(int connectionIdleTimeout)
+        {
+            this.connectionIdleTimeout = connectionIdleTimeout;
+            return this;
+        }
+
+        public Builder setWorkManagerSource(WorkManagerSource workManagerSource)
+        {
+            this.workManagerSource = workManagerSource;
+            return this;
+        }
+
+        public HttpServerConfiguration build()
+        {
+            return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout, workManagerSource);
+        }
+    }
 }

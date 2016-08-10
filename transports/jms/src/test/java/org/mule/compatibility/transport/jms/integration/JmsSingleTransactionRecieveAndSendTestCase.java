@@ -15,19 +15,21 @@ import javax.jms.TextMessage;
 
 import org.junit.Test;
 
-public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase {
+public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "integration/jms-single-tx-receive-send-in-one-tx.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-single-tx-receive-send-in-one-tx.xml";
-  }
-
-  @Test
-  public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception {
-    send(scenarioCommit);
-    Message message = receive(scenarioReceive);
-    assertNotNull(message);
-    assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-    assertEquals(((TextMessage) message).getText(), AbstractJmsFunctionalTestCase.DEFAULT_OUTPUT_MESSAGE);
-  }
+    @Test
+    public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
+    {
+        send(scenarioCommit);
+        Message message = receive(scenarioReceive);
+        assertNotNull(message);
+        assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
+        assertEquals(((TextMessage) message).getText(), AbstractJmsFunctionalTestCase.DEFAULT_OUTPUT_MESSAGE);
+    }
 }

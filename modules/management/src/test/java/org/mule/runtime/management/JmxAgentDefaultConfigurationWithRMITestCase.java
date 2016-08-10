@@ -15,21 +15,23 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestCase {
+public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
+    @Override
+    protected String getConfigFile()
+    {
+        return "default-with-rmi-management-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "default-with-rmi-management-config.xml";
-  }
-
-  @Test
-  public void testDefaultJmxAgent() throws Exception {
-    FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
-    Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
-    socket.close();
-  }
+    @Test
+    public void testDefaultJmxAgent() throws Exception
+    {
+        FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
+        Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
+        socket.close();
+    }
 
 }

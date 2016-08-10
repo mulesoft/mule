@@ -18,34 +18,39 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 @SmallTest
-public class FlagsMappingTestCase extends AbstractMuleTestCase {
+public class FlagsMappingTestCase extends AbstractMuleTestCase
+{
+    private FlagsMapping flagsMapping;
 
-  private FlagsMapping flagsMapping;
+    @Before
+    public void setUp() throws Exception
+    {
+        flagsMapping = new FlagsMapping();
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    flagsMapping = new FlagsMapping();
-  }
+    @Test
+    public void testSetSingleFlagString()
+    {
+        int result = rewrite("DOTALL");
+        assertEquals(Pattern.DOTALL, result);
+    }
 
-  @Test
-  public void testSetSingleFlagString() {
-    int result = rewrite("DOTALL");
-    assertEquals(Pattern.DOTALL, result);
-  }
+    @Test
+    public void testMultipleFlagsString()
+    {
+        int result = rewrite("DOTALL,MULTILINE");
+        assertEquals(Pattern.DOTALL | Pattern.MULTILINE, result);
+    }
 
-  @Test
-  public void testMultipleFlagsString() {
-    int result = rewrite("DOTALL,MULTILINE");
-    assertEquals(Pattern.DOTALL | Pattern.MULTILINE, result);
-  }
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidFlagsString()
+    {
+        flagsMapping.rewrite("WRONG_FLAG");
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testInvalidFlagsString() {
-    flagsMapping.rewrite("WRONG_FLAG");
-  }
-
-  private int rewrite(String input) {
-    Integer result = (Integer) flagsMapping.rewrite(input);
-    return result.intValue();
-  }
+    private int rewrite(String input)
+    {
+        Integer result = (Integer) flagsMapping.rewrite(input);
+        return result.intValue();
+    }
 }

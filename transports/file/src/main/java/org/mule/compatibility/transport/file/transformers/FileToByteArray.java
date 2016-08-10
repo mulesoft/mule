@@ -24,72 +24,93 @@ import org.apache.commons.io.IOUtils;
 /**
  * <code>FileToByteArray</code> reads the contents of a file as a byte array.
  */
-public class FileToByteArray extends AbstractTransformer implements DiscoverableTransformer {
+public class FileToByteArray extends AbstractTransformer implements DiscoverableTransformer
+{
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
-
-  public FileToByteArray() {
-    super();
-    registerSourceType(DataType.fromType(File.class));
-    registerSourceType(DataType.fromType(FileInputStream.class));
-    setReturnDataType(DataType.BYTE_ARRAY);
-  }
-
-  @Override
-  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-    File file = null;
-    FileInputStream fileInputStream = null;
-
-    if (src instanceof FileInputStream) {
-      fileInputStream = (FileInputStream) src;
-    } else if (src instanceof File) {
-      file = (File) src;
-
-      if (file == null) {
-        throw new TransformerException(this, new IllegalArgumentException("null file"));
-      }
-
-      if (!file.exists()) {
-        throw new TransformerException(this, new FileNotFoundException(file.getPath()));
-      }
-
-      if (file.length() == 0) {
-        logger.warn("File is empty: " + file.getAbsolutePath());
-        return ArrayUtils.EMPTY_BYTE_ARRAY;
-      }
-
-      try {
-        fileInputStream = new FileInputStream(file);
-      } catch (FileNotFoundException e) {
-        throw new TransformerException(this, e);
-      }
-
-    } else {
-      throw new TransformerException(MessageFactory.createStaticMessage("Cannot handle source type %s", src.getClass().getName()),
-                                     this);
+    public FileToByteArray()
+    {
+        super();
+        registerSourceType(DataType.fromType(File.class));
+        registerSourceType(DataType.fromType(FileInputStream.class));
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
 
-    try {
-      return IOUtils.toByteArray(fileInputStream);
-    }
-    // at least try..
-    catch (OutOfMemoryError oom) {
-      throw new TransformerException(this, oom);
-    } catch (IOException e) {
-      throw new TransformerException(this, e);
-    } finally {
-      IOUtils.closeQuietly(fileInputStream);
-    }
-  }
+    @Override
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
+    {
+        File file = null;
+        FileInputStream fileInputStream = null;
 
-  @Override
-  public int getPriorityWeighting() {
-    return priorityWeighting;
-  }
+        if (src instanceof FileInputStream)
+        {
+            fileInputStream = (FileInputStream) src;
+        }
+        else if (src instanceof File)
+        {
+            file = (File) src;
 
-  @Override
-  public void setPriorityWeighting(int priorityWeighting) {
-    this.priorityWeighting = priorityWeighting;
-  }
+            if (file == null)
+            {
+                throw new TransformerException(this, new IllegalArgumentException("null file"));
+            }
+
+            if (!file.exists())
+            {
+                throw new TransformerException(this, new FileNotFoundException(file.getPath()));
+            }
+
+            if (file.length() == 0)
+            {
+                logger.warn("File is empty: " + file.getAbsolutePath());
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+            }
+
+            try
+            {
+                fileInputStream = new FileInputStream(file);
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new TransformerException(this, e);
+            }
+
+        }
+        else
+        {
+            throw new TransformerException(
+                    MessageFactory.createStaticMessage("Cannot handle source type %s", src.getClass().getName()), this);
+        }
+
+        try
+        {
+            return IOUtils.toByteArray(fileInputStream);
+        }
+        // at least try..
+        catch (OutOfMemoryError oom)
+        {
+            throw new TransformerException(this, oom);
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(this, e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fileInputStream);
+        }
+    }
+
+    @Override
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    @Override
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 
 }

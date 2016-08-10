@@ -20,36 +20,42 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.junit.Test;
 
-public class ConfigurationTestCase extends FunctionalTestCase {
+public class ConfigurationTestCase extends FunctionalTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "configuration-conf-flow-httpn.xml";
-  }
-
-  @Test
-  public void testBusConfiguration() throws Exception {
-    CxfConfiguration config = muleContext.getRegistry().get("cxf");
-
-    Bus cxfBus = config.getCxfBus();
-    boolean found = false;
-    for (Interceptor<? extends Message> i : cxfBus.getInInterceptors()) {
-      if (i instanceof LoggingInInterceptor) {
-        found = true;
-        break;
-      }
+    @Override
+    protected String getConfigFile()
+    {
+        return "configuration-conf-flow-httpn.xml";
     }
 
-    assertTrue("Did not find logging interceptor.", found);
-  }
+    @Test
+    public void testBusConfiguration() throws Exception
+    {
+        CxfConfiguration config = muleContext.getRegistry().get("cxf");
 
-  @Test
-  public void testSpringRefs() throws Exception {
-    FlowConfiguringMessageProcessor processor =
-        muleContext.getRegistry().lookupObjects(FlowConfiguringMessageProcessor.class).iterator().next();
-    List<Interceptor<? extends Message>> inInterceptors =
-        ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
-    assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));
-    assertEquals(muleContext.getRegistry().get("foo3"), inInterceptors.get(1));
-  }
+        Bus cxfBus = config.getCxfBus();
+        boolean found = false;
+        for (Interceptor<? extends Message> i : cxfBus.getInInterceptors())
+        {
+            if (i instanceof LoggingInInterceptor)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue("Did not find logging interceptor.", found);
+    }
+
+    @Test
+    public void testSpringRefs() throws Exception
+    {
+        FlowConfiguringMessageProcessor processor =
+            muleContext.getRegistry().lookupObjects(FlowConfiguringMessageProcessor.class).iterator().next();
+        List<Interceptor<? extends Message>> inInterceptors =
+            ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
+        assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));
+        assertEquals(muleContext.getRegistry().get("foo3"), inInterceptors.get(1));
+    }
 }

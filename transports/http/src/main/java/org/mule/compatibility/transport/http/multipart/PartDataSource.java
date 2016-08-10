@@ -15,31 +15,37 @@ import javax.activation.DataSource;
 /**
  * TODO
  */
-public class PartDataSource implements DataSource {
+public class PartDataSource implements DataSource
+{
+    private Part part;
 
-  private Part part;
+    public PartDataSource(Part part)
+    {
+        this.part = part;
+    }
 
-  public PartDataSource(Part part) {
-    this.part = part;
-  }
+    public InputStream getInputStream() throws IOException
+    {
+        return part.getInputStream();
+    }
 
-  public InputStream getInputStream() throws IOException {
-    return part.getInputStream();
-  }
+    public OutputStream getOutputStream() throws IOException
+    {
+        throw new UnsupportedOperationException("getOutputStream");
+    }
 
-  public OutputStream getOutputStream() throws IOException {
-    throw new UnsupportedOperationException("getOutputStream");
-  }
+    public String getContentType()
+    {
+        return part.getContentType();
+    }
 
-  public String getContentType() {
-    return part.getContentType();
-  }
+    public String getName()
+    {
+        return part.getName();
+    }
 
-  public String getName() {
-    return part.getName();
-  }
-
-  public Part getPart() {
-    return part;
-  }
+    public Part getPart()
+    {
+        return part;
+    }
 }

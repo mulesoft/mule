@@ -26,49 +26,54 @@ import java.util.Set;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
+public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase
+{
+    private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()), new DefaultDomainManager(), containerClassLoader);
 
-  private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                                                                 new DefaultDomainManager(), containerClassLoader);
+    public DefaultDomainFactoryTestCase() throws IOException
+    {
+    }
 
-  public DefaultDomainFactoryTestCase() throws IOException {}
+    @Test
+    public void createDefaultDomain() throws IOException
+    {
+        createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
 
-  @Test
-  public void createDefaultDomain() throws IOException {
-    createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
+        createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
+    }
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
-  }
+    @Test
+    public void createCustomDomain() throws IOException
+    {
+        String domainName = "custom-domain";
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
 
-  @Test
-  public void createCustomDomain() throws IOException {
-    String domainName = "custom-domain";
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
+        createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
+    }
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
-  }
+    @Test
+    public void createCustomDomainWithProperties() throws IOException
+    {
+        String domainName = "custom-domain-with-props";
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
+        createDeployPropertiesFile(domainName);
 
-  @Test
-  public void createCustomDomainWithProperties() throws IOException {
-    String domainName = "custom-domain-with-props";
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
-    createDeployPropertiesFile(domainName);
+        createAndVerifyDomain(domainName, false, containsInAnyOrder("org.mycom.MyClass", "org.yourcom"));
+    }
 
-    createAndVerifyDomain(domainName, false, containsInAnyOrder("org.mycom.MyClass", "org.yourcom"));
-  }
+    private void createAndVerifyDomain(String name, boolean redeployment, Matcher<? super Set<String>> loaderOverridesMatcher) throws IOException
+    {
+        Domain domain = domainFactory.createArtifact(name);
+        assertThat(domain.getArtifactName(), is(name));
+        assertThat(domain.getDescriptor().getName(), is(name));
+        assertThat(domain.getDescriptor().isRedeploymentEnabled(), is(redeployment));
+    }
 
-  private void createAndVerifyDomain(String name, boolean redeployment, Matcher<? super Set<String>> loaderOverridesMatcher)
-      throws IOException {
-    Domain domain = domainFactory.createArtifact(name);
-    assertThat(domain.getArtifactName(), is(name));
-    assertThat(domain.getDescriptor().getName(), is(name));
-    assertThat(domain.getDescriptor().isRedeploymentEnabled(), is(redeployment));
-  }
-
-  private void createDeployPropertiesFile(String domainName) throws FileNotFoundException, UnsupportedEncodingException {
-    File properties = new File(getDomainFolder(domainName), DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
-    PrintWriter writer = new PrintWriter(properties, "UTF8");
-    writer.println(PROPERTY_REDEPLOYMENT_ENABLED + "=false");
-    writer.close();
-  }
+    private void createDeployPropertiesFile(String domainName) throws FileNotFoundException, UnsupportedEncodingException
+    {
+        File properties = new File(getDomainFolder(domainName), DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        PrintWriter writer = new PrintWriter(properties, "UTF8");
+        writer.println(PROPERTY_REDEPLOYMENT_ENABLED + "=false");
+        writer.close();
+    }
 }

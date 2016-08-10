@@ -11,15 +11,18 @@ package org.mule.runtime.core.streaming;
  * 
  * @since 3.5.0
  */
-public class ClosedConsumerException extends RuntimeException {
+public class ClosedConsumerException extends RuntimeException
+{
 
-  private static final long serialVersionUID = -342147990165817320L;
+    private static final long serialVersionUID = -342147990165817320L;
 
-  public ClosedConsumerException() {
-    super();
-  }
+    public ClosedConsumerException()
+    {
+        super();
+    }
 
-  public ClosedConsumerException(String message) {
-    super(message);
-  }
+    public ClosedConsumerException(String message)
+    {
+        super(message);
+    }
 }

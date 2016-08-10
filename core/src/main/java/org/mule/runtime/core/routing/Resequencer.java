@@ -18,54 +18,67 @@ import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCal
 import java.util.Comparator;
 
 /**
- * <code>Resequencer</code> is used to resequence events according to their dispatch sequence in the correlation group. When the
- * message splitter router splits an event it assigns a correlation sequence to the individual message parts so that another
- * router such as the <i>Resequencer</i> can receive the parts and reorder or merge them.
+ * <code>Resequencer</code> is used to resequence events according to their dispatch
+ * sequence in the correlation group. When the message splitter router splits an
+ * event it assigns a correlation sequence to the individual message parts so that
+ * another router such as the <i>Resequencer</i> can receive the parts and reorder or
+ * merge them.
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Resequencer.html">http:// www.eaipatterns.com/Resequencer.html<a/>
+ * <b>EIP Reference:</b> <a
+ * href="http://www.eaipatterns.com/Resequencer.html">http://
+ * www.eaipatterns.com/Resequencer.html<a/>
  */
-public class Resequencer extends AbstractAggregator {
+public class Resequencer extends AbstractAggregator
+{
+    protected Comparator eventComparator;
 
-  protected Comparator eventComparator;
-
-  public Resequencer() {
-    super();
-    this.setEventComparator(new CorrelationSequenceComparator());
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (eventComparator == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("eventComparator"), this);
+    public Resequencer()
+    {
+        super();
+        this.setEventComparator(new CorrelationSequenceComparator());
     }
-    super.initialise();
-  }
 
-  public Comparator getEventComparator() {
-    return eventComparator;
-  }
-
-  public void setEventComparator(Comparator eventComparator) {
-    this.eventComparator = eventComparator;
-  }
-
-  @Override
-  protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext) {
-    return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix);
-  }
-
-  @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent result = eventCorrelator.process(event);
-    if (!isEventValid(result)) {
-      return result;
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (eventComparator == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("eventComparator"), this);
+        }
+        super.initialise();
     }
-    MuleEvent last = null;
-    for (MuleEvent muleEvent : (MuleEvent[]) result.getMessage().getPayload()) {
-      last = processNext(muleEvent);
+
+    public Comparator getEventComparator()
+    {
+        return eventComparator;
     }
-    // Respect existing behaviour by returning last event
-    return last;
-  }
+
+    public void setEventComparator(Comparator eventComparator)
+    {
+        this.eventComparator = eventComparator;
+    }
+
+    @Override
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
+    {
+        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix);
+    }
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleEvent result = eventCorrelator.process(event);
+        if (!isEventValid(result))
+        {
+            return result;
+        }
+        MuleEvent last = null;
+        for (MuleEvent muleEvent : (MuleEvent[]) result.getMessage().getPayload())
+        {
+            last = processNext(muleEvent);
+        }
+        // Respect existing behaviour by returning last event
+        return last;
+    }
 
 }

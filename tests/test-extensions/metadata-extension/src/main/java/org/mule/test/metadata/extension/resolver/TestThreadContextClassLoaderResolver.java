@@ -19,34 +19,38 @@ import org.mule.runtime.core.util.ValueHolder;
 
 import java.util.Set;
 
-public class TestThreadContextClassLoaderResolver
-    implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
+public class TestThreadContextClassLoaderResolver implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
+{
+    private static ValueHolder<ClassLoader> contextClassLoader = new ValueHolder<>();
 
-  private static ValueHolder<ClassLoader> contextClassLoader = new ValueHolder<>();
+    public static void reset()
+    {
+        contextClassLoader.set(null);
+    }
 
-  public static void reset() {
-    contextClassLoader.set(null);
-  }
+    public static ClassLoader getCurrentState()
+    {
+        return contextClassLoader.get();
+    }
 
-  public static ClassLoader getCurrentState() {
-    return contextClassLoader.get();
-  }
+    @Override
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    {
+        contextClassLoader.set(Thread.currentThread().getContextClassLoader());
+        return TestMetadataResolverUtils.getKeys(context);
+    }
 
-  @Override
-  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    contextClassLoader.set(Thread.currentThread().getContextClassLoader());
-    return TestMetadataResolverUtils.getKeys(context);
-  }
+    @Override
+    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException
+    {
+        contextClassLoader.set(Thread.currentThread().getContextClassLoader());
+        return TestMetadataResolverUtils.getMetadata(key);
+    }
 
-  @Override
-  public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException {
-    contextClassLoader.set(Thread.currentThread().getContextClassLoader());
-    return TestMetadataResolverUtils.getMetadata(key);
-  }
-
-  @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
-    contextClassLoader.set(Thread.currentThread().getContextClassLoader());
-    return TestMetadataResolverUtils.getMetadata(key);
-  }
+    @Override
+    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException
+    {
+        contextClassLoader.set(Thread.currentThread().getContextClassLoader());
+        return TestMetadataResolverUtils.getMetadata(key);
+    }
 }

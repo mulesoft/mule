@@ -6,6 +6,7 @@
  */
 package org.mule.tck;
 
-public class NonSerializableObject {
-  // empty
+public class NonSerializableObject
+{
+    // empty
 }

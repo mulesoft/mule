@@ -15,38 +15,43 @@ import java.util.Iterator;
 import org.apache.commons.lang.Validate;
 
 /**
- * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its estimated size is initially the size of the
- * collection, and decreases when elements are consumed using {@link #next()}
+ * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its
+ * estimated size is initially the size of the collection, and decreases when
+ * elements are consumed using {@link #next()}
  * 
  * @author flbulgarelli
  * @param <T>
  */
-public final class CollectionMessageSequence<T> extends AbstractMessageSequence<T> {
+public final class CollectionMessageSequence<T> extends AbstractMessageSequence<T>
+{
+    private final Iterator<T> iter;
+    private int remaining;
 
-  private final Iterator<T> iter;
-  private int remaining;
+    public CollectionMessageSequence(Collection<T> collection)
+    {
+        Validate.notNull(collection);
+        this.iter = collection.iterator();
+        this.remaining = collection.size();
+    }
 
-  public CollectionMessageSequence(Collection<T> collection) {
-    Validate.notNull(collection);
-    this.iter = collection.iterator();
-    this.remaining = collection.size();
-  }
+    @Override
+    public Integer size()
+    {
+        return remaining;
+    }
 
-  @Override
-  public Integer size() {
-    return remaining;
-  }
+    @Override
+    public boolean hasNext()
+    {
+        return iter.hasNext();
+    }
 
-  @Override
-  public boolean hasNext() {
-    return iter.hasNext();
-  }
-
-  @Override
-  public T next() {
-    T next = iter.next();
-    remaining--;
-    return next;
-  }
+    @Override
+    public T next()
+    {
+        T next = iter.next();
+        remaining--;
+        return next;
+    }
 
 }

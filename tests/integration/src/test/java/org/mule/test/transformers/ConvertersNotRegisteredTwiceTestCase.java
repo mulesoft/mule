@@ -30,46 +30,51 @@ import java.util.Set;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class ConvertersNotRegisteredTwiceTestCase extends AbstractIntegrationTestCase {
+public class ConvertersNotRegisteredTwiceTestCase extends AbstractIntegrationTestCase
+{
 
-  private MuleRegistryHelper registryHelper;
+    private MuleRegistryHelper registryHelper;
 
-  @Override
-  protected String[] getConfigFiles() {
-    return new String[] {};
-  }
+    @Override
+    protected String[] getConfigFiles()
+    {
+        return new String[] {};
+    }
 
 
-  @Override
-  protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
-    builders.add(0, new AbstractConfigurationBuilder() {
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        super.addBuilders(builders);
+        builders.add(0, new AbstractConfigurationBuilder()
+        {
+            @Override
+            protected void doConfigure(MuleContext muleContext) throws Exception
+            {
+                registryHelper = (MuleRegistryHelper) muleContext.getRegistry();
+                registryHelper = spy(registryHelper);
+                ((DefaultMuleContext) muleContext).setMuleRegistry(registryHelper);
+            }
+        });
+    }
 
-      @Override
-      protected void doConfigure(MuleContext muleContext) throws Exception {
-        registryHelper = (MuleRegistryHelper) muleContext.getRegistry();
-        registryHelper = spy(registryHelper);
-        ((DefaultMuleContext) muleContext).setMuleRegistry(registryHelper);
-      }
-    });
-  }
+    @Test
+    public void noDuplicates()
+    {
+        ArgumentCaptor<TransformerResolver> transformerResolverCaptor = ArgumentCaptor.forClass(TransformerResolver.class);
+        verify(registryHelper, atLeastOnce()).registerTransformerResolver(transformerResolverCaptor.capture());
+        assertNoDuplicatesNorEmpty(transformerResolverCaptor.getAllValues());
 
-  @Test
-  public void noDuplicates() {
-    ArgumentCaptor<TransformerResolver> transformerResolverCaptor = ArgumentCaptor.forClass(TransformerResolver.class);
-    verify(registryHelper, atLeastOnce()).registerTransformerResolver(transformerResolverCaptor.capture());
-    assertNoDuplicatesNorEmpty(transformerResolverCaptor.getAllValues());
+        ArgumentCaptor<Converter> converterArgumentCaptor = ArgumentCaptor.forClass(Converter.class);
+        verify(registryHelper, atLeastOnce()).notifyTransformerResolvers(converterArgumentCaptor.capture(), same(TransformerResolver.RegistryAction.ADDED));
+        assertNoDuplicatesNorEmpty(converterArgumentCaptor.getAllValues());
+    }
 
-    ArgumentCaptor<Converter> converterArgumentCaptor = ArgumentCaptor.forClass(Converter.class);
-    verify(registryHelper, atLeastOnce()).notifyTransformerResolvers(converterArgumentCaptor.capture(),
-                                                                     same(TransformerResolver.RegistryAction.ADDED));
-    assertNoDuplicatesNorEmpty(converterArgumentCaptor.getAllValues());
-  }
+    private <T> void assertNoDuplicatesNorEmpty(Collection<T> collection)
+    {
+        assertThat(collection.isEmpty(), is(false));
 
-  private <T> void assertNoDuplicatesNorEmpty(Collection<T> collection) {
-    assertThat(collection.isEmpty(), is(false));
-
-    Set<T> noDuplicates = new HashSet<>(collection);
-    assertThat(noDuplicates, hasSize(collection.size()));
-  }
+        Set<T> noDuplicates = new HashSet<>(collection);
+        assertThat(noDuplicates, hasSize(collection.size()));
+    }
 }

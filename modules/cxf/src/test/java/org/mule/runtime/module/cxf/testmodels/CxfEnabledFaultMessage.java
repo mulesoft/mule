@@ -10,26 +10,31 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.frontend.FaultInfoException;
 
-public class CxfEnabledFaultMessage extends FaultInfoException {
+public class CxfEnabledFaultMessage extends FaultInfoException
+{
+    CustomFault faultInfo;
 
-  CustomFault faultInfo;
+    public CxfEnabledFaultMessage(String message, CustomFault fault)
+    {
+        super(message);
+        this.faultInfo = fault;
+    }
 
-  public CxfEnabledFaultMessage(String message, CustomFault fault) {
-    super(message);
-    this.faultInfo = fault;
-  }
+    public CxfEnabledFaultMessage(String message, Throwable t, CustomFault fault)
+    {
+        super(message, t);
+        this.faultInfo = fault;
+    }
 
-  public CxfEnabledFaultMessage(String message, Throwable t, CustomFault fault) {
-    super(message, t);
-    this.faultInfo = fault;
-  }
+    public CustomFault getFaultInfo()
+    {
+        return faultInfo;
+    }
 
-  public CustomFault getFaultInfo() {
-    return faultInfo;
-  }
-
-  public static QName getFaultName() {
-    return new QName("http://org.mule.runtime.module.cxf.testmodels/CxfTestService/", "CxfEnabledFaultMessage");
-  }
+    public static QName getFaultName()
+    {
+        return new QName("http://org.mule.runtime.module.cxf.testmodels/CxfTestService/",
+            "CxfEnabledFaultMessage");
+    }
 
 }

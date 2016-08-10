@@ -17,61 +17,71 @@ import org.mule.runtime.module.http.internal.request.DefaultHttpAuthentication;
 /**
  * Builder for HTTP basic authentication credentials
  */
-public class BasicAuthenticationBuilder {
+public class BasicAuthenticationBuilder
+{
 
-  private final DefaultHttpAuthentication basicAuthentication = new DefaultHttpAuthentication(BASIC);
+    private final DefaultHttpAuthentication basicAuthentication = new DefaultHttpAuthentication(BASIC);
 
-  public BasicAuthenticationBuilder(MuleContext muleContext) {
-    basicAuthentication.setMuleContext(muleContext);
-  }
-
-  /**
-   * @param username basic authentication username
-   * @return the builder
-   */
-  public BasicAuthenticationBuilder setUsername(String username) {
-    basicAuthentication.setUsername(username);
-    return this;
-  }
-
-  /**
-   * @param password basic authentication password
-   * @return this;
-   */
-  public BasicAuthenticationBuilder setPassword(String password) {
-    basicAuthentication.setPassword(password);
-    return this;
-  }
-
-  /**
-   * @param preemptive configures preemptive authentication or not (when true, the authentication header is sent in the first
-   *        request).
-   * @return this
-   */
-  public BasicAuthenticationBuilder setPreemptive(boolean preemptive) {
-    return setPreemptiveExpression(String.valueOf(preemptive));
-  }
-
-  /**
-   * @param preemptive an expression that resolves to a boolean value that defines if preemptive authentication should be used or
-   *        not (when true, the authentication header is sent in the first request).
-   * @return this
-   */
-  public BasicAuthenticationBuilder setPreemptiveExpression(String preemptive) {
-    basicAuthentication.setPreemptive(preemptive);
-    return this;
-  }
-
-  /**
-   * @return the authentication configuration
-   */
-  public HttpAuthentication build() throws MuleException {
-    try {
-      basicAuthentication.initialise();
-    } catch (InitialisationException e) {
-      throw new DefaultMuleException(e);
+    public BasicAuthenticationBuilder(MuleContext muleContext)
+    {
+        basicAuthentication.setMuleContext(muleContext);
     }
-    return basicAuthentication;
-  }
+
+    /**
+     * @param username basic authentication username
+     * @return the builder
+     */
+    public BasicAuthenticationBuilder setUsername(String username)
+    {
+        basicAuthentication.setUsername(username);
+        return this;
+    }
+
+    /**
+     * @param password basic authentication password
+     * @return this;
+     */
+    public BasicAuthenticationBuilder setPassword(String password)
+    {
+        basicAuthentication.setPassword(password);
+        return this;
+    }
+
+    /**
+     * @param preemptive configures preemptive authentication or not (when true, the authentication
+     *                   header is sent in the first request).
+     * @return this
+     */
+    public BasicAuthenticationBuilder setPreemptive(boolean preemptive)
+    {
+        return setPreemptiveExpression(String.valueOf(preemptive));
+    }
+
+    /**
+     * @param preemptive an expression that resolves to a boolean value that defines if preemptive authentication
+     *                   should be used or not (when true, the authentication header is sent in the first request).
+     * @return this
+     */
+    public BasicAuthenticationBuilder setPreemptiveExpression(String preemptive)
+    {
+        basicAuthentication.setPreemptive(preemptive);
+        return this;
+    }
+
+    /**
+     * @return the authentication configuration
+     */
+    public HttpAuthentication build() throws MuleException
+    {
+        try
+        {
+            basicAuthentication.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new DefaultMuleException(e);
+        }
+        return basicAuthentication;
+    }
 
 }

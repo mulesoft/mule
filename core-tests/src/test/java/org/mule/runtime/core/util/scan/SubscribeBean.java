@@ -12,10 +12,11 @@ import org.mule.runtime.core.util.scan.annotations.Marker;
 /**
  * Repesents a subscribe bean in a different package from where the test is run
  */
-public class SubscribeBean {
-
-  @Marker("foo")
-  public String doSomething(Object data) {
-    return null;
-  }
+public class SubscribeBean
+{
+    @Marker("foo")
+    public String doSomething(Object data)
+    {
+        return null;
+    }
 }

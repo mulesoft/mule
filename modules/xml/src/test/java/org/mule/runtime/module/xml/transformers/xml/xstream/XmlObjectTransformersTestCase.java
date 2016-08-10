@@ -20,47 +20,54 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase {
+public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
+{
+    private Apple testObject = null;
+    private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
 
-  private Apple testObject = null;
-  private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
+    public XmlObjectTransformersTestCase()
+    {
+        aliases.put("apple", Apple.class);
+        testObject = new Apple();
+        testObject.wash();
+    }
 
-  public XmlObjectTransformersTestCase() {
-    aliases.put("apple", Apple.class);
-    testObject = new Apple();
-    testObject.wash();
-  }
+    @Override
+    public Transformer getTransformer() throws Exception
+    {
+        ObjectToXml trans =  createObject(ObjectToXml.class);
+        trans.setAliases(aliases);
+        return trans;
+    }
 
-  @Override
-  public Transformer getTransformer() throws Exception {
-    ObjectToXml trans = createObject(ObjectToXml.class);
-    trans.setAliases(aliases);
-    return trans;
-  }
+    @Override
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        XmlToObject trans = createObject(XmlToObject.class);
+        trans.setAliases(aliases);
+        return trans;
+    }
 
-  @Override
-  public Transformer getRoundTripTransformer() throws Exception {
-    XmlToObject trans = createObject(XmlToObject.class);
-    trans.setAliases(aliases);
-    return trans;
-  }
+    @Override
+    public Object getTestData()
+    {
+        return testObject;
+    }
 
-  @Override
-  public Object getTestData() {
-    return testObject;
-  }
+    @Override
+    public Object getResultData()
+    {
+        return "<apple>\n" + "  <bitten>false</bitten>\n"
+               + "  <washed>true</washed>\n" + "</apple>";
+    }
 
-  @Override
-  public Object getResultData() {
-    return "<apple>\n" + "  <bitten>false</bitten>\n" + "  <washed>true</washed>\n" + "</apple>";
-  }
+    @Test
+    public void testStreaming() throws Exception
+    {
+        XmlToObject transformer = createObject(XmlToObject.class);
+        transformer.setAliases(aliases);
 
-  @Test
-  public void testStreaming() throws Exception {
-    XmlToObject transformer = createObject(XmlToObject.class);
-    transformer.setAliases(aliases);
-
-    String input = (String) this.getResultData();
-    assertEquals(testObject, transformer.transform(new ByteArrayInputStream(input.getBytes())));
-  }
+        String input = (String) this.getResultData();
+        assertEquals(testObject, transformer.transform(new ByteArrayInputStream(input.getBytes())));
+    }
 }

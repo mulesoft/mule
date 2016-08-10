@@ -25,103 +25,120 @@ import javax.resource.spi.work.WorkListener;
  *
  * It will create only one thread since it's bound to one endpoint and it only requires one thread.
  */
-public class ReconnectWorkManager implements WorkManager {
+public class ReconnectWorkManager implements WorkManager
+{
 
-  private ExecutorService executor;
-  private boolean isStarted = false;
-  private MuleContext muleContext;
+    private ExecutorService executor;
+    private boolean isStarted = false;
+    private MuleContext muleContext;
 
-  public ReconnectWorkManager(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public boolean isStarted() {
-    return isStarted;
-  }
-
-  @Override
-  public void dispose() {
-    stop();
-  }
-
-  public void stop() {
-    isStarted = false;
-    executor.shutdownNow();
-  }
-
-  @Override
-  public void execute(Runnable runnable) {
-    throw new UnsupportedOperationException();
-  }
-
-  public synchronized void startIfNotStarted() throws MuleException {
-    if (!this.isStarted) {
-      this.start();
-    }
-  }
-
-  @Override
-  public void start() throws MuleException {
-    executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
-      @Override
-      public Thread newThread(Runnable runnable) {
-        return new Thread(runnable, String.format("%s.endpoint.reconnection", ThreadNameHelper.getPrefix(muleContext)));
-      }
-    });
-    isStarted = true;
-  }
-
-  @Override
-  public void doWork(Work work) throws WorkException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener) throws WorkException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public long startWork(Work work) throws WorkException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public long startWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-      throws WorkException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void scheduleWork(Work work) throws WorkException {
-    this.executor.execute(work);
-  }
-
-  @Override
-  public void scheduleWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-      throws WorkException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  public static class WorkDelegate implements Work {
-
-    private Work work;
-
-    public void setWork(Work work) {
-      this.work = work;
+    public ReconnectWorkManager(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
     @Override
-    public void release() {
-      work.release();
+    public boolean isStarted()
+    {
+        return isStarted;
     }
 
     @Override
-    public void run() {
-      work.run();
+    public void dispose()
+    {
+        stop();
     }
-  }
+
+    public void stop()
+    {
+        isStarted = false;
+        executor.shutdownNow();
+    }
+
+    @Override
+    public void execute(Runnable runnable)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public synchronized void startIfNotStarted() throws MuleException
+    {
+        if (!this.isStarted)
+        {
+            this.start();
+        }
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        executor = Executors.newSingleThreadExecutor(new ThreadFactory()
+        {
+            @Override
+            public Thread newThread(Runnable runnable)
+            {
+                return new Thread(runnable, String.format("%s.endpoint.reconnection", ThreadNameHelper.getPrefix(muleContext)));
+            }
+        });
+        isStarted = true;
+    }
+
+    @Override
+    public void doWork(Work work) throws WorkException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener) throws WorkException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long startWork(Work work) throws WorkException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long startWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener) throws WorkException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void scheduleWork(Work work) throws WorkException
+    {
+        this.executor.execute(work);
+    }
+
+    @Override
+    public void scheduleWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener) throws WorkException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Deprecated
+    public static class WorkDelegate implements Work
+    {
+        private Work work;
+
+        public void setWork(Work work)
+        {
+            this.work = work;
+        }
+
+        @Override
+        public void release()
+        {
+            work.release();
+        }
+
+        @Override
+        public void run()
+        {
+            work.run();
+        }
+    }
 }

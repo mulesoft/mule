@@ -51,112 +51,122 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
+public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
+{
 
-  private static final String CONFIG_NAME = "config";
+    private static final String CONFIG_NAME = "config";
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private RuntimeConfigurationModel configurationModel;
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private RuntimeConfigurationModel configurationModel;
 
-  @Mock
-  private OperationModel operationModel;
+    @Mock
+    private OperationModel operationModel;
 
-  @Mock
-  private SourceModel sourceModel;
+    @Mock
+    private SourceModel sourceModel;
 
-  @Mock
-  private ComponentModel componentModel;
+    @Mock
+    private ComponentModel componentModel;
 
-  @Mock
-  private Interceptor interceptor1;
+    @Mock
+    private Interceptor interceptor1;
 
-  @Mock
-  private Interceptor interceptor2;
+    @Mock
+    private Interceptor interceptor2;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleEvent event;
 
-  private ResolverSet resolverSet;
-  private ConfigurationInstanceFactory<TestConfig> factory;
+    private ResolverSet resolverSet;
+    private ConfigurationInstanceFactory<TestConfig> factory;
 
-  @Before
-  public void before() throws Exception {
-    when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
-    when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
-    when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
-    when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
-    when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(asList(sourceModel));
-    when(operationModel.getModelProperty(ConnectivityModelProperty.class))
-        .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
-    when(sourceModel.getModelProperty(ConnectivityModelProperty.class))
-        .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+    @Before
+    public void before() throws Exception
+    {
+        when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
+        when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
+        when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
+        when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
+        when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(asList(sourceModel));
+        when(operationModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+        when(sourceModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
 
-    resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);
-  }
-
-  @Test
-  public void createFromEvent() throws Exception {
-    ConfigurationInstance<TestConfig> configurationInstance =
-        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(null));
-
-    assertConfiguration(configurationInstance);
-  }
-
-  @Test
-  public void createFromResolverSetResult() throws Exception {
-    ResolverSetResult result = ResolverSetResult.newBuilder().build();
-    ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
-
-    assertConfiguration(configurationInstance);
-    assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));
-  }
-
-  private void assertConfiguration(ConfigurationInstance<TestConfig> configurationInstance) {
-    assertThat(configurationInstance, is(notNullValue()));
-    assertThat(configurationInstance.getName(), is(CONFIG_NAME));
-    assertThat(configurationInstance.getModel(), is(sameInstance(configurationModel)));
-    assertThat(configurationInstance.getValue(), is(instanceOf(TestConfig.class)));
-
-    assertThat(configurationInstance, is(instanceOf(Interceptable.class)));
-    assertThat(((Interceptable) configurationInstance).getInterceptors(), containsInAnyOrder(interceptor1, interceptor2));
-  }
-
-  public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Banana> {
-
-    @Override
-    public Banana connect() throws ConnectionException {
-      return new Banana();
+        resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
+        factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);
     }
 
-    @Override
-    public void disconnect(Banana banana) {
+    @Test
+    public void createFromEvent() throws Exception
+    {
+        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(null));
 
+        assertConfiguration(configurationInstance);
     }
 
-    @Override
-    public ConnectionValidationResult validate(Banana banana) {
-      return ConnectionValidationResult.success();
-    }
-  }
+    @Test
+    public void createFromResolverSetResult() throws Exception
+    {
+        ResolverSetResult result = ResolverSetResult.newBuilder().build();
+        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
 
-  public static class InvalidConnectionTypeProvider implements ConnectionProvider<Kiwi> {
-
-    @Override
-    public Kiwi connect() throws ConnectionException {
-      return new Kiwi();
+        assertConfiguration(configurationInstance);
+        assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));
     }
 
-    @Override
-    public void disconnect(Kiwi kiwi) {
+    private void assertConfiguration(ConfigurationInstance<TestConfig> configurationInstance)
+    {
+        assertThat(configurationInstance, is(notNullValue()));
+        assertThat(configurationInstance.getName(), is(CONFIG_NAME));
+        assertThat(configurationInstance.getModel(), is(sameInstance(configurationModel)));
+        assertThat(configurationInstance.getValue(), is(instanceOf(TestConfig.class)));
 
+        assertThat(configurationInstance, is(instanceOf(Interceptable.class)));
+        assertThat(((Interceptable) configurationInstance).getInterceptors(), containsInAnyOrder(interceptor1, interceptor2));
     }
 
-    @Override
-    public ConnectionValidationResult validate(Kiwi kiwi) {
-      return ConnectionValidationResult.success();
+    public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Banana>
+    {
+
+        @Override
+        public Banana connect() throws ConnectionException
+        {
+            return new Banana();
+        }
+
+        @Override
+        public void disconnect(Banana banana)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Banana banana)
+        {
+            return ConnectionValidationResult.success();
+        }
     }
-  }
+
+    public static class InvalidConnectionTypeProvider implements ConnectionProvider<Kiwi>
+    {
+
+        @Override
+        public Kiwi connect() throws ConnectionException
+        {
+            return new Kiwi();
+        }
+
+        @Override
+        public void disconnect(Kiwi kiwi)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Kiwi kiwi)
+        {
+            return ConnectionValidationResult.success();
+        }
+    }
 }

@@ -12,53 +12,61 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import java.util.Properties;
 
 /**
- * <code>HttpsPollingConnector</code> provides Secure http connectivity on top of what is already provided with the Mule
- * {@link org.mule.compatibility.transport.http.HttpPollingConnector}.
+ * <code>HttpsPollingConnector</code> provides Secure http connectivity on top of what is already provided with the
+ * Mule {@link org.mule.compatibility.transport.http.HttpPollingConnector}.
  */
-public class HttpsPollingConnector extends HttpsConnector {
+public class HttpsPollingConnector extends HttpsConnector
+{
+    /**
+     * How long to wait in milliseconds between make a new request
+     */
+    private long pollingFrequency = 1000L;
 
-  /**
-   * How long to wait in milliseconds between make a new request
-   */
-  private long pollingFrequency = 1000L;
+    /**
+     * If a zero-length content is returned should the message be discarded
+     */
+    private boolean discardEmptyContent = true;
 
-  /**
-   * If a zero-length content is returned should the message be discarded
-   */
-  private boolean discardEmptyContent = true;
+    /**
+     * Should the ETag header get honoured if it is present.
+     */
+    private boolean checkEtag = true;
 
-  /**
-   * Should the ETag header get honoured if it is present.
-   */
-  private boolean checkEtag = true;
+    public HttpsPollingConnector(MuleContext context)
+    {
+        super(context);
+        serviceOverrides = new Properties();
+        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS,
+            PollingHttpsMessageReceiver.class.getName());
+    }
 
-  public HttpsPollingConnector(MuleContext context) {
-    super(context);
-    serviceOverrides = new Properties();
-    serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, PollingHttpsMessageReceiver.class.getName());
-  }
+    public boolean isDiscardEmptyContent()
+    {
+        return discardEmptyContent;
+    }
 
-  public boolean isDiscardEmptyContent() {
-    return discardEmptyContent;
-  }
+    public void setDiscardEmptyContent(boolean discardEmptyContent)
+    {
+        this.discardEmptyContent = discardEmptyContent;
+    }
 
-  public void setDiscardEmptyContent(boolean discardEmptyContent) {
-    this.discardEmptyContent = discardEmptyContent;
-  }
+    public long getPollingFrequency()
+    {
+        return pollingFrequency;
+    }
 
-  public long getPollingFrequency() {
-    return pollingFrequency;
-  }
+    public void setPollingFrequency(long pollingFrequency)
+    {
+        this.pollingFrequency = pollingFrequency;
+    }
 
-  public void setPollingFrequency(long pollingFrequency) {
-    this.pollingFrequency = pollingFrequency;
-  }
+    public boolean isCheckEtag()
+    {
+        return checkEtag;
+    }
 
-  public boolean isCheckEtag() {
-    return checkEtag;
-  }
-
-  public void setCheckEtag(boolean checkEtag) {
-    this.checkEtag = checkEtag;
-  }
+    public void setCheckEtag(boolean checkEtag)
+    {
+        this.checkEtag = checkEtag;
+    }
 }

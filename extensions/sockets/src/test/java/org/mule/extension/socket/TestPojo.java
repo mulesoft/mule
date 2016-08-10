@@ -8,24 +8,28 @@ package org.mule.extension.socket;
 
 import java.io.Serializable;
 
-public class TestPojo implements Serializable {
+public class TestPojo implements Serializable
+{
+    int age;
+    String name;
 
-  int age;
-  String name;
+    public int getAge()
+    {
+        return age;
+    }
 
-  public int getAge() {
-    return age;
-  }
+    public void setAge(int age)
+    {
+        this.age = age;
+    }
 
-  public void setAge(int age) {
-    this.age = age;
-  }
+    public String getName()
+    {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 }

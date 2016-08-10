@@ -10,21 +10,22 @@ package org.mule.runtime.module.db.internal.domain.query;
 /**
  * Defines types of SQL queries
  */
-public enum QueryType {
+public enum QueryType
+{
 
-  SELECT,
+    SELECT,
 
-  UPDATE,
+    UPDATE,
 
-  INSERT,
+    INSERT,
 
-  DELETE,
+    DELETE,
 
-  TRUNCATE,
+    TRUNCATE,
 
-  MERGE,
+    MERGE,
 
-  STORE_PROCEDURE_CALL,
+    STORE_PROCEDURE_CALL,
 
-  DDL
+    DDL
 }

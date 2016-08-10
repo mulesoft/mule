@@ -28,113 +28,152 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
+{
 
-  protected Variant variant;
-  protected ExpressionLanguage expressionLanguage;
+    protected Variant variant;
+    protected ExpressionLanguage expressionLanguage;
 
-  public AbstractELTestCase(Variant variant, String mvelOptimizer) {
-    this.variant = variant;
-    OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
-  }
-
-  @Before
-  public void setupExprssionEvaluator() throws Exception {
-    expressionLanguage = getExpressionLanguage();
-    if (expressionLanguage instanceof Initialisable) {
-      ((Initialisable) expressionLanguage).initialise();
+    public AbstractELTestCase(Variant variant, String mvelOptimizer)
+    {
+        this.variant = variant;
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
-  }
 
-  @SuppressWarnings("deprecation")
-  protected Object evaluate(String expression) {
-    switch (variant) {
-      case EVALUATOR_LANGUAGE:
-        return expressionLanguage.evaluate(expression);
-      case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, null);
+    @Before
+    public void setupExprssionEvaluator() throws Exception
+    {
+        expressionLanguage = getExpressionLanguage();
+        if (expressionLanguage instanceof Initialisable)
+        {
+            ((Initialisable) expressionLanguage).initialise();
+        }
     }
-    return null;
-  }
 
-  @SuppressWarnings("deprecation")
-  protected Object evaluate(String expression, MuleEvent event) {
-    switch (variant) {
-      case EVALUATOR_LANGUAGE:
-        return expressionLanguage.evaluate(expression, event);
-      case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, event);
+    @SuppressWarnings("deprecation")
+    protected Object evaluate(String expression)
+    {
+        switch (variant)
+        {
+            case EVALUATOR_LANGUAGE :
+                return expressionLanguage.evaluate(expression);
+            case EXPRESSION_MANAGER :
+                return muleContext.getExpressionManager().evaluate(expression, null);
+        }
+        return null;
     }
-    return null;
-  }
 
-  public static enum Variant {
-    EXPRESSION_MANAGER, EVALUATOR_LANGUAGE
-  }
-
-  @Parameters
-  public static List<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{Variant.EVALUATOR_LANGUAGE, OptimizerFactory.DYNAMIC},
-        {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.SAFE_REFLECTIVE}, {Variant.EXPRESSION_MANAGER, OptimizerFactory.DYNAMIC},
-        {Variant.EXPRESSION_MANAGER, OptimizerFactory.SAFE_REFLECTIVE}});
-  }
-
-  protected ExpressionLanguage getExpressionLanguage() throws Exception {
-    return new MVELExpressionLanguage(muleContext);
-  }
-
-  protected void assertUnsupportedOperation(String expression) {
-    try {
-      evaluate(expression);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+    @SuppressWarnings("deprecation")
+    protected Object evaluate(String expression, MuleEvent event)
+    {
+        switch (variant)
+        {
+            case EVALUATOR_LANGUAGE :
+                return expressionLanguage.evaluate(expression, event);
+            case EXPRESSION_MANAGER :
+                return muleContext.getExpressionManager().evaluate(expression, event);
+        }
+        return null;
     }
-  }
 
-  protected void assertUnsupportedOperation(String expression, MuleEvent event) {
-    try {
-      evaluate(expression, event);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+    public static enum Variant
+    {
+        EXPRESSION_MANAGER, EVALUATOR_LANGUAGE
     }
-  }
 
-  protected void assertImmutableVariable(String expression) {
-    try {
-      evaluate(expression);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+    @Parameters
+    public static List<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]
+        {
+            {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.DYNAMIC},
+            {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.DYNAMIC},
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.SAFE_REFLECTIVE}
+        });
     }
-  }
 
-  protected void assertImmutableVariable(String expression, MuleEvent event) {
-    try {
-      evaluate(expression, event);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+    protected ExpressionLanguage getExpressionLanguage() throws Exception
+    {
+        return new MVELExpressionLanguage(muleContext);
     }
-  }
 
-  protected void assertFinalProperty(String expression) {
-    try {
-      evaluate(expression);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+    protected void assertUnsupportedOperation(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
     }
-  }
 
-  protected void assertFinalProperty(String expression, MuleEvent event) {
-    try {
-      evaluate(expression, event);
-      fail("ExpressionRuntimeException expected");
-    } catch (ExpressionRuntimeException e) {
-      assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+    protected void assertUnsupportedOperation(String expression, MuleEvent event)
+    {
+        try
+        {
+            evaluate(expression, event);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
     }
-  }
+
+    protected void assertImmutableVariable(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertImmutableVariable(String expression, MuleEvent event)
+    {
+        try
+        {
+            evaluate(expression, event);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertFinalProperty(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertFinalProperty(String expression, MuleEvent event)
+    {
+        try
+        {
+            evaluate(expression, event);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
 
 }

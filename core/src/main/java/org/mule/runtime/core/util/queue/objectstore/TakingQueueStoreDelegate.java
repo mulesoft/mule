@@ -17,12 +17,13 @@ import java.io.Serializable;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public interface TakingQueueStoreDelegate extends QueueStoreDelegate {
+public interface TakingQueueStoreDelegate extends QueueStoreDelegate
+{
+    /**
+     * Poll the queue for its first member, and, if there is one, remove and return the corresponding object
+     * from the object store
+     */
+    Serializable takeFromObjectStore(long timeout) throws InterruptedException;
 
-  /**
-   * Poll the queue for its first member, and, if there is one, remove and return the corresponding object from the object store
-   */
-  Serializable takeFromObjectStore(long timeout) throws InterruptedException;
-
-  void writeToObjectStore(Serializable data) throws InterruptedException, ObjectStoreException;
+    void writeToObjectStore(Serializable data) throws InterruptedException,ObjectStoreException;
 }

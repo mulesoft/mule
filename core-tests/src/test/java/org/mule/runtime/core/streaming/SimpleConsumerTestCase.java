@@ -24,84 +24,101 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class SimpleConsumerTestCase {
+public class SimpleConsumerTestCase
+{
 
-  private Producer<String> producer;
-  private Consumer<String> consumer;
-  private final Set<String> values = new HashSet<String>(Arrays.asList("apple", "banana", "kiwi"));
+    private Producer<String> producer;
+    private Consumer<String> consumer;
+    private final Set<String> values = new HashSet<String>(Arrays.asList("apple", "banana", "kiwi"));
 
-  @Before
-  public void setUp() throws Exception {
-    this.producer = new TestProducer();
-    this.consumer = new SimpleConsumer<String>(this.producer);
-  }
-
-  @Test
-  public void happyPath() throws Exception {
-    assertFalse(this.consumer.isConsumed());
-    while (!this.consumer.isConsumed()) {
-      assertTrue(this.values.contains(this.consumer.consume()));
+    @Before
+    public void setUp() throws Exception
+    {
+        this.producer = new TestProducer();
+        this.consumer = new SimpleConsumer<String>(this.producer);
     }
 
-    assertTrue(this.consumer.isConsumed());
-  }
-
-  @Test(expected = ClosedConsumerException.class)
-  public void closeEarly() throws Exception {
-    assertFalse(this.consumer.isConsumed());
-    this.consumer.consume();
-    this.producer.close();
-    assertTrue(this.consumer.isConsumed());
-    assertNull(this.consumer.consume());
-  }
-
-  @Test
-  public void totalAvailable() {
-    assertEquals(this.consumer.size(), this.values.size());
-  }
-
-  @Test
-  public void doubleClose() throws MuleException {
-    this.consumer.close();
-    this.consumer.close();
-  }
-
-  private class TestProducer implements Producer<String> {
-
-    private boolean closed = false;
-    private final Iterator<String> iterator;
-
-    private TestProducer() {
-      this.iterator = values.iterator();
-    }
-
-    @Override
-    public String produce() {
-      if (this.closed) {
-        return null;
-      }
-
-      String value = this.iterator.next();
-      if (value == null) {
-        try {
-          this.close();
-        } catch (Exception e) {
-          throw new RuntimeException(e);
+    @Test
+    public void happyPath() throws Exception
+    {
+        assertFalse(this.consumer.isConsumed());
+        while (!this.consumer.isConsumed())
+        {
+            assertTrue(this.values.contains(this.consumer.consume()));
         }
-      }
 
-      return value;
+        assertTrue(this.consumer.isConsumed());
     }
 
-    @Override
-    public int size() {
-      return values.size();
+    @Test(expected = ClosedConsumerException.class)
+    public void closeEarly() throws Exception
+    {
+        assertFalse(this.consumer.isConsumed());
+        this.consumer.consume();
+        this.producer.close();
+        assertTrue(this.consumer.isConsumed());
+        assertNull(this.consumer.consume());
     }
 
-    @Override
-    public void close() throws MuleException {
-      this.closed = true;
+    @Test
+    public void totalAvailable()
+    {
+        assertEquals(this.consumer.size(), this.values.size());
     }
-  }
+
+    @Test
+    public void doubleClose() throws MuleException
+    {
+        this.consumer.close();
+        this.consumer.close();
+    }
+
+    private class TestProducer implements Producer<String>
+    {
+
+        private boolean closed = false;
+        private final Iterator<String> iterator;
+
+        private TestProducer()
+        {
+            this.iterator = values.iterator();
+        }
+
+        @Override
+        public String produce()
+        {
+            if (this.closed)
+            {
+                return null;
+            }
+
+            String value = this.iterator.next();
+            if (value == null)
+            {
+                try
+                {
+                    this.close();
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            return value;
+        }
+
+        @Override
+        public int size()
+        {
+            return values.size();
+        }
+
+        @Override
+        public void close() throws MuleException
+        {
+            this.closed = true;
+        }
+    }
 
 }

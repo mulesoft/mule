@@ -10,14 +10,16 @@ import org.mule.runtime.module.oauth2.asserter.OAuthContextFunctionAsserter;
 
 import org.junit.Test;
 
-public class ClientCredentialsMinimalConfigTestCase extends AbstractClientCredentialsBasicTestCase {
+public class ClientCredentialsMinimalConfigTestCase extends AbstractClientCredentialsBasicTestCase
+{
 
-  @Test
-  public void authenticationIsDoneOnStartup() throws Exception {
-    verifyRequestDoneToTokenUrlForClientCredentials();
+    @Test
+    public void authenticationIsDoneOnStartup() throws Exception
+    {
+        verifyRequestDoneToTokenUrlForClientCredentials();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
-        .assertAccessTokenIs(ACCESS_TOKEN);
-  }
+        OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
+                .assertAccessTokenIs(ACCESS_TOKEN);
+    }
 
 }

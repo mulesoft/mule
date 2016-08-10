@@ -14,32 +14,38 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * A {@link FactoryBean} which returns the {@link ExtensionManager} obtained through {@link MuleContext#getExtensionManager()}.
- * The purpose of that is to put the extensionManager in the context, even though it makes exist before it.
+ * A {@link FactoryBean} which returns the {@link ExtensionManager}
+ * obtained through {@link MuleContext#getExtensionManager()}. The purpose
+ * of that is to put the extensionManager in the context, even though it
+ * makes exist before it.
  *
  * @since 3.7.0
  */
-public class ExtensionManagerFactoryBean implements FactoryBean<ExtensionManager> {
+public class ExtensionManagerFactoryBean implements FactoryBean<ExtensionManager>
+{
+    private final MuleContext muleContext;
 
-  private final MuleContext muleContext;
+    @Inject
+    public ExtensionManagerFactoryBean(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
-  @Inject
-  public ExtensionManagerFactoryBean(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
+    @Override
+    public ExtensionManager getObject() throws Exception
+    {
+        return muleContext.getExtensionManager();
+    }
 
-  @Override
-  public ExtensionManager getObject() throws Exception {
-    return muleContext.getExtensionManager();
-  }
+    @Override
+    public Class<?> getObjectType()
+    {
+        return ExtensionManager.class;
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return ExtensionManager.class;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
+    @Override
+    public boolean isSingleton()
+    {
+        return true;
+    }
 }

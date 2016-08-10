@@ -10,20 +10,23 @@ import org.mule.tck.probe.Probe;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 
-public class GreeterNotNull implements Probe {
+public class GreeterNotNull implements Probe
+{
+    private GreeterImpl impl;
 
-  private GreeterImpl impl;
+    public GreeterNotNull(GreeterImpl impl)
+    {
+        this.impl = impl;
+    }
 
-  public GreeterNotNull(GreeterImpl impl) {
-    this.impl = impl;
-  }
+    public boolean isSatisfied()
+    {
+        return impl != null;
+    }
 
-  public boolean isSatisfied() {
-    return impl != null;
-  }
-
-  public String describeFailure() {
-    return "Expected Greeter implementation but found null";
-  }
+    public String describeFailure()
+    {
+        return "Expected Greeter implementation but found null";
+    }
 
 }

@@ -13,15 +13,18 @@ import java.util.StringTokenizer;
 /**
  * Be careful - this doesn't work with endpoint properties because they need to be converted to a URI.
  */
-public class ListValueMap implements ValueMap {
+public class ListValueMap implements ValueMap
+{
 
-  public Object rewrite(String value) {
-    List list = new LinkedList();
-    StringTokenizer tokenizer = new StringTokenizer(value);
-    while (tokenizer.hasMoreTokens()) {
-      list.add(tokenizer.nextToken());
+    public Object rewrite(String value)
+    {
+        List list = new LinkedList();
+        StringTokenizer tokenizer = new StringTokenizer(value);
+        while (tokenizer.hasMoreTokens())
+        {
+            list.add(tokenizer.nextToken());
+        }
+        return list;
     }
-    return list;
-  }
 
 }

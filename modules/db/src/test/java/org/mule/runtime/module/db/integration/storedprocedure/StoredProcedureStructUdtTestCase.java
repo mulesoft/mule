@@ -25,38 +25,44 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureStructUdtTestCase extends AbstractDbIntegrationTestCase {
-
-  public StoredProcedureStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    List<Object[]> params = new LinkedList<>();
-
-    if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+public class StoredProcedureStructUdtTestCase extends AbstractDbIntegrationTestCase
+{
+    public StoredProcedureStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    {
+        super(dataSourceConfigResource, testDatabase);
     }
 
-    return params;
-  }
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        List<Object[]> params = new LinkedList<>();
 
-  @Override
-  protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/storedprocedure/stored-procedure-udt-config.xml"};
-  }
+        if (!getOracleResource().isEmpty())
+        {
+            params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
+        }
 
-  @Before
-  public void setupStoredProcedure() throws Exception {
-    testDatabase.createStoredProcedureGetManagerDetails(getDefaultDataSource());
-  }
+        return params;
+    }
 
-  @Test
-  public void returnsObject() throws Exception {
-    final MuleEvent responseEvent = flowRunner("returnsObject").withPayload(TEST_MESSAGE).run();
-    final MuleMessage response = responseEvent.getMessage();
+    @Override
+    protected String[] getFlowConfigurationResources()
+    {
+        return new String[] {"integration/storedprocedure/stored-procedure-udt-config.xml"};
+    }
 
-    assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
-  }
+    @Before
+    public void setupStoredProcedure() throws Exception
+    {
+        testDatabase.createStoredProcedureGetManagerDetails(getDefaultDataSource());
+    }
+
+    @Test
+    public void returnsObject() throws Exception
+    {
+        final MuleEvent responseEvent = flowRunner("returnsObject").withPayload(TEST_MESSAGE).run();
+        final MuleMessage response = responseEvent.getMessage();
+
+        assertThat(((Struct)response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+    }
 }

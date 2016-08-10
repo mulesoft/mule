@@ -15,83 +15,98 @@ import org.mule.runtime.core.util.Preconditions;
  *
  * @since 4.0
  */
-public class ComponentIdentifier {
+public class ComponentIdentifier
+{
 
-  private String namespace;
-  private String identifier;
+    private String namespace;
+    private String identifier;
 
-  private ComponentIdentifier() {}
-
-  /**
-   * @return the unique identifier namespace
-   */
-  public String getNamespace() {
-    return namespace;
-  }
-
-  /**
-   * @return the unique identifier configuration name
-   */
-  public String getName() {
-    return identifier;
-  }
-
-  public static class Builder {
-
-    private ComponentIdentifier componentIdentifier = new ComponentIdentifier();
-
-    /**
-     * @param namespace namespace identifier of the mule language extensions module
-     * @return the builder
-     */
-    public Builder withNamespace(String namespace) {
-      componentIdentifier.namespace = namespace;
-      return this;
+    private ComponentIdentifier()
+    {
     }
 
     /**
-     * @param identifier identifier unique identifier within the namespace of the language configuration extension
-     * @return the builder
+     * @return the unique identifier namespace
      */
-    public Builder withName(String identifier) {
-      componentIdentifier.identifier = identifier;
-      return this;
+    public String getNamespace()
+    {
+        return namespace;
     }
 
-    public ComponentIdentifier build() {
-      checkState(componentIdentifier.namespace != null, "Namespace must be not null");
-      checkState(componentIdentifier.identifier != null, "Name must be not null");
-      return componentIdentifier;
-    }
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    /**
+     * @return the unique identifier configuration name
+     */
+    public String getName()
+    {
+        return identifier;
     }
 
-    ComponentIdentifier that = (ComponentIdentifier) o;
+    public static class Builder
+    {
 
-    if (!namespace.equals(that.namespace)) {
-      return false;
+        private ComponentIdentifier componentIdentifier = new ComponentIdentifier();
+
+        /**
+         * @param namespace namespace identifier of the mule language extensions module
+         * @return the builder
+         */
+        public Builder withNamespace(String namespace)
+        {
+            componentIdentifier.namespace = namespace;
+            return this;
+        }
+
+        /**
+         * @param identifier identifier unique identifier within the namespace of the language configuration extension
+         * @return the builder
+         */
+        public Builder withName(String identifier)
+        {
+            componentIdentifier.identifier = identifier;
+            return this;
+        }
+
+        public ComponentIdentifier build()
+        {
+            checkState(componentIdentifier.namespace != null, "Namespace must be not null");
+            checkState(componentIdentifier.identifier != null, "Name must be not null");
+            return componentIdentifier;
+        }
     }
-    return identifier.equals(that.identifier);
 
-  }
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
 
-  @Override
-  public int hashCode() {
-    int result = namespace.hashCode();
-    result = 31 * result + identifier.hashCode();
-    return result;
-  }
+        ComponentIdentifier that = (ComponentIdentifier) o;
 
-  @Override
-  public String toString() {
-    return getNamespace().equals(CORE_NAMESPACE_NAME) ? getName() : getNamespace() + ":" + getName();
-  }
+        if (!namespace.equals(that.namespace))
+        {
+            return false;
+        }
+        return identifier.equals(that.identifier);
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = namespace.hashCode();
+        result = 31 * result + identifier.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getNamespace().equals(CORE_NAMESPACE_NAME) ? getName() : getNamespace() + ":" + getName();
+    }
 }

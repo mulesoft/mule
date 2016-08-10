@@ -10,20 +10,23 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleMessage;
 
-public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase {
+public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/construct/one-way-outbound-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/construct/one-way-outbound-config.xml";
-  }
+    @Override
+    protected void assertOneWayOutboundResponse(MuleMessage response)
+    {
+        assertEquals("TEST", response.getPayload());
+    }
 
-  @Override
-  protected void assertOneWayOutboundResponse(MuleMessage response) {
-    assertEquals("TEST", response.getPayload());
-  }
-
-  @Override
-  protected void assertOneWayOutboundAfterComponentResponse(MuleMessage response) {
-    assertEquals("TEST processed", response.getPayload());
-  }
+    @Override
+    protected void assertOneWayOutboundAfterComponentResponse(MuleMessage response)
+    {
+        assertEquals("TEST processed", response.getPayload());
+    }
 }

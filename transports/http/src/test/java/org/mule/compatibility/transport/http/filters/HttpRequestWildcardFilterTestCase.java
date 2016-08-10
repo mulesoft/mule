@@ -25,68 +25,65 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase {
+public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
+{
+    private static final String TEST_HTTP_MESSAGE = "Hello=World";
+    private static final String TEST_BAD_MESSAGE = "xyz";
 
-  private static final String TEST_HTTP_MESSAGE = "Hello=World";
-  private static final String TEST_BAD_MESSAGE = "xyz";
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-  @Rule
-  public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-wildcard-filter-test-service.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-wildcard-filter-test-service.xml";
-  }
+    @Test
+    public void testReference() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("reference")).getMessageSource()).getAddress(), TEST_HTTP_MESSAGE, null);
 
-  @Test
-  public void testReference() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage result = client
-        .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("reference")).getMessageSource()).getAddress(),
-              TEST_HTTP_MESSAGE, null);
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
+    }
 
-    assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
-  }
+    @Test
+    public void testHttpPost() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress(), TEST_HTTP_MESSAGE, null);
 
-  @Test
-  public void testHttpPost() throws Exception {
-    MuleClient client = muleContext.getClient();
-    MuleMessage result =
-        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress(),
-                    TEST_HTTP_MESSAGE, null);
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
+    }
 
-    assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
-  }
+    @Test
+    public void testHttpGetNotFiltered() throws Exception
+    {
+        Map<String, Serializable> props = new HashMap<>();
+        props.put(HttpConstants.METHOD_GET, "true");
 
-  @Test
-  public void testHttpGetNotFiltered() throws Exception {
-    Map<String, Serializable> props = new HashMap<>();
-    props.put(HttpConstants.METHOD_GET, "true");
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress() + "/" + "mulerulez", TEST_HTTP_MESSAGE, props);
 
-    MuleClient client = muleContext.getClient();
-    MuleMessage result =
-        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress()
-            + "/" + "mulerulez", TEST_HTTP_MESSAGE, props);
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
+    }
 
-    assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
-  }
+    @Test
+    public void testHttpGetFiltered() throws Exception
+    {
+        Map<String, Serializable> props = new HashMap<>();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
+        //props.put(HttpConstants.METHOD_GET, "true");
 
-  @Test
-  public void testHttpGetFiltered() throws Exception {
-    Map<String, Serializable> props = new HashMap<>();
-    props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-    // props.put(HttpConstants.METHOD_GET, "true");
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress() + "/" + TEST_BAD_MESSAGE, "mule", props);
 
-    MuleClient client = muleContext.getClient();
-    MuleMessage result =
-        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress()
-            + "/" + TEST_BAD_MESSAGE, "mule", props);
-
-    final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-    assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, status);
-    assertNotNull(result.getExceptionPayload());
-  }
+        final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, status);
+        assertNotNull(result.getExceptionPayload());
+    }
 }

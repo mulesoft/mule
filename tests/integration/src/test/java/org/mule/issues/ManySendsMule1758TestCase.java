@@ -13,32 +13,36 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase {
+public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase
+{
+    private static int NUM_MESSAGES = 3000;
 
-  private static int NUM_MESSAGES = 3000;
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/issues/many-sends-mule-1758-test-flow.xml";
-  }
-
-  @Test
-  public void testSingleSend() throws Exception {
-    MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
-    assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
-  }
-
-  @Test
-  public void testManySends() throws Exception {
-    long then = System.currentTimeMillis();
-    for (int i = 0; i < NUM_MESSAGES; ++i) {
-      logger.debug("Message " + i);
-      MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
-      assertNotNull("Response is null", response);
-      assertEquals("Polo", response.getPayload());
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/issues/many-sends-mule-1758-test-flow.xml";
     }
-    long now = System.currentTimeMillis();
-    logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
-  }
+
+    @Test
+    public void testSingleSend() throws Exception
+    {
+        MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
+        assertNotNull("Response is null", response);
+        assertEquals("Polo", response.getPayload());
+    }
+
+    @Test
+    public void testManySends() throws Exception
+    {
+        long then = System.currentTimeMillis();
+        for (int i = 0; i < NUM_MESSAGES; ++i)
+        {
+            logger.debug("Message " + i);
+            MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
+            assertNotNull("Response is null", response);
+            assertEquals("Polo", response.getPayload());
+        }
+        long now = System.currentTimeMillis();
+        logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
+    }
 }

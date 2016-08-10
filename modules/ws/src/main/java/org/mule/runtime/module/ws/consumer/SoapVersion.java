@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.ws.consumer;
 
-public enum SoapVersion {
-  SOAP_11("1.1"), SOAP_12("1.2");
+public enum SoapVersion
+{
+    SOAP_11("1.1"), SOAP_12("1.2");
 
-  private String version;
+    private String version;
 
-  SoapVersion(String version) {
-    this.version = version;
-  }
+    SoapVersion(String version)
+    {
+        this.version = version;
+    }
 
-  public String getVersion() {
-    return version;
-  }
+    public String getVersion()
+    {
+        return version;
+    }
 }

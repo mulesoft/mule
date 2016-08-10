@@ -9,40 +9,44 @@ package org.mule.runtime.core.util.xa;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class ResourceManagerException extends MuleException {
+public class ResourceManagerException extends MuleException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2710661653314559260L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -2710661653314559260L;
+    /**
+     * 
+     */
+    public ResourceManagerException()
+    {
+        super();
+    }
 
-  /**
-   * 
-   */
-  public ResourceManagerException() {
-    super();
-  }
+    /**
+     * @param message
+     */
+    public ResourceManagerException(Message message)
+    {
+        super(message);
+    }
 
-  /**
-   * @param message
-   */
-  public ResourceManagerException(Message message) {
-    super(message);
-  }
+    /**
+     * @param cause
+     */
+    public ResourceManagerException(Throwable cause)
+    {
+        super(cause);
+    }
 
-  /**
-   * @param cause
-   */
-  public ResourceManagerException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * @param message
-   * @param cause
-   */
-  public ResourceManagerException(Message message, Throwable cause) {
-    super(message, cause);
-  }
+    /**
+     * @param message
+     * @param cause
+     */
+    public ResourceManagerException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
 }

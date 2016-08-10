@@ -8,54 +8,67 @@ package org.mule.runtime.core.util;
 
 import java.util.Collection;
 
-public class WildcardAttributeEvaluator {
+public class WildcardAttributeEvaluator
+{
+    private String attributeValue;
+    private String escapedValue;
+    private Boolean hasWildcards;
 
-  private String attributeValue;
-  private String escapedValue;
-  private Boolean hasWildcards;
-
-  public WildcardAttributeEvaluator(String attributeValue) {
-    if (attributeValue == null) {
-      throw new IllegalArgumentException("null not allowed");
+    public WildcardAttributeEvaluator(String attributeValue)
+    {
+        if (attributeValue == null)
+        {
+            throw new IllegalArgumentException("null not allowed");
+        }
+        this.attributeValue = attributeValue;
+        this.escapedValue = attributeValue.replaceAll("\\*","*");
+        hasWildcards = attributeValue.startsWith("*") || (attributeValue.endsWith("*") && !attributeValue.endsWith("\\*"))|| attributeValue.equals("*");
     }
-    this.attributeValue = attributeValue;
-    this.escapedValue = attributeValue.replaceAll("\\*", "*");
-    hasWildcards = attributeValue.startsWith("*") || (attributeValue.endsWith("*") && !attributeValue.endsWith("\\*"))
-        || attributeValue.equals("*");
-  }
 
-  public boolean hasWildcards() {
-    return hasWildcards;
-  }
-
-  public void processValues(Collection<String> values, MatchCallback matchCallback) {
-    if (!hasWildcards()) {
-      throw new IllegalStateException("Can't call processValues with non wildcard attribute");
+    public boolean hasWildcards()
+    {
+        return hasWildcards;
     }
-    String[] valuesArray = values.toArray(new String[values.size()]);
-    for (String value : valuesArray) {
-      if (matches(value)) {
-        matchCallback.processMatch(value);
-      }
-    }
-  }
 
-  public boolean matches(String value) {
-    if (value == null) {
-      return false;
+    public void processValues(Collection<String> values, MatchCallback matchCallback)
+    {
+        if (!hasWildcards())
+        {
+            throw new IllegalStateException("Can't call processValues with non wildcard attribute");
+        }
+        String[] valuesArray = values.toArray(new String[values.size()]);
+        for (String value : valuesArray)
+        {
+            if (matches(value))
+            {
+                matchCallback.processMatch(value);
+            }
+        }
     }
-    if (escapedValue.equals("*")) {
-      return true;
-    } else if (escapedValue.startsWith("*")) {
-      return value.endsWith(escapedValue.substring(1, escapedValue.length()));
-    } else if (escapedValue.endsWith("*")) {
-      return value.startsWith(escapedValue.substring(0, escapedValue.length() - 1));
+
+    public boolean matches(String value)
+    {
+        if (value == null)
+        {
+            return false;
+        }
+        if (escapedValue.equals("*"))
+        {
+            return true;
+        } 
+        else if (escapedValue.startsWith("*"))
+        {
+            return value.endsWith(escapedValue.substring(1, escapedValue.length()));
+        }
+        else if (escapedValue.endsWith("*"))
+        {
+            return value.startsWith(escapedValue.substring(0, escapedValue.length()-1));
+        }
+        return false;
     }
-    return false;
-  }
 
-  public interface MatchCallback {
-
-    public void processMatch(String matchedValue);
-  }
+    public interface MatchCallback 
+    {
+        public void processMatch(String matchedValue);
+    }
 }

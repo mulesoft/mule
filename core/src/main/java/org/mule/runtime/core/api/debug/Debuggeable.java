@@ -12,26 +12,27 @@ package org.mule.runtime.core.api.debug;
  *
  * @since 3.8.0
  */
-public interface Debuggeable {
+public interface Debuggeable
+{
+    /**
+     * Enables the debug mode for this message processor and returns a new debugging session.
+     *
+     * @param callback The callback to be used to interact with the mule debugger. Non null
+     * @return The debugging session
+     */
+    DebuggingSession enableDebug(DebuggerCallback callback);
 
-  /**
-   * Enables the debug mode for this message processor and returns a new debugging session.
-   *
-   * @param callback The callback to be used to interact with the mule debugger. Non null
-   * @return The debugging session
-   */
-  DebuggingSession enableDebug(DebuggerCallback callback);
+    /**
+     * If it is already enabled or not.
+     *
+     * @return True if it is enabled, false otherwise
+     */
+    boolean isDebugEnabled();
 
-  /**
-   * If it is already enabled or not.
-   *
-   * @return True if it is enabled, false otherwise
-   */
-  boolean isDebugEnabled();
-
-  /**
-   * Disables the debugging mode. And finish the debugging session. It should resume any paused execution.
-   */
-  void disableDebug();
+    /**
+     * Disables the debugging mode. And finish the debugging session.
+     * It should resume any paused execution.
+     */
+    void disableDebug();
 
 }

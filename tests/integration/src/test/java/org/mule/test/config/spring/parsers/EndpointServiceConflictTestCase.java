@@ -10,19 +10,21 @@ import static java.lang.String.format;
 
 import org.junit.Test;
 
-public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase {
+public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
+{
+    private static final String REPEATED_GLOBAL_NAME = "LenderService";
 
-  private static final String REPEATED_GLOBAL_NAME = "LenderService";
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/endpoint-service-conflict-test-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/endpoint-service-conflict-test-flow.xml";
-  }
-
-  @Test
-  public void testBeanError() throws Exception {
-    assertErrorContains(format("Two configuration elements have been defined with the same global name. Global name [%s] must be unique",
-                               REPEATED_GLOBAL_NAME));
-  }
+    @Test
+    public void testBeanError() throws Exception
+    {
+        assertErrorContains(format("Two configuration elements have been defined with the same global name. Global name [%s] must be unique",
+                                   REPEATED_GLOBAL_NAME));
+    }
 
 }

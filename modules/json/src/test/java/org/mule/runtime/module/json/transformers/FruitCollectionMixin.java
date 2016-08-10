@@ -14,11 +14,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * TODO
  */
 
-public interface FruitCollectionMixin {
+public interface FruitCollectionMixin
+{
+    @JsonIgnore
+    Banana getBanana();
 
-  @JsonIgnore
-  Banana getBanana();
-
-  @JsonIgnore
-  void setBanana(Banana banana);
+    @JsonIgnore
+    void setBanana(Banana banana);
 }

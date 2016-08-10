@@ -11,14 +11,18 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  *
  */
-class CallAndExpectArgumentTypeMismatch extends AbstractCallAndExpectIllegalArgumentException {
+class CallAndExpectArgumentTypeMismatch extends AbstractCallAndExpectIllegalArgumentException
+{
+    public CallAndExpectArgumentTypeMismatch(String outputEndpointName,
+                                             Object payload,
+                                             MuleContext muleContext)
+    {
+        super(outputEndpointName, payload, muleContext);
+    }
 
-  public CallAndExpectArgumentTypeMismatch(String outputEndpointName, Object payload, MuleContext muleContext) {
-    super(outputEndpointName, payload, muleContext);
-  }
-
-  @Override
-  public String expectedIllegalArgumentExceptionMessage() {
-    return "argument type mismatch";
-  }
+    @Override
+    public String expectedIllegalArgumentExceptionMessage()
+    {
+        return "argument type mismatch";
+    }
 }

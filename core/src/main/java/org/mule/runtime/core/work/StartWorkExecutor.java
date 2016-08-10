@@ -13,12 +13,14 @@ import java.util.concurrent.Executor;
 
 import javax.resource.spi.work.WorkException;
 
-public class StartWorkExecutor implements WorkExecutor {
+public class StartWorkExecutor implements WorkExecutor
+{
 
-  public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException {
-    Latch latch = work.provideStartLatch();
-    executor.execute(work);
-    latch.await();
-  }
+    public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException
+    {
+        Latch latch = work.provideStartLatch();
+        executor.execute(work);
+        latch.await();
+    }
 
 }

@@ -13,29 +13,32 @@ import org.mule.runtime.module.http.internal.ParameterMap;
  *
  * @since 4.0
  */
-public class HttpResponseAttributes extends HttpAttributes {
+public class HttpResponseAttributes extends HttpAttributes
+{
+    /**
+     * HTTP status code of the response. Former 'http.status'.
+     */
+    private final int statusCode;
+    /**
+     * HTTP reason phrase of the response. Former 'http.reason'.
+     */
+    private final String reasonPhrase;
 
-  /**
-   * HTTP status code of the response. Former 'http.status'.
-   */
-  private final int statusCode;
-  /**
-   * HTTP reason phrase of the response. Former 'http.reason'.
-   */
-  private final String reasonPhrase;
+    public HttpResponseAttributes(int statusCode, String reasonPhrase, ParameterMap headers)
+    {
+        super(headers);
+        this.statusCode = statusCode;
+        this.reasonPhrase = reasonPhrase;
+    }
 
-  public HttpResponseAttributes(int statusCode, String reasonPhrase, ParameterMap headers) {
-    super(headers);
-    this.statusCode = statusCode;
-    this.reasonPhrase = reasonPhrase;
-  }
+    public int getStatusCode()
+    {
+        return statusCode;
+    }
 
-  public int getStatusCode() {
-    return statusCode;
-  }
-
-  public String getReasonPhrase() {
-    return reasonPhrase;
-  }
+    public String getReasonPhrase()
+    {
+        return reasonPhrase;
+    }
 
 }

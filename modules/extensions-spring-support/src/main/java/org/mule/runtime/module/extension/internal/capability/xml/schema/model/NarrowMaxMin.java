@@ -23,13 +23,10 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * restricted max/min
  * <p/>
- * <p>
- * Java class for narrowMaxMin complex type.
+ * <p>Java class for narrowMaxMin complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="narrowMaxMin">
  *   &lt;complexContent>
@@ -66,6 +63,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "narrowMaxMin")
-public class NarrowMaxMin extends LocalElement {
+public class NarrowMaxMin extends LocalElement
+{
 
 }

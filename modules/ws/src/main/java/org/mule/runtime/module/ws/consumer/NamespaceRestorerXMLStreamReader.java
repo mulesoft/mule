@@ -18,84 +18,103 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 
 /**
- * XMLStreamReader decorator that restores XML Namespace declarations. By default, it will restore the namespaces on the first
- * declaration, but this can be overriden
+ * XMLStreamReader decorator that restores XML Namespace declarations.
+ * By default, it will restore the namespaces on the first declaration, but this can be overriden
  */
-public class NamespaceRestorerXMLStreamReader extends ScopeSaverXMLStreamReader {
+public class NamespaceRestorerXMLStreamReader extends ScopeSaverXMLStreamReader
+{
+    private List<Namespace> namespaces;
+    private List<String> nsBlacklist = new ArrayList<String>();
 
-  private List<Namespace> namespaces;
-  private List<String> nsBlacklist = new ArrayList<String>();
 
+    public NamespaceRestorerXMLStreamReader(XMLStreamReader reader)
+    {
+        super(reader);
+    }
 
-  public NamespaceRestorerXMLStreamReader(XMLStreamReader reader) {
-    super(reader);
-  }
+    public final NamespaceRestorerXMLStreamReader blackList(String namespace)
+    {
+        nsBlacklist.add(namespace);
+        return this;
+    }
 
-  public final NamespaceRestorerXMLStreamReader blackList(String namespace) {
-    nsBlacklist.add(namespace);
-    return this;
-  }
+    public void restoreNamespaces()
+    {
+        if (getEventType() == START_ELEMENT)
+        {
+            namespaces = new ArrayList<Namespace>();
 
-  public void restoreNamespaces() {
-    if (getEventType() == START_ELEMENT) {
-      namespaces = new ArrayList<Namespace>();
-
-      Set<String> prefixes = new HashSet<String>();
-      for (StartElement elem : scopes()) {
-        Iterator<Namespace> iter = elem.getNamespaces();
-        while (iter.hasNext()) {
-          Namespace ns = iter.next();
-          if (prefixes.add(ns.getPrefix()) && !nsBlacklist.contains(ns.getNamespaceURI())) {
-            namespaces.add(ns);
-          }
+            Set<String> prefixes = new HashSet<String>();
+            for (StartElement elem: scopes())
+            {
+                Iterator<Namespace> iter =  elem.getNamespaces();
+                while(iter.hasNext())
+                {
+                    Namespace ns = iter.next();
+                    if (prefixes.add(ns.getPrefix()) && !nsBlacklist.contains(ns.getNamespaceURI()))
+                    {
+                        namespaces.add(ns);
+                    }
+                }
+            }
         }
-      }
     }
-  }
 
-  @Override
-  public int next() throws XMLStreamException {
-    namespaces = null;
-    return super.next();
-  }
-
-  @Override
-  public int getNamespaceCount() {
-    if (overrideNamespaces()) {
-      return namespaces.size();
+    @Override
+    public int next() throws XMLStreamException
+    {
+        namespaces = null;
+        return super.next();
     }
-    return super.getNamespaceCount();
-  }
 
-  private boolean overrideNamespaces() {
-    return namespaces != null;
-  }
-
-  @Override
-  public String getNamespacePrefix(int index) {
-    if (overrideNamespaces()) {
-      return namespaces.get(index).getPrefix();
-    }
-    return super.getNamespacePrefix(index);
-  }
-
-  @Override
-  public String getNamespaceURI(String prefix) {
-    if (overrideNamespaces()) {
-      for (Namespace ns : namespaces) {
-        if (ns.getPrefix().equals(prefix)) {
-          return ns.getNamespaceURI();
+    @Override
+    public int getNamespaceCount()
+    {
+        if (overrideNamespaces())
+        {
+            return namespaces.size();
         }
-      }
+        return super.getNamespaceCount();
     }
-    return super.getNamespaceURI(prefix);
-  }
 
-  @Override
-  public String getNamespaceURI(int index) {
-    if (overrideNamespaces()) {
-      return namespaces.get(index).getNamespaceURI();
+    private boolean overrideNamespaces()
+    {
+        return namespaces != null;
     }
-    return super.getNamespaceURI(index);
-  }
+
+    @Override
+    public String getNamespacePrefix(int index)
+    {
+        if (overrideNamespaces())
+        {
+            return namespaces.get(index).getPrefix();
+        }
+        return super.getNamespacePrefix(index);
+    }
+
+    @Override
+    public String getNamespaceURI(String prefix)
+    {
+        if (overrideNamespaces())
+        {
+            for (Namespace ns : namespaces)
+            {
+                if (ns.getPrefix().equals(prefix))
+                {
+                    return ns.getNamespaceURI();
+                }
+            }
+        }
+        return super.getNamespaceURI(prefix);
+    }
+
+    @Override
+    public String getNamespaceURI(int index)
+    {
+        if (overrideNamespaces())
+        {
+            return namespaces.get(index).getNamespaceURI();
+        }
+        return super.getNamespaceURI(index);
+    }
 }

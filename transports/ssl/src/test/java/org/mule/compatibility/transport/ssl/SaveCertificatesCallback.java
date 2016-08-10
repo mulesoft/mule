@@ -15,31 +15,35 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SaveCertificatesCallback implements EventCallback {
+public class SaveCertificatesCallback implements EventCallback
+{
+    // volatile since this is a thread-safe collection (see holger)
+    private volatile List<Certificate[]> certificates;
 
-  // volatile since this is a thread-safe collection (see holger)
-  private volatile List<Certificate[]> certificates;
+    public SaveCertificatesCallback()
+    {
+        super();
+        clear();
+    }
 
-  public SaveCertificatesCallback() {
-    super();
-    clear();
-  }
+    @Override
+    public void eventReceived(MuleEventContext context, Object component) throws Exception
+    {
+        // putting a Thread.sleep here doesn't make this less reliable
+        // surely it would if it was thread scribbling?
+        Thread.sleep(100);
 
-  @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
-    // putting a Thread.sleep here doesn't make this less reliable
-    // surely it would if it was thread scribbling?
-    Thread.sleep(100);
+        Certificate[] certs = context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES);
+        certificates.add(certs);
+    }
 
-    Certificate[] certs = context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES);
-    certificates.add(certs);
-  }
+    public void clear()
+    {
+        certificates = Collections.synchronizedList(new LinkedList<Certificate[]>());
+    }
 
-  public void clear() {
-    certificates = Collections.synchronizedList(new LinkedList<Certificate[]>());
-  }
-
-  public List<Certificate[]> getCertificates() {
-    return certificates;
-  }
+    public List<Certificate[]> getCertificates()
+    {
+        return certificates;
+    }
 }

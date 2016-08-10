@@ -11,29 +11,35 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route the current outbound event.
+ * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route
+ * the current outbound event.
  */
 
-public class CouldNotRouteOutboundMessageException extends RoutingException {
+public class CouldNotRouteOutboundMessageException extends RoutingException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 4609966704030524483L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 4609966704030524483L;
+    public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target)
+    {
+        super(event, target);
+    }
 
-  public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target) {
-    super(event, target);
-  }
+    public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target, Throwable cause)
+    {
+        super(event, target, cause);
+    }
 
-  public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(event, target, cause);
-  }
+    public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target)
+    {
+        super(message, event, target);
+    }
 
-  public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target) {
-    super(message, event, target);
-  }
-
-  public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(message, event, target, cause);
-  }
+    public CouldNotRouteOutboundMessageException(Message message, MuleEvent event,
+                                                 MessageProcessor target, Throwable cause)
+    {
+        super(message, event, target, cause);
+    }
 }

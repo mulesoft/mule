@@ -17,20 +17,24 @@ import org.slf4j.LoggerFactory;
 /**
  * Extracts the local hostname from the local system
  */
-public class HostNameFactory implements PropertyFactory {
+public class HostNameFactory implements PropertyFactory
+{
+    protected static final Logger logger = LoggerFactory.getLogger(HostNameFactory.class);
 
-  protected static final Logger logger = LoggerFactory.getLogger(HostNameFactory.class);
-
-  public Object create(Map<?, ?> props) throws Exception {
-    // we could use getCanonicalHostName here. however, on machines behind
-    // NAT firewalls it seems that is often the NAT address, which corresponds
-    // to an interface on the firewall, not on the local machine.
-    try {
-      return NetworkUtils.getLocalHost().getHostName();
-    } catch (Exception e) {
-      logger.warn("Unable to resolve hostname, defaulting to 'localhost': " + e.getMessage(), e);
-      return "localhost";
+    public Object create(Map<?, ?> props) throws Exception
+    {
+        // we could use getCanonicalHostName here.  however, on machines behind
+        // NAT firewalls it seems that is often the NAT address, which corresponds
+        // to an interface on the firewall, not on the local machine.
+        try
+        {
+            return NetworkUtils.getLocalHost().getHostName();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Unable to resolve hostname, defaulting to 'localhost': " + e.getMessage(), e);
+            return "localhost";
+        }
     }
-  }
 
 }

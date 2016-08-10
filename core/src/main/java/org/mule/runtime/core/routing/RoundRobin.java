@@ -17,50 +17,61 @@ import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * RoundRobin divides the messages it receives among its target routes in round-robin fashion. This includes messages received on
- * all threads, so there is no guarantee that messages received from a splitter are sent to consecutively numbered targets.
+ * RoundRobin divides the messages it receives among its target routes in round-robin
+ * fashion. This includes messages received on all threads, so there is no guarantee
+ * that messages received from a splitter are sent to consecutively numbered targets.
  */
-public class RoundRobin extends AbstractOutboundRouter {
+public class RoundRobin extends AbstractOutboundRouter
+{
+    /** Index of target route to use */
+    AtomicInteger index = new AtomicInteger(1);
 
-  /** Index of target route to use */
-  AtomicInteger index = new AtomicInteger(1);
-
-  /**
-   * Process the event using the next target route in sequence
-   */
-  @Override
-  public MuleEvent route(MuleEvent event) throws MessagingException {
-    int modulo = getAndIncrementModuloN(routes.size());
-    if (modulo < 0) {
-      throw new CouldNotRouteOutboundMessageException(event, this);
+    /**
+     *  Process the event using the next target route in sequence
+     */
+    @Override
+    public MuleEvent route(MuleEvent event) throws MessagingException
+    {
+        int modulo = getAndIncrementModuloN(routes.size());
+        if (modulo < 0)
+        {
+            throw new CouldNotRouteOutboundMessageException(event, this);
+        }
+        
+        MessageProcessor mp = routes.get(modulo);
+        try
+        {
+            return doProcessRoute(mp, event);
+        }
+        catch (MuleException ex)
+        {
+            throw new RoutingException(event, this, ex);
+        }
     }
 
-    MessageProcessor mp = routes.get(modulo);
-    try {
-      return doProcessRoute(mp, event);
-    } catch (MuleException ex) {
-      throw new RoutingException(event, this, ex);
+    /**
+     * Get the index of the processor to use
+     */
+    private int getAndIncrementModuloN(int modulus)
+    {
+        if (modulus == 0)
+        {
+            return -1;
+        }
+        while (true)
+        {
+            int lastIndex = index.get();
+            int nextIndex = (lastIndex + 1) % modulus;
+            if (index.compareAndSet(lastIndex, nextIndex))
+            {
+                return nextIndex;
+            }
+        }
     }
-  }
 
-  /**
-   * Get the index of the processor to use
-   */
-  private int getAndIncrementModuloN(int modulus) {
-    if (modulus == 0) {
-      return -1;
+    @Override
+    public boolean isMatch(MuleEvent message) throws MuleException
+    {
+        return true;
     }
-    while (true) {
-      int lastIndex = index.get();
-      int nextIndex = (lastIndex + 1) % modulus;
-      if (index.compareAndSet(lastIndex, nextIndex)) {
-        return nextIndex;
-      }
-    }
-  }
-
-  @Override
-  public boolean isMatch(MuleEvent message) throws MuleException {
-    return true;
-  }
 }

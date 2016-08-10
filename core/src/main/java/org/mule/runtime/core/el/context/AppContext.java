@@ -15,100 +15,121 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Exposes information about the current Mule Application:
- * <li><b>encoding</b> <i>Application default encoding</i>
- * <li><b>name</b> <i>Application name</i>
- * <li><b>registry</b> <i>Mule registry (as a map)</i>
- * <li><b>standalone</b> <i>If Mule is running standalone</i>
- * <li><b>workdir</b> <i>Application work directory</i>
+ * Exposes information about the current Mule Application: <li><b>encoding</b> <i>Application default
+ * encoding</i> <li><b>name</b> <i>Application name</i> <li><b>registry</b> <i>Mule registry (as a map)</i>
+ * <li><b>standalone</b> <i>If Mule is running standalone</i> <li><b>workdir</b> <i>Application work
+ * directory</i>
  */
-public class AppContext {
+public class AppContext
+{
 
-  protected MuleContext muleContext;
+    protected MuleContext muleContext;
 
-  public AppContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  public String getName() {
-    return muleContext.getConfiguration().getId();
-  }
-
-  public String getWorkDir() {
-    return muleContext.getConfiguration().getWorkingDirectory();
-  }
-
-  public String getEncoding() {
-    return muleContext.getConfiguration().getDefaultEncoding();
-  }
-
-  public boolean isStandalone() {
-    return muleContext.getConfiguration().isStandalone();
-  }
-
-  public Map<String, Object> getRegistry() {
-    return new RegistryWrapperMap(muleContext.getRegistry());
-  }
-
-  private static class RegistryWrapperMap extends AbstractMapContext<Object> {
-
-    private MuleRegistry registry;
-
-    public RegistryWrapperMap(MuleRegistry registry) {
-      this.registry = registry;
+    public AppContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException();
+    public String getName()
+    {
+        return muleContext.getConfiguration().getId();
     }
 
-    @Override
-    public boolean containsKey(Object key) {
-      return get(key) != null;
+    public String getWorkDir()
+    {
+        return muleContext.getConfiguration().getWorkingDirectory();
     }
 
-    @Override
-    public Object doGet(String key) {
-      return registry.get(key);
+    public String getEncoding()
+    {
+        return muleContext.getConfiguration().getDefaultEncoding();
     }
 
-    @Override
-    public void doPut(String key, Object value) {
-      try {
-        registry.registerObject(key, value);
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
+    public boolean isStandalone()
+    {
+        return muleContext.getConfiguration().isStandalone();
     }
 
-    @Override
-    public void doRemove(String key) {
-      Object value = registry.lookupObject(key);
-      if (value != null) {
-        try {
-          registry.unregisterObject(key);
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
+    public Map<String, Object> getRegistry()
+    {
+        return new RegistryWrapperMap(muleContext.getRegistry());
+    }
+
+    private static class RegistryWrapperMap extends AbstractMapContext<Object>
+    {
+        private MuleRegistry registry;
+
+        public RegistryWrapperMap(MuleRegistry registry)
+        {
+            this.registry = registry;
         }
-      }
-    }
 
-    @Override
-    public boolean isEmpty() {
-      return false;
-    }
+        @Override
+        public void clear()
+        {
+            throw new UnsupportedOperationException();
+        }
 
-    @Override
-    public Set<String> keySet() {
-      throw new UnsupportedOperationException();
-    }
+        @Override
+        public boolean containsKey(Object key)
+        {
+            return get(key) != null;
+        }
 
-    @Override
-    public int size() {
-      throw new UnsupportedOperationException();
-    }
+        @Override
+        public Object doGet(String key)
+        {
+            return registry.get(key);
+        }
 
-  }
+        @Override
+        public void doPut(String key, Object value)
+        {
+            try
+            {
+                registry.registerObject(key, value);
+            }
+            catch (RegistrationException e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
+
+        @Override
+        public void doRemove(String key)
+        {
+            Object value = registry.lookupObject(key);
+            if (value != null)
+            {
+                try
+                {
+                    registry.unregisterObject(key);
+                }
+                catch (RegistrationException e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+            }
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return false;
+        }
+
+        @Override
+        public Set<String> keySet()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int size()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+    }
 
 }

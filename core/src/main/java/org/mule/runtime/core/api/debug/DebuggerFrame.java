@@ -16,39 +16,42 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
  *
  * @since 3.8.0
  */
-public class DebuggerFrame {
+public class DebuggerFrame
+{
+    private List<FieldDebugInfo<?>> variables;
+    private String name;
 
-  private List<FieldDebugInfo<?>> variables;
-  private String name;
+    /**
+     * A new debugger frame with the list of variables and a given name for this frame.
+     *
+     * @param variables The list of visible variables in this frame. Non null
+     * @param name A name of the frame. Non empty
+     */
+    public DebuggerFrame(List<FieldDebugInfo<?>> variables, String name)
+    {
+        checkArgument(variables != null, "Variables cannot be null.");
+        checkArgument(!isEmpty(name), "Name cannot be empty.");
+        this.variables = variables;
+        this.name = name;
+    }
 
-  /**
-   * A new debugger frame with the list of variables and a given name for this frame.
-   *
-   * @param variables The list of visible variables in this frame. Non null
-   * @param name A name of the frame. Non empty
-   */
-  public DebuggerFrame(List<FieldDebugInfo<?>> variables, String name) {
-    checkArgument(variables != null, "Variables cannot be null.");
-    checkArgument(!isEmpty(name), "Name cannot be empty.");
-    this.variables = variables;
-    this.name = name;
-  }
+    /**
+     * Returns the list of variables active in this frame
+     *
+     * @return The list of variables
+     */
+    public List<FieldDebugInfo<?>> getVariables()
+    {
+        return variables;
+    }
 
-  /**
-   * Returns the list of variables active in this frame
-   *
-   * @return The list of variables
-   */
-  public List<FieldDebugInfo<?>> getVariables() {
-    return variables;
-  }
-
-  /**
-   * The name of the frame
-   *
-   * @return The name
-   */
-  public String getName() {
-    return name;
-  }
+    /**
+     * The name of the frame
+     *
+     * @return The name
+     */
+    public String getName()
+    {
+        return name;
+    }
 }

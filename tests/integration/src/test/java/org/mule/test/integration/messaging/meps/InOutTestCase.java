@@ -21,31 +21,33 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InOutTestCase extends AbstractIntegrationTestCase {
+public class InOutTestCase extends AbstractIntegrationTestCase
+{
+    public static final long TIMEOUT = 3000;
 
-  public static final long TIMEOUT = 3000;
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort httpPort = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/messaging/meps/pattern_In-Out-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/messaging/meps/pattern_In-Out-flow.xml";
-  }
+    @Test
+    public void testExchange() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testExchange() throws Exception {
-    MuleClient client = muleContext.getClient();
+        String listenerUrl = format("http://localhost:%s/", httpPort.getNumber());
+        MuleMessage result = client.send(listenerUrl, "some data", null);
+        assertNotNull(result);
+        assertEquals("foo header not received", getPayloadAsString(result));
 
-    String listenerUrl = format("http://localhost:%s/", httpPort.getNumber());
-    MuleMessage result = client.send(listenerUrl, "some data", null);
-    assertNotNull(result);
-    assertEquals("foo header not received", getPayloadAsString(result));
-
-    Map<String, Serializable> props = new HashMap<>();
-    props.put("foo", "bar");
-    result = client.send(listenerUrl, "some data", props);
-    assertNotNull(result);
-    assertEquals("foo header received", getPayloadAsString(result));
-  }
+        Map<String, Serializable> props = new HashMap<>();
+        props.put("foo", "bar");
+        result = client.send(listenerUrl, "some data", props);
+        assertNotNull(result);
+        assertEquals("foo header received", getPayloadAsString(result));
+    }
 }

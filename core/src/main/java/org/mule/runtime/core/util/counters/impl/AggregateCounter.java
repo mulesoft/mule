@@ -9,47 +9,54 @@ package org.mule.runtime.core.util.counters.impl;
 import org.mule.runtime.core.util.counters.Counter;
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public abstract class AggregateCounter extends AbstractCounter {
+public abstract class AggregateCounter extends AbstractCounter
+{
+    private final Counter base;
 
-  private final Counter base;
+    public AggregateCounter(String name, Type type, AbstractCounter base)
+    {
+        super(name, type);
+        this.base = base;
+        base.addAggregate(this);
+    }
 
-  public AggregateCounter(String name, Type type, AbstractCounter base) {
-    super(name, type);
-    this.base = base;
-    base.addAggregate(this);
-  }
+    @Override
+    public double increment()
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public double increment() {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public double incrementBy(double value)
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public double incrementBy(double value) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public double decrement()
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public double decrement() {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void setRawValue(double value)
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public void setRawValue(double value) {
-    throw new UnsupportedOperationException();
-  }
+    public final synchronized void compute()
+    {
+        this.doCompute();
+        this.propagate();
+    }
 
-  public final synchronized void compute() {
-    this.doCompute();
-    this.propagate();
-  }
+    public Counter getBase()
+    {
+        return this.base;
+    }
 
-  public Counter getBase() {
-    return this.base;
-  }
+    @Override
+    public abstract double nextValue();
 
-  @Override
-  public abstract double nextValue();
-
-  public abstract void doCompute();
+    public abstract void doCompute();
 }

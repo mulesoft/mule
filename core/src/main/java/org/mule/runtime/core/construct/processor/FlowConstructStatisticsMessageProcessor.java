@@ -13,28 +13,35 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class FlowConstructStatisticsMessageProcessor implements MessageProcessor, FlowConstructAware {
+public class FlowConstructStatisticsMessageProcessor implements MessageProcessor, FlowConstructAware
+{
+    protected FlowConstruct flowConstruct;
 
-  protected FlowConstruct flowConstruct;
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        if (flowConstruct.getStatistics().isEnabled())
+        {
+            if (event.getExchangePattern().hasResponse())
+            {
+                flowConstruct.getStatistics().incReceivedEventSync();
+            }
+            else
+            {
+                flowConstruct.getStatistics().incReceivedEventASync();
+            }
+        }
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    if (flowConstruct.getStatistics().isEnabled()) {
-      if (event.getExchangePattern().hasResponse()) {
-        flowConstruct.getStatistics().incReceivedEventSync();
-      } else {
-        flowConstruct.getStatistics().incReceivedEventASync();
-      }
+        return event;
     }
 
-    return event;
-  }
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
 
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
-
-  @Override
-  public String toString() {
-    return ObjectUtils.toString(this);
-  }
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

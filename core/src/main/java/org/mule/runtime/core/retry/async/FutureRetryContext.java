@@ -17,76 +17,92 @@ import org.mule.runtime.core.api.retry.RetryContext;
  * executed in a separate thread via the {@link AsynchronousRetryTemplate}. A FutureRetryContext is a proxy to a real
  * {@link RetryContext} and provides access to the real context once it becomes available.
  */
-public class FutureRetryContext implements RetryContext {
+public class FutureRetryContext implements RetryContext
+{
+    private RetryContext delegate;
 
-  private RetryContext delegate;
-
-  void setDelegateContext(RetryContext context) {
-    this.delegate = context;
-  }
-
-  public boolean isReady() {
-    return delegate != null;
-  }
-
-  protected void checkState() {
-    if (!isReady()) {
-      throw new IllegalStateException("Cannot perform operations on a FutureRetryContext until isReady() returns true");
+    void setDelegateContext(RetryContext context)
+    {
+        this.delegate = context;
     }
-  }
 
-  public void addReturnMessage(MuleMessage result) {
-    checkState();
-    delegate.addReturnMessage(result);
-  }
+    public boolean isReady()
+    {
+        return delegate != null;
+    }
 
-  public String getDescription() {
-    checkState();
-    return delegate.getDescription();
-  }
+    protected void checkState()
+    {
+        if (!isReady())
+        {
+            throw new IllegalStateException(
+                "Cannot perform operations on a FutureRetryContext until isReady() returns true");
+        }
+    }
 
-  public MuleMessage getFirstReturnMessage() {
-    checkState();
-    return delegate.getFirstReturnMessage();
-  }
+    public void addReturnMessage(MuleMessage result)
+    {
+        checkState();
+        delegate.addReturnMessage(result);
+    }
 
-  public Map<Object, Object> getMetaInfo() {
-    checkState();
-    return delegate.getMetaInfo();
-  }
+    public String getDescription()
+    {
+        checkState();
+        return delegate.getDescription();
+    }
 
-  public MuleMessage[] getReturnMessages() {
-    checkState();
-    return delegate.getReturnMessages();
-  }
+    public MuleMessage getFirstReturnMessage()
+    {
+        checkState();
+        return delegate.getFirstReturnMessage();
+    }
 
-  public void setReturnMessages(MuleMessage[] returnMessages) {
-    checkState();
-    delegate.setReturnMessages(returnMessages);
-  }
+    public Map<Object, Object> getMetaInfo()
+    {
+        checkState();
+        return delegate.getMetaInfo();
+    }
 
-  public Throwable getLastFailure() {
-    checkState();
-    return delegate.getLastFailure();
-  }
+    public MuleMessage[] getReturnMessages()
+    {
+        checkState();
+        return delegate.getReturnMessages();
+    }
 
-  public void setOk() {
-    checkState();
-    delegate.setOk();
-  }
+    public void setReturnMessages(MuleMessage[] returnMessages)
+    {
+        checkState();
+        delegate.setReturnMessages(returnMessages);
+    }
 
-  public void setFailed(Throwable lastFailure) {
-    checkState();
-    delegate.setFailed(lastFailure);
-  }
+    public Throwable getLastFailure()
+    {
+        checkState();
+        return delegate.getLastFailure();
+    }
 
-  public boolean isOk() {
-    checkState();
-    return delegate.isOk();
-  }
+    public void setOk()
+    {
+        checkState();
+        delegate.setOk();
+    }
 
-  public MuleContext getMuleContext() {
-    checkState();
-    return delegate.getMuleContext();
-  }
+    public void setFailed(Throwable lastFailure)
+    {
+        checkState();
+        delegate.setFailed(lastFailure);
+    }
+
+    public boolean isOk()
+    {
+        checkState();
+        return delegate.isOk();
+    }
+
+    public MuleContext getMuleContext()
+    {
+        checkState();
+        return delegate.getMuleContext();
+    }
 }

@@ -19,51 +19,64 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Script service backed by a JSR-223 compliant script engine such as Groovy, JavaScript, or Rhino.
+ * A Script service backed by a JSR-223 compliant script engine such as
+ * Groovy, JavaScript, or Rhino.
  */
-public class ScriptComponent extends AbstractComponent {
+public class ScriptComponent extends AbstractComponent
+{
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ScriptComponent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptComponent.class);
 
-  private Scriptable script;
+    private Scriptable script;
 
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(script, muleContext);
-    super.doInitialise();
-  }
-
-  @Override
-  protected void doDispose() {
-    LifecycleUtils.disposeIfNeeded(script, LOGGER);
-  }
-
-  @Override
-  protected Object doInvoke(MuleEvent event) throws Exception {
-    // Set up initial script variables.
-    Bindings bindings = script.getScriptEngine().createBindings();
-    putBindings(bindings);
-    script.populateBindings(bindings, event);
-    try {
-      return script.runScript(bindings);
-    } catch (Exception e) {
-      // leave this catch block in place to help debug classloading issues
-      throw e;
-    } finally {
-      event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
-      bindings.clear();
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
+        super.doInitialise();
     }
-  }
 
-  protected void putBindings(Bindings bindings) {
-    // template method
-  }
+    @Override
+    protected void doDispose()
+    {
+        LifecycleUtils.disposeIfNeeded(script, LOGGER);
+    }
 
-  public Scriptable getScript() {
-    return script;
-  }
+    @Override
+    protected Object doInvoke(MuleEvent event) throws Exception
+    {
+        // Set up initial script variables.
+        Bindings bindings = script.getScriptEngine().createBindings();
+        putBindings(bindings);
+        script.populateBindings(bindings, event);
+        try
+        {
+            return script.runScript(bindings);
+        }
+        catch (Exception e)
+        {
+            // leave this catch block in place to help debug classloading issues
+            throw e;
+        }
+        finally
+        {
+            event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
+            bindings.clear();
+        }
+    }
 
-  public void setScript(Scriptable script) {
-    this.script = script;
-  }
+    protected void putBindings(Bindings bindings)
+    {
+        // template method
+    }
+
+    public Scriptable getScript()
+    {
+        return script;
+    }
+
+    public void setScript(Scriptable script)
+    {
+        this.script = script;
+    }
 }

@@ -17,40 +17,49 @@ import org.mule.runtime.core.routing.IdentifiableDynamicRouteResolver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver {
+public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver
+{
 
-  private final String ID_EXPRESSION = "#[flowVars['id']]";
+    private final String ID_EXPRESSION = "#[flowVars['id']]";
 
-  static List<MessageProcessor> routes = new ArrayList<>();
+    static List<MessageProcessor> routes = new ArrayList<>();
 
-  @Override
-  public List<MessageProcessor> resolveRoutes(MuleEvent event) {
-    return routes;
-  }
-
-  @Override
-  public String getRouteIdentifier(MuleEvent event) throws MessagingException {
-    return event.getMuleContext().getExpressionManager().parse(ID_EXPRESSION, event);
-  }
-
-  public static class AddLetterMessageProcessor implements MessageProcessor {
-
-    private String letter;
-
-    public AddLetterMessageProcessor(String letter) {
-      this.letter = letter;
+    @Override
+    public List<MessageProcessor> resolveRoutes(MuleEvent event)
+    {
+        return routes;
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
-        return event;
-      } catch (Exception e) {
-        throw new DefaultMuleException(e);
-      }
+    public String getRouteIdentifier(MuleEvent event) throws MessagingException
+    {
+        return event.getMuleContext().getExpressionManager().parse(ID_EXPRESSION, event);
     }
 
-  }
+    public static class AddLetterMessageProcessor implements MessageProcessor
+    {
+
+        private String letter;
+
+        public AddLetterMessageProcessor(String letter)
+        {
+            this.letter = letter;
+        }
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            try
+            {
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
+                return event;
+            }
+            catch (Exception e)
+            {
+                throw new DefaultMuleException(e);
+            }
+        }
+
+    }
 
 }

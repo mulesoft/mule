@@ -23,77 +23,95 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for providers not
- * implementing the {@code JMSXDeliveryCount} property support.
+ * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for
+ * providers not implementing the {@code JMSXDeliveryCount} property support.
  */
-public class CountingRedeliveryHandler extends AbstractRedeliveryHandler {
+public class CountingRedeliveryHandler extends AbstractRedeliveryHandler
+{
+    /**
+     * logger used by this class
+     */
+    protected static final Logger logger = LoggerFactory.getLogger(CountingRedeliveryHandler.class);
 
-  /**
-   * logger used by this class
-   */
-  protected static final Logger logger = LoggerFactory.getLogger(CountingRedeliveryHandler.class);
+    private Map<String, Integer> messages = null;
 
-  private Map<String, Integer> messages = null;
-
-  @SuppressWarnings("unchecked")
-  public CountingRedeliveryHandler() {
-    super();
-    messages = Collections.synchronizedMap(new LRUMap(256));
-  }
-
-  /**
-   * process the redelivered message. If the Jms receiver should process the message, it should be returned. Otherwise the
-   * connector should throw a <code>EndpointMessageRedeliveredException</code> to indicate that the message should be handled by
-   * the connector Exception Handler.
-   * 
-   */
-  @Override
-  public void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException {
-    final int connectorRedelivery = connector.getMaxRedelivery();
-    if (connectorRedelivery == JmsConnector.REDELIVERY_IGNORE || connectorRedelivery < 0) // just in case, for manual setting)
+    @SuppressWarnings("unchecked")
+    public CountingRedeliveryHandler()
     {
-      if (logger.isDebugEnabled()) {
-        logger.debug("We were asked to ignore the redelivery count, nothing to do here.");
-      }
-      return;
+        super();
+        messages = Collections.synchronizedMap(new LRUMap(256));
     }
 
-    String id = message.getJMSMessageID();
+    /**
+     * process the redelivered message. If the Jms receiver should process the
+     * message, it should be returned. Otherwise the connector should throw a
+     * <code>EndpointMessageRedeliveredException</code> to indicate that the message should
+     * be handled by the connector Exception Handler.
+     * 
+     */
+    @Override
+    public void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException
+    {
+        final int connectorRedelivery = connector.getMaxRedelivery();
+        if (connectorRedelivery == JmsConnector.REDELIVERY_IGNORE || connectorRedelivery < 0 ) // just in case, for manual setting)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("We were asked to ignore the redelivery count, nothing to do here.");
+            }
+            return;
+        }
 
-    if (id == null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Message doesn't have a JMSMessageID set, Mule can't handle redelivery for it. " + message);
-      }
-      return;
+        String id = message.getJMSMessageID();
+
+        if (id == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message doesn't have a JMSMessageID set, Mule can't handle redelivery for it. " + message);
+            }
+            return;
+        }
+
+        Integer redeliveryCount = messages.remove(id);
+        if (redeliveryCount != null)
+        {
+            redeliveryCount += 1; // inc the count
+        }
+
+        if (redeliveryCount == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message with id: " + id + " has been redelivered for the first time");
+            }
+            messages.put(id, 1);
+        }
+        else if (redeliveryCount == 1)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message with id: " + id + " has been redelivered for the first time");
+            }
+
+            if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
+            {
+                MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+                throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
+            }
+        }
+        else if (redeliveryCount > connectorRedelivery)
+        {
+            MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+            throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
+        }
+        else
+        {
+            messages.put(id, redeliveryCount);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message with id: " + id + " has been redelivered " + redeliveryCount + " times");
+            }
+        }
     }
-
-    Integer redeliveryCount = messages.remove(id);
-    if (redeliveryCount != null) {
-      redeliveryCount += 1; // inc the count
-    }
-
-    if (redeliveryCount == null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Message with id: " + id + " has been redelivered for the first time");
-      }
-      messages.put(id, 1);
-    } else if (redeliveryCount == 1) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Message with id: " + id + " has been redelivered for the first time");
-      }
-
-      if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST) {
-        MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
-        throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
-      }
-    } else if (redeliveryCount > connectorRedelivery) {
-      MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
-      throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
-    } else {
-      messages.put(id, redeliveryCount);
-      if (logger.isDebugEnabled()) {
-        logger.debug("Message with id: " + id + " has been redelivered " + redeliveryCount + " times");
-      }
-    }
-  }
 }

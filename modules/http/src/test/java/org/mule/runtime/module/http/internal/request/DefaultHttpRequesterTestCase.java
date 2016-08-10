@@ -15,51 +15,56 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class DefaultHttpRequesterTestCase extends AbstractMuleContextTestCase {
+public class DefaultHttpRequesterTestCase extends AbstractMuleContextTestCase
+{
+    private static final String TEST_HOST = "TEST_HOST";
+    private static final String TEST_PORT = "TEST_PORT";
 
-  private static final String TEST_HOST = "TEST_HOST";
-  private static final String TEST_PORT = "TEST_PORT";
+    private DefaultHttpRequester requester = new DefaultHttpRequester();
+    private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
 
-  private DefaultHttpRequester requester = new DefaultHttpRequester();
-  private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
+    @Before
+    public void setup()
+    {
+        requester.setMuleContext(muleContext);
+        config.setMuleContext(muleContext);
+        requester.setConfig(config);
+        requester.setPath("/");
+    }
 
-  @Before
-  public void setup() {
-    requester.setMuleContext(muleContext);
-    config.setMuleContext(muleContext);
-    requester.setConfig(config);
-    requester.setPath("/");
-  }
+    @Test
+    public void initializesWithHostAndPortInRequesterConfig() throws InitialisationException
+    {
+        config.setHost(TEST_HOST);
+        config.setPort(TEST_PORT);
+        requester.initialise();
+        assertThat(requester.getHost(), equalTo(TEST_HOST));
+        assertThat(requester.getPort(), equalTo(TEST_PORT));
+    }
 
-  @Test
-  public void initializesWithHostAndPortInRequesterConfig() throws InitialisationException {
-    config.setHost(TEST_HOST);
-    config.setPort(TEST_PORT);
-    requester.initialise();
-    assertThat(requester.getHost(), equalTo(TEST_HOST));
-    assertThat(requester.getPort(), equalTo(TEST_PORT));
-  }
+    @Test
+    public void initializesWithHostAndPortInRequester() throws InitialisationException
+    {
+        requester.setHost(TEST_HOST);
+        requester.setPort(TEST_PORT);
+        requester.initialise();
+        assertThat(requester.getHost(), equalTo(TEST_HOST));
+        assertThat(requester.getPort(), equalTo(TEST_PORT));
+    }
 
-  @Test
-  public void initializesWithHostAndPortInRequester() throws InitialisationException {
-    requester.setHost(TEST_HOST);
-    requester.setPort(TEST_PORT);
-    requester.initialise();
-    assertThat(requester.getHost(), equalTo(TEST_HOST));
-    assertThat(requester.getPort(), equalTo(TEST_PORT));
-  }
+    @Test(expected = InitialisationException.class)
+    public void failsToInitialiseWithoutHost() throws InitialisationException
+    {
+        config.setHost(null);
+        config.setPort(TEST_PORT);
+        requester.initialise();
+    }
 
-  @Test(expected = InitialisationException.class)
-  public void failsToInitialiseWithoutHost() throws InitialisationException {
-    config.setHost(null);
-    config.setPort(TEST_PORT);
-    requester.initialise();
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void failsToInitializeWithoutPort() throws InitialisationException {
-    config.setHost(TEST_HOST);
-    config.setPort(null);
-    requester.initialise();
-  }
+    @Test(expected = InitialisationException.class)
+    public void failsToInitializeWithoutPort() throws InitialisationException
+    {
+        config.setHost(TEST_HOST);
+        config.setPort(null);
+        requester.initialise();
+    }
 }

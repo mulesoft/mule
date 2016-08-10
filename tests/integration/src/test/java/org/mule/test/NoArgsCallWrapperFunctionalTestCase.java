@@ -18,33 +18,36 @@ import org.junit.Test;
 /**
  * This test has been re-written to use entry point resolvers.
  */
-public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTestCase {
+public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTestCase
+{
+    private static final int RECEIVE_TIMEOUT = 5000;
 
-  private static final int RECEIVE_TIMEOUT = 5000;
+    @Override
+    protected String getConfigFile()
+    {
+        return "no-args-call-wrapper-config-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "no-args-call-wrapper-config-flow.xml";
-  }
+    @Test
+    public void testNoArgsCallWrapper() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT);
+        assertNotNull(reply);
+        assertNull(reply.getExceptionPayload());
+        assertThat(reply.getPayload(), is("Just an apple."));
+    }
 
-  @Test
-  public void testNoArgsCallWrapper() throws Exception {
-    MuleClient client = muleContext.getClient();
-    flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
-    MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT);
-    assertNotNull(reply);
-    assertNull(reply.getExceptionPayload());
-    assertThat(reply.getPayload(), is("Just an apple."));
-  }
-
-  @Test
-  public void testWithInjectedDelegate() throws Exception {
-    MuleClient client = muleContext.getClient();
-    flowRunner("WrapperUMOInjected").withPayload("test").asynchronously().run();
-    MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT);
-    assertNotNull(reply);
-    assertNull(reply.getExceptionPayload());
-    // same as original input
-    assertThat(reply.getPayload(), is("test"));
-  }
+    @Test
+    public void testWithInjectedDelegate() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        flowRunner("WrapperUMOInjected").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT);
+        assertNotNull(reply);
+        assertNull(reply.getExceptionPayload());
+        // same as original input
+        assertThat(reply.getPayload(), is("test"));
+    }
 }

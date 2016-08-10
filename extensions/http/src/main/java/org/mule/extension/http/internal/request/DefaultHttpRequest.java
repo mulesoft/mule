@@ -22,78 +22,92 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
+public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
+{
 
-  private final String uri;
-  private final String path;
-  private final String method;
-  private HttpProtocol version;
-  private ParameterMap headers;
-  private ParameterMap queryParams;
-  private HttpEntity entity;
+    private final String uri;
+    private final String path;
+    private final String method;
+    private HttpProtocol version;
+    private ParameterMap headers;
+    private ParameterMap queryParams;
+    private HttpEntity entity;
 
-  DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity) {
-    this.uri = uri;
-    this.path = path;
-    this.method = method;
-    this.headers = headers;
-    this.queryParams = queryParams;
-    this.entity = entity;
-  }
-
-  @Override
-  public HttpProtocol getProtocol() {
-    return this.version;
-  }
-
-  @Override
-  public String getPath() {
-    return path;
-  }
-
-  @Override
-  public String getMethod() {
-    return method;
-  }
-
-
-  @Override
-  public Collection<String> getHeaderNames() {
-    if (headers == null) {
-      return new ArrayList<>();
+    DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity)
+    {
+        this.uri = uri;
+        this.path = path;
+        this.method = method;
+        this.headers = headers;
+        this.queryParams = queryParams;
+        this.entity = entity;
     }
-    return headers.keySet();
-  }
 
-  @Override
-  public String getHeaderValue(String headerName) {
-    if (headers == null) {
-      return null;
+    @Override
+    public HttpProtocol getProtocol()
+    {
+        return this.version;
     }
-    return headers.get(headerName);
-  }
 
-  @Override
-  public Collection<String> getHeaderValues(String headerName) {
-    return headers.getAll(headerName);
-  }
+    @Override
+    public String getPath()
+    {
+        return path;
+    }
 
-  @Override
-  public HttpEntity getEntity() {
-    return entity;
-  }
+    @Override
+    public String getMethod()
+    {
+        return method;
+    }
 
-  @Override
-  public String getUri() {
-    return uri;
-  }
 
-  public Map<String, String> getQueryParams() {
-    return queryParams;
-  }
+    @Override
+    public Collection<String> getHeaderNames()
+    {
+        if (headers == null)
+        {
+            return new ArrayList<>();
+        }
+        return headers.keySet();
+    }
 
-  @Override
-  public InputStreamHttpEntity getInputStreamEntity() {
-    return null;
-  }
+    @Override
+    public String getHeaderValue(String headerName)
+    {
+        if (headers == null)
+        {
+            return null;
+        }
+        return headers.get(headerName);
+    }
+
+    @Override
+    public Collection<String> getHeaderValues(String headerName)
+    {
+        return headers.getAll(headerName);
+    }
+
+    @Override
+    public HttpEntity getEntity()
+    {
+        return entity;
+    }
+
+    @Override
+    public String getUri()
+    {
+        return uri;
+    }
+
+    public Map<String, String> getQueryParams()
+    {
+        return queryParams;
+    }
+
+    @Override
+    public InputStreamHttpEntity getInputStreamEntity()
+    {
+        return null;
+    }
 }

@@ -16,20 +16,22 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase {
+public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
+    @Override
+    protected String getConfigFile()
+    {
+        return "empty-management-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "empty-management-config.xml";
-  }
-
-  @Test(expected = ConnectException.class)
-  public void testDefaultJmxAgent() throws Exception {
-    FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
-    Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
-    socket.close();
-  }
+    @Test(expected = ConnectException.class)
+    public void testDefaultJmxAgent() throws Exception
+    {
+        FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
+        Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
+        socket.close();
+    }
 }

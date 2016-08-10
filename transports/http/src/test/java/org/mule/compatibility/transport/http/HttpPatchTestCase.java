@@ -18,29 +18,31 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPatchTestCase extends FunctionalTestCase {
+public class HttpPatchTestCase extends FunctionalTestCase
+{
+    private static final String REQUEST = "{ \"name\" : \"alan\" }";
 
-  private static final String REQUEST = "{ \"name\" : \"alan\" }";
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
+    @Override
+    protected String getConfigFile()
+    {
+        return "mule-http-patch.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "mule-http-patch.xml";
-  }
+    @Test
+    public void patchBodyShouldBeEchoed() throws Exception
+    {
+        String url = String.format("http://localhost:%d/httpPatch", port.getNumber());
+        PatchMethod patch = new PatchMethod(url);
 
-  @Test
-  public void patchBodyShouldBeEchoed() throws Exception {
-    String url = String.format("http://localhost:%d/httpPatch", port.getNumber());
-    PatchMethod patch = new PatchMethod(url);
+        RequestEntity requestEntity = new StringRequestEntity(REQUEST, "text/plain", "UTF-8");
+        patch.setRequestEntity(requestEntity);
 
-    RequestEntity requestEntity = new StringRequestEntity(REQUEST, "text/plain", "UTF-8");
-    patch.setRequestEntity(requestEntity);
+        new HttpClient().executeMethod(patch);
 
-    new HttpClient().executeMethod(patch);
-
-    String response = patch.getResponseBodyAsString();
-    assertEquals(REQUEST, response);
-  }
+        String response = patch.getResponseBodyAsString();
+        assertEquals(REQUEST, response);
+    }
 }

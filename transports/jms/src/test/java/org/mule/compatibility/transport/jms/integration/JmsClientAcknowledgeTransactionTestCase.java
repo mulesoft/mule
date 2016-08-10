@@ -20,48 +20,54 @@ import org.junit.Test;
 /**
  * Test jms using JmsClientAcknowledgeTransactionFactory
  */
-public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "integration/jms-client-acknowledge-tx.xml";
-  }
-
-  @Test
-  @Ignore("MULE-6926: flaky test")
-  public void testJmsClientAcknowledgeTransaction() throws Exception {
-    send(scenarioAcknowledge);
-    receive(scenarioWithoutAcknowledge);
-    receive(scenarioAcknowledge);
-    receive(scenarioNotReceive);
-  }
-
-  Scenario scenarioAcknowledge = new NonTransactedScenario() {
-
+public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
+{
     @Override
-    public int getAcknowledge() {
-      return Session.CLIENT_ACKNOWLEDGE;
+    protected String getConfigFile()
+    {
+        return "integration/jms-client-acknowledge-tx.xml";
     }
 
-    @Override
-    public void send(Session session, MessageProducer producer) throws JMSException {
-      producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
+    @Test
+    @Ignore("MULE-6926: flaky test")
+    public void testJmsClientAcknowledgeTransaction() throws Exception
+    {
+        send(scenarioAcknowledge);
+        receive(scenarioWithoutAcknowledge);
+        receive(scenarioAcknowledge);
+        receive(scenarioNotReceive);
     }
 
-    @Override
-    public Message receive(Session session, MessageConsumer consumer) throws JMSException {
-      Message message = consumer.receive(getTimeout());
-      assertNotNull(message);
-      message.acknowledge();
-      return message;
-    }
-  };
+    Scenario scenarioAcknowledge = new NonTransactedScenario()
+    {
+        @Override
+        public int getAcknowledge()
+        {
+            return Session.CLIENT_ACKNOWLEDGE;
+        }
 
-  Scenario scenarioWithoutAcknowledge = new NonTransactedScenario() {
+        @Override
+        public void send(Session session, MessageProducer producer) throws JMSException
+        {
+            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
+        }
 
-    @Override
-    public int getAcknowledge() {
-      return Session.CLIENT_ACKNOWLEDGE;
-    }
-  };
+        @Override
+        public Message receive(Session session, MessageConsumer consumer) throws JMSException
+        {
+            Message message = consumer.receive(getTimeout());
+            assertNotNull(message);
+            message.acknowledge();
+            return message;
+        }
+    };
+
+    Scenario scenarioWithoutAcknowledge = new NonTransactedScenario()
+    {
+        @Override
+        public int getAcknowledge()
+        {
+            return Session.CLIENT_ACKNOWLEDGE;
+        }
+    };
 }

@@ -21,8 +21,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
- * Allows for parsing either a shortcut component configuration by delegating to two different component parses depending on the
- * existence of the class attribute. If the class attribute is used then an embedded object factory element cannot be used.
+ * Allows for parsing either a shortcut component configuration by delegating to two
+ * different component parses depending on the existence of the class attribute. If
+ * the class attribute is used then an embedded object factory element cannot be
+ * used.
  * 
  * <pre>
  * &lt;component class=&quot;&quot;&gt;
@@ -36,69 +38,87 @@ import org.w3c.dom.Node;
  * &lt;/component&gt;
  * </pre>
  */
-public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegatingDefinitionParser {
+public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegatingDefinitionParser
+{
 
-  private MuleDefinitionParser normalConfig;
-  private MuleDefinitionParser shortcutConfig;
+    private MuleDefinitionParser normalConfig;
+    private MuleDefinitionParser shortcutConfig;
 
-  public ComponentDelegatingDefinitionParser(Class clazz) {
-    normalConfig = new ComponentDefinitionParser(clazz);
-    shortcutConfig = new ShortcutComponentDefinitionParser(clazz);
-    addDelegate(normalConfig);
-    addDelegate(shortcutConfig);
-    registerPreProcessor(new CheckExclusiveClassAttributeObjectFactory());
-  }
-
-  @Override
-  protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext) {
-    if (StringUtils.isEmpty(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS))) {
-      return normalConfig;
-    } else {
-      return shortcutConfig;
+    public ComponentDelegatingDefinitionParser(Class clazz)
+    {
+        normalConfig = new ComponentDefinitionParser(clazz);
+        shortcutConfig = new ShortcutComponentDefinitionParser(clazz);
+        addDelegate(normalConfig);
+        addDelegate(shortcutConfig);
+        registerPreProcessor(new CheckExclusiveClassAttributeObjectFactory());
     }
-  }
-
-  /**
-   * Given that the service object-factory is extensible and new object factory types can be implemented and used by substitution,
-   * the only way of checking for the existence of an object-factory if by object factory element convention.<br>
-   * This pre-processor checks for the existence of a <i>"class"</i> attribute on the service, and throws an exception if the
-   * service has any elements that match the object factory element convention (i.e. that end in "object"). NOTE: We used to test
-   * by exclusion here allowing all other elements, but that no longer works now extensible interceptors elements can be used.
-   */
-  class CheckExclusiveClassAttributeObjectFactory implements PreProcessor {
-
-    private static final String OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX = "object";
 
     @Override
-    public void preProcess(PropertyConfiguration config, Element element) {
-      NamedNodeMap attributes = element.getAttributes();
-      for (int i = 0; i < attributes.getLength(); i++) {
-        String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-        if (alias.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)) {
-          for (int j = 0; j < element.getChildNodes().getLength(); j++) {
-            Node child = element.getChildNodes().item(j);
-            if (child instanceof Element && child.getLocalName().endsWith(OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX)) {
-              StringBuilder message = new StringBuilder("The child element '");
-              message.append(child.getLocalName());
-              message.append("' cannot appear with the 'class' attribute");
-              message.append(" in element ");
-              message.append(SpringXMLUtils.elementToString(element));
-              message.append(".");
-              throw new CheckExclusiveClassAttributeObjectFactoryException(message.toString());
-            }
-          }
+    protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
+    {
+        if (StringUtils.isEmpty(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)))
+        {
+            return normalConfig;
         }
-      }
+        else
+        {
+            return shortcutConfig;
+        }
     }
-  }
 
-  public class CheckExclusiveClassAttributeObjectFactoryException extends IllegalStateException {
+    /**
+     * Given that the service object-factory is extensible and new object factory
+     * types can be implemented and used by substitution, the only way of checking
+     * for the existence of an object-factory if by object factory element
+     * convention.<br>
+     * This pre-processor checks for the existence of a <i>"class"</i> attribute on
+     * the service, and throws an exception if the service has any elements that
+     * match the object factory element convention (i.e. that end in "object"). NOTE:
+     * We used to test by exclusion here allowing all other elements, but that no
+     * longer works now extensible interceptors elements can be used.
+     */
+    class CheckExclusiveClassAttributeObjectFactory implements PreProcessor
+    {
 
-    private static final long serialVersionUID = 4625276914151932111L;
+        private static final String OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX = "object";
 
-    CheckExclusiveClassAttributeObjectFactoryException(String message) {
-      super(message);
+        @Override
+        public void preProcess(PropertyConfiguration config, Element element)
+        {
+            NamedNodeMap attributes = element.getAttributes();
+            for (int i = 0; i < attributes.getLength(); i++)
+            {
+                String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+                if (alias.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS))
+                {
+                    for (int j = 0; j < element.getChildNodes().getLength(); j++)
+                    {
+                        Node child = element.getChildNodes().item(j);
+                        if (child instanceof Element
+                            && child.getLocalName().endsWith(OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX))
+                        {
+                            StringBuilder message = new StringBuilder("The child element '");
+                            message.append(child.getLocalName());
+                            message.append("' cannot appear with the 'class' attribute");
+                            message.append(" in element ");
+                            message.append(SpringXMLUtils.elementToString(element));
+                            message.append(".");
+                            throw new CheckExclusiveClassAttributeObjectFactoryException(message.toString());
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
+
+    public class CheckExclusiveClassAttributeObjectFactoryException extends IllegalStateException
+    {
+        private static final long serialVersionUID = 4625276914151932111L;
+
+        CheckExclusiveClassAttributeObjectFactoryException(String message)
+        {
+            super(message);
+        }
+    }
 
 }

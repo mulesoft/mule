@@ -22,116 +22,145 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * A Simple object store that stores String objects by key to a text file. This store is only suitable for storing simple key
- * value pair strings. This store is backed by an in-memory store and supports the ability to expire and apply TTL to objects in
- * the store.
+ * A Simple object store that stores String objects by key to a text file. This store
+ * is only suitable for storing simple key value pair strings. This store is backed
+ * by an in-memory store and supports the ability to expire and apply TTL to objects
+ * in the store.
  */
-public class TextFileObjectStore extends InMemoryObjectStore<String> {
+public class TextFileObjectStore extends InMemoryObjectStore<String>
+{
+    protected File fileStore;
+    protected String directory;
+    protected String encoding;
 
-  protected File fileStore;
-  protected String directory;
-  protected String encoding;
-
-  private FileOutputStream output;
+    private FileOutputStream output;
 
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean isPersistent() {
-    return true;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-    if (encoding == null) {
-      encoding = context.getConfiguration().getDefaultEncoding();
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPersistent()
+    {
+        return true;
     }
 
-    if (directory == null) {
-      directory = context.getConfiguration().getWorkingDirectory() + "/objectstore";
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        if (encoding == null)
+        {
+            encoding = context.getConfiguration().getDefaultEncoding();
+        }
+
+        if (directory == null)
+        {
+            directory = context.getConfiguration().getWorkingDirectory() + "/objectstore";
+        }
+
+        try
+        {
+            File dir = FileUtils.openDirectory(directory);
+            fileStore = new File(dir, name + ".dat");
+            if (fileStore.exists())
+            {
+                loadFromStore();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
-    try {
-      File dir = FileUtils.openDirectory(directory);
-      fileStore = new File(dir, name + ".dat");
-      if (fileStore.exists()) {
-        loadFromStore();
-      }
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
-  }
+    protected synchronized void loadFromStore() throws Exception
+    {
+        Properties props = new Properties();
+        props.load(new FileInputStream(fileStore));
 
-  protected synchronized void loadFromStore() throws Exception {
-    Properties props = new Properties();
-    props.load(new FileInputStream(fileStore));
-
-    for (Map.Entry<Object, Object> entry : props.entrySet()) {
-      super.store(entry.getKey().toString(), entry.getValue().toString());
-    }
-  }
-
-  @Override
-  public void store(Serializable id, String item) throws ObjectStoreException {
-    super.store(id, item);
-
-    try {
-      if (output == null) {
-        output = new FileOutputStream(fileStore, true);
-      }
-
-      StringBuilder buf = new StringBuilder();
-      buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
-      output.write(buf.toString().getBytes());
-    } catch (IOException iox) {
-      throw new ObjectStoreException(iox);
-    }
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  public String getDirectory() {
-    return directory;
-  }
-
-  public void setDirectory(String directory) {
-    this.directory = directory;
-  }
-
-  public String getEncoding() {
-    return encoding;
-  }
-
-  public void setEncoding(String encoding) {
-    this.encoding = encoding;
-  }
-
-  @Override
-  public synchronized void dispose() {
-    Properties props = new Properties();
-
-    for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext();) {
-      StoredObject<?> storedObject = (StoredObject<?>) iterator.next();
-      props.put(storedObject.getId(), storedObject.getItem());
+        for (Map.Entry<Object, Object> entry : props.entrySet())
+        {
+            super.store(entry.getKey().toString(), entry.getValue().toString());
+        }
     }
 
-    if (output == null) {
-      try {
-        output = new FileOutputStream(fileStore, false);
-        props.store(output, StringUtils.EMPTY);
-        IOUtils.closeQuietly(output);
-      } catch (IOException e) {
-        logger.error(e.getMessage(), e);
-      }
-    } else {
-      IOUtils.closeQuietly(output);
+    @Override
+    public void store(Serializable id, String item) throws ObjectStoreException
+    {
+        super.store(id, item);
+
+        try
+        {
+            if (output == null)
+            {
+                output = new FileOutputStream(fileStore, true);
+            }
+
+            StringBuilder buf = new StringBuilder();
+            buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
+            output.write(buf.toString().getBytes());
+        }
+        catch (IOException iox)
+        {
+            throw new ObjectStoreException(iox);
+        }
+    }
+    
+    @Override
+    public void clear()
+    {
+        throw new UnsupportedOperationException();
     }
 
-    super.dispose();
-  }
+    public String getDirectory()
+    {
+        return directory;
+    }
+
+    public void setDirectory(String directory)
+    {
+        this.directory = directory;
+    }
+
+    public String getEncoding()
+    {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
+    }
+
+    @Override
+    public synchronized void dispose()
+    {
+        Properties props = new Properties();
+
+        for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext();)
+        {
+            StoredObject<?> storedObject = (StoredObject<?>) iterator.next();
+            props.put(storedObject.getId(), storedObject.getItem());
+        }
+
+        if (output == null)
+        {
+            try
+            {
+                output = new FileOutputStream(fileStore, false);
+                props.store(output, StringUtils.EMPTY);
+                IOUtils.closeQuietly(output);
+            }
+            catch (IOException e)
+            {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        else
+        {
+            IOUtils.closeQuietly(output);
+        }
+
+        super.dispose();
+    }
 }

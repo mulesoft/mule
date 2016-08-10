@@ -11,18 +11,20 @@ import org.mule.test.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
-public class OrphanSimpleTestCase extends AbstractNamespaceTestCase {
+public class OrphanSimpleTestCase extends AbstractNamespaceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/orphan-simple-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/orphan-simple-test.xml";
-  }
-
-  @Test
-  public void testOrphan2() {
-    OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-    assertBeanPopulated(orphan2, "orphan2");
-    ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
-    assertBeanPopulated(child2, "child2");
-  }
+    @Test
+    public void testOrphan2()
+    {
+        OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+        assertBeanPopulated(orphan2, "orphan2");
+        ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
+        assertBeanPopulated(child2, "child2");
+    }
 }

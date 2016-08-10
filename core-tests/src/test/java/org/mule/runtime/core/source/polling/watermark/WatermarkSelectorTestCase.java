@@ -21,41 +21,46 @@ import java.util.Calendar;
 import org.junit.Test;
 
 @SmallTest
-public class WatermarkSelectorTestCase extends AbstractMuleTestCase {
+public class WatermarkSelectorTestCase extends AbstractMuleTestCase
+{
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private Calendar calendar = Calendar.getInstance();
 
-  private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-  private Calendar calendar = Calendar.getInstance();
+    @Test
+    public void testMaxSelected()
+    {
+        MaxValueWatermarkSelector selector = new MaxValueWatermarkSelector();
 
-  @Test
-  public void testMaxSelected() {
-    MaxValueWatermarkSelector selector = new MaxValueWatermarkSelector();
+        String max = null;
 
-    String max = null;
+        for (int i = 0; i < 19; i++)
+        {
+            calendar.add(Calendar.DAY_OF_YEAR, 100);
+            max = format.format(calendar.getTime());
+            selector.acceptValue(max);
+        }
 
-    for (int i = 0; i < 19; i++) {
-      calendar.add(Calendar.DAY_OF_YEAR, 100);
-      max = format.format(calendar.getTime());
-      selector.acceptValue(max);
+        assertThat(max, equalTo(selector.getSelectedValue()));
     }
 
-    assertThat(max, equalTo(selector.getSelectedValue()));
-  }
+    @Test
+    public void testMinSelected()
+    {
+        MinValueWatermarkSelector selector = new MinValueWatermarkSelector();
 
-  @Test
-  public void testMinSelected() {
-    MinValueWatermarkSelector selector = new MinValueWatermarkSelector();
+        String min = null;
+        for (int i = 0; i < 10; i++)
+        {
+            calendar.add(Calendar.DAY_OF_YEAR, 100);
+            if (min == null)
+            {
+                min = format.format(calendar.getTime());
+            }
 
-    String min = null;
-    for (int i = 0; i < 10; i++) {
-      calendar.add(Calendar.DAY_OF_YEAR, 100);
-      if (min == null) {
-        min = format.format(calendar.getTime());
-      }
+            selector.acceptValue(min);
+        }
 
-      selector.acceptValue(min);
+        assertThat(min, equalTo(selector.getSelectedValue()));
     }
-
-    assertThat(min, equalTo(selector.getSelectedValue()));
-  }
 
 }

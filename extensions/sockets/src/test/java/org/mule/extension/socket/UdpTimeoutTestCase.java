@@ -12,18 +12,20 @@ import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Test;
 
-public class UdpTimeoutTestCase extends SocketExtensionTestCase {
+public class UdpTimeoutTestCase extends SocketExtensionTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "udp-timeout-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "udp-timeout-config.xml";
-  }
+    @Test
+    public void socketThrowsTimeout() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(instanceOf(ReadingTimeoutException.class));
 
-  @Test
-  public void socketThrowsTimeout() throws Exception {
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(ReadingTimeoutException.class));
-
-    flowRunner("udp-send-with-timeout").withPayload(TEST_STRING).run();
-  }
+        flowRunner("udp-send-with-timeout").withPayload(TEST_STRING).run();
+    }
 }

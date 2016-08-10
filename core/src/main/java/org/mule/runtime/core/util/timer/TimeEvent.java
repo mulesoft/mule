@@ -9,33 +9,37 @@ package org.mule.runtime.core.util.timer;
 import java.util.EventObject;
 
 /**
- * <code>TimeEvent</code> TODO is an event that occurs at a specified number of milliseconds.
+ * <code>TimeEvent</code> TODO is an event that occurs at a specified number of
+ * milliseconds.
  */
-public class TimeEvent extends EventObject {
+public class TimeEvent extends EventObject
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -7540426406525372393L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -7540426406525372393L;
+    /**
+     * The event name
+     */
+    private String name;
 
-  /**
-   * The event name
-   */
-  private String name;
+    private long timeExpired;
 
-  private long timeExpired;
+    public TimeEvent(Object source, String name, long timeExpired)
+    {
+        super(source);
+        this.name = name;
+        this.timeExpired = timeExpired;
+    }
 
-  public TimeEvent(Object source, String name, long timeExpired) {
-    super(source);
-    this.name = name;
-    this.timeExpired = timeExpired;
-  }
+    public String getName()
+    {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
-
-  public long getTimeExpired() {
-    return timeExpired;
-  }
+    public long getTimeExpired()
+    {
+        return timeExpired;
+    }
 }

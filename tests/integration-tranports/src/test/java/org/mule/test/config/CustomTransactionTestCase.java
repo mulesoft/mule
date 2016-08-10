@@ -19,34 +19,37 @@ import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.junit.Test;
 
-public class CustomTransactionTestCase extends FunctionalTestCase {
+public class CustomTransactionTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/config/custom-transaction-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/config/custom-transaction-config.xml";
-  }
+    @Test
+    public void testConfig1() throws Exception
+    {
+        EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint1");
+        assertNotNull(epb);
+        InboundEndpoint iep = epb.buildInboundEndpoint();
 
-  @Test
-  public void testConfig1() throws Exception {
-    EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint1");
-    assertNotNull(epb);
-    InboundEndpoint iep = epb.buildInboundEndpoint();
+        assertNotNull(iep.getTransactionConfig());
+        assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
+        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
+        assertEquals(4004, iep.getTransactionConfig().getTimeout());
+    }
 
-    assertNotNull(iep.getTransactionConfig());
-    assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
-    assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
-    assertEquals(4004, iep.getTransactionConfig().getTimeout());
-  }
+    @Test
+    public void testConfig2() throws Exception
+    {
+        EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint2");
+        assertNotNull(epb);
+        InboundEndpoint iep = epb.buildInboundEndpoint();
 
-  @Test
-  public void testConfig2() throws Exception {
-    EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint2");
-    assertNotNull(epb);
-    InboundEndpoint iep = epb.buildInboundEndpoint();
-
-    assertNotNull(iep.getTransactionConfig());
-    assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
-    assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
-    assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(), iep.getTransactionConfig().getTimeout());
-  }
+        assertNotNull(iep.getTransactionConfig());
+        assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
+        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
+        assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(), iep.getTransactionConfig().getTimeout());
+    }
 }

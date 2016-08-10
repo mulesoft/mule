@@ -17,32 +17,36 @@ import org.mule.runtime.extension.api.introspection.property.StudioModelProperty
  *
  * @since 4.0
  */
-public final class StudioModelEnricher extends AbstractAnnotatedModelEnricher {
+public final class StudioModelEnricher extends AbstractAnnotatedModelEnricher
+{
 
-  @Override
-  public void enrich(DescribingContext describingContext) {
-    StudioProvidedEditor studioProvidedEditor =
-        extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), StudioProvidedEditor.class);
-    CustomStudioEditor customStudioEditor =
-        extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), CustomStudioEditor.class);
+    @Override
+    public void enrich(DescribingContext describingContext)
+    {
+        StudioProvidedEditor studioProvidedEditor = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), StudioProvidedEditor.class);
+        CustomStudioEditor customStudioEditor = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), CustomStudioEditor.class);
 
-    ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
-    descriptor.withModelProperty(createStudioEditorModelProperty(studioProvidedEditor, customStudioEditor));
-  }
-
-  private StudioModelProperty createStudioEditorModelProperty(StudioProvidedEditor studioProvidedEditor,
-                                                              CustomStudioEditor customStudioEditor) {
-    String editorFileName = "";
-    boolean isDerived = false;
-
-    // No annotations found on extension
-    if (customStudioEditor == null && studioProvidedEditor == null) {
-      isDerived = true;
-    } else {
-      if (customStudioEditor != null) {
-        editorFileName = customStudioEditor.fileName();
-      }
+        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
+        descriptor.withModelProperty(createStudioEditorModelProperty(studioProvidedEditor, customStudioEditor));
     }
-    return new StudioModelProperty(editorFileName, isDerived);
-  }
+
+    private StudioModelProperty createStudioEditorModelProperty(StudioProvidedEditor studioProvidedEditor, CustomStudioEditor customStudioEditor)
+    {
+        String editorFileName = "";
+        boolean isDerived = false;
+
+        //No annotations found on extension
+        if (customStudioEditor == null && studioProvidedEditor == null)
+        {
+            isDerived = true;
+        }
+        else
+        {
+            if (customStudioEditor != null)
+            {
+                editorFileName = customStudioEditor.fileName();
+            }
+        }
+        return new StudioModelProperty(editorFileName, isDerived);
+    }
 }

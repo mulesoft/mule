@@ -14,24 +14,30 @@ import java.io.Serializable;
 
 import static org.junit.Assert.fail;
 
-public class SimpleMemoryObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase {
-
-  @Override
-  public ObjectStore<Serializable> getObjectStore() {
-    return new SimpleMemoryObjectStore<Serializable>();
-  }
-
-  @Override
-  public Serializable getStorableValue() {
-    return new Banana();
-  }
-
-  public void testStoreNullValue() throws Exception {
-    try {
-      getObjectStore().store("key", null);
-      fail("store() called with null value must throw ObjectStoreException");
-    } catch (ObjectStoreException ose) {
-      // this one was expected
+public class SimpleMemoryObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase
+{
+    @Override
+    public ObjectStore<Serializable> getObjectStore()
+    {
+        return new SimpleMemoryObjectStore<Serializable>();
     }
-  }
+
+    @Override
+    public Serializable getStorableValue()
+    {
+        return new Banana();
+    }
+
+    public void testStoreNullValue() throws Exception
+    {
+        try
+        {
+            getObjectStore().store("key", null);
+            fail("store() called with null value must throw ObjectStoreException");
+        }
+        catch (ObjectStoreException ose)
+        {
+            // this one was expected
+        }
+    }
 }

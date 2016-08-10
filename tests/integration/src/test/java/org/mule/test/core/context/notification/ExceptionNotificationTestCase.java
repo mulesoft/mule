@@ -15,35 +15,39 @@ import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public class ExceptionNotificationTestCase extends AbstractNotificationTestCase {
+public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
+{
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/notifications/exception-notification-test-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/notifications/exception-notification-test-flow.xml";
-  }
+    @Override
+    public void doTest() throws Exception
+    {
+        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+        expectedException.expect(ComponentException.class);
+        MuleMessage result = flowRunner("the-service").withPayload(getTestMuleMessage()).run().getMessage();
+        // processing is async, give time for the exception notificator to run
+        exceptionListener.waitUntilAllNotificationsAreReceived();
 
-  @Override
-  public void doTest() throws Exception {
-    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-    expectedException.expect(ComponentException.class);
-    MuleMessage result = flowRunner("the-service").withPayload(getTestMuleMessage()).run().getMessage();
-    // processing is async, give time for the exception notificator to run
-    exceptionListener.waitUntilAllNotificationsAreReceived();
+        assertNull(result);
+    }
 
-    assertNull(result);
-  }
+    @Override
+    public RestrictedNode getSpecification()
+    {
+        return new Node(ExceptionNotification.class, ExceptionNotification.EXCEPTION_ACTION);
+    }
 
-  @Override
-  public RestrictedNode getSpecification() {
-    return new Node(ExceptionNotification.class, ExceptionNotification.EXCEPTION_ACTION);
-  }
-
-  @Override
-  public void validateSpecification(RestrictedNode spec) throws Exception {
-    verifyAllNotifications(spec, ExceptionNotification.class, ExceptionNotification.EXCEPTION_ACTION,
-                           ExceptionNotification.EXCEPTION_ACTION);
-  }
+    @Override
+    public void validateSpecification(RestrictedNode spec) throws Exception
+    {
+        verifyAllNotifications(spec, ExceptionNotification.class,
+                ExceptionNotification.EXCEPTION_ACTION, ExceptionNotification.EXCEPTION_ACTION);
+    }
 }

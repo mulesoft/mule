@@ -16,29 +16,31 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
 
-public class XStreamConfigurationTestCase extends FunctionalTestCase {
+public class XStreamConfigurationTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "xstream-transformer-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "xstream-transformer-config.xml";
-  }
+    @Test
+    public void testConfig() throws Exception
+    {
+        AbstractXStreamTransformer transformer =
+            (AbstractXStreamTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
 
-  @Test
-  public void testConfig() throws Exception {
-    AbstractXStreamTransformer transformer =
-        (AbstractXStreamTransformer) muleContext.getRegistry().lookupTransformer("ObjectToXml");
+        assertNotNull(transformer);
+        assertNotNull(transformer.getAliases());
+        assertEquals(Apple.class, transformer.getAliases().get("apple"));
+        assertNotNull(transformer.getConverters());
+        assertEquals(3, transformer.getConverters().size());
+        assertTrue(transformer.getConverters().contains(DummyConverter.class));
 
-    assertNotNull(transformer);
-    assertNotNull(transformer.getAliases());
-    assertEquals(Apple.class, transformer.getAliases().get("apple"));
-    assertNotNull(transformer.getConverters());
-    assertEquals(3, transformer.getConverters().size());
-    assertTrue(transformer.getConverters().contains(DummyConverter.class));
+        Apple apple = new Apple();
+        apple.wash();
+        Object result = transformer.transform(apple);
 
-    Apple apple = new Apple();
-    apple.wash();
-    Object result = transformer.transform(apple);
-
-    assertEquals("<apple>\n  <bitten>false</bitten>\n  <washed>true</washed>\n</apple>", result);
-  }
+        assertEquals("<apple>\n  <bitten>false</bitten>\n  <washed>true</washed>\n</apple>", result);
+    }
 }

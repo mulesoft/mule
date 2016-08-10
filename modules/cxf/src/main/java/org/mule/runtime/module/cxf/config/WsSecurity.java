@@ -11,68 +11,83 @@ import org.mule.runtime.module.cxf.support.MuleSecurityManagerValidator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WsSecurity {
+public class WsSecurity
+{
+    String name;
+    WsSecurity ref;
+    WsConfig wsConfig;
+    MuleSecurityManagerValidator securityManager;
+    Map<String, Object> customValidator;
 
-  String name;
-  WsSecurity ref;
-  WsConfig wsConfig;
-  MuleSecurityManagerValidator securityManager;
-  Map<String, Object> customValidator;
-
-  public void setRef(WsSecurity ref) {
-    this.ref = ref;
-  }
-
-  public WsSecurity getRef() {
-    return ref;
-  }
-
-  public void setWsConfig(WsConfig wsConfig) {
-    this.wsConfig = wsConfig;
-  }
-
-  public Map<String, Object> getConfigProperties() {
-    if (ref != null) {
-      return ref.getConfigProperties();
+    public void setRef(WsSecurity ref)
+    {
+        this.ref = ref;
     }
-    if (wsConfig != null) {
-      return wsConfig.getConfigProperties();
+    
+    public WsSecurity getRef()
+    {
+        return ref;
     }
-    return new HashMap<String, Object>();
-  }
 
-  public MuleSecurityManagerValidator getSecurityManager() {
-    if (ref != null) {
-      return ref.getSecurityManager();
+    public void setWsConfig(WsConfig wsConfig)
+    {
+        this.wsConfig = wsConfig;
     }
-    return securityManager;
-  }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    if (ref != null) {
-      return ref.getName();
+    public Map<String, Object> getConfigProperties()
+    {
+        if(ref != null)
+        {
+            return ref.getConfigProperties();
+        }
+        if(wsConfig != null)
+        {
+            return wsConfig.getConfigProperties();
+        }
+        return new HashMap<String, Object>();
     }
-    return name;
-  }
-
-  public void setSecurityManager(MuleSecurityManagerValidator securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setCustomValidator(Map<String, Object> customValidator) {
-    this.customValidator = customValidator;
-  }
-
-  public Map<String, Object> getCustomValidator() {
-    if (ref != null) {
-      return ref.getCustomValidator();
+    
+    public MuleSecurityManagerValidator getSecurityManager()
+    {
+        if(ref != null)
+        {
+            return ref.getSecurityManager();
+        }
+        return securityManager;
     }
-    return customValidator;
-  }
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        if(ref != null)
+        {
+            return ref.getName();
+        }
+        return name;
+    }
 
+    public void setSecurityManager(MuleSecurityManagerValidator securityManager)
+    {
+        this.securityManager = securityManager;
+    }
+    
+    public void setCustomValidator(Map<String, Object> customValidator)
+    {
+        this.customValidator = customValidator;
+    }
+    
+    public Map<String, Object> getCustomValidator()
+    {
+        if(ref != null)
+        {
+            return ref.getCustomValidator();
+        }
+        return customValidator;
+    }
+    
 
 }

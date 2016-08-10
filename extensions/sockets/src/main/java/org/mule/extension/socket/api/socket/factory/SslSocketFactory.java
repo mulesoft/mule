@@ -16,23 +16,26 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * Concrete implementation for {@link SimpleSocketFactory}. It provides TCP {@link Socket} that use SSL protocol.
+ * Concrete implementation for {@link SimpleSocketFactory}.
+ * It provides TCP {@link Socket} that use SSL protocol.
  *
  * @since 4.0
  */
-public class SslSocketFactory implements SimpleSocketFactory {
+public class SslSocketFactory  implements SimpleSocketFactory
+{
+    private final SSLSocketFactory sslSocketFactory;
 
-  private final SSLSocketFactory sslSocketFactory;
+    public SslSocketFactory(TlsContextFactory tlsContextFactory) throws NoSuchAlgorithmException, KeyManagementException
+    {
+        sslSocketFactory = tlsContextFactory.createSslContext().getSocketFactory();
+    }
 
-  public SslSocketFactory(TlsContextFactory tlsContextFactory) throws NoSuchAlgorithmException, KeyManagementException {
-    sslSocketFactory = tlsContextFactory.createSslContext().getSocketFactory();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Socket createSocket() throws IOException {
-    return sslSocketFactory.createSocket();
-  }
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public Socket createSocket() throws IOException
+    {
+        return sslSocketFactory.createSocket();
+    }
 }

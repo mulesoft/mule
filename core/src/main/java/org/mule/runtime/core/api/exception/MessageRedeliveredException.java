@@ -12,48 +12,50 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class MessageRedeliveredException extends MessagingException {
+public class MessageRedeliveredException extends MessagingException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 9013890402770563931L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 9013890402770563931L;
+    String messageId;
+    int redeliveryCount;
+    int maxRedelivery;
 
-  String messageId;
-  int redeliveryCount;
-  int maxRedelivery;
+    protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event, Message message)
+    {
+        super(message, event);
+        this.messageId = messageId;
+        this.redeliveryCount = redeliveryCount;
+        this.maxRedelivery = maxRedelivery;
+    }
 
-  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event,
-                                        Message message) {
-    super(message, event);
-    this.messageId = messageId;
-    this.redeliveryCount = redeliveryCount;
-    this.maxRedelivery = maxRedelivery;
-  }
+    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event, Message message, MessageProcessor failingMessageProcessor)
+    {
+        super(message, event, failingMessageProcessor);
+        this.messageId = messageId;
+        this.redeliveryCount = redeliveryCount;
+        this.maxRedelivery = maxRedelivery;
+    }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event, Message message,
-                                     MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
-    this.messageId = messageId;
-    this.redeliveryCount = redeliveryCount;
-    this.maxRedelivery = maxRedelivery;
-  }
+    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event, MessageProcessor failingMessageProcessor)
+    {
+        this(messageId, redeliveryCount, maxRedelivery, event, CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
+    }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event,
-                                     MessageProcessor failingMessageProcessor) {
-    this(messageId, redeliveryCount, maxRedelivery, event,
-         CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
-  }
+    public String getMessageId()
+    {
+        return messageId;
+    }
 
-  public String getMessageId() {
-    return messageId;
-  }
+    public int getRedeliveryCount()
+    {
+        return redeliveryCount;
+    }
 
-  public int getRedeliveryCount() {
-    return redeliveryCount;
-  }
-
-  public int getMaxRedelivery() {
-    return maxRedelivery;
-  }
+    public int getMaxRedelivery()
+    {
+        return maxRedelivery;
+    }
 }

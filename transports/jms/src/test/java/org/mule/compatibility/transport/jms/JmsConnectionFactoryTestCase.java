@@ -18,38 +18,43 @@ import javax.jms.ConnectionFactory;
 
 import org.junit.Test;
 
-public class JmsConnectionFactoryTestCase extends FunctionalTestCase {
+public class JmsConnectionFactoryTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "jms-connection-factory.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "jms-connection-factory.xml";
-  }
+    /**
+     * Test providerProperties set on JmsConnector are not passed to the underlying
+     * ConnectionFactory.
+     */
+    @Test
+    public void testProviderPropertiesNotPassed() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector1");
+        assertNotNull(c);
 
-  /**
-   * Test providerProperties set on JmsConnector are not passed to the underlying ConnectionFactory.
-   */
-  @Test
-  public void testProviderPropertiesNotPassed() throws Exception {
-    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector1");
-    assertNotNull(c);
+        ConnectionFactory cf = c.getConnectionFactory();
+        assertTrue(cf instanceof TestConnectionFactory);
+        assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
+            ((TestConnectionFactory)cf).getProviderProperty());
+    }
 
-    ConnectionFactory cf = c.getConnectionFactory();
-    assertTrue(cf instanceof TestConnectionFactory);
-    assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
-                 ((TestConnectionFactory) cf).getProviderProperty());
-  }
+    /**
+     * Test connectionFactoryProperties set on JmsConnector are actually passed to
+     * the underlying ConnectionFactory.
+     */
+    @Test
+    public void testConnectionFactoryPropertiesPassed() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector2");
+        assertNotNull(c);
 
-  /**
-   * Test connectionFactoryProperties set on JmsConnector are actually passed to the underlying ConnectionFactory.
-   */
-  @Test
-  public void testConnectionFactoryPropertiesPassed() throws Exception {
-    JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector2");
-    assertNotNull(c);
-
-    ConnectionFactory cf = c.getConnectionFactory();
-    assertTrue(cf instanceof TestConnectionFactory);
-    assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",
-                 ((TestConnectionFactory) cf).getConnectionFactoryProperty());
-  }
+        ConnectionFactory cf = c.getConnectionFactory();
+        assertTrue(cf instanceof TestConnectionFactory);
+        assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",
+            ((TestConnectionFactory)cf).getConnectionFactoryProperty());
+    }
 }

@@ -14,29 +14,30 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
+public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
+{
+    @Rule
+    public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestIncludedTypes.wsdl");
 
-  @Rule
-  public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestIncludedTypes.wsdl");
+    @Override
+    protected String getConfigFile()
+    {
+        return "included-wsdl-types-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "included-wsdl-types-config.xml";
-  }
+    /**
+     * Verifies that a no parameter operation is successful having a WSDL definition file that imports
+     * the types from another WSDL file, which includes the schema from yet another XSD file. If the metadata cannot
+     * be generated then the payload would be used as SOAP body and the test would fail.
+     * @throws Exception
+     */
+    @Test
+    public void metadataIsGeneratedAndPayloadIsIgnored() throws Exception
+    {
+        MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
 
-  /**
-   * Verifies that a no parameter operation is successful having a WSDL definition file that imports the types from another WSDL
-   * file, which includes the schema from yet another XSD file. If the metadata cannot be generated then the payload would be used
-   * as SOAP body and the test would fail.
-   * 
-   * @throws Exception
-   */
-  @Test
-  public void metadataIsGeneratedAndPayloadIsIgnored() throws Exception {
-    MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
-
-    String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">"
-        + "<text>TEST</text></ns:noParamsResponse>";
-    assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
-  }
+        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
+                                  "<text>TEST</text></ns:noParamsResponse>";
+        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
+    }
 }

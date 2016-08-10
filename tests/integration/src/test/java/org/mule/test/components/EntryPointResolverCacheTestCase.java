@@ -19,58 +19,68 @@ import org.junit.Test;
 /**
  * Test an entry-point resolver used for multiple classes
  */
-public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/components/entry-point-resolver-cache-flow.xml";
-  }
-
-  @Test
-  public void testCache() throws Exception {
-    MuleMessage response = null;
-
-    response = flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run()
-        .getMessage();
-    Object payload = response.getPayload();
-
-    assertThat(payload, instanceOf(String.class));
-    assertThat(payload, is("ServiceOne"));
-
-    response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData")
-        .run().getMessage();
-    payload = response.getPayload();
-    if ((payload == null) || (response.getExceptionPayload() != null)) {
-      DefaultExceptionPayload exPld = (DefaultExceptionPayload) response.getExceptionPayload();
-      if (exPld.getException() != null) {
-        fail(exPld.getException().getMessage());
-      } else {
-        fail(exPld.toString());
-      }
-    }
-    assertThat(payload, instanceOf(String.class));
-    assertThat(payload, is("ServiceTwo"));
-
-  }
-
-  public interface ReferenceDataService {
-
-    String retrieveReferenceData(String refKey);
-  }
-
-  public static class RefDataServiceOne implements ReferenceDataService {
+public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
+{
 
     @Override
-    public String retrieveReferenceData(String refKey) {
-      return "ServiceOne";
+    protected String getConfigFile()
+    {
+        return "org/mule/test/components/entry-point-resolver-cache-flow.xml";
     }
-  }
 
-  public static class RefDataServiceTwo implements ReferenceDataService {
+    @Test
+    public void testCache() throws Exception
+    {
+        MuleMessage response = null;
 
-    @Override
-    public String retrieveReferenceData(String refKey) {
-      return "ServiceTwo";
+        response = flowRunner("refServiceOne").withPayload("a request")
+                                              .withInboundProperty("method", "retrieveReferenceData")
+                                              .run()
+                                              .getMessage();
+        Object payload = response.getPayload();
+
+        assertThat(payload, instanceOf(String.class));
+        assertThat(payload, is("ServiceOne"));
+
+        response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData").run().getMessage();
+        payload = response.getPayload();
+        if ((payload == null) || (response.getExceptionPayload() != null))
+        {
+            DefaultExceptionPayload exPld = (DefaultExceptionPayload) response.getExceptionPayload();
+            if (exPld.getException() != null)
+            {
+                fail(exPld.getException().getMessage());
+            }
+            else
+            {
+                fail(exPld.toString());
+            }
+        }
+        assertThat(payload, instanceOf(String.class));
+        assertThat(payload, is("ServiceTwo"));
+
     }
-  }
+
+    public interface ReferenceDataService
+    {
+        String retrieveReferenceData(String refKey);
+    }
+
+    public static class RefDataServiceOne implements ReferenceDataService
+    {
+        @Override
+        public String retrieveReferenceData(String refKey)
+        {
+            return "ServiceOne";
+        }
+    }
+
+    public static class RefDataServiceTwo implements ReferenceDataService
+    {
+        @Override
+        public String retrieveReferenceData(String refKey)
+        {
+            return "ServiceTwo";
+        }
+    }
 }

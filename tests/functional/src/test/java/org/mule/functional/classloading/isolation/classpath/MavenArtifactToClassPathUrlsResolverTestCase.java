@@ -32,91 +32,95 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class MavenArtifactToClassPathUrlsResolverTestCase extends AbstractMuleTestCase {
+public class MavenArtifactToClassPathUrlsResolverTestCase extends AbstractMuleTestCase
+{
 
-  public static final String PARENT_PROJECT_FOLDER = "/parent-project/";
-  public static final String UTILS_CORE_MODULE_FOLDER = PARENT_PROJECT_FOLDER + "utils/";
+    public static final String PARENT_PROJECT_FOLDER = "/parent-project/";
+    public static final String UTILS_CORE_MODULE_FOLDER = PARENT_PROJECT_FOLDER + "utils/";
 
-  private MavenArtifactToClassPathUrlsResolver urlsResolver;
-  private MavenMultiModuleArtifactMapping mapping;
+    private MavenArtifactToClassPathUrlsResolver urlsResolver;
+    private MavenMultiModuleArtifactMapping mapping;
 
-  private MavenArtifact coreArtifact;
-  private MavenArtifact utilsCoreArtifact;
-  private URL coreArtifactMavenRepoURL;
-  private URL utilsCoreArtifactMultiModuleURL;
+    private MavenArtifact coreArtifact;
+    private MavenArtifact utilsCoreArtifact;
+    private URL coreArtifactMavenRepoURL;
+    private URL utilsCoreArtifactMultiModuleURL;
 
-  private MavenArtifact commonCliArtifact;
+    private MavenArtifact commonCliArtifact;
 
-  @Rule
-  public ExpectedException expectedException = none();
+    @Rule
+    public ExpectedException expectedException = none();
 
-  @Before
-  public void before() throws Exception {
-    mapping = mock(MavenMultiModuleArtifactMapping.class);
-    urlsResolver = new MavenArtifactToClassPathUrlsResolver(mapping);
+    @Before
+    public void before() throws Exception
+    {
+        mapping = mock(MavenMultiModuleArtifactMapping.class);
+        urlsResolver = new MavenArtifactToClassPathUrlsResolver(mapping);
 
-    commonCliArtifact = MavenArtifact.builder().withGroupId("commons-cli").withArtifactId("commons-cli").withType("jar")
-        .withVersion("1.2").withScope("provided").build();
-    coreArtifact = MavenArtifact.builder().withGroupId("org.my.company").withArtifactId("core-artifact").withType("jar")
-        .withVersion("1.0.0").withScope("compile").build();
-    coreArtifactMavenRepoURL = buildArtifactUrlMock(coreArtifact);
+        commonCliArtifact = MavenArtifact.builder().withGroupId("commons-cli").withArtifactId("commons-cli").withType("jar").withVersion("1.2").withScope("provided").build();
+        coreArtifact = MavenArtifact.builder().withGroupId("org.my.company").withArtifactId("core-artifact").withType("jar").withVersion("1.0.0").withScope("compile").build();
+        coreArtifactMavenRepoURL = buildArtifactUrlMock(coreArtifact);
 
-    utilsCoreArtifact = MavenArtifact.builder().withGroupId("org.my.company").withArtifactId("utils").withType("jar")
-        .withVersion("1.0.0").withScope("compile").build();
-    utilsCoreArtifactMultiModuleURL = buildMultiModuleUrlMock(UTILS_CORE_MODULE_FOLDER);
-  }
+        utilsCoreArtifact = MavenArtifact.builder().withGroupId("org.my.company").withArtifactId("utils").withType("jar").withVersion("1.0.0").withScope("compile").build();
+        utilsCoreArtifactMultiModuleURL = buildMultiModuleUrlMock(UTILS_CORE_MODULE_FOLDER);
+    }
 
-  @Test
-  public void resolveURLUsingGroupIdArtifactId() throws Exception {
-    assertURL(coreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact), coreArtifactMavenRepoURL),
-              coreArtifactMavenRepoURL);
-    verifyZeroInteractions(mapping);
-  }
+    @Test
+    public void resolveURLUsingGroupIdArtifactId() throws Exception
+    {
+        assertURL(coreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact), coreArtifactMavenRepoURL), coreArtifactMavenRepoURL);
+        verifyZeroInteractions(mapping);
+    }
 
-  @Test
-  public void resolveUrlMultiModuleMapping() throws Exception {
-    when(mapping.getFolderName(utilsCoreArtifact.getArtifactId())).thenReturn(UTILS_CORE_MODULE_FOLDER);
-    assertURL(utilsCoreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact), coreArtifactMavenRepoURL,
-                                                    utilsCoreArtifactMultiModuleURL),
-              utilsCoreArtifactMultiModuleURL);
-    verify(mapping);
-  }
+    @Test
+    public void resolveUrlMultiModuleMapping() throws Exception
+    {
+        when(mapping.getFolderName(utilsCoreArtifact.getArtifactId())).thenReturn(UTILS_CORE_MODULE_FOLDER);
+        assertURL(utilsCoreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact), coreArtifactMavenRepoURL, utilsCoreArtifactMultiModuleURL), utilsCoreArtifactMultiModuleURL);
+        verify(mapping);
+    }
 
-  @Test
-  public void urlNotFoundForArtifact() throws Exception {
-    when(mapping.getFolderName(coreArtifact.getArtifactId())).thenReturn("doesnotexist-folder");
-    expectedException.expect(IllegalArgumentException.class);
-    assertURL(coreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact)), coreArtifactMavenRepoURL);
-  }
+    @Test
+    public void urlNotFoundForArtifact() throws Exception
+    {
+        when(mapping.getFolderName(coreArtifact.getArtifactId())).thenReturn("doesnotexist-folder");
+        expectedException.expect(IllegalArgumentException.class);
+        assertURL(coreArtifact, Lists.newArrayList(buildArtifactUrlMock(commonCliArtifact)), coreArtifactMavenRepoURL);
+    }
 
 
-  private void assertURL(MavenArtifact artifact, List<URL> urls, URL expectedURL) throws MalformedURLException {
-    URL resolvedURL = urlsResolver.resolveURL(artifact, urls);
-    assertThat(resolvedURL, equalTo(expectedURL));
-  }
+    private void assertURL(MavenArtifact artifact, List<URL> urls, URL expectedURL) throws MalformedURLException
+    {
+        URL resolvedURL = urlsResolver.resolveURL(artifact, urls);
+        assertThat(resolvedURL, equalTo(expectedURL));
+    }
 
-  private URL buildArtifactUrlMock(MavenArtifact artifact) throws MalformedURLException {
-    String s = File.separator;
-    StringBuilder filePath = new StringBuilder();
-    filePath.append(s).append("home").append(s).append("user").append(s).append(".m2").append(s).append("repository").append(s)
-        .append(artifact.getGroupIdAsPath()).append(s).append(artifact.getArtifactId()).append(s).append(artifact.getVersion())
-        .append(s).append(artifact.getArtifactId()).append("-").append(artifact.getVersion()).append(".")
-        .append(artifact.getType());
+    private URL buildArtifactUrlMock(MavenArtifact artifact) throws MalformedURLException
+    {
+        String s = File.separator;
+        StringBuilder filePath = new StringBuilder();
+        filePath.append(s).append("home").append(s).append("user").append(s).append(".m2").append(s).append("repository").append(s)
+                .append(artifact.getGroupIdAsPath()).append(s)
+                .append(artifact.getArtifactId()).append(s)
+                .append(artifact.getVersion()).append(s)
+                .append(artifact.getArtifactId()).append("-").append(artifact.getVersion()).append(".").append(artifact.getType());
 
-    URL artifactURL = new URL("file", "", -1, filePath.toString());
+        URL artifactURL = new URL("file", "", -1, filePath.toString());
 
-    return artifactURL;
-  }
+        return artifactURL;
+    }
 
-  private URL buildMultiModuleUrlMock(String multiModuleFolder) throws MalformedURLException {
-    String s = File.separator;
-    StringBuilder filePath = new StringBuilder();
-    filePath.append(s).append("home").append(s).append("user").append(s).append("workspace").append(multiModuleFolder)
-        .append("target").append(s).append("classes").append(s);
+    private URL buildMultiModuleUrlMock(String multiModuleFolder) throws MalformedURLException
+    {
+        String s = File.separator;
+        StringBuilder filePath = new StringBuilder();
+        filePath.append(s).append("home").append(s).append("user").append(s).append("workspace")
+                .append(multiModuleFolder)
+                .append("target").append(s).append("classes").append(s);
 
-    URL artifactURL = new URL("file", "", -1, filePath.toString());
+        URL artifactURL = new URL("file", "", -1, filePath.toString());
 
-    return artifactURL;
-  }
+        return artifactURL;
+    }
 
 }

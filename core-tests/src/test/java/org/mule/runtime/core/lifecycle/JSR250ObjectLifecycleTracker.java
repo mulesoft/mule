@@ -15,25 +15,28 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-public class JSR250ObjectLifecycleTracker implements MuleContextAware {
+public class JSR250ObjectLifecycleTracker implements MuleContextAware
+    {
+        private final List<String> tracker = new ArrayList<String>();
 
-  private final List<String> tracker = new ArrayList<String>();
+        public List<String> getTracker() {
+            return tracker;
+        }
 
-  public List<String> getTracker() {
-    return tracker;
-  }
+        public void setMuleContext(MuleContext context)
+        {
+            tracker.add("setMuleContext");
+        }
 
-  public void setMuleContext(MuleContext context) {
-    tracker.add("setMuleContext");
-  }
+        @PostConstruct
+        public void init()
+        {
+            tracker.add("initialise");
+        }
 
-  @PostConstruct
-  public void init() {
-    tracker.add("initialise");
-  }
-
-  @PreDestroy
-  public void dispose() {
-    tracker.add("dispose");
-  }
-}
+        @PreDestroy
+        public void dispose()
+        {
+            tracker.add("dispose");
+        }
+    }

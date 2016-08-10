@@ -10,5 +10,6 @@ package org.mule.runtime.module.scripting;
 /**
  * Workaround for javadoc generation (http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4492654)
  */
-public class Placeholder {
+public class Placeholder
+{
 }

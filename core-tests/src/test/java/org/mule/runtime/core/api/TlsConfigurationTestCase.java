@@ -28,135 +28,165 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.junit.Test;
 
-public class TlsConfigurationTestCase extends AbstractMuleTestCase {
+public class TlsConfigurationTestCase extends AbstractMuleTestCase
+{
 
-  private static final String SUPPORTED_CIPHER_SUITE = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
-  private static final String SUPPORTED_PROTOCOL = "TLSv1";
-  private static final String TEST_SECURITY_MODEL = "test";
+    private static final String SUPPORTED_CIPHER_SUITE = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
+    private static final String SUPPORTED_PROTOCOL = "TLSv1";
+    private static final String TEST_SECURITY_MODEL = "test";
 
-  @Test
-  public void testEmptyConfiguration() throws Exception {
-    TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-    try {
-      configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
-      fail("no key password");
-    } catch (IllegalArgumentException e) {
-      assertNotNull("expected", e);
+    @Test
+    public void testEmptyConfiguration() throws Exception
+    {
+        TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+        try
+        {
+            configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+            fail("no key password");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertNotNull("expected", e);
+        }
+        configuration.setKeyPassword("mulepassword");
+        try
+        {
+            configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+            fail("no store password");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertNotNull("expected", e);
+        }
+        configuration.setKeyStorePassword("mulepassword");
+        configuration.setKeyStore(""); // guaranteed to not exist
+        try
+        {
+            configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+            fail("no keystore");
+        }
+        catch (Exception e)
+        {
+            assertNotNull("expected", e);
+        }
     }
-    configuration.setKeyPassword("mulepassword");
-    try {
-      configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
-      fail("no store password");
-    } catch (IllegalArgumentException e) {
-      assertNotNull("expected", e);
+
+    @Test
+    public void testSimpleSocket() throws Exception
+    {
+        TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+        configuration.setKeyPassword("mulepassword");
+        configuration.setKeyStorePassword("mulepassword");
+        configuration.setKeyStore("clientKeystore");
+        configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+        SSLSocketFactory socketFactory = configuration.getSocketFactory();
+        assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
     }
-    configuration.setKeyStorePassword("mulepassword");
-    configuration.setKeyStore(""); // guaranteed to not exist
-    try {
-      configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
-      fail("no keystore");
-    } catch (Exception e) {
-      assertNotNull("expected", e);
+
+    @Test
+    public void testExceptionOnInvalidKeyAlias() throws Exception
+    {
+        URL keystoreUrl = getClass().getClassLoader().getResource("serverKeystore");
+        File keystoreFile = new File(keystoreUrl.toURI());
+
+        TlsConfiguration config = new TlsConfiguration(keystoreFile.getAbsolutePath());
+        config.setKeyStorePassword("mulepassword");
+        config.setKeyPassword("mulepassword");
+        config.setKeyAlias("this_key_does_not_exist_in_the_keystore");
+
+        try
+        {
+            config.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+        }
+        catch (CreateException ce)
+        {
+            assertTrue(ce.getCause() instanceof IllegalStateException);
+        }
     }
-  }
 
-  @Test
-  public void testSimpleSocket() throws Exception {
-    TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-    configuration.setKeyPassword("mulepassword");
-    configuration.setKeyStorePassword("mulepassword");
-    configuration.setKeyStore("clientKeystore");
-    configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
-    SSLSocketFactory socketFactory = configuration.getSocketFactory();
-    assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
-  }
 
-  @Test
-  public void testExceptionOnInvalidKeyAlias() throws Exception {
-    URL keystoreUrl = getClass().getClassLoader().getResource("serverKeystore");
-    File keystoreFile = new File(keystoreUrl.toURI());
+    @Test
+    public void testCipherSuitesFromConfigFile() throws Exception
+    {
+        File configFile = createDefaultConfigFile();
 
-    TlsConfiguration config = new TlsConfiguration(keystoreFile.getAbsolutePath());
-    config.setKeyStorePassword("mulepassword");
-    config.setKeyPassword("mulepassword");
-    config.setKeyAlias("this_key_does_not_exist_in_the_keystore");
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
 
-    try {
-      config.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
-    } catch (CreateException ce) {
-      assertTrue(ce.getCause() instanceof IllegalStateException);
+            SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
+            SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
+
+            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, socket.getEnabledCipherSuites());
+            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, serverSocket.getEnabledCipherSuites());
+        }
+        finally
+        {
+            configFile.delete();
+        }
     }
-  }
 
+    @Test
+    public void testProtocolsFromConfigFile() throws Exception
+    {
+        File configFile = createDefaultConfigFile();
 
-  @Test
-  public void testCipherSuitesFromConfigFile() throws Exception {
-    File configFile = createDefaultConfigFile();
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
 
-    try {
-      TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-      tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
+            SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
+            SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-      SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
-      SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
-
-      assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, socket.getEnabledCipherSuites());
-      assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, serverSocket.getEnabledCipherSuites());
-    } finally {
-      configFile.delete();
+            assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, socket.getEnabledProtocols());
+            assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, serverSocket.getEnabledProtocols());
+        }
+        finally
+        {
+            configFile.delete();
+        }
     }
-  }
 
-  @Test
-  public void testProtocolsFromConfigFile() throws Exception {
-    File configFile = createDefaultConfigFile();
+    @Test
+    public void testSecurityModelProperty() throws Exception
+    {
+        String previousSecurityModel = SecurityUtils.getSecurityModel();
+        System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, TEST_SECURITY_MODEL);
+        File file = createConfigFile(TEST_SECURITY_MODEL, "enabledCipherSuites=TEST");
 
-    try {
-      TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-      tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
 
-      SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
-      SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
-
-      assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, socket.getEnabledProtocols());
-      assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, serverSocket.getEnabledProtocols());
-    } finally {
-      configFile.delete();
+            assertArrayEquals(new String[] {"TEST"}, tlsConfiguration.getEnabledCipherSuites());
+        }
+        finally
+        {
+            System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
+            file.delete();
+        }
     }
-  }
 
-  @Test
-  public void testSecurityModelProperty() throws Exception {
-    String previousSecurityModel = SecurityUtils.getSecurityModel();
-    System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, TEST_SECURITY_MODEL);
-    File file = createConfigFile(TEST_SECURITY_MODEL, "enabledCipherSuites=TEST");
+    private File createDefaultConfigFile() throws IOException
+    {
+        String contents = String.format("enabledCipherSuites=UNSUPPORTED,%s\n" +
+                                        "enabledProtocols=UNSUPPORTED,%s", SUPPORTED_CIPHER_SUITE, SUPPORTED_PROTOCOL);
 
-    try {
-      TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-      tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
-
-      assertArrayEquals(new String[] {"TEST"}, tlsConfiguration.getEnabledCipherSuites());
-    } finally {
-      System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
-      file.delete();
+        return createConfigFile(TlsConfiguration.DEFAULT_SECURITY_MODEL, contents);
     }
-  }
 
-  private File createDefaultConfigFile() throws IOException {
-    String contents = String.format("enabledCipherSuites=UNSUPPORTED,%s\n" + "enabledProtocols=UNSUPPORTED,%s",
-                                    SUPPORTED_CIPHER_SUITE, SUPPORTED_PROTOCOL);
+    private File createConfigFile(String securityModel, String contents) throws IOException
+    {
+        String path = ClassUtils.getClassPathRoot(getClass()).getPath();
+        File file = new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, securityModel));
 
-    return createConfigFile(TlsConfiguration.DEFAULT_SECURITY_MODEL, contents);
-  }
+        PrintWriter writer = new PrintWriter(file, "UTF-8");
+        writer.println(contents);
+        writer.close();
 
-  private File createConfigFile(String securityModel, String contents) throws IOException {
-    String path = ClassUtils.getClassPathRoot(getClass()).getPath();
-    File file = new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, securityModel));
-
-    PrintWriter writer = new PrintWriter(file, "UTF-8");
-    writer.println(contents);
-    writer.close();
-
-    return file;
-  }
+        return file;
+    }
 }

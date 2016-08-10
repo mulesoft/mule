@@ -15,33 +15,39 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
 /**
  * Calculate and record the processing time for a message processing chain
  */
-public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor {
-
-  public ProcessingTimeInterceptor() {
-    super();
-  }
-
-  public ProcessingTimeInterceptor(MessageProcessor next, FlowConstruct fc) {
-    setListener(next);
-    setFlowConstruct(fc);
-  }
-
-  @Override
-  public MuleEvent before(MuleEvent event) throws MuleException {
-    return event;
-  }
-
-  @Override
-  public MuleEvent after(MuleEvent event) throws MuleException {
-    return event;
-  }
-
-
-  @Override
-  public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
-    if (time != null) {
-      time.addFlowExecutionBranchTime(startTime);
+public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor
+{
+    public ProcessingTimeInterceptor()
+    {
+        super();
     }
-    return event;
-  }
+
+    public ProcessingTimeInterceptor(MessageProcessor next, FlowConstruct fc)
+    {
+        setListener(next);
+        setFlowConstruct(fc);
+    }
+
+    @Override
+    public MuleEvent before(MuleEvent event) throws MuleException
+    {
+        return event;
+    }
+
+    @Override
+    public MuleEvent after(MuleEvent event) throws MuleException
+    {
+        return event;
+    }
+
+
+    @Override
+    public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException
+    {
+        if (time != null)
+        {
+            time.addFlowExecutionBranchTime(startTime);
+        }
+        return event;
+    }
 }

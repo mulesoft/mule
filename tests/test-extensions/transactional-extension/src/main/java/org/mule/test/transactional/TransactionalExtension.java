@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Providers(LocalTransactionProvider.class)
 @Operations(TransactionalOperations.class)
 @Xml(namespace = "tx")
-public class TransactionalExtension {
+public class TransactionalExtension
+{
 
 }

@@ -18,85 +18,103 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.map.LRUMap;
 
-public class GraphTransformerResolver implements TransformerResolver {
+public class GraphTransformerResolver implements TransformerResolver
+{
 
-  private ReentrantReadWriteLock readWriteLock;
-  private TransformationGraph graph;
-  private CompositeConverterFilter converterFilter;
-  private LRUMap cache;
-  private TransformationGraphLookupStrategy lookupStrategyTransformation;
+    private ReentrantReadWriteLock readWriteLock;
+    private TransformationGraph graph;
+    private CompositeConverterFilter converterFilter;
+    private LRUMap cache;
+    private TransformationGraphLookupStrategy lookupStrategyTransformation;
 
-  public GraphTransformerResolver() {
-    this.readWriteLock = new ReentrantReadWriteLock();
-    this.graph = new TransformationGraph();
-    lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
-    converterFilter = new CompositeConverterFilter(new TransformationLengthConverterFilter(),
-                                                   new PriorityWeightingConverterFilter(), new NameConverterFilter());
-    cache = new LRUMap();
-  }
-
-  @Override
-  public Transformer resolve(DataType source, DataType result) throws ResolverException {
-    String cacheKey = getDataTypeSourceResultPairHash(source, result);
-
-    readWriteLock.readLock().lock();
-    try {
-      if (cache.containsKey(cacheKey)) {
-        return (Converter) cache.get(cacheKey);
-      }
-    } finally {
-      readWriteLock.readLock().unlock();
+    public GraphTransformerResolver()
+    {
+        this.readWriteLock = new ReentrantReadWriteLock();
+        this.graph = new TransformationGraph();
+        lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
+        converterFilter = new CompositeConverterFilter(new TransformationLengthConverterFilter(), new PriorityWeightingConverterFilter(), new NameConverterFilter());
+        cache = new LRUMap();
     }
 
-    List<Converter> converters =
-        converterFilter.filter(lookupStrategyTransformation.lookupConverters(source, result), source, result);
+    @Override
+    public Transformer resolve(DataType source, DataType result) throws ResolverException
+    {
+        String cacheKey = getDataTypeSourceResultPairHash(source, result);
 
-    if (converters.size() > 1) {
-      throw new ResolverException(CoreMessages.transformHasMultipleMatches(source.getType(), result.getType(), converters));
+        readWriteLock.readLock().lock();
+        try
+        {
+            if (cache.containsKey(cacheKey))
+            {
+                return (Converter) cache.get(cacheKey);
+            }
+        }
+        finally
+        {
+            readWriteLock.readLock().unlock();
+        }
+
+        List<Converter> converters = converterFilter.filter(lookupStrategyTransformation.lookupConverters(source, result), source, result);
+
+        if (converters.size() > 1)
+        {
+            throw new ResolverException(CoreMessages.transformHasMultipleMatches(source.getType(), result.getType(), converters));
+        }
+
+        Transformer converter = (converters.size() == 0) ? null : converters.get(0);
+
+
+        readWriteLock.writeLock().lock();
+        try
+        {
+            cache.put(cacheKey, converter);
+        }
+        finally
+        {
+            readWriteLock.writeLock().unlock();
+        }
+
+        return converter;
     }
 
-    Transformer converter = (converters.size() == 0) ? null : converters.get(0);
+    private String getDataTypeSourceResultPairHash(DataType source, DataType result)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(source.getClass().getName());
+        builder.append(source.hashCode());
+        builder.append(":");
+        builder.append(result.getClass().getName());
+        builder.append(result.hashCode());
 
-
-    readWriteLock.writeLock().lock();
-    try {
-      cache.put(cacheKey, converter);
-    } finally {
-      readWriteLock.writeLock().unlock();
+        return builder.toString();
     }
 
-    return converter;
-  }
+    @Override
+    public void transformerChange(Transformer transformer, RegistryAction registryAction)
+    {
+        readWriteLock.writeLock().lock();
 
-  private String getDataTypeSourceResultPairHash(DataType source, DataType result) {
-    StringBuilder builder = new StringBuilder();
-    builder.append(source.getClass().getName());
-    builder.append(source.hashCode());
-    builder.append(":");
-    builder.append(result.getClass().getName());
-    builder.append(result.hashCode());
+        try
+        {
+            if (!(transformer instanceof Converter))
+            {
+                return;
+            }
 
-    return builder.toString();
-  }
+            cache.clear();
 
-  @Override
-  public void transformerChange(Transformer transformer, RegistryAction registryAction) {
-    readWriteLock.writeLock().lock();
-
-    try {
-      if (!(transformer instanceof Converter)) {
-        return;
-      }
-
-      cache.clear();
-
-      if (registryAction == RegistryAction.ADDED) {
-        graph.addConverter((Converter) transformer);
-      } else if (registryAction == RegistryAction.REMOVED) {
-        graph.removeConverter((Converter) transformer);
-      }
-    } finally {
-      readWriteLock.writeLock().unlock();
+            if (registryAction == RegistryAction.ADDED)
+            {
+                graph.addConverter((Converter) transformer);
+            }
+            else if (registryAction == RegistryAction.REMOVED)
+            {
+                graph.removeConverter((Converter) transformer);
+            }
+        }
+        finally
+        {
+            readWriteLock.writeLock().unlock();
+        }
     }
-  }
 }

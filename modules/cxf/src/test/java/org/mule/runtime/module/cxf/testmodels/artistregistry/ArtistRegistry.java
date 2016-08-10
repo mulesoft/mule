@@ -12,42 +12,45 @@ import java.util.List;
 
 import javax.jws.WebParam;
 
-public class ArtistRegistry implements ArtistRegistryWebServices {
+public class ArtistRegistry implements ArtistRegistryWebServices
+{
+    private List<Artist> artists;
 
-  private List<Artist> artists;
+    public ArtistRegistry()
+    {
+        initMockArtists();
+    }
 
-  public ArtistRegistry() {
-    initMockArtists();
-  }
+    @Override
+    public void addArtist(@WebParam(partName = "arg0", name = "arg0") Artist arg0)
+    {
+        artists.add(arg0);
+    }
 
-  @Override
-  public void addArtist(@WebParam(partName = "arg0", name = "arg0") Artist arg0) {
-    artists.add(arg0);
-  }
+    @Override
+    public ArtistArray getAll(@WebParam(partName = "pageSize", name = "pageSize") int pageSize, @WebParam(partName = "pageNumber", name = "pageNumber") int pageNumber)
+    {
+        ArtistArray artistArray = new ArtistArray();
+        List<Artist> artistList = artistArray.getItem();
+        artistList.addAll(artists);
+        return artistArray;
+    }
 
-  @Override
-  public ArtistArray getAll(@WebParam(partName = "pageSize", name = "pageSize") int pageSize,
-                            @WebParam(partName = "pageNumber", name = "pageNumber") int pageNumber) {
-    ArtistArray artistArray = new ArtistArray();
-    List<Artist> artistList = artistArray.getItem();
-    artistList.addAll(artists);
-    return artistArray;
-  }
+    private void initMockArtists()
+    {
+        artists = new ArrayList<Artist>();
+        Artist author = new Artist();
+        author.setArtType(ArtType.AUTHOR);
+        author.setFamousWorks("Hamlet");
+        author.setFirstName("William");
+        author.setLastName("Shakespeare");
+        artists.add(author);
 
-  private void initMockArtists() {
-    artists = new ArrayList<Artist>();
-    Artist author = new Artist();
-    author.setArtType(ArtType.AUTHOR);
-    author.setFamousWorks("Hamlet");
-    author.setFirstName("William");
-    author.setLastName("Shakespeare");
-    artists.add(author);
-
-    Artist actor = new Artist();
-    actor.setArtType(ArtType.ACTOR);
-    actor.setFamousWorks("Mission Impossible");
-    actor.setFirstName("Tom");
-    actor.setLastName("Cruise");
-    artists.add(actor);
-  }
+        Artist actor = new Artist();
+        actor.setArtType(ArtType.ACTOR);
+        actor.setFamousWorks("Mission Impossible");
+        actor.setFirstName("Tom");
+        actor.setLastName("Cruise");
+        artists.add(actor);
+    }
 }

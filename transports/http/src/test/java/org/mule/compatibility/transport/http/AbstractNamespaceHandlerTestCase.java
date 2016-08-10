@@ -12,39 +12,42 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase {
+public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase
+{
+    private String prefix;
 
-  private String prefix;
+    protected AbstractNamespaceHandlerTestCase(String prefix)
+    {
+        this.prefix = prefix;
+    }
 
-  protected AbstractNamespaceHandlerTestCase(String prefix) {
-    this.prefix = prefix;
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return prefix + "-namespace-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return prefix + "-namespace-config.xml";
-  }
+    protected void testBasicProperties(HttpConnector connector)
+    {
+        assertNotNull(connector);
 
-  protected void testBasicProperties(HttpConnector connector) {
-    assertNotNull(connector);
-
-    assertEquals(1234, connector.getClientSoTimeout());
-    assertEquals("netscape", connector.getCookieSpec());
-    assertEquals("bcd", connector.getProxyHostname());
-    assertEquals("cde", connector.getProxyPassword());
-    assertEquals(2345, connector.getProxyPort());
-    assertEquals("def", connector.getProxyUsername());
-    assertEquals(34, connector.getReceiveBacklog());
-    assertEquals(4567, connector.getReceiveBufferSize());
-    assertEquals(5678, connector.getSendBufferSize());
-    assertEquals(6789, connector.getSocketSoLinger());
-    assertEquals(7890, connector.getServerSoTimeout());
-    assertEquals(4000, connector.getConnectionTimeout());
-    assertEquals(true, connector.isEnableCookies());
-    assertEquals(true, connector.isKeepAlive());
-    assertEquals(true, connector.isKeepSendSocketOpen());
-    assertEquals(true, connector.isSendTcpNoDelay());
-    assertEquals(false, connector.isValidateConnections());
-  }
+        assertEquals(1234, connector.getClientSoTimeout());
+        assertEquals("netscape", connector.getCookieSpec());
+        assertEquals("bcd", connector.getProxyHostname());
+        assertEquals("cde", connector.getProxyPassword());
+        assertEquals(2345, connector.getProxyPort());
+        assertEquals("def", connector.getProxyUsername());
+        assertEquals(34, connector.getReceiveBacklog());
+        assertEquals(4567, connector.getReceiveBufferSize());
+        assertEquals(5678, connector.getSendBufferSize());
+        assertEquals(6789, connector.getSocketSoLinger());
+        assertEquals(7890, connector.getServerSoTimeout());
+        assertEquals(4000, connector.getConnectionTimeout());
+        assertEquals(true, connector.isEnableCookies());
+        assertEquals(true, connector.isKeepAlive());
+        assertEquals(true, connector.isKeepSendSocketOpen());
+        assertEquals(true, connector.isSendTcpNoDelay());
+        assertEquals(false, connector.isValidateConnections());
+    }
 
 }

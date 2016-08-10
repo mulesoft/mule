@@ -21,98 +21,106 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
-// Test is ignored since ExceptionHandlingMessageProcessor is not longer used - should be removed in next major release
-public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
+//Test is ignored since ExceptionHandlingMessageProcessor is not longer used - should be removed in next major release
+public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessageProcessorTestCase
+{
+    private TestExceptionListener exceptionListener;
 
-  private TestExceptionListener exceptionListener;
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        exceptionListener = new TestExceptionListener();
+    }
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    exceptionListener = new TestExceptionListener();
-  }
+    @Test
+    public void testNoCatch() throws Exception
+    {
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
+        InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
+        TestListener listener = new TestListener();
+        mp.setListener(listener);
 
-  @Test
-  public void testNoCatch() throws Exception {
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
-    InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
-    TestListener listener = new TestListener();
-    mp.setListener(listener);
+        MuleEvent event = createTestOutboundEvent();
 
-    MuleEvent event = createTestOutboundEvent();
+        MuleEvent result = mp.process(event);
 
-    MuleEvent result = mp.process(event);
+        assertSame(event, listener.sensedEvent);
+        assertSame(event, result);
+        assertNull(exceptionListener.sensedException);
+    }
 
-    assertSame(event, listener.sensedEvent);
-    assertSame(event, result);
-    assertNull(exceptionListener.sensedException);
-  }
+    @Test
+    public void testCatchRuntimeExceptionSync() throws Exception
+    {
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
+        InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
+        mp.setListener(new ExceptionThrowingMessageProcessor());
 
-  @Test
-  public void testCatchRuntimeExceptionSync() throws Exception {
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
-    InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
-    mp.setListener(new ExceptionThrowingMessageProcessor());
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+        MuleEvent resultEvent = mp.process(event);
+        assertNotNull(resultEvent);
+        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-    MuleEvent resultEvent = mp.process(event);
-    assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+        assertEquals(null, resultEvent.getMessage().getPayload());
+        assertNotNull(exceptionListener.sensedException);
+    }
 
-    assertEquals(null, resultEvent.getMessage().getPayload());
-    assertNotNull(exceptionListener.sensedException);
-  }
+    @Test
+    public void testCatchRuntimeExceptionAsync() throws Exception
+    {
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 
+            MessageExchangePattern.ONE_WAY, null);
+        InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
+        mp.setListener(new ExceptionThrowingMessageProcessor());
 
-  @Test
-  public void testCatchRuntimeExceptionAsync() throws Exception {
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, MessageExchangePattern.ONE_WAY, null);
-    InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
-    mp.setListener(new ExceptionThrowingMessageProcessor());
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+        MuleEvent resultEvent = mp.process(event);
+        assertNotNull(resultEvent);
+        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-    MuleEvent resultEvent = mp.process(event);
-    assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+        assertEquals(null, resultEvent.getMessage().getPayload());
+        assertNotNull(exceptionListener.sensedException);
+    }
 
-    assertEquals(null, resultEvent.getMessage().getPayload());
-    assertNotNull(exceptionListener.sensedException);
-  }
+    @Test
+    public void testCatchDispatchExceptionSync() throws Exception
+    {
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
+        InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
+        mp.setListener(new ExceptionThrowingMessageProcessor());
 
-  @Test
-  public void testCatchDispatchExceptionSync() throws Exception {
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
-    InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
-    mp.setListener(new ExceptionThrowingMessageProcessor());
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+        MuleEvent resultEvent = mp.process(event);
+        assertNotNull(resultEvent);
+        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-    MuleEvent resultEvent = mp.process(event);
-    assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+        assertEquals(null, resultEvent.getMessage().getPayload());
+        assertNotNull(exceptionListener.sensedException);
+    }
 
-    assertEquals(null, resultEvent.getMessage().getPayload());
-    assertNotNull(exceptionListener.sensedException);
-  }
+    @Test
+    public void testCatchDispatchExceptionAsync() throws Exception
+    {
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 
+            MessageExchangePattern.ONE_WAY, null);
+        InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
+        mp.setListener(new ExceptionThrowingMessageProcessor());
 
-  @Test
-  public void testCatchDispatchExceptionAsync() throws Exception {
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, MessageExchangePattern.ONE_WAY, null);
-    InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
-    mp.setListener(new ExceptionThrowingMessageProcessor());
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+        MuleEvent resultEvent = mp.process(event);
+        assertNotNull(resultEvent);
+        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-    MuleEvent resultEvent = mp.process(event);
-    assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
-
-    assertEquals(null, resultEvent.getMessage().getPayload());
-    assertNotNull(exceptionListener.sensedException);
-  }
+        assertEquals(null, resultEvent.getMessage().getPayload());
+        assertNotNull(exceptionListener.sensedException);
+    }
 }

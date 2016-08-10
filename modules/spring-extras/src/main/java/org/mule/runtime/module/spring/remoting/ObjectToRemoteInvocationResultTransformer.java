@@ -20,35 +20,44 @@ import org.springframework.remoting.support.RemoteInvocationResult;
  * Converts an Object to a Spring RemoteInvocationResult and then into a byte[].
  */
 
-public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer {
-
-  public ObjectToRemoteInvocationResultTransformer() {
-    super();
-    setReturnDataType(DataType.BYTE_ARRAY);
-  }
-
-  @Override
-  protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-    try {
-      if (logger.isDebugEnabled()) {
-        logger.debug("ObjectToRemoteInvocationResult.doTransform(" + src + ")");
-      }
-
-      RemoteInvocationResult rval;
-
-      if (src instanceof RemoteInvocationResult) {
-        rval = (RemoteInvocationResult) src;
-      } else {
-        rval = new RemoteInvocationResult(src);
-      }
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = new ObjectOutputStream(baos);
-      oos.writeObject(rval);
-      oos.close();
-      return baos.toByteArray();
-    } catch (Exception e) {
-      throw new TransformerException(this, e);
+public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer
+{
+    public ObjectToRemoteInvocationResultTransformer()
+    {
+        super();
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
-  }
+
+    @Override
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
+    {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("ObjectToRemoteInvocationResult.doTransform(" + src + ")");
+            }
+
+            RemoteInvocationResult rval;
+
+            if (src instanceof RemoteInvocationResult)
+            {
+                rval = (RemoteInvocationResult)src;
+            }
+            else
+            {
+                rval = new RemoteInvocationResult(src);
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(rval);
+            oos.close();
+            return baos.toByteArray();
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
+    }
 }

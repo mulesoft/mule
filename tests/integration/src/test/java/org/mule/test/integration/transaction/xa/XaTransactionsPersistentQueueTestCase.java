@@ -16,22 +16,23 @@ import org.mule.runtime.core.transaction.XaTransactionFactory;
 
 import org.junit.Test;
 
-public class XaTransactionsPersistentQueueTestCase extends AbstractIntegrationTestCase {
+public class XaTransactionsPersistentQueueTestCase extends AbstractIntegrationTestCase
+{
+    private static final String TEST_MESSAGE = "TEST_MESSAGE";
 
-  private static final String TEST_MESSAGE = "TEST_MESSAGE";
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/transaction/xa-transaction-persistent-queue-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/transaction/xa-transaction-persistent-queue-flow.xml";
-  }
+    @Test
+    public void testOutboundRouterTransactions() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testOutboundRouterTransactions() throws Exception {
-    MuleClient client = muleContext.getClient();
+        flowRunner("XaTestService").withPayload(TEST_MESSAGE).asynchronously().transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).run().getMessage();
 
-    flowRunner("XaTestService").withPayload(TEST_MESSAGE).asynchronously()
-        .transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).run().getMessage();
-
-    assertThat(client.request("test://finish", RECEIVE_TIMEOUT), not(nullValue()));
-  }
+        assertThat(client.request("test://finish", RECEIVE_TIMEOUT), not(nullValue()));
+    }
 }

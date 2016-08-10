@@ -15,26 +15,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>TimerInterceptor</code> simply times and displays the time taken to process an event.
+ * <code>TimerInterceptor</code> simply times and displays the time taken to process
+ * an event.
  */
-public class TimerInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor {
+public class TimerInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
+{
+    /**
+     * logger used by this class
+     */
+    private static Logger logger = LoggerFactory.getLogger(TimerInterceptor.class);
 
-  /**
-   * logger used by this class
-   */
-  private static Logger logger = LoggerFactory.getLogger(TimerInterceptor.class);
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        long startTime = System.currentTimeMillis();
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    long startTime = System.currentTimeMillis();
+        MuleEvent resultEvent = processNext(event);
 
-    MuleEvent resultEvent = processNext(event);
+        if (logger.isInfoEnabled())
+        {
+            long executionTime = System.currentTimeMillis() - startTime;
+            logger.info(resultEvent.getFlowConstruct().getName() + " took " + executionTime
+                        + "ms to process event [" + resultEvent.getId() + "]");
+        }
 
-    if (logger.isInfoEnabled()) {
-      long executionTime = System.currentTimeMillis() - startTime;
-      logger.info(resultEvent.getFlowConstruct().getName() + " took " + executionTime + "ms to process event ["
-          + resultEvent.getId() + "]");
+        return resultEvent;
     }
-
-    return resultEvent;
-  }
 }

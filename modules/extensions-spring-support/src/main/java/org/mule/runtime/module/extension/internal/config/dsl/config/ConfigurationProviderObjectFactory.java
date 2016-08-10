@@ -30,90 +30,116 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider} instances
+ * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider}
+ * instances
  *
  * @since 4.0
  */
-class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider<Object>>
-    implements ObjectFactory<ConfigurationProvider<Object>> {
+class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider<Object>> implements ObjectFactory<ConfigurationProvider<Object>>
+{
+    private final String name;
+    private final RuntimeConfigurationModel configurationModel;
+    private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
+    private final MuleContext muleContext;
 
-  private final String name;
-  private final RuntimeConfigurationModel configurationModel;
-  private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
-  private final MuleContext muleContext;
+    private DynamicConfigPolicy dynamicConfigPolicy;
+    private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
+    private ConfigurationProvider<Object> instance;
+    private boolean requiresConnection = false;
 
-  private DynamicConfigPolicy dynamicConfigPolicy;
-  private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
-  private ConfigurationProvider<Object> instance;
-  private boolean requiresConnection = false;
-
-  @Inject
-  private TimeSupplier timeSupplier;
+    @Inject
+    private TimeSupplier timeSupplier;
 
 
-  ConfigurationProviderObjectFactory(String name, RuntimeConfigurationModel configurationModel, MuleContext muleContext) {
-    this.name = name;
-    this.configurationModel = configurationModel;
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public ConfigurationProvider<Object> getObject() throws Exception {
-    if (instance == null) {
-      instance = createInnerInstance();
-    }
-    return instance;
-  }
-
-  private ConfigurationProvider<Object> createInnerInstance() throws ConfigurationException {
-    ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
-    final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
-
-    ConfigurationProvider<Object> configurationProvider;
-    try {
-      if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
-        configurationProvider =
-            configurationProviderFactory.createDynamicConfigurationProvider(name, configurationModel, resolverSet,
-                                                                            connectionProviderResolver, getDynamicConfigPolicy());
-      } else {
-        configurationProvider = configurationProviderFactory
-            .createStaticConfigurationProvider(name, configurationModel, resolverSet, connectionProviderResolver, muleContext);
-      }
-
-      muleContext.getInjector().inject(configurationProvider);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    ConfigurationProviderObjectFactory(String name,
+                                       RuntimeConfigurationModel configurationModel,
+                                       MuleContext muleContext)
+    {
+        this.name = name;
+        this.configurationModel = configurationModel;
+        this.muleContext = muleContext;
     }
 
-    return configurationProvider;
-  }
-
-  private DynamicConfigPolicy getDynamicConfigPolicy() {
-    if (dynamicConfigPolicy == null) {
-      dynamicConfigPolicy = DynamicConfigPolicy.getDefault(timeSupplier);
+    @Override
+    public ConfigurationProvider<Object> getObject() throws Exception
+    {
+        if (instance == null)
+        {
+            instance = createInnerInstance();
+        }
+        return instance;
     }
 
-    return dynamicConfigPolicy;
-  }
+    private ConfigurationProvider<Object> createInnerInstance() throws ConfigurationException
+    {
+        ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
+        final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
-  private ValueResolver<ConnectionProvider> getConnectionProviderResolver() {
-    return connectionProviderResolver.orElseGet(() -> {
-      if (requiresConnection) {
-        return new ImplicitConnectionProviderValueResolver(name, configurationModel);
-      }
-      return new StaticValueResolver<>(null);
-    });
-  }
+        ConfigurationProvider<Object> configurationProvider;
+        try
+        {
+            if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic())
+            {
+                configurationProvider = configurationProviderFactory.createDynamicConfigurationProvider(
+                        name,
+                        configurationModel,
+                        resolverSet,
+                        connectionProviderResolver,
+                        getDynamicConfigPolicy());
+            }
+            else
+            {
+                configurationProvider = configurationProviderFactory.createStaticConfigurationProvider(
+                        name,
+                        configurationModel,
+                        resolverSet,
+                        connectionProviderResolver,
+                        muleContext);
+            }
 
-  public void setDynamicConfigPolicy(DynamicConfigPolicy dynamicConfigPolicy) {
-    this.dynamicConfigPolicy = dynamicConfigPolicy;
-  }
+            muleContext.getInjector().inject(configurationProvider);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
 
-  public void setConnectionProviderResolver(ConnectionProviderResolver connectionProviderResolver) {
-    this.connectionProviderResolver = ofNullable(connectionProviderResolver);
-  }
+        return configurationProvider;
+    }
 
-  public void setRequiresConnection(boolean requiresConnection) {
-    this.requiresConnection = requiresConnection;
-  }
+    private DynamicConfigPolicy getDynamicConfigPolicy()
+    {
+        if (dynamicConfigPolicy == null)
+        {
+            dynamicConfigPolicy = DynamicConfigPolicy.getDefault(timeSupplier);
+        }
+
+        return dynamicConfigPolicy;
+    }
+
+    private ValueResolver<ConnectionProvider> getConnectionProviderResolver()
+    {
+        return connectionProviderResolver.orElseGet(() -> {
+            if (requiresConnection)
+            {
+                return new ImplicitConnectionProviderValueResolver(name, configurationModel);
+            }
+            return new StaticValueResolver<>(null);
+        });
+    }
+
+    public void setDynamicConfigPolicy(DynamicConfigPolicy dynamicConfigPolicy)
+    {
+        this.dynamicConfigPolicy = dynamicConfigPolicy;
+    }
+
+    public void setConnectionProviderResolver(ConnectionProviderResolver connectionProviderResolver)
+    {
+        this.connectionProviderResolver = ofNullable(connectionProviderResolver);
+    }
+
+    public void setRequiresConnection(boolean requiresConnection)
+    {
+        this.requiresConnection = requiresConnection;
+    }
 }

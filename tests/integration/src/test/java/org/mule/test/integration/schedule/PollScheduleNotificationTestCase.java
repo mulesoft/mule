@@ -21,48 +21,53 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class PollScheduleNotificationTestCase extends AbstractIntegrationTestCase {
-
-  private Prober prober = new PollingProber(5000, 100l);
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/schedule/poll-notifications-config.xml";
-  }
-
-  @Test
-  public void validateNotificationsAreSent() throws Exception {
-    final MyListener listener = new MyListener();
-    muleContext.getNotificationManager().addListener(listener);
-    Flow flow = (Flow) getFlowConstruct("pollfoo");
-    PollingMessageSource pollingMessageSource = (PollingMessageSource) flow.getMessageSource();
-    prober.check(new Probe() {
-
-      @Override
-      public boolean isSatisfied() {
-        return listener.getNotifications().size() > 1
-            && pollingMessageSource.getPollingUniqueName().equals(listener.getNotifications().get(0).getEndpoint());
-      }
-
-      @Override
-      public String describeFailure() {
-        return "The notification was never sent";
-      }
-    });
-
-  }
-
-  class MyListener implements ConnectorMessageNotificationListener<ConnectorMessageNotification> {
-
-    List<ConnectorMessageNotification> notifications = new ArrayList<>();
+public class PollScheduleNotificationTestCase extends AbstractIntegrationTestCase
+{
+    private Prober prober = new PollingProber(5000, 100l);
 
     @Override
-    public void onNotification(ConnectorMessageNotification notification) {
-      notifications.add(notification);
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/schedule/poll-notifications-config.xml";
     }
 
-    public List<ConnectorMessageNotification> getNotifications() {
-      return notifications;
+    @Test
+    public void validateNotificationsAreSent() throws Exception
+    {
+        final MyListener listener = new MyListener();
+        muleContext.getNotificationManager().addListener(listener);
+        Flow flow = (Flow) getFlowConstruct("pollfoo");
+        PollingMessageSource pollingMessageSource = (PollingMessageSource) flow.getMessageSource();
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return listener.getNotifications().size() > 1 && pollingMessageSource.getPollingUniqueName().equals(listener.getNotifications().get(0).getEndpoint());
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The notification was never sent";
+            }
+        });
+
     }
-  }
+    class MyListener implements ConnectorMessageNotificationListener<ConnectorMessageNotification>
+    {
+
+        List<ConnectorMessageNotification> notifications = new ArrayList<>();
+
+        @Override
+        public void onNotification(ConnectorMessageNotification notification)
+        {
+            notifications.add(notification);
+        }
+
+        public List<ConnectorMessageNotification> getNotifications()
+        {
+            return notifications;
+        }
+    }
 }

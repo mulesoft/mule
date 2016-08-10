@@ -23,50 +23,58 @@ import org.mule.runtime.core.construct.builder.AbstractFlowConstructBuilder;
 @Deprecated
 @SuppressWarnings("unchecked")
 public abstract class AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<T extends AbstractFlowConstructBuilder<?, ?>, F extends AbstractFlowConstruct>
-    extends AbstractFlowConstructWithSingleInboundEndpointBuilder<T, F> {
+    extends AbstractFlowConstructWithSingleInboundEndpointBuilder<T, F>
+{
+    private OutboundEndpoint outboundEndpoint;
+    private EndpointBuilder outboundEndpointBuilder;
+    private String outboundAddress;
 
-  private OutboundEndpoint outboundEndpoint;
-  private EndpointBuilder outboundEndpointBuilder;
-  private String outboundAddress;
-
-  public T outboundEndpoint(OutboundEndpoint outboundEndpoint) {
-    this.outboundEndpoint = outboundEndpoint;
-    return (T) this;
-  }
-
-  public T outboundEndpoint(EndpointBuilder outboundEndpointBuilder) {
-    this.outboundEndpointBuilder = outboundEndpointBuilder;
-    return (T) this;
-  }
-
-  public T outboundAddress(String outboundAddress) {
-    this.outboundAddress = outboundAddress;
-    return (T) this;
-  }
-
-  protected OutboundEndpoint getOrBuildOutboundEndpoint(MuleContext muleContext) throws MuleException {
-    if (outboundEndpoint != null) {
-      return outboundEndpoint;
+    public T outboundEndpoint(OutboundEndpoint outboundEndpoint)
+    {
+        this.outboundEndpoint = outboundEndpoint;
+        return (T) this;
     }
 
-    if (outboundEndpointBuilder == null) {
-      outboundEndpointBuilder = getEndpointFactory(muleContext.getRegistry()).getEndpointBuilder(outboundAddress);
+    public T outboundEndpoint(EndpointBuilder outboundEndpointBuilder)
+    {
+        this.outboundEndpointBuilder = outboundEndpointBuilder;
+        return (T) this;
     }
 
-    outboundEndpointBuilder.setExchangePattern(getOutboundMessageExchangePattern());
+    public T outboundAddress(String outboundAddress)
+    {
+        this.outboundAddress = outboundAddress;
+        return (T) this;
+    }
 
-    doConfigureOutboundEndpointBuilder(muleContext, outboundEndpointBuilder);
+    protected OutboundEndpoint getOrBuildOutboundEndpoint(MuleContext muleContext) throws MuleException
+    {
+        if (outboundEndpoint != null)
+        {
+            return outboundEndpoint;
+        }
 
-    return outboundEndpointBuilder.buildOutboundEndpoint();
-  }
+        if (outboundEndpointBuilder == null)
+        {
+            outboundEndpointBuilder = getEndpointFactory(muleContext.getRegistry()).getEndpointBuilder(outboundAddress);
+        }
 
-  protected abstract MessageExchangePattern getOutboundMessageExchangePattern();
+        outboundEndpointBuilder.setExchangePattern(getOutboundMessageExchangePattern());
 
-  protected void doConfigureOutboundEndpointBuilder(MuleContext muleContext, EndpointBuilder endpointBuilder) {
-    // template method
-  }
+        doConfigureOutboundEndpointBuilder(muleContext, outboundEndpointBuilder);
 
-  public EndpointFactory getEndpointFactory(MuleRegistry registry) {
-    return (EndpointFactory) registry.lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-  }
+        return outboundEndpointBuilder.buildOutboundEndpoint();
+    }
+
+    protected abstract MessageExchangePattern getOutboundMessageExchangePattern();
+
+    protected void doConfigureOutboundEndpointBuilder(MuleContext muleContext, EndpointBuilder endpointBuilder)
+    {
+        // template method
+    }
+
+    public EndpointFactory getEndpointFactory(MuleRegistry registry)
+    {
+        return (EndpointFactory) registry.lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+    }
 }

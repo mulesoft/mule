@@ -7,34 +7,34 @@
 package org.mule.runtime.module.management.mbean;
 
 /**
- * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the Mule server configuration. This is read-only
- * after start-up
+ * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the
+ * Mule server configuration. This is read-only after start-up
  * 
  */
-public interface MuleConfigurationServiceMBean {
+public interface MuleConfigurationServiceMBean
+{
+    String DEFAULT_JMX_NAME = "name=Configuration";
 
-  String DEFAULT_JMX_NAME = "name=Configuration";
+    int getSynchronousEventTimeout();
 
-  int getSynchronousEventTimeout();
+    String getWorkingDirectory();
 
-  String getWorkingDirectory();
+    int getTransactionTimeout();
+    
+    int getShutdownTimeout();
+    
+    String getEncoding();
 
-  int getTransactionTimeout();
+    boolean isContainerMode();
 
-  int getShutdownTimeout();
+    boolean isFullStackTraces();
 
-  String getEncoding();
+    void setFullStackTraces(boolean sanitize);
 
-  boolean isContainerMode();
+    String getStackTraceFilter();
 
-  boolean isFullStackTraces();
-
-  void setFullStackTraces(boolean sanitize);
-
-  String getStackTraceFilter();
-
-  /**
-   * Comma-separated list of packages and/or classes to remove.
-   */
-  void setStackTraceFilter(String filterAsString);
+    /**
+     * Comma-separated list of packages and/or classes to remove.
+     */
+    void setStackTraceFilter(String filterAsString);
 }

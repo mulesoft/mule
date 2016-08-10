@@ -8,21 +8,24 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Sum extends AggregateCounter {
+public class Sum extends AggregateCounter
+{
+    private double value;
 
-  private double value;
+    public Sum(String name, AbstractCounter base)
+    {
+        super(name, Type.SUM, base);
+    }
 
-  public Sum(String name, AbstractCounter base) {
-    super(name, Type.SUM, base);
-  }
+    @Override
+    public double nextValue()
+    {
+        return this.value;
+    }
 
-  @Override
-  public double nextValue() {
-    return this.value;
-  }
-
-  @Override
-  public void doCompute() {
-    this.value += getBase().nextValue();
-  }
+    @Override
+    public void doCompute()
+    {
+        this.value += getBase().nextValue();
+    }
 }

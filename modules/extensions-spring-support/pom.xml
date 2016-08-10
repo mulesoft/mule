@@ -16,10 +16,6 @@
         backed by the spring framework
     </description>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>

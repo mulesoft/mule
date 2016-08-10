@@ -17,24 +17,26 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class PropertiesWithAllTestCase extends FunctionalTestCase {
+public class PropertiesWithAllTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/issues/all-properties.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/issues/all-properties.xml";
-  }
-
-  @Test
-  public void testSessionAndOutboundProperties() throws Exception {
-    MuleEvent response = flowRunner("flow1").withPayload("Hello").run();
-    assertNotNull(response);
-    assertEquals("foo", response.getSession().getProperty("foo"));
-    assertEquals("bar", response.getSession().getProperty("bar"));
-    assertEquals("baz", response.getSession().getProperty("baz"));
-    assertNull(response.getMessage().<String>getOutboundProperty("outbar"));
-    assertNull(response.getMessage().<String>getOutboundProperty("outbaz"));
-  }
+    @Test
+    public void testSessionAndOutboundProperties() throws Exception
+    {
+        MuleEvent response = flowRunner("flow1").withPayload("Hello").run();
+        assertNotNull(response);
+        assertEquals("foo", response.getSession().getProperty("foo"));
+        assertEquals("bar", response.getSession().getProperty("bar"));
+        assertEquals("baz", response.getSession().getProperty("baz"));
+        assertNull(response.getMessage().<String>getOutboundProperty("outbar"));
+        assertNull(response.getMessage().<String>getOutboundProperty("outbaz"));
+    }
 }

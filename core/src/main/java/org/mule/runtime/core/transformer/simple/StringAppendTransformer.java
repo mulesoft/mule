@@ -15,50 +15,64 @@ import org.mule.runtime.core.util.StringUtils;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-public class StringAppendTransformer extends AbstractTransformer {
+public class StringAppendTransformer extends AbstractTransformer
+{
+    private String message = StringUtils.EMPTY;
 
-  private String message = StringUtils.EMPTY;
-
-  public StringAppendTransformer() {
-    this(StringUtils.EMPTY);
-  }
-
-  public StringAppendTransformer(String message) {
-    this.message = message;
-    registerSourceType(DataType.STRING);
-    registerSourceType(DataType.BYTE_ARRAY);
-    registerSourceType(DataType.INPUT_STREAM);
-    setReturnDataType(DataType.STRING);
-  }
-
-  @Override
-  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
-    String string;
-    if (src instanceof byte[]) {
-      string = new String((byte[]) src);
-    } else if (src instanceof InputStream) {
-      InputStream input = (InputStream) src;
-      try {
-        string = IOUtils.toString(input);
-      } finally {
-        IOUtils.closeQuietly(input);
-      }
-    } else {
-      string = (String) src;
+    public StringAppendTransformer()
+    {
+        this(StringUtils.EMPTY);
     }
 
-    return append(message, string);
-  }
+    public StringAppendTransformer(String message)
+    {
+        this.message = message;
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.INPUT_STREAM);
+        setReturnDataType(DataType.STRING);
+    }
 
-  public static String append(String append, String msg) {
-    return msg + append;
-  }
+    @Override
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
+    {
+        String string;
+        if (src instanceof byte[])
+        {
+            string = new String((byte[]) src);
+        }
+        else if (src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
+            try
+            {
+                string = IOUtils.toString(input);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(input);
+            }
+        }
+        else
+        {
+            string = (String) src;
+        }
 
-  public String getMessage() {
-    return message;
-  }
+        return append(message, string);
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public static String append(String append, String msg)
+    {
+        return msg + append;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public void setMessage(String message)
+    {
+        this.message = message;
+    }
 }

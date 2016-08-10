@@ -15,32 +15,37 @@ import org.mule.runtime.core.api.transaction.UniversalTransactionFactory;
  * <p>
  * <code>JmsTransactionFactory</code> creates a JMS local transaction
  */
-public class JmsTransactionFactory implements UniversalTransactionFactory {
+public class JmsTransactionFactory implements UniversalTransactionFactory
+{
+    private String name;
+    
+    @Override
+    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
+    {
+        JmsTransaction tx = new JmsTransaction(muleContext);
+        tx.begin();
+        return tx;
+    }
 
-  private String name;
+    @Override
+    public boolean isTransacted()
+    {
+        return true;
+    }
 
-  @Override
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
-    JmsTransaction tx = new JmsTransaction(muleContext);
-    tx.begin();
-    return tx;
-  }
+    public String getName()
+    {
+        return name;
+    }
 
-  @Override
-  public boolean isTransacted() {
-    return true;
-  }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public Transaction createUnboundTransaction(MuleContext muleContext) {
-    return new JmsTransaction(muleContext);
-  }
+    @Override
+    public Transaction createUnboundTransaction(MuleContext muleContext)
+    {
+        return new JmsTransaction(muleContext);
+    }
 }

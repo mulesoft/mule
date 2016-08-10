@@ -17,61 +17,72 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ValidationExceptionTestCase extends ValidationTestCase {
+public class ValidationExceptionTestCase extends ValidationTestCase
+{
 
-  private static final String MESSAGE_FAILED = "failed";
+    private static final String MESSAGE_FAILED = "failed";
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-
-  @Override
-  protected String getConfigFile() {
-    return "validation-exception.xml";
-  }
-
-  @Test
-  public void byRefExceptionFactory() throws Exception {
-    assertCustomExceptionFactory("byRefExceptionFactoryFlow");
-  }
-
-  @Test
-  public void byClassExceptionFactory() throws Exception {
-    assertCustomExceptionFactory("byClassExceptionFactoryFlow");
-  }
-
-  @Test
-  public void globalExceptionFactory() throws Exception {
-    assertCustomExceptionFactory("globalExceptionFactoryFlow");
-  }
-
-  @Test
-  public void customMessage() throws Exception {
-    expectedException.expectMessage("Hello World!");
-    flowRunner("customMessage").run();
-  }
-
-  @Test
-  public void customExceptionType() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    flowRunner("customExceptionType").run();
-  }
-
-  private void assertCustomExceptionFactory(String flowName) throws Exception {
-    expectedException.expect(instanceOf(ValidationException.class));
-    expectedException.expectMessage(MESSAGE_FAILED);
-    flowRunner(flowName).run();
-  }
-
-  public static class TestExceptionFactory implements ExceptionFactory {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
-    public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event) {
-      return (T) new ValidationException(error(MESSAGE_FAILED), event);
+    protected String getConfigFile()
+    {
+        return "validation-exception.xml";
     }
 
-    @Override
-    public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event) {
-      return new ValidationException(error(MESSAGE_FAILED), event);
+    @Test
+    public void byRefExceptionFactory() throws Exception
+    {
+        assertCustomExceptionFactory("byRefExceptionFactoryFlow");
     }
-  }
+
+    @Test
+    public void byClassExceptionFactory() throws Exception
+    {
+        assertCustomExceptionFactory("byClassExceptionFactoryFlow");
+    }
+
+    @Test
+    public void globalExceptionFactory() throws Exception
+    {
+        assertCustomExceptionFactory("globalExceptionFactoryFlow");
+    }
+
+    @Test
+    public void customMessage() throws Exception
+    {
+        expectedException.expectMessage("Hello World!");
+        flowRunner("customMessage").run();
+    }
+
+    @Test
+    public void customExceptionType() throws Exception
+    {
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        flowRunner("customExceptionType").run();
+    }
+
+    private void assertCustomExceptionFactory(String flowName) throws Exception
+    {
+        expectedException.expect(instanceOf(ValidationException.class));
+        expectedException.expectMessage(MESSAGE_FAILED);
+        flowRunner(flowName).run();
+    }
+
+    public static class TestExceptionFactory implements ExceptionFactory
+    {
+
+        @Override
+        public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event)
+        {
+            return (T) new ValidationException(error(MESSAGE_FAILED), event);
+        }
+
+        @Override
+        public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event)
+        {
+            return new ValidationException(error(MESSAGE_FAILED), event);
+        }
+    }
 }

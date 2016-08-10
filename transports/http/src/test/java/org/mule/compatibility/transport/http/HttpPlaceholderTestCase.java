@@ -10,20 +10,24 @@ import org.mule.compatibility.transport.http.HttpConnector;
 
 import org.junit.Test;
 
-public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase {
+public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase
+{
+    public HttpPlaceholderTestCase()
+    {
+        super("http");
+    }
 
-  public HttpPlaceholderTestCase() {
-    super("http");
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-placeholder-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-placeholder-test.xml";
-  }
-
-  @Test
-  public void testConnectorProperties() {
-    HttpConnector connector = (HttpConnector) muleContext.getRegistry().lookupObject("httpConnector");
-    testBasicProperties(connector);
-  }
+    @Test
+    public void testConnectorProperties()
+    {
+        HttpConnector connector =
+                (HttpConnector) muleContext.getRegistry().lookupObject("httpConnector");
+        testBasicProperties(connector);
+    }
 }

@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.cxf.testmodels;
 
-public class CustomFault {
+public class CustomFault
+{
+    private String description;
 
-  private String description;
+    public String getDescription()
+    {
+        return description;
+    }
 
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(final String description) {
-    this.description = description;
-  }
+    public void setDescription(final String description)
+    {
+        this.description = description;
+    }
 }

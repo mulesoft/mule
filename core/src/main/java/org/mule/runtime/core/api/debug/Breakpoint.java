@@ -14,38 +14,41 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
  *
  * @since 3.8.0
  */
-public class Breakpoint {
+public class Breakpoint
+{
+    private String location;
+    private String condition;
 
-  private String location;
-  private String condition;
+    /**
+     * It contains the location of where the execution needs to stop and the condition if any.
+     *
+     * @param location The location. Must not be empty {@link String}
+     * @param condition The condition script
+     */
+    public Breakpoint(String location, String condition)
+    {
+        checkArgument(!isEmpty(location), "Location cannot be empty");
+        this.location = location;
+        this.condition = condition;
+    }
 
-  /**
-   * It contains the location of where the execution needs to stop and the condition if any.
-   *
-   * @param location The location. Must not be empty {@link String}
-   * @param condition The condition script
-   */
-  public Breakpoint(String location, String condition) {
-    checkArgument(!isEmpty(location), "Location cannot be empty");
-    this.location = location;
-    this.condition = condition;
-  }
+    /**
+     * Returns the location of this breakpoint
+     *
+     * @return The location string
+     */
+    public String getLocation()
+    {
+        return location;
+    }
 
-  /**
-   * Returns the location of this breakpoint
-   *
-   * @return The location string
-   */
-  public String getLocation() {
-    return location;
-  }
-
-  /**
-   * Return the condition expression for this breakpoint if any.
-   *
-   * @return Returns the script or null
-   */
-  public String getCondition() {
-    return condition;
-  }
+    /**
+     * Return the condition expression for this breakpoint if any.
+     *
+     * @return Returns the script or null
+     */
+    public String getCondition()
+    {
+        return condition;
+    }
 }

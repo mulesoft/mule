@@ -8,31 +8,36 @@ package org.mule.runtime.module.pgp;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class PGPCryptInfo {
+public class PGPCryptInfo
+{
+    private PGPPublicKey publicKey;
+    private boolean signRequested;
 
-  private PGPPublicKey publicKey;
-  private boolean signRequested;
+    public PGPCryptInfo(PGPPublicKey publicKey, boolean signRequested)
+    {
+        super();
 
-  public PGPCryptInfo(PGPPublicKey publicKey, boolean signRequested) {
-    super();
+        this.setPublicKey(publicKey);
+        this.setSignRequested(signRequested);
+    }
 
-    this.setPublicKey(publicKey);
-    this.setSignRequested(signRequested);
-  }
+    public PGPPublicKey getPublicKey()
+    {
+        return publicKey;
+    }
 
-  public PGPPublicKey getPublicKey() {
-    return publicKey;
-  }
+    public void setPublicKey(PGPPublicKey publicKey)
+    {
+        this.publicKey = publicKey;
+    }
 
-  public void setPublicKey(PGPPublicKey publicKey) {
-    this.publicKey = publicKey;
-  }
+    public boolean isSignRequested()
+    {
+        return signRequested;
+    }
 
-  public boolean isSignRequested() {
-    return signRequested;
-  }
-
-  public void setSignRequested(boolean signRequested) {
-    this.signRequested = signRequested;
-  }
+    public void setSignRequested(boolean signRequested)
+    {
+        this.signRequested = signRequested;
+    }
 }

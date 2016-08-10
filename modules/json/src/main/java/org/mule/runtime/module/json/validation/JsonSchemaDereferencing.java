@@ -11,7 +11,9 @@ package org.mule.runtime.module.json.validation;
  *
  * @since 3.6.0
  */
-public enum JsonSchemaDereferencing {
+public enum JsonSchemaDereferencing
+{
 
-  CANONICAL, INLINE
+    CANONICAL,
+    INLINE
 }

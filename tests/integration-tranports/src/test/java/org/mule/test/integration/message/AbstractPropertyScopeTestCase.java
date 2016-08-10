@@ -17,17 +17,21 @@ import org.junit.Rule;
 import org.junit.Test;
 
 //TODO(gfernandes): MULE-10183 remove this class and use the one from IT tests once transport IT test are migrated to use isolation runner
-public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase {
+public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
 
-  @Rule
-  public DynamicPort port = new DynamicPort("port");
+    @Test
+    public void testRequestResponse() throws Exception
+    {
+        MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD)
+                                              .withInboundProperty("foo", "fooValue")
+                                              .run()
+                                              .getMessage();
 
-  @Test
-  public void testRequestResponse() throws Exception {
-    MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
-
-    assertThat(result.getPayload(), is("test bar"));
-    assertThat(result.getOutboundProperty("foo"), is("fooValue"));
-  }
+        assertThat(result.getPayload(), is("test bar"));
+        assertThat(result.getOutboundProperty("foo"), is("fooValue"));
+    }
 
 }

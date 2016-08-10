@@ -8,16 +8,18 @@ package org.mule.test.config.spring;
 
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-public class DummyComponent {
+public class DummyComponent
+{
+    private MuleContextAware property;
 
-  private MuleContextAware property;
+    public MuleContextAware getProperty()
+    {
+        return property;
+    }
 
-  public MuleContextAware getProperty() {
-    return property;
-  }
-
-  public void setProperty(MuleContextAware dummy) {
-    this.property = dummy;
-  }
+    public void setProperty(MuleContextAware dummy)
+    {
+        this.property = dummy;
+    }
 
 }

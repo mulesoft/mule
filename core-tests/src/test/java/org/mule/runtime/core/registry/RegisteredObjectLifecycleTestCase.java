@@ -20,110 +20,122 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCase {
+public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCase
+{
+    private static final long TIMEOUT = 200;
 
-  private static final long TIMEOUT = 200;
+    protected Latch initLatch;
+    protected Latch startLatch;
+    protected Latch stopLatch;
+    protected Latch disposeLatch;
 
-  protected Latch initLatch;
-  protected Latch startLatch;
-  protected Latch stopLatch;
-  protected Latch disposeLatch;
-
-  private DummyBean bean = new DummyBean();
-
-  @Override
-  protected void doSetUp() throws Exception {
-    bean = new DummyBean();
-    initLatch = new Latch();
-    startLatch = new Latch();
-    stopLatch = new Latch();
-    disposeLatch = new Latch();
-  }
-
-  @Test
-  public void testLifecycleForMuleContext() throws Exception {
-    muleContext.getRegistry().registerObject("dummy", bean);
-    assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    Thread.sleep(TIMEOUT);
-    assertThat(startLatch.getCount(), is(1L));
-    assertThat(stopLatch.getCount(), is(1L));
-    assertThat(disposeLatch.getCount(), is(1L));
-
-    muleContext.start();
-    assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    Thread.sleep(TIMEOUT);
-    assertThat(stopLatch.getCount(), is(1L));
-    assertThat(disposeLatch.getCount(), is(1L));
-
-    muleContext.stop();
-    assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    Thread.sleep(TIMEOUT);
-    assertThat(disposeLatch.getCount(), is(1L));
-
-    muleContext.dispose();
-    assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-  }
-
-  @Test
-  public void testLifecycleForUnregisteredObject() throws Exception {
-    muleContext.getRegistry().registerObject("dummy", bean);
-    assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    Thread.sleep(TIMEOUT);
-    assertThat(startLatch.getCount(), is(1L));
-    assertThat(stopLatch.getCount(), is(1L));
-    assertThat(disposeLatch.getCount(), is(1L));
-
-    muleContext.start();
-    assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    Thread.sleep(TIMEOUT);
-    assertThat(stopLatch.getCount(), is(1L));
-    assertThat(disposeLatch.getCount(), is(1L));
-
-    muleContext.getRegistry().unregisterObject("dummy");
-    assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-  }
-
-  public class DummyBean implements Lifecycle {
-
-    public String echo(String echo) {
-      return echo;
-    }
+    private DummyBean bean = new DummyBean();
 
     @Override
-    public void initialise() throws InitialisationException {
-      initLatch.countDown();
+    protected void doSetUp() throws Exception
+    {
+        bean = new DummyBean();
+        initLatch = new Latch();
+        startLatch = new Latch();
+        stopLatch = new Latch();
+        disposeLatch = new Latch();
     }
 
-    @Override
-    public void start() throws MuleException {
-      startLatch.countDown();
+    @Test
+    public void testLifecycleForMuleContext() throws Exception
+    {
+        muleContext.getRegistry().registerObject("dummy", bean);
+        assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(startLatch.getCount(), is(1L));
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
+
+        muleContext.start();
+        assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
+
+        muleContext.stop();
+        assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(disposeLatch.getCount(), is(1L));
+
+        muleContext.dispose();
+        assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
-    @Override
-    public void stop() throws MuleException {
-      stopLatch.countDown();
+    @Test
+    public void testLifecycleForUnregisteredObject() throws Exception
+    {
+        muleContext.getRegistry().registerObject("dummy", bean);
+        assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(startLatch.getCount(), is(1L));
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
+
+        muleContext.start();
+        assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
+
+        muleContext.getRegistry().unregisterObject("dummy");
+        assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
-    @Override
-    public void dispose() {
-      disposeLatch.countDown();
-    }
+    public class DummyBean implements Lifecycle
+    {
+        public String echo(String echo)
+        {
+            return echo;
+        }
 
-    public boolean isInitialised() {
-      return false;
-    }
+        @Override
+        public void initialise() throws InitialisationException
+        {
+            initLatch.countDown();
+        }
 
-    public boolean isStarted() {
-      return false;
-    }
+        @Override
+        public void start() throws MuleException
+        {
+            startLatch.countDown();
+        }
 
-    public boolean isStopped() {
-      return false;
-    }
+        @Override
+        public void stop() throws MuleException
+        {
+            stopLatch.countDown();
+        }
 
-    public boolean isDisposed() {
-      return false;
+        @Override
+        public void dispose()
+        {
+            disposeLatch.countDown();
+        }
+
+        public boolean isInitialised()
+        {
+            return false;
+        }
+
+        public boolean isStarted()
+        {
+            return false;
+        }
+
+        public boolean isStopped()
+        {
+            return false;
+        }
+
+        public boolean isDisposed()
+        {
+            return false;
+        }
     }
-  }
 }

@@ -23,51 +23,68 @@ import javax.resource.spi.work.Work;
 
 /**
  * Extends {@link TcpMessageReceiver} providing managing of protocol error conditions.
- * {@link TcpMessageReceiver.TcpWorker#getNextMessage(Object)} is extended so, in case of an protocol error it will try to send
- * the exception back to the client instead of ignoring it. If an exception is thrown managing the error it will ignored.
+ * {@link TcpMessageReceiver.TcpWorker#getNextMessage(Object)} is extended so, in case
+ * of an protocol error it will try to send the exception back to the client instead
+ * of ignoring it. If an exception is thrown managing the error it will ignored.
  */
-public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver {
+public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver
+{
 
-  public ExceptionReturnTcpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-      throws CreateException {
-    super(connector, flowConstruct, endpoint);
-  }
-
-  @Override
-  protected Work createWork(Socket socket) throws IOException {
-    return new TcpWorker(socket, this);
-  }
-
-  protected class TcpWorker extends TcpMessageReceiver.TcpWorker {
-
-    public TcpWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException {
-      super(socket, receiver);
+    public ExceptionReturnTcpMessageReceiver(Connector connector, FlowConstruct flowConstruct,
+         InboundEndpoint endpoint)
+            throws CreateException
+    {
+        super(connector, flowConstruct, endpoint);
     }
 
     @Override
-    protected Object getNextMessage(Object resource) throws Exception {
-      try {
-        return super.getNextMessage(resource);
-      } catch (Exception e) {
-        manageException(e);
-        return null;
-      }
+    protected Work createWork(Socket socket) throws IOException
+    {
+        return new TcpWorker(socket, this);
     }
 
-    private void manageException(Exception readingException) throws Exception {
-      try {
-        logger.warn("Failed to read message: " + readingException);
+    protected class TcpWorker extends TcpMessageReceiver.TcpWorker
+    {
 
-        MuleMessage msg =
-            MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(readingException)).build();
-        List msgList = new ArrayList(1);
-        msgList.add(msg);
+        public TcpWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
+        {
+            super(socket, receiver);
+        }
 
-        handleResults(msgList);
-      } catch (Exception writingException) {
-        logger.warn("Failed to write exception back to client: " + writingException);
-        throw writingException;
-      }
+        @Override
+        protected Object getNextMessage(Object resource) throws Exception
+        {
+            try
+            {
+                return super.getNextMessage(resource);
+            }
+            catch (Exception e)
+            {
+                manageException(e);
+                return null;
+            }
+        }
+
+        private void manageException(Exception readingException) throws Exception
+        {
+            try
+            {
+                logger.warn("Failed to read message: " + readingException);
+
+                MuleMessage msg = MuleMessage.builder()
+                        .nullPayload()
+                        .exceptionPayload(new DefaultExceptionPayload(readingException))
+                        .build();
+                List msgList = new ArrayList(1);
+                msgList.add(msg);
+
+                handleResults(msgList);
+            }
+            catch (Exception writingException)
+            {
+                logger.warn("Failed to write exception back to client: " + writingException);
+                throw writingException;
+            }
+        }
     }
-  }
 }

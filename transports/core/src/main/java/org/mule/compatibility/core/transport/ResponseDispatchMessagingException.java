@@ -14,30 +14,35 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  *
  */
-class ResponseDispatchMessagingException extends MessagingException {
+class ResponseDispatchMessagingException extends MessagingException
+{
+    ResponseDispatchMessagingException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event) {
-    super(message, event);
-  }
+    ResponseDispatchMessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
+    {
+        super(message, event, failingMessageProcessor);
+    }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
-  }
+    ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
+    }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
-  }
+    ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
+    {
+        super(message, event, cause, failingMessageProcessor);
+    }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause,
-                                     MessageProcessor failingMessageProcessor) {
-    super(message, event, cause, failingMessageProcessor);
-  }
+    ResponseDispatchMessagingException(MuleEvent event, Throwable cause)
+    {
+        super(event, cause);
+    }
 
-  ResponseDispatchMessagingException(MuleEvent event, Throwable cause) {
-    super(event, cause);
-  }
-
-  ResponseDispatchMessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
-    super(event, cause, failingMessageProcessor);
-  }
+    ResponseDispatchMessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
+    {
+        super(event, cause, failingMessageProcessor);
+    }
 }

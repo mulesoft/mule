@@ -14,22 +14,24 @@ import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 
 import org.junit.Test;
 
-public class CustomProtocolRefTestCase extends SocketExtensionTestCase {
+public class CustomProtocolRefTestCase extends SocketExtensionTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "custom-protocol-ref-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "custom-protocol-ref-config.xml";
-  }
+    @Test
+    public void useCustomProtocolClass() throws Exception
+    {
 
-  @Test
-  public void useCustomProtocolClass() throws Exception {
+        expectedException.expect(UnsupportedOperationException.class);
 
-    expectedException.expect(UnsupportedOperationException.class);
+        TcpProtocol protocol = muleContext.getRegistry().get("myProtocolRef");
+        assertThat(protocol, is(not(nullValue())));
 
-    TcpProtocol protocol = muleContext.getRegistry().get("myProtocolRef");
-    assertThat(protocol, is(not(nullValue())));
-
-    // throws UnsupportedOperationException
-    protocol.write(null, null, "UTF-8");
-  }
+        // throws UnsupportedOperationException
+        protocol.write(null, null, "UTF-8");
+    }
 }

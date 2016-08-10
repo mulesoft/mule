@@ -16,30 +16,35 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class TransactionManagerInjectTestCase extends AbstractIntegrationTestCase {
+public class TransactionManagerInjectTestCase extends AbstractIntegrationTestCase
+{
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/transaction/transaction-manager-inject.xml";
-  }
-
-  @Test
-  public void injectTransactionManager() {
-    TransactionClient txClient = (TransactionClient) muleContext.getRegistry().lookupObject("txClient");
-    assertThat(txClient.getTxMgr(), not(nullValue()));
-  }
-
-  public static class TransactionClient {
-
-    private TransactionManager txMgr;
-
-    public TransactionManager getTxMgr() {
-      return txMgr;
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/transaction/transaction-manager-inject.xml";
     }
 
-    @Inject
-    public void setTxMgr(TransactionManager txMgr) {
-      this.txMgr = txMgr;
+    @Test
+    public void injectTransactionManager()
+    {
+        TransactionClient txClient = (TransactionClient) muleContext.getRegistry().lookupObject("txClient");
+        assertThat(txClient.getTxMgr(), not(nullValue()));
     }
-  }
+
+    public static class TransactionClient
+    {
+        private TransactionManager txMgr;
+
+        public TransactionManager getTxMgr()
+        {
+            return txMgr;
+        }
+
+        @Inject
+        public void setTxMgr(TransactionManager txMgr)
+        {
+            this.txMgr = txMgr;
+        }
+    }
 }

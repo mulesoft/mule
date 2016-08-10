@@ -17,16 +17,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class TransactionConstraintTestCase extends AbstractMuleTestCase {
+public class TransactionConstraintTestCase extends AbstractMuleTestCase
+{
+    @Test
+    public void testConstraintFilter() throws Exception
+    {
+        ConstraintFilter filter = new ConstraintFilter();
+        MuleEvent event = Mockito.mock(MuleEvent.class);
+        assertTrue(filter.accept(event));
 
-  @Test
-  public void testConstraintFilter() throws Exception {
-    ConstraintFilter filter = new ConstraintFilter();
-    MuleEvent event = Mockito.mock(MuleEvent.class);
-    assertTrue(filter.accept(event));
-
-    ConstraintFilter clone = (ConstraintFilter) filter.clone();
-    assertNotNull(clone);
-    assertNotSame(filter, clone);
-  }
+        ConstraintFilter clone = (ConstraintFilter)filter.clone();
+        assertNotNull(clone);
+        assertNotSame(filter, clone);
+    }
 }

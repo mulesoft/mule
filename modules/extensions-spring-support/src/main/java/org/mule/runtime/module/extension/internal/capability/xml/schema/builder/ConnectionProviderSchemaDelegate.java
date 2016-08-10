@@ -28,62 +28,69 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 /**
- * Builder delegation class to generate a XSD schema that describes a {@link ConnectionProviderModel}
+ * Builder delegation class to generate a XSD schema that describes a
+ * {@link ConnectionProviderModel}
  *
  * @since 4.0.0
  */
-final class ConnectionProviderSchemaDelegate {
+final class ConnectionProviderSchemaDelegate
+{
 
-  private final ObjectFactory objectFactory = new ObjectFactory();
-  private final SchemaBuilder builder;
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    private final ObjectFactory objectFactory = new ObjectFactory();
+    private final SchemaBuilder builder;
+    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  public ConnectionProviderSchemaDelegate(SchemaBuilder builder) {
-    this.builder = builder;
-  }
-
-  public void registerConnectionProviderElement(ConnectionProviderModel providerModel) {
-    Element providerElement = new TopLevelElement();
-    providerElement.setName(providerModel.getName());
-    providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
-
-    LocalComplexType complexType = new LocalComplexType();
-    providerElement.setComplexType(complexType);
-
-    ExtensionType providerType = new ExtensionType();
-    providerType.setBase(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE);
-
-    ComplexContent complexContent = new ComplexContent();
-    complexContent.setExtension(providerType);
-    complexType.setComplexContent(complexContent);
-
-    builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
-
-    final ExplicitGroup choice = new ExplicitGroup();
-    choice.setMinOccurs(ZERO);
-    choice.setMaxOccurs(UNBOUNDED);
-
-    ConnectionManagementType managementType = providerModel.getConnectionManagementType();
-    if (managementType == POOLING || managementType == CACHED) {
-      addValidationFlag(providerType);
-      builder.addRetryPolicy(choice);
-    }
-    if (managementType == POOLING) {
-      addConnectionProviderPoolingProfile(choice);
+    public ConnectionProviderSchemaDelegate(SchemaBuilder builder)
+    {
+        this.builder = builder;
     }
 
-    builder.registerParameters(providerType, choice, providerModel.getParameterModels());
-  }
+    public void registerConnectionProviderElement(ConnectionProviderModel providerModel)
+    {
+        Element providerElement = new TopLevelElement();
+        providerElement.setName(providerModel.getName());
+        providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
 
-  private void addConnectionProviderPoolingProfile(ExplicitGroup choice) {
-    TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, false);
-    choice.getParticle().add(objectFactory.createElement(objectElement));
-  }
+        LocalComplexType complexType = new LocalComplexType();
+        providerElement.setComplexType(complexType);
 
-  private void addValidationFlag(ExtensionType providerType) {
-    providerType.getAttributeOrAttributeGroup()
-        .add(builder.createAttribute(DISABLE_VALIDATION, typeLoader.load(boolean.class), false, NOT_SUPPORTED));
-  }
+        ExtensionType providerType = new ExtensionType();
+        providerType.setBase(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE);
+
+        ComplexContent complexContent = new ComplexContent();
+        complexContent.setExtension(providerType);
+        complexType.setComplexContent(complexContent);
+
+        builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
+
+        final ExplicitGroup choice = new ExplicitGroup();
+        choice.setMinOccurs(ZERO);
+        choice.setMaxOccurs(UNBOUNDED);
+
+        ConnectionManagementType managementType = providerModel.getConnectionManagementType();
+        if (managementType == POOLING || managementType == CACHED)
+        {
+            addValidationFlag(providerType);
+            builder.addRetryPolicy(choice);
+        }
+        if (managementType == POOLING)
+        {
+            addConnectionProviderPoolingProfile(choice);
+        }
+
+        builder.registerParameters(providerType, choice, providerModel.getParameterModels());
+    }
+
+    private void addConnectionProviderPoolingProfile(ExplicitGroup choice)
+    {
+        TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, false);
+        choice.getParticle().add(objectFactory.createElement(objectElement));
+    }
+
+    private void addValidationFlag(ExtensionType providerType)
+    {
+        providerType.getAttributeOrAttributeGroup().add(builder.createAttribute(DISABLE_VALIDATION, typeLoader.load(boolean.class), false, NOT_SUPPORTED));
+    }
 
 
 }

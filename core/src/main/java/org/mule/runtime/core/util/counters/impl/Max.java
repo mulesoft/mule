@@ -8,25 +8,29 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Max extends AggregateCounter {
+public class Max extends AggregateCounter
+{
+    private double max = Double.MIN_VALUE;
 
-  private double max = Double.MIN_VALUE;
-
-  public Max(String name, AbstractCounter base) {
-    super(name, Type.MAX, base);
-  }
-
-  @Override
-  public double nextValue() {
-    return max;
-  }
-
-  @Override
-  public void doCompute() {
-    double next = this.getBase().nextValue();
-
-    if (Double.isNaN(max) || (next > max)) {
-      max = next;
+    public Max(String name, AbstractCounter base)
+    {
+        super(name, Type.MAX, base);
     }
-  }
+
+    @Override
+    public double nextValue()
+    {
+        return max;
+    }
+
+    @Override
+    public void doCompute()
+    {
+        double next = this.getBase().nextValue();
+
+        if (Double.isNaN(max) || (next > max))
+        {
+            max = next;
+        }
+    }
 }

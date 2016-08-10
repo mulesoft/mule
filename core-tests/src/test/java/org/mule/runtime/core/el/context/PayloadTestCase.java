@@ -20,40 +20,44 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class PayloadTestCase extends AbstractELTestCase {
+public class PayloadTestCase extends AbstractELTestCase
+{
+    private MuleEvent event;
+    private MuleMessage message;
 
-  private MuleEvent event;
-  private MuleMessage message;
+    public PayloadTestCase(Variant variant, String mvelOptimizer)
+    {
+        super(variant, mvelOptimizer);
+    }
 
-  public PayloadTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
-  }
+    @Before
+    public void setup()
+    {
+        event = mock(MuleEvent.class);
+        message = mock(MuleMessage.class);
+        doAnswer(invocation -> {
+            message = (MuleMessage) invocation.getArguments()[0];
+            return null;
+        }).when(event).setMessage(any(MuleMessage.class));
+        when(event.getMessage()).thenAnswer(invocation -> message);
+        when(event.getMuleContext()).thenReturn(muleContext);
+    }
 
-  @Before
-  public void setup() {
-    event = mock(MuleEvent.class);
-    message = mock(MuleMessage.class);
-    doAnswer(invocation -> {
-      message = (MuleMessage) invocation.getArguments()[0];
-      return null;
-    }).when(event).setMessage(any(MuleMessage.class));
-    when(event.getMessage()).thenAnswer(invocation -> message);
-    when(event.getMuleContext()).thenReturn(muleContext);
-  }
+    @Test
+    public void payload() throws Exception
+    {
+        Object payload = new Object();
+        Mockito.when(message.getPayload()).thenReturn(payload);
+        assertSame(payload, evaluate("payload", event));
+    }
 
-  @Test
-  public void payload() throws Exception {
-    Object payload = new Object();
-    Mockito.when(message.getPayload()).thenReturn(payload);
-    assertSame(payload, evaluate("payload", event));
-  }
-
-  @Test
-  public void assignPayload() throws Exception {
-    message = MuleMessage.builder().payload("").build();
-    when(event.getMessage()).thenReturn(message);
-    evaluate("payload = 'foo'", event);
-    assertEquals("foo", message.getPayload());
-  }
+    @Test
+    public void assignPayload() throws Exception
+    {
+        message = MuleMessage.builder().payload("").build();
+        when(event.getMessage()).thenReturn(message);
+        evaluate("payload = 'foo'", event);
+        assertEquals("foo", message.getPayload());
+    }
 
 }

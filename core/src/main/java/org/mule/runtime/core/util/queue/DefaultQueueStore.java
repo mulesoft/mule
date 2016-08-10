@@ -13,120 +13,151 @@ import java.io.Serializable;
 import org.apache.commons.lang.NotImplementedException;
 
 /**
- * Internal queue implementation that will execute operations directly to the queue storage. Stores information about a Queue
+ * Internal queue implementation that will execute operations directly to the queue storage.
+ * Stores information about a Queue
  */
-public class DefaultQueueStore implements RecoverableQueueStore {
+public class DefaultQueueStore implements RecoverableQueueStore
+{
+    private QueueConfiguration config;
+    private String name;
+    private QueueStoreDelegate delegate;
+    private MuleContext muleContext;
 
-  private QueueConfiguration config;
-  private String name;
-  private QueueStoreDelegate delegate;
-  private MuleContext muleContext;
-
-  public DefaultQueueStore(String name, MuleContext muleContext, QueueConfiguration config) {
-    this.name = name;
-    this.muleContext = muleContext;
-    setConfigAndDelegate(config);
-  }
-
-  public void setConfig(QueueConfiguration config) {
-    setConfigAndDelegate(config);
-  }
-
-  private void setConfigAndDelegate(QueueConfiguration newConfig) {
-    if (delegate != null) {
-      return;
+    public DefaultQueueStore(String name, MuleContext muleContext, QueueConfiguration config)
+    {
+        this.name = name;
+        this.muleContext = muleContext;
+        setConfigAndDelegate(config);
     }
-    this.config = newConfig;
-    if (this.config == null) {
-      this.config = new DefaultQueueConfiguration();
+
+    public void setConfig(QueueConfiguration config)
+    {
+        setConfigAndDelegate(config);
     }
-    if (this.config.isPersistent()) {
-      delegate = new DualRandomAccessFileQueueStoreDelegate(this.name, muleContext.getConfiguration().getWorkingDirectory(),
-                                                            muleContext, this.config.getCapacity());
-    } else {
-      delegate = new DefaultQueueStoreDelegate(this.config.getCapacity());
+
+    private void setConfigAndDelegate(QueueConfiguration newConfig)
+    {
+        if (delegate != null)
+        {
+            return;
+        }
+        this.config = newConfig;
+        if (this.config == null)
+        {
+            this.config = new DefaultQueueConfiguration();
+        }
+        if (this.config.isPersistent())
+        {
+            delegate = new DualRandomAccessFileQueueStoreDelegate(this.name, muleContext.getConfiguration().getWorkingDirectory(), muleContext, this.config.getCapacity());
+        }
+        else
+        {
+            delegate = new DefaultQueueStoreDelegate(this.config.getCapacity());
+        }
     }
-  }
 
-  @Override
-  public boolean equals(Object obj) {
-    return (obj instanceof DefaultQueueStore && name.equals(((DefaultQueueStore) obj).name));
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public int hashCode() {
-    return name.hashCode();
-  }
-
-  public void putNow(Serializable o) {
-    delegate.putNow(o);
-  }
-
-  public boolean offer(Serializable o, int room, long timeout) throws InterruptedException {
-    return delegate.offer(o, room, timeout);
-  }
-
-  public Serializable poll(long timeout) throws InterruptedException {
-    return delegate.poll(timeout);
-  }
-
-  public Serializable peek() throws InterruptedException {
-    return delegate.peek();
-  }
-
-  public void untake(Serializable item) throws InterruptedException {
-    delegate.untake(item);
-  }
-
-  public int getSize() {
-    return delegate.getSize();
-  }
-
-  public void clear() throws InterruptedException {
-    this.delegate.clear();
-  }
-
-  public void dispose() {
-    this.delegate.dispose();
-  }
-
-  public int getCapacity() {
-    return config == null ? null : config.getCapacity();
-  }
-
-  public void remove(Serializable value) {
-    if (this.delegate instanceof TransactionalQueueStoreDelegate) {
-      ((TransactionalQueueStoreDelegate) delegate).remove(value);
-    } else {
-      throw new NotImplementedException(String.format("Queue of type %s does not support remove",
-                                                      delegate.getClass().getCanonicalName()));
+    @Override
+    public boolean equals(Object obj)
+    {
+        return (obj instanceof DefaultQueueStore && name.equals(((DefaultQueueStore) obj).name));
     }
-  }
 
-  public boolean contains(Serializable value) {
-    if (this.delegate instanceof TransactionalQueueStoreDelegate) {
-      return ((TransactionalQueueStoreDelegate) delegate).contains(value);
-    } else {
-      throw new NotImplementedException(String.format("Queue of type %s does not support contains",
-                                                      delegate.getClass().getCanonicalName()));
+    public String getName()
+    {
+        return name;
     }
-  }
 
-  public void close() {
-    if (this.delegate instanceof TransactionalQueueStoreDelegate) {
-      ((TransactionalQueueStoreDelegate) delegate).close();
-    } else {
-      throw new NotImplementedException(String.format("Queue of type %s does not support close",
-                                                      delegate.getClass().getCanonicalName()));
+    @Override
+    public int hashCode()
+    {
+        return name.hashCode();
     }
-  }
 
-  @Override
-  public boolean isPersistent() {
-    return config.isPersistent();
-  }
+    public void putNow(Serializable o)
+    {
+        delegate.putNow(o);
+    }
+
+    public boolean offer(Serializable o, int room, long timeout)
+        throws InterruptedException
+    {
+        return delegate.offer(o, room, timeout);
+    }
+
+    public Serializable poll(long timeout) throws InterruptedException
+    {
+        return delegate.poll(timeout);
+    }
+
+    public Serializable peek() throws InterruptedException
+    {
+        return delegate.peek();
+    }
+
+    public void untake(Serializable item) throws InterruptedException
+    {
+        delegate.untake(item);
+    }
+
+    public int getSize()
+    {
+        return delegate.getSize();
+    }
+
+    public void clear() throws InterruptedException
+    {
+        this.delegate.clear();
+    }
+
+    public void dispose()
+    {
+        this.delegate.dispose();
+    }
+
+    public int getCapacity()
+    {
+        return config == null ? null : config.getCapacity();
+    }
+
+    public void remove(Serializable value)
+    {
+        if (this.delegate instanceof TransactionalQueueStoreDelegate)
+        {
+            ((TransactionalQueueStoreDelegate) delegate).remove(value);
+        }
+        else
+        {
+            throw new NotImplementedException(String.format("Queue of type %s does not support remove", delegate.getClass().getCanonicalName()));
+        }
+    }
+
+    public boolean contains(Serializable value)
+    {
+        if (this.delegate instanceof TransactionalQueueStoreDelegate)
+        {
+            return ((TransactionalQueueStoreDelegate) delegate).contains(value);
+        }
+        else
+        {
+            throw new NotImplementedException(String.format("Queue of type %s does not support contains", delegate.getClass().getCanonicalName()));
+        }
+    }
+
+    public void close()
+    {
+        if (this.delegate instanceof TransactionalQueueStoreDelegate)
+        {
+            ((TransactionalQueueStoreDelegate) delegate).close();
+        }
+        else
+        {
+            throw new NotImplementedException(String.format("Queue of type %s does not support close", delegate.getClass().getCanonicalName()));
+        }
+    }
+
+    @Override
+    public boolean isPersistent()
+    {
+        return config.isPersistent();
+    }
 }

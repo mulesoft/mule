@@ -13,6 +13,7 @@ package org.mule.runtime.core.api.config;
  *
  * @since 4.0
  */
-public interface ConfigurationExtension {
+public interface ConfigurationExtension
+{
 
 }

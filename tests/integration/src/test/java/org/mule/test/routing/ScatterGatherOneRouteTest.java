@@ -23,38 +23,46 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ScatterGatherOneRouteTest extends AbstractMuleTestCase {
+public class ScatterGatherOneRouteTest extends AbstractMuleTestCase
+{
+    private MuleContext context;
 
-  private MuleContext context;
-
-  @Before
-  public void before() throws InitialisationException, ConfigurationException {
-    context = new DefaultMuleContextFactory().createMuleContext();
-  }
-
-  @After
-  public void after() {
-    if (context != null) {
-      context.dispose();
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        context = new DefaultMuleContextFactory().createMuleContext();
     }
-  }
 
-  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-  @Test(expected = InitialisationException.class)
-  public void oneRouteOnXml() throws Exception {
-    new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml"));
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void oneRouteProgramatically() throws Exception {
-    ScatterGatherRouter sc = new ScatterGatherRouter();
-    sc.setRoutes(Collections.<MessageProcessor>emptyList());
-
-    try {
-      sc.initialise();
-    } catch (InitialisationException e) {
-      Asserts.assertTrue(e.getCause() instanceof IllegalStateException);
-      throw e;
+    @After
+    public void after()
+    {
+        if (context != null)
+        {
+            context.dispose();
+        }
     }
-  }
+
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
+    public void oneRouteOnXml() throws Exception
+    {
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml"));
+    }
+
+    @Test(expected = InitialisationException.class)
+    public void oneRouteProgramatically() throws Exception
+    {
+        ScatterGatherRouter sc = new ScatterGatherRouter();
+        sc.setRoutes(Collections.<MessageProcessor>emptyList());
+
+        try
+        {
+            sc.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            Asserts.assertTrue(e.getCause() instanceof IllegalStateException);
+            throw e;
+        }
+    }
 }

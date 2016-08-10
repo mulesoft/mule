@@ -10,8 +10,9 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
-public class MetadataOperationsParent {
+        contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+        outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+public class MetadataOperationsParent
+{
 
 }

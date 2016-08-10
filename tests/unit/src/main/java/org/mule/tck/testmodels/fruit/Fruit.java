@@ -8,9 +8,9 @@ package org.mule.tck.testmodels.fruit;
 
 import java.io.Serializable;
 
-public interface Fruit extends Serializable {
+public interface Fruit extends Serializable
+{
+    void bite();
 
-  void bite();
-
-  boolean isBitten();
+    boolean isBitten();
 }

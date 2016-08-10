@@ -12,37 +12,42 @@ import org.mule.runtime.core.api.MessagingException;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase {
+public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
+{
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/construct/flow-asynchronous-processing-strategy-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/construct/flow-asynchronous-processing-strategy-config.xml";
-  }
+    @Override
+    public void requestResponse() throws Exception
+    {
+        setUpExpectedException();
+        super.requestResponse();
+    }
 
-  @Override
-  public void requestResponse() throws Exception {
-    setUpExpectedException();
-    super.requestResponse();
-  }
+    @Override
+    public void requestResponseTransacted() throws Exception
+    {
+        setUpExpectedException();
+        super.requestResponseTransacted();
+    }
 
-  @Override
-  public void requestResponseTransacted() throws Exception {
-    setUpExpectedException();
-    super.requestResponseTransacted();
-  }
+    @Override
+    public void oneWayTransacted() throws Exception
+    {
+        setUpExpectedException();
+        super.oneWayTransacted();
+    }
 
-  @Override
-  public void oneWayTransacted() throws Exception {
-    setUpExpectedException();
-    super.oneWayTransacted();
-  }
-
-  private void setUpExpectedException() {
-    expectedException.expect(MessagingException.class);
-    expectedException.expectMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE);
-  }
+    private void setUpExpectedException()
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE);
+    }
 
 }

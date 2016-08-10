@@ -22,13 +22,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for anonymous complex type.
+ * <p>Java class for anonymous complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -46,6 +43,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "pattern")
-public class Pattern extends NoFixedFacet {
+public class Pattern extends NoFixedFacet
+{
 
 }

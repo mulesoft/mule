@@ -21,38 +21,42 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("MULE-6926: Flaky test - fails on build server")
-public class FileToTcpStreamingTestCase extends FunctionalTestCase {
+public class FileToTcpStreamingTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml";
-  }
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory()
+                                                    + "/test-data"));
+    }
 
-  @Override
-  protected void doTearDown() throws Exception {
-    FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/test-data"));
-  }
+    @Test
+    public void testStreamingFromFileToTcp() throws Exception
+    {
+        String text = "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah\n\n";
 
-  @Test
-  public void testStreamingFromFileToTcp() throws Exception {
-    String text = "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
-        + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
-        + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
-        + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah\n\n";
+        String basepath = muleContext.getConfiguration().getWorkingDirectory() + "/test-data";
 
-    String basepath = muleContext.getConfiguration().getWorkingDirectory() + "/test-data";
+        FileUtils.stringToFile(basepath + "/in/foo.txt", text);
 
-    FileUtils.stringToFile(basepath + "/in/foo.txt", text);
+        File file = FileUtils.newFile(basepath, "out/foo.txt.processed");
 
-    File file = FileUtils.newFile(basepath, "out/foo.txt.processed");
+        PollingProber pollingProber = new PollingProber(5000, 10);
+        pollingProber.check(new FileExists(file));
 
-    PollingProber pollingProber = new PollingProber(5000, 10);
-    pollingProber.check(new FileExists(file));
-
-    String result = FileUtils.readFileToString(file, "UTF8");
-    assertEquals(text, result);
-  }
+        String result = FileUtils.readFileToString(file, "UTF8");
+        assertEquals(text, result);
+    }
 }

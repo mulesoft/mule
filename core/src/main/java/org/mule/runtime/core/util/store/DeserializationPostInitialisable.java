@@ -13,10 +13,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * A marker interface used to trigger post-deserialization initialization of an object. This works in the same way as
- * {@link Cloneable} interface. Implementors of this interface must add the method
- * <code>private void initAfterDeserialization(MuleContext muleContext) throws MuleException</code> to their class (note that it's
- * private). This will get invoked after the object has been deserialized passing in the current mulecontext when using either
+ * A marker interface used to trigger post-deserialization initialization of an object. This works
+ * in the same way as {@link Cloneable} interface. Implementors of this interface must add the
+ * method <code>private void initAfterDeserialization(MuleContext muleContext) throws MuleException</code>
+ * to their class (note that it's private). This will get invoked after the object has been
+ * deserialized passing in the current mulecontext when using either
  * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
  * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat}, or the
  * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
@@ -25,37 +26,48 @@ import java.security.PrivilegedAction;
  * @see org.mule.runtime.core.transformer.wire.SerializationWireFormat
  * @see org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat
  */
-public interface DeserializationPostInitialisable {
+public interface DeserializationPostInitialisable
+{
+    public class Implementation
+    {
+        public static void init(final Object object, final MuleContext muleContext) throws Exception
+        {
+            try
+            {
+                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation",
+                    MuleContext.class);
 
-  public class Implementation {
+                Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
+                {
+                    @Override
+                    public Object run()
+                    {
+                        try
+                        {
+                            m.setAccessible(true);
+                            m.invoke(object, muleContext);
+                            return null;
+                        }
+                        catch (Exception e)
+                        {
+                            return e;
+                        }
 
-    public static void init(final Object object, final MuleContext muleContext) throws Exception {
-      try {
-        final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+                    }
+                });
 
-        Object o = AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                if (o != null)
+                {
+                    throw (Exception) o;
+                }
 
-          @Override
-          public Object run() {
-            try {
-              m.setAccessible(true);
-              m.invoke(object, muleContext);
-              return null;
-            } catch (Exception e) {
-              return e;
             }
-
-          }
-        });
-
-        if (o != null) {
-          throw (Exception) o;
+            catch (NoSuchMethodException e)
+            {
+                throw new IllegalArgumentException("Object " + object.getClass() + " implements " +
+                        DeserializationPostInitialisable.class + " but does not have a method " +
+                        "private void initAfterDeserialisation(MuleContext) defined", e);
+            }
         }
-
-      } catch (NoSuchMethodException e) {
-        throw new IllegalArgumentException("Object " + object.getClass() + " implements " + DeserializationPostInitialisable.class
-            + " but does not have a method " + "private void initAfterDeserialisation(MuleContext) defined", e);
-      }
     }
-  }
 }

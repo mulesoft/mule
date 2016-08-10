@@ -10,10 +10,11 @@ package org.mule.runtime.core.api.transport;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface LegacyInboundEndpoint {
+public interface LegacyInboundEndpoint
+{
 
-  boolean isCompatibleWithAsync();
+    boolean isCompatibleWithAsync();
 
-  String getCanonicalURI();
+    String getCanonicalURI();
 
 }

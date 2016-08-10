@@ -10,8 +10,9 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 
 @WebService
-public interface CxfSimpleService {
+public interface CxfSimpleService
+{
 
-  @WebResult
-  String getName();
+    @WebResult
+    String getName();
 }

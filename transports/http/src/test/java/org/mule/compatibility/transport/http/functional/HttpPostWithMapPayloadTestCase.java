@@ -19,27 +19,29 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase {
+public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase
+{
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-post-with-map-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-post-with-map-config.xml";
-  }
+    @Test
+    public void sendAndReceivesSameMapPayload() throws Exception
+    {
+        Map<String, String> mapPayload = new HashMap<String, String>();
+        mapPayload.put("key1", "value1");
+        mapPayload.put("key2", "value2");
 
-  @Test
-  public void sendAndReceivesSameMapPayload() throws Exception {
-    Map<String, String> mapPayload = new HashMap<String, String>();
-    mapPayload.put("key1", "value1");
-    mapPayload.put("key2", "value2");
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://testInput", mapPayload, null);
 
-    MuleClient client = muleContext.getClient();
-    client.dispatch("vm://testInput", mapPayload, null);
-
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-    assertEquals(mapPayload, response.getPayload());
-  }
+        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        assertEquals(mapPayload, response.getPayload());
+    }
 
 }

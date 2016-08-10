@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.management.stats;
 
-public interface QueueStatisticsAware {
+public interface QueueStatisticsAware
+{
 
-  public void setQueueStatistics(QueueStatistics queueStatistics);
+    public void setQueueStatistics(QueueStatistics queueStatistics);
 
 }
 

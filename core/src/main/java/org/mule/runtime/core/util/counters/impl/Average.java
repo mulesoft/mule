@@ -8,23 +8,26 @@ package org.mule.runtime.core.util.counters.impl;
 
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public class Average extends AggregateCounter {
+public class Average extends AggregateCounter
+{
+    private double sum = 0;
+    private long times = 0;
 
-  private double sum = 0;
-  private long times = 0;
+    public Average(String name, AbstractCounter base)
+    {
+        super(name, Type.AVERAGE, base);
+    }
 
-  public Average(String name, AbstractCounter base) {
-    super(name, Type.AVERAGE, base);
-  }
+    @Override
+    public double nextValue()
+    {
+        return (times > 0) ? sum / times : 0;
+    }
 
-  @Override
-  public double nextValue() {
-    return (times > 0) ? sum / times : 0;
-  }
-
-  @Override
-  public void doCompute() {
-    this.sum += getBase().nextValue();
-    this.times++;
-  }
+    @Override
+    public void doCompute()
+    {
+        this.sum += getBase().nextValue();
+        this.times++;
+    }
 }

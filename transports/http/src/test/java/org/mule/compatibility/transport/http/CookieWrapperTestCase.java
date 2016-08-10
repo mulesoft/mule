@@ -35,146 +35,157 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 @SmallTest
-public class CookieWrapperTestCase extends AbstractMuleTestCase {
+public class CookieWrapperTestCase extends AbstractMuleTestCase
+{
+    private CookieWrapper cookieWrapper;
+    private ExpressionManager mockExpressionManager;
+    private MuleMessage mockMuleMessage;
+    private MuleEvent mockMuleEvent;
 
-  private CookieWrapper cookieWrapper;
-  private ExpressionManager mockExpressionManager;
-  private MuleMessage mockMuleMessage;
-  private MuleEvent mockMuleEvent;
+    @Before
+    public void setUp()
+    {
+        cookieWrapper = new CookieWrapper();
+        mockExpressionManager = mock(ExpressionManager.class);
+        mockMuleMessage = mock(MuleMessage.class);
+        mockMuleEvent = mock(MuleEvent.class);
+    }
 
-  @Before
-  public void setUp() {
-    cookieWrapper = new CookieWrapper();
-    mockExpressionManager = mock(ExpressionManager.class);
-    mockMuleMessage = mock(MuleMessage.class);
-    mockMuleEvent = mock(MuleEvent.class);
-  }
+    @Test
+    public void testCookieWrapper() throws ParseException
+    {
+        cookieWrapper.setName("test");
+        cookieWrapper.setValue("test");
+        cookieWrapper.setDomain("localhost");
+        cookieWrapper.setPath("/");
+        cookieWrapper.setMaxAge("3600");
+        cookieWrapper.setSecure("true");
+        cookieWrapper.setVersion("1");
 
-  @Test
-  public void testCookieWrapper() throws ParseException {
-    cookieWrapper.setName("test");
-    cookieWrapper.setValue("test");
-    cookieWrapper.setDomain("localhost");
-    cookieWrapper.setPath("/");
-    cookieWrapper.setMaxAge("3600");
-    cookieWrapper.setSecure("true");
-    cookieWrapper.setVersion("1");
+        mockParse();
 
-    mockParse();
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
+        assertEquals("test", cookie.getName());
+        assertEquals("test", cookie.getValue());
+        assertEquals("localhost", cookie.getDomain());
+        assertEquals("/", cookie.getPath());
+        assertTrue(cookie.getSecure());
+        assertEquals(1, cookie.getVersion());
+    }
 
-    assertEquals("test", cookie.getName());
-    assertEquals("test", cookie.getValue());
-    assertEquals("localhost", cookie.getDomain());
-    assertEquals("/", cookie.getPath());
-    assertTrue(cookie.getSecure());
-    assertEquals(1, cookie.getVersion());
-  }
+    @Test
+    public void testCookieWrapperWithExpressions() throws ParseException
+    {
+        cookieWrapper.setName("#[name]");
+        cookieWrapper.setValue("#[value]");
+        cookieWrapper.setDomain("#[domain]");
+        cookieWrapper.setPath("#[path]");
+        cookieWrapper.setMaxAge("#[maxAge]");
+        cookieWrapper.setSecure("#[secure]");
+        cookieWrapper.setVersion("#[version]");
 
-  @Test
-  public void testCookieWrapperWithExpressions() throws ParseException {
-    cookieWrapper.setName("#[name]");
-    cookieWrapper.setValue("#[value]");
-    cookieWrapper.setDomain("#[domain]");
-    cookieWrapper.setPath("#[path]");
-    cookieWrapper.setMaxAge("#[maxAge]");
-    cookieWrapper.setSecure("#[secure]");
-    cookieWrapper.setVersion("#[version]");
+        when(mockExpressionManager.parse("#[name]", mockMuleEvent)).thenReturn("test");
+        when(mockExpressionManager.parse("#[value]", mockMuleEvent)).thenReturn("test");
+        when(mockExpressionManager.parse("#[domain]", mockMuleEvent)).thenReturn("localhost");
+        when(mockExpressionManager.parse("#[path]", mockMuleEvent)).thenReturn("/");
+        when(mockExpressionManager.parse("#[maxAge]", mockMuleEvent)).thenReturn("3600");
+        when(mockExpressionManager.parse("#[secure]", mockMuleEvent)).thenReturn("true");
+        when(mockExpressionManager.parse("#[version]", mockMuleEvent)).thenReturn("1");
 
-    when(mockExpressionManager.parse("#[name]", mockMuleEvent)).thenReturn("test");
-    when(mockExpressionManager.parse("#[value]", mockMuleEvent)).thenReturn("test");
-    when(mockExpressionManager.parse("#[domain]", mockMuleEvent)).thenReturn("localhost");
-    when(mockExpressionManager.parse("#[path]", mockMuleEvent)).thenReturn("/");
-    when(mockExpressionManager.parse("#[maxAge]", mockMuleEvent)).thenReturn("3600");
-    when(mockExpressionManager.parse("#[secure]", mockMuleEvent)).thenReturn("true");
-    when(mockExpressionManager.parse("#[version]", mockMuleEvent)).thenReturn("1");
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
+        assertEquals("test", cookie.getName());
+        assertEquals("test", cookie.getValue());
+        assertEquals("localhost", cookie.getDomain());
+        assertEquals("/", cookie.getPath());
+        assertTrue(cookie.getSecure());
+        assertEquals(1, cookie.getVersion());
+    }
 
-    assertEquals("test", cookie.getName());
-    assertEquals("test", cookie.getValue());
-    assertEquals("localhost", cookie.getDomain());
-    assertEquals("/", cookie.getPath());
-    assertTrue(cookie.getSecure());
-    assertEquals(1, cookie.getVersion());
-  }
+    @Test
+    public void testCookieWrapperOnlyRequiredAttributes() throws ParseException
+    {
+        cookieWrapper.setName("test");
+        cookieWrapper.setValue("test");
 
-  @Test
-  public void testCookieWrapperOnlyRequiredAttributes() throws ParseException {
-    cookieWrapper.setName("test");
-    cookieWrapper.setValue("test");
+        mockParse();
 
-    mockParse();
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
+        assertEquals("test=test", cookie.toString());
+    }
 
-    assertEquals("test=test", cookie.toString());
-  }
+    @Test
+    public void testCookieWrapperStringExpiryDate() throws ParseException
+    {
+        cookieWrapper.setName("test");
+        cookieWrapper.setValue("test");
+        cookieWrapper.setExpiryDate("Sun, 15 Dec 2013 16:00:00 GMT");
 
-  @Test
-  public void testCookieWrapperStringExpiryDate() throws ParseException {
-    cookieWrapper.setName("test");
-    cookieWrapper.setValue("test");
-    cookieWrapper.setExpiryDate("Sun, 15 Dec 2013 16:00:00 GMT");
+        mockParse();
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
+        Date expiryDate = cookie.getExpiryDate();
 
-    mockParse();
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
-    Date expiryDate = cookie.getExpiryDate();
+        SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-    SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-    formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        assertNotNull("Sun, 15 Dec 2013 16:00:00 GMT", formatter.format(expiryDate));
+    }
 
-    assertNotNull("Sun, 15 Dec 2013 16:00:00 GMT", formatter.format(expiryDate));
-  }
+    @Test
+    public void testCookieWrapperExpiryDate() throws ParseException
+    {
+        Date now = new Date();
+        cookieWrapper.setName("test");
+        cookieWrapper.setValue("test");
+        cookieWrapper.setExpiryDate(now);
 
-  @Test
-  public void testCookieWrapperExpiryDate() throws ParseException {
-    Date now = new Date();
-    cookieWrapper.setName("test");
-    cookieWrapper.setValue("test");
-    cookieWrapper.setExpiryDate(now);
+        mockParse();
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
 
-    mockParse();
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
+        Date expiryDate = cookie.getExpiryDate();
+        assertEquals(0, now.compareTo(expiryDate));
+    }
 
-    Date expiryDate = cookie.getExpiryDate();
-    assertEquals(0, now.compareTo(expiryDate));
-  }
+    @Test
+    public void testCookieWrapperExpiryDateExpression() throws ParseException
+    {
+        Date now = new Date();
+        cookieWrapper.setName("test");
+        cookieWrapper.setValue("test");
+        cookieWrapper.setExpiryDate("#[expiryDate]");
 
-  @Test
-  public void testCookieWrapperExpiryDateExpression() throws ParseException {
-    Date now = new Date();
-    cookieWrapper.setName("test");
-    cookieWrapper.setValue("test");
-    cookieWrapper.setExpiryDate("#[expiryDate]");
+        when(mockExpressionManager.isExpression("#[expiryDate]")).thenReturn(true);
+        when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent)).thenReturn(now);
+        mockParse();
 
-    when(mockExpressionManager.isExpression("#[expiryDate]")).thenReturn(true);
-    when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent)).thenReturn(now);
-    mockParse();
+        cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
+        Cookie cookie = cookieWrapper.createCookie();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
-    Cookie cookie = cookieWrapper.createCookie();
-
-    Date expiryDate = cookie.getExpiryDate();
-    assertEquals(0, now.compareTo(expiryDate));
-  }
+        Date expiryDate = cookie.getExpiryDate();
+        assertEquals(0, now.compareTo(expiryDate));
+    }
 
 
-  private void mockParse() {
-    when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return invocation.getArguments()[0];
-      }
-    });
-  }
+    private void mockParse()
+    {
+        when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
+             new Answer<Object>()
+             {
+                 @Override
+                 public Object answer(InvocationOnMock invocation) throws Throwable
+                 {
+                     return invocation.getArguments()[0];
+                 }
+             }
+         );
+    }
 
 
 

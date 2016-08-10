@@ -12,28 +12,33 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class TriggerableMessageSource implements NonBlockingMessageSource {
+public class TriggerableMessageSource implements NonBlockingMessageSource
+{
+    protected MessageProcessor listener;
 
-  protected MessageProcessor listener;
+    public TriggerableMessageSource()
+    {
+        // empty
+    }
 
-  public TriggerableMessageSource() {
-    // empty
-  }
+    public TriggerableMessageSource(MessageProcessor listener)
+    {
+        this.listener = listener;
+    }
 
-  public TriggerableMessageSource(MessageProcessor listener) {
-    this.listener = listener;
-  }
+    public MuleEvent trigger(MuleEvent event) throws MuleException
+    {
+        return listener.process(event);
+    }
 
-  public MuleEvent trigger(MuleEvent event) throws MuleException {
-    return listener.process(event);
-  }
-
-  public void setListener(MessageProcessor listener) {
-    this.listener = listener;
-  }
-
-  @Override
-  public String toString() {
-    return ObjectUtils.toString(this);
-  }
+    public void setListener(MessageProcessor listener)
+    {
+        this.listener = listener;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

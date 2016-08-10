@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.http.internal;
 
-public enum HttpParamType {
-  QUERY_PARAM, URI_PARAM, HEADER;
+public enum HttpParamType
+{
+    QUERY_PARAM, URI_PARAM, HEADER;
 
 }

@@ -10,13 +10,14 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 
-public class PetStoreSimpleConnectionTestCase extends PetStoreConnectionTestCase {
+public class PetStoreSimpleConnectionTestCase extends PetStoreConnectionTestCase
+{
+    @Rule
+    public SystemProperty configNameProperty = new SystemProperty("configName", DEFAULT_CONFIG_NAME);
 
-  @Rule
-  public SystemProperty configNameProperty = new SystemProperty("configName", DEFAULT_CONFIG_NAME);
-
-  @Override
-  protected String getConfigFile() {
-    return "petstore-simple-connection.xml";
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "petstore-simple-connection.xml";
+    }
 }

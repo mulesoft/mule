@@ -50,263 +50,339 @@ import java.util.List;
  */
 @Deprecated
 public class QueuePersistenceObjectStore<T extends Serializable> extends AbstractObjectStore<T>
-    implements ListableObjectStore<T>, MuleContextAware {
+    implements ListableObjectStore<T>, MuleContextAware
+{
+    /**
+     * The default queueStore directory for persistence
+     */
+    public static final String DEFAULT_QUEUE_STORE = "queuestore";
 
-  /**
-   * The default queueStore directory for persistence
-   */
-  public static final String DEFAULT_QUEUE_STORE = "queuestore";
+    private static final String FILE_EXTENSION = ".msg";
 
-  private static final String FILE_EXTENSION = ".msg";
+    private MuleContext muleContext;
 
-  private MuleContext muleContext;
+    /**
+     * This is the base directory into which all queues will be persisted
+     */
+    private File storeDirectory;
 
-  /**
-   * This is the base directory into which all queues will be persisted
-   */
-  private File storeDirectory;
-
-  /**
-   * Default constructor for Spring.
-   */
-  public QueuePersistenceObjectStore() {
-    super();
-  }
-
-  public QueuePersistenceObjectStore(MuleContext context) {
-    super();
-    muleContext = context;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isPersistent() {
-    return true;
-  }
-
-  @Override
-  public void open() throws ObjectStoreException {
-    initStoreDirectory();
-    if (!storeDirectory.exists()) {
-      createStoreDirectory(storeDirectory);
-    } else {
-      removeUnhealthyFiles();
-    }
-  }
-
-  @Override
-  public void clear() throws ObjectStoreException {
-    if (this.storeDirectory == null) {
-      throw new IllegalStateException("ObjectStore cannot be cleared bacause it's not opened");
+    /**
+     * Default constructor for Spring.
+     */
+    public QueuePersistenceObjectStore()
+    {
+        super();
     }
 
-    try {
-      FileUtils.cleanDirectory(this.storeDirectory);
-    } catch (IOException e) {
-      throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear object store"), e);
-    }
-  }
-
-  private void initStoreDirectory() throws ObjectStoreException {
-    try {
-      String workingDirectory = muleContext.getConfiguration().getWorkingDirectory();
-      String path = workingDirectory + File.separator + DEFAULT_QUEUE_STORE;
-      storeDirectory = FileUtils.newFile(path);
-    } catch (MuleRuntimeException mre) {
-      // FileUtils throws a MuleRuntimeException if something goes wrong when
-      // creating the
-      // path. To fully conform to the ObjectStore contract we cannot just let
-      // it bubble
-      // through but rather catch it and re-throw as ObjectStoreException
-      throw new ObjectStoreException(mre);
-    }
-  }
-
-  protected synchronized void createStoreDirectory(File directory) throws ObjectStoreException {
-    // To support concurrency we need to check if directory exists again inside
-    // synchronized method
-    if (!directory.exists() && !directory.mkdirs()) {
-      Message message = CoreMessages.failedToCreate("queue store store directory " + directory.getAbsolutePath());
-      throw new ObjectStoreException(message);
-    }
-  }
-
-  @Override
-  public void close() throws ObjectStoreException {
-    // Nothing to do
-  }
-
-  @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
-    if (storeDirectory == null) {
-      return Collections.emptyList();
+    public QueuePersistenceObjectStore(MuleContext context)
+    {
+        super();
+        muleContext = context;
     }
 
-    return collectAllKeys();
-  }
-
-  protected List<Serializable> collectAllKeys() throws ObjectStoreException {
-    try {
-      List<Serializable> keys = new ArrayList<Serializable>();
-      listStoredFiles(storeDirectory, keys);
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("Restore retrieved " + keys.size() + " objects");
-      }
-
-      return keys;
-    } catch (ClassNotFoundException e) {
-      String message = String.format("Could not restore from %1s", storeDirectory.getAbsolutePath());
-      throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
-    } catch (IOException e) {
-      String message = String.format("Could not restore from %1s", storeDirectory.getAbsolutePath());
-      throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
-    }
-  }
-
-  protected void listStoredFiles(File directory, List<Serializable> keys) throws IOException, ClassNotFoundException {
-    File[] files = directory.listFiles();
-    if (files == null) {
-      return;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPersistent()
+    {
+        return true;
     }
 
-    // sort the files so they are in the order in which their ids were generated
-    // in store()
-    Arrays.sort(files);
-
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].isDirectory()) {
-        listStoredFiles(files[i], keys);
-      } else if (files[i].getName().endsWith(FILE_EXTENSION)) {
-        String id = files[i].getCanonicalPath();
-
-        int beginIndex = storeDirectory.getCanonicalPath().length() + 1;
-        int length = id.length() - FILE_EXTENSION.length();
-        id = id.substring(beginIndex, length);
-
-        String queue = id.substring(0, id.indexOf(File.separator));
-        id = id.substring(queue.length() + 1);
-
-        keys.add(new QueueKey(queue, id));
-      }
+    @Override
+    public void open() throws ObjectStoreException
+    {
+        initStoreDirectory();
+        if (!storeDirectory.exists())
+        {
+            createStoreDirectory(storeDirectory);
+        }
+        else
+        {
+            removeUnhealthyFiles();
+        }
     }
-  }
 
-  @Override
-  protected boolean doContains(Serializable key) throws ObjectStoreException {
-    File storeFile = createStoreFile(key);
-    return storeFile.exists();
-  }
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        if (this.storeDirectory == null)
+        {
+            throw new IllegalStateException("ObjectStore cannot be cleared bacause it's not opened");
+        }
 
-  @Override
-  protected void doStore(Serializable key, T value) throws ObjectStoreException {
-    File outputFile = createStoreFile(key);
-    ensureStoreDirectoryExists(outputFile);
-
-    try {
-      serialize(value, outputFile);
-    } catch (ObjectStoreException e) {
-      if (e.getCause() instanceof SerializationException) {
-        deleteStoreFile(outputFile);
-      }
-      throw e;
+        try
+        {
+            FileUtils.cleanDirectory(this.storeDirectory);
+        }
+        catch (IOException e)
+        {
+            throw new ObjectStoreException(
+                MessageFactory.createStaticMessage("Could not clear object store"), e);
+        }
     }
-  }
 
-  protected void ensureStoreDirectoryExists(File outputFile) throws ObjectStoreException {
-    File directory = outputFile.getParentFile();
-    if (!directory.exists()) {
-      createStoreDirectory(directory);
+    private void initStoreDirectory() throws ObjectStoreException
+    {
+        try
+        {
+            String workingDirectory = muleContext.getConfiguration().getWorkingDirectory();
+            String path = workingDirectory + File.separator + DEFAULT_QUEUE_STORE;
+            storeDirectory = FileUtils.newFile(path);
+        }
+        catch (MuleRuntimeException mre)
+        {
+            // FileUtils throws a MuleRuntimeException if something goes wrong when
+            // creating the
+            // path. To fully conform to the ObjectStore contract we cannot just let
+            // it bubble
+            // through but rather catch it and re-throw as ObjectStoreException
+            throw new ObjectStoreException(mre);
+        }
     }
-  }
 
-  protected void serialize(T value, File outputFile) throws ObjectStoreException {
-    try {
-      FileOutputStream out = new FileOutputStream(outputFile);
-      out.write(muleContext.getObjectSerializer().serialize(value));
-      out.flush();
-    } catch (SerializationException se) {
-      throw new ObjectStoreException(se);
-    } catch (FileNotFoundException fnfe) {
-      throw new ObjectStoreException(fnfe);
-    } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not write to file"), e);
+    protected synchronized void createStoreDirectory(File directory) throws ObjectStoreException
+    {
+        // To support concurrency we need to check if directory exists again inside
+        // synchronized method
+        if (!directory.exists() && !directory.mkdirs())
+        {
+            Message message = CoreMessages.failedToCreate("queue store store directory "
+                                                          + directory.getAbsolutePath());
+            throw new ObjectStoreException(message);
+        }
     }
-  }
 
-  @Override
-  protected T doRetrieve(Serializable key) throws ObjectStoreException {
-    File file = createStoreFile(key);
-    return deserialize(file);
-  }
-
-  protected File createStoreFile(Serializable key) throws ObjectStoreException {
-    QueueKey queueKey = (QueueKey) key;
-
-    String filename = queueKey.id + FILE_EXTENSION;
-    String path = queueKey.queueName + File.separator + filename;
-
-    try {
-      return FileUtils.newFile(storeDirectory, path);
-    } catch (MuleRuntimeException mre) {
-      // FileUtils throws a MuleRuntimeException if something goes wrong when
-      // creating the
-      // path. To fully conform to the ObjectStore contract we cannot just let
-      // it bubble
-      // through but rather catch it and re-throw as ObjectStoreException
-      throw new ObjectStoreException(mre);
+    @Override
+    public void close() throws ObjectStoreException
+    {
+        // Nothing to do
     }
-  }
 
-  @SuppressWarnings("unchecked")
-  protected T deserialize(File file) throws ObjectStoreException {
-    try {
-      FileInputStream in = new FileInputStream(file);
-      return muleContext.getObjectSerializer().deserialize(in);
-    } catch (SerializationException se) {
-      throw new ObjectStoreException(se);
-    } catch (FileNotFoundException fnfe) {
-      throw new ObjectStoreException(fnfe);
+    @Override
+    public List<Serializable> allKeys() throws ObjectStoreException
+    {
+        if (storeDirectory == null)
+        {
+            return Collections.emptyList();
+        }
+
+        return collectAllKeys();
     }
-  }
 
-  @Override
-  protected T doRemove(Serializable key) throws ObjectStoreException {
-    File storeFile = createStoreFile(key);
-    T storedValue = deserialize(storeFile);
-    deleteStoreFile(storeFile);
+    protected List<Serializable> collectAllKeys() throws ObjectStoreException
+    {
+        try
+        {
+            List<Serializable> keys = new ArrayList<Serializable>();
+            listStoredFiles(storeDirectory, keys);
 
-    return storedValue;
-  }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Restore retrieved " + keys.size() + " objects");
+            }
 
-  protected void deleteStoreFile(File file) throws ObjectStoreException {
-    if (file.exists()) {
-      if (!file.delete()) {
-        Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
-        throw new ObjectStoreException(message);
-      }
-    } else {
-      throw new ObjectDoesNotExistException();
+            return keys;
+        }
+        catch (ClassNotFoundException e)
+        {
+            String message = String.format("Could not restore from %1s", storeDirectory.getAbsolutePath());
+            throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
+        }
+        catch (IOException e)
+        {
+            String message = String.format("Could not restore from %1s", storeDirectory.getAbsolutePath());
+            throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
+        }
     }
-  }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
+    protected void listStoredFiles(File directory, List<Serializable> keys)
+        throws IOException, ClassNotFoundException
+    {
+        File[] files = directory.listFiles();
+        if (files == null)
+        {
+            return;
+        }
 
-  private void removeUnhealthyFiles() throws ObjectStoreException {
-    List<Serializable> keys = allKeys();
-    for (Serializable key : keys) {
-      QueueKey qkey = (QueueKey) key;
-      String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id + FILE_EXTENSION;
-      File file = new File(fileName);
-      if (file.length() == 0) {
-        FileUtils.deleteQuietly(file);
-        logger.info("Removing zero size file: " + file.getAbsolutePath());
-      }
+        // sort the files so they are in the order in which their ids were generated
+        // in store()
+        Arrays.sort(files);
+
+        for (int i = 0; i < files.length; i++)
+        {
+            if (files[i].isDirectory())
+            {
+                listStoredFiles(files[i], keys);
+            }
+            else if (files[i].getName().endsWith(FILE_EXTENSION))
+            {
+                String id = files[i].getCanonicalPath();
+
+                int beginIndex = storeDirectory.getCanonicalPath().length() + 1;
+                int length = id.length() - FILE_EXTENSION.length();
+                id = id.substring(beginIndex, length);
+
+                String queue = id.substring(0, id.indexOf(File.separator));
+                id = id.substring(queue.length() + 1);
+
+                keys.add(new QueueKey(queue, id));
+            }
+        }
     }
-  }
+
+    @Override
+    protected boolean doContains(Serializable key) throws ObjectStoreException
+    {
+        File storeFile = createStoreFile(key);
+        return storeFile.exists();
+    }
+
+    @Override
+    protected void doStore(Serializable key, T value) throws ObjectStoreException
+    {
+        File outputFile = createStoreFile(key);
+        ensureStoreDirectoryExists(outputFile);
+
+        try
+        {
+            serialize(value, outputFile);
+        }
+        catch (ObjectStoreException e)
+        {
+            if (e.getCause() instanceof SerializationException)
+            {
+                deleteStoreFile(outputFile);
+            }
+            throw e;
+        }
+    }
+
+    protected void ensureStoreDirectoryExists(File outputFile) throws ObjectStoreException
+    {
+        File directory = outputFile.getParentFile();
+        if (!directory.exists())
+        {
+            createStoreDirectory(directory);
+        }
+    }
+
+    protected void serialize(T value, File outputFile) throws ObjectStoreException
+    {
+        try
+        {
+            FileOutputStream out = new FileOutputStream(outputFile);
+            out.write(muleContext.getObjectSerializer().serialize(value));
+            out.flush();
+        }
+        catch (SerializationException se)
+        {
+            throw new ObjectStoreException(se);
+        }
+        catch (FileNotFoundException fnfe)
+        {
+            throw new ObjectStoreException(fnfe);
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not write to file"), e);
+        }
+    }
+
+    @Override
+    protected T doRetrieve(Serializable key) throws ObjectStoreException
+    {
+        File file = createStoreFile(key);
+        return deserialize(file);
+    }
+
+    protected File createStoreFile(Serializable key) throws ObjectStoreException
+    {
+        QueueKey queueKey = (QueueKey) key;
+
+        String filename = queueKey.id + FILE_EXTENSION;
+        String path = queueKey.queueName + File.separator + filename;
+
+        try
+        {
+            return FileUtils.newFile(storeDirectory, path);
+        }
+        catch (MuleRuntimeException mre)
+        {
+            // FileUtils throws a MuleRuntimeException if something goes wrong when
+            // creating the
+            // path. To fully conform to the ObjectStore contract we cannot just let
+            // it bubble
+            // through but rather catch it and re-throw as ObjectStoreException
+            throw new ObjectStoreException(mre);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected T deserialize(File file) throws ObjectStoreException
+    {
+        try
+        {
+            FileInputStream in = new FileInputStream(file);
+            return muleContext.getObjectSerializer().deserialize(in);
+        }
+        catch (SerializationException se)
+        {
+            throw new ObjectStoreException(se);
+        }
+        catch (FileNotFoundException fnfe)
+        {
+            throw new ObjectStoreException(fnfe);
+        }
+    }
+
+    @Override
+    protected T doRemove(Serializable key) throws ObjectStoreException
+    {
+        File storeFile = createStoreFile(key);
+        T storedValue = deserialize(storeFile);
+        deleteStoreFile(storeFile);
+
+        return storedValue;
+    }
+
+    protected void deleteStoreFile(File file) throws ObjectStoreException
+    {
+        if (file.exists())
+        {
+            if (!file.delete())
+            {
+                Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
+                                                                   + " failed");
+                throw new ObjectStoreException(message);
+            }
+        }
+        else
+        {
+            throw new ObjectDoesNotExistException();
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
+
+    private void removeUnhealthyFiles() throws ObjectStoreException
+    {
+        List<Serializable> keys = allKeys();
+        for (Serializable key : keys)
+        {
+            QueueKey qkey = (QueueKey) key;
+            String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id
+                              + FILE_EXTENSION;
+            File file = new File(fileName);
+            if (file.length() == 0)
+            {
+                FileUtils.deleteQuietly(file);
+                logger.info("Removing zero size file: " + file.getAbsolutePath());
+            }
+        }
+    }
 }

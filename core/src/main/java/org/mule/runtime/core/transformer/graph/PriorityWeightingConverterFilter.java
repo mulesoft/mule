@@ -15,42 +15,52 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Filters a list of {@link Converter} returning a new list containing only the converters with the highest priority weighting.
+ * Filters a list of {@link Converter} returning a new list containing only the
+ * converters with the highest priority weighting.
  */
-public class PriorityWeightingConverterFilter implements ConverterFilter {
+public class PriorityWeightingConverterFilter implements ConverterFilter
+{
 
-  @Override
-  public List<Converter> filter(List<Converter> converters, DataType source, DataType result) {
-    if (converters.size() == 0) {
-      return Collections.emptyList();
+    @Override
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
+    {
+        if (converters.size() == 0)
+        {
+            return Collections.emptyList();
+        }
+
+        List<TransformerWeighting> weightings = getTransformerWeightings(converters, source.getType(), result.getType());
+
+        TransformerWeighting transformerWeighting = weightings.get(weightings.size() - 1);
+        int index = weightings.size() - 2;
+        List<Converter> heaviestConverter = new LinkedList<>();
+        heaviestConverter.add((Converter) transformerWeighting.getTransformer());
+
+        for (; index > -1; --index)
+        {
+            if (weightings.get(index).compareTo(transformerWeighting) < 0)
+            {
+                break;
+            }
+            else
+            {
+                heaviestConverter.add((Converter) weightings.get(index).getTransformer());
+            }
+        }
+
+        return heaviestConverter;
     }
 
-    List<TransformerWeighting> weightings = getTransformerWeightings(converters, source.getType(), result.getType());
+    private List<TransformerWeighting> getTransformerWeightings(List<Converter> converters, Class input, Class output)
+    {
+        List<TransformerWeighting> weightings = new LinkedList<>();
+        for (Converter converter : converters)
+        {
+            TransformerWeighting current = new TransformerWeighting(input, output, converter);
+            weightings.add(current);
+        }
+        Collections.sort(weightings);
 
-    TransformerWeighting transformerWeighting = weightings.get(weightings.size() - 1);
-    int index = weightings.size() - 2;
-    List<Converter> heaviestConverter = new LinkedList<>();
-    heaviestConverter.add((Converter) transformerWeighting.getTransformer());
-
-    for (; index > -1; --index) {
-      if (weightings.get(index).compareTo(transformerWeighting) < 0) {
-        break;
-      } else {
-        heaviestConverter.add((Converter) weightings.get(index).getTransformer());
-      }
+        return weightings;
     }
-
-    return heaviestConverter;
-  }
-
-  private List<TransformerWeighting> getTransformerWeightings(List<Converter> converters, Class input, Class output) {
-    List<TransformerWeighting> weightings = new LinkedList<>();
-    for (Converter converter : converters) {
-      TransformerWeighting current = new TransformerWeighting(input, output, converter);
-      weightings.add(current);
-    }
-    Collections.sort(weightings);
-
-    return weightings;
-  }
 }

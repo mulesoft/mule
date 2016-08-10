@@ -10,39 +10,43 @@ import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>EndpointNotFoundException</code> is thrown when an endpoint name or protocol is specified but a matching endpoint is not
- * registered with the Mule server
+ * <code>EndpointNotFoundException</code> is thrown when an endpoint name or protocol is specified but a matching
+ * endpoint is not registered with the Mule server
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class EndpointNotFoundException extends EndpointException {
+public class EndpointNotFoundException extends EndpointException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 790450139906970837L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 790450139906970837L;
+    public EndpointNotFoundException(String endpoint)
+    {
+        super(TransportCoreMessages.endpointNotFound(endpoint));
+    }
 
-  public EndpointNotFoundException(String endpoint) {
-    super(TransportCoreMessages.endpointNotFound(endpoint));
-  }
+    /**
+     * @param message the exception message
+     */
+    public EndpointNotFoundException(Message message)
+    {
+        super(message);
+    }
 
-  /**
-   * @param message the exception message
-   */
-  public EndpointNotFoundException(Message message) {
-    super(message);
-  }
+    /**
+     * @param message the exception message
+     * @param cause the exception that cause this exception to be thrown
+     */
+    public EndpointNotFoundException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-  /**
-   * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
-   */
-  public EndpointNotFoundException(Message message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public EndpointNotFoundException(Throwable cause) {
-    super(cause);
-  }
+    public EndpointNotFoundException(Throwable cause)
+    {
+        super(cause);
+    }
 }

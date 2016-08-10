@@ -12,11 +12,12 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import java.util.concurrent.Executor;
 
 /**
- * <code>WorkManager</code> extends the standard JCA WorkManager with lifecycle methods and util.concurrent bridging.
+ * <code>WorkManager</code> extends the standard JCA WorkManager with lifecycle
+ * methods and util.concurrent bridging.
  */
-public interface WorkManager extends javax.resource.spi.work.WorkManager, Startable, Disposable, Executor {
-
-  /** Is the WorkManager ready to accept work? */
-  public boolean isStarted();
-
+public interface WorkManager extends javax.resource.spi.work.WorkManager, Startable, Disposable, Executor
+{
+    /** Is the WorkManager ready to accept work? */
+    public boolean isStarted();
+    
 }

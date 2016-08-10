@@ -11,27 +11,31 @@ import org.mule.runtime.core.api.retry.RetryPolicy;
 /**
  * This policy is the same as {@link SimpleRetryPolicyTemplate} but will retry an infinite amount of times.
  */
-public class RetryForeverPolicyTemplate extends SimpleRetryPolicyTemplate {
+public class RetryForeverPolicyTemplate extends SimpleRetryPolicyTemplate
+{
+    public RetryForeverPolicyTemplate()
+    {
+        super();
+    }
 
-  public RetryForeverPolicyTemplate() {
-    super();
-  }
+    public RetryForeverPolicyTemplate(long frequency)
+    {
+        this.frequency = frequency;
+    }
 
-  public RetryForeverPolicyTemplate(long frequency) {
-    this.frequency = frequency;
-  }
+    @Override
+    public RetryPolicy createRetryInstance()
+    {
+        return new SimpleRetryPolicy(frequency, RETRY_COUNT_FOREVER);
+    }
 
-  @Override
-  public RetryPolicy createRetryInstance() {
-    return new SimpleRetryPolicy(frequency, RETRY_COUNT_FOREVER);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("RetryForeverPolicy");
-    sb.append("{frequency=").append(frequency);
-    sb.append('}');
-    return sb.toString();
-  }
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("RetryForeverPolicy");
+        sb.append("{frequency=").append(frequency);
+        sb.append('}');
+        return sb.toString();
+    }
 }

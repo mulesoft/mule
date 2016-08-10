@@ -12,14 +12,16 @@ import java.net.SocketException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpMethod;
 
-public class MuleHttpMethodRetryHandler extends DefaultHttpMethodRetryHandler {
-
-  @Override
-  public boolean retryMethod(final HttpMethod method, final IOException exception, int executionCount) {
-    if ((executionCount < this.getRetryCount()) && (exception instanceof SocketException)) {
-      return true;
+public class MuleHttpMethodRetryHandler extends DefaultHttpMethodRetryHandler
+{
+    @Override
+    public boolean retryMethod(final HttpMethod method, final IOException exception, int executionCount)
+    {
+        if ((executionCount < this.getRetryCount()) && (exception instanceof SocketException))
+        {
+            return true;
+        }
+        
+        return super.retryMethod(method, exception, executionCount);
     }
-
-    return super.retryMethod(method, exception, executionCount);
-  }
 }

@@ -19,82 +19,95 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Performs authentication based on a username and password. The username and password are retrieved from the {@link MuleMessage}
- * based on expressions specified via the username and password setters. These are then used to create a DefaultMuleAuthentication
- * object which is passed to the authenticate method of the {@link SecurityManager}.
+ * Performs authentication based on a username and password. The username and password are retrieved from the
+ * {@link MuleMessage} based on expressions specified via the username and password setters. These
+ * are then used to create a DefaultMuleAuthentication object which is passed to the authenticate method of the
+ * {@link SecurityManager}.
  */
-public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationFilter {
+public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationFilter
+{
+    private String username = "#[message.inboundProperties.username]";
+    private String password = "#[message.inboundProperties.password]";
 
-  private String username = "#[message.inboundProperties.username]";
-  private String password = "#[message.inboundProperties.password]";
-
-  public UsernamePasswordAuthenticationFilter() {
-    super();
-  }
-
-  /**
-   * Authenticates the current message.
-   *
-   * @param event the current message recieved
-   * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
-   */
-  @Override
-  public void authenticate(MuleEvent event)
-      throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
-    Authentication authentication = getAuthenticationToken(event);
-    Authentication authResult;
-    try {
-      authResult = getSecurityManager().authenticate(authentication);
-    } catch (UnauthorisedException e) {
-      // Authentication failed
-      if (logger.isDebugEnabled()) {
-        logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
-      }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(authentication.getPrincipal().toString()), e);
+    public UsernamePasswordAuthenticationFilter()
+    {
+        super();
     }
 
-    // Authentication success
-    if (logger.isDebugEnabled()) {
-      logger.debug("Authentication success: " + authResult.toString());
+    /**
+     * Authenticates the current message.
+     *
+     * @param event the current message recieved
+     * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
+     */
+    @Override
+    public void authenticate(MuleEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
+    {
+        Authentication authentication = getAuthenticationToken(event);
+        Authentication authResult;
+        try
+        {
+            authResult = getSecurityManager().authenticate(authentication);
+        }
+        catch (UnauthorisedException e)
+        {
+            // Authentication failed
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
+            }
+            throw new UnauthorisedException(CoreMessages.authFailedForUser(authentication.getPrincipal().toString()), e);
+        }
+
+        // Authentication success
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Authentication success: " + authResult.toString());
+        }
+
+        SecurityContext context = getSecurityManager().createSecurityContext(authResult);
+        context.setAuthentication(authResult);
+        event.getSession().setSecurityContext(context);
+
     }
 
-    SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-    context.setAuthentication(authResult);
-    event.getSession().setSecurityContext(context);
+    protected Authentication getAuthenticationToken(MuleEvent event) throws UnauthorisedException
+    {
+        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
 
-  }
+        Object usernameEval = expressionManager.evaluate(username, event);
+        Object passwordEval = expressionManager.evaluate(password, event);
 
-  protected Authentication getAuthenticationToken(MuleEvent event) throws UnauthorisedException {
-    ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+        if (usernameEval == null) {
+            throw new UnauthorisedException(CoreMessages.authNoCredentials());
+        }
 
-    Object usernameEval = expressionManager.evaluate(username, event);
-    Object passwordEval = expressionManager.evaluate(password, event);
+        if (passwordEval == null) {
+            throw new UnauthorisedException(CoreMessages.authNoCredentials());
+        }
 
-    if (usernameEval == null) {
-      throw new UnauthorisedException(CoreMessages.authNoCredentials());
+        return new DefaultMuleAuthentication(new MuleCredentials(usernameEval.toString(), passwordEval.toString().toCharArray()));
     }
 
-    if (passwordEval == null) {
-      throw new UnauthorisedException(CoreMessages.authNoCredentials());
+    public String getUsername()
+    {
+        return username;
     }
 
-    return new DefaultMuleAuthentication(new MuleCredentials(usernameEval.toString(), passwordEval.toString().toCharArray()));
-  }
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public String getPassword()
+    {
+        return password;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
 
 }

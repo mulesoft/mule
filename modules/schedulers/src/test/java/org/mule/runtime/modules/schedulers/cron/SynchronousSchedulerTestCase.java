@@ -21,37 +21,45 @@ import org.junit.Test;
  * Validates that a synchronous flow processing strategy implies a synchronous poll execution
  * </p>
  */
-public class SynchronousSchedulerTestCase extends FunctionalTestCase {
+public class SynchronousSchedulerTestCase extends FunctionalTestCase
+{
+    private static List<String> foo = new ArrayList<String>();
 
-  private static List<String> foo = new ArrayList<String>();
-
-  @Override
-  protected String getConfigFile() {
-    return "cron-synchronous-scheduler-config.xml";
-  }
-
-  @Test
-  public void test() throws InterruptedException {
-    Thread.sleep(6000);
-
-    assertEquals(1, foo.size());
-  }
-
-
-  public static class FooComponent {
-
-    public boolean process(String s) {
-      synchronized (foo) {
-
-        foo.add(s);
-
-      }
-      try {
-        Thread.sleep(10000);
-      } catch (InterruptedException e) {
-
-      }
-      return false;
+    @Override
+    protected String getConfigFile()
+    {
+        return "cron-synchronous-scheduler-config.xml";
     }
-  }
+
+    @Test
+    public void test() throws InterruptedException
+    {
+        Thread.sleep(6000);
+
+        assertEquals(1, foo.size());
+    }
+
+
+    public static class FooComponent
+    {
+
+        public boolean process(String s)
+        {
+            synchronized (foo)
+            {
+
+                foo.add(s);
+
+            }
+            try
+            {
+                Thread.sleep(10000);
+            }
+            catch (InterruptedException e)
+            {
+
+            }
+            return false;
+        }
+    }
 }

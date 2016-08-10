@@ -8,10 +8,12 @@ package org.mule.runtime.config.spring.parsers.processors;
 
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
-public class IdAttribute extends AddAttribute {
+public class IdAttribute extends AddAttribute
+{
 
-  public IdAttribute(String id) {
-    super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, id);
-  }
+    public IdAttribute(String id)
+    {
+        super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, id);
+    }
 
 }

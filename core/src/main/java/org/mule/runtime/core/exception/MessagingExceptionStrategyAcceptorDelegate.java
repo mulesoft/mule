@@ -15,45 +15,50 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 /**
- * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as
- * {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor}.
+ * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor}.
  */
-public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler>
-    implements MessagingExceptionHandlerAcceptor {
+public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements MessagingExceptionHandlerAcceptor
+{
+    private MessagingExceptionHandler delegate;
 
-  private MessagingExceptionHandler delegate;
-
-  public MessagingExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler) {
-    this.delegate = messagingExceptionHandler;
-  }
-
-  @Override
-  public boolean accept(MuleEvent event) {
-    if (delegate instanceof MessagingExceptionHandlerAcceptor) {
-      return ((MessagingExceptionHandlerAcceptor) delegate).accept(event);
+    public MessagingExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.delegate = messagingExceptionHandler;
     }
-    return true;
-  }
 
-  @Override
-  public boolean acceptsAll() {
-    if (delegate instanceof MessagingExceptionHandlerAcceptor) {
-      return ((MessagingExceptionHandlerAcceptor) delegate).acceptsAll();
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        if (delegate instanceof MessagingExceptionHandlerAcceptor)
+        {
+            return ((MessagingExceptionHandlerAcceptor)delegate).accept(event);
+        }
+        return true;
     }
-    return true;
-  }
 
-  @Override
-  public MuleEvent handleException(Exception exception, MuleEvent event) {
-    return delegate.handleException(exception, event);
-  }
+    @Override
+    public boolean acceptsAll()
+    {
+        if (delegate instanceof MessagingExceptionHandlerAcceptor)
+        {
+            return ((MessagingExceptionHandlerAcceptor)delegate).acceptsAll();
+        }
+        return true;
+    }
 
-  @Override
-  protected List<MessagingExceptionHandler> getOwnedObjects() {
-    return Arrays.asList(delegate);
-  }
+    @Override
+    public MuleEvent handleException(Exception exception, MuleEvent event)
+    {
+        return delegate.handleException(exception,event);
+    }
 
-  public MessagingExceptionHandler getExceptionListener() {
-    return this.delegate;
-  }
+    @Override
+    protected List<MessagingExceptionHandler> getOwnedObjects() {
+        return Arrays.asList(delegate);
+    }
+
+    public MessagingExceptionHandler getExceptionListener()
+    {
+        return this.delegate;
+    }
 }

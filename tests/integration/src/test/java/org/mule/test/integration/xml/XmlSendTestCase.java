@@ -24,81 +24,82 @@ import java.io.InputStream;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class XmlSendTestCase extends AbstractIntegrationTestCase {
+public class XmlSendTestCase extends AbstractIntegrationTestCase
+{
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort = new DynamicPort("port1");
+    private static final HttpRequestOptions httpOptions = newOptions().disableStatusCodeValidation().method(POST.name()).build();
 
-  private static final HttpRequestOptions httpOptions = newOptions().disableStatusCodeValidation().method(POST.name()).build();
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/xml/xml-conf-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/xml/xml-conf-flow.xml";
-  }
+	@Test
+    public void testXmlFilter() throws Exception
+    {
+        InputStream xml = getClass().getResourceAsStream("request.xml");
 
-  @Test
-  public void testXmlFilter() throws Exception {
-    InputStream xml = getClass().getResourceAsStream("request.xml");
+        assertNotNull(xml);
 
-    assertNotNull(xml);
+        MuleClient client = muleContext.getClient();
 
-    MuleClient client = muleContext.getClient();
+        // this will submit the xml via a POST request
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions);
+        assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
-    // this will submit the xml via a POST request
-    MuleMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions);
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+        // This won't pass the filter
+        xml = getClass().getResourceAsStream("validation1.xml");
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions);
+        assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    }
 
-    // This won't pass the filter
-    xml = getClass().getResourceAsStream("validation1.xml");
-    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions);
-    assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
-  }
+	@Test
+    public void testXmlFilterAndXslt() throws Exception
+    {
+        InputStream xml = getClass().getResourceAsStream("request.xml");
 
-  @Test
-  public void testXmlFilterAndXslt() throws Exception {
-    InputStream xml = getClass().getResourceAsStream("request.xml");
+        assertNotNull(xml);
 
-    assertNotNull(xml);
+        MuleClient client = muleContext.getClient();
 
-    MuleClient client = muleContext.getClient();
+        // this will submit the xml via a POST request
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", getTestMuleMessage(xml), httpOptions);
+        assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    }
 
-    // this will submit the xml via a POST request
-    MuleMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", getTestMuleMessage(xml), httpOptions);
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
-  }
+	@Test
+    public void testXmlValidation() throws Exception
+    {
+        InputStream xml = getClass().getResourceAsStream("validation1.xml");
 
-  @Test
-  public void testXmlValidation() throws Exception {
-    InputStream xml = getClass().getResourceAsStream("validation1.xml");
+        assertNotNull(xml);
 
-    assertNotNull(xml);
+        MuleClient client = muleContext.getClient();
 
-    MuleClient client = muleContext.getClient();
+        // this will submit the xml via a POST request
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
+        assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
-    // this will submit the xml via a POST request
-    MuleMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+        xml = getClass().getResourceAsStream("validation2.xml");
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
+        assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
-    xml = getClass().getResourceAsStream("validation2.xml");
-    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
-    assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+        xml = getClass().getResourceAsStream("validation3.xml");
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
+        assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    }
 
-    xml = getClass().getResourceAsStream("validation3.xml");
-    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions);
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
-  }
+    @Test
+    public void testExtractor() throws Exception
+    {
+        InputStream xml = getClass().getResourceAsStream("validation1.xml");
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testExtractor() throws Exception {
-    InputStream xml = getClass().getResourceAsStream("validation1.xml");
-    MuleClient client = muleContext.getClient();
-
-    // this will submit the xml via a POST request
-    MuleMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", getTestMuleMessage(xml), httpOptions);
-    assertThat(getPayloadAsString(message), equalTo("some"));
-  }
+        // this will submit the xml via a POST request
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", getTestMuleMessage(xml), httpOptions);
+        assertThat(getPayloadAsString(message), equalTo("some"));
+    }
 }

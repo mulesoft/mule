@@ -16,18 +16,21 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpOutboundHeadersPropagationComponent implements Callable {
+public class HttpOutboundHeadersPropagationComponent implements Callable
+{
 
-  protected Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Override
-  public Object onCall(MuleEventContext muleEventContext) throws Exception {
-    MuleMessage m = muleEventContext.getMessage();
-    Map<String, Object> headers = new TreeMap<>();
-    for (String s : m.getInboundPropertyNames()) {
-      headers.put(s, m.getInboundProperty(s));
+    @Override
+    public Object onCall(MuleEventContext muleEventContext) throws Exception
+    {
+        MuleMessage m = muleEventContext.getMessage();
+        Map<String, Object> headers = new TreeMap<>();
+        for(String s : m.getInboundPropertyNames())
+        {
+            headers.put(s, m.getInboundProperty(s));
+        }
+        headers.put("Content-Type", m.getDataType().getMediaType().toRfcString());
+        return headers;
     }
-    headers.put("Content-Type", m.getDataType().getMediaType().toRfcString());
-    return headers;
-  }
 }

@@ -22,81 +22,104 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class HttpResponseHeaderBuilder {
+public class HttpResponseHeaderBuilder
+{
 
-  private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
+    private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
 
-  Multimap<String, String> headers =
-      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), () -> Sets.newHashSet());
+    Multimap<String, String> headers =
+            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), () -> Sets.newHashSet());
 
-  public void addHeader(String headerName, Object headerValue) {
-    if (headerValue instanceof Iterable) {
-      failIfHeaderDoesNotSupportMultipleValues(headerName);
-      Iterable values = (Iterable) headerValue;
-      for (Object value : values) {
-        addSimpleValue(headerName, value.toString());
-      }
-    } else if (headerValue instanceof String[]) {
-      failIfHeaderDoesNotSupportMultipleValues(headerName);
-      String[] values = (String[]) headerValue;
-      for (String value : values) {
-        addSimpleValue(headerName, value);
-      }
-    } else {
-      addSimpleValue(headerName, headerValue.toString());
+    public void addHeader(String headerName, Object headerValue)
+    {
+        if (headerValue instanceof Iterable)
+        {
+            failIfHeaderDoesNotSupportMultipleValues(headerName);
+            Iterable values = (Iterable) headerValue;
+            for (Object value : values)
+            {
+                addSimpleValue(headerName, value.toString());
+            }
+        }
+        else if (headerValue instanceof String[])
+        {
+            failIfHeaderDoesNotSupportMultipleValues(headerName);
+            String[] values = (String[]) headerValue;
+            for (String value : values)
+            {
+                addSimpleValue(headerName, value);
+            }
+        }
+        else
+        {
+            addSimpleValue(headerName, headerValue.toString());
+        }
     }
-  }
 
-  public Collection<String> removeHeader(String headerName) {
-    return headers.removeAll(headerName);
-  }
-
-  private void failIfHeaderDoesNotSupportMultipleValues(String headerName) {
-    if (calculatedHeadersNames.contains(headerName)) {
-      throw new MuleRuntimeException(createStaticMessage("Header: " + headerName + " does not support multiple values"));
+    public Collection<String> removeHeader(String headerName)
+    {
+        return headers.removeAll(headerName);
     }
-  }
 
-  private void addSimpleValue(String headerName, String headerValue) {
-    if (headers.containsValue(headerName)) {
-      failIfHeaderDoesNotSupportMultipleValues(headerName);
+    private void failIfHeaderDoesNotSupportMultipleValues(String headerName)
+    {
+        if (calculatedHeadersNames.contains(headerName))
+        {
+            throw new MuleRuntimeException(createStaticMessage("Header: " + headerName + " does not support multiple values"));
+        }
     }
-    headers.put(headerName, headerValue);
-  }
 
-  public String getContentType() {
-    return getSimpleValue(CONTENT_TYPE);
-  }
-
-  public String getTransferEncoding() {
-    return getSimpleValue(TRANSFER_ENCODING);
-  }
-
-  public String getContentLength() {
-    return getSimpleValue(CONTENT_LENGTH);
-  }
-
-  private String getSimpleValue(String header) {
-    if (!headers.containsKey(header)) {
-      return null;
+    private void addSimpleValue(String headerName, String headerValue)
+    {
+        if (headers.containsValue(headerName))
+        {
+            failIfHeaderDoesNotSupportMultipleValues(headerName);
+        }
+        headers.put(headerName, headerValue);
     }
-    return (String) ((Collection) headers.get(header)).iterator().next();
-  }
 
-  public void addContentType(String multipartFormData) {
-    addSimpleValue(CONTENT_TYPE, multipartFormData);
-  }
+    public String getContentType()
+    {
+        return getSimpleValue(CONTENT_TYPE);
+    }
 
-  public void setContentLenght(String calculatedContentLenght) {
-    removeHeader(CONTENT_LENGTH);
-    addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
-  }
+    public String getTransferEncoding()
+    {
+        return getSimpleValue(TRANSFER_ENCODING);
+    }
 
-  public Collection<String> getHeaderNames() {
-    return headers.keySet();
-  }
+    public String getContentLength()
+    {
+        return getSimpleValue(CONTENT_LENGTH);
+    }
 
-  public Collection<String> getHeader(String headerName) {
-    return headers.get(headerName);
-  }
+    private String getSimpleValue(String header)
+    {
+        if (!headers.containsKey(header))
+        {
+            return null;
+        }
+        return (String)((Collection)headers.get(header)).iterator().next();
+    }
+
+    public void addContentType(String multipartFormData)
+    {
+        addSimpleValue(CONTENT_TYPE, multipartFormData);
+    }
+
+    public void setContentLenght(String calculatedContentLenght)
+    {
+        removeHeader(CONTENT_LENGTH);
+        addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
+    }
+
+    public Collection<String> getHeaderNames()
+    {
+        return headers.keySet();
+    }
+
+    public Collection<String> getHeader(String headerName)
+    {
+        return headers.get(headerName);
+    }
 }

@@ -11,15 +11,17 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
-public class HttpMessageAttributesMatchers {
+public class HttpMessageAttributesMatchers
+{
+    @Factory
+    public static Matcher<HttpResponseAttributes> hasStatusCode(int statusCode)
+    {
+        return new HttpResponseAttributesStatusCodeMatcher(statusCode);
+    }
 
-  @Factory
-  public static Matcher<HttpResponseAttributes> hasStatusCode(int statusCode) {
-    return new HttpResponseAttributesStatusCodeMatcher(statusCode);
-  }
-
-  @Factory
-  public static Matcher<HttpResponseAttributes> hasReasonPhrase(String reasonPhrase) {
-    return new HttpResponseAttributesReasonPhraseMatcher(reasonPhrase);
-  }
+    @Factory
+    public static Matcher<HttpResponseAttributes> hasReasonPhrase(String reasonPhrase)
+    {
+        return new HttpResponseAttributesReasonPhraseMatcher(reasonPhrase);
+    }
 }

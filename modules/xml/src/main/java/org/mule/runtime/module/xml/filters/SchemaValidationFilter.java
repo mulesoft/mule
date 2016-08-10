@@ -41,294 +41,368 @@ import org.xml.sax.SAXException;
  * Filter for schema validation.
  * 
  **/
-public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable {
+public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable
+{
+    public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
-  public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    private String schemaLocations;
+    private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
+    private Schema schemaObject;
+    private ErrorHandler errorHandler;
+    private Map<String, Boolean> validatorFeatures;
+    private Map<String, Object> validatorProperties;
+    private LSResourceResolver resourceResolver;
+    private boolean useStaxSource = false;
+    private boolean returnResult = true;
+    private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
-  private String schemaLocations;
-  private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
-  private Schema schemaObject;
-  private ErrorHandler errorHandler;
-  private Map<String, Boolean> validatorFeatures;
-  private Map<String, Object> validatorProperties;
-  private LSResourceResolver resourceResolver;
-  private boolean useStaxSource = false;
-  private boolean returnResult = true;
-  private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-  @Override
-  public boolean accept(MuleMessage message) {
-    throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
-  }
-
-  /**
-   * Accepts the message if schema validation passes.
-   * 
-   * @param event The event.
-   * @return Whether the message passes schema validation.
-   */
-  @Override
-  public boolean accept(MuleEvent event) {
-    Source source;
-    try {
-      source = loadSource(event.getMessage());
-    } catch (Exception e) {
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException) e;
-      }
-
-      if (logger.isInfoEnabled()) {
-        logger.info("SchemaValidationFilter rejected a message because there was a problem interpreting the payload as XML.", e);
-      }
-      return false;
+    @Override
+    public boolean accept(MuleMessage message)
+    {
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
     }
 
-    if (source == null) {
-      if (logger.isInfoEnabled()) {
-        logger.info("SchemaValidationFilter rejected a message because the XML source was null.");
-      }
-      return false;
-    }
-
-
-    DOMResult result = null;
-
-    try {
-      if (returnResult) {
-        result = new DOMResult();
-        createValidator().validate(source, result);
-      } else {
-        createValidator().validate(source);
-      }
-    } catch (SAXException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("SchemaValidationFilter rejected a message because it apparently failed to validate against the schema.", e);
-      }
-      return false;
-    } catch (IOException e) {
-      if (logger.isInfoEnabled()) {
-        logger.info("SchemaValidationFilter rejected a message because there was a problem reading the XML.", e);
-      }
-      return false;
-    } finally {
-      if (result != null && result.getNode() != null) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
-      }
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("SchemaValidationFilter accepted the message.");
-    }
-
-    return true;
-  }
-
-  /**
-   * Get a delayed result.
-   * 
-   * @param source The source.
-   * @return The result.
-   */
-  protected Object getDelayedResult(final Source source) {
-    return new DelayedResult() {
-
-      private String systemId;
-
-      @Override
-      public void write(Result result) throws Exception {
-        createValidator().validate(source, result);
-      }
-
-      @Override
-      public String getSystemId() {
-        return systemId;
-      }
-
-      @Override
-      public void setSystemId(String systemId) {
-        this.systemId = systemId;
-      }
-    };
-  }
-
-  /**
-   * Load the source from the specified object.
-   * 
-   * @param msg Encompassing message
-   * @return The source
-   */
-  protected Source loadSource(MuleMessage msg) throws Exception {
-    Object payload = msg.getPayload();
-    if (returnResult) {
-      // Validation requires that a DOM goes in for a DOM to go out
-      payload = toDOMNode(payload);
-    }
-    return XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), payload);
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-
-    if (getSchemaObject() == null) {
-      if (schemaLocations == null) {
-        throw new InitialisationException(CoreMessages.objectIsNull("schemaLocations"), this);
-      }
-
-      String[] split = StringUtils.splitAndTrim(schemaLocations, ",");
-      Source[] schemas = new Source[split.length];
-      for (int i = 0; i < split.length; i++) {
-        String loc = split[i];
-        InputStream schemaStream;
-        try {
-          schemaStream = loadSchemaStream(loc);
-        } catch (IOException e) {
-          throw new InitialisationException(e, this);
+    /**
+     * Accepts the message if schema validation passes.
+     * 
+     * @param event The event.
+     * @return Whether the message passes schema validation.
+     */
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        Source source;
+        try
+        {
+            source = loadSource(event.getMessage());
+        }
+        catch (Exception e)
+        {
+            if (e instanceof RuntimeException)
+            {
+                throw (RuntimeException) e;
+            }
+            
+            if (logger.isInfoEnabled())
+            {
+                logger.info("SchemaValidationFilter rejected a message because there was a problem interpreting the payload as XML.", e);
+            }
+            return false;
         }
 
-        if (schemaStream == null) {
-          throw new InitialisationException(CoreMessages.failedToLoad(loc), this);
+        if (source == null)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("SchemaValidationFilter rejected a message because the XML source was null.");
+            }
+            return false;
         }
 
-        schemas[i] = new StreamSource(schemaStream);
-      }
+        
+        DOMResult result = null;
+        
+        try
+        {
+            if (returnResult) 
+            {
+                result = new DOMResult();
+                createValidator().validate(source, result);
+            }
+            else 
+            {
+                createValidator().validate(source);
+            }
+        }
+        catch (SAXException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(
+                    "SchemaValidationFilter rejected a message because it apparently failed to validate against the schema.",
+                    e);
+            }
+            return false;
+        }
+        catch (IOException e)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info(
+                    "SchemaValidationFilter rejected a message because there was a problem reading the XML.",
+                    e);
+            }
+            return false;
+        }
+        finally 
+        {
+            if (result != null && result.getNode() != null)
+            {
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
+            }
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("SchemaValidationFilter accepted the message.");
+        }
 
-      SchemaFactory schemaFactory = SchemaFactory.newInstance(getSchemaLanguage());
-
-      if (logger.isInfoEnabled()) {
-        logger.info("Schema factory implementation: " + schemaFactory);
-      }
-
-      if (this.errorHandler != null) {
-        schemaFactory.setErrorHandler(this.errorHandler);
-      }
-
-      if (this.resourceResolver == null) {
-        this.resourceResolver = new MuleResourceResolver();
-      }
-
-      schemaFactory.setResourceResolver(this.resourceResolver);
-
-      Schema schema;
-      try {
-        schema = schemaFactory.newSchema(schemas);
-      } catch (SAXException e) {
-        throw new InitialisationException(e, this);
-      }
-
-      setSchemaObject(schema);
+        return true;
     }
 
-    if (getSchemaObject() == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("schemaObject"), this);
+    /**
+     * Get a delayed result.
+     * 
+     * @param source The source.
+     * @return The result.
+     */
+    protected Object getDelayedResult(final Source source)
+    {
+        return new DelayedResult()
+        {
+            private String systemId;
+
+            @Override
+            public void write(Result result) throws Exception
+            {
+                createValidator().validate(source, result);
+            }
+
+            @Override
+            public String getSystemId()
+            {
+                return systemId;
+            }
+
+            @Override
+            public void setSystemId(String systemId)
+            {
+                this.systemId = systemId;
+            }
+        };
     }
-  }
 
-  protected InputStream loadSchemaStream(String schemaLocation) throws IOException {
-    return IOUtils.getResourceAsStream(schemaLocation, getClass());
-  }
-
-  /**
-   * Create a validator.
-   * 
-   * @return The validator.
-   */
-  public Validator createValidator() throws SAXException {
-    Validator validator = getSchemaObject().newValidator();
-
-    if (this.validatorFeatures != null) {
-      for (Map.Entry<String, Boolean> feature : this.validatorFeatures.entrySet()) {
-        validator.setFeature(feature.getKey(), feature.getValue());
-      }
+    /**
+     * Load the source from the specified object.
+     * 
+     * @param msg Encompassing message
+     * @return The source
+     */
+    protected Source loadSource(MuleMessage msg) throws Exception
+    {
+        Object payload = msg.getPayload();
+        if (returnResult)
+        {
+            // Validation requires that a DOM goes in for a DOM to go out
+            payload = toDOMNode(payload);
+        }
+        return XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), payload);
     }
 
-    if (this.validatorProperties != null) {
-      for (Map.Entry<String, Object> validatorProperty : this.validatorProperties.entrySet()) {
-        validator.setProperty(validatorProperty.getKey(), validatorProperty.getValue());
-      }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        
+        if (getSchemaObject() == null)
+        {
+            if (schemaLocations == null)
+            {
+                throw new InitialisationException(CoreMessages.objectIsNull("schemaLocations"), this);
+            }
+
+            String[] split = StringUtils.splitAndTrim(schemaLocations, ",");
+            Source[] schemas = new Source[split.length];
+            for (int i = 0; i < split.length; i++)
+            {
+                String loc = split[i];
+                InputStream schemaStream;
+                try
+                {
+                    schemaStream = loadSchemaStream(loc);
+                }
+                catch (IOException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
+    
+                if (schemaStream == null)
+                {
+                    throw new InitialisationException(CoreMessages.failedToLoad(loc), this);
+                }
+                
+                schemas[i] = new StreamSource(schemaStream);
+            }
+            
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(getSchemaLanguage());
+
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Schema factory implementation: " + schemaFactory);
+            }
+
+            if (this.errorHandler != null)
+            {
+                schemaFactory.setErrorHandler(this.errorHandler);
+            }
+
+            if (this.resourceResolver == null)
+            {
+                this.resourceResolver = new MuleResourceResolver();
+            }
+
+            schemaFactory.setResourceResolver(this.resourceResolver);
+
+            Schema schema;
+            try
+            {
+                schema = schemaFactory.newSchema(schemas);
+            }
+            catch (SAXException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+
+            setSchemaObject(schema);
+        }
+
+        if (getSchemaObject() == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("schemaObject"), this);
+        }
     }
 
-    return validator;
-  }
+    protected InputStream loadSchemaStream(String schemaLocation) throws IOException
+    {
+        return IOUtils.getResourceAsStream(schemaLocation, getClass());
+    }
 
-  public String getSchemaLocations() {
-    return schemaLocations;
-  }
+    /**
+     * Create a validator.
+     * 
+     * @return The validator.
+     */
+    public Validator createValidator() throws SAXException
+    {
+        Validator validator = getSchemaObject().newValidator();
 
-  public void setSchemaLocations(String schemaLocations) {
-    this.schemaLocations = schemaLocations;
-  }
+        if (this.validatorFeatures != null)
+        {
+            for (Map.Entry<String, Boolean> feature : this.validatorFeatures.entrySet())
+            {
+                validator.setFeature(feature.getKey(), feature.getValue());
+            }
+        }
 
-  public String getSchemaLanguage() {
-    return schemaLanguage;
-  }
+        if (this.validatorProperties != null)
+        {
+            for (Map.Entry<String, Object> validatorProperty : this.validatorProperties.entrySet())
+            {
+                validator.setProperty(validatorProperty.getKey(), validatorProperty.getValue());
+            }
+        }
 
-  public void setSchemaLanguage(String schemaLanguage) {
-    this.schemaLanguage = schemaLanguage;
-  }
+        return validator;
+    }
 
-  public Schema getSchemaObject() {
-    return schemaObject;
-  }
+    public String getSchemaLocations()
+    {
+        return schemaLocations;
+    }
 
-  public void setSchemaObject(Schema schemaObject) {
-    this.schemaObject = schemaObject;
-  }
+    public void setSchemaLocations(String schemaLocations)
+    {
+        this.schemaLocations = schemaLocations;
+    }
 
-  public ErrorHandler getErrorHandler() {
-    return errorHandler;
-  }
+    public String getSchemaLanguage()
+    {
+        return schemaLanguage;
+    }
 
-  public void setErrorHandler(ErrorHandler errorHandler) {
-    this.errorHandler = errorHandler;
-  }
+    public void setSchemaLanguage(String schemaLanguage)
+    {
+        this.schemaLanguage = schemaLanguage;
+    }
 
-  public LSResourceResolver getResourceResolver() {
-    return resourceResolver;
-  }
+    public Schema getSchemaObject()
+    {
+        return schemaObject;
+    }
 
-  public void setResourceResolver(LSResourceResolver resourceResolver) {
-    this.resourceResolver = resourceResolver;
-  }
+    public void setSchemaObject(Schema schemaObject)
+    {
+        this.schemaObject = schemaObject;
+    }
 
-  public Map<String, Boolean> getValidatorFeatures() {
-    return validatorFeatures;
-  }
+    public ErrorHandler getErrorHandler()
+    {
+        return errorHandler;
+    }
 
-  public void setValidatorFeatures(Map<String, Boolean> validatorFeatures) {
-    this.validatorFeatures = validatorFeatures;
-  }
+    public void setErrorHandler(ErrorHandler errorHandler)
+    {
+        this.errorHandler = errorHandler;
+    }
 
-  public Map<String, Object> getValidatorProperties() {
-    return validatorProperties;
-  }
+    public LSResourceResolver getResourceResolver()
+    {
+        return resourceResolver;
+    }
 
-  public void setValidatorProperties(Map<String, Object> validatorProperties) {
-    this.validatorProperties = validatorProperties;
-  }
+    public void setResourceResolver(LSResourceResolver resourceResolver)
+    {
+        this.resourceResolver = resourceResolver;
+    }
 
-  public XMLInputFactory getXMLInputFactory() {
-    return xmlInputFactory;
-  }
+    public Map<String, Boolean> getValidatorFeatures()
+    {
+        return validatorFeatures;
+    }
 
-  public void setXMLInputFactory(XMLInputFactory xmlInputFactory) {
-    this.xmlInputFactory = xmlInputFactory;
-  }
+    public void setValidatorFeatures(Map<String, Boolean> validatorFeatures)
+    {
+        this.validatorFeatures = validatorFeatures;
+    }
 
-  public boolean isUseStaxSource() {
-    return useStaxSource;
-  }
+    public Map<String, Object> getValidatorProperties()
+    {
+        return validatorProperties;
+    }
 
-  public void setUseStaxSource(boolean useStaxSource) {
-    this.useStaxSource = useStaxSource;
-  }
+    public void setValidatorProperties(Map<String, Object> validatorProperties)
+    {
+        this.validatorProperties = validatorProperties;
+    }
 
-  public boolean isReturnResult() {
-    return returnResult;
-  }
+    public XMLInputFactory getXMLInputFactory()
+    {
+        return xmlInputFactory;
+    }
 
-  public void setReturnResult(boolean returnResult) {
-    this.returnResult = returnResult;
-  }
+    public void setXMLInputFactory(XMLInputFactory xmlInputFactory)
+    {
+        this.xmlInputFactory = xmlInputFactory;
+    }
+
+    public boolean isUseStaxSource()
+    {
+        return useStaxSource;
+    }
+
+    public void setUseStaxSource(boolean useStaxSource)
+    {
+        this.useStaxSource = useStaxSource;
+    }
+
+    public boolean isReturnResult()
+    {
+        return returnResult;
+    }
+
+    public void setReturnResult(boolean returnResult)
+    {
+        this.returnResult = returnResult;
+    }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.pgp;
 
-public interface Message {
+public interface Message
+{
 
 }

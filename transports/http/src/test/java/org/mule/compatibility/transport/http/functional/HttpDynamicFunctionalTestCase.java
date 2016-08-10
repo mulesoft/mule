@@ -20,34 +20,36 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpDynamicFunctionalTestCase extends FunctionalTestCase {
+public class HttpDynamicFunctionalTestCase extends FunctionalTestCase
+{
+    protected static String TEST_REQUEST = "Test Http Request";
 
-  protected static String TEST_REQUEST = "Test Http Request";
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-  @Rule
-  public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-dynamic-functional-test-service.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "http-dynamic-functional-test-service.xml";
-  }
+    @Test
+    public void testSend() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testSend() throws Exception {
-    MuleClient client = muleContext.getClient();
+        Map<String, Serializable> props = new HashMap<>();
+        props.put("port", dynamicPort1.getNumber());
+        props.put("path", "foo");
 
-    Map<String, Serializable> props = new HashMap<>();
-    props.put("port", dynamicPort1.getNumber());
-    props.put("path", "foo");
+        MuleMessage result = client.send("clientEndpoint", TEST_REQUEST, props);
+        assertEquals(TEST_REQUEST + " Received 1", getPayloadAsString(result));
 
-    MuleMessage result = client.send("clientEndpoint", TEST_REQUEST, props);
-    assertEquals(TEST_REQUEST + " Received 1", getPayloadAsString(result));
-
-    props.put("port", dynamicPort2.getNumber());
-    result = client.send("clientEndpoint", TEST_REQUEST, props);
-    assertEquals(TEST_REQUEST + " Received 2", getPayloadAsString(result));
-  }
+        props.put("port", dynamicPort2.getNumber());
+        result = client.send("clientEndpoint", TEST_REQUEST, props);
+        assertEquals(TEST_REQUEST + " Received 2", getPayloadAsString(result));
+    }
 }

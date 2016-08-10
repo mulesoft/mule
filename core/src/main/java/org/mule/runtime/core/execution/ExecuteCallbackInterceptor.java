@@ -8,10 +8,11 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 
-class ExecuteCallbackInterceptor<T> implements ExecutionInterceptor<T> {
-
-  @Override
-  public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception {
-    return callback.process();
-  }
+class ExecuteCallbackInterceptor<T> implements ExecutionInterceptor<T>
+{
+    @Override
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
+    {
+        return callback.process();
+    }
 }

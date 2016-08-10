@@ -17,20 +17,23 @@ import org.mule.mvel2.util.ASTLinkedList;
 /**
  * Base class {@link EnricherDataTypePropagator}
  */
-public abstract class AbstractEnricherDataTypePropagator implements EnricherDataTypePropagator {
+public abstract class AbstractEnricherDataTypePropagator implements EnricherDataTypePropagator
+{
 
-  @Override
-  public boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression) {
-    ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
+    @Override
+    public boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression)
+    {
+        ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
 
-    if (iterator.hasMoreNodes()) {
-      ASTNode node = iterator.nextNode();
+        if (iterator.hasMoreNodes())
+        {
+            ASTNode node = iterator.nextNode();
 
-      return doPropagate(event, typedValue, node);
+            return doPropagate(event, typedValue, node);
+        }
+
+        return false;
     }
 
-    return false;
-  }
-
-  protected abstract boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node);
+    protected abstract boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node);
 }

@@ -8,7 +8,8 @@ package org.mule.test.metadata.extension.model.attribute;
 
 import org.mule.runtime.api.message.Attributes;
 
-public interface AbstractOutputAttributes extends Attributes {
+public interface AbstractOutputAttributes extends Attributes
+{
 
-  String getOutputId();
+    String getOutputId();
 }

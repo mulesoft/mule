@@ -15,28 +15,33 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.util.StringUtils;
 
-public class HttpsMessageReceiver extends HttpMessageReceiver {
-
-  public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException {
-    super(connector, flow, endpoint);
-  }
-
-  @Override
-  protected void doConnect() throws ConnectException {
-    checkKeyStore();
-    super.doConnect();
-  }
-
-  protected void checkKeyStore() throws ConnectException {
-    HttpsConnector httpsConnector = (HttpsConnector) connector;
-    String keyStore = httpsConnector.getKeyStore();
-    if (StringUtils.isBlank(keyStore)) {
-      throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
+public class HttpsMessageReceiver extends HttpMessageReceiver
+{
+    public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
+    {
+        super(connector, flow, endpoint);
     }
-  }
 
-  @Override
-  HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection) {
-    return new HttpsMessageProcessTemplate(this, httpServerConnection, getWorkManager());
-  }
+    @Override
+    protected void doConnect() throws ConnectException
+    {
+        checkKeyStore();
+        super.doConnect();
+    }
+
+    protected void checkKeyStore() throws ConnectException
+    {
+        HttpsConnector httpsConnector = (HttpsConnector) connector;
+        String keyStore = httpsConnector.getKeyStore();
+        if (StringUtils.isBlank(keyStore))
+        {
+            throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
+        }
+    }
+
+    @Override
+    HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection)
+    {
+        return new HttpsMessageProcessTemplate(this, httpServerConnection,getWorkManager());
+    }
 }

@@ -12,24 +12,24 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * <code>Authentication</code> represents an authentication request and contains authentication information if the request was
- * successful
+ * <code>Authentication</code> represents an authentication request and contains
+ * authentication information if the request was successful
  */
-public interface Authentication extends Serializable {
+public interface Authentication extends Serializable
+{
+    void setAuthenticated(boolean b);
 
-  void setAuthenticated(boolean b);
+    boolean isAuthenticated();
 
-  boolean isAuthenticated();
+    Object getCredentials();
 
-  Object getCredentials();
+    Object getPrincipal();
 
-  Object getPrincipal();
+    Map<String, Object> getProperties();
 
-  Map<String, Object> getProperties();
+    void setProperties(Map<String, Object> properties);
 
-  void setProperties(Map<String, Object> properties);
+    MuleEvent getEvent();
 
-  MuleEvent getEvent();
-
-  void setEvent(MuleEvent event);
+    void setEvent(MuleEvent event);
 }

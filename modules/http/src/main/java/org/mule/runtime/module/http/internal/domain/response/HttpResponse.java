@@ -8,14 +8,15 @@ package org.mule.runtime.module.http.internal.domain.response;
 
 import org.mule.runtime.module.http.internal.domain.HttpMessage;
 
-public interface HttpResponse extends HttpMessage {
+public interface HttpResponse extends HttpMessage
+{
 
-  int getStatusCode();
+    int getStatusCode();
 
-  void setStatusCode(int statusCode);
+    void setStatusCode(int statusCode);
 
-  String getReasonPhrase();
+    String getReasonPhrase();
 
-  void setReasonPhrase(String reasonPhrase);
+    void setReasonPhrase(String reasonPhrase);
 
 }

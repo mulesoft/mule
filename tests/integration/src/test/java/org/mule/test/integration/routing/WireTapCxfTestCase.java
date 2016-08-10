@@ -19,30 +19,32 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class WireTapCxfTestCase extends AbstractIntegrationTestCase {
+public class WireTapCxfTestCase extends AbstractIntegrationTestCase
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/routing/wire-tap-cxf-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/routing/wire-tap-cxf-flow.xml";
-  }
+    @Test
+    public void testWireTap() throws Exception
+    {
+        String url = "http://localhost:" + port1.getNumber() + "/services/EchoUMO";
+        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                     + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
-  @Test
-  public void testWireTap() throws Exception {
-    String url = "http://localhost:" + port1.getNumber() + "/services/EchoUMO";
-    String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-        + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build());
+        assertNotNull(response);
 
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build());
-    assertNotNull(response);
+        String responseString = getPayloadAsString(response);
+        assertTrue(responseString.contains("echoResponse"));
+        assertFalse(responseString.contains("soap:Fault"));
 
-    String responseString = getPayloadAsString(response);
-    assertTrue(responseString.contains("echoResponse"));
-    assertFalse(responseString.contains("soap:Fault"));
-
-    assertNotNull(client.request("test://wireTapped", RECEIVE_TIMEOUT));
-  }
+        assertNotNull(client.request("test://wireTapped", RECEIVE_TIMEOUT));
+    }
 }

@@ -30,199 +30,240 @@ import org.xml.sax.SAXException;
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
  */
 @Deprecated
-public class JsonSchemaValidationFilter implements JsonSchemaFilter {
+public class JsonSchemaValidationFilter implements JsonSchemaFilter
+{
 
-  protected JsonSchemaFilter delegate;
-  private String schemaLocations;
-  private Schema schemaObject;
-  private LSResourceResolver resourceResolver;
-  private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
-  private MuleContext muleContext;
-  private ErrorHandler errorHandler;
-  private boolean returnResult;
-  private boolean useStaxSource;
-  private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-  private Map<String, Object> validatorProperties;
-  private Map<String, Boolean> validatorFeatures;
+    protected JsonSchemaFilter delegate;
+    private String schemaLocations;
+    private Schema schemaObject;
+    private LSResourceResolver resourceResolver;
+    private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
+    private MuleContext muleContext;
+    private ErrorHandler errorHandler;
+    private boolean returnResult;
+    private boolean useStaxSource;
+    private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private Map<String, Object> validatorProperties;
+    private Map<String, Boolean> validatorFeatures;
 
-  @Override
-  public boolean accept(MuleMessage msg) {
-    return delegate.accept(msg);
-  }
-
-  @Override
-  public boolean accept(MuleEvent event) {
-    return delegate.accept(event);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    if (delegate != null) {
-      delegate.setMuleContext(muleContext);
-    }
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (isJsonSchema(schemaLocations)) {
-      delegate = new JsonSchemaJsonValidationFilter();
-    } else {
-      delegate = new JsonSchemaXsdValidationFilter();
+    @Override
+    public boolean accept(MuleMessage msg)
+    {
+        return delegate.accept(msg);
     }
 
-    delegate.setSchemaLocations(schemaLocations);
-    delegate.setSchemaObject(schemaObject);
-    delegate.setResourceResolver(resourceResolver);
-    delegate.setSchemaLanguage(schemaLanguage);
-    delegate.setMuleContext(muleContext);
-    delegate.setErrorHandler(errorHandler);
-    delegate.setReturnResult(returnResult);
-    delegate.setUseStaxSource(useStaxSource);
-    delegate.setXMLInputFactory(xmlInputFactory);
-    delegate.setValidatorProperties(validatorProperties);
-    delegate.setValidatorFeatures(validatorFeatures);
-
-    delegate.initialise();
-  }
-
-  protected boolean isJsonSchema(String schema) {
-    return schema.endsWith(".json");
-  }
-
-  @Override
-  public void setSchemaLocations(String schemaLocations) {
-    this.schemaLocations = schemaLocations;
-    if (delegate != null) {
-      delegate.setSchemaLocations(schemaLocations);
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        return delegate.accept(event);
     }
-  }
 
-  @Override
-  public String getSchemaLocations() {
-    return delegate.getSchemaLocations();
-  }
-
-  @Override
-  public Validator createValidator() throws SAXException {
-    return delegate.createValidator();
-  }
-
-  @Override
-  public String getSchemaLanguage() {
-    return delegate.getSchemaLanguage();
-  }
-
-  @Override
-  public Schema getSchemaObject() {
-    return delegate.getSchemaObject();
-  }
-
-  @Override
-  public void setSchemaObject(Schema schemaObject) {
-    this.schemaObject = schemaObject;
-    if (delegate != null) {
-      delegate.setSchemaObject(schemaObject);
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        if (delegate != null)
+        {
+            delegate.setMuleContext(muleContext);
+        }
+        this.muleContext = muleContext;
     }
-  }
 
-  @Override
-  public ErrorHandler getErrorHandler() {
-    return delegate.getErrorHandler();
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (isJsonSchema(schemaLocations))
+        {
+            delegate = new JsonSchemaJsonValidationFilter();
+        }
+        else
+        {
+            delegate = new JsonSchemaXsdValidationFilter();
+        }
 
-  @Override
-  public void setErrorHandler(ErrorHandler errorHandler) {
-    this.errorHandler = errorHandler;
-    if (delegate != null) {
-      delegate.setErrorHandler(errorHandler);
+        delegate.setSchemaLocations(schemaLocations);
+        delegate.setSchemaObject(schemaObject);
+        delegate.setResourceResolver(resourceResolver);
+        delegate.setSchemaLanguage(schemaLanguage);
+        delegate.setMuleContext(muleContext);
+        delegate.setErrorHandler(errorHandler);
+        delegate.setReturnResult(returnResult);
+        delegate.setUseStaxSource(useStaxSource);
+        delegate.setXMLInputFactory(xmlInputFactory);
+        delegate.setValidatorProperties(validatorProperties);
+        delegate.setValidatorFeatures(validatorFeatures);
+
+        delegate.initialise();
     }
-  }
 
-  @Override
-  public LSResourceResolver getResourceResolver() {
-    return delegate.getResourceResolver();
-  }
-
-  @Override
-  public void setResourceResolver(LSResourceResolver resourceResolver) {
-    this.resourceResolver = resourceResolver;
-    if (delegate != null) {
-      delegate.setResourceResolver(resourceResolver);
+    protected boolean isJsonSchema(String schema)
+    {
+        return schema.endsWith(".json");
     }
-  }
 
-  @Override
-  public Map<String, Boolean> getValidatorFeatures() {
-    return delegate.getValidatorFeatures();
-  }
-
-  @Override
-  public void setValidatorFeatures(Map<String, Boolean> validatorFeatures) {
-    this.validatorFeatures = validatorFeatures;
-    if (delegate != null) {
-      delegate.setValidatorFeatures(validatorFeatures);
+    @Override
+    public void setSchemaLocations(String schemaLocations)
+    {
+        this.schemaLocations = schemaLocations;
+        if (delegate != null)
+        {
+            delegate.setSchemaLocations(schemaLocations);
+        }
     }
-  }
 
-  @Override
-  public Map<String, Object> getValidatorProperties() {
-    return delegate.getValidatorProperties();
-  }
-
-  @Override
-  public void setValidatorProperties(Map<String, Object> validatorProperties) {
-    this.validatorProperties = validatorProperties;
-    if (delegate != null) {
-      delegate.setValidatorProperties(validatorProperties);
+    @Override
+    public String getSchemaLocations()
+    {
+        return delegate.getSchemaLocations();
     }
-  }
 
-  @Override
-  public XMLInputFactory getXMLInputFactory() {
-    return delegate.getXMLInputFactory();
-  }
-
-  @Override
-  public void setXMLInputFactory(XMLInputFactory xmlInputFactory) {
-    this.xmlInputFactory = xmlInputFactory;
-    if (delegate != null) {
-      delegate.setXMLInputFactory(xmlInputFactory);
+    @Override
+    public Validator createValidator() throws SAXException
+    {
+        return delegate.createValidator();
     }
-  }
 
-  @Override
-  public boolean isUseStaxSource() {
-    return delegate.isUseStaxSource();
-  }
-
-  @Override
-  public void setUseStaxSource(boolean useStaxSource) {
-    this.useStaxSource = useStaxSource;
-    if (delegate != null) {
-      delegate.setUseStaxSource(useStaxSource);
+    @Override
+    public String getSchemaLanguage()
+    {
+        return delegate.getSchemaLanguage();
     }
-  }
 
-  @Override
-  public boolean isReturnResult() {
-    return delegate.isReturnResult();
-  }
-
-  @Override
-  public void setReturnResult(boolean returnResult) {
-    this.returnResult = returnResult;
-    if (delegate != null) {
-      delegate.setReturnResult(returnResult);
+    @Override
+    public Schema getSchemaObject()
+    {
+        return delegate.getSchemaObject();
     }
-  }
 
-  @Override
-  public void setSchemaLanguage(String schemaLanguage) {
-    this.schemaLanguage = schemaLanguage;
-    if (delegate != null) {
-      delegate.setSchemaLanguage(schemaLanguage);
+    @Override
+    public void setSchemaObject(Schema schemaObject)
+    {
+        this.schemaObject = schemaObject;
+        if (delegate != null)
+        {
+            delegate.setSchemaObject(schemaObject);
+        }
     }
-  }
+
+    @Override
+    public ErrorHandler getErrorHandler()
+    {
+        return delegate.getErrorHandler();
+    }
+
+    @Override
+    public void setErrorHandler(ErrorHandler errorHandler)
+    {
+        this.errorHandler = errorHandler;
+        if (delegate != null)
+        {
+            delegate.setErrorHandler(errorHandler);
+        }
+    }
+
+    @Override
+    public LSResourceResolver getResourceResolver()
+    {
+        return delegate.getResourceResolver();
+    }
+
+    @Override
+    public void setResourceResolver(LSResourceResolver resourceResolver)
+    {
+        this.resourceResolver = resourceResolver;
+        if (delegate != null)
+        {
+            delegate.setResourceResolver(resourceResolver);
+        }
+    }
+
+    @Override
+    public Map<String, Boolean> getValidatorFeatures()
+    {
+        return delegate.getValidatorFeatures();
+    }
+
+    @Override
+    public void setValidatorFeatures(Map<String, Boolean> validatorFeatures)
+    {
+        this.validatorFeatures = validatorFeatures;
+        if (delegate != null)
+        {
+            delegate.setValidatorFeatures(validatorFeatures);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getValidatorProperties()
+    {
+        return delegate.getValidatorProperties();
+    }
+
+    @Override
+    public void setValidatorProperties(Map<String, Object> validatorProperties)
+    {
+        this.validatorProperties = validatorProperties;
+        if (delegate != null)
+        {
+            delegate.setValidatorProperties(validatorProperties);
+        }
+    }
+
+    @Override
+    public XMLInputFactory getXMLInputFactory()
+    {
+        return delegate.getXMLInputFactory();
+    }
+
+    @Override
+    public void setXMLInputFactory(XMLInputFactory xmlInputFactory)
+    {
+        this.xmlInputFactory = xmlInputFactory;
+        if (delegate != null)
+        {
+            delegate.setXMLInputFactory(xmlInputFactory);
+        }
+    }
+
+    @Override
+    public boolean isUseStaxSource()
+    {
+        return delegate.isUseStaxSource();
+    }
+
+    @Override
+    public void setUseStaxSource(boolean useStaxSource)
+    {
+        this.useStaxSource = useStaxSource;
+        if (delegate != null)
+        {
+            delegate.setUseStaxSource(useStaxSource);
+        }
+    }
+
+    @Override
+    public boolean isReturnResult()
+    {
+        return delegate.isReturnResult();
+    }
+
+    @Override
+    public void setReturnResult(boolean returnResult)
+    {
+        this.returnResult = returnResult;
+        if (delegate != null)
+        {
+            delegate.setReturnResult(returnResult);
+        }
+    }
+
+    @Override
+    public void setSchemaLanguage(String schemaLanguage)
+    {
+        this.schemaLanguage = schemaLanguage;
+        if (delegate != null)
+        {
+            delegate.setSchemaLanguage(schemaLanguage);
+        }
+    }
 }
 

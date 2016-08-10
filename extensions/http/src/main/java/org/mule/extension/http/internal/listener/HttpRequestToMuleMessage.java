@@ -37,54 +37,73 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class HttpRequestToMuleMessage {
+public class HttpRequestToMuleMessage
+{
+    private static Logger logger = LoggerFactory.getLogger(HttpRequestToMuleMessage.class);
 
-  private static Logger logger = LoggerFactory.getLogger(HttpRequestToMuleMessage.class);
+    public static MuleMessage transform(final HttpRequestContext requestContext, final MuleContext muleContext, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
+    {
+        final HttpRequest request = requestContext.getRequest();
 
-  public static MuleMessage transform(final HttpRequestContext requestContext, final MuleContext muleContext,
-                                      Boolean parseRequest, ListenerPath listenerPath)
-      throws HttpRequestParsingException {
-    final HttpRequest request = requestContext.getRequest();
+        final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
 
-    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
-
-    Object payload = null;
-    if (parseRequest) {
-      final HttpEntity entity = request.getEntity();
-      if (entity != null && !(entity instanceof EmptyHttpEntity)) {
-        if (entity instanceof MultipartHttpEntity) {
-          try {
-            payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
-          } catch (IOException e) {
-            throw new HttpRequestParsingException(e.getMessage(), e);
-          }
-        } else {
-          if (mediaType != null) {
-            if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)) {
-              try {
-                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
-                                               mediaType.getCharset().get());
-              } catch (IllegalArgumentException e) {
-                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
-              }
-            } else if (entity instanceof InputStreamHttpEntity) {
-              payload = ((InputStreamHttpEntity) entity).getInputStream();
+        Object payload = null;
+        if (parseRequest)
+        {
+            final HttpEntity entity = request.getEntity();
+            if (entity != null && !(entity instanceof EmptyHttpEntity))
+            {
+                if (entity instanceof MultipartHttpEntity)
+                {
+                    try
+                    {
+                        payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new HttpRequestParsingException(e.getMessage(), e);
+                    }
+                }
+                else
+                {
+                    if (mediaType != null)
+                    {
+                        if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+                        {
+                            try
+                            {
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), mediaType.getCharset().get());
+                            }
+                            catch (IllegalArgumentException e)
+                            {
+                                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
+                            }
+                        }
+                        else if (entity instanceof InputStreamHttpEntity)
+                        {
+                            payload = ((InputStreamHttpEntity) entity).getInputStream();
+                        }
+                    }
+                    else if (entity instanceof InputStreamHttpEntity)
+                    {
+                        payload = ((InputStreamHttpEntity) entity).getInputStream();
+                    }
+                }
             }
-          } else if (entity instanceof InputStreamHttpEntity) {
-            payload = ((InputStreamHttpEntity) entity).getInputStream();
-          }
         }
-      }
-    } else {
-      final InputStreamHttpEntity inputStreamEntity = request.getInputStreamEntity();
-      if (inputStreamEntity != null) {
-        payload = inputStreamEntity.getInputStream();
-      }
-    }
+        else
+        {
+            final InputStreamHttpEntity inputStreamEntity = request.getInputStreamEntity();
+            if (inputStreamEntity != null)
+            {
+                payload = inputStreamEntity.getInputStream();
+            }
+        }
 
-    HttpRequestAttributes attributes =
-        new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
-    return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
-  }
+        HttpRequestAttributes attributes = new HttpRequestAttributesBuilder().setRequestContext(requestContext)
+                                                                             .setListenerPath(listenerPath)
+                                                                             .build();
+        return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+    }
 
 }

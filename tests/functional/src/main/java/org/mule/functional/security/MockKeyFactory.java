@@ -11,10 +11,12 @@ import org.mule.runtime.core.security.SecretKeyFactory;
 /**
  * Empty mock for tests
  */
-public class MockKeyFactory extends Named implements SecretKeyFactory {
+public class MockKeyFactory extends Named implements SecretKeyFactory
+{
 
-  public byte[] getKey() {
-    return "key".getBytes();
-  }
+    public byte[] getKey()
+    {
+        return "key".getBytes();
+    }
 
 }

@@ -11,16 +11,16 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 /**
  * Interface used by objects that allow an endpoint instance to be set.
  */
-public interface EndpointAware {
+public interface EndpointAware
+{
+    void setEndpoint(ImmutableEndpoint ep);
 
-  void setEndpoint(ImmutableEndpoint ep);
-
-  /**
-   * The endpoint that this transformer is attached to
-   * 
-   * @return the endpoint associated with the transformer
-   * @deprecated
-   */
-  @Deprecated
-  ImmutableEndpoint getEndpoint();
+    /**
+     * The endpoint that this transformer is attached to
+     * 
+     * @return the endpoint associated with the transformer
+     * @deprecated
+     */
+    @Deprecated
+    ImmutableEndpoint getEndpoint();
 }

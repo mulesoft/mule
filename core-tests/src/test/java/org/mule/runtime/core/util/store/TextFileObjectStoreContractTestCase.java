@@ -13,38 +13,43 @@ import java.io.Serializable;
 
 import org.junit.Test;
 
-public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase {
+public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase
+{
+    private TextFileObjectStore objectStore;
 
-  private TextFileObjectStore objectStore;
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
+        objectStore = new TextFileObjectStore();
+        objectStore.setMuleContext(muleContext);
+        objectStore.initialise();
+    }
 
-    objectStore = new TextFileObjectStore();
-    objectStore.setMuleContext(muleContext);
-    objectStore.initialise();
-  }
+    @Test(expected = UnsupportedOperationException.class)
+    public void clear() throws ObjectStoreException
+    {
+        super.clear();
+    };
 
-  @Test(expected = UnsupportedOperationException.class)
-  public void clear() throws ObjectStoreException {
-    super.clear();
-  };
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        objectStore.dispose();
+        super.doTearDown();
+    }
 
-  @Override
-  protected void doTearDown() throws Exception {
-    objectStore.dispose();
-    super.doTearDown();
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public ObjectStore getObjectStore()
+    {
+        return objectStore;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public ObjectStore getObjectStore() {
-    return objectStore;
-  }
-
-  @Override
-  public Serializable getStorableValue() {
-    return "This is the value";
-  }
+    @Override
+    public Serializable getStorableValue()
+    {
+        return "This is the value";
+    }
 }

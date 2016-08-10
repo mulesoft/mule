@@ -16,47 +16,54 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class PgpNamespaceHandlerTestCase extends FunctionalTestCase {
+public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "pgp-namespace-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "pgp-namespace-config.xml";
-  }
+    @Test
+    public void testPgpProvider()
+    {
+        knownProperties(getProvider("pgpSecurityProvider"));
+    }
+    
+    @Test
+    public void testKeyBasedEncryptionStrategy()
+    {
+        knownProperties(getEncryptionStrategy("keyBasedEncryptionStrategy"));
+    }
 
-  @Test
-  public void testPgpProvider() {
-    knownProperties(getProvider("pgpSecurityProvider"));
-  }
+    protected SecurityProvider getProvider(String securityProviderName)
+    {
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getProvider(securityProviderName);
+    }
 
-  @Test
-  public void testKeyBasedEncryptionStrategy() {
-    knownProperties(getEncryptionStrategy("keyBasedEncryptionStrategy"));
-  }
-
-  protected SecurityProvider getProvider(String securityProviderName) {
-    SecurityManager securityManager = muleContext.getSecurityManager();
-    return securityManager.getProvider(securityProviderName);
-  }
-
-  protected void knownProperties(SecurityProvider provider) {
-    assertNotNull(provider);
-    assertTrue(provider instanceof PGPSecurityProvider);
-    PGPSecurityProvider pgpProvider = (PGPSecurityProvider) provider;
-    assertNotNull(pgpProvider.getKeyManager());
-    assertTrue(pgpProvider.getKeyManager() instanceof PGPKeyRingImpl);
-  }
-
-  protected EncryptionStrategy getEncryptionStrategy(String encryptionStrategyName) {
-    SecurityManager securityManager = muleContext.getSecurityManager();
-    return securityManager.getEncryptionStrategy(encryptionStrategyName);
-  }
-
-  protected void knownProperties(EncryptionStrategy encryptionStrategy) {
-    assertNotNull(encryptionStrategy);
-    assertTrue(encryptionStrategy instanceof KeyBasedEncryptionStrategy);
-    KeyBasedEncryptionStrategy keyBased = (KeyBasedEncryptionStrategy) encryptionStrategy;
-    assertNotNull(keyBased.getKeyManager());
-    assertTrue(keyBased.getKeyManager() instanceof PGPKeyRingImpl);
-  }
+    protected void knownProperties(SecurityProvider provider)
+    {
+        assertNotNull(provider);
+        assertTrue(provider instanceof PGPSecurityProvider);
+        PGPSecurityProvider pgpProvider = (PGPSecurityProvider) provider;
+        assertNotNull(pgpProvider.getKeyManager());
+        assertTrue(pgpProvider.getKeyManager() instanceof PGPKeyRingImpl);
+    }
+    
+    protected EncryptionStrategy getEncryptionStrategy(String encryptionStrategyName)
+    {
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getEncryptionStrategy(encryptionStrategyName);
+    }
+    
+    protected void knownProperties(EncryptionStrategy encryptionStrategy)
+    {
+        assertNotNull(encryptionStrategy);
+        assertTrue(encryptionStrategy instanceof KeyBasedEncryptionStrategy);
+        KeyBasedEncryptionStrategy keyBased = (KeyBasedEncryptionStrategy) encryptionStrategy;
+        assertNotNull(keyBased.getKeyManager());
+        assertTrue(keyBased.getKeyManager() instanceof PGPKeyRingImpl);
+    }
 
 }

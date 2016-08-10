@@ -27,43 +27,49 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 /**
- * Sets up two HTTPS clients using a regular trust-store, but one of them insecure. Then two HTTPS servers: one will return a
- * certificate present in the trust-store but with an invalid SAN extension, the other will return a certificate that's not in the
- * trust-store. Verifies that only the insecure client is successful.
+ * Sets up two HTTPS clients using a regular trust-store, but one of them insecure.
+ * Then two HTTPS servers: one will return a certificate present in the trust-store
+ * but with an invalid SAN extension, the other will return a certificate that's not in the trust-store.
+ * Verifies that only the insecure client is successful.
  */
 @RunnerDelegateTo(Parameterized.class)
-public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
+public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase
+{
+    @Parameterized.Parameter
+    public String config;
 
-  @Parameterized.Parameter
-  public String config;
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    @Rule
+    public SystemProperty insecure = new SystemProperty("insecure", "true");
 
-  @Rule
-  public DynamicPort port1 = new DynamicPort("port1");
-  @Rule
-  public SystemProperty insecure = new SystemProperty("insecure", "true");
+    @Override
+    protected String getConfigFile()
+    {
+        return config;
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return config;
-  }
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-request-insecure-hostname-config.xml"},
+                {"http-request-insecure-certificate-config.xml"}});
+    }
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays
-        .asList(new Object[][] {{"http-request-insecure-hostname-config.xml"}, {"http-request-insecure-certificate-config.xml"}});
-  }
+    @Test
+    public void insecureRequest() throws Exception
+    {
+        final MuleEvent res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
+        assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
+    }
 
-  @Test
-  public void insecureRequest() throws Exception {
-    final MuleEvent res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
-    assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
-  }
-
-  @Test
-  public void secureRequest() throws Exception {
-    MessagingException expectedException = flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).runExpectingException();
-    assertThat(expectedException.getCause(), instanceOf(IOException.class));
-    assertThat(expectedException.getCause(), hasMessage(containsString("General SSLEngine problem")));
-  }
+    @Test
+    public void secureRequest() throws Exception
+    {
+        MessagingException expectedException = flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).runExpectingException();
+        assertThat(expectedException.getCause(), instanceOf(IOException.class));
+        assertThat(expectedException.getCause(), hasMessage(containsString("General SSLEngine problem")));
+    }
 
 }

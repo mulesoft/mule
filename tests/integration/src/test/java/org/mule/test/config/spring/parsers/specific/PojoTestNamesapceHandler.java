@@ -8,11 +8,13 @@ package org.mule.test.config.spring.parsers.specific;
 
 import org.mule.runtime.config.spring.handlers.AbstractPojoNamespaceHandler;
 
-public class PojoTestNamesapceHandler extends AbstractPojoNamespaceHandler {
+public class PojoTestNamesapceHandler extends AbstractPojoNamespaceHandler
+{
 
-  public void init() {
-    registerPojo("config", TestPojo.class);
+    public void init()
+    {
+        registerPojo("config", TestPojo.class);
 
-  }
+    }
 
 }

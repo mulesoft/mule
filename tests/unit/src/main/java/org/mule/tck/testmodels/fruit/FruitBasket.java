@@ -15,38 +15,45 @@ import java.util.Map;
 /**
  * TODO
  */
-public class FruitBasket {
+public class FruitBasket
+{
+    private final Map<Class<? extends Fruit>, Fruit> basket = Collections.synchronizedMap(new HashMap<Class<? extends Fruit>, Fruit>());
 
-  private final Map<Class<? extends Fruit>, Fruit> basket =
-      Collections.synchronizedMap(new HashMap<Class<? extends Fruit>, Fruit>());
-
-  public boolean hasApple() {
-    return basket.get(Apple.class) != null;
-  }
-
-  public boolean hasBanana() {
-    return basket.get(Banana.class) != null;
-  }
-
-  public void setFruit(Fruit[] fruit) {
-    for (int i = 0; i < fruit.length; i++) {
-      basket.put(fruit[i].getClass(), fruit[i]);
+    public boolean hasApple()
+    {
+        return basket.get(Apple.class) != null;
     }
-  }
 
-  public void setFruit(List<Fruit> fruit) {
-    this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
-  }
+    public boolean hasBanana()
+    {
+        return basket.get(Banana.class) != null;
+    }
 
-  public List<Fruit> getFruit() {
-    return new ArrayList<Fruit>(basket.values());
-  }
+    public void setFruit(Fruit[] fruit)
+    {
+        for (int i = 0; i < fruit.length; i++)
+        {
+            basket.put(fruit[i].getClass(), fruit[i]);
+        }
+    }
 
-  public Apple getApple() {
-    return (Apple) basket.get(Apple.class);
-  }
+    public void setFruit(List<Fruit> fruit)
+    {
+        this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
+    }
 
-  public Banana getBanana() {
-    return (Banana) basket.get(Banana.class);
-  }
+    public List<Fruit> getFruit()
+    {
+        return new ArrayList<Fruit>(basket.values());
+    }
+
+    public Apple getApple()
+    {
+        return (Apple) basket.get(Apple.class);
+    }
+
+    public Banana getBanana()
+    {
+        return (Banana) basket.get(Banana.class);
+    }
 }

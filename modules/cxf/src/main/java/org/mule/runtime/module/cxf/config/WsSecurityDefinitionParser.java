@@ -19,39 +19,45 @@ import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttribute
 
 import org.w3c.dom.Element;
 
-public class WsSecurityDefinitionParser extends ParentContextDefinitionParser {
+public class WsSecurityDefinitionParser extends ParentContextDefinitionParser
+{
+    
+    public WsSecurityDefinitionParser(Class wsSecurityClass)
+    {
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, createRootDefinitionParser(wsSecurityClass));
+        otherwise(createChildDefinitionParser(wsSecurityClass));
 
-  public WsSecurityDefinitionParser(Class wsSecurityClass) {
-    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, createRootDefinitionParser(wsSecurityClass));
-    otherwise(createChildDefinitionParser(wsSecurityClass));
+        super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{"ref"},
+                                                                           new String[]{"mule-security-manager", "ws-config", "ws-custom-validator"}));
 
-    super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[] {"ref"}, new String[] {
-        "mule-security-manager", "ws-config", "ws-custom-validator"}));
+    }
+    
+    public static MuleOrphanDefinitionParser createRootDefinitionParser(Class wsSecurityClass)
+    {
+        return new MuleOrphanDefinitionParser(wsSecurityClass, true);
+    }
+    
+    public static ChildDefinitionParser createChildDefinitionParser(Class wsSecurityClass)
+    {
+        ChildDefinitionParser childParser = new ChildDefinitionParser("wsSecurity", wsSecurityClass, false);
+        childParser.registerPreProcessor(createNoNameAttributePreProcessor());
+        return childParser;
+    }
 
-  }
-
-  public static MuleOrphanDefinitionParser createRootDefinitionParser(Class wsSecurityClass) {
-    return new MuleOrphanDefinitionParser(wsSecurityClass, true);
-  }
-
-  public static ChildDefinitionParser createChildDefinitionParser(Class wsSecurityClass) {
-    ChildDefinitionParser childParser = new ChildDefinitionParser("wsSecurity", wsSecurityClass, false);
-    childParser.registerPreProcessor(createNoNameAttributePreProcessor());
-    return childParser;
-  }
-
-  static PreProcessor createNoNameAttributePreProcessor() {
-    return new PreProcessor() {
-
-      @Override
-      public void preProcess(PropertyConfiguration config, Element element) {
-        if (element.hasAttribute("name")) {
-          throw new MuleRuntimeException(CoreMessages
-              .createStaticMessage("name attribute on exception strategy is only allowed on global exception strategies"));
-        }
-      }
-    };
-  }
+    static PreProcessor createNoNameAttributePreProcessor()
+    {
+        return new PreProcessor()
+        {
+            @Override
+            public void preProcess(PropertyConfiguration config, Element element)
+            {
+                if (element.hasAttribute("name"))
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("name attribute on exception strategy is only allowed on global exception strategies"));
+                }
+            }
+        };
+    }
 
 
 }

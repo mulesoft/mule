@@ -14,18 +14,20 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class TransactionWithRecipientListTestCase extends FunctionalTestCase {
+public class TransactionWithRecipientListTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "vm/transaction-with-recipient-list-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "vm/transaction-with-recipient-list-config.xml";
-  }
+    @Test
+    public void testRecipientListRouterUseDefinedTransaction() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
 
-  @Test
-  public void testRecipientListRouterUseDefinedTransaction() throws Exception {
-    MuleClient client = muleContext.getClient();
-
-    MuleMessage response = client.send("vm://input", "test", null);
-    assertEquals("test Received", getPayloadAsString(response));
-  }
+        MuleMessage response = client.send("vm://input", "test", null);
+        assertEquals("test Received", getPayloadAsString(response));
+    }
 }

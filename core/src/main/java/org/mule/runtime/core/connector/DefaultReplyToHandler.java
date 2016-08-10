@@ -28,87 +28,101 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>DefaultReplyToHandler</code> is responsible for processing a message replyTo header.
+ * <code>DefaultReplyToHandler</code> is responsible for processing a message
+ * replyTo header.
  */
 
-public class DefaultReplyToHandler implements ReplyToHandler, Serializable, DeserializationPostInitialisable {
+public class DefaultReplyToHandler implements ReplyToHandler, Serializable, DeserializationPostInitialisable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
+    /**
+     * logger used by this class
+     */
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  /**
-   * logger used by this class
-   */
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+    protected transient MuleContext muleContext;
+    protected transient Map<String, Object> serializedData = null;
 
-  protected transient MuleContext muleContext;
-  protected transient Map<String, Object> serializedData = null;
-
-  public DefaultReplyToHandler(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  @Override
-  public void processReplyTo(final MuleEvent event, final MuleMessage returnMessage, final Object replyTo) throws MuleException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("sending reply to: " + replyTo);
+    public DefaultReplyToHandler(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
-    // make sure remove the replyTo property as not cause a a forever
-    // replyto loop
-    event.removeFlowVariable(MULE_REPLY_TO_PROPERTY);
+    @Override
+    public void processReplyTo(final MuleEvent event, final MuleMessage returnMessage, final Object replyTo) throws MuleException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("sending reply to: " + replyTo);
+        }
 
-    // MULE-4617. This is fixed with MULE-4620, but lets remove this property
-    // anyway as it should never be true from a replyTo dispatch
-    event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
+        // make sure remove the replyTo property as not cause a a forever
+        // replyto loop
+        event.removeFlowVariable(MULE_REPLY_TO_PROPERTY);
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY).build());
+        // MULE-4617. This is fixed with MULE-4620, but lets remove this property
+        // anyway as it should never be true from a replyTo dispatch
+        event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
 
-    // TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
-  }
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY)
+                                    .build());
 
-  @Override
-  public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-    // DefaultReplyToHandler does not send a reply message when an exception errors, this is rather handled by
-    // using an exception strategy.
-  }
-
-  public void initAfterDeserialisation(MuleContext context) throws MuleException {
-    // this method can be called even on objects that were not serialized. In this case,
-    // the temporary holder for serialized data is not initialized and we can just return
-    if (serializedData == null) {
-      return;
+        //TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
     }
-    this.muleContext = context;
 
-    logger = LoggerFactory.getLogger(getClass());
-    serializedData = null;
-  }
-
-  private void writeObject(ObjectOutputStream out) throws IOException {
-    out.defaultWriteObject();
-
-    String connectorName = null;
-    String connectorType = null;
-
-    // Can be null if service call originates from MuleClient
-    if (serializedData != null) {
-      connectorName = (String) serializedData.get("connectorName");
-      connectorType = (String) serializedData.get("connectorType");
-    } else {
-      // TODO See MULE-9307 - add behaviour to store config name to be used for reply to destination
+    @Override
+    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+    {
+       // DefaultReplyToHandler does not send a reply message when an exception errors, this is rather handled by
+       // using an exception strategy.
     }
-    out.writeObject(connectorName);
-    out.writeObject(connectorType);
-  }
 
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    serializedData = new HashMap<>();
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
+    {
+        // this method can be called even on objects that were not serialized. In this case,
+        // the temporary holder for serialized data is not initialized and we can just return
+        if (serializedData == null)
+        {
+            return;
+        }
+        this.muleContext = context;
 
-    serializedData.put("connectorName", in.readObject());
-    serializedData.put("connectorType", in.readObject());
-  }
+        logger = LoggerFactory.getLogger(getClass());
+        serializedData = null;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+
+        String connectorName = null;
+        String connectorType = null;
+
+        //Can be null if service call originates from MuleClient
+        if (serializedData != null)
+        {
+            connectorName = (String) serializedData.get("connectorName");
+            connectorType = (String) serializedData.get("connectorType");
+        }
+        else
+        {
+            //TODO See MULE-9307 - add behaviour to store config name to be used for reply to destination
+        }
+        out.writeObject(connectorName);
+        out.writeObject(connectorType);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        serializedData = new HashMap<>();
+
+        serializedData.put("connectorName", in.readObject());
+        serializedData.put("connectorType", in.readObject());
+    }
 }

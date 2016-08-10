@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.core.util.queue;
 
-public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
+public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
+{
+    @Override
+    protected TransactionalQueueManager createQueueManager() throws Exception
+    {
+        TransactionalQueueManager mgr = new TransactionalQueueManager();
+        mgr.setMuleContext(muleContext);
+        mgr.initialise();
+        mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, false));
+        return mgr;
+    }
 
-  @Override
-  protected TransactionalQueueManager createQueueManager() throws Exception {
-    TransactionalQueueManager mgr = new TransactionalQueueManager();
-    mgr.setMuleContext(muleContext);
-    mgr.initialise();
-    mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, false));
-    return mgr;
-  }
-
-  @Override
-  protected boolean isPersistent() {
-    return false;
-  }
+    @Override
+    protected boolean isPersistent()
+    {
+        return false;
+    }
 }

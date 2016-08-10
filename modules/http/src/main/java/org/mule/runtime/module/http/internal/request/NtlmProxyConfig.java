@@ -9,16 +9,12 @@ package org.mule.runtime.module.http.internal.request;
 /**
  * A Proxy configuration for NTLM authentication proxies.
  */
-public class NtlmProxyConfig extends DefaultProxyConfig {
+public class NtlmProxyConfig extends DefaultProxyConfig
+{
+    private String ntlmDomain;
 
-  private String ntlmDomain;
+    public String getNtlmDomain() { return ntlmDomain; }
 
-  public String getNtlmDomain() {
-    return ntlmDomain;
-  }
-
-  public void setNtlmDomain(String ntlmDomain) {
-    this.ntlmDomain = ntlmDomain;
-  }
+    public void setNtlmDomain(String ntlmDomain) { this.ntlmDomain = ntlmDomain; }
 
 }

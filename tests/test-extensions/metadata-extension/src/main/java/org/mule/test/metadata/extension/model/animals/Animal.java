@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
-public interface Animal {
+public interface Animal
+{
 
 }

@@ -22,58 +22,63 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JmxSupportTestCase extends AbstractMuleJmxTestCase {
+public class JmxSupportTestCase extends AbstractMuleJmxTestCase
+{
+    private final String MANAGER_ID = "Test_Instance";
+    private final String TEST_DOMAIN = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + MANAGER_ID;
 
-  private final String MANAGER_ID = "Test_Instance";
-  private final String TEST_DOMAIN = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + MANAGER_ID;
+    @Override
+    protected void configureMuleContext(MuleContextBuilder contextBuilder)
+    {
+        super.configureMuleContext(contextBuilder);
 
-  @Override
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    super.configureMuleContext(contextBuilder);
+        DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+        config.setId(MANAGER_ID);
+        contextBuilder.setMuleConfiguration(config);
+    }
 
-    DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-    config.setId(MANAGER_ID);
-    contextBuilder.setMuleConfiguration(config);
-  }
+    @Test
+    public void testClashingDomains() throws Exception
+    {
+        // pre-register the same domain to simulate a clashing domain
+        ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
+        mBeanServer.registerMBean(new StatisticsService(), name);
 
-  @Test
-  public void testClashingDomains() throws Exception {
-    // pre-register the same domain to simulate a clashing domain
-    ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
-    mBeanServer.registerMBean(new StatisticsService(), name);
+        muleContext.start();
 
-    muleContext.start();
+        List<String> domains = Arrays.asList(mBeanServer.getDomains());
+        assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
+        assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".1"));
+    }
 
-    List<String> domains = Arrays.asList(mBeanServer.getDomains());
-    assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
-    assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".1"));
-  }
+    @Test
+    public void testClashingSuffixedDomains() throws Exception
+    {
 
-  @Test
-  public void testClashingSuffixedDomains() throws Exception {
+        // get original, pre-test number of domains
+        int numOriginalDomains = mBeanServer.getDomains().length;
 
-    // get original, pre-test number of domains
-    int numOriginalDomains = mBeanServer.getDomains().length;
+        // pre-register the same domain to simulate a clashing domain
+        ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
+        mBeanServer.registerMBean(new StatisticsService(), name);
 
-    // pre-register the same domain to simulate a clashing domain
-    ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
-    mBeanServer.registerMBean(new StatisticsService(), name);
+        // add another domain with suffix already applied
+        name = ObjectName.getInstance(TEST_DOMAIN + ".1" + ":name=TestDuplicates");
+        mBeanServer.registerMBean(new StatisticsService(), name);
 
-    // add another domain with suffix already applied
-    name = ObjectName.getInstance(TEST_DOMAIN + ".1" + ":name=TestDuplicates");
-    mBeanServer.registerMBean(new StatisticsService(), name);
+        assertEquals("Wrong number of domains created.",
+                     numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-    assertEquals("Wrong number of domains created.", numOriginalDomains + 2, mBeanServer.getDomains().length);
+        muleContext.start();
 
-    muleContext.start();
+        List<String> domains = Arrays.asList(mBeanServer.getDomains());
+        // one extra domain created by Mule's clash resolution
+        assertEquals("Wrong number of domains created.",
+                     numOriginalDomains + 3, domains.size());
 
-    List<String> domains = Arrays.asList(mBeanServer.getDomains());
-    // one extra domain created by Mule's clash resolution
-    assertEquals("Wrong number of domains created.", numOriginalDomains + 3, domains.size());
-
-    assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
-    assertTrue("Should have contained an original suffixed domain.", domains.contains(TEST_DOMAIN + ".1"));
-    assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
-  }
-
+        assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
+        assertTrue("Should have contained an original suffixed domain.", domains.contains(TEST_DOMAIN + ".1"));
+        assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
+    }
+    
 }

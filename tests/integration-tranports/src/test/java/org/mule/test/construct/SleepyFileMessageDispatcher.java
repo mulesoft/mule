@@ -10,21 +10,24 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.transport.file.FileMessageDispatcher;
 import org.mule.runtime.core.api.MuleEvent;
 
-public class SleepyFileMessageDispatcher extends FileMessageDispatcher {
+public class SleepyFileMessageDispatcher extends FileMessageDispatcher
+{
+    public SleepyFileMessageDispatcher(OutboundEndpoint endpoint)
+    {
+        super(endpoint);
+    }
 
-  public SleepyFileMessageDispatcher(OutboundEndpoint endpoint) {
-    super(endpoint);
-  }
+    @Override
+    protected void doDispatch(MuleEvent event) throws Exception
+    {
+        // TODO
+        String sleepTime = event.getMessage().getOutboundProperty(
+            FlowSyncAsyncProcessingStrategyTestCase.SLEEP_TIME);
 
-  @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
-    // TODO
-    String sleepTime = event.getMessage().getOutboundProperty(FlowSyncAsyncProcessingStrategyTestCase.SLEEP_TIME);
+        Thread.sleep(Integer.valueOf(sleepTime));
 
-    Thread.sleep(Integer.valueOf(sleepTime));
+        super.doDispatch(event);
 
-    super.doDispatch(event);
-
-  }
+    }
 
 }

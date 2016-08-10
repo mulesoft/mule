@@ -12,57 +12,76 @@ import org.mule.runtime.core.api.MuleException;
 
 import javax.resource.spi.work.Work;
 
-public class PollingReceiverWorker implements Work {
+public class PollingReceiverWorker implements Work
+{
+    protected final AbstractPollingMessageReceiver receiver;
+    protected volatile boolean running = false;
 
-  protected final AbstractPollingMessageReceiver receiver;
-  protected volatile boolean running = false;
-
-  public PollingReceiverWorker(AbstractPollingMessageReceiver pollingMessageReceiver) {
-    super();
-    receiver = pollingMessageReceiver;
-  }
-
-  public AbstractPollingMessageReceiver getReceiver() {
-    return receiver;
-  }
-
-  public boolean isRunning() {
-    return running;
-  }
-
-  // the run() method will exit after each poll() since it will be invoked again
-  // by the scheduler
-  @Override
-  public void run() {
-    // Make sure we start with a clean slate.
-    RequestContext.clear();
-    if (receiver.isStarted()) {
-      running = true;
-      try {
-        poll();
-      } catch (InterruptedException e) {
-        // stop polling
-        try {
-          receiver.stop();
-        } catch (MuleException e1) {
-          receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e1);
-        }
-      } catch (MessagingException e) {
-        // Already handled by TransactionTemplate
-      } catch (Exception e) {
-        receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
-      } finally {
-        running = false;
-      }
+    public PollingReceiverWorker(AbstractPollingMessageReceiver pollingMessageReceiver)
+    {
+        super();
+        receiver = pollingMessageReceiver;
     }
-  }
 
-  protected void poll() throws Exception {
-    receiver.performPoll();
-  }
+    public AbstractPollingMessageReceiver getReceiver()
+    {
+        return receiver;
+    }
+    
+    public boolean isRunning()
+    {
+        return running;
+    }
 
-  @Override
-  public void release() {
-    // nop
-  }
+    // the run() method will exit after each poll() since it will be invoked again
+    // by the scheduler
+    @Override
+    public void run()
+    {
+        // Make sure we start with a clean slate.
+        RequestContext.clear();
+        if (receiver.isStarted())
+        {
+            running = true;
+            try
+            {
+                poll();
+            }
+            catch (InterruptedException e)
+            {
+                // stop polling
+                try
+                {
+                    receiver.stop();
+                }
+                catch (MuleException e1)
+                {
+                    receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e1);
+                }
+            }
+            catch (MessagingException e)
+            {
+                //Already handled by TransactionTemplate
+            }
+            catch (Exception e)
+            {
+                receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
+            }
+            finally
+            {
+                running = false;
+            }
+        }
+    }
+
+    protected void poll() throws Exception
+    {
+        receiver.performPoll();
+    }
+
+    @Override
+    public void release()
+    {
+        // nop
+    }
 }

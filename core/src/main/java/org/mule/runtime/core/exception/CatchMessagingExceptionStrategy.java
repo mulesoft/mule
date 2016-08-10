@@ -9,25 +9,31 @@ package org.mule.runtime.core.exception;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
-public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy {
+public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
+{
+    public CatchMessagingExceptionStrategy()
+    {
+        setHandleException(true);
+    }
 
-  public CatchMessagingExceptionStrategy() {
-    setHandleException(true);
-  }
+    @Override
+    protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
+    {
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .exceptionPayload(null)
+                                    .build());
+    }
 
-  @Override
-  protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
-  }
+    @Override
+    protected MuleEvent afterRouting(Exception exception, MuleEvent event)
+    {
+        return event;
+    }
 
-  @Override
-  protected MuleEvent afterRouting(Exception exception, MuleEvent event) {
-    return event;
-  }
-
-  @Override
-  protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
-    return event;
-  }
+    @Override
+    protected MuleEvent beforeRouting(Exception exception, MuleEvent event)
+    {
+        return event;
+    }
 
 }

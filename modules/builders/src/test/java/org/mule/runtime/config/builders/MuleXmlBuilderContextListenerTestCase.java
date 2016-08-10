@@ -24,79 +24,89 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.context.WebApplicationContext;
 
-public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase {
+public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase
+{
+    private MuleXmlBuilderContextListener listener;
+    private ServletContext context;
 
-  private MuleXmlBuilderContextListener listener;
-  private ServletContext context;
+    @Before
+    public void setUp() throws Exception
+    {
+        listener = new MuleXmlBuilderContextListener();
+        context = mock(ServletContext.class);
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    listener = new MuleXmlBuilderContextListener();
-    context = mock(ServletContext.class);
-  }
+    @After
+    public void tearDown() throws Exception
+    {
+        listener.muleContext.stop();
+    }
 
-  @After
-  public void tearDown() throws Exception {
-    listener.muleContext.stop();
-  }
+    @Test
+    public void noMuleAppProperties()
+    {
+        when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
+            .thenReturn("mule-config.xml");
+        when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
+            .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+            .thenReturn(new File(".mule/testWeb"));
 
-  @Test
-  public void noMuleAppProperties() {
-    when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG)).thenReturn("mule-config.xml");
-    when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE)).thenReturn(null);
-    when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
-        .thenReturn(new File(".mule/testWeb"));
+        listener.initialize(context);
 
-    listener.initialize(context);
+        verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
+        verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        
+        assertEquals("./.mule/testWeb", listener.muleContext.getConfiguration().getWorkingDirectory());
+    }
 
-    verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
-    verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+    @Test
+    public void withImplicitMuleAppProperties()
+    {
+        when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
+            .thenReturn("org/mule/config/builders/mule-config.xml");
+        when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
+            .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+                .thenReturn(new File(".mule/testWeb"));
 
-    assertEquals("./.mule/testWeb", listener.muleContext.getConfiguration().getWorkingDirectory());
-  }
+        listener.initialize(context);
 
-  @Test
-  public void withImplicitMuleAppProperties() {
-    when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
-        .thenReturn("org/mule/config/builders/mule-config.xml");
-    when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE)).thenReturn(null);
-    when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
-        .thenReturn(new File(".mule/testWeb"));
+        verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
+        verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-    listener.initialize(context);
+        // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+        // and should go away
+        assertWorkingDirectoryEndsWith("target/.appTmp/testWeb");
+    }
 
-    verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
-    verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
-
-    // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
-    // and should go away
-    assertWorkingDirectoryEndsWith("target/.appTmp/testWeb");
-  }
-
-  @Test
-  public void withExplicitMuleAppProperties() {
-    when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
-        .thenReturn("org/mule/config/builders/mule-config.xml");
-    when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_APP_CONFIG))
+    @Test
+    public void withExplicitMuleAppProperties()
+    {
+        when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
+            .thenReturn("org/mule/config/builders/mule-config.xml");
+        when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_APP_CONFIG))
         .thenReturn("org/mule/config/builders/mule-app-ppp.properties");
-    when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE)).thenReturn(null);
-    when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
-        .thenReturn(new File(".mule/testWeb"));
+        when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
+            .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+                .thenReturn(new File(".mule/testWeb"));
 
-    listener.initialize(context);
+        listener.initialize(context);
 
-    verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
-    verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
+        verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-    // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
-    // and should go away
-    assertWorkingDirectoryEndsWith("target/.appTmp2/testWeb");
-  }
+        // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+        // and should go away
+        assertWorkingDirectoryEndsWith("target/.appTmp2/testWeb");
+    }
 
-  private void assertWorkingDirectoryEndsWith(String expected) {
-    // handle Windows filenames, just in case
-    String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory().replace('\\', '/');
-    workingDirectory = FilenameUtils.separatorsToUnix(workingDirectory);
-    assertTrue(workingDirectory.endsWith(expected));
-  }
+    private void assertWorkingDirectoryEndsWith(String expected)
+    {
+        // handle Windows filenames, just in case
+        String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory().replace('\\', '/');
+        workingDirectory = FilenameUtils.separatorsToUnix(workingDirectory);
+        assertTrue(workingDirectory.endsWith(expected));
+    }
 }

@@ -19,44 +19,53 @@ import java.util.Properties;
 /**
  * Verifies the signature of a SOAP response, using certificates of the trust-store in the provided TLS context.
  */
-public class WssEncryptSecurityStrategy extends AbstractSecurityStrategy {
+public class WssEncryptSecurityStrategy extends AbstractSecurityStrategy
+{
 
-  private static final String WS_ENCRYPT_PROPERTIES_KEY = "encryptProperties";
+    private static final String WS_ENCRYPT_PROPERTIES_KEY = "encryptProperties";
 
-  private TlsContextFactory tlsContextFactory;
-  private String alias;
+    private TlsContextFactory tlsContextFactory;
+    private String alias;
 
-  @Override
-  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties) {
-    appendAction(outConfigProperties, ENCRYPT);
+    @Override
+    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
+    {
+        appendAction(outConfigProperties, ENCRYPT);
 
-    Properties encryptionProperties;
+        Properties encryptionProperties;
 
-    if (tlsContextFactory == null) {
-      encryptionProperties = createDefaultTrustStoreProperties();
-    } else {
-      encryptionProperties = createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
+        if (tlsContextFactory == null)
+        {
+            encryptionProperties = createDefaultTrustStoreProperties();
+        }
+        else
+        {
+            encryptionProperties = createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
+        }
+
+        outConfigProperties.put(ENC_PROP_REF_ID, WS_ENCRYPT_PROPERTIES_KEY);
+        outConfigProperties.put(WS_ENCRYPT_PROPERTIES_KEY, encryptionProperties);
+        outConfigProperties.put(ENCRYPTION_USER, alias);
     }
 
-    outConfigProperties.put(ENC_PROP_REF_ID, WS_ENCRYPT_PROPERTIES_KEY);
-    outConfigProperties.put(WS_ENCRYPT_PROPERTIES_KEY, encryptionProperties);
-    outConfigProperties.put(ENCRYPTION_USER, alias);
-  }
 
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContextFactory;
+    }
 
-  public TlsContextFactory getTlsContext() {
-    return tlsContextFactory;
-  }
+    public void setTlsContext(TlsContextFactory tlsContextFactory)
+    {
+        this.tlsContextFactory = tlsContextFactory;
+    }
 
-  public void setTlsContext(TlsContextFactory tlsContextFactory) {
-    this.tlsContextFactory = tlsContextFactory;
-  }
+    public String getAlias()
+    {
+        return alias;
+    }
 
-  public String getAlias() {
-    return alias;
-  }
-
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
+    public void setAlias(String alias)
+    {
+        this.alias = alias;
+    }
 }

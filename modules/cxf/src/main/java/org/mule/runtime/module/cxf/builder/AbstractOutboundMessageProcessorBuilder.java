@@ -34,274 +34,334 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
-public abstract class AbstractOutboundMessageProcessorBuilder implements MessageProcessorBuilder, MuleContextAware {
+public abstract class AbstractOutboundMessageProcessorBuilder 
+    implements MessageProcessorBuilder, MuleContextAware
+{
+    protected Client client;
+    protected String defaultMethodName;
+    protected Method defaultMethod;
 
-  protected Client client;
-  protected String defaultMethodName;
-  protected Method defaultMethod;
+    protected CxfConfiguration configuration;
+    protected List<Interceptor<? extends Message>> inInterceptors;
+    protected List<Interceptor<? extends Message>> inFaultInterceptors;
+    protected List<Interceptor<? extends Message>> outInterceptors;
+    protected List<Interceptor<? extends Message>> outFaultInterceptors;
+    protected DataBinding databinding;
+    protected List<AbstractFeature> features;
+    protected String wsdlLocation;
+    protected boolean mtomEnabled;
+    protected String soapVersion;
+    protected boolean enableMuleSoapHeaders = true;
+    protected CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
+    protected Map<String,Object> properties = new HashMap<String, Object>();
+    protected MuleContext muleContext;
+    protected String address;
+    protected String operation;
+    protected String decoupledEndpoint;
 
-  protected CxfConfiguration configuration;
-  protected List<Interceptor<? extends Message>> inInterceptors;
-  protected List<Interceptor<? extends Message>> inFaultInterceptors;
-  protected List<Interceptor<? extends Message>> outInterceptors;
-  protected List<Interceptor<? extends Message>> outFaultInterceptors;
-  protected DataBinding databinding;
-  protected List<AbstractFeature> features;
-  protected String wsdlLocation;
-  protected boolean mtomEnabled;
-  protected String soapVersion;
-  protected boolean enableMuleSoapHeaders = true;
-  protected CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
-  protected Map<String, Object> properties = new HashMap<String, Object>();
-  protected MuleContext muleContext;
-  protected String address;
-  protected String operation;
-  protected String decoupledEndpoint;
+    private WsSecurity wsSecurity;
 
-  private WsSecurity wsSecurity;
+    @Override
+    public CxfOutboundMessageProcessor build() throws MuleException
+    {
+        if (muleContext == null) 
+        {
+            throw new IllegalStateException("MuleContext must be supplied.");
+        }
+        
+        if (configuration == null)
+        {
+            configuration = CxfConfiguration.getConfiguration(muleContext);
+        }
+        
+        // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
+        // which I don't know about, but may depend on it) can use it when creating a Client -- DD
+        BusFactory.setThreadDefaultBus(getBus());
+       
+        try
+        {
+            client = createClient();
+        }
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(e);
+        }
 
-  @Override
-  public CxfOutboundMessageProcessor build() throws MuleException {
-    if (muleContext == null) {
-      throw new IllegalStateException("MuleContext must be supplied.");
+        addInterceptors(client.getInInterceptors(), inInterceptors);
+        addInterceptors(client.getInFaultInterceptors(), inFaultInterceptors);
+        addInterceptors(client.getOutInterceptors(), outInterceptors);
+        addInterceptors(client.getOutFaultInterceptors(), outFaultInterceptors);
+
+        client.setThreadLocalRequestContext(true);
+
+        if(wsSecurity != null && wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
+        {
+            client.getOutInterceptors().add(new WSS4JOutInterceptor(wsSecurity.getConfigProperties()));
+        }
+
+        configureClient(client);
+        
+        if (features != null)
+        {
+            for (AbstractFeature f : features)
+            {
+                f.initialize(client, getBus());
+            }
+        }
+
+        if (mtomEnabled)
+        {
+            client.getEndpoint().put(Message.MTOM_ENABLED, mtomEnabled);
+        }
+
+        addMuleInterceptors();
+        
+        CxfOutboundMessageProcessor processor = createMessageProcessor();
+        processor.setOperation(operation);
+        configureMessageProcessor(processor);
+        processor.setPayloadToArguments(payloadToArguments);
+
+        processor.setMimeType(getMimeType());
+        
+        return processor;
     }
 
-    if (configuration == null) {
-      configuration = CxfConfiguration.getConfiguration(muleContext);
+    protected CxfOutboundMessageProcessor createMessageProcessor()
+    {
+        CxfOutboundMessageProcessor processor = new CxfOutboundMessageProcessor(client);
+        processor.setMuleContext(muleContext);
+        return processor;
     }
 
-    // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
-    // which I don't know about, but may depend on it) can use it when creating a Client -- DD
-    BusFactory.setThreadDefaultBus(getBus());
-
-    try {
-      client = createClient();
-    } catch (Exception e) {
-      throw new DefaultMuleException(e);
+    protected void configureMessageProcessor(CxfOutboundMessageProcessor processor)
+    {
     }
 
-    addInterceptors(client.getInInterceptors(), inInterceptors);
-    addInterceptors(client.getInFaultInterceptors(), inFaultInterceptors);
-    addInterceptors(client.getOutInterceptors(), outInterceptors);
-    addInterceptors(client.getOutFaultInterceptors(), outFaultInterceptors);
-
-    client.setThreadLocalRequestContext(true);
-
-    if (wsSecurity != null && wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty()) {
-      client.getOutInterceptors().add(new WSS4JOutInterceptor(wsSecurity.getConfigProperties()));
+    protected void configureClient(Client client)
+    {
     }
 
-    configureClient(client);
-
-    if (features != null) {
-      for (AbstractFeature f : features) {
-        f.initialize(client, getBus());
-      }
+    protected Bus getBus()
+    {
+        return configuration.getCxfBus();
     }
 
-    if (mtomEnabled) {
-      client.getEndpoint().put(Message.MTOM_ENABLED, mtomEnabled);
+    protected abstract Client createClient() throws CreateException, Exception;
+
+    public Client getClient()
+    {
+        return client;
     }
 
-    addMuleInterceptors();
-
-    CxfOutboundMessageProcessor processor = createMessageProcessor();
-    processor.setOperation(operation);
-    configureMessageProcessor(processor);
-    processor.setPayloadToArguments(payloadToArguments);
-
-    processor.setMimeType(getMimeType());
-
-    return processor;
-  }
-
-  protected CxfOutboundMessageProcessor createMessageProcessor() {
-    CxfOutboundMessageProcessor processor = new CxfOutboundMessageProcessor(client);
-    processor.setMuleContext(muleContext);
-    return processor;
-  }
-
-  protected void configureMessageProcessor(CxfOutboundMessageProcessor processor) {}
-
-  protected void configureClient(Client client) {}
-
-  protected Bus getBus() {
-    return configuration.getCxfBus();
-  }
-
-  protected abstract Client createClient() throws CreateException, Exception;
-
-  public Client getClient() {
-    return client;
-  }
-
-  private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor<? extends Message>> supplied) {
-    if (supplied != null) {
-      col.addAll(supplied);
+    private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor<? extends Message>> supplied)
+    {
+        if (supplied != null) 
+        {
+            col.addAll(supplied);
+        }
     }
-  }
-
-  protected String getAddress() {
-    if (address == null) {
-      // dummy URL for client builder
-      return "http://host";
+    
+    protected String getAddress()
+    {
+        if (address == null) 
+        {
+            // dummy URL for client builder
+            return "http://host";
+        }
+        return address;
     }
-    return address;
-  }
 
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  protected void createClientFromLocalServer() throws Exception {
-    // template method
-  }
-
-  protected void addMuleInterceptors() {
-
-    if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders()) {
-      client.getInInterceptors().add(new MuleHeadersInInterceptor());
-      client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
-      client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
-      client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
+    public void setAddress(String address)
+    {
+        this.address = address;
     }
-  }
 
-  public String getOperation() {
-    return operation;
-  }
+    protected void createClientFromLocalServer() throws Exception
+    {
+        // template method
+    }
 
-  public void setOperation(String operation) {
-    this.operation = operation;
-  }
+    protected void addMuleInterceptors()
+    {
 
-  public DataBinding getDatabinding() {
-    return databinding;
-  }
+        if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
+        {
+            client.getInInterceptors().add(new MuleHeadersInInterceptor());
+            client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
+            client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
+            client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
+        }
+    }
 
-  public void setDatabinding(DataBinding databinding) {
-    this.databinding = databinding;
-  }
+    public String getOperation()
+    {
+        return operation;
+    }
 
-  public boolean isMtomEnabled() {
-    return mtomEnabled;
-  }
+    public void setOperation(String operation)
+    {
+        this.operation = operation;
+    }
 
-  public void setMtomEnabled(boolean mtomEnabled) {
-    this.mtomEnabled = mtomEnabled;
-  }
+    public DataBinding getDatabinding()
+    {
+        return databinding;
+    }
 
-  public void setSoapVersion(String soapVersion) {
-    this.soapVersion = soapVersion;
-  }
+    public void setDatabinding(DataBinding databinding)
+    {
+        this.databinding = databinding;
+    }
 
-  public String getSoapVersion() {
-    return soapVersion;
-  }
+    public boolean isMtomEnabled()
+    {
+        return mtomEnabled;
+    }
 
-  public List<Interceptor<? extends Message>> getInInterceptors() {
-    return inInterceptors;
-  }
+    public void setMtomEnabled(boolean mtomEnabled)
+    {
+        this.mtomEnabled = mtomEnabled;
+    }
 
-  public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors) {
-    this.inInterceptors = inInterceptors;
-  }
+    public void setSoapVersion(String soapVersion)
+    {
+        this.soapVersion = soapVersion;
+    }
 
-  public List<Interceptor<? extends Message>> getInFaultInterceptors() {
-    return inFaultInterceptors;
-  }
+    public String getSoapVersion()
+    {
+        return soapVersion;
+    }
+    
+    public List<Interceptor<? extends Message>> getInInterceptors()
+    {
+        return inInterceptors;
+    }
 
-  public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors) {
-    this.inFaultInterceptors = inFaultInterceptors;
-  }
+    public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors)
+    {
+        this.inInterceptors = inInterceptors;
+    }
 
-  public List<Interceptor<? extends Message>> getOutInterceptors() {
-    return outInterceptors;
-  }
+    public List<Interceptor<? extends Message>> getInFaultInterceptors()
+    {
+        return inFaultInterceptors;
+    }
 
-  public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors) {
-    this.outInterceptors = outInterceptors;
-  }
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors)
+    {
+        this.inFaultInterceptors = inFaultInterceptors;
+    }
 
-  public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
-    return outFaultInterceptors;
-  }
+    public List<Interceptor<? extends Message>> getOutInterceptors()
+    {
+        return outInterceptors;
+    }
 
-  public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors) {
-    this.outFaultInterceptors = outFaultInterceptors;
-  }
+    public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors)
+    {
+        this.outInterceptors = outInterceptors;
+    }
 
-  public List<AbstractFeature> getFeatures() {
-    return features;
-  }
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors()
+    {
+        return outFaultInterceptors;
+    }
 
-  public void setFeatures(List<AbstractFeature> features) {
-    this.features = features;
-  }
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors)
+    {
+        this.outFaultInterceptors = outFaultInterceptors;
+    }
 
-  public String getWsdlLocation() {
-    return wsdlLocation;
-  }
+    public List<AbstractFeature> getFeatures()
+    {
+        return features;
+    }
 
-  public void setWsdlLocation(String wsdlLocation) {
-    this.wsdlLocation = wsdlLocation;
-  }
+    public void setFeatures(List<AbstractFeature> features)
+    {
+        this.features = features;
+    }
+    
+    public String getWsdlLocation()
+    {
+        return wsdlLocation;
+    }
 
-  public CxfConfiguration getConfiguration() {
-    return configuration;
-  }
+    public void setWsdlLocation(String wsdlLocation)
+    {
+        this.wsdlLocation = wsdlLocation;
+    }
+    
+    public CxfConfiguration getConfiguration()
+    {
+        return configuration;
+    }
 
-  public void setConfiguration(CxfConfiguration configuration) {
-    this.configuration = configuration;
-  }
+    public void setConfiguration(CxfConfiguration configuration)
+    {
+        this.configuration = configuration;
+    }
 
-  public boolean isEnableMuleSoapHeaders() {
-    return enableMuleSoapHeaders;
-  }
+    public boolean isEnableMuleSoapHeaders()
+    {
+        return enableMuleSoapHeaders;
+    }
 
-  public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders) {
-    this.enableMuleSoapHeaders = enableMuleSoapHeaders;
-  }
+    public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders)
+    {
+        this.enableMuleSoapHeaders = enableMuleSoapHeaders;
+    }
 
-  public CxfPayloadToArguments getPayloadToArguments() {
-    return payloadToArguments;
-  }
+    public CxfPayloadToArguments getPayloadToArguments()
+    {
+        return payloadToArguments;
+    }
 
-  public void setPayloadToArguments(CxfPayloadToArguments payloadToArguments) {
-    this.payloadToArguments = payloadToArguments;
-  }
+    public void setPayloadToArguments(CxfPayloadToArguments payloadToArguments)
+    {
+        this.payloadToArguments = payloadToArguments;
+    }
+    
+    public Map<String, Object> getProperties()
+    {
+        return properties;
+    }
 
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
+    public void setProperties(Map<String, Object> properties)
+    {
+        this.properties = properties;
+    }
 
-  public void setProperties(Map<String, Object> properties) {
-    this.properties = properties;
-  }
+    public void setAddProperties(Map<String, Object> properties)
+    {
+        this.properties.putAll(properties);
+    }
 
-  public void setAddProperties(Map<String, Object> properties) {
-    this.properties.putAll(properties);
-  }
+    public String getDecoupledEndpoint()
+    {
+        return decoupledEndpoint;
+    }
 
-  public String getDecoupledEndpoint() {
-    return decoupledEndpoint;
-  }
+    public void setDecoupledEndpoint(String decoupledEndpoint)
+    {
+        this.decoupledEndpoint = decoupledEndpoint;
+    }
 
-  public void setDecoupledEndpoint(String decoupledEndpoint) {
-    this.decoupledEndpoint = decoupledEndpoint;
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
+    public void setWsSecurity(WsSecurity wsSecurity)
+    {
+        this.wsSecurity = wsSecurity;
+    }
 
-  public void setWsSecurity(WsSecurity wsSecurity) {
-    this.wsSecurity = wsSecurity;
-  }
-
-  protected MediaType getMimeType() {
-    return MediaType.ANY;
-  }
+    protected MediaType getMimeType()
+    {
+        return MediaType.ANY;
+    }
 
 }

@@ -21,13 +21,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for localComplexType complex type.
+ * <p>Java class for localComplexType complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="localComplexType">
  *   &lt;complexContent>
@@ -44,6 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "localComplexType")
-public class LocalComplexType extends ComplexType {
+public class LocalComplexType extends ComplexType
+{
 
 }

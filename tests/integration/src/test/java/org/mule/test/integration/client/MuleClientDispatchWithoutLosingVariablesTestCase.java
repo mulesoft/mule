@@ -22,79 +22,89 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
- * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event to a
- * sub-flow, without losing the Flow variables.
+ * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event to
+ * a sub-flow, without losing the Flow variables.
  */
-public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIntegrationTestCase {
-
-  @ClassRule
-  public static DynamicPort port = new DynamicPort("port");
-
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/client/client-flow-vars-when-dispatch-flow.xml";
-  }
-
-  private void doSendMessageToHttp(String flowName) throws Exception {
-    MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
-    assertThat(result, notNullValue(MuleMessage.class));
-    FlowAssert.verify(flowName);
-  }
-
-  /**
-   * When doing a dispatch from a MessageProcessor the event was overwritten in ThreadLocal by OptimizedRequestContext while
-   * processing it and before dispatching it to a different thread so the original event that is the one that has to continue the
-   * execution of the main flow was losing the Flow variables.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testFlowVarsAfterDispatchFromMessageProcessor() throws Exception {
-    doSendMessageToHttp("flowVarsFlowUsingProcessor");
-  }
-
-  /**
-   * When doing a dispatch from a JavaComponent the event was overwritten in ThreadLocal by OptimizedRequestContext while
-   * processing it and before dispatching it to a different thread so the original event that is the one that has to continue the
-   * execution of the main flow was losing the Flow variables.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testFlowVarsAfterDispatchFromJavaComponent() throws Exception {
-    doSendMessageToHttp("flowVarsFlowUsingJavaComponent");
-  }
-
-  public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor {
+public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIntegrationTestCase
+{
+    @ClassRule
+    public static DynamicPort port = new DynamicPort("port");
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
-      return event;
-
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/client/client-flow-vars-when-dispatch-flow.xml";
     }
-  }
 
-  public static class JavaComponentDispatchFlowUsingNewMuleClient implements Callable {
-
-    @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
-      return eventContext.getMessage();
+    private void doSendMessageToHttp(String flowName) throws Exception
+    {
+        MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
+        assertThat(result, notNullValue(MuleMessage.class));
+        FlowAssert.verify(flowName);
     }
-  }
 
-  public static class JavaComponentSendFlowUsingNewMuleClient implements Callable {
-
-    @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
-      return eventContext.getMessage();
+    /**
+     * When doing a dispatch from a MessageProcessor the event was overwritten in ThreadLocal by
+     * OptimizedRequestContext while processing it and before dispatching it to a different thread so
+     * the original event that is the one that has to continue the execution of the main flow
+     * was losing the Flow variables.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testFlowVarsAfterDispatchFromMessageProcessor() throws Exception
+    {
+        doSendMessageToHttp("flowVarsFlowUsingProcessor");
     }
-  }
 
-  private static String getUrl(String path) {
-    return String.format("http://localhost:%s/%s", port.getValue(), path);
-  }
+    /**
+     * When doing a dispatch from a JavaComponent the event was overwritten in ThreadLocal by
+     * OptimizedRequestContext while processing it and before dispatching it to a different thread so
+     * the original event that is the one that has to continue the execution of the main flow
+     * was losing the Flow variables.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testFlowVarsAfterDispatchFromJavaComponent() throws Exception
+    {
+        doSendMessageToHttp("flowVarsFlowUsingJavaComponent");
+    }
+
+    public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+            return event;
+
+        }
+    }
+
+    public static class JavaComponentDispatchFlowUsingNewMuleClient implements Callable
+    {
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+            return eventContext.getMessage();
+        }
+    }
+
+    public static class JavaComponentSendFlowUsingNewMuleClient implements Callable
+    {
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
+            return eventContext.getMessage();
+        }
+    }
+
+    private static String getUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", port.getValue(), path);
+    }
 
 }

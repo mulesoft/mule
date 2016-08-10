@@ -21,89 +21,108 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * TODO: document this class
  */
-public class SpringTransactionFactory implements TransactionFactory {
+public class SpringTransactionFactory implements TransactionFactory
+{
 
-  private PlatformTransactionManager manager;
+    private PlatformTransactionManager manager;
 
-  public SpringTransactionFactory() {
-    super();
-  }
-
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
-    Transaction tx = new SpringTransaction(muleContext);
-    tx.begin();
-    return tx;
-  }
-
-  public boolean isTransacted() {
-    return true;
-  }
-
-  /**
-   * @return Returns the manager.
-   */
-  synchronized public PlatformTransactionManager getManager() {
-    return manager;
-  }
-
-  /**
-   * @param manager The manager to set.
-   */
-  synchronized public void setManager(PlatformTransactionManager manager) {
-    this.manager = manager;
-  }
-
-  /**
-   * TODO: document this class
-   */
-  public class SpringTransaction extends AbstractSingleResourceTransaction {
-
-    protected final TransactionStatus status;
-
-    public SpringTransaction(MuleContext muleContext) {
-      super(muleContext);
-      status = manager.getTransaction(null);
+    public SpringTransactionFactory()
+    {
+        super();
     }
 
-    protected void doBegin() throws TransactionException {
-      // nothing to do
+    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
+    {
+        Transaction tx = new SpringTransaction(muleContext);
+        tx.begin();
+        return tx;
     }
 
-    protected void doCommit() throws TransactionException {
-      manager.commit(status);
+    public boolean isTransacted()
+    {
+        return true;
     }
 
-    protected void doRollback() throws TransactionException {
-      manager.rollback(status);
+    /**
+     * @return Returns the manager.
+     */
+    synchronized public PlatformTransactionManager getManager()
+    {
+        return manager;
     }
 
-    public Object getResource(Object key) {
-      Object res = TransactionSynchronizationManager.getResource(key);
-      if (res != null) {
-        if (!(res instanceof ConnectionHolder)) {
-          if (res instanceof JmsResourceHolder) {
-            return ((JmsResourceHolder) res).getConnection();
-          }
-        } else {
-          return ((ConnectionHolder) res).getConnection();
+    /**
+     * @param manager The manager to set.
+     */
+    synchronized public void setManager(PlatformTransactionManager manager)
+    {
+        this.manager = manager;
+    }
+
+    /**
+     * TODO: document this class
+     */
+    public class SpringTransaction extends AbstractSingleResourceTransaction
+    {
+        protected final TransactionStatus status;
+
+        public SpringTransaction(MuleContext muleContext)
+        {
+            super(muleContext);
+            status = manager.getTransaction(null);
         }
-      }
-      return res;
-    }
 
-    public boolean hasResource(Object key) {
-      return getResource(key) != null;
-    }
+        protected void doBegin() throws TransactionException
+        {
+            // nothing to do
+        }
 
-    public void bindResource(Object key, Object resource) throws TransactionException {
-      throw new UnsupportedOperationException();
-    }
+        protected void doCommit() throws TransactionException
+        {
+           manager.commit(status);
+        }
 
-    public void setRollbackOnly() {
-      super.setRollbackOnly();
-      status.setRollbackOnly();
-    }
+        protected void doRollback() throws TransactionException
+        {
+           manager.rollback(status);
+        }
 
-  }
+        public Object getResource(Object key)
+        {
+            Object res = TransactionSynchronizationManager.getResource(key);
+            if (res != null)
+            {
+                if (!(res instanceof ConnectionHolder))
+                {
+                    if (res instanceof JmsResourceHolder)
+                    {
+                        return ((JmsResourceHolder)res).getConnection();
+                    }
+                }
+                else
+                {
+                    return ((ConnectionHolder)res).getConnection();
+                }
+            }
+            return res;
+        }
+
+        public boolean hasResource(Object key)
+        {
+            return getResource(key) != null;
+        }
+
+        public void bindResource(Object key, Object resource) throws TransactionException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setRollbackOnly()
+        {
+            super.setRollbackOnly();
+            status.setRollbackOnly();
+        }
+
+    }
 
 }

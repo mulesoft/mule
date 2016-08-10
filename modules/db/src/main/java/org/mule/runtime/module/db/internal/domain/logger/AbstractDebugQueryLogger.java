@@ -12,18 +12,20 @@ import org.slf4j.Logger;
 /**
  * Base class for query loggers that write to a logger
  */
-public abstract class AbstractDebugQueryLogger implements QueryLogger {
+public abstract class AbstractDebugQueryLogger implements QueryLogger
+{
+    private final Logger logger;
+    protected final StringBuilder builder;
 
-  private final Logger logger;
-  protected final StringBuilder builder;
+    protected AbstractDebugQueryLogger(Logger logger)
+    {
+        this.logger = logger;
+        this.builder = new StringBuilder();
+    }
 
-  protected AbstractDebugQueryLogger(Logger logger) {
-    this.logger = logger;
-    this.builder = new StringBuilder();
-  }
-
-  @Override
-  public void logQuery() {
-    logger.debug(builder.toString());
-  }
+    @Override
+    public void logQuery()
+    {
+        logger.debug(builder.toString());
+    }
 }

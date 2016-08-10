@@ -16,86 +16,104 @@ import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 
-public class TestDomainWrapper implements Domain {
+public class TestDomainWrapper implements Domain
+{
 
-  private Domain delegate;
-  private boolean failOnPurpose;
-  private boolean failOnDispose;
+    private Domain delegate;
+    private boolean failOnPurpose;
+    private boolean failOnDispose;
 
-  public TestDomainWrapper(Domain delegate) {
-    this.delegate = delegate;
-  }
-
-  @Override
-  public boolean containsSharedResources() {
-    return delegate.containsSharedResources();
-  }
-
-  @Override
-  public MuleContext getMuleContext() {
-    return delegate.getMuleContext();
-  }
-
-  @Override
-  public void install() throws InstallException {
-    delegate.install();
-  }
-
-  @Override
-  public void init() {
-    delegate.init();
-  }
-
-  @Override
-  public void start() throws DeploymentStartException {
-    delegate.start();
-  }
-
-  @Override
-  public void stop() {
-    if (failOnPurpose) {
-      fail();
+    public TestDomainWrapper(Domain delegate)
+    {
+        this.delegate = delegate;
     }
-    delegate.stop();
-  }
 
-  private void fail() {
-    throw new RuntimeException("fail on purpose");
-  }
-
-  @Override
-  public void dispose() {
-    if (failOnDispose) {
-      fail();
+    @Override
+    public boolean containsSharedResources()
+    {
+        return delegate.containsSharedResources();
     }
-    delegate.dispose();
-  }
 
-  @Override
-  public String getArtifactName() {
-    return delegate.getArtifactName();
-  }
+    @Override
+    public MuleContext getMuleContext()
+    {
+        return delegate.getMuleContext();
+    }
 
-  @Override
-  public DomainDescriptor getDescriptor() {
-    return delegate.getDescriptor();
-  }
+    @Override
+    public void install() throws InstallException
+    {
+        delegate.install();
+    }
 
-  @Override
-  public File[] getResourceFiles() {
-    return delegate.getResourceFiles();
-  }
+    @Override
+    public void init()
+    {
+        delegate.init();
+    }
 
-  @Override
-  public ArtifactClassLoader getArtifactClassLoader() {
-    return delegate.getArtifactClassLoader();
-  }
+    @Override
+    public void start() throws DeploymentStartException
+    {
+        delegate.start();
+    }
 
-  public void setFailOnStop() {
-    this.failOnPurpose = true;
-  }
+    @Override
+    public void stop()
+    {
+        if (failOnPurpose)
+        {
+            fail();
+        }
+        delegate.stop();
+    }
 
-  public void setFailOnDispose() {
-    this.failOnDispose = true;
-  }
+    private void fail()
+    {
+        throw new RuntimeException("fail on purpose");
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (failOnDispose)
+        {
+            fail();
+        }
+        delegate.dispose();
+    }
+
+    @Override
+    public String getArtifactName()
+    {
+        return delegate.getArtifactName();
+    }
+
+    @Override
+    public DomainDescriptor getDescriptor()
+    {
+        return delegate.getDescriptor();
+    }
+
+    @Override
+    public File[] getResourceFiles()
+    {
+        return delegate.getResourceFiles();
+    }
+
+    @Override
+    public ArtifactClassLoader getArtifactClassLoader()
+    {
+        return delegate.getArtifactClassLoader();
+    }
+
+    public void setFailOnStop()
+    {
+        this.failOnPurpose = true;
+    }
+
+    public void setFailOnDispose()
+    {
+        this.failOnDispose = true;
+    }
 }

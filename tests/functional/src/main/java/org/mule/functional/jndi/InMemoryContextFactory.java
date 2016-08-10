@@ -15,15 +15,17 @@ import javax.naming.spi.InitialContextFactory;
 /**
  * Simple in-memory JNDI context for unit testing.
  */
-public class InMemoryContextFactory implements InitialContextFactory {
+public class InMemoryContextFactory implements InitialContextFactory
+{
+    public Context getInitialContext() throws NamingException
+    {
+        return getInitialContext(null);
+    }
 
-  public Context getInitialContext() throws NamingException {
-    return getInitialContext(null);
-  }
-
-  public Context getInitialContext(Hashtable environment) throws NamingException {
-    return new InMemoryContext();
-  }
+    public Context getInitialContext(Hashtable environment) throws NamingException
+    {
+        return new InMemoryContext();
+    }
 }
 
 

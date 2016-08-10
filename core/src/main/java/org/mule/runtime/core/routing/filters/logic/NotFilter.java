@@ -17,49 +17,55 @@ import org.mule.runtime.core.api.routing.filter.ObjectFilter;
  * <code>NotFilter</code> accepts if the filter does not accept.
  */
 
-public class NotFilter implements Filter, ObjectFilter {
+public class NotFilter implements Filter, ObjectFilter
+{
+    private Filter filter;
 
-  private Filter filter;
+    public NotFilter()
+    {
+        super();
+    }
 
-  public NotFilter() {
-    super();
-  }
+    public NotFilter(Filter filter)
+    {
+        this.filter = filter;
+    }
 
-  public NotFilter(Filter filter) {
-    this.filter = filter;
-  }
+    public Filter getFilter()
+    {
+        return filter;
+    }
 
-  public Filter getFilter() {
-    return filter;
-  }
+    public void setFilter(Filter filter)
+    {
+        this.filter = filter;
+    }
 
-  public void setFilter(Filter filter) {
-    this.filter = filter;
-  }
+    @Override
+    public boolean accept(MuleMessage message)
+    {
+        return (filter != null ? !filter.accept(message) : false);
+    }
 
-  @Override
-  public boolean accept(MuleMessage message) {
-    return (filter != null ? !filter.accept(message) : false);
-  }
+    @Override
+    public boolean accept(Object object)
+    {
+        return (filter != null ? !((ObjectFilter) filter).accept(object) : false);
+    }
 
-  @Override
-  public boolean accept(Object object) {
-    return (filter != null ? !((ObjectFilter) filter).accept(object) : false);
-  }
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null || getClass() != obj.getClass())
-      return false;
+        final NotFilter other = (NotFilter) obj;
+        return equal(filter, other.filter);
+    }
 
-    final NotFilter other = (NotFilter) obj;
-    return equal(filter, other.filter);
-  }
-
-  @Override
-  public int hashCode() {
-    return hash(new Object[] {this.getClass(), filter});
-  }
+    @Override
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), filter});
+    }
 }

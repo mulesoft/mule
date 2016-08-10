@@ -11,47 +11,57 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import static org.junit.Assert.assertEquals;
 
-public class StringObjectArrayTransformersTestCase extends AbstractTransformerTestCase {
+public class StringObjectArrayTransformersTestCase extends AbstractTransformerTestCase
+{
 
-  public Transformer getTransformer() throws Exception {
-    return new StringToObjectArray();
-  }
-
-  public Transformer getRoundTripTransformer() throws Exception {
-    return new ObjectArrayToString();
-  }
-
-  public Object getTestData() {
-    return "test1 test2 test3";
-  }
-
-  public Object getResultData() {
-    return new String[] {"test1", "test2", "test3"};
-  }
-
-  @Override
-  public boolean compareResults(Object src, Object result) {
-    if (src == null || result == null) {
-      return false;
+    public Transformer getTransformer() throws Exception
+    {
+        return new StringToObjectArray();
     }
 
-    if (result instanceof Object[]) {
-      Object[] out = (Object[]) result;
-      assertEquals(out[0].toString(), "test1");
-      assertEquals(out[1].toString(), "test2");
-      assertEquals(out[2].toString(), "test3");
-      return true;
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return new ObjectArrayToString();
     }
 
-    return false;
-  }
-
-  @Override
-  public boolean compareRoundtripResults(Object src, Object result) {
-    if (src == null || result == null) {
-      return false;
+    public Object getTestData()
+    {
+        return "test1 test2 test3";
     }
-    return src.equals(result);
-  }
+
+    public Object getResultData()
+    {
+        return new String[]{"test1", "test2", "test3"};
+    }
+
+    @Override
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src == null || result == null)
+        {
+            return false;
+        }
+
+        if (result instanceof Object[])
+        {
+            Object[] out = (Object[]) result;
+            assertEquals(out[0].toString(), "test1");
+            assertEquals(out[1].toString(), "test2");
+            assertEquals(out[2].toString(), "test3");
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean compareRoundtripResults(Object src, Object result)
+    {
+        if (src == null || result == null)
+        {
+            return false;
+        }
+        return src.equals(result);
+    }
 
 }

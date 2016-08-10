@@ -8,21 +8,25 @@ package org.mule.test.metadata.extension.model.attribute;
 
 import org.mule.runtime.core.message.BaseAttributes;
 
-public class AnimalsOutputAttributes extends BaseAttributes implements AbstractOutputAttributes {
+public class AnimalsOutputAttributes extends BaseAttributes implements AbstractOutputAttributes
+{
 
-  private String outputId = "AnimalsOutputAttributes";
-  private String kind;
+    private String outputId = "AnimalsOutputAttributes";
+    private String kind;
 
-  public String getKind() {
-    return kind;
-  }
+    public String getKind()
+    {
+        return kind;
+    }
 
-  public void setKind(String kind) {
-    this.kind = kind;
-  }
+    public void setKind(String kind)
+    {
+        this.kind = kind;
+    }
 
-  @Override
-  public String getOutputId() {
-    return outputId;
-  }
+    @Override
+    public String getOutputId()
+    {
+        return outputId;
+    }
 }

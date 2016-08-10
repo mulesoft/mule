@@ -20,15 +20,17 @@ import java.util.List;
  *
  * @param <D> the type of {@link ArtifactDescriptor}
  */
-public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> extends SplashScreen {
+public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> extends SplashScreen
+{
+    protected abstract void createMessage(D descriptor);
 
-  protected abstract void createMessage(D descriptor);
-
-  protected List<String> getLibraries(File artifactLibFolder) {
-    if (artifactLibFolder.exists()) {
-      String[] libraries = artifactLibFolder.list((dir, name) -> name.endsWith(".jar"));
-      return asList(libraries);
+    protected List<String> getLibraries(File artifactLibFolder)
+    {
+        if (artifactLibFolder.exists())
+        {
+            String[] libraries = artifactLibFolder.list((dir, name) -> name.endsWith(".jar"));
+            return asList(libraries);
+        }
+        return new ArrayList<>();
     }
-    return new ArrayList<>();
-  }
 }

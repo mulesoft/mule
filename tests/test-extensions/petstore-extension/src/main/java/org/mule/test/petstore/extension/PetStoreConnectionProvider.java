@@ -24,107 +24,128 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle {
+public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle
+{
 
-  @Inject
-  protected MuleContext muleContext;
-  @ConfigName
-  protected String configName;
-  @Parameter
-  protected String username;
-  @Parameter
-  @Password
-  protected String password;
-  @Parameter
-  @Optional
-  protected TlsContextFactory tls;
-  @Parameter
-  @Optional
-  protected ThreadingProfile threadingProfile;
-  @Optional
-  @Parameter
-  protected Date openingDate;
-  private int initialise, start, stop, dispose = 0;
+    @Inject
+    protected MuleContext muleContext;
+    @ConfigName
+    protected String configName;
+    @Parameter
+    protected String username;
+    @Parameter
+    @Password
+    protected String password;
+    @Parameter
+    @Optional
+    protected TlsContextFactory tls;
+    @Parameter
+    @Optional
+    protected ThreadingProfile threadingProfile;
+    @Optional
+    @Parameter
+    protected Date openingDate;
+    private int initialise, start, stop, dispose = 0;
 
-  @Override
-  public T connect() {
-    return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
-  }
-
-  @Override
-  public void disconnect(PetStoreClient connection) {
-    if (connection != null) {
-      connection.disconnect();
+    @Override
+    public T connect()
+    {
+        return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
     }
-  }
 
-  @Override
-  public ConnectionValidationResult validate(PetStoreClient connection) {
-    if (connection.getUsername().equals("john") && connection.getPassword().equals("doe")) {
-      return ConnectionValidationResult.success();
-    } else {
-      return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+    @Override
+    public void disconnect(PetStoreClient connection)
+    {
+        if (connection != null)
+        {
+            connection.disconnect();
+        }
     }
-  }
 
-  @Override
-  public void dispose() {
-    dispose++;
-  }
+    @Override
+    public ConnectionValidationResult validate(PetStoreClient connection)
+    {
+        if (connection.getUsername().equals("john") && connection.getPassword().equals("doe"))
+        {
+            return ConnectionValidationResult.success();
+        }
+        else
+        {
+            return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("Invalid credentials"));
+        }
+    }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    initialise++;
-  }
+    @Override
+    public void dispose()
+    {
+        dispose++;
+    }
 
-  @Override
-  public void start() throws MuleException {
-    start++;
-  }
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        initialise++;
+    }
 
-  @Override
-  public void stop() throws MuleException {
-    stop++;
-  }
+    @Override
+    public void start() throws MuleException
+    {
+        start++;
+    }
 
-  public int getInitialise() {
-    return initialise;
-  }
+    @Override
+    public void stop() throws MuleException
+    {
+        stop++;
+    }
 
-  public int getStart() {
-    return start;
-  }
+    public int getInitialise()
+    {
+        return initialise;
+    }
 
-  public int getStop() {
-    return stop;
-  }
+    public int getStart()
+    {
+        return start;
+    }
 
-  public int getDispose() {
-    return dispose;
-  }
+    public int getStop()
+    {
+        return stop;
+    }
 
-  public MuleContext getMuleContext() {
-    return muleContext;
-  }
+    public int getDispose()
+    {
+        return dispose;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public String getUsername()
+    {
+        return username;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public String getPassword()
+    {
+        return password;
+    }
 
-  public Date getOpeningDate() {
-    return openingDate;
-  }
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public Date getOpeningDate()
+    {
+        return openingDate;
+    }
 }

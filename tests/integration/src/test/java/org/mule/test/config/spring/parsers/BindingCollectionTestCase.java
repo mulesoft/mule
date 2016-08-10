@@ -14,17 +14,19 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-public class BindingCollectionTestCase extends AbstractNamespaceTestCase {
+public class BindingCollectionTestCase extends AbstractNamespaceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/nested-collection-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/nested-collection-test.xml";
-  }
-
-  @Test
-  public void testAll() {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
-    Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
-    assertEquals(5, kids.size());
-  }
+    @Test
+    public void testAll()
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
+        Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
+        assertEquals(5, kids.size());
+    }
 }

@@ -29,48 +29,55 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase {
+public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase
+{
 
-  private ObjectSerializer objectSerializer;
+    private ObjectSerializer objectSerializer;
 
-  @Override
-  protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        super.addBuilders(builders);
 
-    objectSerializer = new JavaObjectSerializer();
-    try {
-      LifecycleUtils.initialiseIfNeeded(objectSerializer);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+        objectSerializer = new JavaObjectSerializer();
+        try
+        {
+            LifecycleUtils.initialiseIfNeeded(objectSerializer);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        objectSerializer = spy(objectSerializer);
+
+        Map<String, Object> serializerMap = new HashMap<>();
+        serializerMap.put("customSerializer", objectSerializer);
+        builders.add(0, new SimpleConfigurationBuilder(serializerMap));
     }
-    objectSerializer = spy(objectSerializer);
 
-    Map<String, Object> serializerMap = new HashMap<>();
-    serializerMap.put("customSerializer", objectSerializer);
-    builders.add(0, new SimpleConfigurationBuilder(serializerMap));
-  }
+    @Override
+    protected String getConfigFile()
+    {
+        return "vm/vm-uses-default-object-serializer-test-flow.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "vm/vm-uses-default-object-serializer-test-flow.xml";
-  }
+    @Test
+    public void serializeWithKryo() throws Exception
+    {
+        final String payload = "payload";
+        flowRunner("dispatch").withPayload(payload).run();
 
-  @Test
-  public void serializeWithKryo() throws Exception {
-    final String payload = "payload";
-    flowRunner("dispatch").withPayload(payload).run();
+        MuleMessage response = muleContext.getClient().request("vm://in", 5000);
+        assertThat(response, is(notNullValue()));
+        assertThat(getPayloadAsString(response), is(payload));
 
-    MuleMessage response = muleContext.getClient().request("vm://in", 5000);
-    assertThat(response, is(notNullValue()));
-    assertThat(getPayloadAsString(response), is(payload));
+        ArgumentCaptor<MuleMessage> messageArgumentCaptor = ArgumentCaptor.forClass(MuleMessage.class);
+        verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
+        MuleMessage capturedMessage = messageArgumentCaptor.getValue();
+        assertThat(capturedMessage, is(notNullValue()));
+        assertThat(getPayloadAsString(capturedMessage), is(payload));
 
-    ArgumentCaptor<MuleMessage> messageArgumentCaptor = ArgumentCaptor.forClass(MuleMessage.class);
-    verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
-    MuleMessage capturedMessage = messageArgumentCaptor.getValue();
-    assertThat(capturedMessage, is(notNullValue()));
-    assertThat(getPayloadAsString(capturedMessage), is(payload));
-
-    verify(objectSerializer, atLeastOnce()).deserialize(any(byte[].class));
-  }
+        verify(objectSerializer, atLeastOnce()).deserialize(any(byte[].class));
+    }
 
 }

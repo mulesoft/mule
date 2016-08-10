@@ -23,13 +23,10 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * Only elements allowed inside
  * <p/>
- * <p>
- * Java class for all complex type.
+ * <p>Java class for all complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="all">
  *   &lt;complexContent>
@@ -58,6 +55,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "all")
-public class All extends ExplicitGroup {
+public class All extends ExplicitGroup
+{
 
 }

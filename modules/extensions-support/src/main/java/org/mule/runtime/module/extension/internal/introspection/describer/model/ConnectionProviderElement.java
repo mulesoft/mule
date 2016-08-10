@@ -11,6 +11,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
  *
  * @since 4.0
  */
-public interface ConnectionProviderElement extends ParameterizableTypeElement, WithParameters, WithGenerics {
+public interface ConnectionProviderElement extends ParameterizableTypeElement, WithParameters, WithGenerics
+{
 
 }

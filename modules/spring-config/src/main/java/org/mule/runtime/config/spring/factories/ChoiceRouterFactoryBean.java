@@ -9,14 +9,16 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.routing.ChoiceRouter;
 
-public class ChoiceRouterFactoryBean extends AbstractSelectiveRouterFactoryBean {
+public class ChoiceRouterFactoryBean extends AbstractSelectiveRouterFactoryBean
+{
+    public Class<?> getObjectType()
+    {
+        return ChoiceRouter.class;
+    }
 
-  public Class<?> getObjectType() {
-    return ChoiceRouter.class;
-  }
-
-  @Override
-  protected AbstractSelectiveRouter newAbstractSelectiveRouter() {
-    return new ChoiceRouter();
-  }
+    @Override
+    protected AbstractSelectiveRouter newAbstractSelectiveRouter()
+    {
+        return new ChoiceRouter();
+    }
 }

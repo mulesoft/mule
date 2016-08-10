@@ -7,19 +7,18 @@
 package org.mule.runtime.core.api.retry;
 
 /**
- * This is the main Retry SPI. The code inside the {@link #doWork} method is what will actually get <u>retried</u> according to
- * the {@link RetryPolicy} that has been configured. Note that retries can be wrapped in a transaction to ensure the work is
- * atomic.
+ * This is the main Retry SPI.  The code inside the {@link #doWork} method is what will actually get <u>retried</u> 
+ * according to the {@link RetryPolicy} that has been configured.  Note that retries can be wrapped in a transaction 
+ * to ensure the work is atomic.
  */
-public interface RetryCallback {
+public interface RetryCallback
+{
+    public void doWork(RetryContext context) throws Exception;
 
-  public void doWork(RetryContext context) throws Exception;
+    public String getWorkDescription();
 
-  public String getWorkDescription();
-
-  /**
-   * @return the object for which the retry of the work is being done. Ideally, it should return a
-   *         {@link org.mule.runtime.core.api.transport.Connector}.
-   */
-  public Object getWorkOwner();
+    /**
+     * @return the object for which the retry of the work is being done. Ideally, it should return a {@link org.mule.runtime.core.api.transport.Connector}.
+     */
+    public Object getWorkOwner();
 }

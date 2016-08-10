@@ -10,15 +10,17 @@ import org.mule.compatibility.transport.file.FilenameParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 
-public class DummyFilenameParser implements FilenameParser {
+public class DummyFilenameParser implements FilenameParser
+{
+    @Override
+    public String getFilename(MuleEvent event, String pattern)
+    {
+        return null;
+    }
 
-  @Override
-  public String getFilename(MuleEvent event, String pattern) {
-    return null;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    // ignore muleContext here
-  }
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        // ignore muleContext here
+    }
 }

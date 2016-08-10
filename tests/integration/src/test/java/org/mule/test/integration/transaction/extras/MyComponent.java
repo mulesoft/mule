@@ -6,21 +6,24 @@
  */
 package org.mule.test.integration.transaction.extras;
 
-public class MyComponent {
+public class MyComponent
+{
+    private LibraryDao library;
 
-  private LibraryDao library;
+    public boolean doInsertTitle(Book book) throws Exception
+    {
+        return library.insertBook(book);
+    }
 
-  public boolean doInsertTitle(Book book) throws Exception {
-    return library.insertBook(book);
-  }
+    public LibraryDao getLibrary()
+    {
+        return library;
+    }
 
-  public LibraryDao getLibrary() {
-    return library;
-  }
-
-  public void setLibrary(LibraryDao library) {
-    this.library = library;
-  }
+    public void setLibrary(LibraryDao library)
+    {
+        this.library = library;
+    }
 }
 
 

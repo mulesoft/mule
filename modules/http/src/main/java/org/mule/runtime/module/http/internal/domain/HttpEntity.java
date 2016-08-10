@@ -9,6 +9,7 @@ package org.mule.runtime.module.http.internal.domain;
 /**
  * Marker interface for a http message entity.
  */
-public interface HttpEntity {
+public interface HttpEntity
+{
 
 }

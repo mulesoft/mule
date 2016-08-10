@@ -17,30 +17,32 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class NonBlockingFullySupportedEndpointFunctionalTestCase extends FunctionalTestCase {
+public class NonBlockingFullySupportedEndpointFunctionalTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "non-blocking-fully-supported-endpoint-test-config.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "non-blocking-fully-supported-endpoint-test-config.xml";
-  }
+    @Test
+    public void testTransportOutboundEndpoint() throws Exception
+    {
+        final MuleEvent result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
+        verify("testOutboundEndpoint");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
 
-  @Test
-  public void testTransportOutboundEndpoint() throws Exception {
-    final MuleEvent result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE)
-        .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
-    verify("testOutboundEndpoint");
-    assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
-  }
+    @Test
+    public void testTransportOutboundEndpointError() throws Exception
+    {
+        MuleEvent result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
+        verify("testOutboundEndpointError");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
 
-  @Test
-  public void testTransportOutboundEndpointError() throws Exception {
-    MuleEvent result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE)
-        .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
-    verify("testOutboundEndpointError");
-    assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
-  }
-
-  protected MessageExchangePattern getMessageExchnagePattern() {
-    return MessageExchangePattern.REQUEST_RESPONSE;
-  }
+    protected MessageExchangePattern getMessageExchnagePattern()
+    {
+        return MessageExchangePattern.REQUEST_RESPONSE;
+    }
 }

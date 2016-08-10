@@ -21,13 +21,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>
- * Java class for topLevelComplexType complex type.
+ * <p>Java class for topLevelComplexType complex type.
  * <p/>
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <p/>
- * 
  * <pre>
  * &lt;complexType name="topLevelComplexType">
  *   &lt;complexContent>
@@ -45,6 +42,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "topLevelComplexType")
-public class TopLevelComplexType extends ComplexType {
+public class TopLevelComplexType extends ComplexType
+{
 
 }

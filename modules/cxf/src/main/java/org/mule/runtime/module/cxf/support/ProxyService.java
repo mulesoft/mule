@@ -8,8 +8,9 @@ package org.mule.runtime.module.cxf.support;
 
 import javax.xml.transform.Source;
 
-public interface ProxyService {
+public interface ProxyService
+{
 
-  Source invoke(Source arg0);
+    Source invoke(Source arg0);
 
 }

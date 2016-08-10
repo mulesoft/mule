@@ -8,12 +8,13 @@ package org.mule.compatibility.core.transformer.simple;
 
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
-public class OutboundAppendTransformer extends StringAppendTransformer {
+public class OutboundAppendTransformer extends StringAppendTransformer
+{
+    public static String APPEND_STRING = " outbound";
 
-  public static String APPEND_STRING = " outbound";
-
-  public OutboundAppendTransformer() {
-    super(APPEND_STRING);
-  }
+    public OutboundAppendTransformer()
+    {
+        super(APPEND_STRING);
+    }
 
 }

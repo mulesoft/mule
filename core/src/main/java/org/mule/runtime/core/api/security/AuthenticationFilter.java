@@ -12,12 +12,13 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 /**
  * <code>AuthenticationFilter</code> is a base filter for authenticating messages.
  */
-public interface AuthenticationFilter extends SecurityFilter {
+public interface AuthenticationFilter extends SecurityFilter
+{
+    void setCredentialsAccessor(CredentialsAccessor accessor);
 
-  void setCredentialsAccessor(CredentialsAccessor accessor);
+    CredentialsAccessor getCredentialsAccessor();
 
-  CredentialsAccessor getCredentialsAccessor();
-
-  void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-      SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
+    void authenticate(MuleEvent event)
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

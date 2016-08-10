@@ -20,28 +20,32 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExpirationPolicyObjectFactory implements ObjectFactory<ExpirationPolicy> {
+public class ExpirationPolicyObjectFactory implements ObjectFactory<ExpirationPolicy>
+{
+    @Inject
+    private TimeSupplier timeSupplier;
 
-  @Inject
-  private TimeSupplier timeSupplier;
+    private Long maxIdleTime = null;
+    private TimeUnit timeUnit = null;
 
-  private Long maxIdleTime = null;
-  private TimeUnit timeUnit = null;
+    @Override
+    public ExpirationPolicy getObject() throws Exception
+    {
+        if (maxIdleTime != null && timeUnit != null)
+        {
+            return new ImmutableExpirationPolicy(maxIdleTime, timeUnit, timeSupplier);
+        }
 
-  @Override
-  public ExpirationPolicy getObject() throws Exception {
-    if (maxIdleTime != null && timeUnit != null) {
-      return new ImmutableExpirationPolicy(maxIdleTime, timeUnit, timeSupplier);
+        return ImmutableExpirationPolicy.getDefault(timeSupplier);
     }
 
-    return ImmutableExpirationPolicy.getDefault(timeSupplier);
-  }
+    public void setMaxIdleTime(Long maxIdleTime)
+    {
+        this.maxIdleTime = maxIdleTime;
+    }
 
-  public void setMaxIdleTime(Long maxIdleTime) {
-    this.maxIdleTime = maxIdleTime;
-  }
-
-  public void setTimeUnit(TimeUnit timeUnit) {
-    this.timeUnit = timeUnit;
-  }
+    public void setTimeUnit(TimeUnit timeUnit)
+    {
+        this.timeUnit = timeUnit;
+    }
 }

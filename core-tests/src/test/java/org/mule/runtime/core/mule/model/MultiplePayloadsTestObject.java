@@ -9,21 +9,25 @@ package org.mule.runtime.core.mule.model;
 /**
  * A test object with multiple signatures matching a payload for the discovery to fail.
  */
-public class MultiplePayloadsTestObject {
+public class MultiplePayloadsTestObject
+{
+    public MultiplePayloadsTestObject()
+    {
+        // nothing to do
+    }
 
-  public MultiplePayloadsTestObject() {
-    // nothing to do
-  }
+    public void someBusinessMethod(String parameter)
+    {
+        // nothing to do
+    }
 
-  public void someBusinessMethod(String parameter) {
-    // nothing to do
-  }
+    public void someSetter(String otherStringParameter)
+    {
+        // nothing to do
+    }
 
-  public void someSetter(String otherStringParameter) {
-    // nothing to do
-  }
-
-  public void someOtherBusinessMethod(String parameter, String otherParameter) {
-    // nothing to do
-  }
+    public void someOtherBusinessMethod(String parameter, String otherParameter)
+    {
+        // nothing to do
+    }
 }

@@ -13,41 +13,44 @@ import org.mule.test.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
-public class ListElementTestCase extends AbstractNamespaceTestCase {
+public class ListElementTestCase extends AbstractNamespaceTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/config/spring/parsers/list-element-test.xml";
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "org/mule/config/spring/parsers/list-element-test.xml";
-  }
+    @Test
+    public void testListElement1()
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
+        assertNotNull(orphan.getKids());
+        assertTrue(orphan.getKids().size() == 2);
+        assertTrue(orphan.getKids().contains("kid1"));
+        assertTrue(orphan.getKids().contains("kid2"));
+    }
 
-  @Test
-  public void testListElement1() {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
-    assertNotNull(orphan.getKids());
-    assertTrue(orphan.getKids().size() == 2);
-    assertTrue(orphan.getKids().contains("kid1"));
-    assertTrue(orphan.getKids().contains("kid2"));
-  }
+    @Test
+    public void testListElement2()
+    {
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+        assertNotNull(orphan.getKids());
+        assertTrue(orphan.getKids().size() == 2);
+        assertTrue(orphan.getKids().contains("kid1"));
+        assertTrue(orphan.getKids().contains("kid2"));
+    }
 
-  @Test
-  public void testListElement2() {
-    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-    assertNotNull(orphan.getKids());
-    assertTrue(orphan.getKids().size() == 2);
-    assertTrue(orphan.getKids().contains("kid1"));
-    assertTrue(orphan.getKids().contains("kid2"));
-  }
-
-  // simpler list element parser doesn't support dynamic attribute
-  // @Test
-  // public void testListElement3()
-  // {
-  // OrphanBean orphan = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
-  // assertNotNull(orphan.getKids());
-  // assertTrue(orphan.getKids().size() == 3);
-  // assertTrue(orphan.getKids().contains("kid1"));
-  // assertTrue(orphan.getKids().contains("kid2"));
-  // assertTrue(orphan.getKids().contains("kid3"));
-  // }
+    // simpler list element parser doesn't support dynamic attribute
+//    @Test
+//    public void testListElement3()
+//    {
+//        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
+//        assertNotNull(orphan.getKids());
+//        assertTrue(orphan.getKids().size() == 3);
+//        assertTrue(orphan.getKids().contains("kid1"));
+//        assertTrue(orphan.getKids().contains("kid2"));
+//        assertTrue(orphan.getKids().contains("kid3"));
+//    }
 
 }

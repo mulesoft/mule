@@ -13,25 +13,30 @@ import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 
-public class MockHandshakeCompletedEvent extends HandshakeCompletedEvent {
+public class MockHandshakeCompletedEvent extends HandshakeCompletedEvent
+{
+    
+    public MockHandshakeCompletedEvent()
+    {
+        this(new MockSslSocket());
+    }
+    
+    public MockHandshakeCompletedEvent(SSLSocket socket)
+    {
+        super(socket, null);
+    }
 
-  public MockHandshakeCompletedEvent() {
-    this(new MockSslSocket());
-  }
+    @Override
+    public Certificate[] getLocalCertificates()
+    {
+        return new Certificate[0];
+    }
 
-  public MockHandshakeCompletedEvent(SSLSocket socket) {
-    super(socket, null);
-  }
-
-  @Override
-  public Certificate[] getLocalCertificates() {
-    return new Certificate[0];
-  }
-
-  @Override
-  public Certificate[] getPeerCertificates() throws SSLPeerUnverifiedException {
-    return new Certificate[0];
-  }
-
+    @Override
+    public Certificate[] getPeerCertificates() throws SSLPeerUnverifiedException
+    {
+        return new Certificate[0];
+    }
+    
 }
 

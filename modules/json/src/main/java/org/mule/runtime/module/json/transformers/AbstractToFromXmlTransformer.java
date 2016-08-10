@@ -23,23 +23,25 @@ import java.io.StringWriter;
 /**
  * Superclass for transformers that convert JSON to and from XML
  */
-public abstract class AbstractToFromXmlTransformer extends AbstractTransformer {
+public abstract class AbstractToFromXmlTransformer extends AbstractTransformer
+{
+    TransformerFactory transformerFactory;
 
-  TransformerFactory transformerFactory;
+    protected AbstractToFromXmlTransformer()
+    {
+        transformerFactory = TransformerInputs.createTransformerFactory();
+    }
 
-  protected AbstractToFromXmlTransformer() {
-    transformerFactory = TransformerInputs.createTransformerFactory();
-  }
-
-  /**
-   * Return result of transformation
-   */
-  protected String convert(Source source, XMLOutputFactory factory) throws XMLStreamException, TransformerException {
-    StringWriter writer = new StringWriter();
-    XMLStreamWriter output = factory.createXMLStreamWriter(writer);
-    Result result = new StAXResult(output);
-    Transformer transformer = transformerFactory.newTransformer();
-    transformer.transform(source, result);
-    return writer.toString();
-  }
+    /**
+     * Return result of transformation
+     */
+    protected String convert(Source source, XMLOutputFactory factory) throws XMLStreamException, TransformerException
+    {
+        StringWriter writer = new StringWriter();
+        XMLStreamWriter output = factory.createXMLStreamWriter(writer);
+        Result result = new StAXResult(output);
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(source, result);
+        return writer.toString();
+    }
 }

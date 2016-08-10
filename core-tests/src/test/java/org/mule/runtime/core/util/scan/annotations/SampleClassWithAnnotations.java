@@ -7,26 +7,30 @@
 package org.mule.runtime.core.util.scan.annotations;
 
 @Marker("ClassLevel")
-public class SampleClassWithAnnotations {
+public class SampleClassWithAnnotations
+{
+    @Marker("FieldLevel")
+    private String myField;
 
-  @Marker("FieldLevel")
-  private String myField;
+    private int anotherNonAnnotatedField;
 
-  private int anotherNonAnnotatedField;
+    @Marker("MethodLevel / Main")
+    public static void main(@Marker("ParamLevel")
+                            @MultiMarker(value = "ParamLevel", param1 = "12", param2 = "abc")
+                            String[] args) throws Exception
+    {
+        // no-op
+    }
 
-  @Marker("MethodLevel / Main")
-  public static void main(@Marker("ParamLevel") @MultiMarker(value = "ParamLevel", param1 = "12", param2 = "abc") String[] args)
-      throws Exception {
-    // no-op
-  }
+    @Override
+    @Marker("MethodLevel / toString")
+    public String toString()
+    {
+        return super.toString();
+    }
 
-  @Override
-  @Marker("MethodLevel / toString")
-  public String toString() {
-    return super.toString();
-  }
-
-  public void nonAnnotatedMethod() {
-    // no-op
-  }
+    public void nonAnnotatedMethod()
+    {
+        // no-op
+    }
 }

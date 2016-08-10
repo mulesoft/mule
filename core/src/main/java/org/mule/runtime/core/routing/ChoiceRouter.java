@@ -16,22 +16,25 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter} to evaluate the event being processed and find
- * the first route that can be used.
+ * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter}
+ * to evaluate the event being processed and find the first route that can be used.
  * <p>
- * If a default route has been configured and no match has been found, the default route will be used. Otherwise it throws a
- * {@link RoutePathNotFoundException}.
+ * If a default route has been configured and no match has been found, the default
+ * route will be used. Otherwise it throws a {@link RoutePathNotFoundException}.
  */
-public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlockingMessageProcessor {
+public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlockingMessageProcessor
+{
+    @Override
+    protected Collection<MessageProcessor> selectProcessors(MuleEvent event)
+    {
+        for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors())
+        {
+            if (mpfp.getFilter().accept(event))
+            {
+                return Collections.singleton(mpfp.getMessageProcessor());
+            }
+        }
 
-  @Override
-  protected Collection<MessageProcessor> selectProcessors(MuleEvent event) {
-    for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors()) {
-      if (mpfp.getFilter().accept(event)) {
-        return Collections.singleton(mpfp.getMessageProcessor());
-      }
+        return Collections.emptySet();
     }
-
-    return Collections.emptySet();
-  }
 }

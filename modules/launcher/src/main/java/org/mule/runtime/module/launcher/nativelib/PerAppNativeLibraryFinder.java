@@ -14,39 +14,48 @@ import java.io.File;
 /**
  * Finds native libraries in an application's lib folder
  */
-public class PerAppNativeLibraryFinder implements NativeLibraryFinder {
+public class PerAppNativeLibraryFinder implements NativeLibraryFinder
+{
 
-  public static final String DYLIB_EXTENSION = ".dylib";
-  public static final String JNILIB_EXTENSION = ".jnilib";
+    public static final String DYLIB_EXTENSION = ".dylib";
+    public static final String JNILIB_EXTENSION = ".jnilib";
 
-  private final File libDir;
+    private final File libDir;
 
-  public PerAppNativeLibraryFinder(File libDir) {
-    this.libDir = libDir;
-  }
-
-  @Override
-  public String findLibrary(String name, String libraryPath) {
-    if (null == libraryPath) {
-      libraryPath = findLibraryLocally(name);
+    public PerAppNativeLibraryFinder(File libDir)
+    {
+        this.libDir = libDir;
     }
 
-    return libraryPath;
-  }
+    @Override
+    public String findLibrary(String name, String libraryPath)
+    {
+        if (null == libraryPath)
+        {
+            libraryPath = findLibraryLocally(name);
+        }
 
-  protected String findLibraryLocally(String name) {
-    String nativeLibName = System.mapLibraryName(name);
-    File library = new File(libDir, nativeLibName);
-
-    if (!library.exists() && SystemUtils.IS_OS_MAC) {
-      nativeLibName = nativeLibName.replace(DYLIB_EXTENSION, JNILIB_EXTENSION);
-      library = new File(libDir, nativeLibName);
+        return libraryPath;
     }
 
-    if (library.exists()) {
-      return library.getAbsolutePath();
-    } else {
-      return null;
+    protected String findLibraryLocally(String name)
+    {
+        String nativeLibName = System.mapLibraryName(name);
+        File library = new File(libDir, nativeLibName);
+
+        if (!library.exists() && SystemUtils.IS_OS_MAC)
+        {
+            nativeLibName = nativeLibName.replace(DYLIB_EXTENSION, JNILIB_EXTENSION);
+            library = new File(libDir, nativeLibName);
+        }
+
+        if (library.exists())
+        {
+            return library.getAbsolutePath();
+        }
+        else
+        {
+            return null;
+        }
     }
-  }
 }

@@ -11,25 +11,30 @@ import org.mule.runtime.core.model.streaming.DelegatingInputStream;
 import java.io.InputStream;
 
 /**
- * The {@link TcpMessageDispatcher} and the {@link TcpMessageReceiver} use this class as the input parameter to the read() method
- * on the {@link TcpProtocol} interface. If you wish to simply use the InputStream as the message payload that you're reading in,
- * you just call tcpInputStream.setStreaming(true) so that Mule knows to stop listening for more messages on that stream.
+ * The {@link TcpMessageDispatcher} and the {@link TcpMessageReceiver} use this
+ * class as the input parameter to the read() method on the {@link TcpProtocol}
+ * interface. If you wish to simply use the InputStream as the message payload
+ * that you're reading in, you just call tcpInputStream.setStreaming(true) so
+ * that Mule knows to stop listening for more messages on that stream. 
  */
-public class TcpInputStream extends DelegatingInputStream {
+public class TcpInputStream extends DelegatingInputStream
+{
+    private boolean streaming;
+    
+    public TcpInputStream(InputStream delegate)
+    {
+        super(delegate);
+    }
 
-  private boolean streaming;
+    public boolean isStreaming()
+    {
+        return streaming;
+    }
 
-  public TcpInputStream(InputStream delegate) {
-    super(delegate);
-  }
-
-  public boolean isStreaming() {
-    return streaming;
-  }
-
-  public void setStreaming(boolean streaming) {
-    this.streaming = streaming;
-  }
+    public void setStreaming(boolean streaming)
+    {
+        this.streaming = streaming;
+    }
 
 }
 

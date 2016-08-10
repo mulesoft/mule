@@ -21,60 +21,75 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class ReflectionMuleCoreExtensionDependencyDiscovererTestCase extends AbstractMuleTestCase {
+public class ReflectionMuleCoreExtensionDependencyDiscovererTestCase extends AbstractMuleTestCase
+{
 
-  private ReflectionMuleCoreExtensionDependencyDiscoverer dependencyDiscoverer =
-      new ReflectionMuleCoreExtensionDependencyDiscoverer();
+    private ReflectionMuleCoreExtensionDependencyDiscoverer dependencyDiscoverer = new ReflectionMuleCoreExtensionDependencyDiscoverer();
 
-  @Test
-  public void resolvesEmptyDependencies() throws Exception {
-    final List<LinkedMuleCoreExtensionDependency> dependencies = dependencyDiscoverer.findDependencies(new TestCoreExtension());
-    assertThat(dependencies.size(), equalTo(0));
-  }
-
-  @Test
-  public void resolvesSingleDependency() throws Exception {
-    final List<LinkedMuleCoreExtensionDependency> dependencies =
-        dependencyDiscoverer.findDependencies(new DependantTestCoreExtension());
-    assertThat(dependencies.size(), equalTo(1));
-    assertThat((Class<TestCoreExtension>) dependencies.get(0).getDependencyClass(), equalTo(TestCoreExtension.class));
-    assertThat(dependencies.get(0).getDependantMethod().getName(), equalTo("setTestCoreExtension"));
-  }
-
-  public static class AbstractTestCoreExtension implements MuleCoreExtension {
-
-    @Override
-    public void dispose() {}
-
-    @Override
-    public void initialise() throws InitialisationException {}
-
-    @Override
-    public String getName() {
-      return null;
+    @Test
+    public void resolvesEmptyDependencies() throws Exception
+    {
+        final List<LinkedMuleCoreExtensionDependency> dependencies = dependencyDiscoverer.findDependencies(new TestCoreExtension());
+        assertThat(dependencies.size(), equalTo(0));
     }
 
-    @Override
-    public void start() throws MuleException {}
+    @Test
+    public void resolvesSingleDependency() throws Exception
+    {
+        final List<LinkedMuleCoreExtensionDependency> dependencies = dependencyDiscoverer.findDependencies(new DependantTestCoreExtension());
+        assertThat(dependencies.size(), equalTo(1));
+        assertThat((Class<TestCoreExtension>) dependencies.get(0).getDependencyClass(), equalTo(TestCoreExtension.class));
+        assertThat(dependencies.get(0).getDependantMethod().getName(), equalTo("setTestCoreExtension"));
+    }
 
-    @Override
-    public void stop() throws MuleException {}
+    public static class AbstractTestCoreExtension implements MuleCoreExtension
+    {
 
-    @Override
-    public void setContainerClassLoader(ArtifactClassLoader containerClassLoader) {
+        @Override
+        public void dispose()
+        {
+        }
+
+        @Override
+        public void initialise() throws InitialisationException
+        {
+        }
+
+        @Override
+        public String getName()
+        {
+            return null;
+        }
+
+        @Override
+        public void start() throws MuleException
+        {
+        }
+
+        @Override
+        public void stop() throws MuleException
+        {
+        }
+
+        @Override
+        public void setContainerClassLoader(ArtifactClassLoader containerClassLoader)
+        {
+
+        }
+    }
+
+    public static class TestCoreExtension extends AbstractTestCoreExtension
+    {
 
     }
-  }
 
-  public static class TestCoreExtension extends AbstractTestCoreExtension {
+    public static class DependantTestCoreExtension extends AbstractTestCoreExtension
+    {
 
-  }
+        @MuleCoreExtensionDependency
+        public void setTestCoreExtension(TestCoreExtension coreExtension)
+        {
 
-  public static class DependantTestCoreExtension extends AbstractTestCoreExtension {
-
-    @MuleCoreExtensionDependency
-    public void setTestCoreExtension(TestCoreExtension coreExtension) {
-
+        }
     }
-  }
 }

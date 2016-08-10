@@ -11,12 +11,13 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
  *
  * @since 4.0
  */
-interface WithName {
+interface WithName
+{
 
-  /**
-   * Returns the component's name
-   *
-   * @return a non blank {@link String}
-   */
-  String getName();
+    /**
+     * Returns the component's name
+     *
+     * @return a non blank {@link String}
+     */
+    String getName();
 }

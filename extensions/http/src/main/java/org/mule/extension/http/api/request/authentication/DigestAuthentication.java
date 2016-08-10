@@ -14,10 +14,12 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentic
  *
  * @since 4.0
  */
-public class DigestAuthentication extends UsernamePasswordAuthentication {
+public class DigestAuthentication extends UsernamePasswordAuthentication
+{
 
-  @Override
-  public HttpRequestAuthentication buildRequestAuthentication() {
-    return getBaseRequestAuthentication(DIGEST);
-  }
+    @Override
+    public HttpRequestAuthentication buildRequestAuthentication()
+    {
+        return getBaseRequestAuthentication(DIGEST);
+    }
 }

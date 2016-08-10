@@ -12,28 +12,33 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 /**
  * TODO
  */
-public class TestFilter implements Filter {
+public class TestFilter implements Filter
+{
+    private String foo;
+    private int bar;
 
-  private String foo;
-  private int bar;
+    public int getBar()
+    {
+        return bar;
+    }
 
-  public int getBar() {
-    return bar;
-  }
+    public void setBar(int bar)
+    {
+        this.bar = bar;
+    }
 
-  public void setBar(int bar) {
-    this.bar = bar;
-  }
+    public String getFoo()
+    {
+        return foo;
+    }
 
-  public String getFoo() {
-    return foo;
-  }
+    public void setFoo(String foo)
+    {
+        this.foo = foo;
+    }
 
-  public void setFoo(String foo) {
-    this.foo = foo;
-  }
-
-  public boolean accept(MuleMessage message) {
-    return true;
-  }
+    public boolean accept(MuleMessage message)
+    {
+        return true;
+    }
 }

@@ -22,45 +22,54 @@ import org.junit.Test;
 /**
  *
  */
-public class JmsJndiReconnectionTestCase extends FunctionalTestCase {
-
-  @Override
-  protected String getConfigFile() {
-    return "jms-jndi-reconnection-config.xml";
-  }
-
-  @BeforeClass
-  public static void makeInitialContextFail() {
-    JmsTestContextFactory.failWhenRetrievingInitialContext = true;
-  }
-
-  @AfterClass
-  public static void restoreInitialContextState() {
-    JmsTestContextFactory.failWhenRetrievingInitialContext = false;
-  }
-
-  @Test
-  public void testReconnectionWorksWhenInitialContextIsNotAvailable() throws Exception {
-    JmsTestContextFactory.failWhenRetrievingInitialContext = true;
-    try {
-      final JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
-      assertThat(jmsConnector.isConnected(), is(false));
-      JmsTestContextFactory.failWhenRetrievingInitialContext = false;
-      PollingProber prober = new PollingProber(RECEIVE_TIMEOUT, 100);
-      prober.check(new Probe() {
-
-        @Override
-        public boolean isSatisfied() {
-          return jmsConnector.isConnected();
-        }
-
-        @Override
-        public String describeFailure() {
-          return "jms connector should be connected by now.";
-        }
-      });
-    } finally {
-      JmsTestContextFactory.failWhenRetrievingInitialContext = false;
+public class JmsJndiReconnectionTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return "jms-jndi-reconnection-config.xml";
     }
-  }
+
+    @BeforeClass
+    public static void makeInitialContextFail()
+    {
+        JmsTestContextFactory.failWhenRetrievingInitialContext = true;
+    }
+
+    @AfterClass
+    public static void restoreInitialContextState()
+    {
+        JmsTestContextFactory.failWhenRetrievingInitialContext = false;
+    }
+
+    @Test
+    public void testReconnectionWorksWhenInitialContextIsNotAvailable() throws Exception
+    {
+        JmsTestContextFactory.failWhenRetrievingInitialContext = true;
+        try
+        {
+            final JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
+            assertThat(jmsConnector.isConnected(), is(false));
+            JmsTestContextFactory.failWhenRetrievingInitialContext = false;
+            PollingProber prober = new PollingProber(RECEIVE_TIMEOUT,100);
+            prober.check(new Probe()
+            {
+                @Override
+                public boolean isSatisfied()
+                {
+                    return jmsConnector.isConnected();
+                }
+
+                @Override
+                public String describeFailure()
+                {
+                    return "jms connector should be connected by now.";
+                }
+            });
+        }
+        finally
+        {
+            JmsTestContextFactory.failWhenRetrievingInitialContext = false;
+        }
+    }
 }
