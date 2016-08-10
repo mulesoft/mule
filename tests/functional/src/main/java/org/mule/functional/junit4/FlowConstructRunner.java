@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -160,6 +161,28 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    */
   public R withSessionProperty(String key, Object value) {
     eventBuilder.withSessionProperty(key, value);
+
+    return (R) this;
+  }
+
+  /**
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link MuleEvent#getCorrelationId()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public R withSourceCorrelationId(String sourceCorrelationId) {
+    eventBuilder.withSourceCorrelationId(sourceCorrelationId);
+
+    return (R) this;
+  }
+
+  /**
+   * Configures the product event to have the provided {@code correlation}. See {@link MuleEvent#getCorrelation()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public R withCorrelation(Correlation correlation) {
+    eventBuilder.withCorrelation(correlation);
 
     return (R) this;
   }

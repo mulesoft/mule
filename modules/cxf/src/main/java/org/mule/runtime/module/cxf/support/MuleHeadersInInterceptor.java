@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.cxf.support;
 
+import static java.lang.Integer.parseInt;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Set;
@@ -88,19 +91,12 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor {
     }
 
     String corId = (String) message.get(MULE_CORRELATION_ID_PROPERTY);
-    if (corId != null) {
-      builder.correlationId(corId);
-    }
-
     String corGroupSize = (String) message.get(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-    if (corGroupSize != null) {
-      builder.correlationGroupSize(Integer.valueOf(corGroupSize));
-    }
-
     String corSeq = (String) message.get(MULE_CORRELATION_SEQUENCE_PROPERTY);
-    if (corSeq != null) {
-      builder.correlationSequence(Integer.valueOf(corSeq));
-    }
+
+    ((DefaultMuleEvent) reqEvent).setCorrelation(new Correlation(corId, corGroupSize != null ? parseInt(corGroupSize) : null,
+                                                                 corSeq != null ? parseInt(corSeq) : null));
+
     reqEvent.setMessage(builder.build());
   }
 

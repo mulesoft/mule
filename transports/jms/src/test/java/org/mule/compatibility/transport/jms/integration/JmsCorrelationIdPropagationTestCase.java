@@ -8,9 +8,11 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.mule.functional.functional.FlowAssert.verify;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -54,9 +56,9 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message = MuleMessage.builder(event.getMessage()).correlationId(getCid()).build();
-      event.setMessage(message);
-      return message;
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(getCid(), event.getCorrelation().getGroupSize().orElse(null),
+                                                                event.getCorrelation().getSequence().orElse(null)));
+      return event.getMessage();
     }
 
     protected String getCid() {

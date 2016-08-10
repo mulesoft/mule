@@ -7,6 +7,8 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -36,8 +38,8 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     props.put("string", "hello");
     testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
 
-    setCurrentEvent(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext)));
+    setCurrentEvent(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), testObject,
+                                         getTestFlow(), MuleTestUtils.getTestSession(muleContext)));
   }
 
   @Override
@@ -116,10 +118,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
       boolean stringPropertiesAreEqual = compareStringProperties(sourceMuleMessage, resultMuleMessage);
       boolean intPropertiesAreEqual = compareIntProperties(sourceMuleMessage, resultMuleMessage);
 
-      return payloadsAreEqual
-          && objectPropertiesAreEqual
-          && stringPropertiesAreEqual
-          && intPropertiesAreEqual;
+      return payloadsAreEqual && objectPropertiesAreEqual && stringPropertiesAreEqual && intPropertiesAreEqual;
     } else {
       return false;
     }

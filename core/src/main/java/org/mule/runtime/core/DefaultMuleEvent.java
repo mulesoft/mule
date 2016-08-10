@@ -189,6 +189,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                           MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session, int timeout,
                           Credentials credentials, OutputStream outputStream, ReplyToHandler replyToHandler) {
     this.executionContext = executionContext;
+    this.correlation = new Correlation(null, null, null);
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
     this.session = session;
@@ -234,6 +235,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                           MuleSession session, ReplyToHandler replyToHandler, Object replyToDestination,
                           OutputStream outputStream) {
     this.executionContext = executionContext;
+    this.correlation = new Correlation(null, null, null);
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
     this.session = session;
@@ -403,6 +405,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                           MuleSession session, int timeout, Credentials credentials, OutputStream outputStream,
                           boolean transacted, Object replyToDestination, ReplyToHandler replyToHandler) {
     this.executionContext = executionContext;
+    this.correlation = new Correlation(null, null, null);
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
     this.session = session;
@@ -429,6 +432,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                           MuleSession session, int timeout, Credentials credentials, OutputStream outputStream,
                           boolean transacted, boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler) {
     this.executionContext = executionContext;
+    this.correlation = new Correlation(null, null, null);
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
     this.session = session;
@@ -588,6 +592,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     StringBuilder buf = new StringBuilder(64);
     buf.append("MuleEvent: ").append(getId());
     buf.append(", stop processing=").append(isStopFurtherProcessing());
+    buf.append(", correlation=").append(getCorrelation().toString());
     buf.append(", ").append(messageSourceURI);
 
     return buf.toString();
@@ -976,6 +981,11 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public String getCorrelationId() {
     return getExecutionContext().getSourceCorrelationId().orElse(getId());
+  }
+
+  @Override
+  public boolean hasSourceCorrelation() {
+    return getExecutionContext().getSourceCorrelationId().isPresent();
   }
 
   /**

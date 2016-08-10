@@ -163,9 +163,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   protected String getAsyncReplyCorrelationId(MuleEvent event) {
-    // TODO add logic to use also seqNo when present so it works with split messages
-    String correlationId = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
-    return correlationId + event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
+    return event.getCorrelationId() + event.getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
   }
 
   protected void sendAsyncRequest(MuleEvent event) throws MuleException {

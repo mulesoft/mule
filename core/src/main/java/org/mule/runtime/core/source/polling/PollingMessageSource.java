@@ -7,6 +7,8 @@
 package org.mule.runtime.core.source.polling;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;

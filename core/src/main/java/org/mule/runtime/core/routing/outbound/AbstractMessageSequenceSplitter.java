@@ -76,7 +76,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   protected abstract MessageSequence<?> splitMessageIntoSequence(MuleEvent event) throws MuleException;
 
   protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException {
-    String correlationId = originalEvent.getMessage().getCorrelation().getId().orElse(originalEvent.getMessage().getUniqueId());
+    String correlationId = originalEvent.getCorrelationId();
     List<MuleEvent> resultEvents = new ArrayList<>();
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;

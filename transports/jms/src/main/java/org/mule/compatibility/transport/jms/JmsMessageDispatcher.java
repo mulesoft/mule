@@ -360,7 +360,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    * @param event the current MuleEvent
    */
   private String resolveMuleCorrelationId(MuleEvent event) throws JMSException {
-    return event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
+    return event.getCorrelationId();
   }
 
   protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception {

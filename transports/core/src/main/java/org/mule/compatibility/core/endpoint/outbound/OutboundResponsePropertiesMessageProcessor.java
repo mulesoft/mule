@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -44,9 +45,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
         }
       }
 
-      request.getMessage().getCorrelation().getId().ifPresent(v -> builder.correlationId(v));
-      request.getMessage().getCorrelation().getSequence().ifPresent(v -> builder.correlationSequence(v));
-      request.getMessage().getCorrelation().getGroupSize().ifPresent(v -> builder.correlationGroupSize(v));
+      ((DefaultMuleEvent) response).setCorrelation(request.getCorrelation());
 
       response.setMessage(builder.build());
     }

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
@@ -42,7 +43,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
   public void setup() {
     event = mock(MuleEvent.class);
     message = spy(MuleMessage.builder().nullPayload().build());
-    when(message.getCorrelation()).thenReturn(mock(Correlation.class));
+    when(event.getCorrelation()).thenReturn(mock(Correlation.class));
     doAnswer(invocation -> {
       message = (MuleMessage) invocation.getArguments()[0];
       return null;
@@ -79,21 +80,21 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void correlationId() throws Exception {
-    when(message.getCorrelation().getId()).thenReturn(of("3"));
+    when(event.getCorrelation().getId()).thenReturn(of("3"));
     assertEquals("3", evaluate("message.correlation.id.get()", event));
     assertFinalProperty("message.correlation.id.get()=2", event);
   }
 
   @Test
   public void correlationSequence() throws Exception {
-    when(message.getCorrelation().getSequence()).thenReturn(of(4));
+    when(event.getCorrelation().getSequence()).thenReturn(of(4));
     assertEquals(4, evaluate("message.correlation.sequence.get()", event));
     assertFinalProperty("message.correlation.sequence.get()=2", event);
   }
 
   @Test
   public void correlationGroupSize() throws Exception {
-    when(message.getCorrelation().getGroupSize()).thenReturn(of(4));
+    when(event.getCorrelation().getGroupSize()).thenReturn(of(4));
     assertEquals(4, evaluate("message.correlation.groupSize.get()", event));
     assertFinalProperty("message.correlation.groupSize.get()=2", event);
   }

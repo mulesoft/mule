@@ -263,6 +263,11 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
+  public boolean hasSourceCorrelation() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public MuleEvent getParent() {
     throw new UnsupportedOperationException();
   }

@@ -75,9 +75,6 @@ public class MessageChunkAggregator extends AbstractAggregator {
             builder.payload(baos.toByteArray());
           }
 
-          builder.correlationGroupSize(null);
-          builder.correlationSequence(null);
-
           return new DefaultMuleEvent(builder.build(), firstEvent, getMergedSession(events.toArray()));
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);

@@ -19,8 +19,8 @@ public final class CorrelationSequenceComparator implements Comparator<MuleEvent
 
   @Override
   public int compare(MuleEvent event1, MuleEvent event2) {
-    Optional<Integer> val1 = event1.getMessage().getCorrelation().getSequence();
-    Optional<Integer> val2 = event2.getMessage().getCorrelation().getSequence();
+    Optional<Integer> val1 = event1.getCorrelation().getSequence();
+    Optional<Integer> val2 = event2.getCorrelation().getSequence();
 
     if (val1 == val2) {
       return 0;

@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -80,7 +81,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     HttpResponse httpResponse = getHttpResponse(message);
 
-    propagateMessageProperties(httpResponse, message);
+    propagateMessageProperties(httpResponse, message, event.hasSourceCorrelation(), event.getCorrelationId(),
+                               event.getCorrelation());
     checkVersion(message);
     setStatus(httpResponse, event);
     setContentType(httpResponse, event);
@@ -118,22 +120,24 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  private void propagateMessageProperties(HttpResponse response, MuleMessage message) {
+  private void propagateMessageProperties(HttpResponse response, MuleMessage message, boolean hasCorrelation,
+                                          String correlationId, Correlation correlation) {
     copyOutboundProperties(response, message);
     if (propagateMuleProperties) {
-      copyCorrelationIdProperties(response, message);
+      copyCorrelationIdProperties(response, message, hasCorrelation, correlationId, correlation);
       copyReplyToProperty(response, message);
     }
   }
 
-  private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message) {
-    message.getCorrelation().getId().ifPresent(v -> {
-      response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, v));
-      message.getCorrelation().getGroupSize().ifPresent(s -> response
+  private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message, boolean hasCorrelation,
+                                           String correlationId, Correlation correlation) {
+    if (hasCorrelation) {
+      response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, correlationId));
+      correlation.getGroupSize().ifPresent(s -> response
           .setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
-      message.getCorrelation().getSequence()
+      correlation.getSequence()
           .ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
-    });
+    }
   }
 
   private void copyReplyToProperty(HttpResponse response, MuleMessage message) {

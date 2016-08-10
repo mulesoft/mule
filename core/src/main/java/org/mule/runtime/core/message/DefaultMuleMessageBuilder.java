@@ -70,9 +70,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
   private String id;
   private String rootId;
-  private String correlationId;
-  private Integer correlationSequence;
-  private Integer correlationGroupSize;
   private ExceptionPayload exceptionPayload;
 
   private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
@@ -88,9 +85,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
   private void copyMessageAttributes(MuleMessage message) {
     this.id = message.getUniqueId();
-    message.getCorrelation().getId().ifPresent(v -> this.correlationId = v);
-    message.getCorrelation().getSequence().ifPresent(v -> this.correlationSequence = v);
-    message.getCorrelation().getGroupSize().ifPresent(v -> this.correlationGroupSize = v);
     this.rootId = message.getMessageRootId();
     this.exceptionPayload = message.getExceptionPayload();
     message.getInboundPropertyNames().forEach(key -> {
@@ -176,24 +170,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   @Override
   public MuleMessage.Builder attributes(Attributes attributes) {
     this.attributes = attributes;
-    return this;
-  }
-
-  @Override
-  public MuleMessage.Builder correlationId(String correlationId) {
-    this.correlationId = correlationId;
-    return this;
-  }
-
-  @Override
-  public MuleMessage.Builder correlationSequence(Integer correlationSequence) {
-    this.correlationSequence = correlationSequence;
-    return this;
-  }
-
-  @Override
-  public MuleMessage.Builder correlationGroupSize(Integer correlationGroupSize) {
-    this.correlationGroupSize = correlationGroupSize;
     return this;
   }
 
@@ -322,8 +298,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     return new MuleMessageImplementation(id != null ? id : UUID.getUUID(), rootId,
                                          new TypedValue(payload, resolveDataType()), attributes,
                                          inboundProperties, outboundProperties, inboundAttachments,
-                                         outboundAttachments, correlationId, correlationGroupSize,
-                                         correlationSequence, exceptionPayload);
+                                         outboundAttachments, exceptionPayload);
   }
 
   private DataType resolveDataType() {
@@ -365,7 +340,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    private Correlation correlation;
     private transient TypedValue typedValue;
     private Attributes attributes;
 
@@ -376,7 +350,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
                                       Map<String, TypedValue<Serializable>> inboundProperties,
                                       Map<String, TypedValue<Serializable>> outboundProperties,
                                       Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
-                                      String correlationId, Integer correlationGroupSize, Integer correlationSequence,
                                       ExceptionPayload exceptionPayload) {
       this.id = id;
       this.rootId = rootId != null ? rootId : id;
@@ -386,7 +359,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       this.outboundMap.putAll(outboundProperties);
       this.inboundAttachments = inboundAttachments;
       this.outboundAttachments = outboundAttachments;
-      this.correlation = new Correlation(correlationId, correlationGroupSize, correlationSequence);
       this.exceptionPayload = exceptionPayload;
     }
 
@@ -401,11 +373,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     @Override
     public String getMessageRootId() {
       return rootId;
-    }
-
-    @Override
-    public Correlation getCorrelation() {
-      return correlation;
     }
 
     /**
@@ -431,8 +398,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       buf.append("  payload=").append(getDataType().getType().getName());
       buf.append(LINE_SEPARATOR);
       buf.append("  mediaType=").append(getDataType().getMediaType());
-      buf.append(LINE_SEPARATOR);
-      buf.append("  correlation=").append(getCorrelation().toString());
       buf.append(LINE_SEPARATOR);
       buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
       buf.append(LINE_SEPARATOR);

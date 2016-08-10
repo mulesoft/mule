@@ -250,7 +250,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     String logUniqueId = defaultString(logMessage.getUniqueId(), NOT_SET);
 
     String printableLogMessage =
-        format("Message identification summary here: id={0}, correlation={1}", logUniqueId, logMessage.getCorrelation());
+        format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getCorrelation());
 
     logger.error("Failed to dispatch message to error queue after it failed to process.  This may cause message loss. "
         + (event.getMessage() == null ? "" : printableLogMessage), t);

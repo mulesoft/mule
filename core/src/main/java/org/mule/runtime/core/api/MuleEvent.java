@@ -66,6 +66,11 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   String getCorrelationId();
 
   /**
+   * @return {@code true} if the source of this event has set a correlation id (see {@link #getCorrelationId()}).
+   */
+  boolean hasSourceCorrelation();
+
+  /**
    * @return the {@link MuleEvent}
    */
   MuleEvent getParent();

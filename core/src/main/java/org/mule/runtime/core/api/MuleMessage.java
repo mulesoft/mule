@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
@@ -74,13 +73,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
   String getMessageRootId();
 
   /**
-   * Returns the correlation metadata of this message. See {@link Correlation}.
-   * 
-   * @return the correlation metadata of this message.
-   */
-  Correlation getCorrelation();
-
-  /**
    * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
    * and Mule error code, plus any other releated info
    *
@@ -113,24 +105,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
 
     @Override
     Builder attributes(Attributes value);
-
-    /**
-     * @param correlationId
-     * @return this builder.
-     */
-    Builder correlationId(String correlationId);
-
-    /**
-     * @param correlationSequence
-     * @return this builder.
-     */
-    Builder correlationSequence(Integer correlationSequence);
-
-    /**
-     * @param correlationGroupSize
-     * @return this builder.
-     */
-    Builder correlationGroupSize(Integer correlationGroupSize);
 
     /**
      * @param exceptionPayload

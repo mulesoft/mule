@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -49,6 +50,9 @@ public class TestEventBuilder {
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
   private Map<String, Attachment> outboundAttachments = new HashMap<>();
   private Map<String, Object> sessionProperties = new HashMap<>();
+
+  private String sourceCorrelationId = null;
+  private Correlation correlation = null;
 
   private Map<String, Object> flowVariables = new HashMap<>();
 
@@ -189,6 +193,28 @@ public class TestEventBuilder {
   }
 
   /**
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link MuleEvent#getCorrelationId()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public TestEventBuilder withSourceCorrelationId(String sourceCorrelationId) {
+    this.sourceCorrelationId = sourceCorrelationId;
+
+    return this;
+  }
+
+  /**
+   * Configures the product event to have the provided {@code correlation}. See {@link MuleEvent#getCorrelation()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public TestEventBuilder withCorrelation(Correlation correlation) {
+    this.correlation = correlation;
+
+    return this;
+  }
+
+  /**
    * Prepares a flow variable with the given key and value to be set in the product.
    *
    * @param key the key of the flow variable to put
@@ -275,7 +301,7 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), sourceCorrelationId),
                              (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
                              flow, new DefaultMuleSession(), muleContext.getConfiguration().getDefaultResponseTimeout(), null,
                              null, transacted, null, replyToHandler);

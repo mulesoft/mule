@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
@@ -255,14 +256,18 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
+
+    final DefaultMessageExecutionContext executionContext =
+        new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(),
+                                           message.getOutboundProperty(MULE_CORRELATION_ID_PROPERTY, null));
+    message = MuleMessage.builder(message).removeOutboundProperty(MULE_CORRELATION_ID_PROPERTY).build();
+
     if (replyToFromMessage != null) {
       newEvent =
-          new DefaultMuleEvent(new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(), null),
-                               message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
     } else {
       newEvent =
-          new DefaultMuleEvent(new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(), null),
-                               message, flowConstruct, session, null, null, ros);
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null, ros);
     }
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;

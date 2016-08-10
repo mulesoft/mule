@@ -56,7 +56,7 @@ public class MessageContext {
   }
 
   public Correlation getCorrelation() {
-    return event.getMessage().getCorrelation();
+    return event.getCorrelation();
   }
 
   public DataType getDataType() {

@@ -7,6 +7,8 @@
 package org.mule.compatibility.transport.jms;
 
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -169,12 +171,12 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory {
       String value = jmsMessage.getJMSCorrelationID();
       if (value != null) {
         messageBuilder.addInboundProperty(JmsConstants.JMS_CORRELATION_ID, value);
-        messageBuilder.correlationId(value);
+        messageBuilder.addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, value);
       }
 
-      final Serializable mcid = messageProperties.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+      final Serializable mcid = messageProperties.remove(MULE_CORRELATION_ID_PROPERTY);
       if (mcid != null) {
-        messageBuilder.correlationId(mcid.toString());
+        messageBuilder.addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, value);
       }
     } catch (JMSException e) {
       // ignored

@@ -258,7 +258,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private void assertLogicallyEqualEvents(final MuleEvent testEvent, MuleEvent eventReceived) throws MuleException {
     // events have been rewritten so are different but the correlation ID has been carried around
-    assertEquals(testEvent.getMessage().getCorrelation().getId(), eventReceived.getMessage().getCorrelation().getId());
+    assertEquals(testEvent.getCorrelationId(), eventReceived.getCorrelationId());
     // and their payload
     assertEquals(testEvent.getMessageAsString(), eventReceived.getMessageAsString());
   }
