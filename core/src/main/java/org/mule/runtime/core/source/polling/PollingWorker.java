@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -49,7 +50,7 @@ public class PollingWorker implements Work {
   @Override
   public void run() {
     // Make sure we start with a clean slate.
-    RequestContext.clear();
+    setCurrentEvent(null);
     if (task.isStarted()) {
       running = true;
       try {

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.enricher;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -65,7 +65,10 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
   }
 
-  protected void enrich(MuleEvent currentEvent, MuleEvent enrichmentEvent, String sourceExpressionArg, String targetExpressionArg,
+  protected void enrich(MuleEvent currentEvent,
+                        MuleEvent enrichmentEvent,
+                        String sourceExpressionArg,
+                        String targetExpressionArg,
                         ExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
       sourceExpressionArg = "#[payload:]";
@@ -81,8 +84,10 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     if (!StringUtils.isEmpty(targetExpressionArg)) {
       expressionManager.enrichTyped(targetExpressionArg, currentEvent, typedValue);
     } else {
-      currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).payload(typedValue.getValue())
-          .mediaType(typedValue.getDataType().getMediaType()).build());
+      currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage())
+          .payload(typedValue.getValue())
+          .mediaType(typedValue.getDataType().getMediaType())
+          .build());
     }
   }
 
@@ -188,7 +193,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     }
 
     private MuleEvent copyEventForEnrichment(MuleEvent event) {
-      return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+      MuleEvent copy = DefaultMuleEvent.copy(event);
+      setCurrentEvent(copy);
+      return copy;
     }
 
     @Override
@@ -200,7 +207,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
           enrich(eventToEnrich, response, pair.getSource(), pair.getTarget(), expressionManager);
         }
       }
-      return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
+      setCurrentEvent(eventToEnrich);
+      return eventToEnrich;
     }
 
   }

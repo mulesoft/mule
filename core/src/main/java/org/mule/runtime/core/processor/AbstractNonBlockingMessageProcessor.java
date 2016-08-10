@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.DefaultMuleEvent.*;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -34,7 +35,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
       processNonBlocking(event, createNonBlockingCompletionHandler(event));
       // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this
       // thread.
-      RequestContext.clear();
+      setCurrentEvent(null);
       return NonBlockingVoidMuleEvent.getInstance();
     } else {
       return processBlocking(event);

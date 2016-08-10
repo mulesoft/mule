@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.core.component;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -68,10 +68,11 @@ public class BindingInvocationHandler implements InvocationHandler {
       throw new IllegalArgumentException(TransportCoreMessages.cannotFindBindingForMethod(method.getName()).toString());
     }
 
-    MuleEvent currentEvent = RequestContext.getEvent();
+    MuleEvent currentEvent = getCurrentEvent();
     MuleEvent replyEvent = router.process(new DefaultMuleEvent(message, currentEvent));
 
-    if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent) && replyEvent.getMessage() != null) {
+    if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent)
+        && replyEvent.getMessage() != null) {
       MuleMessage reply = replyEvent.getMessage();
       if (reply.getExceptionPayload() != null) {
         throw findDeclaredMethodException(method, reply.getExceptionPayload().getException());

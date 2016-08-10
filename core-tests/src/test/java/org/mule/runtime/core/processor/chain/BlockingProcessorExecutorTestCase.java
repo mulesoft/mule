@@ -15,10 +15,11 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -68,7 +69,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     processors.add(processor2);
     processors.add(processor3);
 
-    OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
 
     when(event.getFlowConstruct()).thenReturn(getTestFlow());
     MuleMessage message = MuleMessage.builder().payload("").build();
@@ -76,8 +77,8 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     when(event.getMessage()).thenReturn(message);
     when(event.getMuleContext()).thenReturn(muleContext);
     when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
-        .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0])
-            .process((MuleEvent) invocation.getArguments()[1]));
+        .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
+            .getArguments()[1]));
     muleContext.setTransformationService(new TransformationService(muleContext));
   }
 
@@ -116,11 +117,11 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
 
     if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE) {
       assertThat(executor.execute().getMessageAsString(), equalTo(RESULT));
-      assertThat(RequestContext.getEvent(), requestResponseMatcher);
+      assertThat(getCurrentEvent(), requestResponseMatcher);
     } else {
       assertThat(executor.execute().getId(), equalTo(event.getId()));
       assertThat(executor.execute().getMessage(), equalTo(event.getMessage()));
-      assertThat(RequestContext.getEvent(), not(sameInstance(event)));
+      assertThat(getCurrentEvent(), not(sameInstance(event)));
     }
 
     assertThat(processor1.event, is(notNullValue()));

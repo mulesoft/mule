@@ -11,10 +11,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
@@ -27,7 +28,8 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
   @Test
   public void testFilterPass() throws Exception {
     TestSecurityFilter securityFilter = new TestSecurityFilter(true);
-    InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter, MessageExchangePattern.REQUEST_RESPONSE, null);
+    InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter,
+                                                         MessageExchangePattern.REQUEST_RESPONSE, null);
     InterceptingMessageProcessor mp = new SecurityFilterMessageProcessor(securityFilter);
     TestListener listner = new TestListener();
     mp.setListener(listner);
@@ -43,7 +45,8 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
   @Test
   public void testFilterFail() throws Exception {
     TestSecurityFilter securityFilter = new TestSecurityFilter(false);
-    InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter, MessageExchangePattern.REQUEST_RESPONSE, null);
+    InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter,
+                                                         MessageExchangePattern.REQUEST_RESPONSE, null);
     InterceptingMessageProcessor mp = new SecurityFilterMessageProcessor(securityFilter);
     TestListener listner = new TestListener();
     mp.setListener(listner);
@@ -51,7 +54,7 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
     MuleEvent inEvent = createTestInboundEvent(endpoint);
 
     // Need event in RequestContext :-(
-    RequestContext.setEvent(inEvent);
+    setCurrentEvent(inEvent);
 
     try {
       mp.process(inEvent);

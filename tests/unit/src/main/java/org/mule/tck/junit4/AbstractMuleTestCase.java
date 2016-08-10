@@ -7,7 +7,8 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -144,7 +145,8 @@ public abstract class AbstractMuleTestCase {
 
   public boolean isOffline(String method) {
     if (offline) {
-      logger.warn(StringMessageUtils.getBoilerPlate("Working offline cannot run test: " + method, '=', 80));
+      logger.warn(StringMessageUtils.getBoilerPlate(
+                                                    "Working offline cannot run test: " + method, '=', 80));
     }
 
     return offline;
@@ -204,7 +206,7 @@ public abstract class AbstractMuleTestCase {
 
   @After
   public final void clearRequestContext() {
-    RequestContext.clear();
+    setCurrentEvent(null);
   }
 
   private static List<String> collectThreadNames() {

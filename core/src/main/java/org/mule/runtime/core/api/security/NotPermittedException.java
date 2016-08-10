@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -25,11 +26,11 @@ public class NotPermittedException extends SecurityException {
   private static final long serialVersionUID = -6664384216189042673L;
 
   public NotPermittedException(Message message) {
-    super(message, RequestContext.getEvent());
+    super(message, getCurrentEvent());
   }
 
   public NotPermittedException(Message message, Throwable cause, MessageProcessor failingMessageProcessor) {
-    super(message, RequestContext.getEvent(), cause, failingMessageProcessor);
+    super(message, getCurrentEvent(), cause, failingMessageProcessor);
   }
 
   public NotPermittedException(Message message, MuleEvent event) {
@@ -44,7 +45,9 @@ public class NotPermittedException extends SecurityException {
     super(constructMessage(context, event.getMessageSourceURI(), filter), event);
   }
 
-  private static Message constructMessage(SecurityContext context, URI endpointURI, SecurityFilter filter) {
+  private static Message constructMessage(SecurityContext context,
+                                          URI endpointURI,
+                                          SecurityFilter filter) {
 
     Message m;
     if (context == null) {

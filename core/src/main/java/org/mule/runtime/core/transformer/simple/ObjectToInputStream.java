@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 
@@ -39,7 +40,7 @@ public class ObjectToInputStream extends SerializableToByteArray {
         OutputHandler oh = (OutputHandler) src;
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        oh.write(RequestContext.getEvent(), out);
+        oh.write(getCurrentEvent(), out);
 
         return new ByteArrayInputStream(out.toByteArray());
       } else {

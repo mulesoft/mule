@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.Credentials;
@@ -48,7 +49,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testEventSerialization() throws Exception {
-    MuleEvent event = RequestContext.setEvent(getTestEvent("payload"));
+    MuleEvent event = getTestEvent("payload");
+    setCurrentEvent(event);
 
     Transformer transformer = createSerializableToByteArrayTransformer();
     transformer.setMuleContext(muleContext);
@@ -139,7 +141,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
       payload.append("1234567890");
     }
     MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
-    RequestContext.setEvent(testEvent);
+    setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 

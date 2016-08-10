@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -62,8 +63,10 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
     super.initialise();
 
     if (expression == null) {
-      throw new InitialisationException(MessageFactory
-          .createStaticMessage("An expression must be supplied to the StandardXPathExtractor"), this);
+      throw new InitialisationException(
+                                        MessageFactory
+                                            .createStaticMessage("An expression must be supplied to the StandardXPathExtractor"),
+                                        this);
     }
 
     if (xpathEvaluator == null) {
@@ -81,7 +84,7 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
 
   @Override
   public Object doTransform(Object src, Charset encoding) throws TransformerException {
-    MuleEvent event = RequestContext.getEvent();
+    MuleEvent event = getCurrentEvent();
     try {
       return xpathEvaluator.evaluate(expression, XMLUtils.toDOMNode(src, event), resultType, event);
     } catch (Exception e) {

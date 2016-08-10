@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.xml.util;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
@@ -236,7 +237,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   @Deprecated
   public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj)
       throws XMLStreamException {
-    return toXMLStreamReader(factory, RequestContext.getEvent(), obj);
+    return toXMLStreamReader(factory, getCurrentEvent(), obj);
   }
 
   /**
@@ -298,7 +299,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
 
   public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception {
     // StaxSource requires that we advance to a start element/document event
-    if (!src.isStartElement() && src.getEventType() != XMLStreamConstants.START_DOCUMENT) {
+    if (!src.isStartElement() &&
+        src.getEventType() != XMLStreamConstants.START_DOCUMENT) {
       src.nextTag();
     }
 
@@ -343,7 +345,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
       OutputHandler handler = ((OutputHandler) src);
       ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-      handler.write(RequestContext.getEvent(), output);
+      handler.write(getCurrentEvent(), output);
 
       return toStreamSource(xmlInputFactory, useStaxSource, new ByteArrayInputStream(output.toByteArray()));
     } else {
@@ -388,7 +390,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else if (src instanceof InputStream) {
       return factory.newDocumentBuilder().parse((InputStream) src);
     } else if (src instanceof String) {
-      return factory.newDocumentBuilder().parse(new InputSource(new StringReader((String) src)));
+      return factory.newDocumentBuilder().parse(
+                                                new InputSource(new StringReader((String) src)));
     } else if (src instanceof XMLStreamReader) {
       XMLStreamReader xsr = (XMLStreamReader) src;
 
@@ -421,7 +424,9 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     copy(reader, writer, false);
   }
 
-  public static void copy(XMLStreamReader reader, XMLStreamWriter writer, boolean fragment) throws XMLStreamException {
+  public static void copy(XMLStreamReader reader, XMLStreamWriter writer,
+                          boolean fragment)
+      throws XMLStreamException {
     // number of elements read in
     int read = 0;
     int event = reader.getEventType();
@@ -454,7 +459,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     }
   }
 
-  private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer) throws XMLStreamException {
+  private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer)
+      throws XMLStreamException {
     String local = reader.getLocalName();
     String uri = reader.getNamespaceURI();
     String prefix = reader.getPrefix();
@@ -523,10 +529,11 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
       if (ns == null || ns.length() == 0) {
         writer.writeAttribute(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
       } else if (nsPrefix == null || nsPrefix.length() == 0) {
-        writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i), reader.getAttributeValue(i));
-      } else {
-        writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
+        writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
                               reader.getAttributeValue(i));
+      } else {
+        writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader
+            .getAttributeLocalName(i), reader.getAttributeValue(i));
       }
 
     }

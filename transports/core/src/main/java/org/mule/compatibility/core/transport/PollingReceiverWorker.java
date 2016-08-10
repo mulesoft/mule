@@ -6,7 +6,8 @@
  */
 package org.mule.compatibility.core.transport;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleException;
 
@@ -35,7 +36,7 @@ public class PollingReceiverWorker implements Work {
   @Override
   public void run() {
     // Make sure we start with a clean slate.
-    RequestContext.clear();
+    setCurrentEvent(null);
     if (receiver.isStarted()) {
       running = true;
       try {

@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.work;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 
 import javax.resource.spi.work.Work;
@@ -42,10 +41,10 @@ public abstract class AbstractMuleEventWork implements Work {
   public final void run() {
     try {
       // Set event in RequestContext now we are in new thread (fresh copy already made in constructor)
-      OptimizedRequestContext.unsafeSetEvent(event);
+      setCurrentEvent(event);
       doRun();
     } finally {
-      RequestContext.clear();
+      setCurrentEvent(null);
     }
   }
 

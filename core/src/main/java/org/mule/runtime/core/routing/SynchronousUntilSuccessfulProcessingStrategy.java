@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -48,7 +48,8 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             }
             finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
           }
-          return OptimizedRequestContext.unsafeSetEvent(finalEvent);
+          setCurrentEvent(finalEvent);
+          return finalEvent;
         } catch (Exception e) {
           logger.info("Exception thrown inside until-successful " + e.getMessage());
           if (logger.isDebugEnabled()) {
@@ -70,7 +71,9 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   }
 
   private MuleEvent copyEventForRetry(MuleEvent event) {
-    return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+    MuleEvent copy = DefaultMuleEvent.copy(event);
+    setCurrentEvent(copy);
+    return copy;
   }
 
 

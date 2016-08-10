@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.routing.CorrelationMode.NEVER;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -37,7 +37,8 @@ import java.util.List;
  * @author flbulgarelli
  * @see AbstractSplitter
  */
-public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor implements MuleContextAware {
+public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor
+    implements MuleContextAware {
 
   protected MuleContext muleContext;
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
@@ -110,7 +111,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       event.setMessage(builder.build());
 
-      MuleEvent resultEvent = processNext(RequestContext.setEvent(event));
+      setCurrentEvent(event);
+      MuleEvent resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);
       }

@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * <code>DefaultMuleEventContext</code> is the context object for the current request. Using the context, developers can
  * send/dispatch/receive events programmatically as well as manage transactions.
  */
+@Deprecated
 public class DefaultMuleEventContext implements MuleEventContext {
 
   /**

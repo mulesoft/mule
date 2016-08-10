@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -128,29 +128,28 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
           logger.warn("Exception occurred processing request:", e);
           sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
         } finally {
-          RequestContext.clear();
+          setCurrentEvent(null);
         }
       }
 
       private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback) {
-        responseCallback.responseReady(
-                                       new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
-                                           .setStatusCode(status.getStatusCode()).setReasonPhrase(status.getReasonPhrase())
-                                           .setEntity(new ByteArrayHttpEntity(message.getBytes())).build(),
-                                       new ResponseStatusCallback() {
+        responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+            .setStatusCode(status.getStatusCode())
+            .setReasonPhrase(status.getReasonPhrase())
+            .setEntity(new ByteArrayHttpEntity(message.getBytes()))
+            .build(), new ResponseStatusCallback() {
 
-                                         @Override
-                                         public void responseSendFailure(Throwable exception) {
-                                           logger.warn("Error while sending {} response {}", status.getStatusCode(),
-                                                       exception.getMessage());
-                                           if (logger.isDebugEnabled()) {
-                                             logger.debug("Exception thrown", exception);
-                                           }
-                                         }
+              @Override
+              public void responseSendFailure(Throwable exception) {
+                logger.warn("Error while sending {} response {}", status.getStatusCode(), exception.getMessage());
+                if (logger.isDebugEnabled()) {
+                  logger.debug("Exception thrown", exception);
+                }
+              }
 
-                                         @Override
-                                         public void responseSendSuccessfully() {}
-                                       });
+              @Override
+              public void responseSendSuccessfully() {}
+            });
       }
     };
   }
@@ -159,7 +158,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     MuleEvent muleEvent =
         HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
     // Update RequestContext ThreadLocal for backwards compatibility
-    OptimizedRequestContext.unsafeSetEvent(muleEvent);
+    setCurrentEvent(muleEvent);
     return muleEvent;
   }
 

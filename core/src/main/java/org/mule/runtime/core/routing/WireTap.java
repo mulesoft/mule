@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
@@ -53,9 +53,9 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
       // Tap should not respond to reply to handler
       // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
       tapEvent = new DefaultMuleEvent(tapEvent, (ReplyToHandler) null);
-      OptimizedRequestContext.unsafeSetEvent(tapEvent);
+      setCurrentEvent(tapEvent);
       filteredTap.process(tapEvent);
-      OptimizedRequestContext.unsafeSetEvent(event);
+      setCurrentEvent(event);
     } catch (MuleException e) {
       logger.error("Exception sending to wiretap output " + tap, e);
     }

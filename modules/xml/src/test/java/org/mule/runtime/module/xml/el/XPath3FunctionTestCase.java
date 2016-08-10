@@ -13,8 +13,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -114,8 +114,9 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   @Test
   public void fromW3CDocument() throws Exception {
-    org.w3c.dom.Document document =
-        DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(ROOT_FOO_BAR)));
+    org.w3c.dom.Document document = DocumentBuilderFactory.newInstance()
+        .newDocumentBuilder()
+        .parse(new InputSource(new StringReader(ROOT_FOO_BAR)));
 
     evaluateFooFromPayload(document);
     evaluateFooFromFlowVar(document);
@@ -162,11 +163,11 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   private Object doEvaluate(String expression, MuleEvent event) throws Exception {
 
-    RequestContext.setEvent(event);
+    setCurrentEvent(event);
     try {
       return evaluate(expression, event);
     } finally {
-      RequestContext.clear();
+      setCurrentEvent(null);
     }
   }
 }

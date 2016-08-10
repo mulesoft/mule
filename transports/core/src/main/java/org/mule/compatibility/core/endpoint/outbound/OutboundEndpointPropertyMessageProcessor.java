@@ -6,11 +6,12 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -36,8 +37,8 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage.Builder messageBuilder =
-        MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
+    MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage())
+        .addOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
 
     if (endpoint.getProperties() != null) {
       for (String prop : endpoint.getProperties().keySet()) {
@@ -55,7 +56,7 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
       }
     }
     event.setMessage(messageBuilder.build());
-    event = OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
     return event;
   }
 

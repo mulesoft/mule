@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.xml.el;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -129,8 +130,10 @@ public class XPath3Function implements ExpressionLanguageFunction {
   private static final Logger LOGGER = LoggerFactory.getLogger(XPath3Function.class);
 
   private static final XPathReturnType DEFAULT_RETURN_TYPE = XPathReturnType.STRING;
-  private static final DataType[] SUPPORTED_TYPES =
-      new DataType[] {DataType.fromType(Document.class), DataType.fromType(Node.class)};
+  private static final DataType[] SUPPORTED_TYPES = new DataType[] {
+      DataType.fromType(Document.class),
+      DataType.fromType(Node.class)
+  };
   private static final String SUPPORTED_TYPES_AS_STRING = Joiner.on(',').join(SUPPORTED_TYPES);
 
   private final MuleContext muleContext;
@@ -169,7 +172,7 @@ public class XPath3Function implements ExpressionLanguageFunction {
   private MuleEvent getMuleEvent(ExpressionLanguageContext context) {
     MuleEvent event = context.getVariable(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE);
     if (event == null) {
-      event = RequestContext.getEvent();
+      event = getCurrentEvent();
     }
 
     checkState(event != null, "Could not obtain MuleEvent");
@@ -188,7 +191,8 @@ public class XPath3Function implements ExpressionLanguageFunction {
     }
 
     if (node == null) {
-      throw new IllegalArgumentException(String.format(
+      throw new IllegalArgumentException(
+                                         String.format(
                                                        "Could not transform input of type '%s' to a supported one. Supported types are '%s'",
                                                        input.getClass().getName(), SUPPORTED_TYPES_AS_STRING));
     }

@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -25,11 +26,11 @@ public class UnauthorisedException extends SecurityException {
   private static final long serialVersionUID = -6664384216189042673L;
 
   public UnauthorisedException(Message message) {
-    super(message, RequestContext.getEvent());
+    super(message, getCurrentEvent());
   }
 
   public UnauthorisedException(Message message, Throwable cause) {
-    super(message, RequestContext.getEvent(), cause);
+    super(message, getCurrentEvent(), cause);
   }
 
   public UnauthorisedException(Message message, MuleEvent event) {
@@ -45,11 +46,13 @@ public class UnauthorisedException extends SecurityException {
   }
 
   @Deprecated
-  public UnauthorisedException(MuleEvent event, SecurityContext context, URI endpointURI, SecurityFilter filter) {
+  public UnauthorisedException(MuleEvent event, SecurityContext context,
+                               URI endpointURI, SecurityFilter filter) {
     super(constructMessage(context, endpointURI, filter), event);
   }
 
-  private static Message constructMessage(SecurityContext context, URI endpointURI, SecurityFilter filter) {
+  private static Message constructMessage(SecurityContext context, URI endpointURI,
+                                          SecurityFilter filter) {
 
     Message m;
     if (context == null) {

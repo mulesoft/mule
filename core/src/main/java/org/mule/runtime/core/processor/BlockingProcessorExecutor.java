@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -77,7 +77,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
       MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
       MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
       if (isUseEventCopy(result)) {
-        OptimizedRequestContext.unsafeSetEvent(copy);
+        setCurrentEvent(copy);
         result = copy;
       }
       return result;

@@ -8,9 +8,9 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -56,7 +56,8 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
    */
   @Override
   @SuppressWarnings(value = {"unchecked"})
-  public MuleEvent aggregateResults(final List<MuleEvent> results, final MuleEvent previous) {
+  public MuleEvent aggregateResults(final List<MuleEvent> results,
+                                    final MuleEvent previous) {
     if (results == null) {
       return null;
     } else if (results.size() == 1) {
@@ -74,7 +75,9 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
       }
     } else {
       List<MuleEvent> nonNullResults = results.stream().filter(object -> {
-        return !VoidMuleEvent.getInstance().equals(object) && object != null && object.getMessage() != null;
+        return !VoidMuleEvent.getInstance().equals(object) &&
+            object != null &&
+            object.getMessage() != null;
       }).collect(toList());
 
       if (nonNullResults.size() == 0) {
@@ -88,23 +91,29 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
   }
 
   private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event) {
-    final MuleMessage coll =
-        MuleMessage.builder().collectionPayload(singletonList(event.getMessage()), MuleMessage.class).build();
+    final MuleMessage coll = MuleMessage.builder()
+        .collectionPayload(singletonList(event.getMessage()), MuleMessage.class)
+        .build();
     event.setMessage(coll);
-    return OptimizedRequestContext.unsafeSetEvent(event);
+    setCurrentEvent(event);
+    return event;
   }
 
-  private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults, final MuleEvent previous) {
+  private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
+                                            final MuleEvent previous) {
     List<MuleMessage> list = new ArrayList<>();
     for (MuleEvent event : nonNullResults) {
       list.add(event.getMessage());
     }
-    final MuleMessage coll =
-        MuleMessage.builder().collectionPayload(list, MuleMessage.class).rootId(previous.getMessage().getMessageRootId()).build();
+    final MuleMessage coll = MuleMessage.builder()
+        .collectionPayload(list, MuleMessage.class)
+        .rootId(previous.getMessage().getMessageRootId())
+        .build();
     MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
     for (String name : previous.getFlowVariableNames()) {
       resultEvent.setFlowVariable(name, previous.getFlowVariable(name), previous.getFlowVariableDataType(name));
     }
-    return OptimizedRequestContext.unsafeSetEvent(resultEvent);
+    setCurrentEvent(resultEvent);
+    return resultEvent;
   }
 }

@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.RequestContext;
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -39,14 +40,19 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
         // Unfortunately a filter causes the whole chain to return null
         // and there's no other way to retrieve the last event but using the RequestContext.
         // see https://www.mulesoft.org/jira/browse/MULE-8670
-        event = RequestContext.getEvent();
+        event = getCurrentEvent();
         if (event == null || VoidMuleEvent.getInstance().equals(event)) {
           return;
         }
       }
-      getNotificationHelper(muleContext.getNotificationManager())
-          .fireNotification(source, event, event.getMessageSourceURI() != null ? event.getMessageSourceURI().toString() : null,
-                            event.getFlowConstruct(), action);
+      getNotificationHelper(muleContext.getNotificationManager()).fireNotification(
+                                                                                   source,
+                                                                                   event,
+                                                                                   event.getMessageSourceURI() != null
+                                                                                       ? event.getMessageSourceURI().toString()
+                                                                                       : null,
+                                                                                   event.getFlowConstruct(),
+                                                                                   action);
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }

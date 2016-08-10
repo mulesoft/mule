@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -59,7 +59,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private MessageProcessor target;
 
-  public AsyncDelegateMessageProcessor(MessageProcessor delegate, ProcessingStrategy processingStrategy, String name) {
+  public AsyncDelegateMessageProcessor(MessageProcessor delegate,
+                                       ProcessingStrategy processingStrategy,
+                                       String name) {
     this.delegate = delegate;
     this.processingStrategy = processingStrategy;
     this.name = name;
@@ -85,7 +87,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
-    processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder, muleContext);
+    processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
+                                           muleContext);
     try {
       target = builder.build();
     } catch (MuleException e) {
@@ -112,9 +115,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     final MuleMessage message = event.getMessage();
     if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getDataType().getType())) {
-      logger.warn(String.format(
-                                "Using 'async' router with consumable payload (%s) may lead to unexpected results."
-                                    + " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
+      logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
+          " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
                                 message.getPayload().getClass().getName()));
     }
 
@@ -122,7 +124,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       // Clone event, make it async and remove ReplyToHandler
       MuleEvent newEvent = new DefaultMuleEvent(message, event, false, false, MessageExchangePattern.ONE_WAY, null);
       // Update RequestContext ThreadLocal for backwards compatibility
-      OptimizedRequestContext.unsafeSetEvent(newEvent);
+      setCurrentEvent(newEvent);
       target.process(newEvent);
     }
     return VoidMuleEvent.getInstance();

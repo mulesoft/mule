@@ -6,8 +6,9 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -288,7 +289,7 @@ public class HttpServerConnection implements HandshakeCompletedListener {
         }
       }
 
-      content.write(RequestContext.getEvent(), outstream);
+      content.write(getCurrentEvent(), outstream);
 
       if (outstream instanceof ChunkedOutputStream) {
         ((ChunkedOutputStream) outstream).finish();
