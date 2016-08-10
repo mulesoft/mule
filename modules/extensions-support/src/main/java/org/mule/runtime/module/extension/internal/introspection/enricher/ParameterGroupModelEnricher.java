@@ -131,7 +131,9 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
    */
   private ParameterGroup toParameterGroup(FieldElement fieldElement) {
     final Type paramGroupType = fieldElement.getType();
-    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaredClass(), fieldElement.getField());
+    final Field field = fieldElement.getField();
+    field.setAccessible(true);
+    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaredClass(), field);
     populateParameterGroup(parameterGroup, paramGroupType);
 
     return parameterGroup;

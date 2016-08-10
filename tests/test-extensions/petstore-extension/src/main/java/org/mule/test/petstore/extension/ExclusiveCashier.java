@@ -8,6 +8,7 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 @ExclusiveOptionals
@@ -23,4 +24,19 @@ public class ExclusiveCashier {
   @Parameter
   @Optional
   private String pensionPlan;
+
+  @ParameterGroup
+  private BankAccount account;
+
+  public String getRothIRA() {
+    return rothIRA;
+  }
+
+  public String getPensionPlan() {
+    return pensionPlan;
+  }
+
+  public BankAccount getAccount() {
+    return account;
+  }
 }

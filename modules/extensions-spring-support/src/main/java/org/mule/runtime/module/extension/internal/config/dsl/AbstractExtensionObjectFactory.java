@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
@@ -27,7 +26,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -140,17 +142,47 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
     }
   }
 
+  /**
+   * Checks that the following conditions are honored:
+   * <ul>
+   * <li>Resolved fields from the parameter group belong to the same class</li>
+   * <li>If there is more than one field set, the parameter group declaring those fields must be a nester parameter group</li>
+   * <li>If set, the "one parameter should be present" condition must be honored</li>
+   * </ul>
+   * 
+   * @param model
+   * @param parameterGroupModelProperty
+   * @param resolverKeys
+   * @throws ConfigurationException if exclusiveness condition is not honored
+   */
   private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty,
                                                 Set<String> resolverKeys)
       throws ConfigurationException {
     for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups()) {
-      Set<String> parametersFromGroup = group.getOptionalParameters().stream().map(p -> p.getName())
-          .filter(name -> resolverKeys.contains(name)).collect(toSet());
+      Multimap<Class<?>, Field> parametersFromGroup = ArrayListMultimap.create();
+      group.getOptionalParameters().stream()
+          .filter(f -> resolverKeys.contains(f.getName()))
+          .forEach(f -> parametersFromGroup.put(f.getDeclaringClass(), f));
 
-      if (parametersFromGroup.size() > 1) {
-        throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
+      group.getModelProperty(ParameterGroupModelProperty.class).ifPresent(mp -> mp.getGroups().stream()
+          .flatMap(g -> ((ParameterGroup<Field>) g).getOptionalParameters().stream())
+          .filter(f -> resolverKeys.contains((f).getName()))
+          .forEach(f -> parametersFromGroup.put(f.getDeclaringClass(), f)));
+
+      if (parametersFromGroup.keySet().size() > 1) {
+        throw new ConfigurationException(createStaticMessage(format("In %s '%s', exclusive parameters cannot be set in different classes: [%s]",
                                                                     getComponentModelTypeName(model), getModelName(model),
-                                                                    Joiner.on(", ").join(parametersFromGroup))));
+                                                                    Joiner.on(", ").join(parametersFromGroup.keySet()))));
+      }
+
+      for (Class<?> declaringParameterGroupClass : parametersFromGroup.keySet()) {
+        if (parametersFromGroup.get(declaringParameterGroupClass).size() > 1
+            && declaringParameterGroupClass.equals(group.getType())) {
+          throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
+                                                                      getComponentModelTypeName(model), getModelName(model),
+                                                                      Joiner.on(", ").join(parametersFromGroup
+                                                                          .get(declaringParameterGroupClass)))));
+        }
       }
 
       if (group.isOneRequired() && parametersFromGroup.isEmpty()) {

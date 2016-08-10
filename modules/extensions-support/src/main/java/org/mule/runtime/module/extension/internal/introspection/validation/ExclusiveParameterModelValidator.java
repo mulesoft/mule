@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
@@ -29,14 +30,15 @@ import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
 
-import java.util.Optional;
-
 /**
  * This validator makes sure that all the {@link ParameterizedModel}s which contains any {@link ParameterGroup} using exclusion
- * complies the following condition:
+ * complies the following conditions:
  * <p>
- * The class of the {@link ParameterGroup} doesn't contain any nested {@link ParameterGroup} or any other parameter of a complex
- * type.
+ *
+ * The {@link ParameterGroup} doesn't have any nested {@link ParameterGroup} that contains exclusive optionals.
+ * 
+ * It must contain more than one optional parameter on its inside, and those optional parameter's {@link MetadataType} must be
+ * either an {@link ObjectType} or a {@link SimpleType}.
  *
  * @since 4.0
  */
@@ -75,18 +77,19 @@ public final class ExclusiveParameterModelValidator implements ModelValidator {
 
   /**
    * @param model to be validated
-   * @throws IllegalModelDefinitionException if there is a nested {@link ParameterGroup} or the parameter {@link MetadataType} is
-   *         not a {@link SimpleType}
+   * @throws IllegalModelDefinitionException if there is a nested {@link ParameterGroup} that has exclusive optionals on its
+   *         inside or the parameter {@link MetadataType} is not a {@link SimpleType} nor a {@link ObjectType}
    */
   private void validateExclusiveParameterGroups(EnrichableModel model) throws IllegalModelDefinitionException {
 
     model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals()).ifPresent(property -> {
       for (ParameterGroup<?> pg : property.getGroups()) {
-        Optional<ParameterGroupModelProperty> nestedParameterGroup = pg.getModelProperty(ParameterGroupModelProperty.class);
-        if (nestedParameterGroup.isPresent()) {
-          throw new IllegalModelDefinitionException(format("Parameter group of class '%s' is annotated with '%s' so it cannot contain any nested parameter group on its inside.",
-                                                           pg.getType().getName(), ExclusiveOptionals.class.getName()));
-        }
+        pg.getModelProperty(ParameterGroupModelProperty.class)
+            .filter(ParameterGroupModelProperty::hasExclusiveOptionals)
+            .ifPresent(nestedParameterGroup -> {
+              throw new IllegalModelDefinitionException(format("Parameter group of class '%s' is annotated with '%s' so it cannot contain any nested parameter group with exclusive optionals on its inside.",
+                                                               pg.getType().getName(), ExclusiveOptionals.class.getName()));
+            });
 
         long optionalParametersCount = pg.getOptionalParameters().stream().count();
         if (optionalParametersCount <= 1) {
@@ -106,6 +109,9 @@ public final class ExclusiveParameterModelValidator implements ModelValidator {
 
           @Override
           public void visitSimpleType(SimpleType simpleType) {}
+
+          @Override
+          public void visitObject(ObjectType objectType) {}
         }));
       }
     });

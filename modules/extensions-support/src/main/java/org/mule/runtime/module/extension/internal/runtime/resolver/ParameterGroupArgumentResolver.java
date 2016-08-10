@@ -64,6 +64,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   public T resolve(OperationContext operationContext) {
     try {
       T parameterGroup = (T) group.getType().newInstance();
+
       for (Field parameterField : group.getParameters()) {
         final String parameterName = parameterField.getName();
         if (operationContext.hasParameter(parameterName)) {
@@ -72,7 +73,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
       }
 
       for (ParameterGroupArgumentResolver<?> childResolver : childResolvers) {
-        childResolver.resolve(operationContext);
+        ((Field) childResolver.getContainer()).set(parameterGroup, childResolver.resolve(operationContext));
       }
 
       return parameterGroup;
