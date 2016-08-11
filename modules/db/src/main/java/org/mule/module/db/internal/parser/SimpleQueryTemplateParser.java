@@ -190,20 +190,25 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
             }
             else if (currentChar == ':')
             {
-                String parameter;
+                if (tokenEnd < sqlTextChars.length && '=' == sqlTextChars[tokenEnd]) {
+                  sqlToUse = sqlToUse + currentChar;
+                  tokenStart++;
+                } else {
+                    String parameter;
 
-                while (tokenEnd < sqlTextChars.length && !isParameterSeparator(sqlTextChars[tokenEnd]))
-                {
-                    tokenEnd++;
+                    while (tokenEnd < sqlTextChars.length && !isParameterSeparator(sqlTextChars[tokenEnd]))
+                    {
+                        tokenEnd++;
+                    }
+                    if (tokenEnd - tokenStart > 1)
+                    {
+                        sqlToUse = sqlToUse + "?";
+                        parameter = sqlText.substring(tokenStart + 1, tokenEnd);
+                        QueryParam inputParam = new DefaultInputQueryParam(paramIndex++, UnknownDbType.getInstance(), null, parameter);
+                        parameterList.add(inputParam);
+                    }
+                    tokenStart = tokenEnd;
                 }
-                if (tokenEnd - tokenStart > 1)
-                {
-                    sqlToUse = sqlToUse + "?";
-                    parameter = sqlText.substring(tokenStart + 1, tokenEnd);
-                    QueryParam inputParam = new DefaultInputQueryParam(paramIndex++, UnknownDbType.getInstance(), null, parameter);
-                    parameterList.add(inputParam);
-                }
-                tokenStart = tokenEnd;
             }
             else if (isParamChar(currentChar))
             {
