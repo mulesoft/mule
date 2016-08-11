@@ -6,17 +6,21 @@
  */
 package org.mule.test.config.spring;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class BeanProfileTwoTestCase extends AbstractBeanProfileTestCase {
+@Ignore("MULE-10198")
+public class BeanProfileTwoTestCase extends AbstractBeanProfileTestCase
+{
+    @Override
+    protected String getConfigFile()
+    {
+        return getConfigFile("two");
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return getConfigFile("two");
-  }
-
-  @Test
-  public void profileOne() throws Exception {
-    profile("Simpson");
-  }
+    @Test
+    public void profileOne() throws Exception
+    {
+        profile("Simpson");
+    }
 }
