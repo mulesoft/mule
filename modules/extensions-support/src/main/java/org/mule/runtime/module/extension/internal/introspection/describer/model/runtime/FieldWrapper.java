@@ -94,4 +94,17 @@ public class FieldWrapper implements FieldElement {
   public String getOwnerDescription() {
     return format("Class: '%s'", field.getDeclaringClass().getSimpleName());
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FieldWrapper) {
+      return ((FieldWrapper) obj).getField().equals(field);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return field.hashCode();
+  }
 }
