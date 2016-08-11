@@ -371,7 +371,16 @@ public final class AnnotationsBasedDescriber implements Describer {
         }
 
         if (!annotatedParameters.isEmpty()) {
-          declareParameters(component, annotatedParameters, contributors, extensionParameter);
+          if (extensionParameter.equals(parameterGroupOwner)) {
+            throw new IllegalParameterModelDefinitionException(String
+                .format("@%s cannot be applied recursively within the same class but field '%s' was found inside class '%s'",
+                        org.mule.runtime.extension.api.annotation.ParameterGroup.class.getSimpleName(),
+                        parameterGroupOwner.getName(),
+                        parameterGroupOwner.getType().getName()));
+          } else {
+            declareParameters(component, annotatedParameters, contributors, extensionParameter);
+          }
+
         } else {
           declareParameters(component, getFieldsWithGetterAndSetters(type.getDeclaredClass()).stream().map(FieldWrapper::new)
               .collect(toList()), contributors, extensionParameter);

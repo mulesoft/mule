@@ -70,6 +70,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
@@ -188,11 +189,18 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         .describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test(expected = IllegalParameterModelDefinitionException.class)
   public void heisenbergWithParameterGroupAsOptional() throws Exception {
     describerFor(HeisenbergWithParameterGroupAsOptional.class)
         .describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
   }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void heisenbergWithRecursiveParameterGroup() throws Exception {
+    describerFor(HeisenbergWithRecursiveParameterGroup.class)
+        .describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
+  }
+
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void heisenbergWithMoreThanOneConfigInOperation() throws Exception {
@@ -619,6 +627,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   }
 
   @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+  public static class HeisenbergWithRecursiveParameterGroup extends HeisenbergExtension {
+
+    @ParameterGroup
+    private RecursiveParameterGroup group;
+
+  }
+
+  @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
   @Operations(HeisenbergAlternateConfig.class)
   @Configurations(HeisenbergAlternateConfig.class)
   public static class HeisenbergWithSameOperationsAndConfigs extends HeisenbergExtension {
@@ -686,5 +702,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void setExtendedProperty(String extendedProperty) {
       this.extendedProperty = extendedProperty;
     }
+  }
+
+  private static class RecursiveParameterGroup {
+
+    @ParameterGroup
+    private RecursiveParameterGroup recursiveParameterGroup;
   }
 }
