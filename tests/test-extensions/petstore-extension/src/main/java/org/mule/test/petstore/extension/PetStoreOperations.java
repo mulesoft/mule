@@ -29,6 +29,10 @@ public class PetStoreOperations {
     return breeder;
   }
 
+  public ExclusiveCashier getCashier(@ParameterGroup ExclusiveCashier cashier) {
+    return cashier;
+  }
+
   public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, MuleEvent event) throws Exception {
     CountDownLatch countDownLatch = event.getFlowVariable("testLatch");
     if (countDownLatch != null) {

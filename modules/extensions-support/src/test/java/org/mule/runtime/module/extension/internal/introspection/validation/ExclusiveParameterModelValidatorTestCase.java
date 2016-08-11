@@ -41,11 +41,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidExclusionWithNestedPojo() throws Exception {
-    validate(InvalidExtensionWithNestedPojo.class);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
   public void invalidExclusionWithNestedGroup() throws Exception {
     validate(InvalidExtensionWithNestedGroup.class);
   }
@@ -77,13 +72,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
     @ParameterGroup
     private ExclusionWithoutOneOptionalParameters group;
-  }
-
-  @Extension(name = "InvalidExtensionWithNestedPojo")
-  public static class InvalidExtensionWithNestedPojo {
-
-    @ParameterGroup
-    private ExclusionWithNestedPojo group;
   }
 
   @Extension(name = "InvalidExtensionWithNestedGroup")
@@ -120,6 +108,9 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     @Parameter
     @Optional
     private String anotherValidType;
+
+    @ParameterGroup
+    private SimplePojo simplePojo;
   }
 
   @ExclusiveOptionals
@@ -160,7 +151,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     private Integer otherValidType;
 
     @ParameterGroup
-    private SimplePojo nesterGroup;
+    private ExclusivePojo nesterGroup;
   }
 
   @ExclusiveOptionals
@@ -172,6 +163,14 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     @Parameter
     @Optional
     private Integer lonelyOptional;
+  }
+
+  @ExclusiveOptionals
+  public static class ExclusivePojo {
+
+    @Parameter
+    private Integer number;
+
   }
 
   public static class SimplePojo {
