@@ -20,12 +20,12 @@ import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFact
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.DefaultArtifactPluginRepository;
-import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.launcher.service.MuleServiceManager;
-import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
-import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.MuleServiceManager;
+import org.mule.runtime.module.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.service.ReflectionServiceResolver;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.

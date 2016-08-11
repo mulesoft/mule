@@ -14,7 +14,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
+import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;

@@ -15,7 +15,7 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.launcher.service.ServiceRepository;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.IOException;
 import java.util.Collections;

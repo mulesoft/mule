@@ -11,13 +11,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getExecutionFolder;
-
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

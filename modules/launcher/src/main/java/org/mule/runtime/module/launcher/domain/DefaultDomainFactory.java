@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher.domain;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;

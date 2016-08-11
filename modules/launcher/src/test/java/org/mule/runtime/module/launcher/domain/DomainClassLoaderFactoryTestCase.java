@@ -7,14 +7,13 @@
 package org.mule.runtime.module.launcher.domain;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMuleLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -24,7 +23,6 @@ import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Test;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
@@ -14,7 +15,6 @@ import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinder;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
 

@@ -28,7 +28,7 @@ import org.mule.runtime.module.launcher.MuleDeploymentService;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
-import org.mule.runtime.module.launcher.service.ServiceManager;
+import org.mule.runtime.module.service.ServiceManager;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;

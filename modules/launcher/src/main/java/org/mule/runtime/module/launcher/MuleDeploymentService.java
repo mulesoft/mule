@@ -15,13 +15,6 @@ import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.domain.DefaultDomainFactory;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainFactory;
-import org.mule.runtime.module.launcher.domain.DomainManager;
-import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.launcher.plugin.DefaultArtifactPluginRepository;
-import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
 import org.mule.runtime.module.launcher.util.ObservableList;
 

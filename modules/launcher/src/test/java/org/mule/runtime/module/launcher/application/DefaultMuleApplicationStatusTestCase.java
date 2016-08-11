@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.launcher.service.ServiceRepository;
+import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

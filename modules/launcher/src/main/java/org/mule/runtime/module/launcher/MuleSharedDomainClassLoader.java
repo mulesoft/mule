@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.launcher.nativelib;
 
-import org.mule.runtime.module.launcher.MuleFoldersUtil;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 
 /**
  * Creates {@link NativeLibraryFinder}

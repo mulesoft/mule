@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.domain;
 
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import org.mule.runtime.module.launcher.artifact.ArtifactStartedSplashScreen;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
