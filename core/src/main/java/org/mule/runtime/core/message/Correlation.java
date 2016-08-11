@@ -44,14 +44,9 @@ public class Correlation implements Serializable {
   }
 
   /**
-   * The correlation Id can be used by components in the system to manage message relations.
-   * <p>
-   * The id is associated with the message using the underlying transport protocol. As such not all messages will support the
-   * notion of a id i.e. tcp or file. In this situation the correlation Id is set as a property of the message where it's up to
-   * developer to keep the association with the message. For example if the message is serialised to xml the id will be available
-   * in the message.
+   * If present, this id will take precedence over any correlationId already set for the event.
    *
-   * @return the id for this message or null value if one hasn't been set
+   * @return the correlation id for this event or null value if one hasn't been set
    */
   public Optional<String> getId() {
     return ofNullable(id);

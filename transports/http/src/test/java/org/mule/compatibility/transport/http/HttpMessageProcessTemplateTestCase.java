@@ -17,6 +17,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_X_FORWARDED_FOR;
+
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -74,7 +76,8 @@ public class HttpMessageProcessTemplateTestCase {
             .addInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "/").build();
 
     when(messageReceiver.getEndpoint().getEncoding()).thenReturn(ENCODING);
-    when(messageReceiver.createMuleMessage(any(), any())).thenAnswer(invocation -> message);
+    when(messageReceiver.createMuleMessage(any(), any()))
+        .thenAnswer(invocation -> new MuleCompatibilityMessageBuilder(message).build());
     when(messageReceiver.getEndpoint().getEndpointURI().getAddress()).thenReturn("http://127.0.0.1/");
   }
 

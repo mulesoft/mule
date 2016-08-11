@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.Correlation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -25,8 +24,7 @@ import javax.activation.DataHandler;
  * <li><b>id</b> <i>The unique message id</i>
  * <li><b>rootId</b> <i>The root message id. The id of the message before being split into parts. If was is not split then this
  * value is the same as the id.</i>
- * <li><b>correlation</b> <i>The message correlation infromation.</i>
- * <li><b>correlationId</b> <i>The message correlationId.</i>
+ * <li><b>correlationId</b> <i>The event correlationId.</i>
  * <li><b>dataType</b> <i>The message data type (org.mule.runtime.core.api.transformer.DataType).</i>
  * <li><b>replyTo</b> <i>The message reply to destination. (mutable)</i>
  * <li><b>payload</b> <i>The message payload (mutable). You can also use message.payloadAs(Class clazz). Note: If the message
@@ -52,10 +50,6 @@ public class MessageContext {
 
   public String getRootId() {
     return event.getMessage().getMessageRootId();
-  }
-
-  public Correlation getCorrelation() {
-    return event.getCorrelation();
   }
 
   public String getCorrelationId() {
