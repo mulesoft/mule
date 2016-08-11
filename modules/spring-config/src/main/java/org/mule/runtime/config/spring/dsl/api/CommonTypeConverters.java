@@ -19,24 +19,19 @@ import org.springframework.util.ClassUtils;
  *
  * @since 4.0
  */
-public class CommonTypeConverters
-{
+public class CommonTypeConverters {
 
-    /**
-     * @return a converter that transforms class name to a {@code Class} instance.
-     */
-    public static TypeConverter<String, Class> stringToClassConverter()
-    {
-        return className -> {
-            try
-            {
-                return forName(className, currentThread().getContextClassLoader());
-            }
-            catch (ClassNotFoundException e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        };
-    }
+  /**
+   * @return a converter that transforms class name to a {@code Class} instance.
+   */
+  public static TypeConverter<String, Class> stringToClassConverter() {
+    return className -> {
+      try {
+        return forName(className, currentThread().getContextClassLoader());
+      } catch (ClassNotFoundException e) {
+        throw new MuleRuntimeException(e);
+      }
+    };
+  }
 
 }

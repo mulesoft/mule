@@ -39,55 +39,48 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  *
  * @since 4.0
  */
-public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator
-{
+public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    private static final String REF_ATTRIBUTE = "ref";
-    private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers = new ImmutableMap.Builder()
-            .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
-            .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
-            .put(TRANSFORMER_IDENTIFIER, getConsumer())
-            .build();
+  private static final String REF_ATTRIBUTE = "ref";
+  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers = new ImmutableMap.Builder()
+      .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
+      .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
+      .put(TRANSFORMER_IDENTIFIER, getConsumer())
+      .build();
 
-    private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer()
-    {
-        return getFixedConsumer(MessageProcessor.class);
+  private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
+    return getFixedConsumer(MessageProcessor.class);
+  }
+
+  private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer() {
+    return getFixedConsumer(QueueStore.class);
+  }
+
+  private Consumer<CreateBeanDefinitionRequest> getConsumer() {
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
+      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REF_ATTRIBUTE)));
+      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+      componentModel.setType(objectTypeVisitor.getType());
+    };
+  }
+
+  private Consumer<CreateBeanDefinitionRequest> getFixedConsumer(Class<?> componentModelType) {
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
+      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get("ref")));
+      componentModel.setType(componentModelType);
+    };
+  }
+
+  @Override
+  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    if (referenceConsumers.containsKey(componentModel.getIdentifier())) {
+      referenceConsumers.get(componentModel.getIdentifier()).accept(createBeanDefinitionRequest);
+      return true;
     }
-
-    private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer()
-    {
-        return getFixedConsumer(QueueStore.class);
-    }
-
-    private Consumer<CreateBeanDefinitionRequest> getConsumer()
-    {
-        return (beanDefinitionRequest) -> {
-            ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
-            componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REF_ATTRIBUTE)));
-            ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-            beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
-            componentModel.setType(objectTypeVisitor.getType());
-        };
-    }
-
-    private Consumer<CreateBeanDefinitionRequest> getFixedConsumer(Class<?> componentModelType)
-    {
-        return (beanDefinitionRequest) -> {
-            ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
-            componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get("ref")));
-            componentModel.setType(componentModelType);
-        };
-    }
-
-    @Override
-    boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        if (referenceConsumers.containsKey(componentModel.getIdentifier()))
-        {
-            referenceConsumers.get(componentModel.getIdentifier()).accept(createBeanDefinitionRequest);
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }

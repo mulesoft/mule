@@ -25,48 +25,38 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<AbstractTransformer>
-{
+public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<AbstractTransformer> {
 
-    private Class<?> getReturnType(String returnClass)
-    {
-        Class<?> returnType = Object.class;
-        if (returnClass != null)
-        {
-            try
-            {
-                returnType = ClassUtils.getClass(returnClass);
-            }
-            catch (ClassNotFoundException e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }
-        return returnType;
+  private Class<?> getReturnType(String returnClass) {
+    Class<?> returnType = Object.class;
+    if (returnClass != null) {
+      try {
+        returnType = ClassUtils.getClass(returnClass);
+      } catch (ClassNotFoundException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
+    return returnType;
+  }
 
-    @Override
-    public void configure(AbstractTransformer transformerInstance, Map<String, Object> parameters)
-    {
-        String returnClass = (String) parameters.get("returnClass");
-        String mimeType = (String) parameters.get("mimeType");
-        String name = (String) parameters.get("name");
-        String encoding = (String) parameters.get("encoding");
-        Boolean ignoreBadInput = (Boolean) parameters.get("ignoreBadInput");
-        if (returnClass != null || mimeType != null)
-        {
-            DataTypeParamsBuilder builder = DataType.builder().type(getReturnType(returnClass));
-            if (isNotEmpty(mimeType))
-            {
-                builder.mediaType(mimeType);
-            }
-            transformerInstance.setReturnDataType(builder.charset(encoding).build());
-        }
-        if (ignoreBadInput != null)
-        {
-            transformerInstance.setIgnoreBadInput(ignoreBadInput);
-        }
-        transformerInstance.setName(name);
+  @Override
+  public void configure(AbstractTransformer transformerInstance, Map<String, Object> parameters) {
+    String returnClass = (String) parameters.get("returnClass");
+    String mimeType = (String) parameters.get("mimeType");
+    String name = (String) parameters.get("name");
+    String encoding = (String) parameters.get("encoding");
+    Boolean ignoreBadInput = (Boolean) parameters.get("ignoreBadInput");
+    if (returnClass != null || mimeType != null) {
+      DataTypeParamsBuilder builder = DataType.builder().type(getReturnType(returnClass));
+      if (isNotEmpty(mimeType)) {
+        builder.mediaType(mimeType);
+      }
+      transformerInstance.setReturnDataType(builder.charset(encoding).build());
     }
+    if (ignoreBadInput != null) {
+      transformerInstance.setIgnoreBadInput(ignoreBadInput);
+    }
+    transformerInstance.setName(name);
+  }
 
 }

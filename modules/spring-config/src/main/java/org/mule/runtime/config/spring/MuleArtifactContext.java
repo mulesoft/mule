@@ -91,8 +91,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * that allows resources to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  */
-public class MuleArtifactContext extends AbstractXmlApplicationContext
-{
+public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   /**
    * Indicates that XSD validation should be used (found no "DOCTYPE" declaration).
@@ -101,7 +100,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
   private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
-  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
+  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
+      new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
   private final ArtifactConfiguration artifactConfiguration;
@@ -125,13 +125,17 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}  @see org.mule.runtime.config.spring.SpringRegistry
    * @since 3.7.0
    */
-  public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType) throws BeansException
-  {
-    this(muleContext, convert(artifactConfigResources), artifactConfiguration, optionalObjectsController, artifactProperties, artifactType);
+  public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
+                             ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
+                             Map<String, String> artifactProperties, ArtifactType artifactType)
+      throws BeansException {
+    this(muleContext, convert(artifactConfigResources), artifactConfiguration, optionalObjectsController, artifactProperties,
+         artifactType);
   }
 
-  public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType)
-  {
+  public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
+                             ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
+                             Map<String, String> artifactProperties, ArtifactType artifactType) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -142,7 +146,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
       componentBuildingDefinitionProvider.init(muleContext);
-      componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream().forEach(componentBuildingDefinitionRegistry::register);
+      componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
+          .forEach(componentBuildingDefinitionRegistry::register);
     });
 
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
@@ -153,72 +158,58 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     determineIfOnlyNewParsingMechanismCanBeUsed();
   }
 
-  private void determineIfOnlyNewParsingMechanismCanBeUsed()
-  {
-    if (applicationModel.hasSpringConfig())
-    {
+  private void determineIfOnlyNewParsingMechanismCanBeUsed() {
+    if (applicationModel.hasSpringConfig()) {
       useNewParsingMechanism = false;
       return;
     }
     applicationModel.executeOnEveryComponentTree(componentModel -> {
       Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
-              .flatMap(parentComponentModel ->
-                               Optional.ofNullable(parentComponentModel.getIdentifier())
-              );
-      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional))
-      {
+          .flatMap(parentComponentModel -> Optional.ofNullable(parentComponentModel.getIdentifier()));
+      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         useNewParsingMechanism = false;
       }
     });
   }
 
-  private void createApplicationModel()
-  {
-    try
-    {
+  private void createApplicationModel() {
+    try {
       ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
       applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
-      for (Resource springResource : artifactConfigResources)
-      {
+      for (Resource springResource : artifactConfigResources) {
         Document document = getXmlDocument(springResource);
         ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
         applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
       }
       applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
-      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration, Optional.of(componentBuildingDefinitionRegistry));
-    }
-    catch (Exception e)
-    {
+      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration,
+                                              Optional.of(componentBuildingDefinitionRegistry));
+    } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private String getFilename(Resource resource)
-  {
-    if (resource instanceof ByteArrayResource)
-    {
+  private String getFilename(Resource resource) {
+    if (resource instanceof ByteArrayResource) {
       return resource.getDescription();
     }
     return resource.getFilename();
   }
 
-  private Document getXmlDocument(Resource artifactResource)
-  {
-    try
-    {
+  private Document getXmlDocument(Resource artifactResource) {
+    try {
       Document document = new MuleDocumentLoader()
-              .loadDocument(new InputSource(artifactResource.getInputStream()), new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader()), new DefaultHandler(), VALIDATION_XSD, true);
+          .loadDocument(new InputSource(artifactResource.getInputStream()),
+                        new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader()), new DefaultHandler(),
+                        VALIDATION_XSD, true);
       return document;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   @Override
-  protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
-  {
+  protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
 
     registerEditors(beanFactory);
@@ -227,46 +218,41 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                           new MuleContextPostProcessor(muleContext),
                           new GlobalNamePostProcessor(),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
-                          new DiscardedOptionalBeanPostProcessor(optionalObjectsController, (DefaultListableBeanFactory) beanFactory),
-                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
-    );
+                          new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
+                                                                 (DefaultListableBeanFactory) beanFactory),
+                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
   }
 
-  private void registerEditors(ConfigurableListableBeanFactory beanFactory)
-  {
+  private void registerEditors(ConfigurableListableBeanFactory beanFactory) {
     MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
     registrar.setMuleContext(muleContext);
     beanFactory.addPropertyEditorRegistrar(registrar);
   }
 
-  private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
-  {
-    for (BeanPostProcessor processor : processors)
-    {
+  private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors) {
+    for (BeanPostProcessor processor : processors) {
       beanFactory.addBeanPostProcessor(processor);
     }
   }
 
-  private static Resource[] convert(ConfigResource[] resources)
-  {
+  @Override
+  public void close() {
+    super.close();
+    beanDefinitionFactory.destroy();
+  }
+
+  private static Resource[] convert(ConfigResource[] resources) {
     Resource[] configResources = new Resource[resources.length];
-    for (int i = 0; i < resources.length; i++)
-    {
+    for (int i = 0; i < resources.length; i++) {
       ConfigResource resource = resources[i];
-      if (resource.getUrl() != null)
-      {
+      if (resource.getUrl() != null) {
         configResources[i] = new UrlResource(resource.getUrl());
-      }
-      else
-      {
-        try
-        {
+      } else {
+        try {
           configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()), resource.getResourceName());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
@@ -275,78 +261,72 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
   }
 
   @Override
-  protected Resource[] getConfigResources()
-  {
+  protected Resource[] getConfigResources() {
     return addAll(artifactConfigResources);
   }
 
   @Override
-  protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
-  {
+  protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
     BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
     // Communicate mule context to parsers
-    try
-    {
+    try {
       currentMuleContext.set(muleContext);
-      if (useNewParsingMechanism)
-      {
+      if (useNewParsingMechanism) {
         applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
-          if (componentModel.isRoot())
-          {
-            beanDefinitionFactory.resolveComponentRecursively(applicationModel.getRootComponentModel(), componentModel, beanFactory,
+          if (componentModel.isRoot()) {
+            beanDefinitionFactory.resolveComponentRecursively(applicationModel.getRootComponentModel(), componentModel,
+                                                              beanFactory,
                                                               (resolvedComponentModel, registry) -> {
-                                                                if (resolvedComponentModel.isRoot())
-                                                                {
-                                                                  String nameAttribute = resolvedComponentModel.getNameAttribute();
-                                                                  if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER))
-                                                                  {
+                                                                if (resolvedComponentModel.isRoot()) {
+                                                                  String nameAttribute =
+                                                                      resolvedComponentModel.getNameAttribute();
+                                                                  if (resolvedComponentModel.getIdentifier()
+                                                                      .equals(CONFIGURATION_IDENTIFIER)) {
                                                                     nameAttribute = OBJECT_MULE_CONFIGURATION;
-                                                                  }
-                                                                  else if (nameAttribute == null)
-                                                                  {
+                                                                  } else if (nameAttribute == null) {
                                                                     //This may be a configuration that does not requires a name.
-                                                                    nameAttribute = uniqueValue(resolvedComponentModel.getBeanDefinition().getBeanClassName());
+                                                                    nameAttribute = uniqueValue(resolvedComponentModel
+                                                                        .getBeanDefinition().getBeanClassName());
                                                                   }
-                                                                  registry.registerBeanDefinition(nameAttribute, resolvedComponentModel.getBeanDefinition());
-                                                                  postProcessBeanDefinition(componentModel, registry, nameAttribute);
+                                                                  registry.registerBeanDefinition(nameAttribute,
+                                                                                                  resolvedComponentModel
+                                                                                                      .getBeanDefinition());
+                                                                  postProcessBeanDefinition(componentModel, registry,
+                                                                                            nameAttribute);
                                                                 }
                                                               }, null);
           }
         });
-      }
-      else
-      {
+      } else {
         beanDefinitionReader.loadBeanDefinitions(getConfigResources());
       }
-    }
-    finally
-    {
+    } finally {
       currentMuleContext.remove();
     }
   }
 
   @Override
-  protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory)
-  {
+  protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory).createArtifactServices();
+    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory)
+        .createArtifactServices();
   }
 
   @Override
-  protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
-  {
-    Optional<ComponentModel> configurationOptional = applicationModel.findComponentDefinitionModel(ApplicationModel.CONFIGURATION_IDENTIFIER);
-    if (configurationOptional.isPresent())
-    {
+  protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+    Optional<ComponentModel> configurationOptional =
+        applicationModel.findComponentDefinitionModel(ApplicationModel.CONFIGURATION_IDENTIFIER);
+    if (configurationOptional.isPresent()) {
       return;
     }
     BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-    beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION, genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
+    beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+                                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
-  protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
-  {
-    beanDefinitionReader = new MuleXmlBeanDefinitionReader(beanFactory, createBeanDefinitionDocumentReader(beanDefinitionFactory));
+  protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory) {
+    beanDefinitionReader =
+        new MuleXmlBeanDefinitionReader(beanFactory, createBeanDefinitionDocumentReader(beanDefinitionFactory));
     // annotate parsed elements with metadata
     beanDefinitionReader.setDocumentLoader(createLoader());
     // hook in our custom hierarchical reader
@@ -358,70 +338,60 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     return beanDefinitionReader;
   }
 
-  protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
-  {
-    if (artifactType.equals(ArtifactType.DOMAIN))
-    {
+  protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory) {
+    if (artifactType.equals(ArtifactType.DOMAIN)) {
       return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
     }
     return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
   }
 
-  protected MuleDocumentLoader createLoader()
-  {
+  protected MuleDocumentLoader createLoader() {
     return new MuleDocumentLoader();
   }
 
-  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
-  {
-    registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, ConfigurationClassPostProcessor.class, source);
-    registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME, RequiredAnnotationBeanPostProcessor.class, source);
+  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source) {
+    registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
+                                      ConfigurationClassPostProcessor.class, source);
+    registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+                                      RequiredAnnotationBeanPostProcessor.class, source);
     registerInjectorProcessor(registry);
   }
 
-  protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
-  {
-    if (artifactType.equals(ArtifactType.APP))
-    {
+  protected void registerInjectorProcessor(BeanDefinitionRegistry registry) {
+    if (artifactType.equals(ArtifactType.APP)) {
       registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, MuleInjectorProcessor.class, null);
-    }
-    else if (artifactType.equals(ArtifactType.DOMAIN))
-    {
+    } else if (artifactType.equals(ArtifactType.DOMAIN)) {
       BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ContextExclusiveInjectorProcessor.class);
       builder.addConstructorArgValue(this);
       registerPostProcessor(registry, (RootBeanDefinition) builder.getBeanDefinition(), AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
     }
   }
 
-  private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source)
-  {
+  private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
     RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
     beanDefinition.setSource(source);
     registerPostProcessor(registry, beanDefinition, key);
   }
 
-  protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName)
-  {
+  protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
     definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
     registry.registerBeanDefinition(beanName, definition);
   }
 
-  protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
-  {
-    if (artifactType.equals(ArtifactType.DOMAIN))
-    {
+  protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass() {
+    if (artifactType.equals(ArtifactType.DOMAIN)) {
       return MuleDomainBeanDefinitionDocumentReader.class;
     }
     return MuleBeanDefinitionDocumentReader.class;
   }
 
   @Override
-  protected DefaultListableBeanFactory createBeanFactory()
-  {
+  protected DefaultListableBeanFactory createBeanFactory() {
     //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
-    beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(), optionalObjectsController));
+    beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
+                                                                             optionalObjectsController));
 
     return beanFactory;
   }
@@ -434,14 +404,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
    * an exception
    */
   @Override
-  public boolean isRunning()
-  {
-    try
-    {
+  public boolean isRunning() {
+    try {
       return super.isRunning();
-    }
-    catch (IllegalStateException e)
-    {
+    } catch (IllegalStateException e) {
       return false;
     }
   }
@@ -452,54 +418,46 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
    * {@link PostRegistrationActionsPostProcessor} can work
    * its magic and add them to the transformation graph
    */
-  protected static void postProcessBeanDefinition(ComponentModel resolvedComponent, BeanDefinitionRegistry registry, String beanName)
-  {
-    if (Converter.class.isAssignableFrom(resolvedComponent.getType()))
-    {
+  protected static void postProcessBeanDefinition(ComponentModel resolvedComponent, BeanDefinitionRegistry registry,
+                                                  String beanName) {
+    if (Converter.class.isAssignableFrom(resolvedComponent.getType())) {
       GenericBeanDefinition converterBeanDefinitionCopy = new GenericBeanDefinition(resolvedComponent.getBeanDefinition());
       converterBeanDefinitionCopy.setScope(SPRING_SINGLETON_OBJECT);
       registry.registerBeanDefinition(beanName + "-" + "converter", converterBeanDefinitionCopy);
     }
   }
 
-  public MuleContext getMuleContext()
-  {
+  public MuleContext getMuleContext() {
     return muleContext;
   }
 
-  protected OptionalObjectsController getOptionalObjectsController()
-  {
+  protected OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
   }
 
-  public static ThreadLocal<MuleContext> getCurrentMuleContext()
-  {
+  public static ThreadLocal<MuleContext> getCurrentMuleContext() {
     return currentMuleContext;
   }
 
-  private class XmlServiceRegistry implements ServiceRegistry
-  {
+  private class XmlServiceRegistry implements ServiceRegistry {
 
     private final ServiceRegistry delegate;
     private final XmlNamespaceInfoProvider extensionsXmlInfoProvider;
 
-    public XmlServiceRegistry(ServiceRegistry delegate, MuleContext muleContext)
-    {
+    public XmlServiceRegistry(ServiceRegistry delegate, MuleContext muleContext) {
       this.delegate = delegate;
       final ExtensionManager extensionManager = muleContext.getExtensionManager();
       List<XmlNamespaceInfo> extensionNamespaces;
-      if (extensionManager != null)
-      {
+      if (extensionManager != null) {
         extensionNamespaces = extensionManager.getExtensions().stream()
-                .map(ext -> {
-                  XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
-                  return xmlModelProperty != null ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
-                })
-                .filter(info -> info != null)
-                .collect(new ImmutableListCollector<>());
-      }
-      else
-      {
+            .map(ext -> {
+              XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
+              return xmlModelProperty != null
+                  ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
+            })
+            .filter(info -> info != null)
+            .collect(new ImmutableListCollector<>());
+      } else {
         extensionNamespaces = ImmutableList.of();
       }
 
@@ -507,11 +465,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     }
 
     @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader loader)
-    {
+    public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader loader) {
       Collection<T> providers = delegate.lookupProviders(providerClass, loader);
-      if (XmlNamespaceInfoProvider.class.equals(providerClass))
-      {
+      if (XmlNamespaceInfoProvider.class.equals(providerClass)) {
         providers = ImmutableList.<T>builder().addAll(providers).add((T) extensionsXmlInfoProvider).build();
       }
 
@@ -519,8 +475,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     }
 
     @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass)
-    {
+    public <T> Collection<T> lookupProviders(Class<T> providerClass) {
       return lookupProviders(providerClass, Thread.currentThread().getContextClassLoader());
     }
   }

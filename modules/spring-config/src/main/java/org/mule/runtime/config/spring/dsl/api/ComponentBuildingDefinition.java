@@ -30,11 +30,12 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @since 4.0
  */
-public class ComponentBuildingDefinition
-{
+public class ComponentBuildingDefinition {
 
-  public static final String TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE = "Type converter cannot be used with a type definition from a configuration attribute.";
-  public static final String TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE = "Type converter can only be used with simple types. You can't use it with %s";
+  public static final String TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE =
+      "Type converter cannot be used with a type definition from a configuration attribute.";
+  public static final String TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE =
+      "Type converter can only be used with simple types. You can't use it with %s";
   public static final String KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE = "key type converter can only be used with objects of type Map";
 
   private TypeDefinition typeDefinition;
@@ -50,52 +51,44 @@ public class ComponentBuildingDefinition
   private Optional<TypeConverter> typeConverter = empty();
   private Optional<TypeConverter> keyTypeConverter = empty();
 
-  private ComponentBuildingDefinition()
-  {
-  }
+  private ComponentBuildingDefinition() {}
 
   /**
    * @return a definition for the object type that must be created for this component
    */
-  public TypeDefinition getTypeDefinition()
-  {
+  public TypeDefinition getTypeDefinition() {
     return typeDefinition;
   }
 
   /**
    * @return true if the building definition is an scope of message processors
    */
-  public boolean isScope()
-  {
+  public boolean isScope() {
     return scope;
   }
 
   /**
    * @return an ordered list of the constructor parameters that must be set to create the domain object
    */
-  public List<AttributeDefinition> getConstructorAttributeDefinition()
-  {
+  public List<AttributeDefinition> getConstructorAttributeDefinition() {
     return constructorAttributeDefinition;
   }
 
   /**
    * @return a list of the attributes and its definitions that may contain configuration for the domain object to be created.
    */
-  public List<SetterAttributeDefinition> getSetterParameterDefinitions()
-  {
+  public List<SetterAttributeDefinition> getSetterParameterDefinitions() {
     return setterParameterDefinitions;
   }
 
-  public Set<String> getIgnoredConfigurationParameters()
-  {
+  public Set<String> getIgnoredConfigurationParameters() {
     return copyOf(ignoredConfigurationParameters);
   }
 
   /**
    * @return the factory for the domain object. For complex object creations it's possible to define an object builder that will end up creating the domain object.
    */
-  public Class<?> getObjectFactoryType()
-  {
+  public Class<?> getObjectFactoryType() {
     return objectFactoryType;
   }
 
@@ -104,40 +97,35 @@ public class ComponentBuildingDefinition
    */
   //TODO MULE-9681: remove for some other semantic. The API should not define something as "prototype" it should declare if it's a reusable component or an instance.
   //Ideally this can be inferred by the language itself. e.g.: Global message processors are always reusable components and do not define entities by them self.
-  public boolean isPrototype()
-  {
+  public boolean isPrototype() {
     return prototype;
   }
 
   /**
    * @return the unique identifier for this component
    */
-  public ComponentIdentifier getComponentIdentifier()
-  {
+  public ComponentIdentifier getComponentIdentifier() {
     return componentIdentifier;
   }
 
   /**
    * @return a converter to be applied to the configuration value.
    */
-  public Optional<TypeConverter> getTypeConverter()
-  {
+  public Optional<TypeConverter> getTypeConverter() {
     return typeConverter;
   }
 
   /**
    * @return a converter to be applied to the configuration key when the element is a map entry.
    */
-  public Optional<TypeConverter> getKeyTypeConverter()
-  {
+  public Optional<TypeConverter> getKeyTypeConverter() {
     return keyTypeConverter;
   }
 
   /**
    * @return whether the defined component has a name attribute
    */
-  public boolean isNamed()
-  {
+  public boolean isNamed() {
     return named;
   }
 
@@ -146,8 +134,7 @@ public class ComponentBuildingDefinition
    * <p/>
    * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
    */
-  public static class Builder
-  {
+  public static class Builder {
 
     private String namespace;
     private String identifier;
@@ -159,8 +146,7 @@ public class ComponentBuildingDefinition
      * @param attributeDefinition the constructor argument definition.
      * @return {@code this} builder
      */
-    public Builder withConstructorParameterDefinition(AttributeDefinition attributeDefinition)
-    {
+    public Builder withConstructorParameterDefinition(AttributeDefinition attributeDefinition) {
       definition.constructorAttributeDefinition.add(attributeDefinition);
       return this;
     }
@@ -172,8 +158,7 @@ public class ComponentBuildingDefinition
      * @param attributeDefinition the setter parameter definition
      * @return {@code this} builder
      */
-    public Builder withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition)
-    {
+    public Builder withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition) {
       definition.setterParameterDefinitions.add(new SetterAttributeDefinition(fieldName, attributeDefinition));
       return this;
     }
@@ -185,8 +170,7 @@ public class ComponentBuildingDefinition
      * @param identifier configuration element identifier
      * @return {@code this} builder
      */
-    public Builder withIdentifier(String identifier)
-    {
+    public Builder withIdentifier(String identifier) {
       this.identifier = identifier;
       return this;
     }
@@ -198,8 +182,7 @@ public class ComponentBuildingDefinition
      * @param namespace configuration element namespace
      * @return {@code this} builder
      */
-    public Builder withNamespace(String namespace)
-    {
+    public Builder withNamespace(String namespace) {
       this.namespace = namespace;
       return this;
     }
@@ -213,8 +196,7 @@ public class ComponentBuildingDefinition
      * @param typeDefinition the type definition to discover the objecvt type
      * @return {@code this} builder
      */
-    public Builder withTypeDefinition(TypeDefinition typeDefinition)
-    {
+    public Builder withTypeDefinition(TypeDefinition typeDefinition) {
       definition.typeDefinition = typeDefinition;
       return this;
     }
@@ -229,8 +211,7 @@ public class ComponentBuildingDefinition
      * @return {@code this} builder
      * @return
      */
-    public Builder withTypeConverter(TypeConverter typeConverter)
-    {
+    public Builder withTypeConverter(TypeConverter typeConverter) {
       definition.typeConverter = of(typeConverter);
       return this;
     }
@@ -245,8 +226,7 @@ public class ComponentBuildingDefinition
      * @return {@code this} builder
      * @return
      */
-    public Builder withKeyTypeConverter(TypeConverter typeConverter)
-    {
+    public Builder withKeyTypeConverter(TypeConverter typeConverter) {
       definition.keyTypeConverter = of(typeConverter);
       return this;
     }
@@ -256,8 +236,7 @@ public class ComponentBuildingDefinition
      *
      * @return {@code this} builder
      */
-    public Builder asScope()
-    {
+    public Builder asScope() {
       definition.scope = true;
       return this;
     }
@@ -266,8 +245,7 @@ public class ComponentBuildingDefinition
      * Used to declare that the object to be created has a name attribute
      * @return {@code this} builder
      */
-    public Builder asNamed()
-    {
+    public Builder asNamed() {
       definition.named = true;
       return this;
     }
@@ -279,8 +257,7 @@ public class ComponentBuildingDefinition
      * @param objectFactoryType {@code Class} for the factory to use to create the object
      * @return {@code this} builder
      */
-    public Builder withObjectFactoryType(Class<?> objectFactoryType)
-    {
+    public Builder withObjectFactoryType(Class<?> objectFactoryType) {
       definition.objectFactoryType = objectFactoryType;
       return this;
     }
@@ -293,8 +270,7 @@ public class ComponentBuildingDefinition
      * @param parameterName the configuration parameter name.
      * @return {@code this} builder.
      */
-    public Builder withIgnoredConfigurationParameter(String parameterName)
-    {
+    public Builder withIgnoredConfigurationParameter(String parameterName) {
       definition.ignoredConfigurationParameters.add(parameterName);
       return this;
     }
@@ -304,8 +280,7 @@ public class ComponentBuildingDefinition
      *
      * @return a {@code Builder} copy.
      */
-    public Builder copy()
-    {
+    public Builder copy() {
       Builder builder = new Builder();
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.setterParameterDefinitions = new ArrayList<>(this.definition.setterParameterDefinitions);
@@ -317,8 +292,7 @@ public class ComponentBuildingDefinition
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.objectFactoryType = this.definition.objectFactoryType;
 
-      if (definition.isNamed())
-      {
+      if (definition.isNamed()) {
         builder.asNamed();
       }
 
@@ -332,51 +306,48 @@ public class ComponentBuildingDefinition
      *
      * @return a fully configured {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
      */
-    public ComponentBuildingDefinition build()
-    {
+    public ComponentBuildingDefinition build() {
       checkState(definition.typeDefinition != null, "You must specify the type");
       checkState(identifier != null, "You must specify the identifier");
       checkState(namespace != null, "You must specify the namespace");
       Optional<Class> componentType = getType();
-      checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()), TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
-      checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && (isSimpleType(componentType.get()) || isMapType(componentType.get()))), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
-      checkState(!definition.keyTypeConverter.isPresent() || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())), KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);
+      checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()),
+                 TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
+      checkState(!definition.typeConverter.isPresent()
+          || (definition.typeConverter.isPresent() && (isSimpleType(componentType.get()) || isMapType(componentType.get()))),
+                 format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
+      checkState(!definition.keyTypeConverter.isPresent()
+          || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())),
+                 KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);
       definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
       return definition;
     }
 
-    private boolean isMapType(Class componentType)
-    {
+    private boolean isMapType(Class componentType) {
       return Map.class.isAssignableFrom(componentType);
     }
 
     //TODO MULE-9681: remove for some other semantic. The API should not define something as "prototype" it should declare if it's a reusable component or an instance.
     //Ideally this can be inferred by the language itself. e.g.: Global message processors are always reusable components and do not define entities by them self.
-    public Builder asPrototype()
-    {
+    public Builder asPrototype() {
       definition.prototype = true;
       return this;
     }
 
-    private Optional<Class> getType()
-    {
+    private Optional<Class> getType() {
       final AtomicReference<Class> typeReference = new AtomicReference<>();
-      definition.typeDefinition.visit(new TypeDefinitionVisitor()
-      {
+      definition.typeDefinition.visit(new TypeDefinitionVisitor() {
+
         @Override
-        public void onType(Class<?> type)
-        {
+        public void onType(Class<?> type) {
           typeReference.set(type);
         }
 
         @Override
-        public void onConfigurationAttribute(String attributeName)
-        {
-        }
+        public void onConfigurationAttribute(String attributeName) {}
 
         @Override
-        public void onMapType(TypeDefinition.MapEntryType mapEntryType)
-        {
+        public void onMapType(TypeDefinition.MapEntryType mapEntryType) {
           typeReference.set(Map.class);
         }
       });

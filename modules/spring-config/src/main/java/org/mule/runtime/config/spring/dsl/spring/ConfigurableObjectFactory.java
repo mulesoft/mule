@@ -23,61 +23,54 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObject implements ObjectFactory<T>
-{
-    @Inject
-    private MuleContext muleContext;
+public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObject implements ObjectFactory<T> {
 
-    private Class<ObjectFactoryCommonConfigurator> commonConfiguratorType;
-    private ConfigurableInstanceFactory factory;
-    private Map<String, Object> parameters = new HashMap<>();
+  @Inject
+  private MuleContext muleContext;
 
-    @Override
-    public T getObject() throws Exception
-    {
-        Object instance = factory.createInstance(parameters);
-        if (instance instanceof AnnotatedObject)
-        {
-            ((AnnotatedObject) instance).setAnnotations(getAnnotations());
-        }
-        if (commonConfiguratorType != null)
-        {
-            ObjectFactoryCommonConfigurator commonConfigurator = instanciateClass(commonConfiguratorType);
-            commonConfigurator.configure(instance, parameters);
-        }
-        if (instance instanceof MuleContextAware)
-        {
-            ((MuleContextAware) instance).setMuleContext(muleContext);
-        }
-        return (T) instance;
+  private Class<ObjectFactoryCommonConfigurator> commonConfiguratorType;
+  private ConfigurableInstanceFactory factory;
+  private Map<String, Object> parameters = new HashMap<>();
+
+  @Override
+  public T getObject() throws Exception {
+    Object instance = factory.createInstance(parameters);
+    if (instance instanceof AnnotatedObject) {
+      ((AnnotatedObject) instance).setAnnotations(getAnnotations());
     }
-
-    /**
-     * injection method for the {@link ObjectFactoryCommonConfigurator} of the object instance.
-     *
-     * @param commonConfiguratorType the common configuration type.
-     */
-    public void setCommonConfiguratorType(Class<ObjectFactoryCommonConfigurator> commonConfiguratorType)
-    {
-        this.commonConfiguratorType = commonConfiguratorType;
+    if (commonConfiguratorType != null) {
+      ObjectFactoryCommonConfigurator commonConfigurator = instanciateClass(commonConfiguratorType);
+      commonConfigurator.configure(instance, parameters);
     }
-
-    /**
-     * Sets a {@link ConfigurableInstanceFactory} to create a do custom configuration for the
-     * object to be used at runtime.
-     *
-     * @param factory the factory to create the runtime object instance.
-     */
-    public void setFactory(ConfigurableInstanceFactory factory)
-    {
-        this.factory = factory;
+    if (instance instanceof MuleContextAware) {
+      ((MuleContextAware) instance).setMuleContext(muleContext);
     }
+    return (T) instance;
+  }
 
-    /**
-     * @param parameters set of component parameters map to this {@link ObjectFactory}
-     */
-    public void setParameters(Map<String, Object> parameters)
-    {
-        this.parameters = parameters;
-    }
+  /**
+   * injection method for the {@link ObjectFactoryCommonConfigurator} of the object instance.
+   *
+   * @param commonConfiguratorType the common configuration type.
+   */
+  public void setCommonConfiguratorType(Class<ObjectFactoryCommonConfigurator> commonConfiguratorType) {
+    this.commonConfiguratorType = commonConfiguratorType;
+  }
+
+  /**
+   * Sets a {@link ConfigurableInstanceFactory} to create a do custom configuration for the
+   * object to be used at runtime.
+   *
+   * @param factory the factory to create the runtime object instance.
+   */
+  public void setFactory(ConfigurableInstanceFactory factory) {
+    this.factory = factory;
+  }
+
+  /**
+   * @param parameters set of component parameters map to this {@link ObjectFactory}
+   */
+  public void setParameters(Map<String, Object> parameters) {
+    this.parameters = parameters;
+  }
 }

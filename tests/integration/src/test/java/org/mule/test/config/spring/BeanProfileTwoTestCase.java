@@ -10,17 +10,15 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-10198")
-public class BeanProfileTwoTestCase extends AbstractBeanProfileTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return getConfigFile("two");
-    }
+public class BeanProfileTwoTestCase extends AbstractBeanProfileTestCase {
 
-    @Test
-    public void profileOne() throws Exception
-    {
-        profile("Simpson");
-    }
+  @Override
+  protected String getConfigFile() {
+    return getConfigFile("two");
+  }
+
+  @Test
+  public void profileOne() throws Exception {
+    profile("Simpson");
+  }
 }

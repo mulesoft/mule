@@ -39,8 +39,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -81,6 +84,8 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
 
   private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
+  private Map<Object, Object> postProcessedObjects = new HashMap<>();
+
   /**
    * Transformers are registered on context start, then they are usually not unregistered
    */
@@ -109,6 +114,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   public void dispose() {
     transformerListCache.clear();
     exactTransformerCache.clear();
+    registry.dispose();
   }
 
   @Override
@@ -470,12 +476,16 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   }
 
   public void postObjectRegistrationActions(Object value) {
-    if (value instanceof TransformerResolver) {
-      registerTransformerResolver((TransformerResolver) value);
-    }
+    //TODO MULE-10238 - Remove this check once SimpleRegistry gets removed
+    if (!postProcessedObjects.containsKey(value)) {
+      postProcessedObjects.put(value, value);
+      if (value instanceof TransformerResolver) {
+        registerTransformerResolver((TransformerResolver) value);
+      }
 
-    if (value instanceof Converter) {
-      notifyTransformerResolvers((Converter) value, ADDED);
+      if (value instanceof Converter) {
+        notifyTransformerResolvers((Converter) value, ADDED);
+      }
     }
   }
 
@@ -485,6 +495,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   @Override
   public void registerObject(String key, Object value) throws RegistrationException {
     registry.registerObject(key, value);
+
 
     postObjectRegistrationActions(value);
   }

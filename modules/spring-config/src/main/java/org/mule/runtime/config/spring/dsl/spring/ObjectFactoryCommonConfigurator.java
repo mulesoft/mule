@@ -22,16 +22,15 @@ import java.util.Map;
  * @param <T> type of the object to configure.
  * @since 4.0
  */
-public interface ObjectFactoryCommonConfigurator<T>
-{
+public interface ObjectFactoryCommonConfigurator<T> {
 
-    /**
-     * Configures the {@code object} instance using the {@code parameters}
-     * populated from the configuration.
-     *
-     * @param object     the instance to be configured
-     * @param parameters the set of parameters configured in the component model according to the {@link ComponentBuildingDefinition}
-     */
-    void configure(T object, Map<String, Object> parameters);
+  /**
+   * Configures the {@code object} instance using the {@code parameters}
+   * populated from the configuration.
+   *
+   * @param object     the instance to be configured
+   * @param parameters the set of parameters configured in the component model according to the {@link ComponentBuildingDefinition}
+   */
+  void configure(T object, Map<String, Object> parameters);
 
 }

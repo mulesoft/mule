@@ -20,15 +20,14 @@ import java.util.Map;
  * @param <T> type of the object to be created
  * @since 4.0
  */
-public interface ConfigurableInstanceFactory<T>
-{
+public interface ConfigurableInstanceFactory<T> {
 
-    /**
-     * Creates the object to be used at runtime.
-     *
-     * @param parameters the set of configuration parameters according to the {@link ComponentBuildingDefinition} configuration.
-     * @return the object to be used at runtime.
-     */
-    T createInstance(Map<String, Object> parameters);
+  /**
+   * Creates the object to be used at runtime.
+   *
+   * @param parameters the set of configuration parameters according to the {@link ComponentBuildingDefinition} configuration.
+   * @return the object to be used at runtime.
+   */
+  T createInstance(Map<String, Object> parameters);
 
 }

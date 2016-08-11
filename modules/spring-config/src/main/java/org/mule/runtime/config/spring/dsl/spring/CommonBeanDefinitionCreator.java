@@ -65,287 +65,255 @@ import org.w3c.dom.Node;
  * <p/>
  * TODO MULE-9638 set visibility to package
  */
-public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
-{
+public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS = "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
-    private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
-            .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
-            .add(MULE_IDENTIFIER)
-            .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
-            .build();
+  private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS =
+      "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
+  private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
+      .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
+      .add(MULE_IDENTIFIER)
+      .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
+      .build();
 
-    private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
-    private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
+  private final ObjectFactoryClassRepository objectFactoryClassRepository;
+  private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
-    public CommonBeanDefinitionCreator()
-    {
-        try
-        {
-            //TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
-            this.beanDefinitionPostProcessor = (BeanDefinitionPostProcessor) ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS).newInstance();
-        }
-        catch (Exception e)
-        {
-            this.beanDefinitionPostProcessor = (componentModel, beanDefinition) -> {
-            };
-        }
+  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+    this.objectFactoryClassRepository = objectFactoryClassRepository;
+    try {
+      //TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
+      this.beanDefinitionPostProcessor = (BeanDefinitionPostProcessor) ClassUtils
+          .getClass(Thread.currentThread().getContextClassLoader(), TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS).newInstance();
+    } catch (Exception e) {
+      this.beanDefinitionPostProcessor = (componentModel, beanDefinition) -> {
+      };
     }
+  }
 
-    @Override
-    public boolean handleRequest(CreateBeanDefinitionRequest request)
-    {
-        ComponentModel componentModel = request.getComponentModel();
-        ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
-        componentModel.setType(retrieveComponentType(componentModel, buildingDefinition));
-        BeanDefinitionBuilder beanDefinitionBuilder = createBeanDefinitionBuilder(componentModel, buildingDefinition);
-        processAnnotations(componentModel, beanDefinitionBuilder);
-        processComponentDefinitionModel(request.getParentComponentModel(), componentModel, buildingDefinition, beanDefinitionBuilder);
-        return true;
+  @Override
+  public boolean handleRequest(CreateBeanDefinitionRequest request) {
+    ComponentModel componentModel = request.getComponentModel();
+    ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
+    componentModel.setType(retrieveComponentType(componentModel, buildingDefinition));
+    BeanDefinitionBuilder beanDefinitionBuilder = createBeanDefinitionBuilder(componentModel, buildingDefinition);
+    processAnnotations(componentModel, beanDefinitionBuilder);
+    processComponentDefinitionModel(request.getParentComponentModel(), componentModel, buildingDefinition, beanDefinitionBuilder);
+    return true;
+  }
+
+  private BeanDefinitionBuilder createBeanDefinitionBuilder(ComponentModel componentModel,
+                                                            ComponentBuildingDefinition buildingDefinition) {
+    BeanDefinitionBuilder beanDefinitionBuilder;
+    if (buildingDefinition.getObjectFactoryType() != null) {
+      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
+    } else {
+      beanDefinitionBuilder = genericBeanDefinition(componentModel.getType());
     }
+    return beanDefinitionBuilder;
+  }
 
-    private BeanDefinitionBuilder createBeanDefinitionBuilder(ComponentModel componentModel, ComponentBuildingDefinition buildingDefinition)
-    {
-        BeanDefinitionBuilder beanDefinitionBuilder;
-        if (buildingDefinition.getObjectFactoryType() != null)
-        {
-            beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
-        }
-        else
-        {
-            beanDefinitionBuilder = genericBeanDefinition(componentModel.getType());
-        }
-        return beanDefinitionBuilder;
-    }
-
-    private void processAnnotationParameters(ComponentModel componentModel, Map<QName, Object> annotations)
-    {
-        componentModel.getParameters().entrySet().stream()
-                .filter(entry -> entry.getKey().contains(":"))
-                .forEach(annotationKey ->
-                         {
-                             Node attribute = from(componentModel).getNode().getAttributes().getNamedItem(annotationKey.getKey());
-                             if (attribute != null)
-                             {
-                                 annotations.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), annotationKey.getValue());
-                             }
-                         });
-    }
-
-    private void processNestedAnnotations(ComponentModel componentModel, Map<QName, Object> previousAnnotations)
-    {
-        componentModel.getInnerComponents().stream()
-                .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
-                .findFirst()
-                .ifPresent(annotationsCdm ->
-                                   annotationsCdm.getInnerComponents().forEach(
-                                           annotationCdm -> previousAnnotations.put(new QName(from(annotationCdm).getNamespaceUri(), annotationCdm.getIdentifier().getName()), annotationCdm.getTextContent())
-                                   )
-                );
-    }
-
-    private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder)
-    {
-        if (AnnotatedObject.class.isAssignableFrom(componentModel.getType()))
-        {
-            XmlCustomAttributeHandler.ComponentCustomAttributeRetrieve customAttributeRetrieve = from(componentModel);
-            Map<QName, Object> annotations = processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(), customAttributeRetrieve.getConfigFileName(), beanDefinitionBuilder);
-            processAnnotationParameters(componentModel, annotations);
-            processNestedAnnotations(componentModel, annotations);
-            if (!annotations.isEmpty())
-            {
-                beanDefinitionBuilder.addPropertyValue(PROPERTY_NAME, annotations);
-            }
-        }
-    }
-
-
-    private Class<?> retrieveComponentType(final ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition)
-    {
-        ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-        return objectTypeVisitor.getType();
-    }
-
-    private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ComponentModel componentModel, final ComponentBuildingDefinition componentBuildingDefinition)
-    {
-        ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-        BeanDefinitionBuilder beanDefinitionBuilder;
-        Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
-        Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
-        Optional<Consumer<Object>> instanceCustomizationFunction = empty();
-        if (!customProperties.isEmpty())
-        {
-            instanceCustomizationFunction = Optional.of(object -> {
-                injectSpringProperties(customProperties, object);
-            });
-        }
-
-        Class factoryBeanClass = objectFactoryClassRepository.getObjectFactoryClass(componentBuildingDefinition,
-                                                                                    objectFactoryType,
-                                                                                    objectTypeVisitor.getType(),
-                                                                                    () -> componentModel.getBeanDefinition().isLazyInit(),
-                                                                                    instanceCustomizationFunction);
-        beanDefinitionBuilder = rootBeanDefinition(factoryBeanClass);
-        return beanDefinitionBuilder;
-    }
-
-    private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance)
-    {
-        try
-        {
-            for (String propertyName : customProperties.keySet())
-            {
-                copyProperty(createdInstance, propertyName, customProperties.get(propertyName));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    private Map<String, Object> getTransformerCustomProperties(ComponentModel componentModel)
-    {
-        ComponentIdentifier identifier = componentModel.getIdentifier();
-        if (!identifier.equals(CUSTOM_TRANSFORMER_IDENTIFIER))
-        {
-            return emptyMap();
-        }
-        return componentModel.getInnerComponents()
-                .stream()
-                .filter(innerComponent -> {
-                    ComponentIdentifier childIdentifier = innerComponent.getIdentifier();
-                    return childIdentifier.equals(SPRING_PROPERTY_IDENTIFIER) || childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
-                })
-                .collect(Collectors.toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(), springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
-    }
-
-    private void processComponentDefinitionModel(final ComponentModel parentComponentModel, final ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition, final BeanDefinitionBuilder beanDefinitionBuilder)
-    {
-        processObjectConstructionParameters(componentModel, componentBuildingDefinition, new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
-        processSpringOrMuleProperties(componentModel, beanDefinitionBuilder);
-        if (componentBuildingDefinition.isPrototype())
-        {
-            beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
-        }
-        AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-        AbstractBeanDefinition wrappedBeanDefinition = adaptFilterBeanDefinitions(parentComponentModel, originalBeanDefinition);
-        if (originalBeanDefinition != wrappedBeanDefinition)
-        {
-            componentModel.setType(wrappedBeanDefinition.getBeanClass());
-        }
-        beanDefinitionPostProcessor.postProcess(componentModel, wrappedBeanDefinition);
-        componentModel.setBeanDefinition(wrappedBeanDefinition);
-    }
-
-    //TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
-    private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder)
-    {
-        //for now we skip custom-transformer since requires injection by the object factory.
-        if (componentModel.getIdentifier().equals(CUSTOM_TRANSFORMER_IDENTIFIER))
-        {
-            return;
-        }
-        componentModel.getInnerComponents()
-                .stream()
-                .filter(innerComponent -> {
-                    ComponentIdentifier identifier = innerComponent.getIdentifier();
-                    return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER);
-                })
-                .forEach(propertyComponentModel -> {
-                    PropertyValue propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
-                    beanDefinitionBuilder.addPropertyValue(propertyValue.getName(), propertyValue.getValue());
-                });
-    }
-
-    public static List<PropertyValue> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel)
-    {
-        List<PropertyValue> propertyValues = new ArrayList<>();
-        propertyComponentModel.getInnerComponents().stream().forEach(entryComponentModel -> {
-            propertyValues.add(new PropertyValue(entryComponentModel.getParameters().get("key"), entryComponentModel.getParameters().get("value")));
+  private void processAnnotationParameters(ComponentModel componentModel, Map<QName, Object> annotations) {
+    componentModel.getParameters().entrySet().stream()
+        .filter(entry -> entry.getKey().contains(":"))
+        .forEach(annotationKey -> {
+          Node attribute = from(componentModel).getNode().getAttributes().getNamedItem(annotationKey.getKey());
+          if (attribute != null) {
+            annotations.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), annotationKey.getValue());
+          }
         });
-        return propertyValues;
+  }
+
+  private void processNestedAnnotations(ComponentModel componentModel, Map<QName, Object> previousAnnotations) {
+    componentModel.getInnerComponents().stream()
+        .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
+        .findFirst()
+        .ifPresent(annotationsCdm -> annotationsCdm.getInnerComponents().forEach(
+                                                                                 annotationCdm -> previousAnnotations
+                                                                                     .put(new QName(from(annotationCdm)
+                                                                                         .getNamespaceUri(), annotationCdm
+                                                                                             .getIdentifier()
+                                                                                             .getName()),
+                                                                                          annotationCdm.getTextContent())));
+  }
+
+  private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
+    if (AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
+      XmlCustomAttributeHandler.ComponentCustomAttributeRetrieve customAttributeRetrieve = from(componentModel);
+      Map<QName, Object> annotations =
+          processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(),
+                                           customAttributeRetrieve.getConfigFileName(), beanDefinitionBuilder);
+      processAnnotationParameters(componentModel, annotations);
+      processNestedAnnotations(componentModel, annotations);
+      if (!annotations.isEmpty()) {
+        beanDefinitionBuilder.addPropertyValue(PROPERTY_NAME, annotations);
+      }
+    }
+  }
+
+
+  private Class<?> retrieveComponentType(final ComponentModel componentModel,
+                                         ComponentBuildingDefinition componentBuildingDefinition) {
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+    return objectTypeVisitor.getType();
+  }
+
+  private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ComponentModel componentModel,
+                                                                             final ComponentBuildingDefinition componentBuildingDefinition) {
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+    BeanDefinitionBuilder beanDefinitionBuilder;
+    Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
+    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
+    Optional<Consumer<Object>> instanceCustomizationFunction = empty();
+    if (!customProperties.isEmpty()) {
+      instanceCustomizationFunction = Optional.of(object -> {
+        injectSpringProperties(customProperties, object);
+      });
     }
 
-    private void processObjectConstructionParameters(final ComponentModel componentModel,
-                                                     final ComponentBuildingDefinition componentBuildingDefinition,
-                                                     final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper)
-    {
-        new ComponentConfigurationBuilder(componentModel, componentBuildingDefinition, beanDefinitionBuilderHelper)
-                .processConfiguration();
+    Class factoryBeanClass = objectFactoryClassRepository.getObjectFactoryClass(componentBuildingDefinition,
+                                                                                objectFactoryType,
+                                                                                objectTypeVisitor.getType(),
+                                                                                () -> componentModel.getBeanDefinition()
+                                                                                    .isLazyInit(),
+                                                                                instanceCustomizationFunction);
+    beanDefinitionBuilder = rootBeanDefinition(factoryBeanClass);
+    return beanDefinitionBuilder;
+  }
 
+  private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {
+    try {
+      for (String propertyName : customProperties.keySet()) {
+        copyProperty(createdInstance, propertyName, customProperties.get(propertyName));
+      }
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    public static AbstractBeanDefinition adaptFilterBeanDefinitions(ComponentModel parentComponentModel, AbstractBeanDefinition originalBeanDefinition)
-    {
-        //TODO this condition may be removed
-        if (originalBeanDefinition == null)
-        {
-            return null;
-        }
-        if (!filterWrapperRequired(parentComponentModel))
-        {
-            return originalBeanDefinition;
-        }
-        Class beanClass;
-        if (originalBeanDefinition instanceof RootBeanDefinition)
-        {
-            beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
-        }
-        else
-        {
-            //TODO see if this condition can be removed.
-            if (originalBeanDefinition.getBeanClassName() == null)
-            {
-                return originalBeanDefinition;
-            }
-            try
-            {
-                beanClass = ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
-            }
-            catch (ClassNotFoundException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        BeanDefinition newBeanDefinition;
-        if (areMatchingTypes(Filter.class, beanClass))
-        {
-            boolean failOnUnaccepted = false;
-            Object processorWhenUnaccepted = null;
-            newBeanDefinition = rootBeanDefinition(MessageFilter.class)
-                    .addConstructorArgValue(originalBeanDefinition)
-                    .addConstructorArgValue(failOnUnaccepted)
-                    .addConstructorArgValue(processorWhenUnaccepted)
-                    .getBeanDefinition();
-            return (AbstractBeanDefinition) newBeanDefinition;
-        }
-        else if (areMatchingTypes(SecurityFilter.class, beanClass))
-        {
-            newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
-                    .addPropertyValue("filter", originalBeanDefinition)
-                    .getBeanDefinition();
-            return (AbstractBeanDefinition) newBeanDefinition;
-        }
+  private Map<String, Object> getTransformerCustomProperties(ComponentModel componentModel) {
+    ComponentIdentifier identifier = componentModel.getIdentifier();
+    if (!identifier.equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
+      return emptyMap();
+    }
+    return componentModel.getInnerComponents()
+        .stream()
+        .filter(innerComponent -> {
+          ComponentIdentifier childIdentifier = innerComponent.getIdentifier();
+          return childIdentifier.equals(SPRING_PROPERTY_IDENTIFIER) || childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
+        })
+        .collect(Collectors.toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(),
+                                  springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
+  }
+
+  private void processComponentDefinitionModel(final ComponentModel parentComponentModel, final ComponentModel componentModel,
+                                               ComponentBuildingDefinition componentBuildingDefinition,
+                                               final BeanDefinitionBuilder beanDefinitionBuilder) {
+    processObjectConstructionParameters(componentModel, componentBuildingDefinition,
+                                        new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
+    processSpringOrMuleProperties(componentModel, beanDefinitionBuilder);
+    if (componentBuildingDefinition.isPrototype()) {
+      beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
+    }
+    AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
+    AbstractBeanDefinition wrappedBeanDefinition = adaptFilterBeanDefinitions(parentComponentModel, originalBeanDefinition);
+    if (originalBeanDefinition != wrappedBeanDefinition) {
+      componentModel.setType(wrappedBeanDefinition.getBeanClass());
+    }
+    beanDefinitionPostProcessor.postProcess(componentModel, wrappedBeanDefinition);
+    componentModel.setBeanDefinition(wrappedBeanDefinition);
+  }
+
+  //TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
+  private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
+    //for now we skip custom-transformer since requires injection by the object factory.
+    if (componentModel.getIdentifier().equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
+      return;
+    }
+    componentModel.getInnerComponents()
+        .stream()
+        .filter(innerComponent -> {
+          ComponentIdentifier identifier = innerComponent.getIdentifier();
+          return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER);
+        })
+        .forEach(propertyComponentModel -> {
+          PropertyValue propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
+          beanDefinitionBuilder.addPropertyValue(propertyValue.getName(), propertyValue.getValue());
+        });
+  }
+
+  public static List<PropertyValue> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel) {
+    List<PropertyValue> propertyValues = new ArrayList<>();
+    propertyComponentModel.getInnerComponents().stream().forEach(entryComponentModel -> {
+      propertyValues.add(new PropertyValue(entryComponentModel.getParameters().get("key"),
+                                           entryComponentModel.getParameters().get("value")));
+    });
+    return propertyValues;
+  }
+
+  private void processObjectConstructionParameters(final ComponentModel componentModel,
+                                                   final ComponentBuildingDefinition componentBuildingDefinition,
+                                                   final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
+    new ComponentConfigurationBuilder(componentModel, componentBuildingDefinition, beanDefinitionBuilderHelper)
+        .processConfiguration();
+
+  }
+
+  public static AbstractBeanDefinition adaptFilterBeanDefinitions(ComponentModel parentComponentModel,
+                                                                  AbstractBeanDefinition originalBeanDefinition) {
+    //TODO this condition may be removed
+    if (originalBeanDefinition == null) {
+      return null;
+    }
+    if (!filterWrapperRequired(parentComponentModel)) {
+      return originalBeanDefinition;
+    }
+    Class beanClass;
+    if (originalBeanDefinition instanceof RootBeanDefinition) {
+      beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
+    } else {
+      //TODO see if this condition can be removed.
+      if (originalBeanDefinition.getBeanClassName() == null) {
         return originalBeanDefinition;
+      }
+      try {
+        beanClass = ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
-
-    private static boolean filterWrapperRequired(ComponentModel parentComponentModel)
-    {
-        return !MESSAGE_FILTER_WRAPPERS.contains(parentComponentModel.getIdentifier()) && !parentComponentModel.getIdentifier().getName().endsWith(FILTER_ELEMENT_SUFFIX);
+    BeanDefinition newBeanDefinition;
+    if (areMatchingTypes(Filter.class, beanClass)) {
+      boolean failOnUnaccepted = false;
+      Object processorWhenUnaccepted = null;
+      newBeanDefinition = rootBeanDefinition(MessageFilter.class)
+          .addConstructorArgValue(originalBeanDefinition)
+          .addConstructorArgValue(failOnUnaccepted)
+          .addConstructorArgValue(processorWhenUnaccepted)
+          .getBeanDefinition();
+      return (AbstractBeanDefinition) newBeanDefinition;
+    } else if (areMatchingTypes(SecurityFilter.class, beanClass)) {
+      newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
+          .addPropertyValue("filter", originalBeanDefinition)
+          .getBeanDefinition();
+      return (AbstractBeanDefinition) newBeanDefinition;
     }
+    return originalBeanDefinition;
+  }
 
-    public static boolean areMatchingTypes(Class<?> superType, Class<?> childType)
-    {
-        return superType.isAssignableFrom(childType);
-    }
+  private static boolean filterWrapperRequired(ComponentModel parentComponentModel) {
+    return !MESSAGE_FILTER_WRAPPERS.contains(parentComponentModel.getIdentifier())
+        && !parentComponentModel.getIdentifier().getName().endsWith(FILTER_ELEMENT_SUFFIX);
+  }
 
-    public interface BeanDefinitionPostProcessor
-    {
+  public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {
+    return superType.isAssignableFrom(childType);
+  }
 
-        void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
-    }
+  public interface BeanDefinitionPostProcessor {
+
+    void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
+  }
 
 }
