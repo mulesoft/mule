@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -114,7 +113,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     final MuleMessage message = event.getMessage();
-    if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getDataType().getType())) {
+    if (consumablePayloadWarned.compareAndSet(false, true) && message.getDataType().isStreamType()) {
       logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
           " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
                                 message.getPayload().getClass().getName()));

@@ -6,8 +6,18 @@
  */
 package org.mule.runtime.core.metadata;
 
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.ClassUtils;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A data type that simply wraps a Java type.
@@ -22,10 +32,12 @@ public class SimpleDataType implements DataType {
 
   protected final Class<?> type;
   protected final MediaType mimeType;
+  protected final boolean streamType;
 
-  SimpleDataType(Class<?> type, MediaType mimeType) {
+  SimpleDataType(Class<?> type, MediaType mimeType, boolean streamType) {
     this.type = type;
     this.mimeType = mimeType;
+    this.streamType = streamType;
   }
 
   @Override
@@ -139,5 +151,10 @@ public class SimpleDataType implements DataType {
   @Override
   public String toString() {
     return "SimpleDataType{" + "type=" + (type == null ? null : type.getName()) + ", mimeType='" + mimeType + '\'' + '}';
+  }
+
+  @Override
+  public boolean isStreamType(){
+    return streamType;
   }
 }

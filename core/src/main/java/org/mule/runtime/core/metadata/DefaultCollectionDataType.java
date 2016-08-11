@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.util.Iterator;
+
 /**
  * A data type that represents a generified collection.
  * <p>
@@ -23,8 +25,8 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
 
   private final DataType itemsType;
 
-  DefaultCollectionDataType(Class<? extends Iterable> collectionType, DataType type, MediaType mimeType) {
-    super(collectionType, mimeType);
+  DefaultCollectionDataType(Class collectionType, DataType type, MediaType mimeType, boolean streamType) {
+    super(collectionType, mimeType, streamType);
     this.itemsType = type;
   }
 
@@ -86,4 +88,5 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
     return "CollectionDataType{" + "type=" + getType().getName() + ", itemType=" + getItemDataType().toString() + ", mimeType='"
         + getMediaType() + '\'' + '}';
   }
+
 }

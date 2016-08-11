@@ -7,12 +7,10 @@
 package org.mule.runtime.module.xml.el;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -159,7 +157,7 @@ public class XPath3Function implements ExpressionLanguageFunction {
       Object result = xpathEvaluatorSupplier.get().evaluate(xpathExpression, node, returnType, event);
 
       MuleMessage message = event.getMessage();
-      if (input == message.getPayload() && isConsumable(message.getDataType().getType())) {
+      if (input == message.getPayload() && message.getDataType().isStreamType()) {
         ctx.setPayload(node);
       }
 

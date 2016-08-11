@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -106,7 +104,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     try {
       final MuleMessage message = event.getMessage();
       if (message instanceof MuleMessage) {
-        if (isConsumable(message.getDataType().getType())) {
+        if (message.getDataType().isStreamType()) {
           event.getMessageAsBytes();
         } else {
           ensureSerializable(message);
