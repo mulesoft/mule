@@ -13,9 +13,13 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
+import org.mule.compatibility.core.session.NullSessionHandler;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,7 +30,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.compatibility.core.session.NullSessionHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -75,13 +78,13 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
   @Test
   public void routeMessageRequestResponseReturnsEvent() throws MuleException {
     MessageReceiver receiver = createMessageReciever(REQUEST_RESPONSE);
-    MuleMessage request = createRequestMessage();
+    MuleCompatibilityMessage request = createRequestMessage();
 
     assertEquals(request, receiver.routeMessage(request).getMessage());
   }
 
-  protected MuleMessage createRequestMessage() {
-    return MuleMessage.builder().payload("").build();
+  protected MuleCompatibilityMessage createRequestMessage() {
+    return (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().payload("").build();
   }
 
   protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException {

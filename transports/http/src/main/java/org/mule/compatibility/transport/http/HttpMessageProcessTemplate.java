@@ -35,6 +35,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMessageExecutionContext;
@@ -259,9 +261,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   @Override
-  protected MuleMessage createMessageFromSource(Object message) throws MuleException {
+  protected MuleCompatibilityMessage createMessageFromSource(Object message) throws MuleException {
     MuleMessage muleMessage = super.createMessageFromSource(message);
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(muleMessage);
+    MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(muleMessage);
 
     String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
     int i = path.indexOf('?');

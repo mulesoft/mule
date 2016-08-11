@@ -22,6 +22,8 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMessageExecutionContext;
@@ -120,9 +122,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
                                            requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
 
     MuleEvent result = outboundEndpoint.process(event);
-    MuleMessage message = null;
+    MuleCompatibilityMessage message = null;
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-      message = result.getMessage();
+      message = new MuleCompatibilityMessageBuilder(result.getMessage()).build();
     }
 
     final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);

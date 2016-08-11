@@ -8,6 +8,8 @@ package org.mule.compatibility.transport.vm;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.ContinuousPollingReceiverWorker;
 import org.mule.compatibility.core.transport.PollingReceiverWorker;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
@@ -18,7 +20,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.queue.Queue;
@@ -79,27 +80,24 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
 
   public void onMessage(MuleMessage message) throws MuleException {
     // Rewrite the message to treat it as a new message
-    MuleMessage newMessage = MuleMessage.builder(message).payload(message.getPayload()).build();
+    MuleCompatibilityMessage newMessage =
+        (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(message).payload(message.getPayload()).build();
     routeMessage(newMessage);
   }
 
-  public MuleMessage onCall(final MuleMessage message) throws MuleException {
+  public MuleMessage onCall(final MuleCompatibilityMessage message) throws MuleException {
 
     ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     // TODO remove code to change message MuleContext once MULE-7357 gets fixed
     try {
       Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
       ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-      MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
-
-        @Override
-        public MuleEvent process() throws Exception {
-          MuleEvent event = routeMessage(message);
-          if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse()) {
-            return event;
-          }
-          return null;
+      MuleEvent resultEvent = executionTemplate.execute(() -> {
+        MuleEvent event = routeMessage(message);
+        if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse()) {
+          return event;
         }
+        return null;
       });
       if (resultEvent != null) {
         return resultEvent.getMessage();
@@ -131,7 +129,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
         return null;
       }
 
-      List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
+      List<MuleMessage> messages = new ArrayList<>(1);
       messages.add(message);
       return messages;
     } else {
@@ -145,7 +143,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
     Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
 
     // The list of retrieved messages that will be returned
-    List<MuleMessage> messages = new LinkedList<MuleMessage>();
+    List<MuleMessage> messages = new LinkedList<>();
 
     int batchSize = getBatchSize(queue.size());
 
@@ -198,7 +196,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
 
   @Override
   protected MuleEvent processMessage(Object msg) throws Exception {
-    return routeMessage((MuleMessage) msg);
+    return routeMessage((MuleCompatibilityMessage) msg);
   }
 
   /*

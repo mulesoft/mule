@@ -16,6 +16,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.core.DefaultMessageExecutionContext;
@@ -280,15 +282,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
       destinationFile = FileUtils.newFile(moveDir, destinationFileName);
     }
 
-    MuleMessage.Builder messageBuilder = null;
+    MuleCompatibilityMessageBuilder messageBuilder = null;
     Charset encoding = endpoint.getEncoding();
     try {
       if (fileConnector.isStreaming()) {
         ReceiverFileInputStream payload =
             createReceiverFileInputStream(sourceFile, destinationFile, file1 -> removeProcessingMark(file1.getAbsolutePath()));
-        messageBuilder = MuleMessage.builder(createMuleMessage(payload, encoding));
+        messageBuilder = new MuleCompatibilityMessageBuilder(createMuleMessage(payload, encoding));
       } else {
-        messageBuilder = MuleMessage.builder(createMuleMessage(sourceFile, encoding));
+        messageBuilder = new MuleCompatibilityMessageBuilder(createMuleMessage(sourceFile, encoding));
       }
     } catch (FileNotFoundException e) {
       // we can ignore since we did manage to acquire a lock, but just in case
@@ -313,7 +315,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     }
 
     ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-    final MuleMessage finalMessage = messageBuilder.build();
+    final MuleCompatibilityMessage finalMessage = messageBuilder.build();
     final Object originalPayload = finalMessage.getPayload();
 
 
@@ -362,7 +364,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
 
   private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName,
                                        final String originalSourceDirectory, final File sourceFile, final File destinationFile,
-                                       ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage)
+                                       ExecutionTemplate<MuleEvent> executionTemplate,
+                                       final MuleCompatibilityMessage finalMessage)
       throws DefaultMuleException {
     try {
       executionTemplate.execute(() -> {
@@ -392,7 +395,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
         try {
           // If we are streaming no need to move/delete now, that will be done when
           // stream is closed
-          routeMessage(MuleMessage.builder(finalMessage).addOutboundProperty(PROPERTY_FILENAME, sourceFile.getName()).build());
+          routeMessage((MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(finalMessage)
+              .addOutboundProperty(PROPERTY_FILENAME, sourceFile.getName()).build());
         } catch (Exception e) {
           // ES will try to close stream but FileMessageReceiver is the one that must close it.
           exceptionWasThrown.set(true);
@@ -444,7 +448,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
   }
 
   private void moveAndDelete(final File sourceFile, File destinationFile, String originalSourceFileName,
-                             String originalSourceDirectory, MuleMessage message)
+                             String originalSourceDirectory, MuleCompatibilityMessage message)
       throws MuleException {
     // If we are moving the file to a read directory, move it there now and
     // hand over a reference to the
@@ -460,10 +464,16 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
       }
 
       // create new Message for destinationFile
-      message = MuleMessage.builder(createMuleMessage(destinationFile, endpoint.getEncoding()))
-          .addInboundProperty(PROPERTY_FILENAME, destinationFile.getName())
-          .addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
-          .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
+      message = (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(createMuleMessage(destinationFile,
+                                                                                                 endpoint.getEncoding()))
+                                                                                                     .addInboundProperty(PROPERTY_FILENAME,
+                                                                                                                         destinationFile
+                                                                                                                             .getName())
+                                                                                                     .addInboundProperty(PROPERTY_ORIGINAL_FILENAME,
+                                                                                                                         originalSourceFileName)
+                                                                                                     .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY,
+                                                                                                                         originalSourceDirectory)
+                                                                                                     .build();
     }
 
     // finally deliver the file message

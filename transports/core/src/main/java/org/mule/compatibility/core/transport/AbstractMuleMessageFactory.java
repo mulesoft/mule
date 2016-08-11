@@ -8,6 +8,8 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,18 +28,20 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
   public AbstractMuleMessageFactory() {}
 
   @Override
-  public MuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception {
+  public MuleCompatibilityMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+      throws Exception {
     return doCreate(transportMessage, previousMessage, encoding);
   }
 
   @Override
-  public MuleMessage create(Object transportMessage, Charset encoding) throws Exception {
+  public MuleCompatibilityMessage create(Object transportMessage, Charset encoding) throws Exception {
     return doCreate(transportMessage, null, encoding);
   }
 
-  private MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception {
+  private MuleCompatibilityMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+      throws Exception {
     if (transportMessage == null) {
-      return MuleMessage.builder().nullPayload().build();
+      return (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().nullPayload().build();
     }
 
     if (!isTransportMessageTypeSupported(transportMessage)) {
@@ -46,21 +50,21 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
 
     Object payload = extractPayload(transportMessage, encoding);
     DataTypeParamsBuilder dataTypeBuilder =
-        DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).charset(encoding);
+        DataType.builder().type(payload == null ? Object.class : payload.getClass()).charset(encoding);
     String mimeType = getMimeType(transportMessage);
     if (StringUtils.isNotEmpty(mimeType)) {
       dataTypeBuilder = dataTypeBuilder.mediaType(mimeType);
     }
     final DataType dataType = dataTypeBuilder.build();
-    MuleMessage.Builder messageBuilder;
+    MuleCompatibilityMessageBuilder messageBuilder;
     if (previousMessage != null) {
-      messageBuilder = MuleMessage.builder(previousMessage).payload(payload);
+      messageBuilder = (MuleCompatibilityMessageBuilder) new MuleCompatibilityMessageBuilder(previousMessage).payload(payload);
     } else if (payload instanceof MuleMessage) {
-      messageBuilder = MuleMessage.builder((MuleMessage) payload);
+      messageBuilder = new MuleCompatibilityMessageBuilder((MuleMessage) payload);
     } else if (payload == null) {
-      messageBuilder = MuleMessage.builder().nullPayload();
+      messageBuilder = (MuleCompatibilityMessageBuilder) new MuleCompatibilityMessageBuilder().nullPayload();
     } else {
-      messageBuilder = MuleMessage.builder().payload(payload);
+      messageBuilder = (MuleCompatibilityMessageBuilder) new MuleCompatibilityMessageBuilder().payload(payload);
     }
 
     messageBuilder.mediaType(dataType.getMediaType());
@@ -77,7 +81,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
 
   protected abstract Object extractPayload(Object transportMessage, Charset encoding) throws Exception;
 
-  protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addProperties(MuleCompatibilityMessageBuilder messageBuilder, Object transportMessage) throws Exception {
     // Template method
   }
 

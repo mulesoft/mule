@@ -7,14 +7,16 @@
 package org.mule.compatibility.transport.tcp;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.AbstractReceiverResourceWorker;
 import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -342,12 +344,14 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
     }
 
     @Override
-    protected MuleMessage preRouteMuleMessage(final MuleMessage message) throws Exception {
-      MuleMessage muleMessage = super.preRouteMuleMessage(message);
+    protected MuleCompatibilityMessage preRouteMuleMessage(final MuleCompatibilityMessage message) throws Exception {
+      MuleCompatibilityMessage muleMessage = super.preRouteMuleMessage(message);
 
       final SocketAddress clientAddress = socket.getRemoteSocketAddress();
       if (clientAddress != null) {
-        return MuleMessage.builder(muleMessage).addOutboundProperty(MULE_REMOTE_CLIENT_ADDRESS, clientAddress.toString()).build();
+        final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(muleMessage);
+        builder.addOutboundProperty(MULE_REMOTE_CLIENT_ADDRESS, clientAddress.toString());
+        return builder.build();
       } else {
         return muleMessage;
       }

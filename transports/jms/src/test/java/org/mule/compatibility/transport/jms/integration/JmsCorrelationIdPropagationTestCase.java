@@ -10,7 +10,6 @@ import static org.mule.functional.functional.FlowAssert.verify;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;

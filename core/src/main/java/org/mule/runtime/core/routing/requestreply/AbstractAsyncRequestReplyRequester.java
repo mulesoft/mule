@@ -172,6 +172,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
+    System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
     // flag for catching the interrupted status of the Thread waiting for a
     // result
@@ -258,8 +259,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      String messageId = getAsyncReplyCorrelationId(event);
-      store.store(messageId, event);
+      store.store(getAsyncReplyCorrelationId(event), event);
       replyThread.processNow();
       return null;
     }

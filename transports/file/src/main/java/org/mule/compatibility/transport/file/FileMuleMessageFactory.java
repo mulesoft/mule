@@ -10,6 +10,8 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_DIREC
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILE_SIZE;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILE_TIMESTAMP;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
+
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -39,7 +41,7 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory {
   }
 
   @Override
-  protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addProperties(MuleCompatibilityMessageBuilder messageBuilder, Object transportMessage) throws Exception {
     super.addProperties(messageBuilder, transportMessage);
     File file = convertToFile(transportMessage);
     setPropertiesFromFile(messageBuilder, file);
