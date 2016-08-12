@@ -190,10 +190,13 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
             }
             else if (currentChar == ':')
             {
-                if (tokenEnd < sqlTextChars.length && '=' == sqlTextChars[tokenEnd]) {
-                  sqlToUse = sqlToUse + currentChar;
-                  tokenStart++;
-                } else {
+                if (tokenEnd < sqlTextChars.length && '=' == sqlTextChars[tokenEnd])
+                {
+                    sqlToUse = sqlToUse + currentChar;
+                    tokenStart++;
+                }
+                else
+                {
                     String parameter;
 
                     while (tokenEnd < sqlTextChars.length && !isParameterSeparator(sqlTextChars[tokenEnd]))

@@ -261,7 +261,8 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     }
     
     @Test
-    public void parseSQLVariableAssignment() throws Exception {
+    public void parseSQLVariableAssignment() throws Exception
+    {
         String query = "SELECT @rowNumber := @rowNumber + 1 AS ROWNUMBER, P.* FROM (SELECT * FROM PLANET) P, (SELECT @rowNumber := 0) RN ORDER BY P.NAME";
         QueryTemplate queryTemplate = parser.parse(query);
 
