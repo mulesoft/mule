@@ -154,7 +154,7 @@ public class SimpleDataType implements DataType {
   }
 
   @Override
-  public boolean isStreamType(){
+  public boolean isStreamType() {
     return streamType;
   }
 }
