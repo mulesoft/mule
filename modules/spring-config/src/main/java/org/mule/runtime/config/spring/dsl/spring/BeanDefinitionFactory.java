@@ -8,9 +8,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
@@ -50,35 +52,43 @@ import org.w3c.dom.Element;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
- * {@link org.springframework.beans.factory.config.BeanDefinition} that can later be converted to a runtime object that will be
- * part of the artifact.
+ * {@link org.springframework.beans.factory.config.BeanDefinition} that can later be converted to a runtime object
+ * that will be part of the artifact.
  * <p>
- * It will recursively process a {@code ComponentModel} to create a {@code BeanDefinition}. For the time being it will collaborate
- * with the old bean definitions parsers for configurations that are partially defined in the new parsing method.
+ * It will recursively process a {@code ComponentModel} to create a {@code BeanDefinition}. For the time being
+ * it will collaborate with the old bean definitions parsers for configurations that are partially defined in the
+ * new parsing method.
  *
  * @since 4.0
  */
 public class BeanDefinitionFactory {
 
-  private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers = ImmutableSet
-      .<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build())
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build()).build();
+  public static final String SPRING_PROTOTYPE_OBJECT = "prototype";
+  public static final String SPRING_SINGLETON_OBJECT = "singleton";
+
+  private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(MULE_IDENTIFIER)
+          .add(DESCRIPTION_IDENTIFIER)
+          .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
+          .add(DOC_DESCRIPTION_IDENTIFIER)
+          .build();
 
   /**
-   * These are the set of current language construct that have specific bean definitions parsers since we don't want to include
-   * them in the parsing API.
+   * These are the set of current language construct that have specific bean definitions parsers since we don't want to
+   * include them in the parsing API.
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build()).build();
+      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build())
+      .build();
 
 
   private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private BeanDefinitionCreator componentModelProcessor;
+  private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
   /**
-   * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
-   *        artifact.
+   * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the artifact.
    */
   public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
@@ -88,15 +98,15 @@ public class BeanDefinitionFactory {
   /**
    * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
    *
-   * @param parentComponentModel the parent component model since the bean definition to be created may depend on the context.
-   * @param componentModel the component model from which we want to create the bean definition.
-   * @param registry the bean registry since it may be required to get other bean definitions to create this one or to register
-   *        the bean definition.
+   * @param parentComponentModel        the parent component model since the bean definition to be created may depend on the context.
+   * @param componentModel              the component model from which we want to create the bean definition.
+   * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register the bean definition.
    * @param componentModelPostProcessor a function to post process the bean definition.
-   * @param oldParsingMechanism a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
+   * @param oldParsingMechanism         a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
    * @return the {@code BeanDefinition} of the component model.
    */
-  public BeanDefinition resolveComponentRecursively(ComponentModel parentComponentModel, ComponentModel componentModel,
+  public BeanDefinition resolveComponentRecursively(ComponentModel parentComponentModel,
+                                                    ComponentModel componentModel,
                                                     BeanDefinitionRegistry registry,
                                                     BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor,
                                                     BiFunction<Element, BeanDefinition, BeanDefinition> oldParsingMechanism) {
@@ -124,8 +134,8 @@ public class BeanDefinitionFactory {
     }
     resolveComponentBeanDefinition(parentComponentModel, componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
-    // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
-    // how core constructs are processed.
+    //TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
+    //how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
@@ -156,7 +166,9 @@ public class BeanDefinitionFactory {
       boolean isWrapperComponent = isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier()));
       if (!isWrapperComponent) {
         throw new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency "
-            + "missing to the project that handle that extension.", componentModel.getIdentifier())));
+            +
+            "missing to the project that handle that extension.",
+                                                                  componentModel.getIdentifier())));
       }
       processComponentWrapper(componentModel);
     }
@@ -195,7 +207,7 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
-    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
+    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
     exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
     filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
@@ -208,13 +220,12 @@ public class BeanDefinitionFactory {
   }
 
   /**
-   * Used to collaborate with the bean definition parsers mechanism. If {@code #hasDefinition} returns false, then the old
-   * mechanism must be used.
+   * Used to collaborate with the bean definition parsers mechanism.
+   * If {@code #hasDefinition} returns false, then the old mechanism must be used.
    *
-   * @param componentIdentifier a {@code ComponentModel} identifier.
+   * @param componentIdentifier          a {@code ComponentModel} identifier.
    * @param parentComponentModelOptional the {@code ComponentModel} parent identifier.
-   * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's
-   *         not.
+   * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's not.
    */
   public boolean hasDefinition(ComponentIdentifier componentIdentifier,
                                Optional<ComponentIdentifier> parentComponentModelOptional) {
@@ -224,7 +235,7 @@ public class BeanDefinitionFactory {
         || isWrapperComponent(componentIdentifier, parentComponentModelOptional);
   }
 
-  // TODO MULE-9638 this code will be removed and a cache will be implemented
+  //TODO MULE-9638 this code will be removed and a cache will be implemented
   public boolean isWrapperComponent(ComponentIdentifier componentModel,
                                     Optional<ComponentIdentifier> parentComponentModelOptional) {
     if (!parentComponentModelOptional.isPresent()) {
@@ -273,5 +284,12 @@ public class BeanDefinitionFactory {
         .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
     return wrapperIdentifierAndTypeMap;
+  }
+
+  /**
+   * Release resources from the bean factory.
+   */
+  public void destroy() {
+    objectFactoryClassRepository.destroy();
   }
 }

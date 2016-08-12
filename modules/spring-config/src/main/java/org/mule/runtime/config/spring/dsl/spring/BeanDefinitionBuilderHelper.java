@@ -13,8 +13,8 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
 /**
- * Helper for {@link org.springframework.beans.factory.support.BeanDefinitionBuilder} to use the proper methods to populate a
- * reference or value to a constructor or setter.
+ * Helper for {@link org.springframework.beans.factory.support.BeanDefinitionBuilder} to use the proper methods
+ * to populate a reference or value to a constructor or setter.
  *
  * @since 4.0
  */
@@ -24,13 +24,6 @@ class BeanDefinitionBuilderHelper {
 
   public BeanDefinitionBuilderHelper(BeanDefinitionBuilder beanDefinitionBuilder) {
     this.beanDefinitionBuilder = beanDefinitionBuilder;
-  }
-
-  /**
-   * @param reference adds a constructor parameter which is a reference to another bean
-   */
-  public void addConstructorReference(String reference) {
-    this.beanDefinitionBuilder.addConstructorArgReference(reference);
   }
 
   /**

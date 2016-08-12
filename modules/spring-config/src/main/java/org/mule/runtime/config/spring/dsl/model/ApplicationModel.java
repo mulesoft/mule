@@ -50,25 +50,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
- * configuration option.
+ * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model
+ * to represent any configuration option.
  * <p/>
- * This model is represented by a set of {@link org.mule.runtime.config.spring.dsl.model.ComponentModel}. Each
- * {@code ComponentModel} holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact
- * configuration.
+ * This model is represented by a set of {@link org.mule.runtime.config.spring.dsl.model.ComponentModel}. Each {@code ComponentModel}
+ * holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact configuration.
  * <p/>
- * Once the set of {@code ComponentModel} gets created from the application
- * {@link org.mule.runtime.config.spring.dsl.processor.ConfigFile}s the {@code ApplicationModel} executes a set of common
- * validations dictated by the configuration semantics.
+ * Once the set of {@code ComponentModel} gets created from the application {@link org.mule.runtime.config.spring.dsl.processor.ConfigFile}s
+ * the {@code ApplicationModel} executes a set of common validations dictated by the configuration semantics.
  *
  * @since 4.0
  */
 public class ApplicationModel {
 
-  // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
+  //TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String MULE_ROOT_ELEMENT = "mule";
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
-  public static final String DESCRIPTION_ELEMENT = "description";
+  public static final String ANNOTATIONS = "annotations";
   public static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
@@ -90,9 +88,12 @@ public class ApplicationModel {
   public static final String QUEUE_STORE = "queue-store";
   public static final String CONFIGURATION_ELEMENT = "configuration";
   public static final String DATA_WEAVE = "weave";
+  public static final String CUSTOM_TRANSFORMER = "custom-transformer";
+  public static final String DESCRIPTION_ELEMENT = "description";
 
-  // TODO MULE-9638 Remove once all bean definitions parsers where migrated
+  //TODO MULE-9638 Remove once all bean definitions parsers where migrated
   public static final String TEST_NAMESPACE = "test";
+  public static final String DOC_NAMESPACE = "doc";
   public static final String DB_NAMESPACE = "db";
   public static final String JAAS_NAMESPACE = "jaas";
   public static final String SPRING_SECURITY_NAMESPACE = "ss";
@@ -107,6 +108,7 @@ public class ApplicationModel {
   public static final String BATCH_NAMESPACE = "batch";
   public static final String PARSER_TEST_NAMESPACE = "parsers-test";
   public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
+  public static final String GLOBAL_PROPERTY = "global-property";
 
   public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
@@ -134,64 +136,76 @@ public class ApplicationModel {
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build();
   public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONFIGURATION_ELEMENT).build();
+  public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CUSTOM_TRANSFORMER).build();
   public static final ComponentIdentifier SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_CONTEXT_NAMESPACE).withName(PROPERTY_PLACEHOLDER_ELEMENT).build();
+  public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(DOC_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
+  public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build();
+  public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATIONS).build();
 
-  private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList = ImmutableSet
-      .<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("alias").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("in-memory-store").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("password-encryption-strategy").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-security-provider").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-encryption-strategy").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("secret-key-encryption-strategy").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("import").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("string-to-byte-array-transformer")
-          .build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("append-string-transformer").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("data-type").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("in-param").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("out-param").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("template-query-ref").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("inout-param").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("password-encryption-strategy").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("security-provider").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("property").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("bean").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(SPRING_SECURITY_NAMESPACE).withName("user").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_SECURITY_NAMESPACE).withName("delegate-security-provider")
-          .build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_SECURITY_NAMESPACE).withName("security-manager").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_XML_NAMESPACE).withName("xslt-transformer").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(MULE_XML_NAMESPACE).withName("alias").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(PGP_NAMESPACE).withName("security-provider").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(PGP_NAMESPACE).withName("keybased-encryption-strategy").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("param").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("attribute").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("element").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("outbound-endpoint").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("inbound-endpoint").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("set-cookie").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("header").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-object-transformer")
-          .build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-string-transformer")
-          .build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("message-to-http-response-transformer")
-          .build())
-      .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("object-to-http-request-transformer").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("child").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("kid").build())
-      .add(new ComponentIdentifier.Builder().withNamespace(DATA_WEAVE).withName("reader-property").build()).build();
+  private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("alias").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("in-memory-store").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("password-encryption-strategy")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-security-provider").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-encryption-strategy").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("secret-key-encryption-strategy")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("import").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("string-to-byte-array-transformer")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("append-string-transformer").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("data-type").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("in-param").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("out-param").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("template-query-ref").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("inout-param").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("password-encryption-strategy").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("security-provider").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("property").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("bean").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(SPRING_SECURITY_NAMESPACE).withName("user").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_SECURITY_NAMESPACE).withName("delegate-security-provider")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_SECURITY_NAMESPACE).withName("security-manager").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_XML_NAMESPACE).withName("xslt-transformer").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(MULE_XML_NAMESPACE).withName("alias").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(PGP_NAMESPACE).withName("security-provider").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(PGP_NAMESPACE).withName("keybased-encryption-strategy").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("param").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("attribute").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("element").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("outbound-endpoint").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("inbound-endpoint").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("set-cookie").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("header").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-object-transformer")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-string-transformer")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("message-to-http-response-transformer")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("object-to-http-request-transformer")
+              .build())
+          .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("child").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("kid").build())
+          .add(new ComponentIdentifier.Builder().withNamespace(DATA_WEAVE).withName("reader-property").build())
+          .build();
 
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private List<ComponentModel> springComponentModels = new LinkedList<>();
@@ -203,7 +217,7 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
+   * @param artifactConfig        the mule artifact configuration content.
    * @param artifactConfiguration an {@link ArtifactConfiguration}
    * @throws Exception when the application configuration has semantic errors.
    */
@@ -216,13 +230,12 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
-   * @param artifactConfiguration an {@link ArtifactConfiguration}
-   * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *        this model to their definitions
+   * @param artifactConfig                      the mule artifact configuration content.
+   * @param artifactConfiguration               an {@link ArtifactConfiguration}
+   * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in this model to their definitions
    * @throws Exception when the application configuration has semantic errors.
    */
-  // TODO: MULE-9638 remove this optional
+  //TODO: MULE-9638 remove this optional
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
       throws Exception {
@@ -242,8 +255,10 @@ public class ApplicationModel {
   }
 
   private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot) {
-    ComponentModel.Builder builder = new ComponentModel.Builder().setIdentifier(new ComponentIdentifier.Builder()
-        .withName(componentConfiguration.getIdentifier()).withNamespace(componentConfiguration.getNamespace()).build());
+    ComponentModel.Builder builder = new ComponentModel.Builder()
+        .setIdentifier(new ComponentIdentifier.Builder()
+            .withName(componentConfiguration.getIdentifier())
+            .withNamespace(componentConfiguration.getNamespace()).build());
     if (isRoot) {
       builder.markAsRootComponent();
     }
@@ -258,11 +273,15 @@ public class ApplicationModel {
   }
 
   private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig) {
-    // TODO MULE-9825: a new mechanism for property placeholders need to be defined
+    //TODO MULE-9825: a new mechanism for property placeholders need to be defined
     final List<String> locations = new ArrayList<>();
+    final Map<String, String> globalProperties = new HashMap<>();
     artifactConfig.getConfigFiles().stream().forEach(configFile -> {
       configFile.getConfigLines().get(0).getChildren().stream().forEach(configLine -> {
-        if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT)) {
+        if (GLOBAL_PROPERTY.equals(configLine.getIdentifier())) {
+          globalProperties.put(configLine.getConfigAttributes().get("name").getValue(),
+                               configLine.getConfigAttributes().get("value").getValue());
+        } else if (PROPERTY_PLACEHOLDER_ELEMENT.equals(configLine.getIdentifier())) {
           String locationValue = configLine.getConfigAttributes().get("location").getValue();
           locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
           locationValue = locationValue.replace("classpath:/", "");
@@ -273,11 +292,11 @@ public class ApplicationModel {
     applicationProperties = new Properties();
     applicationProperties.putAll(getenv());
     applicationProperties.putAll(getProperties());
-    // TODO MULE-9638: This check should not be required once we don't use the old mechanism.
+    //TODO MULE-9638: This check should not be required once we don't use the old mechanism.
     if (artifactConfig.getApplicationProperties() != null) {
       applicationProperties.putAll(artifactConfig.getApplicationProperties());
-
     }
+    applicationProperties.putAll(globalProperties);
     for (String propertyFileLocation : locations) {
       Properties properties = new Properties();
       try (InputStream propertiesFileInputStream =
@@ -294,7 +313,7 @@ public class ApplicationModel {
    * @param element element which was the source of the {@code ComponentModel}.
    * @return the {@code ComponentModel} created from the element.
    */
-  // TODO MULE-9638: remove once the old parsing mechanism is not needed anymore
+  //TODO MULE-9638: remove once the old parsing mechanism is not needed anymore
   public ComponentModel findComponentDefinitionModel(Element element) {
     return innerFindComponentDefinitionModel(element, muleComponentModels);
   }
@@ -303,21 +322,23 @@ public class ApplicationModel {
     if (muleComponentModels.isEmpty()) {
       return empty();
     }
-    return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
+    return muleComponentModels.get(0).getInnerComponents().stream()
+        .filter(ComponentModel::isRoot)
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
   }
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
     List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
-    configFiles.stream().forEach(configFile -> {
-      List<ComponentModel> componentModels =
-          extractComponentDefinitionModel(asList(configFile.getConfigLines().get(0)), configFile.getFilename());
-      if (isMuleConfigFile(configFile)) {
-        muleComponentModels.addAll(componentModels);
-      } else {
-        springComponentModels.addAll(componentModels);
-      }
-    });
+    configFiles.stream()
+        .forEach(configFile -> {
+          List<ComponentModel> componentModels =
+              extractComponentDefinitionModel(asList(configFile.getConfigLines().get(0)), configFile.getFilename());
+          if (isMuleConfigFile(configFile)) {
+            muleComponentModels.addAll(componentModels);
+          } else {
+            springComponentModels.addAll(componentModels);
+          }
+        });
 
   }
 
@@ -341,8 +362,7 @@ public class ApplicationModel {
     if (muleComponentModels.isEmpty() || !isMuleConfigurationFile()) {
       return;
     }
-    // TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all
-    // validations instead of failing fast.
+    //TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all validations instead of failing fast.
     validateNameIsNotRepeated();
     validateNameIsOnlyOnTopLevelElements();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
@@ -364,7 +384,8 @@ public class ApplicationModel {
               findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
           if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER)) {
             throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
-                + "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
+                +
+                "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
           }
         }
       }
@@ -474,16 +495,18 @@ public class ApplicationModel {
       throws ConfigurationException {
     try {
       List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
-      topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent -> {
-        final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
-        componentBuildingDefinitionRegistry.getBuildingDefinition(identifier).filter(ComponentBuildingDefinition::isNamed)
-            .ifPresent(buildingDefinition -> {
-              if (isBlank(topLevelComponent.getNameAttribute())) {
-                throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
-                                                                          identifier.getNamespace(), identifier.getName())));
-              }
-            });
-      });
+      topLevelComponents.stream().filter(this::isMuleComponent)
+          .forEach(topLevelComponent -> {
+            final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
+            componentBuildingDefinitionRegistry.getBuildingDefinition(identifier)
+                .filter(ComponentBuildingDefinition::isNamed)
+                .ifPresent(buildingDefinition -> {
+                  if (isBlank(topLevelComponent.getNameAttribute())) {
+                    throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
+                                                                              identifier.getNamespace(), identifier.getName())));
+                  }
+                });
+          });
     } catch (Exception e) {
       throw new ConfigurationException(e);
     }
@@ -509,7 +532,7 @@ public class ApplicationModel {
                                       boolean avoidSpringElements)
       throws MuleRuntimeException {
     if (component.getIdentifier().getNamespace().equals(SPRING_NAMESPACE) && avoidSpringElements) {
-      // TODO MULE-9648: for now do no process beans inside spring
+      //TODO MULE-9648: for now do no process beans inside spring
       return;
     }
     component.getInnerComponents().forEach((innerComponent) -> {
@@ -523,7 +546,10 @@ public class ApplicationModel {
     for (final ConfigLine configLine : configLines) {
       String namespace = configLine.getNamespace() == null ? CORE_NAMESPACE_NAME : configLine.getNamespace();
       ComponentModel.Builder builder = new ComponentModel.Builder()
-          .setIdentifier(new ComponentIdentifier.Builder().withNamespace(namespace).withName(configLine.getIdentifier()).build())
+          .setIdentifier(new ComponentIdentifier.Builder()
+              .withNamespace(namespace)
+              .withName(configLine.getIdentifier())
+              .build())
           .setTextContent(configLine.getTextContent());
       to(builder).addNode(from(configLine).getNode()).addConfigFileName(configFileName);
       for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
@@ -575,8 +601,7 @@ public class ApplicationModel {
   }
 
   /**
-   * TODO MULE-9688: When the model it's made immutable we will also provide the parent component for navigation and this will not
-   * be needed anymore.
+   * TODO MULE-9688: When the model it's made immutable we will also provide the parent component for navigation and this will not be needed anymore.
    *
    * @return the root component model
    */

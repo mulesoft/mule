@@ -31,14 +31,14 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
 /**
  * Based on the object building definition provided by {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
  * and the user configuration defined in {@link org.mule.runtime.config.spring.dsl.model.ComponentModel} it populates all the
- * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
- * {@link org.mule.runtime.config.spring.dsl.spring.BeanDefinitionBuilderHelper}.
+ * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class {@link org.mule.runtime.config.spring.dsl.spring.BeanDefinitionBuilderHelper}.
  *
  * @since 4.0
  */
@@ -53,7 +53,8 @@ class ComponentConfigurationBuilder {
   private final ComponentModel componentModel;
   private final ComponentBuildingDefinition componentBuildingDefinition;
 
-  public ComponentConfigurationBuilder(ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition,
+  public ComponentConfigurationBuilder(ComponentModel componentModel,
+                                       ComponentBuildingDefinition componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
@@ -76,15 +77,15 @@ class ComponentConfigurationBuilder {
 
   private List<ComponentValue> collectComplexParametersWithTypes(ComponentModel componentModel) {
     /*
-     * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
-     * away one we remove the old parsing method.
+     * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition.
+     * This code will go away one we remove the old parsing method.
      */
     return componentModel.getInnerComponents().stream().map(cdm -> {
-      // When it comes from old model it does not have the type set
+      //When it comes from old model it does not have the type set
       Class<?> beanDefinitionType = cdm.getType();
       if (beanDefinitionType == null) {
         if (cdm.getBeanDefinition() == null) {
-          // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
+          //Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
           return null;
         } else {
           try {
@@ -92,7 +93,7 @@ class ComponentConfigurationBuilder {
             if (beanClassName != null) {
               beanDefinitionType = ClassUtils.getClass(beanClassName);
             } else {
-              // Happens in case of spring:property
+              //Happens in case of spring:property
               beanDefinitionType = Object.class;
             }
           } catch (ClassNotFoundException e) {
@@ -103,12 +104,13 @@ class ComponentConfigurationBuilder {
       }
       Object bean = cdm.getBeanDefinition() != null ? cdm.getBeanDefinition() : cdm.getBeanReference();
       return new ComponentValue(cdm, beanDefinitionType, bean);
-    }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
+    })
+        .filter(beanDefinitionTypePair -> beanDefinitionTypePair != null)
+        .collect(toList());
   }
 
   private ConfigurableAttributeDefinitionVisitor constructorVisitor() {
-    return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue,
-                                                      beanDefinitionBuilderHelper::addConstructorReference);
+    return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue);
   }
 
   private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName, AttributeDefinition attributeDefinition) {
@@ -120,7 +122,7 @@ class ComponentConfigurationBuilder {
         return;
       }
       beanDefinitionBuilderHelper.forProperty(propertyName).addValue(value);
-    }, beanDefinitionBuilderHelper.forProperty(propertyName)::addReference);
+    });
   }
 
   private boolean isPropertySetWithUserConfigValue(String propertyName, Optional<Object> defaultValue, Object value) {
@@ -129,28 +131,26 @@ class ComponentConfigurationBuilder {
   }
 
   /**
-   * Process a single {@link AttributeDefinition} from a {@link ComponentBuildingDefinition} and uses an invokes a
-   * {@code Consumer} when the value is a bean definition or a different {@code Consumer} if the value is a bean reference.
+   * Process a single {@link AttributeDefinition} from a {@link ComponentBuildingDefinition} and
+   * uses an invokes a {@code Consumer} when the value is a bean definition or a different {@code Consumer}
+   * if the value is a bean reference.
    */
   private class ConfigurableAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
-    private final Consumer<String> referenceConsumer;
     private final Consumer<Object> valueConsumer;
 
     /**
      * @param valueConsumer consumer for handling a bean definition
-     * @param referenceConsumer consumer for handling a bean reference
      */
-    ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer, Consumer<String> referenceConsumer) {
+    ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer) {
       this.valueConsumer = valueConsumer;
-      this.referenceConsumer = referenceConsumer;
     }
 
     @Override
     public void onReferenceObject(Class<?> objectType) {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onReferenceObject(objectType);
-      referenceConsumer.accept(valueExtractor.getStringValue());
+      valueConsumer.accept(valueExtractor.getValue());
     }
 
     @Override
@@ -158,10 +158,7 @@ class ComponentConfigurationBuilder {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onReferenceSimpleParameter(configAttributeName);
       Object value = valueExtractor.getValue();
-      if (value instanceof String) {
-        referenceConsumer.accept((String) value);
-
-      } else if (value != null) {
+      if (value != null) {
         valueConsumer.accept(value);
       } else {
         valueConsumer.accept(null);
@@ -260,13 +257,15 @@ class ComponentConfigurationBuilder {
 
     @Override
     public void onReferenceObject(Class<?> objectType) {
-      objectReferencePopulator.populate(objectType, referenceId -> this.value = referenceId);
+      objectReferencePopulator.populate(objectType, referenceId -> this.value = new RuntimeBeanReference(referenceId));
     }
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
       String reference = simpleParameters.get(configAttributeName);
-      this.value = reference;
+      if (reference != null) {
+        this.value = new RuntimeBeanReference(reference);
+      }
       simpleParameters.remove(configAttributeName);
       if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy")) {
         ProcessingStrategy processingStrategy = parseProcessingStrategy(reference);
@@ -306,8 +305,9 @@ class ComponentConfigurationBuilder {
     @Override
     public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier) {
       Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
-      List<ComponentValue> matchingComponentValues =
-          complexParameters.stream().filter(matchesTypeAndIdentifierPredicate).collect(toList());
+      List<ComponentValue> matchingComponentValues = complexParameters.stream()
+          .filter(matchesTypeAndIdentifierPredicate)
+          .collect(toList());
 
       matchingComponentValues.stream().forEach(complexParameters::remove);
       if (wrapperIdentifier.isPresent() && !matchingComponentValues.isEmpty()) {
@@ -321,7 +321,9 @@ class ComponentConfigurationBuilder {
 
     @Override
     public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
-      complexParameters.stream().filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier))).findFirst()
+      complexParameters.stream()
+          .filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier)))
+          .findFirst()
           .ifPresent(componentValue -> {
             complexParameters.remove(componentValue);
             value = componentValue.getBean();

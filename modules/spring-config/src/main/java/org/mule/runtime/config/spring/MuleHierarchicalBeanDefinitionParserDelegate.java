@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
@@ -60,8 +61,8 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling There are 4 base
- * DefinitionParsers supplied in Mule that most Parsers will extend from, these are
+ * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling
+ * There are 4 base DefinitionParsers supplied in Mule that most Parsers will extend from, these are
  * {@link org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser}
  * {@link org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser}
  * {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser}
@@ -114,10 +115,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     } else {
       String namespaceUri = element.getNamespaceURI();
       NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
-      if (handler == null) {
-        getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", element);
-        return null;
-      }
 
       boolean noRecurse = false;
       boolean forceRecurse = false;
@@ -146,18 +143,15 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                                                                 BeanDefinitionFactory.checkElementNameUnique(registry, element);
                                                                 registry.registerBeanDefinition(name, resolvedComponent
                                                                     .getBeanDefinition());
+                                                                postProcessBeanDefinition(resolvedComponent, registry, name);
                                                               }
                                                             }, (mpElement, beanDefinition) -> {
-                                                              // We don't want the bean definition to be automatically injected in
-                                                              // the parent bean in this cases since the parent is using the new
-                                                              // parsing mechanism.
-                                                              // Here it will always be a nested element. We use a fake bean
-                                                              // definition so it does not try to validate the ID if it thinks is
-                                                              // a global element
+                                                              //We don't want the bean definition to be automatically injected in the parent bean in this cases since the parent is using the new parsing mechanism.
+                                                              //Here it will always be a nested element. We use a fake bean definition so it does not try to validate the ID if it thinks is a global element
                                                               return parseCustomElement(mpElement, BeanDefinitionBuilder
                                                                   .genericBeanDefinition().getBeanDefinition());
                                                             });
-          // Do not iterate since this iteration is done iside the resolve component going through childrens
+          //Do not iterate since this iteration is done iside the resolve component going through childrens
           return null;
         } else {
           if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)) {
@@ -222,26 +216,26 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     }
   }
 
-  // TODO MULE-9638 Remove this ugly code since it's not going to be needed anymore.
+  //TODO MULE-9638 Remove this ugly code since it's not going to be needed anymore.
   private void setComponentModelTypeFromBeanDefinition(BeanDefinition finalChild, ComponentModel componentModel) {
-    if (componentModel != null) // This condition is needed when we are parsing something unrelated to mule. See ReferenceTestCase
+    if (componentModel != null) //This condition is needed when we are parsing something unrelated to mule. See ReferenceTestCase
     {
       if (finalChild != null) {
         try {
           Class<?> type = ClassUtils.getClass(finalChild.getBeanClassName());
           if (FactoryBean.class.isAssignableFrom(type)) {
             try {
-              // When the FactoryBean implementation implements the FactoryBean directly.
+              //When the FactoryBean implementation implements the FactoryBean directly.
               type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericInterfaces()[0])
                   .getActualTypeArguments()[0];
             } catch (Exception e2) {
               try {
-                // When the FactoryBean implementation extends a Class that implements FactoryBean.
+                //When the FactoryBean implementation extends a Class that implements FactoryBean.
                 type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericSuperclass())
                     .getActualTypeArguments()[0];
               } catch (Exception e3) {
                 try {
-                  // We get the type directly from a FactoryBean instance if it has a default constructor.
+                  //We get the type directly from a FactoryBean instance if it has a default constructor.
                   type = ((FactoryBean) type.newInstance()).getObjectType();
                 } catch (InstantiationException e) {
                   type = Object.class;
@@ -260,8 +254,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   /**
    * Determines if the {@code element} must be parsed using the new mechanism or the old one.
    *
-   * It will use the new mechanism if it's not a root element or if the parent has not been parsed with the old mechanism or if
-   * there's not a {@code org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} defined for the {@code element}.
+   * It will use the new mechanism if it's not a root element or if the parent has not been parsed
+   * with the old mechanism or if there's not a {@code org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+   * defined for the {@code element}.
    *
    * @param element xml element from the XML configuration file.
    * @return true if the parsing should be done with the new mechanism, false otherwise.
@@ -338,21 +333,21 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     // i am trying to keep these to a minimum - using anything but "bean" is a recipe
     // for disaster - we already have problems with "property", for example.
 
-    // else if (isLocalName(element, MAP_ELEMENT))
-    // {
-    // // currently unused?
-    // parseMapElement(element, bd);
-    // }
-    // else if (isLocalName(element, LIST_ELEMENT))
-    // {
-    // // currently unused?
-    // parseListElement(element, bd);
-    // }
-    // else if (isLocalName(element, SET_ELEMENT))
-    // {
-    // // currently unused?
-    // parseSetElement(element, bd);
-    // }
+    //        else if (isLocalName(element, MAP_ELEMENT))
+    //        {
+    //            // currently unused?
+    //            parseMapElement(element, bd);
+    //        }
+    //        else if (isLocalName(element, LIST_ELEMENT))
+    //        {
+    //            // currently unused?
+    //            parseListElement(element, bd);
+    //        }
+    //        else if (isLocalName(element, SET_ELEMENT))
+    //        {
+    //            // currently unused?
+    //            parseSetElement(element, bd);
+    //        }
 
     else if (SpringXMLUtils.isLocalName(element, BEAN_ELEMENT)) {
       BeanDefinitionHolder holder = parseBeanDefinitionElement(element, parent);
@@ -380,7 +375,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   }
 
   protected void registerBeanDefinitionHolder(BeanDefinitionHolder bdHolder) {
-    // bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder);
+    //bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder);
     // Register the final decorated instance.
     BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
     // Send registration event.
@@ -402,7 +397,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   }
 
   public static boolean testFlag(BeanDefinition bean, String flag) {
-    return null != bean && bean.hasAttribute(flag) && bean.getAttribute(flag) instanceof Boolean
+    return null != bean
+        && bean.hasAttribute(flag)
+        && bean.getAttribute(flag) instanceof Boolean
         && ((Boolean) bean.getAttribute(flag)).booleanValue();
   }
 

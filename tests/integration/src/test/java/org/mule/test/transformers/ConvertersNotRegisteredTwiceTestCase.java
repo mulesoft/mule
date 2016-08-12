@@ -13,6 +13,7 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;

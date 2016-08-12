@@ -14,6 +14,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
@@ -21,6 +22,9 @@ import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBea
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.transformer.simple.AddAttachmentTransformer;
+import org.mule.compatibility.core.transformer.simple.CopyAttachmentsTransformer;
+import org.mule.compatibility.core.transformer.simple.RemoveAttachmentTransformer;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
@@ -61,11 +65,15 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
     componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().build());
     componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
     componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
-    componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(ENDPOINT_RESPONSE_ELEMENT).withTypeDefinition(fromType(MessageProcessor.class))
-            .withObjectFactoryType(MessageProcessorChainFactoryBean.class).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("service-overrides")
-        .withObjectFactoryType(ServiceOverridesObjectFactory.class).withTypeDefinition(fromType(Map.class))
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier(ENDPOINT_RESPONSE_ELEMENT)
+        .withTypeDefinition(fromType(MessageProcessor.class))
+        .withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .build());
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("service-overrides")
+        .withObjectFactoryType(ServiceOverridesObjectFactory.class)
+        .withTypeDefinition(fromType(Map.class))
         .withSetterParameterDefinition("messageReceiver", fromSimpleParameter("messageReceiver").build())
         .withSetterParameterDefinition("transactedMessageReceiver", fromSimpleParameter("transactedMessageReceiver").build())
         .withSetterParameterDefinition("xaTransactedMessageReceiver", fromSimpleParameter("xaTransactedMessageReceiver").build())
@@ -79,20 +87,41 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("sessionHandler", fromSimpleParameter("sessionHandler").build())
         .withSetterParameterDefinition("inboundExchangePatterns", fromSimpleParameter("inboundExchangePatterns").build())
         .withSetterParameterDefinition("outboundExchangePatterns", fromSimpleParameter("outboundExchangePatterns").build())
-        .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build()).build());
+        .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build())
+        .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("set-attachment")
+        .withTypeDefinition(fromType(AddAttachmentTransformer.class))
+        .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
+        .withSetterParameterDefinition("contentType", fromSimpleParameter("contentType").build())
+        .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("remove-attachment")
+        .withTypeDefinition(fromType(RemoveAttachmentTransformer.class))
+        .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+        .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("copy-attachments")
+        .withTypeDefinition(fromType(CopyAttachmentsTransformer.class))
+        .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+        .build());
     return componentBuildingDefinitions;
   }
 
   protected ComponentBuildingDefinition.Builder getBaseConnector() {
-    return baseDefinition.copy().withIdentifier("connector")
+    return baseDefinition.copy()
+        .withIdentifier("connector")
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(Map.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
   }
 
   protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder() {
-    return baseDefinition.copy().withIdentifier(OUTBOUND_ENDPOINT_ELEMENT)
-        .withObjectFactoryType(OutboundEndpointFactoryBean.class).withTypeDefinition(fromType(OutboundEndpoint.class))
+    return baseDefinition.copy()
+        .withIdentifier(OUTBOUND_ENDPOINT_ELEMENT)
+        .withObjectFactoryType(OutboundEndpointFactoryBean.class)
+        .withTypeDefinition(fromType(OutboundEndpoint.class))
         .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
@@ -113,7 +142,9 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
   }
 
   protected ComponentBuildingDefinition.Builder getEndpointBuildingDefinitionBuilder() {
-    return baseDefinition.copy().withIdentifier(ENDPOINT_ELEMENT).withTypeDefinition(fromType(EndpointURIEndpointBuilder.class))
+    return baseDefinition.copy()
+        .withIdentifier(ENDPOINT_ELEMENT)
+        .withTypeDefinition(fromType(EndpointURIEndpointBuilder.class))
         .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
@@ -130,11 +161,14 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
         .withSetterParameterDefinition("properties", fromUndefinedSimpleAttributes().build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build()).asPrototype();
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .asPrototype();
   }
 
   protected ComponentBuildingDefinition.Builder getInboundEndpointBuildingDefinitionBuilder() {
-    return baseDefinition.copy().withIdentifier(INBOUND_ENDPOINT_ELEMENT).withObjectFactoryType(InboundEndpointFactoryBean.class)
+    return baseDefinition.copy()
+        .withIdentifier(INBOUND_ENDPOINT_ELEMENT)
+        .withObjectFactoryType(InboundEndpointFactoryBean.class)
         .withTypeDefinition(fromType(InboundEndpoint.class))
         .withSetterParameterDefinition("connector", fromSimpleReferenceParameter("connector-ref").build())
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
@@ -156,7 +190,9 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
   }
 
   protected ComponentBuildingDefinition.Builder getBaseTransactionDefinitionBuilder() {
-    return baseDefinition.copy().withIdentifier("transaction").withTypeDefinition(fromType(MuleTransactionConfig.class))
+    return baseDefinition.copy()
+        .withIdentifier("transaction")
+        .withTypeDefinition(fromType(MuleTransactionConfig.class))
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("action", fromSimpleParameter("action", getTransactionActionTypeConverter()).build());
   }
