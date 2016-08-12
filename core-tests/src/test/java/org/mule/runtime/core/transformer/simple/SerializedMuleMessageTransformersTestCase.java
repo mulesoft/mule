@@ -6,13 +6,8 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -23,6 +18,13 @@ import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Ignore;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.testmodels.fruit.Apple;
 
 public class SerializedMuleMessageTransformersTestCase extends AbstractTransformerTestCase {
 
@@ -36,7 +38,9 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     props.put("string", "hello");
     testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
 
-    setCurrentEvent(new DefaultMuleEvent(testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext)));
+    Flow flow = getTestFlow();
+    setCurrentEvent(new DefaultMuleEvent(create(flow), testObject, flow,
+                                         MuleTestUtils.getTestSession(muleContext)));
   }
 
   @Override
@@ -115,10 +119,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
       boolean stringPropertiesAreEqual = compareStringProperties(sourceMuleMessage, resultMuleMessage);
       boolean intPropertiesAreEqual = compareIntProperties(sourceMuleMessage, resultMuleMessage);
 
-      return payloadsAreEqual
-          && objectPropertiesAreEqual
-          && stringPropertiesAreEqual
-          && intPropertiesAreEqual;
+      return payloadsAreEqual && objectPropertiesAreEqual && stringPropertiesAreEqual && intPropertiesAreEqual;
     } else {
       return false;
     }

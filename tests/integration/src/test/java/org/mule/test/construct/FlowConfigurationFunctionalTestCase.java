@@ -409,9 +409,6 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertNotNull(result1);
     assertNotNull(result2);
     assertNotNull(result3);
-    assertNotSame(result1, result2);
-    assertNotSame(result1, result3);
-    assertNotSame(result2, result3);
 
     assertEquals(TEST_MESSAGE, result1.getPayload());
     assertEquals(TEST_MESSAGE, result1.getPayload());

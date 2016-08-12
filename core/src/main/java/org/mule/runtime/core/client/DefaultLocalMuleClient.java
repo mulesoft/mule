@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.core.client;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,9 +35,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-
-import java.io.Serializable;
-import java.util.Map;
 
 public class DefaultLocalMuleClient implements MuleClient {
 
@@ -68,7 +70,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   @Override
   public MuleMessage send(String url, MuleMessage message) throws MuleException {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
-        .locateConnectorOperation(url, newOptions().outbound().build(), MessageExchangePattern.REQUEST_RESPONSE);
+        .locateConnectorOperation(url, newOptions().outbound().build(), REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
       return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
     } else {
@@ -79,7 +81,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   @Override
   public MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
-        .locateConnectorOperation(url, operationOptions, MessageExchangePattern.REQUEST_RESPONSE);
+        .locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
       return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
     } else {
@@ -114,7 +116,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   @Override
   public void dispatch(String url, MuleMessage message) throws MuleException {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
-        .locateConnectorOperation(url, newOptions().outbound().build(), MessageExchangePattern.ONE_WAY);
+        .locateConnectorOperation(url, newOptions().outbound().build(), ONE_WAY);
     if (connectorMessageProcessor != null) {
       connectorMessageProcessor.process(createOneWayMuleEvent(message));
     } else {
@@ -125,7 +127,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   @Override
   public void dispatch(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException {
     final MessageProcessor connectorMessageProcessor =
-        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
+        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
       connectorMessageProcessor.process(createOneWayMuleEvent(message));
     } else {
@@ -137,7 +139,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   public MuleMessage request(String url, long timeout) throws MuleException {
     final OperationOptions operationOptions = newOptions().responseTimeout(timeout).build();
     final MessageProcessor connectorMessageProcessor =
-        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
+        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
       final MuleEvent event =
           connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().nullPayload().build()));
@@ -149,11 +151,13 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext));
+    MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
+    return new DefaultMuleEvent(create(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new MuleClientFlowConstruct(muleContext));
+    MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
+    return new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct);
   }
 
   protected MuleMessage returnMessage(MuleEvent event) {

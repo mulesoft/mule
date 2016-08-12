@@ -10,13 +10,13 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -220,13 +220,13 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
           }
 
-          MuleMessage messageToRoute = createMuleMessage(message, encoding);
+          MuleCompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
           return routeMessage(messageToRoute);
         }
       };
       executionTemplate.execute(processingCallback);
     } else {
-      MuleMessage messageToRoute = createMuleMessage(message, encoding);
+      MuleCompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
       routeMessage(messageToRoute);
     }
   }

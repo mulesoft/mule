@@ -7,6 +7,11 @@
 package org.mule.compatibility.core.client;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.mule.compatibility.core.api.client.LocalMuleClient;
 import org.mule.compatibility.core.api.endpoint.EndpointCache;
@@ -17,7 +22,6 @@ import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
@@ -25,10 +29,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Provides transports support to {@link LocalMuleClient}.
@@ -77,20 +77,18 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
       return endpointCache.getOutboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern(), null);
     } else {
       final Long timeout = cacheKey.getOperationOptions().getResponseTimeout();
-      return new MessageProcessor() {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException {
-          final InboundEndpoint inboundEndpoint =
-              endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
-          MuleMessage message;
-          try {
-            message = inboundEndpoint.request(timeout);
-          } catch (Exception e) {
-            throw new ReceiveException(inboundEndpoint, timeout, e);
-          }
-          return message != null ? new DefaultMuleEvent(message, new MuleClientFlowConstruct(muleContext)) : null;
+      return event -> {
+        final InboundEndpoint inboundEndpoint =
+            endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
+        MuleMessage message;
+        try {
+          message = inboundEndpoint.request(timeout);
+        } catch (Exception e) {
+          throw new ReceiveException(inboundEndpoint, timeout, e);
         }
+        MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
+        return message != null ? new DefaultMuleEvent(create(flowConstruct), message, flowConstruct)
+            : null;
       };
     }
   }

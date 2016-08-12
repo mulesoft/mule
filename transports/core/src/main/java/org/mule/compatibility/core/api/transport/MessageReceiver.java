@@ -9,6 +9,7 @@ package org.mule.compatibility.core.api.transport;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -58,11 +59,11 @@ public interface MessageReceiver extends Connectable, MessageSource {
 
   void setReceiverKey(String key);
 
-  MuleEvent routeMessage(MuleMessage message) throws MuleException;
+  MuleEvent routeMessage(MuleCompatibilityMessage message) throws MuleException;
 
-  MuleEvent routeMessage(MuleMessage message, Transaction trans) throws MuleException;
+  MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans) throws MuleException;
 
-  MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream) throws MuleException;
+  MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans, OutputStream outputStream) throws MuleException;
 
   MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 

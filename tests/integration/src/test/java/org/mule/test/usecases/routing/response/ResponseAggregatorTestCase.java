@@ -13,16 +13,19 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.test.AbstractIntegrationTestCase;
+
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Map;
 
@@ -55,9 +58,9 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
     try {
       MuleEvent event = getTestEvent("message1");
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).correlationId(event.getMessage().getUniqueId()).correlationGroupSize(1).build();
+      final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
       event.setMessage(message);
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(event.getMessage().getUniqueId(), 1, null));
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

@@ -7,6 +7,13 @@
 package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -15,13 +22,8 @@ import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
 
 public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
 
@@ -81,7 +83,9 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
     public void checkResultUri(ImmutableEndpoint ep) throws Exception {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
-        epUri = muleContext.getExpressionManager().parse(ep.getAddress(), new DefaultMuleEvent(message, getTestFlow()), true);
+        Flow flow = getTestFlow();
+        epUri = muleContext.getExpressionManager()
+            .parse(ep.getAddress(), new DefaultMuleEvent(create(flow), message, flow), true);
       } else {
         epUri = ep.getAddress();
       }

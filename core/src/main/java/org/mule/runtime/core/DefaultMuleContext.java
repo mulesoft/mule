@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.Injector;
@@ -170,7 +172,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
 
-  private Map<QName, Set<Object>> configurationAnnotations = new HashMap<QName, Set<Object>>();
+  private Map<QName, Set<Object>> configurationAnnotations = new HashMap<>();
 
   private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
       new SingleResourceTransactionFactoryManager();
@@ -1029,5 +1031,11 @@ public class DefaultMuleContext implements MuleContext {
 
   public void setBootstrapServiceDiscoverer(BootstrapServiceDiscoverer bootstrapServiceDiscoverer) {
     this.bootstrapServiceDiscoverer = bootstrapServiceDiscoverer;
+  }
+
+  @Override
+  public String getId() {
+    MuleConfiguration conf = getConfiguration();
+    return format("%s.%s.%s", conf.getDomainId(), getClusterId(), conf.getId());
   }
 }

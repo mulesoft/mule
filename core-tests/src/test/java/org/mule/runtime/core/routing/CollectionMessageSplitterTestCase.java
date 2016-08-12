@@ -15,17 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,6 +28,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCase {
 
@@ -122,7 +122,8 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     MuleMessage toSplit = MuleMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
+    DefaultMuleEvent event =
+        new DefaultMuleEvent(create(fc), toSplit, fc, session);
     assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
   }
 
@@ -161,7 +162,8 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
-    DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
+    DefaultMuleEvent event =
+        new DefaultMuleEvent(create(fc), toSplit, fc, session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       event.setFlowVariable(entry.getKey(), entry.getValue());
     }
@@ -181,11 +183,12 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
       MuleMessage msg = event.getMessage();
       assertTrue(msg.getPayload() instanceof String);
       if (counted) {
-        assertThat(msg.getCorrelation().getGroupSize().get(), is(count));
+        assertThat(event.getCorrelation().getGroupSize().get(), is(count));
       } else {
-        assertThat(msg.getCorrelation().getGroupSize().isPresent(), is(false));
+        assertThat(event.getCorrelation().getGroupSize().isPresent(), is(false));
       }
-      actualSequences.add(msg.getCorrelation().getSequence().get());
+      actualSequences.add(event.getCorrelation().getSequence().get());
+      // actualSequences.add(msg.getCorrelation().getSequence().get());
       String str = (String) msg.getPayload();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {

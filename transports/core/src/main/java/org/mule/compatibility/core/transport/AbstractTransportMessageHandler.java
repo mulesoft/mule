@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -361,7 +362,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
    * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance. This is the designated way to
    * build {@link MuleMessage}s from the transport specific message.
    */
-  public MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException {
+  public MuleCompatibilityMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException {
     try {
       return muleMessageFactory.create(transportMessage, encoding);
     } catch (Exception e) {

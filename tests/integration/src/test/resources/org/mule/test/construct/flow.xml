@@ -66,7 +66,7 @@
     </flow>
 
     <flow name="split-aggregate">
-        <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
+        <splitter expression="#[payload.fruit]"/>
         <script:transformer>
             <script:script engine="groovy">
                 ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
@@ -78,7 +78,7 @@
     </flow>
     
     <flow name="split-no-parts">
-        <splitter expression="#[xpath3('//Order/item', payload, 'NODESET')]" enableCorrelation="ALWAYS" />
+        <splitter expression="#[xpath3('//Order/item', payload, 'NODESET')]"/>
     </flow>
 
     <flow name="split-aggregate-singleton-list">
@@ -128,7 +128,7 @@
     </flow>
 
     <flow name="split-aggregate-map">
-        <map-splitter enableCorrelation="IF_NOT_SET" />
+        <map-splitter/>
         <script:transformer>
             <script:script engine="groovy">
                 ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
@@ -138,7 +138,7 @@
     </flow>
 
     <flow name="split-filter-aggregate">
-        <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
+        <splitter expression="#[payload.fruit]"/>
         <message-filter throwOnUnaccepted="false">
             <not-filter>
                 <or-filter>
@@ -152,7 +152,7 @@
     </flow>
     
     <flow name="message-chunk-split-aggregate">
-        <message-chunk-splitter messageSize="20" enableCorrelation="ALWAYS"/>
+        <message-chunk-splitter messageSize="20"/>
         <message-chunk-aggregator />
         <test:queue name="message-chunk-split-aggregate-out"/>
     </flow>
@@ -238,7 +238,7 @@
     </flow>
     
     <flow name="multicaster">
-        <all enableCorrelation="ALWAYS">
+        <all>
             <test:queue name="multicaster-out1"/>
             <test:queue name="multicaster-out2"/>
             <processor-chain>

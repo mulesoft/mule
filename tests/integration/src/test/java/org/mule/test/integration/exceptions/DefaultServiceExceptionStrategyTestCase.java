@@ -76,8 +76,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     MuleMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT);
     assertExceptionMessage(out2);
     assertExceptionMessage(out3);
-    assertNotSame(out2, out3);
-    assertThat(out3.getPayload(), equalTo(out2.getPayload()));
+    assertThat(out2, equalTo(out3));
   }
 
   @Test

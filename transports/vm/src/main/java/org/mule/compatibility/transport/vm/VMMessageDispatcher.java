@@ -7,9 +7,12 @@
 package org.mule.compatibility.transport.vm;
 
 import static java.util.Collections.emptyMap;
+
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.NoReceiverForEndpointException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.vm.i18n.VMMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -50,11 +53,18 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
       throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
     }
     MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
+    final MuleCompatibilityMessageBuilder builder =
+        new MuleCompatibilityMessageBuilder(createInboundMessage(eventToDispatch.getMessage()));
+    builder.correlationId(eventToDispatch.getCorrelation().getId().orElse(null));
+    builder.correlationSequence(eventToDispatch.getCorrelation().getSequence().orElse(null));
+    builder.correlationGroupSize(eventToDispatch.getCorrelation().getGroupSize().orElse(null));
+    final MuleCompatibilityMessage message = builder.build();
+
     eventToDispatch.clearFlowVariables();
     eventToDispatch.setMessage(createInboundMessage(eventToDispatch.getMessage()));
     QueueSession session = getQueueSession();
     Queue queue = session.getQueue(endpointUri.getAddress());
-    if (!queue.offer(eventToDispatch.getMessage(), connector.getQueueTimeout())) {
+    if (!queue.offer(message, connector.getQueueTimeout())) {
       // queue is full
       throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()), eventToDispatch, getEndpoint());
     }
@@ -78,7 +88,12 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     MuleEvent eventToSend = DefaultMuleEvent.copy(event);
-    final MuleMessage message = createInboundMessage(eventToSend.getMessage());
+    final MuleCompatibilityMessageBuilder builder =
+        new MuleCompatibilityMessageBuilder(createInboundMessage(eventToSend.getMessage()));
+    builder.correlationId(eventToSend.getCorrelation().getId().orElse(null));
+    builder.correlationSequence(eventToSend.getCorrelation().getSequence().orElse(null));
+    builder.correlationGroupSize(eventToSend.getCorrelation().getGroupSize().orElse(null));
+    final MuleCompatibilityMessage message = builder.build();
 
     ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate
         .createTransactionalExecutionTemplate(event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());

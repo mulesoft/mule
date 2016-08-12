@@ -51,7 +51,7 @@
 
     <flow name="synchronousCollectionAggregatorFlow">
         <transports:set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
-        <collection-splitter enableCorrelation="ALWAYS"/>
+        <collection-splitter/>
         <expression-component>#[sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
         <collection-aggregator failOnTimeout="true" persistentStores="true"/>
     </flow>

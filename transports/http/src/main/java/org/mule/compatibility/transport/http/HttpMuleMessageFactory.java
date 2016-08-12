@@ -9,10 +9,10 @@ package org.mule.compatibility.transport.http;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.IOUtils;
@@ -99,7 +99,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory {
   }
 
   @Override
-  protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addProperties(MuleCompatibilityMessageBuilder messageBuilder, Object transportMessage) throws Exception {
     String method;
     HttpVersion httpVersion;
     String uri;

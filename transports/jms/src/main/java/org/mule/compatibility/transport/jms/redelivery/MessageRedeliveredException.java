@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.jms.redelivery;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
@@ -22,7 +24,7 @@ public class MessageRedeliveredException extends org.mule.compatibility.core.api
   }
 
   protected static DefaultMuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage) {
-    final DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, flow);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

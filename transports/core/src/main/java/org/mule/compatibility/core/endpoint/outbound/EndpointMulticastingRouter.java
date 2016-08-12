@@ -14,7 +14,6 @@ import org.mule.compatibility.core.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
@@ -30,11 +29,6 @@ import org.slf4j.LoggerFactory;
 public final class EndpointMulticastingRouter extends MulticastingRouter {
 
   private static final Logger logger = LoggerFactory.getLogger(MulticastingRouter.class);
-
-  @Override
-  protected void setMessageProperties(FlowConstruct session, MuleEvent event, MessageProcessor target) {
-    // No reply-to or correlation for exception targets, at least for now anyway.
-  }
 
   @Override
   protected MessageProcessor getTemplateRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {

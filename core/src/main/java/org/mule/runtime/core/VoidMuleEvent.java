@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.core;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -21,11 +27,7 @@ import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
+import org.mule.runtime.core.message.Correlation;
 
 /**
  * A {@link VoidMuleEvent} represents a void return from a {@link MessageProcessor} such as a ONE_WAY
@@ -42,6 +44,11 @@ public class VoidMuleEvent implements MuleEvent {
 
   protected VoidMuleEvent() {
     super();
+  }
+
+  @Override
+  public MessageExecutionContext getExecutionContext() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -242,6 +249,21 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public void setSecurityContext(SecurityContext context) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Correlation getCorrelation() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getCorrelationId() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public MuleEvent getParent() {
     throw new UnsupportedOperationException();
   }
 }

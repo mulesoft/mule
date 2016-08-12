@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.core;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 
@@ -23,6 +19,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCase {
@@ -122,7 +122,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   }
 
   protected DefaultMuleEvent createMuleEvent() throws Exception {
-    return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
+    return new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
   }
 
   protected DefaultMuleEvent createMuleEventWithFlowVarsAndProperties(int numProperties) throws Exception {

@@ -33,8 +33,7 @@ class Configuration {
   private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
       new HashMap<>();
   private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<>();
-  private Set<Class<? extends ServerNotificationListener>> disabledInterfaces =
-      new HashSet<>();
+  private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<>();
   private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<>();
   private volatile boolean dirty = true;
   private Policy policy;

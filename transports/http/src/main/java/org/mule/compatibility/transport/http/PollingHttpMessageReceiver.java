@@ -14,13 +14,17 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -113,12 +117,14 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
     }
     requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
-    MuleEvent event = new DefaultMuleEvent(requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
+    // TODO can a correlation id come as a header?
+    MuleEvent event = new DefaultMuleEvent(create(flowConstruct), requestBuider.build(),
+                                           outboundEndpoint.getExchangePattern(), flowConstruct);
 
     MuleEvent result = outboundEndpoint.process(event);
-    MuleMessage message = null;
+    MuleCompatibilityMessage message = null;
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-      message = result.getMessage();
+      message = new MuleCompatibilityMessageBuilder(result.getMessage()).build();
     }
 
     final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);

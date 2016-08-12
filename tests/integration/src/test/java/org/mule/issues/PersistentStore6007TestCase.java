@@ -8,22 +8,9 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
-
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,6 +22,19 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +74,10 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
 
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
+        Flow flow = getTestFlow();
         MuleEvent event =
-            new DefaultMuleEvent(MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
+            new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(str).build(), ONE_WAY, flow,
+                                 new DefaultMuleSession());
         events.put(buildQueueKey(event), event);
       }
     }

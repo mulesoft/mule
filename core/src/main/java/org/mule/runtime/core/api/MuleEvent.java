@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.api;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -14,14 +19,11 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
+import org.mule.runtime.core.message.Correlation;
 
 /**
  * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
@@ -38,6 +40,31 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   int TIMEOUT_WAIT_FOREVER = 0;
   int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
+
+  /**
+   * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
+   */
+  MessageExecutionContext getExecutionContext();
+
+  /**
+   * Returns the correlation metadata of this message. See {@link Correlation}.
+   * 
+   * @return the correlation metadata of this message.
+   */
+  Correlation getCorrelation();
+
+  /**
+   * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
+   * event.
+   * 
+   * @return the correlation id to use for this event.
+   */
+  String getCorrelationId();
+
+  /**
+   * @return the {@link MuleEvent}
+   */
+  MuleEvent getParent();
 
   /**
    * Returns the message payload for this event
@@ -289,5 +316,4 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param context the context for this session or null if the request is not secure.
    */
   void setSecurityContext(SecurityContext context);
-
 }

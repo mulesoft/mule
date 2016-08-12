@@ -9,24 +9,8 @@ package org.mule.runtime.core.el;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.el.context.AbstractELTestCase;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
-import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.tck.testmodels.fruit.FruitCleaner;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import java.util.Collections;
 
@@ -36,6 +20,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
+import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.FruitCleaner;
 
 @SmallTest
 public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
@@ -106,8 +105,9 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichFlowVariable() throws Exception {
-    MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(), MessageExchangePattern.ONE_WAY,
-                                           new Flow("flow", muleContext));
+    Flow flow = new Flow("flow", muleContext);
+    MuleEvent event =
+        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("flowVars['foo']", event, "bar");
     Assert.assertEquals("bar", event.getFlowVariable("foo"));
     Assert.assertNull(event.getSession().getProperty("foo"));
@@ -115,8 +115,9 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichSessionVariable() throws Exception {
-    MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(), MessageExchangePattern.ONE_WAY,
-                                           new Flow("flow", muleContext));
+    Flow flow = new Flow("flow", muleContext);
+    MuleEvent event =
+        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("sessionVars['foo']", event, "bar");
     Assert.assertEquals("bar", event.getSession().getProperty("foo"));
     Assert.assertNull(event.getFlowVariable("foo"));

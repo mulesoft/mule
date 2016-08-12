@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,7 +36,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.util.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,7 +205,7 @@ public class PollingMessageSource
 
         @Override
         public MuleEvent process() throws Exception {
-          MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.ONE_WAY, flowConstruct);
+          MuleEvent event = new DefaultMuleEvent(create(flowConstruct), request, ONE_WAY, flowConstruct);
           event = interceptor.prepareSourceEvent(event);
 
           setCurrentEvent(event);

@@ -6,32 +6,9 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
-import org.mule.compatibility.core.api.config.MuleEndpointProperties;
-import org.mule.compatibility.core.api.endpoint.EndpointFactory;
-import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.module.cxf.CxfConfiguration;
-import org.mule.runtime.module.cxf.CxfConstants;
-import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
-import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
-import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,10 +25,37 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import org.mule.compatibility.core.api.endpoint.EndpointFactory;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
+import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
+import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
 
 public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
-  private Map<String, OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
+  private Map<String, OutboundEndpoint> endpoints = new HashMap<>();
 
   public EndpointMuleUniversalConduit(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
                                       EndpointReferenceType t) {
@@ -107,8 +111,34 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
       try {
         ep = getEndpoint(muleContext, url);
-        event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
-        // event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
+        FlowConstruct flowConstruct = new FlowConstruct() {
+
+          @Override
+          public MuleContext getMuleContext() {
+            return muleContext;
+          }
+
+          @Override
+          public String getName() {
+            return "EndpointNotificationLoggerAgent";
+          }
+
+          @Override
+          public LifecycleState getLifecycleState() {
+            return null;
+          }
+
+          @Override
+          public MessagingExceptionHandler getExceptionListener() {
+            return null;
+          }
+
+          @Override
+          public FlowConstructStatistics getStatistics() {
+            return null;
+          }
+        };
+        event = new DefaultMuleEvent(create(flowConstruct), muleMsg, ep.getExchangePattern(), flowConstruct);
       } catch (Exception e) {
         throw new Fault(e);
       }

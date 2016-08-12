@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.time.OffsetTime.now;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -25,12 +26,14 @@ import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.time.OffsetTime;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -95,6 +98,37 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
   private class DummyEvent implements MuleEvent {
 
     private MuleMessage message = MuleMessage.builder().payload("").build();
+
+    @Override
+    public MessageExecutionContext getExecutionContext() {
+      return new MessageExecutionContext() {
+
+        @Override
+        public String getId() {
+          return "";
+        }
+
+        @Override
+        public String getCorrelationId() {
+          return "";
+        }
+
+        @Override
+        public OffsetTime getReceivedTime() {
+          return now();
+        }
+
+        @Override
+        public String getServerId() {
+          return "";
+        }
+
+        @Override
+        public String getFlowName() {
+          return "";
+        }
+      };
+    }
 
     @Override
     public MuleMessage getMessage() {
@@ -284,6 +318,21 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public void setSecurityContext(SecurityContext context) {
 
+    }
+
+    @Override
+    public Correlation getCorrelation() {
+      return null;
+    }
+
+    @Override
+    public String getCorrelationId() {
+      return null;
+    }
+
+    @Override
+    public MuleEvent getParent() {
+      return null;
     }
   }
 

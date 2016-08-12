@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -16,6 +17,15 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -55,15 +65,6 @@ import org.mule.runtime.module.extension.internal.model.property.RequireNameFiel
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
-
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -232,7 +233,7 @@ public class MuleExtensionUtils {
   }
 
   public static MuleEvent getInitialiserEvent(MuleContext muleContext) {
-    return new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, new FlowConstruct() {
+    FlowConstruct flowConstruct = new FlowConstruct() {
       // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
 
       @Override
@@ -259,7 +260,9 @@ public class MuleExtensionUtils {
       public FlowConstructStatistics getStatistics() {
         return null;
       }
-    });
+    };
+    return new DefaultMuleEvent(create(flowConstruct),
+                                MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, flowConstruct);
   }
 
   /**

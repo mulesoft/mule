@@ -13,11 +13,10 @@ import static org.mule.functional.functional.FlowAssert.verify;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -75,20 +74,14 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
     String correlationId = "id";
     int correlationGroupSize = 3;
 
-    FlowRunner runner = flowRunner("aggregator").withPayload(TEST_MESSAGE).nonBlocking();
-    MuleMessage message1 = MuleMessage.builder(runner.buildEvent().getMessage()).correlationId(correlationId)
-        .correlationGroupSize(correlationGroupSize).correlationSequence(1).build();
-    runner.runNoVerify();
+    flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
+        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 1)).nonBlocking().runNoVerify();
 
-    runner.reset();
-    MuleMessage message2 = MuleMessage.builder(runner.buildEvent().getMessage()).correlationId(correlationId)
-        .correlationGroupSize(correlationGroupSize).correlationSequence(2).rootId(message1.getMessageRootId()).build();
-    runner.runNoVerify();
+    flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
+        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 2)).nonBlocking().runNoVerify();
 
-    runner.reset();
-    MuleMessage message3 = MuleMessage.builder(runner.buildEvent().getMessage()).correlationId(correlationId)
-        .correlationGroupSize(correlationGroupSize).correlationSequence(3).rootId(message1.getMessageRootId()).build();
-    runner.run();
+    flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
+        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 3)).nonBlocking().run();
   }
 
   @Test

@@ -6,13 +6,8 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Random;
 
@@ -23,6 +18,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCase {
 
@@ -97,7 +97,14 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
   }
 
   protected MuleEvent createMuleEvent() {
-    return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, (Flow) null);
+    Flow flow;
+    try {
+      flow = getTestFlow();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY,
+                                flow);
   }
 
   public static class Payload {

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -90,12 +89,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
   @Override
   public void setMuleContext(MuleContext context) {
     muleContext = context;
-    serverId = generateId(context);
-  }
-
-  protected static String generateId(MuleContext context) {
-    MuleConfiguration conf = context.getConfiguration();
-    return String.format("%s.%s.%s", conf.getDomainId(), context.getClusterId(), conf.getId());
+    serverId = context.getId();
   }
 
   public int getAction() {

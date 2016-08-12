@@ -9,9 +9,10 @@ package org.mule.compatibility.transport.ssl;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.transport.tcp.TcpMessageReceiver;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -65,14 +66,14 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     return new SslWorker(socket, this);
   }
 
-  private MuleMessage preRoute(MuleMessage message) throws Exception {
+  private MuleCompatibilityMessage preRoute(MuleCompatibilityMessage message) throws Exception {
     long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
     boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
     if (rc == false) {
       throw new IllegalStateException("Handshake did not complete");
     }
 
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+    MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(message);
     if (peerCertificateChain != null) {
       messageBuilder.addOutboundProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
     }
@@ -104,7 +105,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     }
 
     @Override
-    protected MuleMessage preRouteMuleMessage(MuleMessage message) throws Exception {
+    protected MuleCompatibilityMessage preRouteMuleMessage(MuleCompatibilityMessage message) throws Exception {
       return preRoute(super.preRouteMuleMessage(message));
     }
 

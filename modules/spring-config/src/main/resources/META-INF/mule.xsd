@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/core"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:spring-context="http://www.springframework.org/schema/context"
@@ -8,7 +7,6 @@
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
 
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
@@ -4749,9 +4747,7 @@
 
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractInterceptingMessageProcessorType">
-                <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
-            </xsd:extension>
+            <xsd:extension base="abstractInterceptingMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -4947,9 +4943,7 @@
 
     <xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="baseSingleRouteRoutingMessageProcessorType">
-                <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
-            </xsd:extension>
+            <xsd:extension base="baseSingleRouteRoutingMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -5286,23 +5280,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:attributeGroup name="defaultCorrelationAttributes">
-        <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Specifies whether Mule should give outgoing messages a correlation ID. The default behavior is to give messages a correlation ID only if they don't already have one, so that existing correlation IDs are maintained.
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="ALWAYS" />
-                    <xsd:enumeration value="NEVER" />
-                    <xsd:enumeration value="IF_NOT_SET" />
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-    </xsd:attributeGroup>
 
     <!--==============================================================-->
     <!--  Lifecycle Adapters                                            -->

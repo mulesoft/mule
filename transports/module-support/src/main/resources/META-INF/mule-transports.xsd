@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transports"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:mule-cxf="http://www.mulesoft.org/schema/mule/cxf"
             xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
             xmlns:management="http://www.mulesoft.org/schema/mule/management"
-            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             xmlns:spring="http://www.springframework.org/schema/beans"
-            xmlns:spring-context="http://www.springframework.org/schema/context"
             targetNamespace="http://www.mulesoft.org/schema/mule/transports"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -525,7 +522,6 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractRoutingMessageProcessorType">
-                    <xsd:attributeGroup ref="mule:defaultCorrelationAttributes"/>
                     <xsd:attributeGroup ref="mule:expressionAttributes"/>
                     <!--  See MULE-5069 <xsd:attributeGroup ref="allExchangePatterns" />-->
                 </xsd:extension>

@@ -10,7 +10,11 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
+import java.util.Iterator;
+
+import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -22,10 +26,6 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-
-import java.util.Iterator;
-
-import org.junit.Test;
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -45,13 +45,10 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).build();
-    message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
-    message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow, session);
-    MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
-    MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
+    MuleEvent event1 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, flow, session);
+    MuleEvent event2 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, flow, session);
+    MuleEvent event3 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, flow, session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

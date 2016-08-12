@@ -29,11 +29,20 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
+
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -52,12 +61,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.internal.listener.HttpMessageProcessorTemplate;
 import org.mule.runtime.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
-
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
 
 public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessTemplate<HttpMessageReceiver, HttpConnector>
     implements RequestResponseFlowProcessingPhaseTemplate, ThrottlingPhaseTemplate, EndPhaseTemplate {
@@ -197,14 +200,14 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   @Override
   public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException {
     try {
-      sendExpect100(request);
+      sendExpect100(request, muleEvent);
       return muleEvent;
     } catch (IOException e) {
       throw new DefaultMuleException(e);
     }
   }
 
-  private void sendExpect100(HttpRequest request) throws MuleException, IOException {
+  private void sendExpect100(HttpRequest request, MuleEvent muleEvent) throws MuleException, IOException {
     RequestLine requestLine = request.getRequestLine();
 
     // respond with status code 100, for Expect handshake
@@ -220,7 +223,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
           HttpResponse expected = new HttpResponse();
           expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
           final DefaultMuleEvent event =
-              new DefaultMuleEvent(MuleMessage.builder().payload(expected).build(), getFlowConstruct());
+              new DefaultMuleEvent(muleEvent.getExecutionContext(), MuleMessage.builder().payload(expected).build(),
+                                   getFlowConstruct());
           DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
           setCurrentEvent(event);
@@ -256,9 +260,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   @Override
-  protected MuleMessage createMessageFromSource(Object message) throws MuleException {
+  protected MuleCompatibilityMessage createMessageFromSource(Object message) throws MuleException {
     MuleMessage muleMessage = super.createMessageFromSource(message);
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(muleMessage);
+    MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(muleMessage);
 
     String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
     int i = path.indexOf('?');
@@ -383,7 +387,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
   protected HttpResponse doBad(RequestLine requestLine) throws MuleException {
     MuleMessage message = getMessageReceiver().createMuleMessage(null);
-    DefaultMuleEvent event = new DefaultMuleEvent(message, getFlowConstruct());
+    DefaultMuleEvent event =
+        new DefaultMuleEvent(create(getFlowConstruct()), message, getFlowConstruct());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
     setCurrentEvent(event);
     HttpResponse response = new HttpResponse();

@@ -8,12 +8,14 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.execution.FlowProcessingPhaseTemplate;
@@ -42,7 +44,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   @Override
   public MuleEvent getMuleEvent() throws MuleException {
     if (muleEvent == null) {
-      MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
+      MuleCompatibilityMessage messageFromSource = createMessageFromSource(getOriginalMessage());
       muleEvent = createEventFromMuleMessage(messageFromSource);
     }
     return muleEvent;
@@ -83,10 +85,12 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
    */
   public abstract Object acquireMessage() throws MuleException;
 
-  protected MuleMessage propagateRootMessageIdProperty(MuleMessage message) {
+  protected MuleCompatibilityMessage propagateRootMessageIdProperty(MuleCompatibilityMessage message) {
     String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
     if (rootId != null) {
-      return MuleMessage.builder(message).rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY).build();
+      final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(message);
+      builder.rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
+      return builder.build();
     } else {
       return message;
     }
@@ -100,8 +104,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   @Override
   public void discardInvalidMessage() throws MuleException {}
 
-  protected MuleMessage warnIfMuleClientSendUsed(MuleMessage message) {
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+  protected MuleCompatibilityMessage warnIfMuleClientSendUsed(MuleCompatibilityMessage message) {
+    MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(message);
     final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !messageReceiver.getEndpoint().getExchangePattern().hasResponse()) {
@@ -112,7 +116,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     return messageBuilder.build();
   }
 
-  protected MuleEvent createEventFromMuleMessage(MuleMessage muleMessage) throws MuleException {
+  protected MuleEvent createEventFromMuleMessage(MuleCompatibilityMessage muleMessage) throws MuleException {
     MuleEvent muleEvent = messageReceiver.createMuleEvent(muleMessage, getOutputStream());
     if (!messageReceiver.getEndpoint().isDisableTransportTransformer()) {
       messageReceiver.applyInboundTransformers(muleEvent);
@@ -124,8 +128,9 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     return null;
   }
 
-  protected MuleMessage createMessageFromSource(Object message) throws MuleException {
-    MuleMessage muleMessage = messageReceiver.createMuleMessage(message, messageReceiver.getEndpoint().getEncoding());
+  protected MuleCompatibilityMessage createMessageFromSource(Object message) throws MuleException {
+    MuleCompatibilityMessage muleMessage =
+        messageReceiver.createMuleMessage(message, messageReceiver.getEndpoint().getEncoding());
     muleMessage = warnIfMuleClientSendUsed(muleMessage);
     muleMessage = propagateRootMessageIdProperty(muleMessage);
     return muleMessage;

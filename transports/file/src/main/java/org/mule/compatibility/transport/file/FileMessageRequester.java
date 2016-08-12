@@ -6,17 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.transport.AbstractMessageRequester;
-import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.util.FileUtils;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -24,6 +14,22 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.transport.AbstractMessageRequester;
+import org.mule.compatibility.transport.file.i18n.FileMessages;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.util.FileUtils;
 
 /**
  * <code>FileMessageRequester</code> is used to read/write files to the filesystem
@@ -172,7 +178,35 @@ public class FileMessageRequester extends AbstractMessageRequester {
         MuleMessage.builder().nullPayload().addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName)
             .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory).build();
 
-    final DefaultMuleEvent event = new DefaultMuleEvent(fileParserMessasge, (FlowConstruct) null);
+    FlowConstruct flowConstruct = new FlowConstruct() {
+
+      @Override
+      public MuleContext getMuleContext() {
+        return endpoint.getMuleContext();
+      }
+
+      @Override
+      public String getName() {
+        return "FileMessageRequester";
+      }
+
+      @Override
+      public LifecycleState getLifecycleState() {
+        return null;
+      }
+
+      @Override
+      public MessagingExceptionHandler getExceptionListener() {
+        return null;
+      }
+
+      @Override
+      public FlowConstructStatistics getStatistics() {
+        return null;
+      }
+    };
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(create(flowConstruct), fileParserMessasge, flowConstruct);
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);
   }

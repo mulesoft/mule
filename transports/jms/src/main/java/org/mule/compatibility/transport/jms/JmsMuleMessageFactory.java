@@ -7,6 +7,8 @@
 package org.mule.compatibility.transport.jms;
 
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
+
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -39,7 +41,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory {
   }
 
   @Override
-  protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addProperties(MuleCompatibilityMessageBuilder messageBuilder, Object transportMessage) throws Exception {
     Message jmsMessage = (Message) transportMessage;
 
     Map<String, Serializable> messageProperties = new HashMap<>();
@@ -163,7 +165,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory {
     }
   }
 
-  protected void addCorrelationProperties(Message jmsMessage, MuleMessage.Builder messageBuilder,
+  protected void addCorrelationProperties(Message jmsMessage, MuleCompatibilityMessageBuilder messageBuilder,
                                           Map<String, Serializable> messageProperties) {
     try {
       String value = jmsMessage.getJMSCorrelationID();

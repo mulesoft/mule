@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
+import java.text.MessageFormat;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -18,9 +22,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.expression.ExpressionConfig;
-
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
     this.config = new ExpressionConfig();
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
@@ -69,6 +71,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @param message a non null message to filter.
    * @return <code>true</code> if the message matches the filter
    */
+  @Override
   public boolean accept(MuleMessage message) {
     String expr = getFullExpression();
     if (delegateFilter != null) {
@@ -80,7 +83,8 @@ public class ExpressionFilter implements Filter, MuleContextAware {
     }
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
-    return accept(new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
+    Flow flowConstruct = new Flow("", muleContext);
+    return accept(new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct));
   }
 
   /**

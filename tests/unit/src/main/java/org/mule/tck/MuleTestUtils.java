@@ -7,8 +7,11 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -32,9 +35,6 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -166,7 +166,8 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(message, mep, flowConstruct, session);
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(create(flowConstruct), message, mep, flowConstruct, session);
     return event;
   }
 
@@ -176,7 +177,8 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+                                                        MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
     return event;
   }
 
@@ -187,7 +189,8 @@ public final class MuleTestUtils {
   public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), flowConstruct, session);
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+                                                        MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }
 

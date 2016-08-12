@@ -237,7 +237,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   }
 
   private String getEventKey(MuleEvent event) {
-    return event.getId() + event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
+    return event.getId() + event.getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
   }
 
   /**

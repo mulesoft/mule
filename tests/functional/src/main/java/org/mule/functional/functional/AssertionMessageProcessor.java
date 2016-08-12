@@ -16,6 +16,8 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import static org.junit.Assert.fail;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -72,10 +74,10 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
    */
   public void verify() throws InterruptedException {
     if (countFailOrNullEvent()) {
-      Assert.fail("Flow assertion '" + message + "' failed. No message received or if count attribute was "
+      fail("Flow assertion '" + message + "' failed. No message received or if count attribute was "
           + "set then it was no matched.");
     } else if (expressionFailed()) {
-      Assert.fail("Flow assertion '" + message + "' failed. Expression " + expression + " evaluated false.");
+      fail("Flow assertion '" + message + "' failed. Expression " + expression + " evaluated false.");
     }
   }
 

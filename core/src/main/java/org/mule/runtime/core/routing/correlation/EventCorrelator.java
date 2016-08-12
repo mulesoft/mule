@@ -121,7 +121,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   public MuleEvent process(MuleEvent event) throws RoutingException {
     // the correlationId of the event's message
-    final String groupId = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
+    final String groupId = event.getCorrelationId();
 
     if (logger.isTraceEnabled()) {
       try {
@@ -191,7 +191,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         if (callback.shouldAggregateEvents(group)) {
           // create the response event
           MuleEvent returnEvent = callback.aggregateEvents(group);
-          final Builder builder = MuleMessage.builder(returnEvent.getMessage()).correlationId(groupId);
+          final Builder builder = MuleMessage.builder(returnEvent.getMessage());
           String rootId = group.getCommonRootId();
           if (rootId != null) {
             builder.rootId(rootId);
@@ -311,7 +311,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis())) {
           MuleEvent newEvent = callback.aggregateEvents(group);
           group.clear();
-          newEvent.setMessage(MuleMessage.builder(newEvent.getMessage()).correlationId(group.getGroupId().toString()).build());
+          newEvent.setMessage(MuleMessage.builder(newEvent.getMessage()).build());
 
           if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey())) {
             // TODO which use cases would need a sync reply event

@@ -9,8 +9,10 @@ package org.mule.compatibility.core.endpoint.outbound;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.junit.Test;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
@@ -19,14 +21,12 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-
-import org.junit.Test;
+import org.mule.runtime.core.construct.Flow;
 
 public class OutboundResponsePropertiesMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
 
   private static String MY_PROPERTY_KEY = "myProperty";
   private static String MY_PROPERTY_VAL = "myPropertyValue";
-  private static String MULE_CORRELATION_ID_VAL = "152";
 
   @Test
   public void testProcess() throws Exception {
@@ -35,23 +35,23 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
     mp.setListener(event -> {
       // return event with same payload but no properties
       try {
-        return new DefaultMuleEvent(MuleMessage.builder().payload(event.getMessage().getPayload()).build(), REQUEST_RESPONSE,
-                                    getTestFlow(), getTestSession(null, muleContext));
+        Flow flow = getTestFlow();
+        return new DefaultMuleEvent(create(flow),
+                                    MuleMessage.builder().payload(event.getMessage().getPayload()).build(), REQUEST_RESPONSE,
+                                    flow, getTestSession(null, muleContext));
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     });
 
     MuleEvent event = createTestOutboundEvent();
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL)
-        .correlationId(MULE_CORRELATION_ID_VAL).build());
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL).build());
 
     MuleEvent result = mp.process(event);
 
     assertNotNull(result);
     assertThat(result.getMessageAsString(), is(TEST_MESSAGE));
     assertThat(result.getMessage().getOutboundProperty(MY_PROPERTY_KEY), is(MY_PROPERTY_VAL));
-    assertThat(result.getMessage().getCorrelation().getId().get(), is(MULE_CORRELATION_ID_VAL));
   }
 
   @Override

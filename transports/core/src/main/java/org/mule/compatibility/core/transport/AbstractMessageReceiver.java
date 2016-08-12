@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
@@ -13,16 +14,22 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 
+import java.io.OutputStream;
+import java.util.List;
+
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -47,9 +54,6 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.work.TrackingWorkManager;
-
-import java.io.OutputStream;
-import java.util.List;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message Receivers provided with Mule. A message receiver
@@ -158,23 +162,23 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleMessage message) throws MuleException {
+  public final MuleEvent routeMessage(MuleCompatibilityMessage message) throws MuleException {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     return routeMessage(message, tx, null);
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleMessage message, Transaction trans) throws MuleException {
+  public final MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans) throws MuleException {
     return routeMessage(message, trans, null);
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
+  public final MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans, OutputStream outputStream)
       throws MuleException {
     return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleMessage message,
+  public final MuleEvent routeMessage(MuleCompatibilityMessage message,
                                       MuleSession session,
                                       Transaction trans,
                                       OutputStream outputStream)
@@ -182,7 +186,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return routeMessage(message, session, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleMessage message, MuleSession session, OutputStream outputStream)
+  public final MuleEvent routeMessage(MuleCompatibilityMessage message, MuleSession session, OutputStream outputStream)
       throws MuleException {
     message = warnIfMuleClientSendUsed(message);
     message = propagateRootMessageIdProperty(message);
@@ -196,17 +200,19 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return routeEvent(muleEvent);
   }
 
-  protected MuleMessage propagateRootMessageIdProperty(MuleMessage message) {
+  protected MuleCompatibilityMessage propagateRootMessageIdProperty(MuleCompatibilityMessage message) {
     String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
     if (rootId != null) {
-      return MuleMessage.builder(message).rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY).build();
+      final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(message);
+      builder.rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
+      return builder.build();
     } else {
       return message;
     }
   }
 
-  protected MuleMessage warnIfMuleClientSendUsed(MuleMessage message) {
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+  protected MuleCompatibilityMessage warnIfMuleClientSendUsed(MuleCompatibilityMessage message) {
+    MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(message);
     final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !endpoint.getExchangePattern().hasResponse()) {
@@ -236,7 +242,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return message;
   }
 
-  protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream)
+  protected MuleEvent createMuleEvent(MuleCompatibilityMessage message, OutputStream outputStream)
       throws MuleException {
     MuleEvent event;
     ResponseOutputStream ros = null;
@@ -254,11 +260,18 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
+
+    final MessageExecutionContext executionContext =
+        create(flowConstruct, message.getCorrelation().getId().orElse(null));
+
     if (replyToFromMessage != null) {
-      newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
+      newEvent =
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
     } else {
-      newEvent = new DefaultMuleEvent(message, flowConstruct, session, null, null, ros);
+      newEvent =
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null, ros);
     }
+    newEvent.setCorrelation(message.getCorrelation());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
     setCurrentEvent(event);

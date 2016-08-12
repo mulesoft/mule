@@ -10,7 +10,8 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -22,7 +23,6 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.message.SessionHandler;
-import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
@@ -91,7 +91,7 @@ public abstract class AbstractReceiverWorker implements Work {
       if (tx != null) {
         bindTransaction(tx);
       }
-      List<MuleEvent> results = new ArrayList<MuleEvent>(messages.size());
+      List<MuleEvent> results = new ArrayList<>(messages.size());
 
       for (final Object payload : messages) {
         ExecutionTemplate<MuleEvent> perMessageExecutionTemplate = TransactionalErrorHandlingExecutionTemplate
@@ -101,7 +101,7 @@ public abstract class AbstractReceiverWorker implements Work {
           resultEvent = perMessageExecutionTemplate.execute(() -> {
             Object preProcessedPayload = preProcessMessage(payload);
             if (preProcessedPayload != null) {
-              MuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
+              MuleCompatibilityMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
               muleMessage = preRouteMuleMessage(muleMessage);
               // TODO Move getSessionHandler() to the Connector interface
               SessionHandler handler;
@@ -151,7 +151,7 @@ public abstract class AbstractReceiverWorker implements Work {
   }
 
   protected List<Object> handleEventResults(List<MuleEvent> events) throws Exception {
-    List<Object> payloads = new ArrayList<Object>(events.size());
+    List<Object> payloads = new ArrayList<>(events.size());
     for (MuleEvent muleEvent : events) {
       MuleMessage result = muleEvent == null ? null : muleEvent.getMessage();
       if (result != null) {
@@ -171,7 +171,7 @@ public abstract class AbstractReceiverWorker implements Work {
    * @param message the next message to be processed
    * @throws Exception
    */
-  protected MuleMessage preRouteMuleMessage(MuleMessage message) throws Exception {
+  protected MuleCompatibilityMessage preRouteMuleMessage(MuleCompatibilityMessage message) throws Exception {
     // no op
     return message;
   }

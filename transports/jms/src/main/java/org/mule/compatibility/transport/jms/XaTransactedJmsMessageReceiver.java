@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
@@ -258,7 +259,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
       redeliveryHandler.get().handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
     }
 
-    MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
+    MuleCompatibilityMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
     routeMessage(messageToRoute);
     closeConsumerIfRequired(consumer);
     return null;

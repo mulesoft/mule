@@ -50,8 +50,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   private static final Attributes TEST_ATTR_2 = new BaseAttributes() {};
   private static final String PROPERTY_KEY = "propertyKey";
   private static final Serializable PROPERTY_VALUE = "propertyValue";
-  private static final String ATTACHMENT_KEY = "attachmentKey";
-  private static final String ATTACHMENT_VALUE = "attachmentValue";
   private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
 
   @Test
@@ -278,8 +276,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private MuleMessage createTestMessage() {
-    return new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).rootId("1")
-        .correlationId("2").correlationGroupSize(3).correlationSequence(4).build();
+    return new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).rootId("1").build();
   }
 
   private void assertTestMessage(MuleMessage message) {
@@ -287,9 +284,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     assertThat(message.getDataType(), is(TEXT_STRING));
     assertThat(message.getAttributes(), is(TEST_ATTR));
     assertThat(message.getMessageRootId(), equalTo("1"));
-    assertThat(message.getCorrelation().getId().get(), equalTo("2"));
-    assertThat(message.getCorrelation().getGroupSize().get(), equalTo(3));
-    assertThat(message.getCorrelation().getSequence().get(), equalTo(4));
   }
 
 }

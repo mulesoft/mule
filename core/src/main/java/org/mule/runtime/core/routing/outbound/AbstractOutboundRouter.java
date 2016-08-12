@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -38,10 +37,8 @@ import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
-import org.mule.runtime.core.routing.CorrelationMode;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,11 +59,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   protected List<MessageProcessor> routes = new CopyOnWriteArrayList<>();
-
-  /**
-   * Determines if Mule stamps outgoing message with a correlation ID or not.
-   */
-  protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
 
   protected TransactionConfig transactionConfig;
 
@@ -107,8 +99,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   protected final MuleEvent sendRequest(final MuleEvent originalEvent, final MuleEvent eventToRoute, final MessageProcessor route,
                                         boolean awaitResponse)
       throws MuleException {
-    setMessageProperties(originalEvent.getFlowConstruct(), eventToRoute, route);
-
     MuleEvent result;
     try {
       result = sendRequestEvent(originalEvent, eventToRoute, route, awaitResponse);
@@ -139,24 +129,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     return result;
-  }
-
-  protected void setMessageProperties(FlowConstruct service, MuleEvent event, MessageProcessor route) {
-    MuleMessage message = event.getMessage();
-    if (enableCorrelation != CorrelationMode.NEVER) {
-      String correlation = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Correlation is " + message.getCorrelation().toString());
-        logger.debug("Extracted correlation Id as: " + correlation);
-
-        StringBuilder buf = new StringBuilder();
-        buf.append("Setting Correlation info on Outbound router");
-        buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
-        logger.debug(buf.toString());
-      }
-
-      event.setMessage(MuleMessage.builder(message).correlationId(correlation).build());
-    }
   }
 
   @Override
@@ -214,28 +186,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       }
     }
     routes.remove(route);
-  }
-
-  public CorrelationMode getEnableCorrelation() {
-    return enableCorrelation;
-  }
-
-  public void setEnableCorrelation(CorrelationMode enableCorrelation) {
-    this.enableCorrelation = enableCorrelation;
-  }
-
-  public void setEnableCorrelationAsString(String enableCorrelation) {
-    if (enableCorrelation != null) {
-      if (enableCorrelation.equals("ALWAYS")) {
-        this.enableCorrelation = CorrelationMode.ALWAYS;
-      } else if (enableCorrelation.equals("NEVER")) {
-        this.enableCorrelation = CorrelationMode.NEVER;
-      } else if (enableCorrelation.equals("IF_NOT_SET")) {
-        this.enableCorrelation = CorrelationMode.IF_NOT_SET;
-      } else {
-        throw new IllegalArgumentException("Value for enableCorrelation not recognised: " + enableCorrelation);
-      }
-    }
   }
 
   public TransactionConfig getTransactionConfig() {

@@ -163,9 +163,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   protected String getAsyncReplyCorrelationId(MuleEvent event) {
-    // TODO add logic to use also seqNo when present so it works with split messages
-    String correlationId = event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
-    return correlationId + event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
+    return event.getCorrelationId() + event.getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
   }
 
   protected void sendAsyncRequest(MuleEvent event) throws MuleException {
@@ -174,6 +172,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
+    System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
     // flag for catching the interrupted status of the Thread waiting for a
     // result
@@ -260,8 +259,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      String messageId = getAsyncReplyCorrelationId(event);
-      store.store(messageId, event);
+      store.store(getAsyncReplyCorrelationId(event), event);
       replyThread.processNow();
       return null;
     }

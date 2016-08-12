@@ -8,9 +8,10 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.mule.functional.functional.FlowAssert.verify;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -41,8 +42,8 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
 
   @Test
   public void testNoCorrelationIdPropagation() throws Exception {
-    flowRunner("withNoCorrelationId").withPayload(MuleMessage.builder().payload(TEST_PAYLOAD).id("custom-cid").build()).run();
-    verifyPropagation();
+    flowRunner("withNoCorrelationId").withPayload(TEST_PAYLOAD).run();
+    verify("withCorrelationIdOut");
   }
 
   protected void verifyPropagation() throws Exception {
@@ -54,9 +55,9 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message = MuleMessage.builder(event.getMessage()).correlationId(getCid()).build();
-      event.setMessage(message);
-      return message;
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(getCid(), event.getCorrelation().getGroupSize().orElse(null),
+                                                                event.getCorrelation().getSequence().orElse(null)));
+      return event.getMessage();
     }
 
     protected String getCid() {
@@ -79,5 +80,4 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
       return "custom-cid-3";
     }
   }
-
 }

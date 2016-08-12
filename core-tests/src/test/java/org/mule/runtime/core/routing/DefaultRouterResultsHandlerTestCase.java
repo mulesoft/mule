@@ -14,7 +14,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,13 +33,6 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
@@ -59,12 +59,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   public void aggregateSingleEvent() {
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+    MuleEvent event1 =
+        new DefaultMuleEvent(create(flow), message1, flow);
     event1.setFlowVariable("key1", "value1");
     event1.getSession().setProperty("key", "value");
 
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleEvent event2 = new DefaultMuleEvent(message2, flow);
+    MuleEvent event2 =
+        new DefaultMuleEvent(create(flow), message2, flow);
     event2.setFlowVariable("key2", "value2");
     event2.getSession().setProperty("key", "valueNEW");
     event2.getSession().setProperty("key1", "value1");
@@ -88,12 +90,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+    MuleEvent event1 = new DefaultMuleEvent(create(flow), message1, flow);
     event1.setFlowVariable("key1", "value1", simpleDateType1);
     MuleSession session = event1.getSession();
-    MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
+    MuleEvent event2 = new DefaultMuleEvent(create(flow), message2, flow, session);
     event2.setFlowVariable("key2", "value2", simpleDateType1);
-    MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
+    MuleEvent event3 = new DefaultMuleEvent(create(flow), message3, flow, session);
     event3.setFlowVariable("key3", "value3", simpleDateType1);
     event1.getSession().setProperty("key", "value");
     event2.getSession().setProperty("key1", "value1");
@@ -133,9 +135,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   public void aggregateMultipleEventsAllButOneNull() {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+    MuleEvent event1 =
+        new DefaultMuleEvent(create(flow), message1, flow);
     event1.setFlowVariable("key", "value");
-    MuleEvent event2 = new DefaultMuleEvent(message2, flow);
+    MuleEvent event2 =
+        new DefaultMuleEvent(create(flow), message2, flow);
     event2.setFlowVariable("key2", "value2");
     List<MuleEvent> events = new ArrayList<>();
     events.add(null);
@@ -153,7 +157,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void aggregateSingleMuleMessageCollection() {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+    MuleEvent event1 = new DefaultMuleEvent(create(flow), message1, flow);
     event1.setFlowVariable("key1", "value1");
 
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -163,7 +167,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     list.add(message2);
     list.add(message3);
     MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
-    MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
+    MuleEvent event2 = new DefaultMuleEvent(create(flow), messageCollection, flow);
     event2.setFlowVariable("key2", "value2");
 
     MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent>singletonList(event2), event1);
@@ -178,7 +182,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void aggregateMultipleMuleMessageCollections() {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+    MuleEvent event1 = new DefaultMuleEvent(create(flow), message1, flow);
     event1.setFlowVariable("key1", "value1");
 
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -190,14 +194,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     list.add(message2);
     list.add(message3);
     MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
-    MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
+    MuleEvent event2 = new DefaultMuleEvent(create(flow), messageCollection, flow);
     event2.setFlowVariable("key2", "value2");
 
     List<MuleMessage> list2 = new ArrayList<>();
     list.add(message4);
     list.add(message5);
     MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
-    MuleEvent event3 = new DefaultMuleEvent(messageCollection2, flow);
+    MuleEvent event3 = new DefaultMuleEvent(create(flow), messageCollection2, flow);
     event3.setFlowVariable("key3", "value3");
 
     List<MuleEvent> events = new ArrayList<>();

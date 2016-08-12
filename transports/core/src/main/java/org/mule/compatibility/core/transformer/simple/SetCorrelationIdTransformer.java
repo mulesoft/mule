@@ -7,10 +7,11 @@
 package org.mule.compatibility.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
@@ -33,10 +34,10 @@ public class SetCorrelationIdTransformer extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    final MuleMessage msg =
-        MuleMessage.builder(event.getMessage()).correlationId(correlationIdEvaluator.resolveValue(event).toString()).build();
-    event.setMessage(msg);
-    return msg;
+    ((DefaultMuleEvent) event).setCorrelation(new Correlation(correlationIdEvaluator.resolveValue(event).toString(),
+                                                              event.getCorrelation().getGroupSize().orElse(null),
+                                                              event.getCorrelation().getSequence().orElse(null)));
+    return event.getMessage();
   }
 
 
