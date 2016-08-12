@@ -63,7 +63,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
 
   private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<>();
   private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
-  private static final List<Class<?>> consumableClasses = new ArrayList<>();
 
   static {
     wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
@@ -81,22 +80,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     for (Class<?> primitiveType : primitiveTypes) {
       primitiveTypeNameMap.put(primitiveType.getName(), primitiveType);
     }
-
-    addToConsumableClasses("javax.xml.stream.XMLStreamReader");
-    addToConsumableClasses("javax.xml.transform.stream.StreamSource");
-    consumableClasses.add(OutputHandler.class);
-    consumableClasses.add(InputStream.class);
-    consumableClasses.add(Reader.class);
   }
-
-  private static void addToConsumableClasses(String className) {
-    try {
-      consumableClasses.add(ClassUtils.loadClass(className, MuleMessage.class));
-    } catch (ClassNotFoundException e) {
-      // ignore
-    }
-  }
-
 
   public static boolean isConcrete(Class<?> clazz) {
     if (clazz == null) {
@@ -941,22 +925,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
    */
   private static <T> boolean isPrimitiveWrapper(Class<T> type) {
     return Primitives.isWrapperType(type);
-  }
-
-  /**
-   * Determines if the payload of this message is consumable i.e. it can't be read more than once.
-   */
-  public static boolean isConsumable(Class<?> payloadClass) {
-    if (consumableClasses.isEmpty()) {
-      return false;
-    }
-
-    for (Class<?> c : consumableClasses) {
-      if (c.isAssignableFrom(payloadClass)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

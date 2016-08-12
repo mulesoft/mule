@@ -7,9 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -69,7 +67,7 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
       }
 
       if (copyEvent) {
-        if (isConsumable(message.getDataType().getType())) {
+        if (message.getDataType().isStreamType()) {
           throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event,
                                        this);
         }

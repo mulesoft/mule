@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -15,12 +13,12 @@ import org.mule.runtime.core.api.routing.filter.Filter;
  * Filters messages that have a consumable payload.
  * <p/>
  * The filter accepts only {@link MuleMessage} instances that have a no consumable payload. Check is done using
- * {@link org.mule.runtime.core.util.ClassUtils#isConsumable()} method.
+ * {@see org.mule.runtime.api.metadata.DataType#isStreamType}.
  */
 public class ConsumableMuleMessageFilter implements Filter {
 
   @Override
   public boolean accept(MuleMessage message) {
-    return !isConsumable(message.getDataType().getType());
+    return !message.getDataType().isStreamType();
   }
 }

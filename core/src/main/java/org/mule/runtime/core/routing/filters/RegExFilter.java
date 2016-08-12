@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.hash;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -90,7 +89,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
             muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING);
         // If the payload is a stream and we've consumed it, then we should set the payload on the
         // message. This is the only time this method will alter the payload on the message
-        if (isConsumable(event.getMessage().getDataType().getType())) {
+        if (event.getMessage().getDataType().isStreamType()) {
           event.setMessage(transformedMessage);
         }
         return accept((Object) transformedMessage.getPayload());

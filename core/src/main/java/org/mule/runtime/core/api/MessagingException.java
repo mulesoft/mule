@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -133,7 +132,7 @@ public class MessagingException extends MuleException {
       if (DefaultMuleConfiguration.isVerboseExceptions()) {
         Object payload = muleMessage.getPayload();
 
-        if (isConsumable(muleMessage.getDataType().getType())) {
+        if (muleMessage.getDataType().isStreamType()) {
           addInfo(PAYLOAD_INFO_KEY, abbreviate(payload.toString(), 1000));
         } else {
           if (payload != null) {

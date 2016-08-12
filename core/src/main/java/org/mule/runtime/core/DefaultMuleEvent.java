@@ -10,14 +10,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.ENDPOINT_PROPERTY_
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CREDENTIALS_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -567,7 +565,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     }
 
     MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message, outputType);
-    if (isConsumable(message.getDataType().getType())) {
+    if (message.getDataType().isStreamType()) {
       setMessage(transformedMessage);
     }
     return transformedMessage.getPayload();
@@ -606,7 +604,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
       MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message,
                                                                                              DataType.builder().type(String.class)
                                                                                                  .charset(encoding).build());
-      if (isConsumable(message.getDataType().getType())) {
+      if (message.getDataType().isStreamType()) {
         setMessage(transformedMessage);
       }
 

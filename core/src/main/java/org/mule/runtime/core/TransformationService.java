@@ -8,7 +8,6 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -125,15 +124,15 @@ public class TransformationService {
    * @return message payload as a String or message with the payload type if payload can't be converted to a String
    */
   public String getPayloadForLogging(MuleMessage message, Charset encoding) {
-    Class type = message.getDataType().getType();
-    if (!isConsumable(type)) {
+    DataType dataType = message.getDataType();
+    if (!dataType.isStreamType()) {
       try {
         return getPayload(message, DataType.STRING, encoding);
       } catch (TransformerException e) {
-        return "Payload could not be converted to a String. Payload type is " + type;
+        return "Payload could not be converted to a String. Payload type is " + dataType.getType();
       }
     }
-    return "Payload is a stream of type: " + type;
+    return "Payload is a stream of type: " + dataType.getType();
   }
 
   private MuleMessage applyAllTransformers(final MuleMessage message, final MuleEvent event,

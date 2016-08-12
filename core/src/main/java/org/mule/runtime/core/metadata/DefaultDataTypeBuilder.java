@@ -12,21 +12,28 @@ import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
 
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,7 +150,6 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     }
   }
 
-  // TODO MULE-10147 Encapsulate isConsumable logic within DataType
   @Override
   public DataTypeCollectionTypeBuilder streamType(Class<? extends Iterator> iteratorType) {
     validateAlreadyBuilt();
@@ -325,11 +331,11 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
   }
 
   protected DataType doBuild() {
-    if (Iterable.class.isAssignableFrom(type)) {
-      return new DefaultCollectionDataType((Class<? extends Iterable>) type,
-                                           itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
+    if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
+      return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
+                                           isConsumable(type));
     } else {
-      return new SimpleDataType(type, mediaType);
+      return new SimpleDataType(type, mediaType, isConsumable(type));
     }
   }
 
@@ -364,4 +370,40 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     return Objects.equals(type, other.type) && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
         && Objects.equals(mediaType, other.mediaType);
   }
+
+  private static final List<Class<?>> consumableClasses = new ArrayList<>();
+
+  static {
+    addToConsumableClasses("javax.xml.stream.XMLStreamReader");
+    addToConsumableClasses("javax.xml.transform.stream.StreamSource");
+    consumableClasses.add(OutputHandler.class);
+    consumableClasses.add(InputStream.class);
+    consumableClasses.add(Reader.class);
+    consumableClasses.add(Iterator.class);
+  }
+
+  private static void addToConsumableClasses(String className) {
+    try {
+      consumableClasses.add(ClassUtils.loadClass(className, MuleMessage.class));
+    } catch (ClassNotFoundException e) {
+      // ignore
+    }
+  }
+
+  /**
+   * Determines if the payload of this message is consumable i.e. it can't be read more than once.
+   */
+  public static boolean isConsumable(Class<?> payloadClass) {
+    if (consumableClasses.isEmpty()) {
+      return false;
+    }
+
+    for (Class<?> c : consumableClasses) {
+      if (c.isAssignableFrom(payloadClass)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
