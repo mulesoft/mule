@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -69,10 +70,11 @@ public class ExtensionParsingContext {
 
   /**
    * Configures the subtype mapping to use
+   *
    * @param subTypesMapping a {@link SubTypesMappingContainer}
    */
   public void setSubTypesMapping(SubTypesMappingContainer subTypesMapping) {
-    this.subTypesMapping = Optional.ofNullable(subTypesMapping);
+    this.subTypesMapping = ofNullable(subTypesMapping);
   }
 
   /**
