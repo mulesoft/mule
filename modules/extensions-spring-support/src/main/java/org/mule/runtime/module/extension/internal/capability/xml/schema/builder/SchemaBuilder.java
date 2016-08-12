@@ -557,7 +557,6 @@ public final class SchemaBuilder {
         }
 
         defaultVisit(objectType);
-
         objectTypeDelegate.generatePojoElement(objectType, paramDsl, name, description, all);
       }
 

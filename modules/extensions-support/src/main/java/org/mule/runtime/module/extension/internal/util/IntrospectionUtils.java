@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static com.google.common.base.Predicates.not;
 import static java.lang.String.format;
+import static java.lang.reflect.Modifier.PUBLIC;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -20,7 +22,6 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -59,7 +60,6 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -355,16 +355,8 @@ public final class IntrospectionUtils {
     return type.equals(void.class) || type.equals(Void.class);
   }
 
-  public static Collection<Field> getParameterFields(Class<?> extensionType) {
-    return getAnnotatedFields(extensionType, Parameter.class);
-  }
-
-  public static Collection<Field> getParameterGroupFields(Class<?> extensionType) {
-    return ImmutableList.copyOf(getAnnotatedFields(extensionType, ParameterGroup.class));
-  }
-
   public static Collection<Method> getOperationMethods(Class<?> declaringClass) {
-    return getAllMethods(declaringClass, withModifier(Modifier.PUBLIC), Predicates.not(withAnnotation(Ignore.class)));
+    return getAllMethods(declaringClass, withModifier(PUBLIC), not(withAnnotation(Ignore.class)));
   }
 
   public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType) {
@@ -415,6 +407,10 @@ public final class IntrospectionUtils {
 
   public static String getAliasName(Class<?> type) {
     return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
+  }
+
+  public static String getAliasName(Field field) {
+    return getAliasName(field.getName(), field.getAnnotation(Alias.class));
   }
 
   public static String getAliasName(String defaultName, Alias aliasAnnotation) {

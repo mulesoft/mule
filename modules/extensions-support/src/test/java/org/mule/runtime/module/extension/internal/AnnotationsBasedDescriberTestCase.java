@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.Category.COMMUNITY;
 import static org.mule.runtime.extension.api.Category.SELECT;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -35,7 +36,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_D
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -83,6 +83,7 @@ import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -140,6 +141,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   private static final String CURE_CANCER = "cureCancer";
   private static final String GET_SAUL_PHONE = "getSaulPhone";
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
+  private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
   private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
@@ -396,7 +398,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(25));
+    assertThat(extensionDeclaration.getOperations(), hasSize(26));
     assertOperation(extensionDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(extensionDeclaration, GET_ENEMY_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
@@ -418,6 +420,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertOperation(extensionDeclaration, GET_SAUL_PHONE, "");
     assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
     assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
+    assertOperation(extensionDeclaration, APPROVE_INVESTMENT, "");
 
     OperationDeclaration operation = getOperation(extensionDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -520,6 +523,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertParameter(operation.getParameters(), "grams", "", TYPE_LOADER.load(int[][].class), false, SUPPORTED, "#[payload]");
     assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(int[][].class)));
 
+    operation = getOperation(extensionDeclaration, APPROVE_INVESTMENT);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getParameters(), "investment", "", TYPE_LOADER.load(Investment.class), true, SUPPORTED, null);
+    assertThat(getType(operation.getOutput().getType()), equalTo(getType(TYPE_LOADER.load(Investment.class))));
+
     operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
     assertThat(operation, is(nullValue()));
 
@@ -567,7 +575,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     assertThat(param.getName(), equalTo(name));
     assertThat(param.getDescription(), equalTo(description));
-    assertThat(param.getType(), is(metadataType));
+    assertThat(getType(param.getType()), equalTo(getType(metadataType)));
     assertThat(param.isRequired(), is(required));
     assertThat(param.getExpressionSupport(), is(expressionSupport));
     assertThat(param.getDefaultValue(), equalTo(defaultValue));

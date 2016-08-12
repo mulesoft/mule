@@ -215,4 +215,12 @@
     <flow name="getGramsInStorage">
         <heisenberg:get-grams-in-storage/>
     </flow>
+
+    <flow name="investment">
+        <heisenberg:approve>
+            <heisenberg:investment>
+                <heisenberg:car-wash commercialName="A1" valuation="100" carsPerMinute="5" />
+            </heisenberg:investment>
+        </heisenberg:approve>
+    </flow>
 </mule>

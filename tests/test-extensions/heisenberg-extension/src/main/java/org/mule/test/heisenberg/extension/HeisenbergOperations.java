@@ -31,6 +31,7 @@ import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -160,6 +161,11 @@ public class HeisenbergOperations {
   @OnException(CureCancerExceptionEnricher.class)
   public String cureCancer() throws HealthException {
     throw new HealthException(CURE_CANCER_MESSAGE);
+  }
+
+  public Investment approve(Investment investment) {
+    investment.approve();
+    return investment;
   }
 
   public Map<Integer, HealthStatus> getMedicalHistory(Map<Integer, HealthStatus> healthByYear) {

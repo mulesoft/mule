@@ -126,7 +126,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
-    List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
+    List<Object> payload = responseEvent.getMessage().getPayload();
     assertThat(payload, hasSize(6));
 
     assertThat(payload.get(0), instanceOf(ParentShape.class));

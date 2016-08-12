@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
@@ -49,7 +49,7 @@ public class ConfigurationModelEnricherTestCase {
     OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), GET_ENEMY);
     final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(operationDeclaration, ConfigTypeModelProperty.class);
 
-    assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
+    assertType(configTypeModelProperty);
   }
 
   @Test
@@ -57,6 +57,10 @@ public class ConfigurationModelEnricherTestCase {
     SourceDeclaration sourceDeclaration = getDeclaration(declaration.getMessageSources(), LISTEN_PAYMENTS);
     final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(sourceDeclaration, ConfigTypeModelProperty.class);
 
-    assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
+    assertType(configTypeModelProperty);
+  }
+
+  private void assertType(ConfigTypeModelProperty configTypeModelProperty) {
+    assertThat(getType(configTypeModelProperty.getConfigType()), equalTo(getType(typeLoader.load(HeisenbergExtension.class))));
   }
 }
