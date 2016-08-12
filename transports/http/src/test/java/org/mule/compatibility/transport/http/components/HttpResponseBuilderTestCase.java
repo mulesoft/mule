@@ -18,6 +18,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
+import org.mule.compatibility.transport.http.CacheControlHeader;
+import org.mule.compatibility.transport.http.CookieHelper;
+import org.mule.compatibility.transport.http.CookieWrapper;
+import org.mule.compatibility.transport.http.HttpConnector;
+import org.mule.compatibility.transport.http.HttpConstants;
+import org.mule.compatibility.transport.http.HttpResponse;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -35,22 +52,6 @@ import org.apache.commons.httpclient.Header;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mule.compatibility.transport.http.CacheControlHeader;
-import org.mule.compatibility.transport.http.CookieHelper;
-import org.mule.compatibility.transport.http.CookieWrapper;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.compatibility.transport.http.HttpResponse;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageExecutionContext;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 @SmallTest
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
@@ -90,7 +91,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
       return null;
     }).when(mockEvent).setMessage(any(MuleMessage.class));
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
-    MessageExecutionContext executionContext = createContext(mock(Flow.class));
+    final Flow flow = mock(Flow.class);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    MessageExecutionContext executionContext = createContext(flow);
     when(mockEvent.getExecutionContext()).thenReturn(executionContext);
     mockExpressionManager = mock(ExpressionManager.class);
     when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
