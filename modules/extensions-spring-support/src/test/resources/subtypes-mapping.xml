@@ -154,4 +154,6 @@
         </subtypes:subtypes-source>
         <set-payload value="100"/>
     </flow>
+    
+    <subtypes:revolver name="sledgeHammer's" bullets="1" />
 </mule>

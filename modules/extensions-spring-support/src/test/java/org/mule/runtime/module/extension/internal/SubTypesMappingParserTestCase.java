@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.extension.internal.config.AbstractConfigParserTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -53,7 +53,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), instanceOf(ParentShape.class));
 
-    ParentShape payload = (ParentShape) responseEvent.getMessage().getPayload();
+    ParentShape payload = responseEvent.getMessage().getPayload();
     assertThat(payload.getArea(), is(16));
   }
 
@@ -63,7 +63,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), instanceOf(CarDoor.class));
 
-    CarDoor payload = (CarDoor) responseEvent.getMessage().getPayload();
+    CarDoor payload = responseEvent.getMessage().getPayload();
     assertThat(payload.getColor(), is("blue"));
   }
 
@@ -73,7 +73,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubTypesMappingConnector.class));
 
-    SubTypesMappingConnector payload = (SubTypesMappingConnector) responseEvent.getMessage().getPayload();
+    SubTypesMappingConnector payload = responseEvent.getMessage().getPayload();
     assertThat(payload.getAbstractShape(), instanceOf(Square.class));
     assertThat(payload.getAbstractShape().getArea(), is(1));
 
@@ -156,7 +156,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
-    List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
+    List<Object> payload = responseEvent.getMessage().getPayload();
     assertThat(payload, hasSize(6));
 
     assertThat(payload.get(0), instanceOf(ParentShape.class));
@@ -208,6 +208,13 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     }
   }
 
+  @Test
+  public void parseRevolver() throws Exception {
+    Revolver revolver = muleContext.getRegistry().get("sledgeHammer's");
+    assertThat(revolver, is(notNullValue()));
+    assertThat(revolver.getBullets(), is(1));
+  }
+
   private void assertRicin(Object payload, Long micrograms, String victim) {
     assertThat(payload, instanceOf(Ricin.class));
     assertThat(((Ricin) payload).getMicrogramsPerKilo(), is(micrograms));
@@ -219,5 +226,4 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload, instanceOf(Revolver.class));
     assertThat(((Revolver) payload).getBullets(), is(bullets));
   }
-
 }

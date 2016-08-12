@@ -545,12 +545,13 @@ public final class SchemaBuilder {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (getId(objectType).equals(TlsContextFactory.class.getName())) {
+        final String id = getId(objectType);
+        if (id.equals(TlsContextFactory.class.getName())) {
           addTlsSupport(extensionType, all);
           return;
         }
 
-        if (getId(objectType).equals(ThreadingProfile.class.getName())) {
+        if (id.equals(ThreadingProfile.class.getName())) {
           addAttributeAndElement(extensionType, all, THREADING_PROFILE_ATTRIBUTE_NAME, MULE_ABSTRACT_THREADING_PROFILE);
           return;
         }
@@ -726,5 +727,4 @@ public final class SchemaBuilder {
 
     all.getParticle().add(objectFactory.createElement(textElement));
   }
-
 }

@@ -63,6 +63,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * A generic {@link ComponentBuildingDefinitionProvider} which provides definitions capable of handling all extensions registered
@@ -110,18 +111,22 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         .withTypeDefinition(fromType(DynamicConfigurationExpiration.class))
         .withObjectFactoryType(DynamicConfigurationExpirationObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleParameter("frequency").build())
-        .withConstructorParameterDefinition(fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
         .build());
 
     definitions.add(baseDefinition.copy().withIdentifier("dynamic-config-policy")
-        .withTypeDefinition(fromType(DynamicConfigPolicy.class)).withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
-        .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build()).build());
+        .withTypeDefinition(fromType(DynamicConfigPolicy.class))
+        .withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
+        .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+        .build());
 
     definitions.add(baseDefinition.copy().withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
         .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
         .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
         .withSetterParameterDefinition("timeUnit",
-                                       fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
+                                       fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value))
+                                           .build())
         .build());
 
     return definitions;
@@ -134,11 +139,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
       return;
     }
 
-    final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
+    final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlModelProperty.get().getNamespace());
-    Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-    final SubTypesMappingContainer typeMapping =
-        new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
     final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel);
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -171,8 +173,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
         @Override
         public void onParameter(ParameterModel model) {
-          registerSubTypes(typeMapping, model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                           parsingContext);
+          registerSubTypes(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
           registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
         }
 
@@ -181,10 +182,12 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
                                            parsingContext);
+
+      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
     });
   }
 
-  private void registerSubTypes(SubTypesMappingContainer typeMapping, MetadataType type, Builder definitionBuilder,
+  private void registerSubTypes(MetadataType type, Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
     type.accept(new MetadataTypeVisitor() {
@@ -201,7 +204,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       @Override
       public void visitObject(ObjectType objectType) {
-        typeMapping.getSubTypes(objectType)
+        parsingContext.getSubTypes(objectType)
             .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
                                                           parsingContext));
       }
@@ -237,6 +240,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
                                                   parsingContext));
         }
+
+        registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
       }
 
       @Override
@@ -263,12 +268,46 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                                     ExtensionParsingContext parsingContext) {
-    extensionModel.getModelProperty(ExportModelProperty.class).map(ExportModelProperty::getExportedTypes)
-        .ifPresent(exportedTypes -> exportedTypes.stream().filter(MetadataTypeUtils::isInstantiable)
-            .filter(MetadataTypeUtils::hasExposedFields).forEach(exportedType -> registerTopLevelParameter(exportedType,
-                                                                                                           definitionBuilder,
-                                                                                                           extensionClassLoader,
-                                                                                                           dslSyntaxResolver,
-                                                                                                           parsingContext)));
+    extensionModel.getModelProperty(ExportModelProperty.class)
+        .map(ExportModelProperty::getExportedTypes)
+        .ifPresent(exportedTypes -> registerTopLevelParameters(exportedTypes.stream(),
+                                                               definitionBuilder,
+                                                               extensionClassLoader,
+                                                               dslSyntaxResolver,
+                                                               parsingContext));
+  }
+
+  private void registerSubTypes(Builder definitionBuilder,
+                                ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
+                                ExtensionParsingContext parsingContext) {
+
+    registerTopLevelParameters(parsingContext.getAllSubTypes().stream(), definitionBuilder, extensionClassLoader,
+                               dslSyntaxResolver,
+                               parsingContext);
+  }
+
+  private void registerTopLevelParameters(Stream<MetadataType> parameters, Builder definitionBuilder,
+                                          ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
+                                          ExtensionParsingContext parsingContext) {
+
+    parameters.filter(MetadataTypeUtils::isInstantiable)
+        .filter(MetadataTypeUtils::hasExposedFields)
+        .forEach(subType -> registerTopLevelParameter(subType,
+                                                      definitionBuilder,
+                                                      extensionClassLoader,
+                                                      dslSyntaxResolver,
+                                                      parsingContext));
+
+  }
+
+  private ExtensionParsingContext createParsingContext(ExtensionModel extensionModel) {
+    Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+
+    final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
+    parsingContext.setSubTypesMapping(
+                                      new SubTypesMappingContainer(subTypesProperty.isPresent()
+                                          ? subTypesProperty.get().getSubTypesMapping() : emptyMap()));
+
+    return parsingContext;
   }
 }
