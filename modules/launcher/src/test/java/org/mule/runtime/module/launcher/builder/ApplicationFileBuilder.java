@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.core.util.StringUtils;

@@ -7,11 +7,10 @@
 package org.mule.runtime.module.launcher.application;
 
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMulePerAppLibFolder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
@@ -25,7 +24,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

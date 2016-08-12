@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.application;
 
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import org.mule.runtime.module.launcher.artifact.ArtifactStartedSplashScreen;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;

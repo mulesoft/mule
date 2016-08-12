@@ -8,9 +8,10 @@
 package org.mule.runtime.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import org.mule.tck.ZipUtils.ZipResource;
 import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
+import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
 import java.util.LinkedList;

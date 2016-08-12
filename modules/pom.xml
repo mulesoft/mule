@@ -36,6 +36,7 @@
         <module>scripting-jruby</module>
         <module>spring-extras</module>
         <module>spring-config</module>
+        <module>service</module>
 
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>

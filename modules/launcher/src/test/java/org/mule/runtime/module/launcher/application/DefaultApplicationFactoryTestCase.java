@@ -30,7 +30,7 @@ import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.launcher.service.ServiceRepository;
+import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 

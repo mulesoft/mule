@@ -15,7 +15,7 @@ import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 

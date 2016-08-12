@@ -29,7 +29,7 @@ import org.mule.runtime.module.launcher.application.ApplicationExtensionsManager
 import org.mule.runtime.module.launcher.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.launcher.application.ArtifactPlugin;
 import org.mule.runtime.module.launcher.domain.DomainMuleContextBuilder;
-import org.mule.runtime.module.launcher.service.ServiceRepository;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.util.ArrayList;

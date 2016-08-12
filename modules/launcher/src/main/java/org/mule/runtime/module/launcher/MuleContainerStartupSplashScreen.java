@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getUserLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getUserLibFolder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.config.MuleManifest;
