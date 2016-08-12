@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.time.OffsetTime;
-import java.util.Optional;
 
 /**
  * Provides context about the execution of a set of related events/messages, applicable to the end-to-end processing.
@@ -31,10 +30,9 @@ public interface MessageExecutionContext {
    * developer to keep the association with the message. For example if the message is serialised to xml the id will be available
    * in the message.
    * 
-   * @return the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this context, if
-   *         available.
+   * @return the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this context.
    */
-  Optional<String> getCorrelationId();
+  String getCorrelationId();
 
   /**
    * @return a timestamp indicating when the message was received by the {@link MessageSource}.

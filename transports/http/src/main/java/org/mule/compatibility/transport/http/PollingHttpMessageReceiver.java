@@ -14,7 +14,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -118,7 +118,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
     requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
     // TODO can a correlation id come as a header?
-    MuleEvent event = new DefaultMuleEvent(createContext(flowConstruct), requestBuider.build(),
+    MuleEvent event = new DefaultMuleEvent(create(flowConstruct), requestBuider.build(),
                                            outboundEndpoint.getExchangePattern(), flowConstruct);
 
     MuleEvent result = outboundEndpoint.process(event);

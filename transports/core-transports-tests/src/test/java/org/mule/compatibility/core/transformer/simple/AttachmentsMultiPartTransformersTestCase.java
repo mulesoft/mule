@@ -15,7 +15,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
 import javax.activation.DataHandler;
@@ -62,7 +62,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   public void nonMultiPartPayloadToAttachment() throws Exception {
     expected.expect(TransformerMessagingException.class);
     Flow flow = getTestFlow();
-    mp2a.transform("", new DefaultMuleEvent(createContext(flow), getTestMuleMessage(), flow));
+    mp2a.transform("", new DefaultMuleEvent(create(flow), getTestMuleMessage(), flow));
   }
 
   @Test
@@ -77,7 +77,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) mp2a
-        .transform(message, new DefaultMuleEvent(createContext(flow), message, flow));
+        .transform(message, new DefaultMuleEvent(create(flow), message, flow));
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(1));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment"));
@@ -95,7 +95,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) mp2a
-        .transform(message, new DefaultMuleEvent(createContext(flow), message, flow));
+        .transform(message, new DefaultMuleEvent(create(flow), message, flow));
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(2));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment1"));
@@ -111,7 +111,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) a2mp
-        .transform(message, new DefaultMuleEvent(createContext(flow), message, flow));
+        .transform(message, new DefaultMuleEvent(create(flow), message, flow));
 
     assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
     assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
@@ -127,7 +127,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) a2mp
-        .transform(message, new DefaultMuleEvent(createContext(flow), message, flow));
+        .transform(message, new DefaultMuleEvent(create(flow), message, flow));
 
     assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
     assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));

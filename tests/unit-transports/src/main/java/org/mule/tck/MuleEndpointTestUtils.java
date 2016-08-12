@@ -6,7 +6,7 @@
  */
 package org.mule.tck;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.MuleTestUtils.getTestSession;
 
@@ -233,7 +233,7 @@ public final class MuleEndpointTestUtils {
     final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(createContext(flowConstruct), message, flowConstruct, session);
+        new DefaultMuleEvent(create(flowConstruct), message, flowConstruct, session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import java.nio.charset.Charset;
@@ -123,7 +123,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (event == null) {
       DefaultLocalMuleClient.MuleClientFlowConstruct flowConstruct =
           new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext);
-      event = new DefaultMuleEvent(createContext(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
+      event = new DefaultMuleEvent(create(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
     }
     try {
       result = transformMessage(event, enc);

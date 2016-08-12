@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
@@ -262,7 +262,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     DefaultMuleEvent newEvent = null;
 
     final MessageExecutionContext executionContext =
-        createContext(flowConstruct, message.getCorrelation().getId().orElse(null));
+        create(flowConstruct, message.getCorrelation().getId().orElse(null));
 
     if (replyToFromMessage != null) {
       newEvent =

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import java.util.ArrayList;
@@ -95,14 +95,14 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     Flow flow = getTestFlow();
     MuleEvent event =
-        new DefaultMuleEvent(createContext(flow, message.getUniqueId()), message, flow);
+        new DefaultMuleEvent(create(flow, message.getUniqueId()), message, flow);
 
     when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
     when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
     MuleSession session = mock(MuleSession.class);
     MuleEvent result = router
-        .route(new DefaultMuleEvent(createContext(flow, message.getUniqueId()),
+        .route(new DefaultMuleEvent(create(flow, message.getUniqueId()),
                                     message, flow, session));
     assertNotNull(result);
     MuleMessage resultMessage = result.getMessage();
@@ -134,7 +134,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     assertTrue(router.isMatch(getTestEvent(message)));
     Flow flow = getTestFlow();
     MuleEvent event =
-        new DefaultMuleEvent(createContext(flow), message, flow);
+        new DefaultMuleEvent(create(flow), message, flow);
 
     when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
     when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
@@ -142,7 +142,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     MuleSession session = mock(MuleSession.class);
 
     MuleEvent result =
-        router.route(new DefaultMuleEvent(createContext(flow), message, flow,
+        router.route(new DefaultMuleEvent(create(flow), message, flow,
                                           session));
     assertNotNull(result);
     assertEquals(getPayload(message), getPayload(result.getMessage()));
@@ -171,7 +171,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
     final DefaultMuleEvent testEvent =
-        new DefaultMuleEvent(createContext(flow, "MyCustomCorrelationId"), message, REQUEST_RESPONSE, flow);
+        new DefaultMuleEvent(create(flow, "MyCustomCorrelationId"), message, REQUEST_RESPONSE, flow);
 
     assertTrue(router.isMatch(testEvent));
 
@@ -190,7 +190,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(answer);
 
     MuleSession session = mock(MuleSession.class);
-    router.route(new DefaultMuleEvent(createContext(flow, "MyCustomCorrelationId"), message, flow, session));
+    router.route(new DefaultMuleEvent(create(flow, "MyCustomCorrelationId"), message, flow, session));
   }
 
   private String getPayload(MuleMessage message) throws Exception {

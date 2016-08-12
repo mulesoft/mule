@@ -8,7 +8,7 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 
@@ -76,7 +76,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
       for (String str : new String[] {"A", "B", "C"}) {
         Flow flow = getTestFlow();
         MuleEvent event =
-            new DefaultMuleEvent(createContext(flow), MuleMessage.builder().payload(str).build(), ONE_WAY, flow,
+            new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(str).build(), ONE_WAY, flow,
                                  new DefaultMuleSession());
         events.put(buildQueueKey(event), event);
       }

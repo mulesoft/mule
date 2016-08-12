@@ -35,7 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -1390,7 +1390,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 
@@ -1454,7 +1454,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 
@@ -1477,7 +1477,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 
@@ -1503,7 +1503,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 
@@ -1519,7 +1519,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 
@@ -1535,7 +1535,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(createContext(mainFlow), muleMessage, REQUEST_RESPONSE,
+    mainFlow.process(new DefaultMuleEvent(create(mainFlow), muleMessage, REQUEST_RESPONSE,
                                           mainFlow));
   }
 

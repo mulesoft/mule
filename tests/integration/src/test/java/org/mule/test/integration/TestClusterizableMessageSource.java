@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -31,7 +31,7 @@ public class TestClusterizableMessageSource
   public void start() throws MuleException {
     MuleMessage muleMessage = MuleMessage.builder().payload("TEST").build();
     DefaultMuleEvent defaultMuleEvent =
-        new DefaultMuleEvent(createContext(flowConstruct), muleMessage, ONE_WAY, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct), muleMessage, ONE_WAY, flowConstruct);
     listener.process(defaultMuleEvent);
   }
 

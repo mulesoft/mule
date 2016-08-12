@@ -17,7 +17,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODE
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -60,28 +60,28 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
   public void validGet() throws Exception {
     MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
     Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(createContext(flow), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(create(flow), msg, flow)));
   }
 
   @Test
   public void validPost() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
     Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(createContext(flow), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(create(flow), msg, flow)));
   }
 
   @Test
   public void validPut() throws Exception {
     MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
     Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(createContext(flow), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(create(flow), msg, flow)));
   }
 
   @Test(expected = TransformerException.class)
   public void invalidContentType() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, "application/json");
     Flow flow = getTestFlow();
-    transform(new DefaultMuleEvent(createContext(flow), msg, flow));
+    transform(new DefaultMuleEvent(create(flow), msg, flow));
   }
 
   private Object transform(MuleEvent event) throws TransformerException {

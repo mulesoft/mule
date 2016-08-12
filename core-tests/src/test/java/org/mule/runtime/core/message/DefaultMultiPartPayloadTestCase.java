@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
@@ -128,7 +128,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(createContext(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
@@ -153,7 +153,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(createContext(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

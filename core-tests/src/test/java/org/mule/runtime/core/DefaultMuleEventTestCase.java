@@ -14,7 +14,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
@@ -48,7 +48,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     Flow flow = getTestFlow();
-    muleEvent = new DefaultMuleEvent(createContext(flow), muleMessage, REQUEST_RESPONSE, flow);
+    muleEvent = new DefaultMuleEvent(create(flow), muleMessage, REQUEST_RESPONSE, flow);
   }
 
   @Test
@@ -92,7 +92,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = mock(Flow.class);
     when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, REQUEST_RESPONSE, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, REQUEST_RESPONSE, flow);
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -102,7 +102,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = mock(Flow.class);
     when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, ONE_WAY, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, ONE_WAY, flow);
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -112,7 +112,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = mock(Flow.class);
     when(flow.isSynchronous()).thenReturn(true);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, REQUEST_RESPONSE, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, REQUEST_RESPONSE, flow);
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -122,7 +122,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = mock(Flow.class);
     when(flow.isSynchronous()).thenReturn(true);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, ONE_WAY, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, ONE_WAY, flow);
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -133,7 +133,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
     muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, REQUEST_RESPONSE, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, REQUEST_RESPONSE, flow);
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -144,7 +144,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
     muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, ONE_WAY, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, ONE_WAY, flow);
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -155,7 +155,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, REQUEST_RESPONSE, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, REQUEST_RESPONSE, flow);
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -166,7 +166,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), muleMessage, ONE_WAY, flow);
+    DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, ONE_WAY, flow);
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }

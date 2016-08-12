@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.meta.NameableObject;
@@ -83,7 +83,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     } else if (rootId != null && flowConstruct != null) {
       final MuleMessage msg = MuleMessage.builder().nullPayload().rootId(rootId).build();
 
-      return new DefaultMuleEvent(createContext(flowConstruct), msg, REQUEST_RESPONSE,
+      return new DefaultMuleEvent(create(flowConstruct), msg, REQUEST_RESPONSE,
                                   flowConstruct);
     } else {
       return null;

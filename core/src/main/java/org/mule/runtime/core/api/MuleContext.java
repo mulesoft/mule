@@ -398,5 +398,12 @@ public interface MuleContext extends Lifecycle {
    * @return a customization service.
    */
   CustomizationService getCustomizationService();
+
+  /**
+   * @return a unique identifier for this context.
+   * 
+   * @since 4.0
+   */
+  String getId();
 }
 

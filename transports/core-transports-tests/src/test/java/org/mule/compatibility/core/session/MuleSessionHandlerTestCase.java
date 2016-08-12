@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
@@ -88,7 +88,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(createContext(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     String string = "bar";
@@ -128,7 +128,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testNonSerializableSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(createContext(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     NotSerializableClass clazz = new NotSerializableClass();
@@ -151,7 +151,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSecurityContext() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(createContext(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());

@@ -7,7 +7,7 @@
 package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
       if (ep instanceof DynamicOutboundEndpoint) {
         Flow flow = getTestFlow();
         epUri = muleContext.getExpressionManager()
-            .parse(ep.getAddress(), new DefaultMuleEvent(createContext(flow), message, flow), true);
+            .parse(ep.getAddress(), new DefaultMuleEvent(create(flow), message, flow), true);
       } else {
         epUri = ep.getAddress();
       }

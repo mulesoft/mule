@@ -11,7 +11,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
@@ -254,7 +254,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
             .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(createContext(flowConstruct), fileParserMessasge, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct), fileParserMessasge, flowConstruct);
 
     final File sourceFile;
     if (workDir != null) {

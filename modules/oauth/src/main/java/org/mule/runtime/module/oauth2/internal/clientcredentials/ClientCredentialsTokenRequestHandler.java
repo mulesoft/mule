@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     try {
       Flow flow = new Flow("test", getMuleContext());
       final DefaultMuleEvent accessTokenEvent =
-          new DefaultMuleEvent(createContext(flow), MuleMessage.builder().nullPayload().build(),
+          new DefaultMuleEvent(create(flow), MuleMessage.builder().nullPayload().build(),
                                REQUEST_RESPONSE, flow);
       setMapPayloadWithTokenRequestParameters(accessTokenEvent);
       final MuleEvent response;

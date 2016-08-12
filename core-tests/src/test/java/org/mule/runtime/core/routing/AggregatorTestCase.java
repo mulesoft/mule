@@ -10,7 +10,7 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.util.Iterator;
 
@@ -46,9 +46,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
-    MuleEvent event1 = new DefaultMuleEvent(createContext(flow, message1.getUniqueId()), message1, flow, session);
-    MuleEvent event2 = new DefaultMuleEvent(createContext(flow, message1.getUniqueId()), message2, flow, session);
-    MuleEvent event3 = new DefaultMuleEvent(createContext(flow, message1.getUniqueId()), message3, flow, session);
+    MuleEvent event1 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, flow, session);
+    MuleEvent event2 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, flow, session);
+    MuleEvent event3 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, flow, session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

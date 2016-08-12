@@ -6,20 +6,15 @@
  */
 package org.mule.runtime.core;
 
-import static java.lang.String.format;
 import static java.time.OffsetTime.now;
-import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.core.api.MessageExecutionContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.io.Serializable;
 import java.time.OffsetTime;
-import java.util.Optional;
 
 /**
  * Default immutable implementation of {@link MessageExecutionContext}.
@@ -34,8 +29,8 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
    * Builds a new execution context with the given parameters.
    * @param flow the flow that processes events of this context. 
    */
-  public static MessageExecutionContext createContext(FlowConstruct flow) {
-    return createContext(flow, null);
+  public static MessageExecutionContext create(FlowConstruct flow) {
+    return create(flow, flow.getMuleContext().getUniqueIdString());
   }
 
   /**
@@ -43,17 +38,12 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
    * @param flow the flow that processes events of this context.
    * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
    */
-  public static MessageExecutionContext createContext(FlowConstruct flow, String correlationId) {
+  public static MessageExecutionContext create(FlowConstruct flow, String correlationId) {
     DefaultMessageExecutionContext executionContext =
         new DefaultMessageExecutionContext(flow.getMuleContext().getUniqueIdString(), correlationId);
-    executionContext.serverId = generateId(flow.getMuleContext());
+    executionContext.serverId = flow.getMuleContext().getId();
     executionContext.flowName = flow.getName();
     return executionContext;
-  }
-
-  private static String generateId(MuleContext context) {
-    MuleConfiguration conf = context.getConfiguration();
-    return format("%s.%s.%s", conf.getDomainId(), context.getClusterId(), conf.getId());
   }
 
   private final String id;
@@ -69,8 +59,8 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   }
 
   @Override
-  public Optional<String> getCorrelationId() {
-    return ofNullable(correlationId);
+  public String getCorrelationId() {
+    return correlationId;
   }
 
   @Override

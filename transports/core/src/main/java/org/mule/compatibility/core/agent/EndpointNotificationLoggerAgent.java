@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.agent;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,7 +148,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           }
         };
 
-        MuleEvent event = new DefaultMuleEvent(createContext(flowConstruct), msg,
+        MuleEvent event = new DefaultMuleEvent(create(flowConstruct), msg,
                                                endpoint.getExchangePattern(), flowConstruct);
         event.setEnableNotifications(false);
         endpoint.process(event);

@@ -10,7 +10,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -68,7 +68,7 @@ public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends 
 
     message = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(createContext(flow), message, flow, mockSession);
+    event = new DefaultMuleEvent(create(flow), message, flow, mockSession);
   }
 
   @Test
