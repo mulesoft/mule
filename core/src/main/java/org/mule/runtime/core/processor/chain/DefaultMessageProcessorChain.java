@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
@@ -27,7 +28,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
   }
 
   protected DefaultMessageProcessorChain(MessageProcessor... processors) {
-    super(null, asList(processors));
+    super(null, new ArrayList<>(asList(processors)));
   }
 
   protected DefaultMessageProcessorChain(String name, List<MessageProcessor> processors) {
@@ -35,7 +36,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
   }
 
   protected DefaultMessageProcessorChain(String name, MessageProcessor... processors) {
-    super(name, asList(processors));
+    super(name, new ArrayList<>(asList(processors)));
   }
 
   public static DefaultMessageProcessorChain from(MuleContext muleContext, MessageProcessor messageProcessor) {

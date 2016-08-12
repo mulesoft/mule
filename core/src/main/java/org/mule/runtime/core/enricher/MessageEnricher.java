@@ -222,5 +222,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
   @Override
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
+    if (this.enrichmentProcessor instanceof DefaultMessageProcessorChain) {
+      ((DefaultMessageProcessorChain) this.enrichmentProcessor).setTemplateMuleContext(muleContext);
+    }
   }
 }
