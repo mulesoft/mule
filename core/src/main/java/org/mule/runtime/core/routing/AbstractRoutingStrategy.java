@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -86,16 +85,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
       throw new DispatchException(CoreMessages.objectIsNull("route"), routedEvent, null);
     }
 
-    MuleEvent event = createEventToRoute(routedEvent, message, route);
-
-    if (awaitResponse) {
-      int timeout = message.getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
-      if (timeout >= 0) {
-        event.setTimeout(timeout);
-      }
-    }
-
-    return route.process(event);
+    return route.process(createEventToRoute(routedEvent, message, route));
   }
 
   /**

@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.transport.ssl;
 
-import org.mule.compatibility.transport.ssl.SslConnector;
 import org.mule.functional.functional.EventCallback;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,13 +23,13 @@ public class SaveCertificateCallback implements EventCallback {
   }
 
   @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
+  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
     certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
     called.set(true);
   }
 
   public void clear() {
-    certificates = new AtomicReference<Object>();
+    certificates = new AtomicReference<>();
     called = new AtomicBoolean(false);
   }
 

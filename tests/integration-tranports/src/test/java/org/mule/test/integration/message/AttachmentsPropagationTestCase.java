@@ -15,6 +15,7 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
@@ -47,7 +48,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
   }
 
   @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
+  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
     final MuleMessage message = context.getEvent().getMessage();
     final Builder builder = MuleMessage.builder(message);
 

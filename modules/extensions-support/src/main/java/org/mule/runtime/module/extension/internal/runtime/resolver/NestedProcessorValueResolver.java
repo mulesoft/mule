@@ -34,6 +34,6 @@ public final class NestedProcessorValueResolver extends AbstractNestedProcessorV
    */
   @Override
   public NestedProcessor resolve(MuleEvent event) throws MuleException {
-    return toNestedProcessor(messageProcessor, event);
+    return toNestedProcessor(messageProcessor, event, event.getMuleContext());
   }
 }

@@ -17,7 +17,7 @@ public class SubflowMessageProcessorChainFactoryBean extends MessageProcessorCha
 
   @Override
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    AbstractMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
+    AbstractMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder(muleContext);
     builder.setName(name);
     return builder;
   }

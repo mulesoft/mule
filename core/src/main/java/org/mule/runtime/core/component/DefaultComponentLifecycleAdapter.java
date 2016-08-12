@@ -7,6 +7,7 @@
 package org.mule.runtime.core.component;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;

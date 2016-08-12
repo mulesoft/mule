@@ -29,7 +29,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor {
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-    if (connector.isEnableMessageEvents(event)) {
+    if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
       int notificationAction;
       if (endpoint.getExchangePattern().hasResponse()) {
         notificationAction = EndpointMessageNotification.MESSAGE_SEND_END;
@@ -37,23 +37,22 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor {
         notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_END;
       }
       dispatchNotification(new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(),
-                                                           notificationAction),
-                           event);
+                                                           notificationAction));
     }
 
     return event;
   }
 
-  public void dispatchNotification(EndpointMessageNotification notification, MuleEvent event) {
+  public void dispatchNotification(EndpointMessageNotification notification) {
     AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-    if (notification != null && connector.isEnableMessageEvents(event)) {
-      connector.fireNotification(notification, event);
+    if (notification != null && connector.isEnableMessageEvents(endpoint.getMuleContext())) {
+      connector.fireNotification(notification, endpoint.getMuleContext());
     }
   }
 
   public EndpointMessageNotification createBeginNotification(MuleEvent event) {
     AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-    if (connector.isEnableMessageEvents(event)) {
+    if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
       int notificationAction;
       if (endpoint.getExchangePattern().hasResponse()) {
         notificationAction = EndpointMessageNotification.MESSAGE_SEND_BEGIN;

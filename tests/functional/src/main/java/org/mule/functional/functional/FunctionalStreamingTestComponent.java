@@ -6,8 +6,9 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @see EventCallback
  */
 
-public class FunctionalStreamingTestComponent implements Callable {
+public class FunctionalStreamingTestComponent implements Callable, MuleContextAware {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -42,6 +43,8 @@ public class FunctionalStreamingTestComponent implements Callable {
   private EventCallback eventCallback;
   private String summary = null;
   private long targetSize = -1;
+
+  private MuleContext muleContext;
 
   public FunctionalStreamingTestComponent() {
     logger.debug("creating " + toString());
@@ -149,7 +152,7 @@ public class FunctionalStreamingTestComponent implements Callable {
     logger.info(msg);
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this);
+      eventCallback.eventReceived(context, this, muleContext);
     }
   }
 
@@ -158,4 +161,8 @@ public class FunctionalStreamingTestComponent implements Callable {
     return ClassUtils.getSimpleName(getClass()) + "/" + number;
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

@@ -8,14 +8,17 @@ package org.mule.compatibility.transport.file;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
@@ -29,9 +32,10 @@ import java.io.InputStream;
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
  */
-public class FileMessageDispatcher extends AbstractMessageDispatcher {
+public class FileMessageDispatcher extends AbstractMessageDispatcher implements MuleContextAware {
 
   private final FileConnector connector;
+  private MuleContext muleContext;
 
   public FileMessageDispatcher(OutboundEndpoint endpoint) {
     super(endpoint);
@@ -63,7 +67,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
       } else if (data instanceof OutputHandler) {
         ((OutputHandler) data).write(event, fos);
       } else {
-        InputStream is = (InputStream) event.transformMessage(DataType.fromType(InputStream.class));
+        InputStream is = (InputStream) event.transformMessage(DataType.fromType(InputStream.class), muleContext);
         IOUtils.copyLarge(is, fos);
         is.close();
       }
@@ -142,5 +146,10 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
   @Override
   protected void doDisconnect() throws Exception {
     // no op
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

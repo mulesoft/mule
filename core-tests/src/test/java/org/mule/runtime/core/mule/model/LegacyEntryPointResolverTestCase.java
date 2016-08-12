@@ -12,7 +12,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -164,6 +163,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         // dummy
       }
     });
+    apple.setMuleContext(muleContext);
     resolver.invoke(apple, new DefaultMuleEventContext(event));
   }
 

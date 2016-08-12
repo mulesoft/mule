@@ -51,7 +51,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase {
 
   @Test
   public void allRoutesReceiveSameMessage() throws Exception {
-    CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterTHenFailsMessageProcessor(LETTER_A));
+    CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterThenFailsMessageProcessor(LETTER_A));
     CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
     runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL, LETTER_B);
   }

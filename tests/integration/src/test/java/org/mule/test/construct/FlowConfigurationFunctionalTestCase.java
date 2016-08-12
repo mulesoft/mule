@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -539,7 +540,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestMessageSource source = (TestMessageSource) flow.getMessageSource();
 
     MuleEvent result = source.fireEvent(getTestEvent("a"));
-    assertEquals("abcd", result.getMessageAsString());
+    assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 
   @Test
@@ -549,7 +550,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestMessageSource source = (TestMessageSource) compositeSource.getSources().get(0);
 
     MuleEvent result = source.fireEvent(getTestEvent("a"));
-    assertEquals("abcd", result.getMessageAsString());
+    assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 
 

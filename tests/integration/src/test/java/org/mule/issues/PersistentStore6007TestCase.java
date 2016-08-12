@@ -12,16 +12,6 @@ import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,6 +25,17 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
         MuleEvent event =
             new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(str).build(), ONE_WAY, flow,
                                  new DefaultMuleSession());
-        events.put(buildQueueKey(event), event);
+        events.put(buildQueueKey(event, muleContext), event);
       }
     }
 
@@ -137,7 +138,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       synchronized (lock) {
-        String payload = eventContext.getMessageAsString();
+        String payload = eventContext.getMessageAsString(muleContext);
         payloads.add(payload);
         log.warn("Saw new payload: " + payload);
         log.warn("Count is now " + payloads.size());

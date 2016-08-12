@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.api.MuleEvent;
-
 import java.io.NotSerializableException;
 import java.io.Serializable;
 

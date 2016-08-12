@@ -9,7 +9,6 @@ package org.mule.test.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -26,6 +25,7 @@ import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,7 +179,7 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      Flow flow = (Flow) eventContext.getMuleContext().getRegistry().lookupFlowConstruct("dynamicComponentFlow");
+      Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("dynamicComponentFlow");
       pipelineId =
           flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("chain update #" + ++count)).resetAndUpdate();
       return eventContext.getMessage();

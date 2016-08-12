@@ -6,14 +6,16 @@
  */
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Apple implements Fruit, Callable {
+public class Apple implements Fruit, Callable, MuleContextAware {
 
   /**
    * Serial version
@@ -31,6 +33,8 @@ public class Apple implements Fruit, Callable {
   private FruitCleaner cleaner;
 
   private Seed seed;
+
+  private MuleContext muleContext;
 
   public Apple() {}
 
@@ -73,7 +77,7 @@ public class Apple implements Fruit, Callable {
 
   @Override
   public Object onCall(MuleEventContext context) throws MuleException {
-    logger.debug("Apple received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString());
+    logger.debug("Apple received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString(muleContext));
     wash();
     return null;
   }
@@ -131,5 +135,10 @@ public class Apple implements Fruit, Callable {
 
   public void setWashed(boolean washed) {
     this.washed = washed;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
@@ -108,7 +109,7 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
     MuleEvent event = flowRunner("readAndWrite").withFlowVariable("path", file.getAbsolutePath()).run();
 
-    assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
+    assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }
 
   @Test

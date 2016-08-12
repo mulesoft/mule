@@ -13,6 +13,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -174,6 +175,7 @@ public final class DefaultExtensionManager
     return getConfiguration(extensionModel, muleEvent);
   }
 
+  @Override
   public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel) {
     List<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel);
 
@@ -190,6 +192,7 @@ public final class DefaultExtensionManager
     return Optional.empty();
   }
 
+  @Override
   public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName) {
     checkArgument(!StringUtils.isBlank(configurationProviderName), "cannot get configuration from a blank provider name");
     return extensionRegistry.getConfigurationProvider(configurationProviderName);
@@ -200,7 +203,8 @@ public final class DefaultExtensionManager
       // check that another thread didn't beat us to create the instance
       if (extensionRegistry.getConfigurationProviders(extensionModel).isEmpty()) {
         registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
-                                                                                                               muleEvent));
+                                                                                                               muleEvent,
+                                                                                                               muleContext));
       }
     }
   }

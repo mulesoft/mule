@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.component.simple;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -18,13 +20,15 @@ import java.io.IOException;
  * A service that will return a static data object as a result. This is useful for testing with expected results. The data
  * returned can be read from a file or set as a property on this service.
  */
-public class StaticComponent implements Callable, Initialisable {
+public class StaticComponent implements Callable, Initialisable, MuleContextAware {
 
   private Object data;
   private String dataFile;
   private String prefix;
   private String postfix;
+  private MuleContext muleContext;
 
+  @Override
   public void initialise() throws InitialisationException {
     if (dataFile != null) {
       try {
@@ -67,12 +71,13 @@ public class StaticComponent implements Callable, Initialisable {
     this.postfix = postfix;
   }
 
+  @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
     if (data != null) {
       return data;
     }
 
-    String eventData = eventContext.transformMessageToString();
+    String eventData = eventContext.transformMessageToString(muleContext);
 
     if (prefix != null) {
       eventData = prefix + eventData;
@@ -83,5 +88,10 @@ public class StaticComponent implements Callable, Initialisable {
     }
 
     return eventData;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

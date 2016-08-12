@@ -7,12 +7,14 @@
 package org.mule.compatibility.transport.http.issues;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestNotification;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -33,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @see org.mule.tck.functional.FunctionalTestNotificationListener
  */
 
-public class NoTransformFunctionalTestComponent implements Callable {
+public class NoTransformFunctionalTestComponent implements Callable, MuleContextAware {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -44,12 +46,14 @@ public class NoTransformFunctionalTestComponent implements Callable {
   private boolean appendComponentName = false;
   private boolean throwException = false;
 
+  private MuleContext muleContext;
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Object onCall(MuleEventContext context) throws Exception {
-    String contents = context.getMessageAsString();
+    String contents = context.getMessageAsString(muleContext);
     String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
         + context.getFlowConstruct().getName() + ". Content is: "
         + StringMessageUtils.truncate(contents, 100, true), '*', 80);
@@ -57,7 +61,7 @@ public class NoTransformFunctionalTestComponent implements Callable {
     logger.info(msg);
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this);
+      eventCallback.eventReceived(context, this, muleContext);
     }
 
     Object replyMessage;
@@ -67,9 +71,8 @@ public class NoTransformFunctionalTestComponent implements Callable {
       replyMessage = received(contents) + (appendComponentName ? " " + context.getFlowConstruct().getName() : "");
     }
 
-    context.getMuleContext().fireNotification(
-                                              new FunctionalTestNotification(context, replyMessage,
-                                                                             FunctionalTestNotification.EVENT_RECEIVED));
+    muleContext
+        .fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
     if (throwException) {
       throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Service Exception"));
@@ -107,7 +110,7 @@ public class NoTransformFunctionalTestComponent implements Callable {
     logger.info(msg);
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this);
+      eventCallback.eventReceived(context, this, muleContext);
     }
 
     Object replyMessage;
@@ -117,9 +120,8 @@ public class NoTransformFunctionalTestComponent implements Callable {
       replyMessage = contents + " Received";
     }
 
-    context.getMuleContext().fireNotification(
-                                              new FunctionalTestNotification(context, replyMessage,
-                                                                             FunctionalTestNotification.EVENT_RECEIVED));
+    muleContext
+        .fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
     if (throwException) {
       if (returnMessage != null && returnMessage instanceof Exception) {
@@ -230,4 +232,8 @@ public class NoTransformFunctionalTestComponent implements Callable {
     this.appendComponentName = appendComponentName;
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

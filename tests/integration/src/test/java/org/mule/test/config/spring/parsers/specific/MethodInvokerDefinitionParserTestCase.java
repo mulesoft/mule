@@ -7,6 +7,7 @@
 package org.mule.test.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Ignore;
@@ -18,9 +19,9 @@ public class MethodInvokerDefinitionParserTestCase extends AbstractIntegrationTe
   @Test
   public void testPojoFlow() throws Exception {
     assertEquals("start nullmethod2Arg1Arg2config2Val arg2Valmethod2Arg1Arg2config2Val ",
-                 flowRunner("pojoFlow").withPayload("start ").run().getMessageAsString());
+                 flowRunner("pojoFlow").withPayload("start ").run().getMessageAsString(muleContext));
     assertEquals("start nullmethod2Arg1Arg2null arg2Valmethod2Arg1Arg2null ",
-                 flowRunner("pojoFlow2").withPayload("start ").run().getMessageAsString());
+                 flowRunner("pojoFlow2").withPayload("start ").run().getMessageAsString(muleContext));
   }
 
   @Override

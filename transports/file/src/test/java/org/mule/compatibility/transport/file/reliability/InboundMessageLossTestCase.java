@@ -11,12 +11,8 @@ import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile
 import static org.mule.compatibility.transport.file.FileTestUtils.createFolder;
 
 import org.mule.compatibility.transport.file.AbstractFileMoveDeleteTestCase;
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -142,13 +138,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
   @Test
   public void testRollbackExceptionStrategyConsumesMessage() throws Exception {
     final CountDownLatch exceptionStrategyLatch = new CountDownLatch(4);
-    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        exceptionStrategyLatch.countDown();
-      }
-    });
+    muleContext.registerListener(notification -> exceptionStrategyLatch.countDown());
 
     tmpDir = createFolder(getFileInsideWorkingDirectory("rollbackOnException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
@@ -219,13 +209,9 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
     tmpDir = createFolder(getFileInsideWorkingDirectory("flowRefException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
     FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
-    ftc.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        exceptionThrownLatch.release();
-        throw new RuntimeException();
-      }
+    ftc.setEventCallback((context, component, muleContext) -> {
+      exceptionThrownLatch.release();
+      throw new RuntimeException();
     });
     Flow flow = (Flow) getFlowConstruct("FlowRefException");
     flow.stop();

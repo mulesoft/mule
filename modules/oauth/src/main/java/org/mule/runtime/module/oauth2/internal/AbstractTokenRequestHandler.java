@@ -9,13 +9,14 @@ package org.mule.runtime.module.oauth2.internal;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.runtime.api.tls.TlsContextFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTokenRequestHandler implements MuleContextAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
-  private MuleContext muleContext;
+  protected MuleContext muleContext;
   private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
   private String tokenUrl;
   private HttpRequestOptions httpRequestOptions =

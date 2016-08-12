@@ -20,7 +20,6 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -127,7 +126,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(MuleEvent.class))).then(invocation -> {
       MuleEvent argEvent = (MuleEvent) invocation.getArguments()[0];
-      assertThat(argEvent.getMessageAsString(), is(TEST_DATA));
+      assertThat(argEvent.getMessageAsString(muleContext), is(TEST_DATA));
       argEvent.setMessage(MuleMessage.builder(argEvent.getMessage()).payload(PROCESSED_DATA).build());
       return argEvent;
     });

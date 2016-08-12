@@ -14,6 +14,7 @@ import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -94,7 +95,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
     return new CounterCallback() {
 
       @Override
-      public void eventReceived(MuleEventContext context, Object Component) throws Exception {
+      public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
         final int count = incCallbackCount();
         logger.info("Message Delivery Count is: " + count);
         throw new FunctionalTestException();
@@ -103,15 +104,12 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   }
 
   private void registerEventListener(final Latch messageRedeliveryExceptionFired) throws NotificationException {
-    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        if (notification.getException() instanceof MessageRedeliveredException) {
-          messageRedeliveryExceptionFired.countDown();
-        }
+    final ExceptionNotificationListener<ExceptionNotification> listener = notification -> {
+      if (notification.getException() instanceof MessageRedeliveredException) {
+        messageRedeliveryExceptionFired.countDown();
       }
-    });
+    };
+    muleContext.registerListener(listener);
   }
 
   protected void assertNoMessageInDlq(String location) throws MuleException {

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.utils;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -33,7 +34,7 @@ public final class ImplicitObjectUtils {
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
    * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
-   * @param expressionManager a {@link ExpressionManager} for the default values which are expessions
+   * @param expressionManager a {@link ExpressionManager} for the default values which are expressions
    * @return a {@link ResolverSet}
    */
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, ExpressionManager expressionManager) {

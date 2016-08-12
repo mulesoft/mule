@@ -11,9 +11,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
-import org.mule.runtime.core.api.MuleEventContext;
 
 import java.io.ByteArrayInputStream;
 import java.util.concurrent.CountDownLatch;
@@ -54,25 +54,21 @@ public class TcpStreamingTestCase extends SocketExtensionTestCase {
    */
   private void streamingTestCase(Object payload, int iterations) throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<String> message = new AtomicReference<String>();
+    final AtomicReference<String> message = new AtomicReference<>();
     final AtomicInteger loopCount = new AtomicInteger(0);
 
-    EventCallback callback = new EventCallback() {
-
-      @Override
-      public synchronized void eventReceived(MuleEventContext context, Object component) {
-        try {
-          LOGGER.info(format("called %d times", loopCount.incrementAndGet()));
-          FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
-          // without this we may have problems with the many repeats
-          if (1 == latch.getCount()) {
-            message.set(ftc.getSummary());
-            assertThat(format(RESULT, TEST_MESSAGE.length()), is(message.get()));
-            latch.countDown();
-          }
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+    EventCallback callback = (context, component, muleContext) -> {
+      try {
+        LOGGER.info(format("called %d times", loopCount.incrementAndGet()));
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
+        // without this we may have problems with the many repeats
+        if (1 == latch.getCount()) {
+          message.set(ftc.getSummary());
+          assertThat(format(RESULT, TEST_MESSAGE.length()), is(message.get()));
+          latch.countDown();
         }
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
       }
     };
 

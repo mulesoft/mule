@@ -9,16 +9,17 @@ package org.mule.runtime.core.work;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of {@link AbstractMuleEventWork} that executes a {@link MessageProcessor} using this work's event. Instances of
@@ -31,14 +32,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProcessingMuleEventWork extends AbstractMuleEventWork {
 
-  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
+  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
   private final CountDownLatch latch = new CountDownLatch(1);
   private final MessageProcessor messageProcessor;
   private MuleEvent resultEvent;
   private MuleException exception;
 
-  public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent) {
+  public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent, MuleContext muleContext) {
     super(muleEvent);
+    messageProcessorExecutionTemplate = createExecutionTemplate();
+    messageProcessorExecutionTemplate.setMuleContext(muleContext);
     this.messageProcessor = messageProcessor;
   }
 
@@ -65,7 +68,7 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
    * 
    * @param timeout time to wait before throwing {@link ResponseTimeoutException}
    * @param timeUnit the unit for the timeout
-   * @return a {@link MuleEvent} once that {@link #doRun()} finised successfuly
+   * @return a {@link MuleEvent} once that {@link #doRun()} finished successfuly
    * @throws InterruptedException if the calling thread is interrupted
    * @throws ResponseTimeoutException if the calling thread waiting time has exceeded the timeout and {@link #doRun()} hasn't yet
    *         finished

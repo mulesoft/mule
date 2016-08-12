@@ -13,7 +13,6 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -46,20 +45,16 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase {
   }
 
   private EventCallback newCallback(final CountDownLatch latch, final AtomicReference<String> message) {
-    return new EventCallback() {
-
-      @Override
-      public synchronized void eventReceived(MuleEventContext context, Object component) {
-        try {
-          FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
-          // without this we may have problems with the many repeats
-          if (1 == latch.getCount()) {
-            message.set(ftc.getSummary());
-            latch.countDown();
-          }
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+    return (context, component, muleContext) -> {
+      try {
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
+        // without this we may have problems with the many repeats
+        if (1 == latch.getCount()) {
+          message.set(ftc.getSummary());
+          latch.countDown();
         }
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
       }
     };
   }
@@ -72,7 +67,7 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase {
     assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<String> message = new AtomicReference<String>();
+    final AtomicReference<String> message = new AtomicReference<>();
     ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
     client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource())
         .getAddress(), TEST_MESSAGE, new HashMap());
@@ -80,7 +75,7 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase {
     assertEquals(RESULT, message.get());
 
     final CountDownLatch latch2 = new CountDownLatch(1);
-    final AtomicReference<String> message2 = new AtomicReference<String>();
+    final AtomicReference<String> message2 = new AtomicReference<>();
     ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
     client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource())
         .getAddress(), TEST_MESSAGE_2, new HashMap());

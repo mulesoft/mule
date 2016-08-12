@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -114,12 +115,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
     MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
 
-    MessageProcessor next = new MessageProcessor() {
-
-      @Override
-      public MuleEvent process(MuleEvent event) throws MuleException {
-        throw new MessagingException(event, null);
-      }
+    MessageProcessor next = event1 -> {
+      throw new MessagingException(event1, null);
     };
 
     messageProcessor.setListener(next);
@@ -139,12 +136,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
     MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
 
-    MessageProcessor next = new MessageProcessor() {
-
-      @Override
-      public MuleEvent process(MuleEvent event) throws MuleException {
-        throw new DefaultMuleException("failure");
-      }
+    MessageProcessor next = event1 -> {
+      throw new DefaultMuleException("failure");
     };
 
     messageProcessor.setListener(next);
@@ -170,7 +163,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
     assertNotSame(Thread.currentThread(), target.thread);
 
     assertSame(VoidMuleEvent.getInstance(), result);

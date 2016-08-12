@@ -6,7 +6,9 @@
  */
 package org.mule.test.config.spring;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.lang.reflect.Method;
@@ -14,14 +16,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.aop.MethodBeforeAdvice;
 
-public class FunctionalTestAdvice implements MethodBeforeAdvice {
+public class FunctionalTestAdvice implements MethodBeforeAdvice, MuleContextAware {
 
   private Latch latch = new Latch();
   private String message;
+  private MuleContext muleContext;
 
+  @Override
   public void before(Method method, Object[] args, Object target) throws Throwable {
     if (null != args && args.length == 1 && args[0] instanceof MuleEventContext) {
-      message = ((MuleEventContext) args[0]).getMessageAsString();
+      message = ((MuleEventContext) args[0]).getMessageAsString(muleContext);
     }
     latch.countDown();
   }
@@ -31,4 +35,8 @@ public class FunctionalTestAdvice implements MethodBeforeAdvice {
     return message;
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

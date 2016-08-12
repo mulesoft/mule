@@ -214,9 +214,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     final Latch latch = new Latch();
     FunctionalTestComponent testComponent = new FunctionalTestComponent();
     testComponent.setMuleContext(muleContext);
-    testComponent.setEventCallback((context, message) -> {
+    testComponent.setEventCallback((context, message, muleContext) -> {
       assertEquals(1, latch.getCount());
-      assertEquals(TEST_MESSAGE, context.transformMessageToString());
+      assertEquals(TEST_MESSAGE, context.transformMessageToString(muleContext));
       latch.countDown();
     });
     testComponent.initialise();

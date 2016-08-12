@@ -8,6 +8,7 @@ package org.mule.runtime.module.oauth2.internal;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 
 import org.slf4j.Logger;
@@ -18,9 +19,11 @@ import org.slf4j.Logger;
 public class MuleEventLogger {
 
   private final Logger logger;
+  private MuleContext muleContext;
 
-  public MuleEventLogger(Logger logger) {
+  public MuleEventLogger(Logger logger, MuleContext muleContext) {
     this.logger = logger;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -32,7 +35,7 @@ public class MuleEventLogger {
     logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
     logger.error("Message content is " + muleEvent.getMessage());
     try {
-      String payloadAsString = muleEvent.getMuleContext().getTransformationService().getPayloadForLogging(muleEvent.getMessage());
+      String payloadAsString = muleContext.getTransformationService().getPayloadForLogging(muleEvent.getMessage());
       logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
     } catch (Exception e) {
       // just skip the logging message if we couldn't convert the payload to string.

@@ -9,10 +9,8 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -34,14 +32,11 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase {
   public void testPollingHttpConnector() throws Exception {
     FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
     assertNotNull(ftc);
-    ftc.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        assertEquals("The Accept header should be set on the incoming message", "application/xml",
-                     context.getMessage().<String>getInboundProperty("Accept"));
-      }
-    });
+    ftc.setEventCallback((context, component, muleContext) -> assertEquals(
+                                                                           "The Accept header should be set on the incoming message",
+                                                                           "application/xml",
+                                                                           context.getMessage()
+                                                                               .<String>getInboundProperty("Accept")));
 
     MuleClient client = muleContext.getClient();
     MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);

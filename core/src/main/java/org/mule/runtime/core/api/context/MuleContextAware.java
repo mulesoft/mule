@@ -14,5 +14,8 @@ import org.mule.runtime.core.api.MuleContext;
  */
 public interface MuleContextAware {
 
+  /**
+   * @param context the Mule node.
+   */
   void setMuleContext(MuleContext context);
 }

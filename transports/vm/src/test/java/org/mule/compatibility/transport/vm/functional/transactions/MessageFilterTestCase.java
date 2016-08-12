@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.vm.functional.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -67,7 +68,7 @@ public class MessageFilterTestCase extends FunctionalTestCase {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        String payload = event.getMessageAsString();
+        String payload = event.getMessageAsString(muleContext);
         rejectMesage = payload + "(rejected!-1)";
         return null;
       } catch (Exception e) {
@@ -85,7 +86,7 @@ public class MessageFilterTestCase extends FunctionalTestCase {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        String payload = event.getMessageAsString();
+        String payload = event.getMessageAsString(muleContext);
         rejectMesage = payload + "(rejected!-2)";
         return null;
       } catch (Exception e) {

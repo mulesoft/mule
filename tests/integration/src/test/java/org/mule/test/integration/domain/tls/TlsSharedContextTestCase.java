@@ -9,6 +9,7 @@ package org.mule.test.integration.domain.tls;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -82,6 +83,6 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase {
 
   private void testFlowForApp(String flowName, String appName, String expected) throws Exception {
     MuleEvent response = new FlowRunner(getMuleContextForApp(appName), flowName).withPayload(DATA).run();
-    assertThat(response.getMessageAsString(), is(expected));
+    assertThat(response.getMessageAsString(getMuleContextForApp(appName)), is(expected));
   }
 }

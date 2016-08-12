@@ -9,11 +9,11 @@ package org.mule.extension.validation.internal;
 import org.mule.extension.validation.api.ObjectSource;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
+import org.mule.extension.validation.api.Validator;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.extension.validation.api.Validator;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -49,7 +49,7 @@ public final class CustomValidatorOperation extends ValidationSupport {
                               MuleEvent event, @UseConfig ValidationExtension config)
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
-    Validator validator = validatorSource.getObject(event.getMuleContext());
+    Validator validator = validatorSource.getObject(muleContext);
 
     validateWith(validator, createContext(options, event, config), event);
   }

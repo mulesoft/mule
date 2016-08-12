@@ -15,7 +15,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -54,6 +53,8 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
   private static final long serialVersionUID = -1650380871293160973L;
 
   public static final String PROPERTY_PROCESS_SYNCHRONOUSLY = "processSynchronously";
+
+  public static int TIMEOUT_WAIT_FOREVER = 0;
 
   /**
    * logger used by this class
@@ -363,7 +364,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
   @Override
   public int getResponseTimeout() {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
-      return MuleEvent.TIMEOUT_WAIT_FOREVER;
+      return TIMEOUT_WAIT_FOREVER;
     }
     return responseTimeout;
   }

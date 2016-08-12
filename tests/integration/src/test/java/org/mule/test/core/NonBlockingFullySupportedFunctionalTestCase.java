@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessagingException;
@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -175,14 +176,14 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
   public void enricherIssue() throws Exception {
     MuleEvent result = flowRunner("enricherIssue").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
         .nonBlocking().run();
-    assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void enricherIssueNonBlocking() throws Exception {
     MuleEvent result = flowRunner("enricherIssueNonBlocking").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
-    assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test

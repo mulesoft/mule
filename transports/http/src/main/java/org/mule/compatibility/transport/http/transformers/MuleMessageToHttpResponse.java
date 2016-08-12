@@ -111,7 +111,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
             if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0)) {
               // Ensure that we convert the payload to an in memory representation
               // so we don't end up with a chunked response
-              len = event.getMessageAsBytes().length;
+              len = event.getMessageAsBytes(muleContext).length;
 
               response.setBody(event.getMessage(), muleContext);
 

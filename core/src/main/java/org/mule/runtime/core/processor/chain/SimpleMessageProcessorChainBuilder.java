@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
@@ -13,12 +14,12 @@ import java.util.LinkedList;
 
 public class SimpleMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
-  public SimpleMessageProcessorChainBuilder() {
-    // empty
+  public SimpleMessageProcessorChainBuilder(FlowConstruct flowConstruct) {
+    super(flowConstruct);
   }
 
-  public SimpleMessageProcessorChainBuilder(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
+  public SimpleMessageProcessorChainBuilder(MuleContext muleContext) {
+    super(muleContext);
   }
 
   @Override

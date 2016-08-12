@@ -10,11 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -39,14 +37,10 @@ public class FileComparatorTestCase extends FunctionalTestCase {
   @Test
   public void testComparator() throws Exception {
     final CountDownLatch countDown = new CountDownLatch(2);
-    EventCallback callback = new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        int index = (int) countDown.getCount() - 1;
-        assertEquals(FILE_NAMES[index], context.getMessage().getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
-        countDown.countDown();
-      }
+    EventCallback callback = (context, component, muleContext) -> {
+      int index = (int) countDown.getCount() - 1;
+      assertEquals(FILE_NAMES[index], context.getMessage().getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+      countDown.countDown();
     };
 
     ((FunctionalTestComponent) getComponent(COMPONENT_NAME)).setEventCallback(callback);

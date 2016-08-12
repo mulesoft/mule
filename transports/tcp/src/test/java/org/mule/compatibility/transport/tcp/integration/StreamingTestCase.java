@@ -9,11 +9,11 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -50,25 +50,21 @@ public class StreamingTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<String> message = new AtomicReference<String>();
+    final AtomicReference<String> message = new AtomicReference<>();
     final AtomicInteger loopCount = new AtomicInteger(0);
 
-    EventCallback callback = new EventCallback() {
-
-      @Override
-      public synchronized void eventReceived(MuleEventContext context, Object component) {
-        try {
-          logger.info("called " + loopCount.incrementAndGet() + " times");
-          FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
-          // without this we may have problems with the many repeats
-          if (1 == latch.getCount()) {
-            message.set(ftc.getSummary());
-            assertEquals(RESULT, message.get());
-            latch.countDown();
-          }
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+    EventCallback callback = (context, component, muleContext) -> {
+      try {
+        logger.info("called " + loopCount.incrementAndGet() + " times");
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
+        // without this we may have problems with the many repeats
+        if (1 == latch.getCount()) {
+          message.set(ftc.getSummary());
+          assertEquals(RESULT, message.get());
+          latch.countDown();
         }
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
       }
     };
 

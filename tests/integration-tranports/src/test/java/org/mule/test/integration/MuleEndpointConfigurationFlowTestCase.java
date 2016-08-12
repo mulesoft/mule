@@ -21,12 +21,10 @@ import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
-import org.mule.tck.MuleEndpointTestUtils;
 
 import java.util.List;
 
@@ -124,16 +122,6 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase {
     assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getExchangePattern());
     assertEquals(2002, ep.getResponseTimeout());
     assertTrue(ep instanceof InboundEndpoint);
-
-    // Test MuleEvent timeout proporgation
-    MuleEvent event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(), (InboundEndpoint) ep, muleContext);
-    assertEquals(2002, event.getTimeout());
-
-    ImmutableEndpoint ep2 = getEndpointFactory().getInboundEndpoint("test://hello?connector=testConnector1");
-
-    event = MuleEndpointTestUtils.getTestEvent("hello", getTestFlow(), (InboundEndpoint) ep2, muleContext);
-    // default event timeout set in the test config file
-    assertEquals(1001, event.getTimeout());
   }
 
   public EndpointFactory getEndpointFactory() {

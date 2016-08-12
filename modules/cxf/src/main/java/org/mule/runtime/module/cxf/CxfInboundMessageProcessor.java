@@ -509,7 +509,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       if (payload instanceof InputStream) {
         m.setContent(InputStream.class, payload);
       } else {
-        InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM);
+        InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM, muleContext);
         m.setContent(InputStream.class, is);
       }
     }
@@ -529,7 +529,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     if (eventMsgPayload instanceof InputStream) {
       is = (InputStream) eventMsgPayload;
     } else {
-      is = (InputStream) context.transformMessage(DataType.INPUT_STREAM);
+      is = (InputStream) context.transformMessage(DataType.INPUT_STREAM, muleContext);
     }
     return is;
   }

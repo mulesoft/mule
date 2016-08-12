@@ -6,10 +6,6 @@
  */
 package org.mule.compatibility.transport.http;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -34,6 +30,10 @@ import org.apache.commons.httpclient.cookie.RFC2109Spec;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -273,11 +273,12 @@ public class CookieHelper {
    * @param event this one is used only if the cookies are stored in a {@link Map} in order to resolve expressions with the
    *        {@link ExpressionManager}.
    * @param destinationUri the host, port and path of this {@link URI} will be used as the data of the cookies that are added.
+   * @param muleContext the Mule node.
    */
   public static void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event,
-                                        URI destinationUri) {
+                                        URI destinationUri, MuleContext muleContext) {
     CookieStorageType.resolveCookieStorageType(cookiesObject).addCookiesToClient(client, cookiesObject, policy, event,
-                                                                                 destinationUri);
+                                                                                 destinationUri, muleContext);
   }
 
   /**
@@ -420,7 +421,8 @@ enum CookieStorageType {
     }
 
     @Override
-    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri) {
+    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri,
+                                   MuleContext muleContext) {
       Cookie[] cookies = (Cookie[]) cookiesObject;
 
       if (cookies != null && cookies.length > 0) {
@@ -439,7 +441,7 @@ enum CookieStorageType {
       if (newCookiesArray == null) {
         return preExistentCookies;
       }
-      final List<Cookie> cookiesThatAreReallyNew = new ArrayList<Cookie>(newCookiesArray.length);
+      final List<Cookie> cookiesThatAreReallyNew = new ArrayList<>(newCookiesArray.length);
       final Cookie[] preExistentCookiesArray = (Cookie[]) preExistentCookies;
       for (Cookie newCookie : newCookiesArray) {
         int newCookieInPreExistentArrayIndex = getCookieIndexFromCookiesArray(newCookie.getName(), preExistentCookiesArray);
@@ -512,7 +514,8 @@ enum CookieStorageType {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri) {
+    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri,
+                                   MuleContext muleContext) {
       Map<String, String> cookieMap = (Map<String, String>) cookiesObject;
 
       client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
@@ -526,7 +529,7 @@ enum CookieStorageType {
 
         final String value;
         if (event != null) {
-          value = event.getMuleContext().getExpressionManager().parse(cookieValue, event);
+          value = muleContext.getExpressionManager().parse(cookieValue, event);
         } else {
           value = cookieValue;
         }
@@ -619,7 +622,7 @@ enum CookieStorageType {
    * @see CookieHelper#addCookiesToClient(HttpClient, Object, String, MuleEvent, URI)
    */
   public abstract void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event,
-                                          URI destinationUri);
+                                          URI destinationUri, MuleContext muleContext);
 
   /**
    * @see CookieHelper#asArrayOfCookies(Object)

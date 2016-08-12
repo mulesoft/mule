@@ -45,7 +45,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase {
     assertNotNull(testComponent);
 
     final AtomicBoolean callbackMade = new AtomicBoolean(false);
-    EventCallback callback = (context, component) -> {
+    EventCallback callback = (context, component, muleContext) -> {
       MuleMessage msg = context.getMessage();
       assertTrue(callbackMade.compareAndSet(false, true));
       assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));

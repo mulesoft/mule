@@ -10,8 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -22,6 +21,7 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -144,7 +144,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       eventFromMainFlow = getCurrentEvent();
       messageFromMainFlow = eventFromMainFlow.getMessage();
 
-      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
 
       throw new Exception("expected exception!");
     }
@@ -157,8 +157,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       eventFromMainFlow = getCurrentEvent();
       messageFromMainFlow = eventFromMainFlow.getMessage();
 
-      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(),
-                             getUrl("innerrequestresponsetest"));
+      muleContext.getClient().send(getUrl("innerrequestresponsetest"), MuleMessage.builder().payload("payload").build());
 
       throw new Exception("expected exception!");
     }
@@ -171,8 +170,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       eventFromMainFlow = getCurrentEvent();
       messageFromMainFlow = eventFromMainFlow.getMessage();
 
-      event.getMuleContext().getClient().dispatch(getUrl("innertest"),
-                                                  MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
 
       throw new DefaultMuleException("expected exception!");
     }

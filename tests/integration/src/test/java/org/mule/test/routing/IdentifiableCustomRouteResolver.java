@@ -8,18 +8,22 @@ package org.mule.test.routing;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.routing.IdentifiableDynamicRouteResolver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver {
+public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver, MuleContextAware {
 
   private final String ID_EXPRESSION = "#[flowVars['id']]";
+
+  private MuleContext muleContext;
 
   static List<MessageProcessor> routes = new ArrayList<>();
 
@@ -30,7 +34,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
 
   @Override
   public String getRouteIdentifier(MuleEvent event) throws MessagingException {
-    return event.getMuleContext().getExpressionManager().parse(ID_EXPRESSION, event);
+    return muleContext.getExpressionManager().parse(ID_EXPRESSION, event);
   }
 
   public static class AddLetterMessageProcessor implements MessageProcessor {
@@ -51,6 +55,11 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
       }
     }
 
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 
 }

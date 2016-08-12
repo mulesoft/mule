@@ -7,8 +7,8 @@
 package org.mule.functional.functional;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -67,7 +67,7 @@ public class FunctionalTestComponent
   private boolean logMessageDetails = false;
   private String id = "<none>";
   private MuleContext muleContext;
-  private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<LifecycleCallback>();
+  private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
 
   /**
@@ -79,7 +79,7 @@ public class FunctionalTestComponent
   @Override
   public void initialise() {
     if (enableMessageHistory) {
-      messageHistory = new CopyOnWriteArrayList<Object>();
+      messageHistory = new CopyOnWriteArrayList<>();
     }
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Initialisable.PHASE_NAME);
@@ -93,6 +93,7 @@ public class FunctionalTestComponent
     }
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
@@ -104,6 +105,7 @@ public class FunctionalTestComponent
     }
   }
 
+  @Override
   public void dispose() {
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Disposable.PHASE_NAME);
@@ -125,11 +127,11 @@ public class FunctionalTestComponent
     if (isDoInboundTransform()) {
       Object o = context.getMessage().getPayload();
       if (getAppendString() != null && !(o instanceof String)) {
-        o = context.transformMessageToString();
+        o = context.transformMessageToString(muleContext);
       }
       return o;
     } else if (getAppendString() != null) {
-      return context.getMessageAsString();
+      return context.getMessageAsString(muleContext);
     } else {
       return context.getMessage().getPayload();
     }
@@ -224,7 +226,7 @@ public class FunctionalTestComponent
     }
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this);
+      eventCallback.eventReceived(context, this, muleContext);
     }
 
     Object replyMessage;

@@ -24,6 +24,7 @@ import static org.mule.runtime.module.oauth2.internal.OAuthConstants.REDIRECT_UR
 import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.springframework.util.StringUtils.isEmpty;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -57,7 +58,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   public static final int TOKEN_NOT_FOUND_STATUS = 201;
   public static final int FAILURE_PROCESSING_REDIRECT_URL_REQUEST_STATUS = 300;
   private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
-  private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
+  private MuleEventLogger muleEventLogger;
 
   public void setTokenResponseConfiguration(final TokenResponseConfiguration tokenResponseConfiguration) {
     this.tokenResponseConfiguration = tokenResponseConfiguration;
@@ -73,6 +74,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   @Override
   public void init() throws MuleException {
     createListenerForRedirectUrl();
+    muleEventLogger = new MuleEventLogger(logger, muleContext);
   }
 
   @Override
@@ -174,7 +176,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   }
 
   private void setMapPayloadWithTokenRequestParameters(final MuleEvent event, final String authorizationCode) {
-    final HashMap<String, String> formData = new HashMap<String, String>();
+    final HashMap<String, String> formData = new HashMap<>();
     formData.put(CODE_PARAMETER, authorizationCode);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
@@ -184,7 +186,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   }
 
   private void setMapPayloadWithRefreshTokenRequestParameters(final MuleEvent event, final String refreshToken) {
-    final HashMap<String, String> formData = new HashMap<String, String>();
+    final HashMap<String, String> formData = new HashMap<>();
     formData.put(OAuthConstants.REFRESH_TOKEN_PARAMETER, refreshToken);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());

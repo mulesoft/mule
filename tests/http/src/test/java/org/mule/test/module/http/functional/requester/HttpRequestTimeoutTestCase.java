@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
@@ -42,11 +41,6 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  public void throwsExceptionWhenEventTimeoutIsExceeded() throws Exception {
-    assertTimeout("requestFlowNoTimeout", -1, 1);
-  }
-
-  @Test
   public void requesterTimeoutOverridesEventTimeout() throws Exception {
     assertTimeout("requestFlow", 1, TEST_TIMEOUT * 2);
   }
@@ -60,11 +54,8 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
       @Override
       public void run() {
         try {
-          FlowRunner runner =
-              flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("timeout", responseTimeoutRequester);
-          runner.buildEvent().setTimeout(responseTimeoutEvent);
-
-          MessagingException e = runner.runExpectingException();
+          MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE)
+              .withFlowVariable("timeout", responseTimeoutRequester).runExpectingException();
 
           assertThat(e.getCauseException(), instanceOf(TimeoutException.class));
           requestTimeoutLatch.release();

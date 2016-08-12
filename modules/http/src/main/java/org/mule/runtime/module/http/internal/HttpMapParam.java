@@ -30,8 +30,7 @@ public class HttpMapParam extends HttpParam {
   }
 
   @Override
-  public void resolve(ParameterMap parameterMap, MuleEvent muleEvent) {
-    MuleContext muleContext = muleEvent.getMuleContext();
+  public void resolve(ParameterMap parameterMap, MuleEvent muleEvent, MuleContext muleContext) {
     Map<Object, Object> paramMap = (Map<Object, Object>) muleContext.getExpressionManager().evaluate(expression, muleEvent);
     for (Map.Entry<Object, Object> entry : paramMap.entrySet()) {
       String paramName = entry.getKey().toString();

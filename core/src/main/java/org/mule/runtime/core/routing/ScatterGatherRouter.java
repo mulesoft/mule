@@ -8,6 +8,7 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -210,7 +211,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     List<ProcessingMuleEventWork> works = new ArrayList<>(routes.size());
     try {
       for (final MessageProcessor route : routes) {
-        ProcessingMuleEventWork work = new ProcessingMuleEventWork(route, event);
+        ProcessingMuleEventWork work = new ProcessingMuleEventWork(route, event, muleContext);
         workManager.scheduleWork(work);
         works.add(work);
       }
@@ -301,7 +302,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       if (route instanceof MessageProcessorChain) {
         routeChains.add(route);
       } else {
-        routeChains.add(new DefaultMessageProcessorChainBuilder().chain(route).build());
+        routeChains.add(new DefaultMessageProcessorChainBuilder(muleContext).chain(route).build());
       }
     }
   }

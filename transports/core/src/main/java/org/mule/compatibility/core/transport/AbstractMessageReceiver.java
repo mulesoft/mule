@@ -451,12 +451,11 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         applyResponseTransformers(resultEvent);
       }
 
-      if (connector.isEnableMessageEvents(muleEvent)) {
+      if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
         connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
                                                                    endpoint,
                                                                    resultEvent.getFlowConstruct(),
-                                                                   MESSAGE_RESPONSE),
-                                   muleEvent);
+                                                                   MESSAGE_RESPONSE));
       }
     }
     return resultEvent;

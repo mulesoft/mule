@@ -117,7 +117,8 @@ public class HttpRequestOperations {
             .setAuthentication(config.getAuthentication()).setParseResponse(resolvedParseResponse)
             .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config).build();
 
-    return OperationResult.<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true))
+    return OperationResult
+        .<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true, muleContext))
         .build();
   }
 
@@ -139,10 +140,8 @@ public class HttpRequestOperations {
 
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
-    } else if (responseTimeout == null) {
-      return muleEvent.getTimeout();
     } else {
-      return responseTimeout;
+      return responseTimeout != null ? responseTimeout : muleContext.getConfiguration().getDefaultResponseTimeout();
     }
   }
 

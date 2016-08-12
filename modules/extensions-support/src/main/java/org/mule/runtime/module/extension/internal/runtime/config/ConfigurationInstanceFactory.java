@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -70,11 +72,12 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event) throws MuleException {
+  public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event, MuleContext muleContext)
+      throws MuleException {
     ValueResolver<ConnectionProvider> providerResolver;
     if (requiresConnection) {
       providerResolver = new StaticValueResolver<>(implicitConnectionProviderFactory
-          .createImplicitConnectionProvider(name, configurationModel, event));
+          .createImplicitConnectionProvider(name, configurationModel, event, muleContext));
     } else {
       providerResolver = NULL_CONNECTION_PROVIDER;
     }

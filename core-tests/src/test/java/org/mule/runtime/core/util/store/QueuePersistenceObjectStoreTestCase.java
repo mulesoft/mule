@@ -21,15 +21,6 @@ import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -45,6 +36,16 @@ import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 import org.mule.tck.NonSerializableObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreContractTestCase {
 
@@ -174,7 +175,6 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     MuleEvent newEvent = (MuleEvent) item;
     MuleMessage newMessage = newEvent.getMessage();
     assertNotNull(newMessage);
-    assertEquals(muleContext, newEvent.getMuleContext());
     assertEquals("Hello", newMessage.getPayload());
   }
 

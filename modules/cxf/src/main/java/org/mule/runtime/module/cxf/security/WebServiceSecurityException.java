@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.cxf.security;
 
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.security.SecurityManager;
 
 public class WebServiceSecurityException extends org.mule.runtime.core.api.security.SecurityException {
 
-  public WebServiceSecurityException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
-    super(MessageFactory
-        .createStaticMessage("Security exception occurred invoking web service\nEndpoint = " + event.getMessageSourceURI()
-            + "\nSecurity provider(s) = " + event.getMuleContext().getSecurityManager().getProviders() + "\nEvent = " + event),
-          event, cause, failingMessageProcessor);
+  public WebServiceSecurityException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor,
+                                     SecurityManager securityManager) {
+    super(createStaticMessage("Security exception occurred invoking web service\nEndpoint = " + event.getMessageSourceURI()
+        + "\nSecurity provider(s) = " + securityManager.getProviders() + "\nEvent = " + event), event, cause,
+          failingMessageProcessor);
   }
 }
 

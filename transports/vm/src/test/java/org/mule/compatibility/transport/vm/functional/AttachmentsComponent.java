@@ -6,8 +6,10 @@
  */
 package org.mule.compatibility.transport.vm.functional;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.io.File;
@@ -19,7 +21,9 @@ import javax.activation.FileDataSource;
  * A test service that reads inbound attachments and sends an attachment back. This class is only suitable for the
  * VMAttachementsTestCase.
  */
-public class AttachmentsComponent implements Callable {
+public class AttachmentsComponent implements Callable, MuleContextAware {
+
+  private MuleContext muleContext;
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
@@ -36,11 +40,16 @@ public class AttachmentsComponent implements Callable {
       throw new IllegalArgumentException("content type is not text/xml");
     }
 
-    if (!"Mmm... attachments!".equals(eventContext.getMessageAsString())) {
+    if (!"Mmm... attachments!".equals(eventContext.getMessageAsString(muleContext))) {
       throw new IllegalArgumentException("payload is incorrect");
     }
     // Lets return an image
     FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
     return MuleMessage.builder().payload("here is one for you!").addOutboundAttachment("mule", new DataHandler(ds)).build();
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

@@ -13,12 +13,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.functional.functional.EventCallback;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -150,19 +149,15 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
    * Configures a test component in a specific flow to block until a specific number of concurrent requests are reached.
    */
   private void configureTestComponent(String flowName, final int maxThreadsActive) throws Exception {
-    getFunctionalTestComponent(flowName).setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        try {
-          maxActiveNumberOfRequestExecutedLatch.countDown();
-          numberOfRequest.incrementAndGet();
-          if (numberOfRequest.get() <= maxThreadsActive) {
-            waitingLatch.await();
-          }
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
+    getFunctionalTestComponent(flowName).setEventCallback((context, component, muleContext) -> {
+      try {
+        maxActiveNumberOfRequestExecutedLatch.countDown();
+        numberOfRequest.incrementAndGet();
+        if (numberOfRequest.get() <= maxThreadsActive) {
+          waitingLatch.await();
         }
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     });
   }

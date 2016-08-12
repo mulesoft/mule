@@ -12,9 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
-import java.util.Iterator;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -26,6 +23,10 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Iterator;
+
+import org.junit.Test;
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -55,10 +56,10 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent result = router.process(event3);
     assertNotNull(result);
-    assertTrue(result.getMessageAsString().contains("test event A"));
-    assertTrue(result.getMessageAsString().contains("test event B"));
-    assertTrue(result.getMessageAsString().contains("test event C"));
-    assertTrue(result.getMessageAsString().matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
+    assertTrue(result.getMessageAsString(muleContext).contains("test event A"));
+    assertTrue(result.getMessageAsString(muleContext).contains("test event B"));
+    assertTrue(result.getMessageAsString(muleContext).contains("test event C"));
+    assertTrue(result.getMessageAsString(muleContext).matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
   }
 
   public static class TestEventAggregator extends AbstractAggregator {
@@ -101,7 +102,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
             for (Iterator iterator = events.iterator(false); iterator.hasNext();) {
               MuleEvent event = (MuleEvent) iterator.next();
               try {
-                newPayload.append(event.getMessageAsString()).append(" ");
+                newPayload.append(event.getMessageAsString(muleContext)).append(" ");
               } catch (MuleException e) {
                 throw new AggregationException(events, next, e);
               }

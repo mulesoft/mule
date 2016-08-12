@@ -141,32 +141,32 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public byte[] getMessageAsBytes() throws MuleException {
+    public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
       return new byte[0];
     }
 
     @Override
-    public Object transformMessage(Class outputType) throws TransformerException {
+    public Object transformMessage(Class outputType, MuleContext muleContext) throws TransformerException {
       return null;
     }
 
     @Override
-    public String transformMessageToString() throws TransformerException {
+    public String transformMessageToString(MuleContext muleContext) throws TransformerException {
       return null;
     }
 
     @Override
-    public String getMessageAsString() throws MuleException {
+    public String getMessageAsString(MuleContext muleContext) throws MuleException {
       return null;
     }
 
     @Override
-    public Object transformMessage(DataType outputType) throws TransformerException {
+    public Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException {
       return null;
     }
 
     @Override
-    public String getMessageAsString(Charset encoding) throws MuleException {
+    public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
       return null;
     }
 
@@ -192,16 +192,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-      // no action
-    }
-
-    @Override
-    public int getTimeout() {
-      return 0;
-    }
-
-    @Override
-    public void setTimeout(int timeout) {
       // no action
     }
 

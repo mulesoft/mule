@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.pgp.filters;
 
-import org.mule.runtime.module.pgp.LiteralMessage;
-import org.mule.runtime.module.pgp.Message;
-import org.mule.runtime.module.pgp.MessageFactory;
-import org.mule.runtime.module.pgp.PGPAuthentication;
-import org.mule.runtime.module.pgp.PGPKeyRing;
-import org.mule.runtime.module.pgp.SignedMessage;
-import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -24,6 +17,13 @@ import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
+import org.mule.runtime.module.pgp.LiteralMessage;
+import org.mule.runtime.module.pgp.Message;
+import org.mule.runtime.module.pgp.MessageFactory;
+import org.mule.runtime.module.pgp.PGPAuthentication;
+import org.mule.runtime.module.pgp.PGPKeyRing;
+import org.mule.runtime.module.pgp.SignedMessage;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 
 public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
 
@@ -44,7 +44,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
 
     byte[] creds = null;
     try {
-      creds = event.getMessageAsBytes();
+      creds = event.getMessageAsBytes(muleContext);
       creds = strategy.decrypt(creds, null);
     } catch (Exception e1) {
       throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);

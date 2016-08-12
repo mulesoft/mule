@@ -13,7 +13,6 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -46,15 +45,11 @@ public class HttpStemTestCase extends FunctionalTestCase {
     FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
     assertNotNull(testComponent);
 
-    EventCallback callback = new EventCallback() {
-
-      @Override
-      public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
-        MuleMessage msg = context.getMessage();
-        assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-        assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-        assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-      }
+    EventCallback callback = (context, component, muleContext) -> {
+      MuleMessage msg = context.getMessage();
+      assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+      assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+      assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
     };
 
     testComponent.setEventCallback(callback);

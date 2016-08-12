@@ -27,7 +27,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
-import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -64,7 +63,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   private boolean originalVerboseExceptions;
 
-  private LocationExecutionContextProvider locationProvider = new MessagingExceptionLocationProvider();
+  private MessagingExceptionLocationProvider locationProvider = new MessagingExceptionLocationProvider();
 
   @Mock
   private MuleContext mockContext;
@@ -78,6 +77,8 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() {
     originalVerboseExceptions = DefaultMuleConfiguration.verboseExceptions;
+
+    locationProvider.setMuleContext(mockContext);
 
     DefaultMuleConfiguration mockConfiguration = mock(DefaultMuleConfiguration.class);
     when(mockConfiguration.getId()).thenReturn("MessagingExceptionTestCase");

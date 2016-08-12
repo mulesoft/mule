@@ -26,6 +26,7 @@ public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessage
   }
 
   public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint) {
+    super(endpoint.getMuleContext());
     this.endpoint = endpoint;
   }
 

@@ -15,9 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.functional.functional.EventCallback;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,14 +69,10 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
   public void soapHeadersAreRemovedFromMessage() throws Exception {
     // A test component is used on the server side to check HTTP headers that are received (inbound properties).
 
-    getFunctionalTestComponent("server").setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        errorCollector.checkThat(context.getMessage().getInboundProperty(HTTP_HEADER), notNullValue());
-        errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_IN), nullValue());
-        errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_INOUT), nullValue());
-      }
+    getFunctionalTestComponent("server").setEventCallback((context, component, muleContext) -> {
+      errorCollector.checkThat(context.getMessage().getInboundProperty(HTTP_HEADER), notNullValue());
+      errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_IN), nullValue());
+      errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_INOUT), nullValue());
     });
 
     flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST).withOutboundProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN)

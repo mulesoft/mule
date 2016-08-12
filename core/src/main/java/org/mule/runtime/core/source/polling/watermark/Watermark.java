@@ -7,7 +7,9 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -35,7 +37,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @since 3.5.0
  */
-public abstract class Watermark extends MessageProcessorPollingOverride {
+public abstract class Watermark extends MessageProcessorPollingOverride implements MuleContextAware {
+
+  protected MuleContext muleContext;
 
   /**
    * Logger to notify errors.
@@ -61,7 +65,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride {
   /**
    * The watermark annotations added to the definition
    */
-  protected Map<QName, Object> annotations = new HashMap<QName, Object>();
+  protected Map<QName, Object> annotations = new HashMap<>();
 
   public Watermark(ObjectStore<Serializable> objectStore, String variable, String defaultExpression) {
     this.objectStore = objectStore;
@@ -71,7 +75,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride {
 
   protected String resolveVariable(MuleEvent event) {
     try {
-      return WatermarkUtils.evaluate(variable, event).toString();
+      return WatermarkUtils.evaluate(variable, event, muleContext).toString();
     } catch (NotSerializableException e) {
       throw new IllegalArgumentException(e);
     }
@@ -89,7 +93,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride {
       watermarkValue = objectStore.retrieve(resolvedVariable);
     } catch (ObjectDoesNotExistException ex) {
       try {
-        watermarkValue = WatermarkUtils.evaluate(defaultExpression, event);
+        watermarkValue = WatermarkUtils.evaluate(defaultExpression, event, muleContext);
       } catch (NotSerializableException nse) {
         logger.warn(String.format("Default watermark expression '%s' returned not serializable value", this.defaultExpression),
                     nse);
@@ -160,4 +164,8 @@ public abstract class Watermark extends MessageProcessorPollingOverride {
     return true;
   }
 
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

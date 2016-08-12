@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.MuleEvent;
@@ -68,7 +69,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
 
     HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes();
     assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));
-    assertThat(event.getMessageAsString(), is(expectedContent));
+    assertThat(event.getMessageAsString(muleContext), is(expectedContent));
   }
 
 }

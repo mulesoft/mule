@@ -16,6 +16,7 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -88,7 +89,7 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase {
     }
 
     @Override
-    public void eventReceived(MuleEventContext context, Object component) throws Exception {
+    public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
       MuleMessage message = context.getMessage();
 
       Object httpMethod = message.getInboundProperty("http.method");

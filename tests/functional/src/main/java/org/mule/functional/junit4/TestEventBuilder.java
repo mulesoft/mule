@@ -11,16 +11,6 @@ import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.activation.DataHandler;
-
-import org.apache.commons.collections.Transformer;
-import org.mockito.Mockito;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -35,6 +25,17 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.activation.DataHandler;
+
+import org.apache.commons.collections.Transformer;
+import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for building events for testing.
@@ -302,8 +303,7 @@ public class TestEventBuilder {
     DefaultMuleEvent event =
         new DefaultMuleEvent(create(flow, sourceCorrelationId),
                              (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
-                             flow, new DefaultMuleSession(), muleContext.getConfiguration().getDefaultResponseTimeout(), null,
-                             null, transacted, null, replyToHandler);
+                             flow, new DefaultMuleSession(), null, null, transacted, null, replyToHandler);
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

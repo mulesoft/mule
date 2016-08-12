@@ -18,10 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
@@ -45,6 +41,11 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
@@ -299,7 +300,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
     assertMessageSent(true);
     assertEquals(TEST_MESSAGE + InboundAppendTransformer.APPEND_STRING,
-                 inboundListener.sensedEvent.getMessageAsString());
+                 inboundListener.sensedEvent.getMessageAsString(muleContext));
 
     assertNotNull(result);
     assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
@@ -357,7 +358,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     assertMessageSent(sync);
     MuleEvent event = inboundListener.sensedEvent;
     assertEquals(inMessage, event.getMessage());
-    assertEquals(TEST_MESSAGE, event.getMessageAsString());
+    assertEquals(TEST_MESSAGE, event.getMessageAsString(muleContext));
     assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
     return event;
   }

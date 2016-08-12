@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
@@ -45,7 +46,7 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testOnlyDefaultRoute() throws Exception {
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString());
+    assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -63,21 +64,21 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
   public void testNoMatchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString());
+    assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString(muleContext));
   }
 
   @Test
   public void testMatchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
+    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString(muleContext));
   }
 
   @Test
   public void testMatchingRouteWithStatistics() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
+    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -99,7 +100,7 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
     choiceRouter.addRoute(mp, new EqualsFilter("paz"));
     choiceRouter.updateRoute(mp, new EqualsFilter("zap"));
-    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
+    assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString(muleContext));
   }
 
   @Test

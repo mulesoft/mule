@@ -38,7 +38,6 @@ public class WebServiceMessageProcessorBuilder extends AbstractInboundMessagePro
 
   private DataBinding databinding;
   private String frontend = CxfConstants.JAX_WS_FRONTEND;
-  protected FlowConstruct flowConstruct;
   private Class<?> serviceClass;
 
   @Override
@@ -73,8 +72,8 @@ public class WebServiceMessageProcessorBuilder extends AbstractInboundMessagePro
   }
 
   @Override
-  protected Invoker createInvoker(CxfInboundMessageProcessor processor) {
-    Invoker invoker = super.createInvoker(processor);
+  protected Invoker createInvoker(CxfInboundMessageProcessor processor, FlowConstruct flowConstruct) {
+    Invoker invoker = super.createInvoker(processor, flowConstruct);
     if (CxfConstants.JAX_WS_FRONTEND.equals(frontend)) {
       invoker = new MuleJAXWSInvoker(invoker);
     }
@@ -99,11 +98,6 @@ public class WebServiceMessageProcessorBuilder extends AbstractInboundMessagePro
 
   public void setServiceClass(Class<?> serviceClass) {
     this.serviceClass = serviceClass;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   public String getFrontend() {

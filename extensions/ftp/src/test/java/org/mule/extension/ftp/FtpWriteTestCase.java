@@ -17,6 +17,7 @@ import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
@@ -115,7 +116,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
     MuleEvent event = flowRunner("readAndWrite").withFlowVariable("path", filePath).run();
 
-    assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
+    assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }
 
   @Test

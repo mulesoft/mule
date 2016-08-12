@@ -12,6 +12,14 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -20,13 +28,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -42,6 +43,9 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   private MuleEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -51,7 +55,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    when(event.getMuleContext().getNotificationManager()).thenReturn(eventNotificationHandler);
+    when(muleContext.getNotificationManager()).thenReturn(eventNotificationHandler);
     when(event.getMessage()).thenReturn(message);
     when((Class<String>) message.getDataType().getType()).thenReturn(String.class);
     initMocks(eventNotificationHandler);
@@ -73,7 +77,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void isNotificationEnabledForEvent() {
-    assertThat(helper.isNotificationEnabled(event), is(true));
+    assertThat(helper.isNotificationEnabled(muleContext), is(true));
     verify(eventNotificationHandler).isNotificationEnabled(TestServerNotification.class);
   }
 
@@ -81,6 +85,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void fireNotificationForEvent() {
     final String uri = "uri";
     final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
     helper.fireNotification(messageSource, event, uri, flowConstruct, action);
@@ -90,7 +95,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   @Test
   public void fireSpecificNotificationForEvent() {
     TestServerNotification notification = new TestServerNotification();
-    helper.fireNotification(notification, event);
+    helper.fireNotification(notification, muleContext);
     verify(eventNotificationHandler).fireNotification(notification);
   }
 

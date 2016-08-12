@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -13,16 +17,10 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +37,9 @@ public class DefaultMuleEventContext implements MuleEventContext {
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleEventContext.class);
 
   private final MuleEvent event;
-  private final MuleContext muleContext;
-  private final MuleClient clientInterface;
 
   public DefaultMuleEventContext(MuleEvent event) {
     this.event = event;
-    this.muleContext = event.getMuleContext();
-    this.clientInterface = muleContext.getClient();
   }
 
   /**
@@ -75,8 +69,8 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
   @Override
-  public Object transformMessage(DataType dataType) throws TransformerException {
-    return event.transformMessage(dataType);
+  public Object transformMessage(DataType dataType, MuleContext muleContext) throws TransformerException {
+    return event.transformMessage(dataType, muleContext);
   }
 
   /**
@@ -91,8 +85,8 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
   @Override
-  public Object transformMessage(Class expectedType) throws TransformerException {
-    return event.transformMessage(DataType.fromType(expectedType));
+  public Object transformMessage(Class expectedType, MuleContext muleContext) throws TransformerException {
+    return event.transformMessage(DataType.fromType(expectedType), muleContext);
   }
 
   /**
@@ -102,8 +96,8 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
    */
   @Override
-  public String getMessageAsString(Charset encoding) throws MuleException {
-    return event.getMessageAsString(encoding);
+  public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
+    return event.getMessageAsString(encoding, muleContext);
   }
 
   /**
@@ -115,19 +109,20 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
   @Override
-  public String transformMessageToString() throws TransformerException {
-    return event.transformMessageToString();
+  public String transformMessageToString(MuleContext muleContext) throws TransformerException {
+    return event.transformMessageToString(muleContext);
   }
 
   /**
    * Returns the message contents as a string This method will use the default encoding on the event
    *
+   * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
    */
   @Override
-  public String getMessageAsString() throws MuleException {
-    return event.getMessageAsString();
+  public String getMessageAsString(MuleContext muleContext) throws MuleException {
+    return event.getMessageAsString(muleContext);
   }
 
   /**
@@ -138,35 +133,6 @@ public class DefaultMuleEventContext implements MuleEventContext {
   @Override
   public Transaction getCurrentTransaction() {
     return TransactionCoordination.getInstance().getTransaction();
-  }
-
-  /**
-   * Depending on the session state this methods either Passes an event synchronously to the next available Mule component in the
-   * pool or via the endpoint configured for the event
-   *
-   * @param message the event message payload to send
-   * @param endpointName The endpoint name to disptch the event through. This will be looked up first on the service configuration
-   *        and then on the mule manager configuration
-   * @return the return Message from the call or null if there was no result
-   * @throws org.mule.runtime.core.api.MuleException if the event fails to be processed by the service or the transport for the
-   *         endpoint
-   */
-  @Override
-  public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException {
-    return clientInterface.send(endpointName, message);
-  }
-
-  /**
-   * Requests a synchronous receive of an event on the service
-   *
-   * @param endpointName the endpoint identifing the endpointUri on ewhich the event will be received
-   * @param timeout time in milliseconds before the request timesout
-   * @return The requested event or null if the request times out
-   * @throws org.mule.runtime.core.api.MuleException if the request operation fails
-   */
-  @Override
-  public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException {
-    return clientInterface.request(endpointName, timeout);
   }
 
   /**
@@ -221,16 +187,6 @@ public class DefaultMuleEventContext implements MuleEventContext {
     return TransactionCoordination.getInstance().getTransaction();
   }
 
-  /**
-   * Get the timeout value associated with the event
-   *
-   * @return the timeout for the event
-   */
-  @Override
-  public int getTimeout() {
-    return event.getTimeout();
-  }
-
   @Override
   public MuleSession getSession() {
     return event.getSession();
@@ -240,10 +196,4 @@ public class DefaultMuleEventContext implements MuleEventContext {
   public String toString() {
     return event.toString();
   }
-
-  @Override
-  public MuleContext getMuleContext() {
-    return event.getMuleContext();
-  }
-
 }

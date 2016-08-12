@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -15,11 +17,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorChainFactoryBean implements FactoryBean {
+public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContextAware {
 
   protected List processors;
   protected String name;
+  protected MuleContext muleContext;
 
+  @Override
   public Class getObjectType() {
     return MessageProcessor.class;
   }
@@ -28,6 +32,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean {
     this.processors = processors;
   }
 
+  @Override
   public Object getObject() throws Exception {
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
@@ -43,17 +48,23 @@ public class MessageProcessorChainFactoryBean implements FactoryBean {
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("processor chain '" + name + "'");
     return builder;
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 
 }

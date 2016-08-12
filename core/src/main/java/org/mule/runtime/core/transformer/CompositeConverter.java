@@ -11,6 +11,7 @@ import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -26,12 +27,14 @@ import java.util.List;
  * When {@link #transform(Object)} is called each converter in the same order they are included in the composition. The output of
  * a given converter is the input of the next composed converter.
  */
-public class CompositeConverter implements Converter {
+public class CompositeConverter implements Converter, MuleContextAware {
 
   private String name;
 
   private LinkedList<Converter> chain;
   private TransformationService transformationService;
+
+  private MuleContext muleContext;
 
   /**
    * Create a new conversion chain using the specified converters
@@ -128,7 +131,7 @@ public class CompositeConverter implements Converter {
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        event.setMessage(event.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, this));
+        event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this));
       } catch (Exception e) {
         throw new TransformerMessagingException(event, this, e);
       }
@@ -139,6 +142,7 @@ public class CompositeConverter implements Converter {
 
   @Override
   public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
     for (Converter converter : chain) {
       converter.setMuleContext(context);
     }

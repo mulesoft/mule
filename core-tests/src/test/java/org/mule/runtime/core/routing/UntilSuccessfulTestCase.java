@@ -122,7 +122,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final MuleEvent testEvent = getTestEvent("test_data");
-    assertThat(untilSuccessful.process(testEvent).getMessageAsString(), equalTo("ACK"));
+    assertThat(untilSuccessful.process(testEvent).getMessageAsString(muleContext), equalTo("ACK"));
     waitDelivery();
   }
 
@@ -176,7 +176,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testPreExistingEvents() throws Exception {
     final MuleEvent testEvent = getTestEvent("test_data");
-    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent), testEvent);
+    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, muleContext), testEvent);
     untilSuccessful.initialise();
     untilSuccessful.start();
     ponderUntilEventProcessed(testEvent);
@@ -260,6 +260,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     // events have been rewritten so are different but the correlation ID has been carried around
     assertEquals(testEvent.getCorrelationId(), eventReceived.getCorrelationId());
     // and their payload
-    assertEquals(testEvent.getMessageAsString(), eventReceived.getMessageAsString());
+    assertEquals(testEvent.getMessageAsString(muleContext), eventReceived.getMessageAsString(muleContext));
   }
 }

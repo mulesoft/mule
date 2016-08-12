@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
@@ -29,6 +29,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   protected ProcessingStrategy processingStrategy;
   protected String name;
 
+  @Override
   public Class getObjectType() {
     return MessageProcessor.class;
   }
@@ -37,8 +38,9 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
     this.messageProcessors = messageProcessors;
   }
 
+  @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("'async' child chain");
 
     for (Object processor : messageProcessors) {
@@ -55,18 +57,22 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
     return delegate;
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }

@@ -17,7 +17,6 @@ import org.mule.compatibility.core.endpoint.inbound.InboundLoggingMessageProcess
 import org.mule.compatibility.core.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
-import org.mule.compatibility.core.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundLoggingMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
@@ -41,7 +40,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
   /** Override this method to change the default MessageProcessors. */
   protected List<MessageProcessor> createInboundMessageProcessors(InboundEndpoint endpoint) {
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<MessageProcessor> list = new ArrayList<>();
 
     list.add(new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
     list.add(new InboundEndpointPropertyMessageProcessor(endpoint));
@@ -53,7 +52,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
   /** Override this method to change the default MessageProcessors. */
   protected List<MessageProcessor> createInboundResponseMessageProcessors(InboundEndpoint endpoint) {
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<MessageProcessor> list = new ArrayList<>();
 
     list.add(new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()));
     list.add(new ReplyToPropertyRequestReplyReplier());
@@ -65,7 +64,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
   protected List<MessageProcessor> createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException {
     Connector connector = endpoint.getConnector();
 
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<MessageProcessor> list = new ArrayList<>();
 
     // Log but don't proceed if connector is not started
     list.add(new OutboundLoggingMessageProcessor());
@@ -74,9 +73,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     // Everything is processed within ExecutionTemplate
     list.add(new EndpointTransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig()));
 
-    list.add(new OutboundEventTimeoutMessageProcessor());
-
-    list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
+    list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler(), endpoint.getMuleContext()));
     list.add(new OutboundEndpointPropertyMessageProcessor(endpoint));
     list.add(new OutboundRootMessageIdPropertyMessageProcessor());
     list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));

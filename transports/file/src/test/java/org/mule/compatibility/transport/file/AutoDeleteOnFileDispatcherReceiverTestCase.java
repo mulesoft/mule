@@ -12,8 +12,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.FileUtils;
@@ -41,16 +39,16 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     MuleEvent event = getTestEvent("TestData");
     setCurrentEvent(event);
 
-    MuleMessage message = new DefaultMuleEventContext(event)
-        .requestEvent(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000);
+    MuleMessage message =
+        muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000);
     // read the payload into a string so the file is deleted on InputStream.close()
     assertNotNull(getPayloadAsString(message));
 
     File[] files = tempDir.listFiles();
     assertTrue(files.length > 0);
-    for (int i = 0; i < files.length; i++) {
-      assertTrue(files[i].getName().equals(message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
-      files[i].delete();
+    for (File file : files) {
+      assertTrue(file.getName().equals(message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
+      file.delete();
     }
   }
 
@@ -61,7 +59,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     MuleEvent event = getTestEvent("TestData");
     setCurrentEvent(event);
 
-    MuleMessage message = new DefaultMuleEventContext(event).requestEvent(getTestEndpointURI() + "/" + tempDirName, 50000);
+    MuleMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000);
     assertNotNull(message.getPayload());
     assertTrue(message.getPayload() instanceof InputStream);
 

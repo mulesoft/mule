@@ -20,6 +20,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.IOUtils;
@@ -59,11 +60,13 @@ public class MuleEventToHttpResponse {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private HttpStreamingType responseStreaming = AUTO;
+  private MuleContext muleContext;
   private boolean multipartEntityWithNoMultipartContentyTypeWarned;
   private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
 
-  public MuleEventToHttpResponse(HttpStreamingType responseStreaming) {
+  public MuleEventToHttpResponse(HttpStreamingType responseStreaming, MuleContext muleContext) {
     this.responseStreaming = responseStreaming;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -153,7 +156,7 @@ public class MuleEventToHttpResponse {
         }
       } else {
         try {
-          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes());
+          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes(muleContext));
           resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                           byteArrayHttpEntity);
           httpEntity = byteArrayHttpEntity;
@@ -270,7 +273,7 @@ public class MuleEventToHttpResponse {
       return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
     } catch (Exception e) {
       throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."),
-                                   event.getMessage(), event.getMuleContext(), e);
+                                   event.getMessage(), muleContext, e);
     }
   }
 

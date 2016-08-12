@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.OutputHandler;
@@ -76,7 +75,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     assertNull(response);
   }
 
-  private CxfInboundMessageProcessor createCxfMessageProcessor() throws MuleException {
+  private CxfInboundMessageProcessor createCxfMessageProcessor() throws Exception {
     CxfConfiguration config = new CxfConfiguration();
     config.setMuleContext(muleContext);
     config.initialise();
@@ -86,6 +85,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     builder.setConfiguration(config);
     builder.setServiceClass(Echo.class);
     builder.setMuleContext(muleContext);
+    builder.setFlowConstruct(getTestFlow());
 
     CxfInboundMessageProcessor processor = builder.build();
     processor.initialise();

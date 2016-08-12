@@ -40,7 +40,7 @@ public class HttpFunctionalTestCase extends FunctionalTestCase {
     assertNotNull(testComponent);
 
     if (checkPathProperties) {
-      EventCallback callback = (context, component) -> {
+      EventCallback callback = (context, component, muleContext) -> {
         MuleMessage msg = context.getMessage();
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));

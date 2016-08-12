@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -20,12 +22,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class TransactionalMessageProcessorsFactoryBean implements FactoryBean {
+public class TransactionalMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware {
 
   protected List messageProcessors;
   protected MessagingExceptionHandler exceptionListener;
   protected String action;
+  private MuleContext muleContext;
 
+  @Override
   public Class getObjectType() {
     return TransactionalInterceptingMessageProcessor.class;
   }
@@ -34,8 +38,9 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean {
     this.messageProcessors = messageProcessors;
   }
 
+  @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
     txProcessor.setExceptionListener(this.exceptionListener);
@@ -68,6 +73,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean {
     return transactionConfig;
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }
@@ -78,5 +84,10 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean {
 
   public void setAction(String action) {
     this.action = action;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

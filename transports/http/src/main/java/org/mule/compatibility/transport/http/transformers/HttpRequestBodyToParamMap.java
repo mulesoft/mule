@@ -49,10 +49,10 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer {
 
       String queryString;
       if (isGet) {
-        URI uri = new URI(event.getMessageAsString(outputEncoding));
+        URI uri = new URI(event.getMessageAsString(outputEncoding, muleContext));
         queryString = uri.getRawQuery();
       } else {
-        queryString = new String(event.getMessageAsString());
+        queryString = new String(event.getMessageAsString(muleContext));
       }
 
       if (StringUtils.isNotBlank(queryString)) {

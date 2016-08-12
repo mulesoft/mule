@@ -16,10 +16,10 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -65,7 +65,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Test
   public void worksWithProtocolAndCipherSuiteMatch() throws Exception {
     MuleEvent response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
-    assertThat(response.getMessageAsString(), is(TEST_PAYLOAD));
+    assertThat(response.getMessageAsString(muleContext), is(TEST_PAYLOAD));
   }
 
   @Test

@@ -42,6 +42,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
   }
 
   public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint) {
+    super(endpoint.getMuleContext());
     this.endpoint = endpoint;
   }
 

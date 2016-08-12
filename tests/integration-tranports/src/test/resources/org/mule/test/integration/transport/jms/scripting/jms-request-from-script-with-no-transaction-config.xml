@@ -42,11 +42,11 @@
                     long timeout = 100L;
                     String result = "";
 
-                    MuleMessage muleMessage = eventContext.requestEvent(jmsUrl, timeout);
+                    MuleMessage muleMessage = muleContext.getClient().request(jmsUrl, timeout);
                     while (muleMessage != null)
                     {
                         result = result + "message";
-                        muleMessage = eventContext.requestEvent(jmsUrl, timeout);
+                        muleMessage = muleContext.getClient().request(jmsUrl, timeout);
                     }
                     return result;
                 ]]>

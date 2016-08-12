@@ -181,8 +181,8 @@ public class RestServiceWrapper extends AbstractComponent {
     MuleEventContext eventContext = new DefaultMuleEventContext(event);
     MuleEvent result =
         new DefaultMuleEvent(event.getExecutionContext(),
-                             eventContext.sendEvent(MuleMessage.builder(event.getMessage()).payload(requestBody).build(),
-                                                    outboundEndpoint.getEndpointURI().toString()),
+                             muleContext.getClient().send(outboundEndpoint.getEndpointURI().toString(),
+                                                          MuleMessage.builder(event.getMessage()).payload(requestBody).build()),
                              flowConstruct);
 
     if (isErrorPayload(result)) {

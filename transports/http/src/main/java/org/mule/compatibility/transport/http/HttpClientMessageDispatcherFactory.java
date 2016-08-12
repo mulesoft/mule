@@ -19,6 +19,8 @@ public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatche
   /** {@inheritDoc} */
   @Override
   public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
-    return new HttpClientMessageDispatcher(endpoint);
+    HttpClientMessageDispatcher dispatcher = new HttpClientMessageDispatcher(endpoint);
+    dispatcher.setMuleContext(endpoint.getMuleContext());
+    return dispatcher;
   }
 }

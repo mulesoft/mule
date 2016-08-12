@@ -6,8 +6,10 @@
  */
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.util.HashMap;
@@ -17,7 +19,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Orange implements Callable, OrangeInterface {
+public class Orange implements Callable, OrangeInterface, MuleContextAware {
 
   /**
    * Serial version
@@ -41,6 +43,8 @@ public class Orange implements Callable, OrangeInterface {
   private List listProperties;
 
   private List arrayProperties;
+
+  private MuleContext muleContext;
 
   public Orange() {
     super();
@@ -71,7 +75,7 @@ public class Orange implements Callable, OrangeInterface {
 
   @Override
   public Object onCall(MuleEventContext context) throws MuleException {
-    logger.debug("Orange received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString());
+    logger.debug("Orange received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString(muleContext));
     bite();
     return null;
   }
@@ -133,6 +137,7 @@ public class Orange implements Callable, OrangeInterface {
   /**
    * @param mapProperties The mapProperties to set.
    */
+  @Override
   public void setMapProperties(Map mapProperties) {
     this.mapProperties = mapProperties;
   }
@@ -140,6 +145,7 @@ public class Orange implements Callable, OrangeInterface {
   /**
    * @return Returns the arrayProperties.
    */
+  @Override
   public List getArrayProperties() {
     return arrayProperties;
   }
@@ -147,22 +153,27 @@ public class Orange implements Callable, OrangeInterface {
   /**
    * @param arrayProperties The arrayProperties to set.
    */
+  @Override
   public void setArrayProperties(List arrayProperties) {
     this.arrayProperties = arrayProperties;
   }
 
+  @Override
   public FruitCleaner getCleaner() {
     return cleaner;
   }
 
+  @Override
   public void setCleaner(FruitCleaner cleaner) {
     this.cleaner = cleaner;
   }
 
+  @Override
   public void wash() {
     cleaner.wash(this);
   }
 
+  @Override
   public void polish() {
     cleaner.polish(this);
   }
@@ -217,4 +228,9 @@ public class Orange implements Callable, OrangeInterface {
     return true;
   }
 
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

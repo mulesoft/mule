@@ -7,9 +7,10 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testProcessorChainViaProcessorRef() throws Exception {
     MuleEvent result = flowRunner("ProcessorChainViaProcessorRef").withPayload("").run();
-    assertEquals("1xyz2", result.getMessageAsString());
+    assertEquals("1xyz2", result.getMessageAsString(muleContext));
 
     assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
                  result.getMessage().getOutboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -35,7 +36,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
   public void testProcessorChainViaFlowRef() throws Exception {
     MuleEvent result = flowRunner("ProcessorChainViaFlowRef").withPayload("").run();
 
-    assertEquals("1xyz2", result.getMessageAsString());
+    assertEquals("1xyz2", result.getMessageAsString(muleContext));
 
     assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
                  result.getMessage().getOutboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -46,7 +47,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testSubFlowViaProcessorRef() throws Exception {
     MuleEvent result = flowRunner("SubFlowViaProcessorRef").withPayload("").run();
-    assertEquals("1xyz2", result.getMessageAsString());
+    assertEquals("1xyz2", result.getMessageAsString(muleContext));
 
     assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
                  result.getMessage().getOutboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -58,7 +59,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
   public void testSubFlowViaFlowRef() throws Exception {
     MuleEvent result = flowRunner("SubFlowViaFlowRef").withPayload("").run();
 
-    assertEquals("1xyz2", result.getMessageAsString());
+    assertEquals("1xyz2", result.getMessageAsString(muleContext));
 
     assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
                  result.getMessage().getOutboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));

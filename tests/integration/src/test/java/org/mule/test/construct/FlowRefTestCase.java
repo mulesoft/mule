@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -24,6 +24,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +66,10 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRef() throws Exception {
-    assertEquals("0A", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "A").run().getMessageAsString());
-    assertEquals("0B", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString());
+    assertEquals("0A",
+                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "A").run().getMessageAsString(muleContext));
+    assertEquals("0B",
+                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString(muleContext));
   }
 
   public static class ProcessorPathAssertingProcessor implements MessageProcessor {
@@ -118,7 +121,8 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefWithChoice() throws Exception {
-    assertEquals("0A", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "C").run().getMessageAsString());
+    assertEquals("0A",
+                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "C").run().getMessageAsString(muleContext));
   }
 
   @Test
@@ -133,7 +137,8 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test(expected = MessagingException.class)
   public void flowRefNotFound() throws Exception {
-    assertEquals("0C", flowRunner("flow2").withPayload("0").withFlowVariable("letter", "Z").run().getMessageAsString());
+    assertEquals("0C",
+                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "Z").run().getMessageAsString(muleContext));
   }
 
   @Test

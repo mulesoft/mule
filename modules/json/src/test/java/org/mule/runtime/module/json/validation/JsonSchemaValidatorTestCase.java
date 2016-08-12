@@ -103,24 +103,24 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void good() throws Exception {
-    validator.validate(getTestEvent(goodJson));
+    validator.validate(getTestEvent(goodJson), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad() throws Exception {
-    validator.validate(getTestEvent(badJson));
+    validator.validate(getTestEvent(badJson), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad2() throws Exception {
-    validator.validate(getTestEvent(badJson2));
+    validator.validate(getTestEvent(badJson2), muleContext);
   }
 
   @Test
   public void goodThroughTransformer() throws Exception {
     muleContext.getRegistry().registerTransformer(new AppleToJson(goodJson));
     try {
-      validator.validate(getTestEvent(new Apple()));
+      validator.validate(getTestEvent(new Apple()), muleContext);
     } catch (JsonSchemaValidationException e) {
       if (goodJson instanceof InputStream) {
         // do nothing, streams are not supported through transformation

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
@@ -23,7 +24,8 @@ public class CountdownCallback implements EventCallback {
     this.countDown = new CountDownLatch(messagesExpected);
   }
 
-  public void eventReceived(MuleEventContext context, Object Component) throws Exception {
+  @Override
+  public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
     synchronized (this) {
       if (countDown.getCount() > 0) {
         countDown.countDown();

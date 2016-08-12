@@ -234,7 +234,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] digestedBytes = md.digest(bytes);
       return (String) byteArrayToHexString.transform(digestedBytes);
     } else {
-      return event.getMuleContext().getExpressionManager().parse(idExpression, event, true);
+      return muleContext.getExpressionManager().parse(idExpression, event, true);
     }
   }
 

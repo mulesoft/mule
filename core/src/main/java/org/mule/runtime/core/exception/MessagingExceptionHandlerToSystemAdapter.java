@@ -6,14 +6,21 @@
  */
 package org.mule.runtime.core.exception;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 public class MessagingExceptionHandlerToSystemAdapter implements MessagingExceptionHandler {
 
+  private MuleContext muleContext;
+
+  public MessagingExceptionHandlerToSystemAdapter(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
   @Override
   public MuleEvent handleException(Exception exception, MuleEvent event) {
-    event.getMuleContext().getExceptionListener().handleException(exception);
+    muleContext.getExceptionListener().handleException(exception);
     return event;
   }
 }

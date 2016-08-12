@@ -12,9 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
-import java.util.Comparator;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -27,6 +24,10 @@ import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Comparator;
+
+import org.junit.Test;
 
 public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
@@ -144,7 +145,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     @Override
     public int compare(Object o1, Object o2) {
       try {
-        return ((MuleEvent) o1).getMessageAsString().compareTo(((MuleEvent) o2).getMessageAsString());
+        return ((MuleEvent) o1).getMessageAsString(muleContext).compareTo(((MuleEvent) o2).getMessageAsString(muleContext));
       } catch (MuleException e) {
         throw new IllegalArgumentException(e.getMessage());
       }

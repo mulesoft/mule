@@ -22,7 +22,6 @@ import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -169,7 +168,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     path = HttpParser.sanitizePathWithStartSlash(path);
     listenerPath = config.getFullListenerPath(path);
     path = listenerPath.getResolvedPath();
-    muleEventToHttpResponse = new MuleEventToHttpResponse(responseStreamingMode);
+    muleEventToHttpResponse = new MuleEventToHttpResponse(responseStreamingMode, muleContext);
     validatePath();
     parseRequest = config.resolveParseRequest(parseRequest);
     try {

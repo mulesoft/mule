@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
@@ -75,7 +74,6 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     MuleMessage message = MuleMessage.builder().payload("").build();
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
-    when(event.getMuleContext()).thenReturn(muleContext);
     when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
         .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
             .getArguments()[1]));
@@ -116,7 +114,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     ProcessorExecutor executor = createProcessorExecutor(processors);
 
     if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE) {
-      assertThat(executor.execute().getMessageAsString(), equalTo(RESULT));
+      assertThat(executor.execute().getMessageAsString(muleContext), equalTo(RESULT));
       assertThat(getCurrentEvent(), requestResponseMatcher);
     } else {
       assertThat(executor.execute().getId(), equalTo(event.getId()));

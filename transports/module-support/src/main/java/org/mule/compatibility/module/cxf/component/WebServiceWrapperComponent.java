@@ -25,7 +25,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
 
   @Override
   protected MuleMessage doInvoke(MuleEvent event) throws Exception {
-    MuleContext muleContext = event.getMuleContext();
+    MuleContext muleContext = flowConstruct.getMuleContext();
 
     String tempUrl;
     if (addressFromMessage) {

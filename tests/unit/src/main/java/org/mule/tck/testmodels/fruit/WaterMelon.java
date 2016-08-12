@@ -6,6 +6,7 @@
  */
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -47,16 +48,18 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
     state = "initialised";
   }
 
+  @Override
   public void bite() {
     bitten = true;
   }
 
+  @Override
   public boolean isBitten() {
     return bitten;
   }
 
-  public void myEventHandler(MuleEvent event) throws MuleException {
-    logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: " + event.getMessageAsString());
+  public void myEventHandler(MuleEvent event, MuleContext muleContext) throws MuleException {
+    logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: " + event.getMessageAsString(null));
     bite();
   }
 
@@ -88,14 +91,17 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
     return state;
   }
 
+  @Override
   public void start() {
     state = "started";
   }
 
+  @Override
   public void stop() {
     state = "stopped";
   }
 
+  @Override
   public void dispose() {
     state = "disposed";
   }

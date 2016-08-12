@@ -7,7 +7,10 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.source.polling.watermark.WatermarkUtils;
@@ -25,23 +28,25 @@ public class WatermarkSelectorWrapper extends WatermarkSelector {
   private final String selectorExpression;
   private final WatermarkSelector wrapped;
   private final MuleEvent muleEvent;
+  private MuleContext muleContext;
 
-  protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent) {
+  protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent,
+                                     MuleContext muleContext) {
     this.selectorExpression = selectorExpression;
     this.wrapped = wrapped;
     this.muleEvent = DefaultMuleEvent.copy(muleEvent);
+    this.muleContext = muleContext;
   }
 
   @Override
   public void acceptValue(Object value) {
     muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(value).build());
     try {
-      Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent);
+      Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent, muleContext);
       this.wrapped.acceptValue(evaluated);
     } catch (NotSerializableException e) {
-      logger.warn(String.format(
-                                "Watermark selector expression '%s' did not resolved to a Serializable value. Value will be ignored",
-                                this.selectorExpression),
+      logger.warn(format("Watermark selector expression '%s' did not resolved to a Serializable value. Value will be ignored",
+                         this.selectorExpression),
                   e);
     }
   }

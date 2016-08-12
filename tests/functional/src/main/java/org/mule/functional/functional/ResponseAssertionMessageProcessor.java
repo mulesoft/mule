@@ -6,6 +6,9 @@
  */
 package org.mule.functional.functional;
 
+import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -21,10 +24,8 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
 
-import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -102,8 +103,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   private MuleEvent processNext(MuleEvent event) throws MuleException {
     if (event != null || event instanceof VoidMuleEvent) {
       return new ProcessorExecutorFactory()
-          .createProcessorExecutor(event, Collections.singletonList(next),
-                                   MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate(), false)
+          .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false)
           .execute();
     } else {
       return event;

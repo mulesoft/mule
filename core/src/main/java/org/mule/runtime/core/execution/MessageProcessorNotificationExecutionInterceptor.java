@@ -7,9 +7,11 @@
 package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
   private MessageProcessorExecutionInterceptor next;
+  private MuleContext muleContext;
 
   MessageProcessorNotificationExecutionInterceptor(MessageProcessorExecutionInterceptor next) {
     this.next = next;
@@ -41,7 +44,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
 
   @Override
   public MuleEvent execute(final MessageProcessor messageProcessor, final MuleEvent event) throws MessagingException {
-    final ServerNotificationManager notificationManager = event.getMuleContext().getNotificationManager();
+    final ServerNotificationManager notificationManager = muleContext.getNotificationManager();
     final boolean fireNotification = event.isNotificationsEnabled();
     if (fireNotification) {
       fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
@@ -118,6 +121,14 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         serverNotificationManager
             .fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
       }
+    }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+    if (next != null) {
+      next.setMuleContext(context);
     }
   }
 }

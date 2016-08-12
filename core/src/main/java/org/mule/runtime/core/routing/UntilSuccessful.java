@@ -266,7 +266,9 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
   @Override
   public MessageProcessor getRoute() {
-    return DefaultMessageProcessorChain.from(routes.get(0));
+    final DefaultMessageProcessorChain chain = DefaultMessageProcessorChain.from(muleContext, routes.get(0));
+    chain.setTemplateMuleContext(muleContext);
+    return chain;
   }
 
   @Override

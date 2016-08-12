@@ -28,7 +28,9 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
   @Test
   public void testGoodMatch() throws Exception {
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-    InvocationResult result = resolver.invoke(new Apple(), getTestEventContext("blah"));
+    final Apple apple = new Apple();
+    apple.setMuleContext(muleContext);
+    InvocationResult result = resolver.invoke(apple, getTestEventContext("blah"));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 }

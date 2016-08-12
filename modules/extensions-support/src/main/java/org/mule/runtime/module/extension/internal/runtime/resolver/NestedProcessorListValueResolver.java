@@ -30,7 +30,8 @@ public class NestedProcessorListValueResolver extends AbstractNestedProcessorVal
 
   @Override
   public List<NestedProcessor> resolve(MuleEvent event) throws MuleException {
-    return messageProcessors.stream().map(mp -> toNestedProcessor(mp, event)).collect(new ImmutableListCollector<>());
+    return messageProcessors.stream().map(mp -> toNestedProcessor(mp, event, event.getMuleContext()))
+        .collect(new ImmutableListCollector<>());
   }
 
   @Override
