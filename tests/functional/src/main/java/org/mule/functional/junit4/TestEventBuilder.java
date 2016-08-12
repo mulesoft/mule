@@ -7,12 +7,22 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import java.io.Serializable;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.activation.DataHandler;
+
+import org.apache.commons.collections.Transformer;
+import org.mockito.Mockito;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,17 +35,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
-
-import java.io.Serializable;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.activation.DataHandler;
-
-import org.apache.commons.collections.Transformer;
-import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for building events for testing.
@@ -301,7 +300,7 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), sourceCorrelationId),
+        new DefaultMuleEvent(buildContext(muleContext, flow, sourceCorrelationId),
                              (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
                              flow, new DefaultMuleSession(), muleContext.getConfiguration().getDefaultResponseTimeout(), null,
                              null, transacted, null, replyToHandler);

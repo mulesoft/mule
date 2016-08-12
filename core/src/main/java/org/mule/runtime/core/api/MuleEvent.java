@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.api;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -19,11 +24,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
 
 /**
  * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
@@ -54,21 +54,12 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   Correlation getCorrelation();
 
   /**
-   * The correlation Id can be used by components in the system to manage message relations.
-   * <p>
-   * The id is associated with the message using the underlying transport protocol. As such not all messages will support the
-   * notion of a id i.e. tcp or file. In this situation the correlation Id is set as a property of the message where it's up to
-   * developer to keep the association with the message. For example if the message is serialised to xml the id will be available
-   * in the message.
-   *
-   * @return the id for this message or null value if one hasn't been set
+   * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
+   * event.
+   * 
+   * @return the correlation id to use for this event.
    */
   String getCorrelationId();
-
-  /**
-   * @return {@code true} if the source of this event has set a correlation id (see {@link #getCorrelationId()}).
-   */
-  boolean hasSourceCorrelation();
 
   /**
    * @return the {@link MuleEvent}

@@ -29,17 +29,22 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -56,12 +61,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.internal.listener.HttpMessageProcessorTemplate;
 import org.mule.runtime.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
-
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
 
 public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessTemplate<HttpMessageReceiver, HttpConnector>
     implements RequestResponseFlowProcessingPhaseTemplate, ThrottlingPhaseTemplate, EndPhaseTemplate {
@@ -389,8 +388,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   protected HttpResponse doBad(RequestLine requestLine) throws MuleException {
     MuleMessage message = getMessageReceiver().createMuleMessage(null);
     DefaultMuleEvent event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(getFlowConstruct().getMuleContext().getUniqueIdString(), null),
-                             message, getFlowConstruct());
+        new DefaultMuleEvent(buildContext(getFlowConstruct().getMuleContext(), getFlowConstruct()), message, getFlowConstruct());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
     setCurrentEvent(event);
     HttpResponse response = new HttpResponse();

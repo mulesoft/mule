@@ -6,28 +6,70 @@
  */
 package org.mule.runtime.core;
 
+import static java.time.OffsetTime.now;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.core.api.MessageExecutionContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.source.MessageSource;
-
 import java.io.Serializable;
-import java.util.Date;
+import java.time.OffsetTime;
 import java.util.Optional;
+
+import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * Default immutable implementation of {@link MessageExecutionContext}.
  *
  * @since 4.0
  */
-public class DefaultMessageExecutionContext implements MessageExecutionContext, Serializable {
+public final class DefaultMessageExecutionContext implements MessageExecutionContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
+  /**
+   * Builds a new execution context with the given parameters.
+   * 
+   * @param context the {@link MuleContext} of the application that is building this context.
+   * @param flow the flow that processes events of this context. 
+   * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
+   */
+  public static MessageExecutionContext buildContext(MuleContext context, FlowConstruct flow) {
+    DefaultMessageExecutionContext executionContext =
+        new DefaultMessageExecutionContext(context.getUniqueIdString(), null);
+    executionContext.serverId = generateId(context);
+    executionContext.flowName = flow.getName();
+    return executionContext;
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   * 
+   * @param context the {@link MuleContext} of the application that is building this context.
+   * @param flow the flow that processes events of this context.
+   * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
+   */
+  public static MessageExecutionContext buildContext(MuleContext context, FlowConstruct flow, String correlationId) {
+    DefaultMessageExecutionContext executionContext =
+        new DefaultMessageExecutionContext(context.getUniqueIdString(), correlationId);
+    executionContext.serverId = generateId(context);
+    executionContext.flowName = flow.getName();
+    return executionContext;
+  }
+
+  private static String generateId(MuleContext context) {
+    MuleConfiguration conf = context.getConfiguration();
+    return String.format("%s.%s.%s", conf.getDomainId(), context.getClusterId(), conf.getId());
+  }
+
   private final String id;
-  private final String sourceCorrelationId;
-  private final Date receivedDate = new Date();
+  private final String correlationId;
+  private final OffsetTime receivedDate = now();
+
+  private String serverId;
+  private String flowName;
 
   @Override
   public String getId() {
@@ -35,29 +77,39 @@ public class DefaultMessageExecutionContext implements MessageExecutionContext, 
   }
 
   @Override
-  public Optional<String> getSourceCorrelationId() {
-    return ofNullable(sourceCorrelationId);
+  public Optional<String> getCorrelationId() {
+    return ofNullable(correlationId);
   }
 
   @Override
-  public Date getReceivedDate() {
+  public OffsetTime getReceivedTime() {
     return receivedDate;
+  }
+
+  @Override
+  public String getServerId() {
+    return serverId;
+  }
+
+  @Override
+  public String getFlowName() {
+    return flowName;
   }
 
   /**
    * Builds a new execution context with the given parameters.
    * 
    * @param id the unique id that identifies all {@link MuleEvent}s of the same context.
-   * @param sourceCorrelationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of
    *        this context, if available.
    */
-  public DefaultMessageExecutionContext(String id, String sourceCorrelationId) {
+  private DefaultMessageExecutionContext(String id, String correlationId) {
     this.id = id;
-    this.sourceCorrelationId = sourceCorrelationId;
+    this.correlationId = correlationId;
   }
 
   @Override
   public String toString() {
-    return "DefaultMessageExecutionContext { id: " + id + "; sourceCorrelationId: " + sourceCorrelationId + " }";
+    return "DefaultMessageExecutionContext { id: " + id + "; correlationId: " + correlationId + " }";
   }
 }

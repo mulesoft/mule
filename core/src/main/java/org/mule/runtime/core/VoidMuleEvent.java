@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,11 +28,6 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
 
 /**
  * A {@link VoidMuleEvent} represents a void return from a {@link MessageProcessor} such as a ONE_WAY
@@ -259,11 +259,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public String getCorrelationId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean hasSourceCorrelation() {
     throw new UnsupportedOperationException();
   }
 

@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.codec.binary.Base64;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -25,11 +30,6 @@ import org.mule.runtime.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
@@ -82,10 +82,10 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
 
   public void refreshAccessToken() throws MuleException {
     try {
+      Flow flow = new Flow("test", getMuleContext());
       final DefaultMuleEvent accessTokenEvent =
-          new DefaultMuleEvent(new DefaultMessageExecutionContext(getMuleContext().getUniqueIdString(), null),
-                               MuleMessage.builder().nullPayload().build(), MessageExchangePattern.REQUEST_RESPONSE,
-                               new Flow("test", getMuleContext()));
+          new DefaultMuleEvent(buildContext(getMuleContext(), flow), MuleMessage.builder().nullPayload().build(),
+                               REQUEST_RESPONSE, flow);
       setMapPayloadWithTokenRequestParameters(accessTokenEvent);
       final MuleEvent response;
       response = invokeTokenUrl(accessTokenEvent);

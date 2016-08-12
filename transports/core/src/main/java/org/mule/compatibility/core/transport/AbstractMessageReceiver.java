@@ -6,12 +6,16 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+
+import java.io.OutputStream;
+import java.util.List;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -21,11 +25,11 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -50,9 +54,6 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.work.TrackingWorkManager;
-
-import java.io.OutputStream;
-import java.util.List;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message Receivers provided with Mule. A message receiver
@@ -260,9 +261,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
 
-    final DefaultMessageExecutionContext executionContext =
-        new DefaultMessageExecutionContext(flowConstruct.getMuleContext().getUniqueIdString(),
-                                           message.getCorrelation().getId().orElse(null));
+    final MessageExecutionContext executionContext =
+        buildContext(flowConstruct.getMuleContext(), flowConstruct, message.getCorrelation().getId().orElse(null));
 
     if (replyToFromMessage != null) {
       newEvent =

@@ -7,6 +7,11 @@
 package org.mule.compatibility.core.client;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.mule.compatibility.core.api.client.LocalMuleClient;
 import org.mule.compatibility.core.api.endpoint.EndpointCache;
@@ -15,7 +20,6 @@ import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -25,10 +29,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Provides transports support to {@link LocalMuleClient}.
@@ -86,8 +86,8 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
         } catch (Exception e) {
           throw new ReceiveException(inboundEndpoint, timeout, e);
         }
-        return message != null ? new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                      message, new MuleClientFlowConstruct(muleContext))
+        MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
+        return message != null ? new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, flowConstruct)
             : null;
       };
     }

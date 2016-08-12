@@ -9,10 +9,18 @@ package org.mule.runtime.core.el;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.util.Collections;
+
+import javax.activation.DataHandler;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,15 +35,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
-
-import java.util.Collections;
-
-import javax.activation.DataHandler;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
@@ -106,9 +105,9 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichFlowVariable() throws Exception {
-    MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                           MuleMessage.builder().payload("").build(), MessageExchangePattern.ONE_WAY,
-                                           new Flow("flow", muleContext));
+    Flow flow = new Flow("flow", muleContext);
+    MuleEvent event =
+        new DefaultMuleEvent(buildContext(muleContext, flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("flowVars['foo']", event, "bar");
     Assert.assertEquals("bar", event.getFlowVariable("foo"));
     Assert.assertNull(event.getSession().getProperty("foo"));
@@ -116,9 +115,9 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichSessionVariable() throws Exception {
-    MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                           MuleMessage.builder().payload("").build(), MessageExchangePattern.ONE_WAY,
-                                           new Flow("flow", muleContext));
+    Flow flow = new Flow("flow", muleContext);
+    MuleEvent event =
+        new DefaultMuleEvent(buildContext(muleContext, flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("sessionVars['foo']", event, "bar");
     Assert.assertEquals("bar", event.getSession().getProperty("foo"));
     Assert.assertNull(event.getFlowVariable("foo"));

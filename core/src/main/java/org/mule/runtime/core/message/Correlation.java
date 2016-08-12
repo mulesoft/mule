@@ -8,10 +8,10 @@ package org.mule.runtime.core.message;
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.message.MuleMessage;
-
 import java.io.Serializable;
 import java.util.Optional;
+
+import org.mule.runtime.api.message.MuleMessage;
 
 /**
  * Immutable container for correlation properties relative to a {@link MuleMessage}.

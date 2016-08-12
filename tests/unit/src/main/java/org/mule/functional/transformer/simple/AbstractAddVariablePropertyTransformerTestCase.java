@@ -15,12 +15,18 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
+import java.nio.charset.Charset;
+
+import javax.activation.MimeTypeParseException;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -30,17 +36,11 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.transformer.simple.AbstractAddVariablePropertyTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.nio.charset.Charset;
-
-import javax.activation.MimeTypeParseException;
-
-import org.junit.Before;
-import org.junit.Test;
 
 @SmallTest
 public abstract class AbstractAddVariablePropertyTransformerTestCase extends AbstractMuleContextTestCase {
@@ -77,8 +77,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     addVariableTransformer.setMuleContext(mockMuleContext);
 
     message = MuleMessage.builder().payload("").build();
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(mockMuleContext.getUniqueIdString(), null), message,
-                                 getTestFlow(), mockSession);
+    Flow flow = getTestFlow();
+    event = new DefaultMuleEvent(buildContext(mockMuleContext, flow), message, flow, mockSession);
   }
 
   @Test

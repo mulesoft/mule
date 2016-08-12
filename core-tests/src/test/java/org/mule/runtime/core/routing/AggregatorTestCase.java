@@ -10,8 +10,11 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.util.Iterator;
+
+import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -23,10 +26,6 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-
-import java.util.Iterator;
-
-import org.junit.Test;
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -47,15 +46,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
-    MuleEvent event1 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
-                             message1, flow, session);
-    MuleEvent event2 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
-                             message2, flow, session);
-    MuleEvent event3 =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), message1.getUniqueId()),
-                             message3, flow, session);
+    MuleEvent event1 = new DefaultMuleEvent(buildContext(muleContext, flow, message1.getUniqueId()), message1, flow, session);
+    MuleEvent event2 = new DefaultMuleEvent(buildContext(muleContext, flow, message1.getUniqueId()), message2, flow, session);
+    MuleEvent event3 = new DefaultMuleEvent(buildContext(muleContext, flow, message1.getUniqueId()), message3, flow, session);
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

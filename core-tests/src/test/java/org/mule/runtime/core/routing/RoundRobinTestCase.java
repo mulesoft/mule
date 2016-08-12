@@ -11,18 +11,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
-import org.mule.runtime.core.DefaultMessageExecutionContext;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +20,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
@@ -77,8 +77,9 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(Collections.singletonList(TEST_MESSAGE)).build();
 
-    roundRobin.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
-                                            MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(), (MuleSession) null));
+    Flow flow = getTestFlow();
+    roundRobin
+        .process(new DefaultMuleEvent(buildContext(muleContext, flow), message, REQUEST_RESPONSE, flow, (MuleSession) null));
 
     verify(route1).process(any(MuleEvent.class));
     verify(route2, never()).process(any(MuleEvent.class));
@@ -102,8 +103,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     public void run() {
       for (int i = 0; i < numMessages; i++) {
         MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE + messageNumber.getAndIncrement()).build();
-        MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
-                                               MessageExchangePattern.REQUEST_RESPONSE, flowConstruct, session);
+        MuleEvent event =
+            new DefaultMuleEvent(buildContext(muleContext, flowConstruct), msg, REQUEST_RESPONSE, flowConstruct, session);
         try {
           target.process(event);
         } catch (MuleException e) {

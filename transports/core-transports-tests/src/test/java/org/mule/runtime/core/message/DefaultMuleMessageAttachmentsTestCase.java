@@ -10,19 +10,13 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
-
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,8 +28,13 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTestCase {
 
@@ -171,8 +170,8 @@ public class DefaultMuleMessageAttachmentsTestCase extends AbstractMuleContextTe
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    setCurrentEvent(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
-                                         getTestFlow()));
+    Flow flow = getTestFlow();
+    setCurrentEvent(new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

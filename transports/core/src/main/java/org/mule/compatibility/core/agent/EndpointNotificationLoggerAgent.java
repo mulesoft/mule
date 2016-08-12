@@ -6,28 +6,33 @@
  */
 package org.mule.compatibility.core.agent;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 /**
  * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications to a configurered endpoint uri.
@@ -115,8 +120,36 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           return;
         }
 
-        MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
-                                               endpoint.getExchangePattern(), (FlowConstruct) null);
+        FlowConstruct flowConstruct = new FlowConstruct() {
+
+          @Override
+          public MuleContext getMuleContext() {
+            return muleContext;
+          }
+
+          @Override
+          public String getName() {
+            return "EndpointNotificationLoggerAgent";
+          }
+
+          @Override
+          public LifecycleState getLifecycleState() {
+            return null;
+          }
+
+          @Override
+          public MessagingExceptionHandler getExceptionListener() {
+            return null;
+          }
+
+          @Override
+          public FlowConstructStatistics getStatistics() {
+            return null;
+          }
+        };
+
+        MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct), msg,
+                                               endpoint.getExchangePattern(), flowConstruct);
         event.setEnableNotifications(false);
         endpoint.process(event);
       } catch (Exception e1) {

@@ -8,8 +8,15 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.Test;
+import org.mockito.Mockito;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -19,14 +26,6 @@ import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.Serializable;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.CountDownLatch;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase {
 
@@ -73,8 +72,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), okMessage,
-                                             flow, session);
+      MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, flow, session);
 
       try {
         event = idempotentMessageFilter.process(event);

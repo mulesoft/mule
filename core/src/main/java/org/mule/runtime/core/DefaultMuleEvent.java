@@ -12,6 +12,18 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageExecutionContext;
@@ -42,19 +54,6 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -980,12 +979,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public String getCorrelationId() {
-    return getCorrelation().getId().orElse(getExecutionContext().getSourceCorrelationId().orElse(getMessage().getUniqueId()));
-  }
-
-  @Override
-  public boolean hasSourceCorrelation() {
-    return getExecutionContext().getSourceCorrelationId().isPresent();
+    return getCorrelation().getId().orElse(getExecutionContext().getCorrelationId().orElse(getMessage().getUniqueId()));
   }
 
   /**

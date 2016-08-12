@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -14,12 +15,15 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionExcepti
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 
+import java.util.Optional;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -52,11 +56,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
-
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +102,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   @Override
   public void handle(MuleMessage message,
                      CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler) {
-    MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct),
                                            (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, downCast(completionHandler)),
@@ -112,7 +111,7 @@ public class ExtensionMessageSource extends ExtensionComponent
 
   @Override
   public void handle(MuleMessage message) {
-    MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct),
                                            (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()),

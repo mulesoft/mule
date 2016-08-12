@@ -6,8 +6,14 @@
  */
 package org.mule.tck;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.MuleTestUtils.getTestSession;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
@@ -21,7 +27,6 @@ import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -40,11 +45,6 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class MuleEndpointTestUtils {
 
@@ -232,8 +232,8 @@ public final class MuleEndpointTestUtils {
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
     final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
-    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(context.getUniqueIdString(), null),
-                                                        message, flowConstruct, session);
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(buildContext(context, flowConstruct), message, flowConstruct, session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

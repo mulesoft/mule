@@ -6,11 +6,22 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.time.OffsetTime.now;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.time.OffsetTime;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,15 +40,6 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.Test;
 
 public class RequestContextTestCase extends AbstractMuleTestCase {
 
@@ -100,7 +102,33 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public MessageExecutionContext getExecutionContext() {
-      return new DefaultMessageExecutionContext("", null);
+      return new MessageExecutionContext() {
+
+        @Override
+        public String getId() {
+          return "";
+        }
+
+        @Override
+        public Optional<String> getCorrelationId() {
+          return empty();
+        }
+
+        @Override
+        public OffsetTime getReceivedTime() {
+          return now();
+        }
+
+        @Override
+        public String getServerId() {
+          return "";
+        }
+
+        @Override
+        public String getFlowName() {
+          return "";
+        }
+      };
     }
 
     @Override
@@ -301,11 +329,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public String getCorrelationId() {
       return null;
-    }
-
-    @Override
-    public boolean hasSourceCorrelation() {
-      return false;
     }
 
     @Override

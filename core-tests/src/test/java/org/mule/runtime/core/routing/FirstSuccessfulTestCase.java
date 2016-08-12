@@ -10,10 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -21,14 +26,10 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
@@ -119,8 +120,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception {
     MuleMessage msg = MuleMessage.builder().payload(message).build();
     try {
-      MuleEvent event = mp.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                        msg, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(), session));
+      Flow flow = getTestFlow();
+      MuleEvent event =
+          mp.process(new DefaultMuleEvent(buildContext(muleContext, flow), msg, REQUEST_RESPONSE, flow, session));
       MuleMessage returnedMessage = event.getMessage();
       if (returnedMessage.getExceptionPayload() != null) {
         System.out.println(returnedMessage.getExceptionPayload().getMessage());
@@ -153,8 +155,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
-                                    MessageExchangePattern.ONE_WAY, event.getFlowConstruct(), event.getSession());
+        return new DefaultMuleEvent(buildContext(muleContext, event.getFlowConstruct()), msg, ONE_WAY,
+                                    event.getFlowConstruct(), event.getSession());
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

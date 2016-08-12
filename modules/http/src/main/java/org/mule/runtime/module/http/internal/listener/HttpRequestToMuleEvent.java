@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
@@ -17,8 +18,16 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,15 +44,6 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpRequestToMuleEvent {
 
@@ -111,7 +111,7 @@ public class HttpRequestToMuleEvent {
         .outboundProperties(outboundProperties).build();
     return new DefaultMuleEvent(
                                 // TODO does a correlation id come as a header that we may use?
-                                new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
+                                buildContext(muleContext, flowConstruct), message,
                                 resolveUri(requestContext), REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
   }
 

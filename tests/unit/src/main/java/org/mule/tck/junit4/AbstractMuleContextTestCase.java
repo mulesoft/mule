@@ -6,10 +6,23 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
@@ -45,19 +58,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -528,7 +528,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final Flow flow = new Flow("", muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
     muleContext.getRegistry().registerFlowConstruct(flow);
-    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                getTestMuleMessage(payload), MessageExchangePattern.REQUEST_RESPONSE, replyToHandler, flow);
+    return new DefaultMuleEvent(buildContext(muleContext, flow), getTestMuleMessage(payload), REQUEST_RESPONSE, replyToHandler,
+                                flow);
   }
 }

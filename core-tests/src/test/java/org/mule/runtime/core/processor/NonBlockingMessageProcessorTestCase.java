@@ -11,11 +11,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.junit.Test;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -27,8 +28,6 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
 
 public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
@@ -63,7 +62,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
   private MuleEvent createNonBlockingTestEvent() throws Exception {
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+    return new DefaultMuleEvent(buildContext(muleContext, flow),
                                 MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE,
                                 new SensingNullReplyToHandler(), flow);

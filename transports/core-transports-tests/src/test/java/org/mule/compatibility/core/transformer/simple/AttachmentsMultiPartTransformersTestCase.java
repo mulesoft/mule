@@ -10,22 +10,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.message.PartAttributes;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.activation.DataHandler;
 
@@ -34,8 +25,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContextTestCase {
 
@@ -62,8 +61,8 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   @Test
   public void nonMultiPartPayloadToAttachment() throws Exception {
     expected.expect(TransformerMessagingException.class);
-    mp2a.transform("", new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                            getTestMuleMessage(), getTestFlow()));
+    Flow flow = getTestFlow();
+    mp2a.transform("", new DefaultMuleEvent(buildContext(muleContext, flow), getTestMuleMessage(), flow));
   }
 
   @Test
@@ -76,9 +75,9 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
                                              attachmentPart))
         .build();
 
+    Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) mp2a
-        .transform(message, new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                 message, getTestFlow()));
+        .transform(message, new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(1));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment"));
@@ -94,9 +93,9 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(attachment1Part, attachment2Part)).build();
 
+    Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) mp2a
-        .transform(message, new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                 message, getTestFlow()));
+        .transform(message, new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(2));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment1"));
@@ -110,9 +109,9 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addInboundAttachment("attachment", attDH).build();
 
+    Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) a2mp
-        .transform(message, new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                 message, getTestFlow()));
+        .transform(message, new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
 
     assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
     assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
@@ -126,9 +125,9 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
     final MuleMessage message = MuleMessage.builder().nullPayload().addInboundAttachment("attachment", attDH).build();
 
+    Flow flow = getTestFlow();
     final MuleMessage response = (MuleMessage) a2mp
-        .transform(message, new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                                 message, getTestFlow()));
+        .transform(message, new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
 
     assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
     assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));

@@ -7,23 +7,23 @@
 package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
-import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
 
@@ -83,12 +83,9 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
     public void checkResultUri(ImmutableEndpoint ep) throws Exception {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
-        epUri = muleContext
-            .getExpressionManager().parse(ep.getAddress(),
-                                          new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(),
-                                                                                                  null),
-                                                               message, getTestFlow()),
-                                          true);
+        Flow flow = getTestFlow();
+        epUri = muleContext.getExpressionManager()
+            .parse(ep.getAddress(), new DefaultMuleEvent(buildContext(muleContext, flow), message, flow), true);
       } else {
         epUri = ep.getAddress();
       }

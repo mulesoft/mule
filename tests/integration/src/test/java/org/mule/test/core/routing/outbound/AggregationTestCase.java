@@ -10,10 +10,17 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -26,14 +33,6 @@ import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.test.AbstractIntegrationTestCase;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
@@ -119,8 +118,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
       }
 
       MuleMessage msg = MuleMessage.builder().payload(eventList).build();
-      return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), msg,
-                                  MessageExchangePattern.ONE_WAY, fc);
+      return new DefaultMuleEvent(buildContext(muleContext, fc), msg, ONE_WAY, fc);
     }
   }
 }

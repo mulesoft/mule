@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
+import java.nio.charset.Charset;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
@@ -20,8 +23,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-
-import java.nio.charset.Charset;
 
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference to the current message. This message can be used
@@ -120,9 +121,9 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     Object result;
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
     if (event == null) {
-      event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
-                                   MessageExchangePattern.REQUEST_RESPONSE,
-                                   new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext));
+      DefaultLocalMuleClient.MuleClientFlowConstruct flowConstruct =
+          new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext);
+      event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
     }
     try {
       result = transformMessage(event, enc);

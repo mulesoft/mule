@@ -13,6 +13,20 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Map;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
@@ -29,21 +43,6 @@ import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.StringUtils;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
-
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Converts a {@link MuleMessage} into an Http response.
@@ -93,8 +92,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
       if (src instanceof HttpResponse) {
         response = (HttpResponse) src;
       } else {
-        response = createResponse(src, outputEncoding, event.getMessage(), event.hasSourceCorrelation(), event.getCorrelationId(),
-                                  event.getCorrelation());
+        response =
+            createResponse(src, outputEncoding, event.getMessage(), event.getExecutionContext().getCorrelationId().isPresent(),
+                           event.getCorrelationId(), event.getCorrelation());
       }
 
       // Ensure there's a content type header

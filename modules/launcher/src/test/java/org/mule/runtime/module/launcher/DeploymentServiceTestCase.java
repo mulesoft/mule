@@ -35,6 +35,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
@@ -50,9 +52,28 @@ import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_
 import static org.mule.runtime.module.launcher.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -94,28 +115,6 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.verification.VerificationMode;
 
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
@@ -1391,8 +1390,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test
@@ -1455,8 +1454,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test
@@ -1478,8 +1477,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test
@@ -1504,8 +1503,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test
@@ -1520,8 +1519,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test
@@ -1536,8 +1535,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(new DefaultMuleEvent(new DefaultMessageExecutionContext(mainFlow.getMuleContext().getUniqueIdString(), null),
-                                          muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    mainFlow.process(new DefaultMuleEvent(buildContext(mainFlow.getMuleContext(), mainFlow), muleMessage, REQUEST_RESPONSE,
+                                          mainFlow));
   }
 
   @Test

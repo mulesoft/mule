@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.text.MessageFormat;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -20,9 +22,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.expression.ExpressionConfig;
-
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +83,8 @@ public class ExpressionFilter implements Filter, MuleContextAware {
     }
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
-    return accept(new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null), message,
-                                       MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
+    Flow flowConstruct = new Flow("", muleContext);
+    return accept(new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, ONE_WAY, flowConstruct));
   }
 
   /**

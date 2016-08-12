@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
@@ -21,7 +22,19 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessagingException;
@@ -56,20 +69,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 @RunWith(MockitoJUnitRunner.class)
 public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
@@ -99,8 +98,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageSource(source);
     pipeline.initialise();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                                 REQUEST_RESPONSE, pipeline);
 
     source.trigger(event);
 
@@ -132,8 +131,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
     event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                             MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+        new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                             REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
     source.trigger(event);
 
@@ -155,8 +154,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageSource(source);
     pipeline.initialise();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(), ONE_WAY,
+                                 pipeline);
 
     source.trigger(event);
 
@@ -182,8 +181,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                                 REQUEST_RESPONSE, pipeline);
 
     try {
       source.trigger(event);
@@ -210,9 +209,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                             MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                                 REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
     try {
       source.trigger(event);
@@ -242,9 +240,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event =
-        new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                             MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                                 REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
     try {
       source.trigger(event);
@@ -273,8 +270,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(),
+                                 REQUEST_RESPONSE, pipeline);
 
     try {
       source.trigger(event);
@@ -299,8 +296,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(), ONE_WAY,
+                                 pipeline);
 
     try {
       source.trigger(event);
@@ -330,8 +327,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
     pipeline.start();
 
-    event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                 MuleMessage.builder().payload("request").build(), ONE_WAY, pipeline);
+    event = new DefaultMuleEvent(buildContext(muleContext, pipeline), MuleMessage.builder().payload("request").build(), ONE_WAY,
+                                 pipeline);
 
     source.trigger(event);
     latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);

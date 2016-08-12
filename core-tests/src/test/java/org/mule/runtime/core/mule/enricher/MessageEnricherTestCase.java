@@ -21,10 +21,13 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -43,10 +46,6 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
-
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
@@ -297,7 +296,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+    MuleEvent in = new DefaultMuleEvent(buildContext(muleContext, flow),
                                         MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                         MessageExchangePattern.REQUEST_RESPONSE, flow);
     MuleEvent out = enricher.process(in);
@@ -367,7 +366,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
+    return new DefaultMuleEvent(buildContext(muleContext, flow),
                                 MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
                                 flow);

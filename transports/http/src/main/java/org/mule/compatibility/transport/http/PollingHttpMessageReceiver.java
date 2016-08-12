@@ -14,6 +14,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -26,7 +27,6 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -118,8 +118,8 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
     requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
     // TODO can a correlation id come as a header?
-    MuleEvent event = new DefaultMuleEvent(new DefaultMessageExecutionContext(muleContext.getUniqueIdString(), null),
-                                           requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
+    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct), requestBuider.build(),
+                                           outboundEndpoint.getExchangePattern(), flowConstruct);
 
     MuleEvent result = outboundEndpoint.process(event);
     MuleCompatibilityMessage message = null;
