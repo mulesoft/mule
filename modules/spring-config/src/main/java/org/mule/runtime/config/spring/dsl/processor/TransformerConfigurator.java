@@ -18,7 +18,7 @@ import org.mule.runtime.core.util.ClassUtils;
 import java.util.Map;
 
 /**
- * {@link ObjectFactoryCommonConfigurator} for transformers in Mules.
+ * {@link ObjectFactoryCommonConfigurator} for transformers in Mule.
  *
  * The transformer class that will be configured setting the returnType, mimeType,
  * name, encoding and ignoreBadInput configuration.
