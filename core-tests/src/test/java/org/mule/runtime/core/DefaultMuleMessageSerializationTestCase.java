@@ -8,7 +8,7 @@ package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import java.io.ByteArrayInputStream;
@@ -47,7 +47,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(createContext(flow), message, flow));
     MuleMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload() instanceof byte[]);
@@ -59,7 +59,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(buildContext(muleContext, flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(createContext(flow), message, flow));
     MuleMessage deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(byte[].class, deserializedMessage.getDataType().getType());

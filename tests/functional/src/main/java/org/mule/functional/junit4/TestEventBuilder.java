@@ -7,7 +7,7 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
@@ -300,7 +300,7 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(muleContext, flow, sourceCorrelationId),
+        new DefaultMuleEvent(createContext(flow, sourceCorrelationId),
                              (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
                              flow, new DefaultMuleSession(), muleContext.getConfiguration().getDefaultResponseTimeout(), null,
                              null, transacted, null, replyToHandler);

@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -47,7 +47,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
     message =
         MuleMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), message, flow);
+    event = new DefaultMuleEvent(createContext(flow), message, flow);
   }
 
   @Test

@@ -17,7 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
@@ -164,7 +164,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     MuleMessage msg = MuleMessage.builder().payload("Hello").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flow), msg, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(createContext(flow), msg, ONE_WAY, flow);
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);

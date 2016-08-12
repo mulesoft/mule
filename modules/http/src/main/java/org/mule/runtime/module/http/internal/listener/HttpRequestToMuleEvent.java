@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
@@ -111,7 +111,7 @@ public class HttpRequestToMuleEvent {
         .outboundProperties(outboundProperties).build();
     return new DefaultMuleEvent(
                                 // TODO does a correlation id come as a header that we may use?
-                                buildContext(muleContext, flowConstruct), message,
+                                createContext(flowConstruct), message,
                                 resolveUri(requestContext), REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
   }
 

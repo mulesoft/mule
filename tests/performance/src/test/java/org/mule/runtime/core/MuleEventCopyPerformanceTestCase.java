@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import java.io.IOException;
@@ -122,7 +122,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   }
 
   protected DefaultMuleEvent createMuleEvent() throws Exception {
-    return new DefaultMuleEvent(buildContext(muleContext, flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
+    return new DefaultMuleEvent(createContext(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
   }
 
   protected DefaultMuleEvent createMuleEventWithFlowVarsAndProperties(int numProperties) throws Exception {

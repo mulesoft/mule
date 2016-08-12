@@ -6,7 +6,7 @@
  */
 package org.mule.tck.junit4;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
@@ -528,7 +528,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final Flow flow = new Flow("", muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
     muleContext.getRegistry().registerFlowConstruct(flow);
-    return new DefaultMuleEvent(buildContext(muleContext, flow), getTestMuleMessage(payload), REQUEST_RESPONSE, replyToHandler,
+    return new DefaultMuleEvent(createContext(flow), getTestMuleMessage(payload), REQUEST_RESPONSE, replyToHandler,
                                 flow);
   }
 }

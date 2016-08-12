@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -102,7 +102,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   @Override
   public void handle(MuleMessage message,
                      CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler) {
-    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct),
+    MuleEvent event = new DefaultMuleEvent(createContext(flowConstruct),
                                            (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, downCast(completionHandler)),
@@ -111,7 +111,7 @@ public class ExtensionMessageSource extends ExtensionComponent
 
   @Override
   public void handle(MuleMessage message) {
-    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct),
+    MuleEvent event = new DefaultMuleEvent(createContext(flowConstruct),
                                            (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()),

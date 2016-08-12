@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -206,7 +206,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
       }
     };
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(endpoint.getMuleContext(), flowConstruct), fileParserMessasge, flowConstruct);
+        new DefaultMuleEvent(createContext(flowConstruct), fileParserMessasge, flowConstruct);
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);
   }

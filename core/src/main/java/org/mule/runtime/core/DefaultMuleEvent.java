@@ -12,18 +12,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageExecutionContext;
@@ -54,6 +42,16 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +101,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   protected String[] ignoredPropertyOverrides = new String[] {MULE_METHOD_PROPERTY};
   private boolean notificationsEnabled = true;
-
-  private transient Map<String, Object> serializedData = null;
 
   private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
@@ -665,7 +661,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
       return TIMEOUT_WAIT_FOREVER;
     }
     if (timeout == TIMEOUT_NOT_SET_VALUE) {
-      return flowConstruct.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+      return getMuleContext().getConfiguration().getDefaultResponseTimeout();
     } else {
       return timeout;
     }
@@ -715,18 +711,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
       }
 
     }
-    // this method can be called even on objects that were not serialized. In this case,
-    // the temporary holder for serialized data is not initialized and we can just return
-    if (serializedData == null) {
-      return;
-    }
-
-    String serviceName = this.getTransientServiceName();
     // Can be null if service call originates from MuleClient
-    if (serviceName != null) {
-      flowConstruct = muleContext.getRegistry().lookupFlowConstruct(serviceName);
+    if (executionContext.getFlowName() != null) {
+      flowConstruct = muleContext.getRegistry().lookupFlowConstruct(executionContext.getFlowName());
     }
-    serializedData = null;
   }
 
   @Override
@@ -780,17 +768,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
-    // Can be null if service call originates from MuleClient
-    if (serializedData != null) {
-      Object serviceName = serializedData.get("serviceName");
-      if (serviceName != null) {
-        out.writeObject(serviceName);
-      }
-    } else {
-      if (getFlowConstruct() != null) {
-        out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
-      }
-    }
     for (Map.Entry<String, TypedValue> entry : flowVariables.entrySet()) {
       Object value = entry.getValue();
       if (value != null && !(value instanceof Serializable)) {
@@ -801,35 +778,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
       }
     }
 
-  }
-
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    serializedData = new HashMap<>();
-
-    try {
-      // Optional
-      this.setTransientServiceName(in.readObject());
-    } catch (OptionalDataException e) {
-      // ignore
-    }
-  }
-
-  /**
-   * Used to fetch the {@link #flowConstruct} after deserealization since its a transient value. This is not part of the public
-   * API and should only be used internally for serialization/deserialization
-   *
-   * @param serviceName the name of the service
-   */
-  public void setTransientServiceName(Object serviceName) {
-    if (serializedData == null) {
-      serializedData = new HashMap<>();
-    }
-    serializedData.put("serviceName", serviceName);
-  }
-
-  private String getTransientServiceName() {
-    return serializedData != null ? (String) serializedData.get("serviceName") : null;
   }
 
   @Override
@@ -979,10 +927,9 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public String getCorrelationId() {
-    return getCorrelation().getId().orElse(getExecutionContext().getCorrelationId().map(cid -> {
-      return cid + (getParent() != null ? getParent().getFlowCallStack().getElements().get(0).getProcessorPath() : null)
-          + getCorrelation().getSequence().map(s -> s.toString()).orElse("");
-    }).orElse(getMessage().getUniqueId()));
+    return getCorrelation().getId().orElse(getExecutionContext().getCorrelationId().orElse(getMessage().getUniqueId())
+        + (getParent() != null ? ":" + getParent().getFlowCallStack().getElements().get(0).getProcessorPath() : "")
+        + getCorrelation().getSequence().map(s -> ":" + s.toString()).orElse(""));
   }
 
   /**

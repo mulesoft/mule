@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.client;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
@@ -152,12 +152,12 @@ public class DefaultLocalMuleClient implements MuleClient {
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
+    return new DefaultMuleEvent(createContext(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, ONE_WAY, flowConstruct);
+    return new DefaultMuleEvent(createContext(flowConstruct), message, ONE_WAY, flowConstruct);
   }
 
   protected MuleMessage returnMessage(MuleEvent event) {

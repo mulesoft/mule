@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -331,7 +331,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(muleContext, flow), inMessage, flow, getTestSession(null, muleContext));
+        new DefaultMuleEvent(createContext(flow), inMessage, flow, getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
     return event;
   }
@@ -339,7 +339,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(muleContext, flow), MuleMessage.builder().payload(RESPONSE_MESSAGE).build(), flow,
+        new DefaultMuleEvent(createContext(flow), MuleMessage.builder().payload(RESPONSE_MESSAGE).build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
     return event;

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.processor;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -116,7 +116,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
   protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
     Flow flow = getTestFlow();
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(muleContext, flow),
+        new DefaultMuleEvent(createContext(flow),
                              MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
@@ -184,7 +184,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
       flow.setExceptionListener(exceptionListener);
     }
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(muleContext, flow),
+        new DefaultMuleEvent(createContext(flow),
                              MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils

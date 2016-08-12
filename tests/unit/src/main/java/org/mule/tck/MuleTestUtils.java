@@ -7,7 +7,7 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import java.util.ArrayList;
@@ -167,7 +167,7 @@ public final class MuleTestUtils {
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(buildContext(context, flowConstruct), message, mep, flowConstruct, session);
+        new DefaultMuleEvent(createContext(flowConstruct), message, mep, flowConstruct, session);
     return event;
   }
 
@@ -177,7 +177,7 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(buildContext(context, flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(createContext(flowConstruct),
                                                         MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
     return event;
   }
@@ -189,7 +189,7 @@ public final class MuleTestUtils {
   public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(buildContext(context, flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(createContext(flowConstruct),
                                                         MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }

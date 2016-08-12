@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
@@ -138,7 +138,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             return null;
           }
         };
-        event = new DefaultMuleEvent(buildContext(muleContext, flowConstruct), muleMsg, ep.getExchangePattern(), flowConstruct);
+        event = new DefaultMuleEvent(createContext(flowConstruct), muleMsg, ep.getExchangePattern(), flowConstruct);
       } catch (Exception e) {
         throw new Fault(e);
       }

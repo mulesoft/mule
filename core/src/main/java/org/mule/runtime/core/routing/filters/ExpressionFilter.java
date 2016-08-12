@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
@@ -84,7 +84,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, ONE_WAY, flowConstruct));
+    return accept(new DefaultMuleEvent(createContext(flowConstruct), message, ONE_WAY, flowConstruct));
   }
 
   /**

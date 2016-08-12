@@ -16,7 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -90,7 +90,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
       return null;
     }).when(mockEvent).setMessage(any(MuleMessage.class));
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
-    MessageExecutionContext executionContext = buildContext(muleContext, mock(Flow.class));
+    MessageExecutionContext executionContext = createContext(mock(Flow.class));
     when(mockEvent.getExecutionContext()).thenReturn(executionContext);
     mockExpressionManager = mock(ExpressionManager.class);
     when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.el.mvel;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import java.util.Random;
@@ -109,7 +109,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return new DefaultMuleEvent(buildContext(muleContext, flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
+    return new DefaultMuleEvent(createContext(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
   }
 
 }

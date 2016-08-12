@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Matchers.isNull;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
@@ -99,7 +99,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
 
     message = MuleMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), message, REQUEST_RESPONSE, flow);
+    event = new DefaultMuleEvent(createContext(flow), message, REQUEST_RESPONSE, flow);
   }
 
   @Test

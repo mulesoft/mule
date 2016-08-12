@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
     Flow flow = getTestFlow();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               new DefaultMuleEvent(buildContext(muleContext, flow), message, ONE_WAY, flow),
+                               new DefaultMuleEvent(createContext(flow), message, ONE_WAY, flow),
                                new IllegalAccessException());
     event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(me)).build());
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));

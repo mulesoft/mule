@@ -9,7 +9,7 @@ package org.mule.compatibility.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import org.junit.Test;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
@@ -44,7 +44,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     ir.setMuleContext(muleContext);
 
     MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
-    DefaultMuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    DefaultMuleEvent event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
@@ -53,14 +53,14 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
 
     // This will not process, because the message is a duplicate
     okMessage = MuleMessage.builder().payload("OK").build();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNull(processedEvent);
 
     // This will process, because the message is not a duplicate
     okMessage = MuleMessage.builder().payload("Not OK").build();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNotNull(processedEvent);

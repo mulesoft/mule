@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.core.api.source.MessageSource;
+
 import java.time.OffsetTime;
 import java.util.Optional;
-
-import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * Provides context about the execution of a set of related events/messages, applicable to the end-to-end processing.
@@ -42,12 +42,12 @@ public interface MessageExecutionContext {
   OffsetTime getReceivedTime();
 
   /**
+   * @return the name of the flow that processes events of this context.
+   */
+  String getFlowName();
+
+  /**
    * @return a unique identifier of the server where events of this context are being processed.
    */
   String getServerId();
-
-  /**
-   * @return the name of the flow that processes events of this context. 
-   */
-  String getFlowName();
 }

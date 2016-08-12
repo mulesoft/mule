@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(buildContext(muleContext, flow), testObject, flow,
+    setCurrentEvent(new DefaultMuleEvent(createContext(flow), testObject, flow,
                                          MuleTestUtils.getTestSession(muleContext)));
   }
 

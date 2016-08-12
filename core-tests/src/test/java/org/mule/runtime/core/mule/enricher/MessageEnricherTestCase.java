@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -296,7 +296,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in = new DefaultMuleEvent(buildContext(muleContext, flow),
+    MuleEvent in = new DefaultMuleEvent(createContext(flow),
                                         MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                         MessageExchangePattern.REQUEST_RESPONSE, flow);
     MuleEvent out = enricher.process(in);
@@ -366,7 +366,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return new DefaultMuleEvent(buildContext(muleContext, flow),
+    return new DefaultMuleEvent(createContext(flow),
                                 MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
                                 flow);

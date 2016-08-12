@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -40,7 +40,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     ir.setMuleContext(muleContext);
 
     MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
-    MuleEvent event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    MuleEvent event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
 
     // This one will process the event on the target endpoint
     MuleEvent processedEvent = ir.process(event);
@@ -48,13 +48,13 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
 
     // This will not process, because the message is a duplicate
     okMessage = MuleMessage.builder().payload("OK").build();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
     processedEvent = ir.process(event);
     assertNull(processedEvent);
 
     // This will process, because the message is not a duplicate
     okMessage = MuleMessage.builder().payload("Not OK").build();
-    event = new DefaultMuleEvent(buildContext(muleContext, flow), okMessage, getTestFlow(), session);
+    event = new DefaultMuleEvent(createContext(flow), okMessage, getTestFlow(), session);
     processedEvent = ir.process(event);
     assertNotNull(processedEvent);
   }

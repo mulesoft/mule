@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.client;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,7 +87,7 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
           throw new ReceiveException(inboundEndpoint, timeout, e);
         }
         MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-        return message != null ? new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, flowConstruct)
+        return message != null ? new DefaultMuleEvent(createContext(flowConstruct), message, flowConstruct)
             : null;
       };
     }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.scripting.filter;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 
@@ -65,7 +65,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
 
     // TODO MULE-9341 Remove Filters.
     Flow flow = new Flow("", muleContext);
-    MuleEvent event = new DefaultMuleEvent(buildContext(getMuleContext(), flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(createContext(flow), message, ONE_WAY, flow);
     script.populateBindings(bindings, event);
     try {
       return (Boolean) script.runScript(bindings);

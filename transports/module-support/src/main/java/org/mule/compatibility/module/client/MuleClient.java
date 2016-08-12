@@ -8,7 +8,7 @@ package org.mule.compatibility.module.client;
 
 import static java.util.Collections.EMPTY_MAP;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.MuleEvent.TIMEOUT_NOT_SET_VALUE;
@@ -431,7 +431,7 @@ public class MuleClient implements Disposable {
           .addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
     }
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return new DefaultMuleEvent(buildContext(muleContext, flowConstruct), message, exchangePattern, flowConstruct);
+    return new DefaultMuleEvent(createContext(flowConstruct), message, exchangePattern, flowConstruct);
   }
 
   protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException {

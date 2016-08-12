@@ -15,7 +15,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.buildContext;
+import static org.mule.runtime.core.DefaultMessageExecutionContext.createContext;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
@@ -78,7 +78,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
 
     message = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(buildContext(mockMuleContext, flow), message, flow, mockSession);
+    event = new DefaultMuleEvent(createContext(flow), message, flow, mockSession);
   }
 
   @Test
