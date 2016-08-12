@@ -44,7 +44,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
 
     DefaultMuleEvent event1 =
         new DefaultMuleEvent(buildContext(muleContext, flow, message1.getUniqueId()), message1, getTestFlow(), session);
-    event1.setCorrelation(new Correlation(message1.getUniqueId(), 3, null));
+    event1.setCorrelation(new Correlation(null, 3, null));
     MuleEvent event2 =
         new DefaultMuleEvent(buildContext(muleContext, flow, message1.getUniqueId()), message2, getTestFlow(), session);
     MuleEvent event3 =

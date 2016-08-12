@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.core.el.context;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.activation.DataHandler;
+import org.mule.runtime.core.message.Correlation;
 
 /**
  * Exposes information about the current Mule message:
@@ -24,6 +25,7 @@ import javax.activation.DataHandler;
  * <li><b>id</b> <i>The unique message id</i>
  * <li><b>rootId</b> <i>The root message id. The id of the message before being split into parts. If was is not split then this
  * value is the same as the id.</i>
+ * <li><b>correlation</b> <i>The event correlation information.</i>
  * <li><b>correlationId</b> <i>The event correlationId.</i>
  * <li><b>dataType</b> <i>The message data type (org.mule.runtime.core.api.transformer.DataType).</i>
  * <li><b>replyTo</b> <i>The message reply to destination. (mutable)</i>
@@ -50,6 +52,10 @@ public class MessageContext {
 
   public String getRootId() {
     return event.getMessage().getMessageRootId();
+  }
+
+  public Correlation getCorrelation() {
+    return event.getCorrelation();
   }
 
   public String getCorrelationId() {

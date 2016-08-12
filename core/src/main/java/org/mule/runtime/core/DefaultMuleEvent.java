@@ -979,7 +979,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public String getCorrelationId() {
-    return getCorrelation().getId().orElse(getExecutionContext().getCorrelationId().orElse(getMessage().getUniqueId()));
+    return getCorrelation().getId().orElse(getExecutionContext().getCorrelationId().map(cid -> {
+      return cid + (getParent() != null ? getParent().getFlowCallStack().getElements().get(0).getProcessorPath() : null)
+          + getCorrelation().getSequence().map(s -> s.toString()).orElse("");
+    }).orElse(getMessage().getUniqueId()));
   }
 
   /**
