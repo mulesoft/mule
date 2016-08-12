@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
@@ -107,8 +108,7 @@ class ComponentConfigurationBuilder {
   }
 
   private ConfigurableAttributeDefinitionVisitor constructorVisitor() {
-    return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue,
-                                                      beanDefinitionBuilderHelper::addConstructorReference);
+    return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue);
   }
 
   private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName, AttributeDefinition attributeDefinition) {
@@ -120,7 +120,7 @@ class ComponentConfigurationBuilder {
         return;
       }
       beanDefinitionBuilderHelper.forProperty(propertyName).addValue(value);
-    }, beanDefinitionBuilderHelper.forProperty(propertyName)::addReference);
+    });
   }
 
   private boolean isPropertySetWithUserConfigValue(String propertyName, Optional<Object> defaultValue, Object value) {
@@ -134,23 +134,20 @@ class ComponentConfigurationBuilder {
    */
   private class ConfigurableAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
-    private final Consumer<String> referenceConsumer;
     private final Consumer<Object> valueConsumer;
 
     /**
      * @param valueConsumer consumer for handling a bean definition
-     * @param referenceConsumer consumer for handling a bean reference
      */
-    ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer, Consumer<String> referenceConsumer) {
+    ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer) {
       this.valueConsumer = valueConsumer;
-      this.referenceConsumer = referenceConsumer;
     }
 
     @Override
     public void onReferenceObject(Class<?> objectType) {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onReferenceObject(objectType);
-      referenceConsumer.accept(valueExtractor.getStringValue());
+      valueConsumer.accept(valueExtractor.getValue());
     }
 
     @Override
@@ -158,10 +155,7 @@ class ComponentConfigurationBuilder {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onReferenceSimpleParameter(configAttributeName);
       Object value = valueExtractor.getValue();
-      if (value instanceof String) {
-        referenceConsumer.accept((String) value);
-
-      } else if (value != null) {
+      if (value != null) {
         valueConsumer.accept(value);
       } else {
         valueConsumer.accept(null);
@@ -260,13 +254,15 @@ class ComponentConfigurationBuilder {
 
     @Override
     public void onReferenceObject(Class<?> objectType) {
-      objectReferencePopulator.populate(objectType, referenceId -> this.value = referenceId);
+      objectReferencePopulator.populate(objectType, referenceId -> this.value = new RuntimeBeanReference(referenceId));
     }
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
       String reference = simpleParameters.get(configAttributeName);
-      this.value = reference;
+      if (reference != null) {
+        this.value = new RuntimeBeanReference(reference);
+      }
       simpleParameters.remove(configAttributeName);
       if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy")) {
         ProcessingStrategy processingStrategy = parseProcessingStrategy(reference);
@@ -306,8 +302,9 @@ class ComponentConfigurationBuilder {
     @Override
     public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier) {
       Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
-      List<ComponentValue> matchingComponentValues =
-          complexParameters.stream().filter(matchesTypeAndIdentifierPredicate).collect(toList());
+      List<ComponentValue> matchingComponentValues = complexParameters.stream()
+          .filter(matchesTypeAndIdentifierPredicate)
+          .collect(toList());
 
       matchingComponentValues.stream().forEach(complexParameters::remove);
       if (wrapperIdentifier.isPresent() && !matchingComponentValues.isEmpty()) {
@@ -321,7 +318,9 @@ class ComponentConfigurationBuilder {
 
     @Override
     public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
-      complexParameters.stream().filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier))).findFirst()
+      complexParameters.stream()
+          .filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier)))
+          .findFirst()
           .ifPresent(componentValue -> {
             complexParameters.remove(componentValue);
             value = componentValue.getBean();

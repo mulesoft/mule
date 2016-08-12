@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
@@ -95,24 +96,53 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           MessagingExceptionHandler.class, AbstractAsyncRequestReplyRequester.class, OutboundRouter.class,
           MessageProcessorChain.class, MuleContext.class, Service.class});
     }
+
+    @Override
+    public void applyLifecycle(Object o) throws LifecycleException {
+      if (o instanceof Transformer) {
+        String name = ((Transformer) o).getName();
+        if (isNamedBean(name)) {
+          super.applyLifecycle(o);
+        }
+      } else {
+        super.applyLifecycle(o);
+      }
+    }
   }
 
   /**
-   * A lifecycle phase that will delegate to the {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in
-   * turn will destroy the application context managed by this registry
+   * Detects if a bean is an inner bean to prevent applying lifecycle to it since
+   * lifecycle is already applied by the owner, i.e.: a flow
+   *
+   * @param name bean name.
+   * @return true if contains inner bean as prefix of the bean name, false otherwise.
+   */
+  private boolean isNamedBean(String name) {
+    return name != null && !name.startsWith(INNER_BEAN_PREFIX);
+  }
+
+  /**
+   * A lifecycle phase that will delegate to the
+   * {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in turn
+   * will destroy the application context managed by this registry
    */
   class SpringContextDisposePhase extends MuleContextDisposePhase {
 
     public SpringContextDisposePhase() {
       super();
       setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
-          OutboundRouter.class, Transformer.class, MuleContext.class, ServerNotificationManager.class, Service.class});
+          OutboundRouter.class, MuleContext.class, ServerNotificationManager.class, Service.class});
     }
 
     @Override
     public void applyLifecycle(Object o) throws LifecycleException {
       if (o instanceof SpringRegistry) {
         ((SpringRegistry) o).doDispose();
+      } else if (o instanceof Transformer) {
+        String name = ((Transformer) o).getName();
+        if (isNamedBean(name)) {
+          super.applyLifecycle(o);
+        }
       } else {
         super.applyLifecycle(o);
       }

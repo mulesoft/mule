@@ -151,6 +151,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     assertFiles(inFile, moveToDir, true, true);
   }
 
+  @Ignore("MULE-10225 - Will get fixed once file transport is migrated to new parsing method")
   @Test
   public void testMoveOnlyFilePayload() throws Exception {
     File inFile = initForRequest();
@@ -161,6 +162,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     assertFiles(inFile, moveToDir, true, false);
   }
 
+  @Ignore("MULE-10225 - Will get fixed once file transport is migrated to new parsing method")
   @Test
   public void testDeleteOnlyFilePayload() throws Exception {
     File inFile = initForRequest();
