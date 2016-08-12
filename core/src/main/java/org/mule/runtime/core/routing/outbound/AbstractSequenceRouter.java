@@ -39,7 +39,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
     }
 
     ((DefaultMuleEvent) event)
-        .setCorrelation(new Correlation(event.getExecutionContext().getCorrelationId().orElse(null), routes.size(), null));
+        .setCorrelation(new Correlation(event.getExecutionContext().getCorrelationId(), routes.size(), null));
 
     List<MuleEvent> results = new ArrayList<>(routes.size());
     try {
