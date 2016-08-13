@@ -79,7 +79,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    */
   @Deprecated
   private final String id;
-  private final MessageExecutionContext executionContext;
+  private MessageExecutionContext executionContext;
   private MuleMessage message;
   private final MuleSession session;
   private transient FlowConstruct flowConstruct;
@@ -498,6 +498,12 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public MessageExecutionContext getExecutionContext() {
     return executionContext;
+  }
+
+  // TODO MULE-9281 Remove when the builder is in place.
+  @Deprecated
+  public void setExecutionContext(MessageExecutionContext executionContext) {
+    this.executionContext = executionContext;
   }
 
   @Override
