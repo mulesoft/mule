@@ -9,9 +9,7 @@ package org.mule.runtime.config.spring;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
-import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -20,8 +18,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.TransformerResolver;
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.registry.AbstractRegistry;
@@ -39,7 +35,6 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -117,7 +112,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       ((ConfigurableApplicationContext) applicationContext).refresh();
     }
 
-    initTransformers();
   }
 
   private BeanDefinitionRegistryPostProcessor createBeforeInitialisationRegisteredObjectsPostProcessor() {
@@ -135,15 +129,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         // do nothing
       }
     };
-  }
-
-  /**
-   * Forces prototype instances of {@link TransformerResolver} and {@link Converter} to be created, so that
-   * {@link PostRegistrationActionsPostProcessor} can work its magic
-   */
-  private void initTransformers() {
-    applicationContext.getBeansOfType(TransformerResolver.class);
-    applicationContext.getBeansOfType(Converter.class);
   }
 
   @Override
@@ -430,9 +415,9 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
           throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
         }
       } else {
-        // since the context has not yet bean initialized, we register a bean definition instead.
-        registeredBeanDefinitionsBeforeInitialization
-            .put(key, genericBeanDefinition(ConstantFactoryBean.class).addConstructorArgValue(value).getBeanDefinition());
+        //since the context has not yet bean initialized, we register a bean definition instead.
+        registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
+            .addConstructorArgValue(value).getBeanDefinition());
       }
     }
   }

@@ -11,6 +11,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_ST
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.store.QueueStore;
 
@@ -41,20 +42,34 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  */
 public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
-  private ImmutableMap<ComponentIdentifier, Consumer<ComponentModel>> referenceConsumers =
-      new ImmutableMap.Builder().put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
-          .put(PROCESSOR_IDENTIFIER, getProcessorConsumer()).put(TRANSFORMER_IDENTIFIER, getProcessorConsumer()).build();
+  private static final String REF_ATTRIBUTE = "ref";
+  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers = new ImmutableMap.Builder()
+      .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
+      .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
+      .put(TRANSFORMER_IDENTIFIER, getConsumer())
+      .build();
 
-  private Consumer<ComponentModel> getProcessorConsumer() {
-    return getConsumer(MessageProcessor.class);
+  private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
+    return getFixedConsumer(MessageProcessor.class);
   }
 
-  private Consumer<ComponentModel> getQueueStoreConsumer() {
-    return getConsumer(QueueStore.class);
+  private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer() {
+    return getFixedConsumer(QueueStore.class);
   }
 
-  private Consumer<ComponentModel> getConsumer(Class<?> componentModelType) {
-    return (componentModel) -> {
+  private Consumer<CreateBeanDefinitionRequest> getConsumer() {
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
+      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REF_ATTRIBUTE)));
+      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+      componentModel.setType(objectTypeVisitor.getType());
+    };
+  }
+
+  private Consumer<CreateBeanDefinitionRequest> getFixedConsumer(Class<?> componentModelType) {
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
       componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get("ref")));
       componentModel.setType(componentModelType);
     };
@@ -64,7 +79,7 @@ public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
     ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
     if (referenceConsumers.containsKey(componentModel.getIdentifier())) {
-      referenceConsumers.get(componentModel.getIdentifier()).accept(componentModel);
+      referenceConsumers.get(componentModel.getIdentifier()).accept(createBeanDefinitionRequest);
       return true;
     }
     return false;

@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
@@ -43,6 +44,8 @@ import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
@@ -70,6 +73,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
@@ -83,8 +87,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
- * Classpath of file system using the MuleBeanDefinitionReader.
+ * <code>MuleArtifactContext</code> is a simple extension application context
+ * that allows resources to be loaded from the Classpath of file system using the
+ * MuleBeanDefinitionReader.
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
@@ -111,13 +116,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private ArtifactType artifactType;
 
   /**
-   * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
-   * registry implementation to wraps the spring ApplicationContext
+   * Parses configuration files creating a spring ApplicationContext which is used
+   * as a parent registry using the SpringRegistry registry implementation to wraps
+   * the spring ApplicationContext
    *
-   * @param muleContext the {@link MuleContext} that own this context
-   * @param artifactConfiguration the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.spring.SpringRegistry
+   * @param muleContext               the {@link MuleContext} that own this context
+   * @param artifactConfiguration     the mule configuration defined programmatically
+   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}  @see org.mule.runtime.config.spring.SpringRegistry
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -193,10 +198,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private Document getXmlDocument(Resource artifactResource) {
     try {
-      Document document =
-          new MuleDocumentLoader().loadDocument(new InputSource(artifactResource.getInputStream()),
-                                                new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader()),
-                                                new DefaultHandler(), VALIDATION_XSD, true);
+      Document document = new MuleDocumentLoader()
+          .loadDocument(new InputSource(artifactResource.getInputStream()),
+                        new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader()), new DefaultHandler(),
+                        VALIDATION_XSD, true);
       return document;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
@@ -209,8 +214,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     registerEditors(beanFactory);
 
-    addBeanPostProcessors(beanFactory, new MuleContextPostProcessor(muleContext), new GlobalNamePostProcessor(),
-                          new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
+    addBeanPostProcessors(beanFactory,
+                          new MuleContextPostProcessor(muleContext),
+                          new GlobalNamePostProcessor(),
+                          new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()));
@@ -228,6 +235,12 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     for (BeanPostProcessor processor : processors) {
       beanFactory.addBeanPostProcessor(processor);
     }
+  }
+
+  @Override
+  public void close() {
+    super.close();
+    beanDefinitionFactory.destroy();
   }
 
   private static Resource[] convert(ConfigResource[] resources) {
@@ -262,7 +275,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
           if (componentModel.isRoot()) {
             beanDefinitionFactory.resolveComponentRecursively(applicationModel.getRootComponentModel(), componentModel,
-                                                              beanFactory, (resolvedComponentModel, registry) -> {
+                                                              beanFactory,
+                                                              (resolvedComponentModel, registry) -> {
                                                                 if (resolvedComponentModel.isRoot()) {
                                                                   String nameAttribute =
                                                                       resolvedComponentModel.getNameAttribute();
@@ -270,13 +284,15 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                                                                       .equals(CONFIGURATION_IDENTIFIER)) {
                                                                     nameAttribute = OBJECT_MULE_CONFIGURATION;
                                                                   } else if (nameAttribute == null) {
-                                                                    // This may be a configuration that does not requires a name.
+                                                                    //This may be a configuration that does not requires a name.
                                                                     nameAttribute = uniqueValue(resolvedComponentModel
                                                                         .getBeanDefinition().getBeanClassName());
                                                                   }
                                                                   registry.registerBeanDefinition(nameAttribute,
                                                                                                   resolvedComponentModel
                                                                                                       .getBeanDefinition());
+                                                                  postProcessBeanDefinition(componentModel, registry,
+                                                                                            nameAttribute);
                                                                 }
                                                               }, null);
           }
@@ -371,7 +387,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
-    // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
+    //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
     beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
@@ -381,8 +397,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   /**
-   * {@inheritDoc} This implementation returns {@code false} if the context hasn't been initialised yet, in opposition to the
-   * default implementation which throws an exception
+   * {@inheritDoc}
+   * This implementation returns {@code false} if the
+   * context hasn't been initialised yet, in opposition
+   * to the default implementation which throws
+   * an exception
    */
   @Override
   public boolean isRunning() {
@@ -390,6 +409,21 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       return super.isRunning();
     } catch (IllegalStateException e) {
       return false;
+    }
+  }
+
+  /**
+   * Forces the registration of instances of {@link TransformerResolver}
+   * and {@link Converter} to be created, so that
+   * {@link PostRegistrationActionsPostProcessor} can work
+   * its magic and add them to the transformation graph
+   */
+  protected static void postProcessBeanDefinition(ComponentModel resolvedComponent, BeanDefinitionRegistry registry,
+                                                  String beanName) {
+    if (Converter.class.isAssignableFrom(resolvedComponent.getType())) {
+      GenericBeanDefinition converterBeanDefinitionCopy = new GenericBeanDefinition(resolvedComponent.getBeanDefinition());
+      converterBeanDefinitionCopy.setScope(SPRING_SINGLETON_OBJECT);
+      registry.registerBeanDefinition(beanName + "-" + "converter", converterBeanDefinitionCopy);
     }
   }
 
@@ -415,11 +449,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       final ExtensionManager extensionManager = muleContext.getExtensionManager();
       List<XmlNamespaceInfo> extensionNamespaces;
       if (extensionManager != null) {
-        extensionNamespaces = extensionManager.getExtensions().stream().map(ext -> {
-          XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
-          return xmlModelProperty != null
-              ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
-        }).filter(info -> info != null).collect(new ImmutableListCollector<>());
+        extensionNamespaces = extensionManager.getExtensions().stream()
+            .map(ext -> {
+              XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
+              return xmlModelProperty != null
+                  ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
+            })
+            .filter(info -> info != null)
+            .collect(new ImmutableListCollector<>());
       } else {
         extensionNamespaces = ImmutableList.of();
       }

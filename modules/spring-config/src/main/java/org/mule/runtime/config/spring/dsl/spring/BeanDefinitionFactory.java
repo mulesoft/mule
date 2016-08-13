@@ -8,9 +8,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
@@ -60,25 +62,32 @@ import org.w3c.dom.Element;
  */
 public class BeanDefinitionFactory {
 
-  private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers = ImmutableSet
-      .<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build())
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build()).build();
+  public static final String SPRING_PROTOTYPE_OBJECT = "prototype";
+  public static final String SPRING_SINGLETON_OBJECT = "singleton";
+
+  private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(MULE_IDENTIFIER)
+          .add(DESCRIPTION_IDENTIFIER)
+          .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
+          .add(DOC_DESCRIPTION_IDENTIFIER)
+          .build();
 
   /**
-   * These are the set of current language construct that have specific bean definitions parsers since we don't want to include
-   * them in the parsing API.
+   * These are the set of current language construct that have specific bean definitions parsers since we don't want to
+   * include them in the parsing API.
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build()).build();
+      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build())
+      .build();
 
 
   private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private BeanDefinitionCreator componentModelProcessor;
+  private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
   /**
-   * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
-   *        artifact.
+   * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the artifact.
    */
   public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
@@ -195,7 +204,7 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
-    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
+    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
     exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
     filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
@@ -273,5 +282,12 @@ public class BeanDefinitionFactory {
         .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
     return wrapperIdentifierAndTypeMap;
+  }
+
+  /**
+   * Release resources from the bean factory.
+   */
+  public void destroy() {
+    objectFactoryClassRepository.destroy();
   }
 }
