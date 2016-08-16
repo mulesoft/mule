@@ -12,24 +12,24 @@ import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
-import org.mule.tck.probe.JUnitProbe;
-import org.mule.tck.probe.PollingProber;
-import org.mule.test.infrastructure.process.MuleProcessController;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.test.infrastructure.process.MuleProcessController;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
