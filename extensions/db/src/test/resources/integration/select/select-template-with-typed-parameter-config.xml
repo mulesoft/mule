@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <dbn:query name="selectQuery">
+        <dbn:sql>select * from Planet where name = :name</dbn:sql>
+        <dbn:input-parameters>
+            <dbn:input-parameter paramName="name" value="#[payload]" type="VARCHAR"/>
+        </dbn:input-parameters>
+    </dbn:query>
+
+    <flow name="selectParameterizedQuery">
+        <dbn:select config-ref="dbConfig" template="selectQuery" />
+    </flow>
+
+</mule>

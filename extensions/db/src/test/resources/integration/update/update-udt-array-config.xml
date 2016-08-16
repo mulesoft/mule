@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="updatesStringArray">
+        <transactional>
+            <dbn:select>
+                <dbn:sql>select ZIPS from REGIONS where REGION_NAME='Northwest'</dbn:sql>
+            </dbn:select>
+
+            <!-- Sets the SQL array as payload-->
+            <set-payload value="#[payload.get(0)['ZIPS']]"/>
+
+            <dbn:update>
+                <dbn:sql>update REGIONS set ZIPS = #[payload] where REGION_NAME = 'Southwest'</dbn:sql>
+            </dbn:update>
+
+            <dbn:select>
+                <dbn:sql>select ZIPs from REGIONS where REGION_NAME = 'Southwest'</dbn:sql>
+            </dbn:select>
+
+            <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload.get(0)['ZIPS'].getArray()]"/>
+        </transactional>
+    </flow>
+
+    <flow name="updatesStructArray">
+        <transactional>
+            <dbn:select>
+                <dbn:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact2'</dbn:sql>
+            </dbn:select>
+
+            <!-- Sets the SQL array as payload-->
+            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+
+            <dbn:update>
+                <dbn:sql>update contacts set DETAILS = #[payload] where CONTACT_NAME = 'Contact1'</dbn:sql>
+            </dbn:update>
+
+            <dbn:select>
+                <dbn:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact1'</dbn:sql>
+            </dbn:select>
+
+            <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload.get(0)['DETAILS'].getArray()]"/>
+        </transactional>
+    </flow>
+</mule>

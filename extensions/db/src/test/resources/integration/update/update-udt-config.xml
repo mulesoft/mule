@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="updatesObject">
+        <transactional>
+            <dbn:select>
+                <dbn:sql>select DETAILS from REGION_MANAGERS where REGION_NAME='Southwest'</dbn:sql>
+            </dbn:select>
+
+            <!-- Sets the UDT as payload-->
+            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+
+            <dbn:update>
+                <dbn:sql>update REGION_MANAGERS set DETAILS = #[payload] where REGION_NAME = 'Northwest'</dbn:sql>
+            </dbn:update>
+
+            <dbn:select>
+                <dbn:sql>select DETAILS from REGION_MANAGERS where REGION_NAME = 'Northwest'</dbn:sql>
+            </dbn:select>
+
+            <!--Obtains the UDT-->
+            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+        </transactional>
+    </flow>
+</mule>

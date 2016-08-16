@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="update">
+        <dbn:stored-procedure>
+            <dbn:sql>call updateParamTestType1(:type)</dbn:sql>
+            <dbn:input-parameters>
+                <dbn:input-parameter paramName="type" value="#[payload]"/>
+            </dbn:input-parameters>
+        </dbn:stored-procedure>
+    </flow>
+</mule>

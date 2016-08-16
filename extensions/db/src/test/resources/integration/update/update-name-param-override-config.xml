@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <dbn:query name="updateTemplate">
+        <dbn:sql>update PLANET set NAME='Mercury' where POSITION= :position</dbn:sql>
+        <dbn:input-parameters>
+            <dbn:input-parameter paramName="position" value="4"/>
+        </dbn:input-parameters>
+    </dbn:query>
+
+    <dbn:query name="overriddenUpdateParam" template="updateTemplate">
+        <dbn:input-parameters>
+            <dbn:input-parameter paramName="position" value="2"/>
+        </dbn:input-parameters>
+    </dbn:query>
+
+    <flow name="defaultParams">
+        <dbn:update template="updateTemplate" />
+    </flow>
+
+    <flow name="overriddenParams">
+        <dbn:update template="overriddenUpdateParam" />
+    </flow>
+
+    <flow name="inlineOverriddenParams">
+        <dbn:update template="overriddenUpdateParam">
+            <dbn:input-parameters>
+            <dbn:input-parameter paramName="position" value="3"/>
+            </dbn:input-parameters>
+        </dbn:update>
+    </flow>
+
+    <flow name="inlineQuery">
+        <dbn:update>
+            <dbn:sql>update PLANET set NAME='Mercury' where POSITION=#['4']</dbn:sql>
+        </dbn:update>
+    </flow>
+
+    <flow name="expressionParam">
+        <dbn:update>
+            <dbn:sql>update PLANET set NAME='Mercury' where POSITION=#[type]AND NAME = 'Earth'</dbn:sql>
+        </dbn:update>
+    </flow>
+</mule>

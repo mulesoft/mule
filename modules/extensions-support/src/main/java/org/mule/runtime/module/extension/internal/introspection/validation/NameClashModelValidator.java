@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
@@ -141,16 +142,27 @@ public final class NameClashModelValidator implements ModelValidator {
 
       Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
       if (CollectionUtils.isEmpty(foundParameters)) {
-        topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
+        Optional<XmlHintsModelProperty> hints = parameter.getModelProperty(XmlHintsModelProperty.class);
+        boolean allowsInlineDefinition = true;
+        if (hints.isPresent() && !hints.get().allowsInlineDefinition()) {
+          allowsInlineDefinition = false;
+        }
+
+        if (allowsInlineDefinition) {
+          topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
+        }
       } else {
         Optional<TopLevelParameter> repeated =
             foundParameters.stream().filter(topLevelParameter -> !topLevelParameter.type.equals(parameterType)).findFirst();
 
         if (repeated.isPresent()) {
           TopLevelParameter tp = repeated.get();
-          throw new IllegalModelDefinitionException(format("Extension '%s' defines a %s of name '%s' which contains a parameter of complex type '%s'. However, "
+          throw new IllegalModelDefinitionException(format("Extension '%s' defines a %s of name '%s' which contains parameter '%s' of complex type '%s'. However, "
               + "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
-                                                           extensionModel.getName(), ownerType, ownerName, parameterType,
+                                                           extensionModel.getName(),
+                                                           ownerType, ownerName,
+                                                           parameter.getName(),
+                                                           parameterType,
                                                            tp.ownerType, tp.owner, tp.type.getName()));
         }
       }
