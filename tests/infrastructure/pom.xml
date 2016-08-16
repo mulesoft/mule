@@ -57,6 +57,12 @@
         <dependency>
             <groupId>com.jayway.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+            <exclusions>
+               <exclusion>
+                   <groupId>cglib</groupId>
+                   <artifactId>cglib-nodep</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
 	</dependencies>
 </project>
