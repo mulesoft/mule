@@ -6,13 +6,12 @@
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
 
-    <vegan:apple-config name="apple"/>
+    <vegan:apple-config name="apple" parameterizedFunction="#[['Apple' : 'Tasty']]"/>
     <vegan:banana-config name="banana"/>
     <vegan:kiwi-config name="kiwi"/>
     <vegan:peach-config name="peach">
         <vegan:connection/>
     </vegan:peach-config>
-
 
     <flow name="appleOk">
         <vegan:eat-apple config-ref="apple"/>

@@ -22,6 +22,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="parameterizedFunction"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -193,7 +194,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
