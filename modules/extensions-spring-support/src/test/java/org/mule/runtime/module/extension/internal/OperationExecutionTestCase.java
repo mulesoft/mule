@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -35,7 +36,9 @@ import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -350,6 +353,19 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     assertThat(gramsInStorage[1][1], is(10));
     assertThat(gramsInStorage[2][0], is(2));
     assertThat(gramsInStorage[2][1], is(30));
+  }
+
+  @Test
+  public void abstractParameterWithSubtypesAndParameterGroup() throws Exception {
+    Investment investement = flowRunner("investment").run().getMessage().getPayload();
+    assertThat(investement, is(instanceOf(CarWash.class)));
+
+    CarWash carWash = (CarWash) investement;
+    assertThat(carWash.getCommercialName(), is("A1"));
+    assertThat(carWash.getInvestmentInfo(), is(notNullValue()));
+    assertThat(carWash.getInvestmentInfo().getValuation(), equalTo(100L));
+    assertThat(carWash.getCarsPerMinute(), is(5));
+    assertThat(carWash.isApproved(), is(true));
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {

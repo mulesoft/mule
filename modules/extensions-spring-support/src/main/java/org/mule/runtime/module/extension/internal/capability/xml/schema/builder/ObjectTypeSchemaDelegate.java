@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -148,8 +149,8 @@ final class ObjectTypeSchemaDelegate {
    * will not register the same type twice even if requested to
    *
    * @param metadataType a {@link MetadataType} describing a pojo type
-   * @param baseType a {@link MetadataType} describing a pojo's base type
-   * @param description the type's description
+   * @param baseType     a {@link MetadataType} describing a pojo's base type
+   * @param description  the type's description
    * @return the reference name of the complexType
    */
   private String registerPojoType(MetadataType metadataType, MetadataType baseType, String description) {
@@ -179,7 +180,10 @@ final class ObjectTypeSchemaDelegate {
     } else {
       DslElementSyntax baseDsl = builder.getDslResolver().resolve(baseType);
       base = new QName(baseDsl.getNamespaceUri(), getBaseTypeName(baseType), baseDsl.getNamespace());
-      fields = metadataType.getFields().stream().filter(f -> !baseType.getFields().contains(f)).collect(toList());
+      fields = metadataType.getFields().stream()
+          .filter(field -> !baseType.getFields().stream()
+              .anyMatch(other -> other.getKey().getName().getLocalPart().equals(field.getKey().getName().getLocalPart())))
+          .collect(toList());
     }
 
     ComplexType complexType = declarePojoAsType(metadataType, base, description, fields);
@@ -206,7 +210,11 @@ final class ObjectTypeSchemaDelegate {
     for (ObjectFieldType field : fields) {
       final ExplicitGroup all = getOrCreateSequenceGroup(extension);
 
-      field.getValue().accept(builder.getParameterDeclarationVisitor(extension, all, asParameter(field)));
+      if (isParameterGroupAtPojoLevel(field)) {
+        ((ObjectType) field.getValue()).getFields().forEach(subField -> declareObjectField(subField, extension, all));
+      } else {
+        declareObjectField(field, extension, all);
+      }
 
       if (all.getParticle().isEmpty()) {
         extension.setSequence(null);
@@ -214,6 +222,14 @@ final class ObjectTypeSchemaDelegate {
     }
 
     return complexType;
+  }
+
+  private boolean isParameterGroupAtPojoLevel(ObjectFieldType field) {
+    return field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
+  }
+
+  private void declareObjectField(ObjectFieldType field, ExtensionType extension, ExplicitGroup all) {
+    field.getValue().accept(builder.getParameterDeclarationVisitor(extension, all, asParameter(field)));
   }
 
   private void registerPojoGlobalElement(DslElementSyntax typeDsl, ObjectType metadataType, ObjectType baseType,

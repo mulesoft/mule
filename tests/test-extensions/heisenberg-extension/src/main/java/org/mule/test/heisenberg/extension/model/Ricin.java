@@ -6,12 +6,16 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
+import org.mule.runtime.extension.api.annotation.Parameter;
+
 public class Ricin implements Weapon {
 
   public static final String RICIN_KILL_MESSAGE = "You have been killed with Ricin";
 
+  @Parameter
   private Long microgramsPerKilo;
 
+  @Parameter
   private KnockeableDoor destination;
 
   public Long getMicrogramsPerKilo() {
