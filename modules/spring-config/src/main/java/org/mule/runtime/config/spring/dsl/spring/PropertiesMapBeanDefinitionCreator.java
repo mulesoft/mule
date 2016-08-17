@@ -73,8 +73,10 @@ public class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processAndAddMapProperty(ComponentModel componentModel, ManagedMap<Object, Object> managedMap) {
-    Object key = resolveValue(componentModel.getParameters().get(KEY_ELEMENT), componentModel.getParameters().get(KEY_REF_ATTRIBUTE));
-    Object value = resolveValue(componentModel.getParameters().get(VALUE_ATTRIBUTE), componentModel.getParameters().get(VALUE_REF_ATTRIBUTE));
+    Object key =
+        resolveValue(componentModel.getParameters().get(KEY_ELEMENT), componentModel.getParameters().get(KEY_REF_ATTRIBUTE));
+    Object value = resolveValue(componentModel.getParameters().get(VALUE_ATTRIBUTE),
+                                componentModel.getParameters().get(VALUE_REF_ATTRIBUTE));
     if (value == null) {
       value = resolveValueFromChild(componentModel.getInnerComponents().get(0));
     }
