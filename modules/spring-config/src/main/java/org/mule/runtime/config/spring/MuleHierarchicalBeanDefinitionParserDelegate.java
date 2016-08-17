@@ -15,6 +15,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOM
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -110,7 +111,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     validate(element);
 
-    if (SpringXMLUtils.isBeansNamespace(element)) {
+    if (SpringXMLUtils.isBeansNamespace(element) && !springElementHasCustomParser(element)) {
       return handleSpringElements(element, parent);
     } else {
       String namespaceUri = element.getNamespaceURI();
@@ -214,6 +215,18 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
       return finalChild;
     }
+  }
+
+  private boolean springElementHasCustomParser(Element element) {
+    if (element.getLocalName().equals(PROPERTIES_ELEMENT)) {
+      return true;
+    }
+    if (element.getLocalName().equals(ENTRY_ELEMENT)) {
+      if (element.getParentNode().getLocalName().equals(PROPERTIES_ELEMENT)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // TODO MULE-9638 Remove this ugly code since it's not going to be needed anymore.

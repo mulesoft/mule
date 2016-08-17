@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -93,18 +94,11 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testJavaComponentAnnotations() {
-    boolean echoAsserted = false;
-    for (DefaultJavaComponent echo : muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values()) {
-      if ("echo".equals(getDocName(echo))) {
-        assertThat(getSourceFile(echo), is("annotations.xml"));
-        assertThat(getSourceFileLine(echo), is(11));
-        assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" + "</echo-component>"));
-
-        echoAsserted = true;
-      }
-    }
-
-    assertThat(echoAsserted, is(true));
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("Bridge");
+    DefaultJavaComponent echo = (DefaultJavaComponent) flow.getMessageProcessors().get(0);
+    assertThat(getSourceFile(echo), is("annotations.xml"));
+    assertThat(getSourceFileLine(echo), is(11));
+    assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" + "</echo-component>"));
   }
 
   @Test

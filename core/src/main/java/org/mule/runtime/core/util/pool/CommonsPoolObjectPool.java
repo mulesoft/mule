@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.util.pool;
 
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.util.ArrayList;

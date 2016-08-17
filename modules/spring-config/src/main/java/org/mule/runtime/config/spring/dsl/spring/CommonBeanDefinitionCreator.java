@@ -17,6 +17,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_E
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
@@ -40,10 +42,10 @@ import org.mule.runtime.core.util.ClassUtils;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -72,6 +74,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
       .add(MULE_IDENTIFIER)
       .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
+      .build();
+
+  private Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
+      .add(SINGLETON_OBJECT_IDENTIFIER)
+      .add(PROTOTYPE_OBJECT_IDENTIFIER)
+      .add(CUSTOM_TRANSFORMER_IDENTIFIER)
       .build();
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
@@ -227,7 +235,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   //TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
   private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
     //for now we skip custom-transformer since requires injection by the object factory.
-    if (componentModel.getIdentifier().equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
+    if (genericPropertiesCustomProcessingIdentifiers.contains(componentModel.getIdentifier())) {
       return;
     }
     componentModel.getInnerComponents()

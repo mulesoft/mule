@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
@@ -14,7 +15,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.runtime.core.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.runtime.core.util.pool.LifecyleEnabledObjectPool;
 import org.mule.runtime.core.util.pool.ObjectPool;

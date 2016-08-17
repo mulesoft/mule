@@ -5,9 +5,7 @@
 
     <flow name="service">
         <component>
-            <spring-object bean="orange">
-                <property key="brand" value="Tutti Frutti"/>
-            </spring-object>
+            <spring-object bean="orange"/>
         </component>
     </flow>
 

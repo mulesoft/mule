@@ -130,7 +130,6 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(HashMap.class).build())
         .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build());
   }
 

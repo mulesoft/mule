@@ -11,19 +11,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Test;
+
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -38,9 +39,7 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
-import org.junit.After;
-import org.junit.Test;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.BeanCreationException;
 
 public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase {
 
@@ -221,13 +220,12 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase 
     try {
       ConfigurationBuilder configBuilder =
           new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-bad-test-flow.xml");
-      muleContextFactory.createMuleContext(configBuilder);
+      muleContextFactory.createMuleContext(configBuilder).initialise();
       throw new IllegalStateException("Expected config to fail");
     } catch (Exception e) {
       // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
       assertEquals(InitialisationException.class, e.getClass());
-      assertEquals(BeanDefinitionStoreException.class, e.getCause().getClass());
-      assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, e.getCause().getCause().getClass());
+      assertEquals(BeanCreationException.class, e.getCause().getClass());
     }
   }
 
