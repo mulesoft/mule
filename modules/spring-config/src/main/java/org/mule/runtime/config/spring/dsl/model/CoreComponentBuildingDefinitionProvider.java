@@ -1022,7 +1022,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseDefinition.copy()
         .withIdentifier(SINGLETON_OBJECT_ELEMENT)
         .withTypeDefinition(fromType(SingletonObjectFactory.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
+        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE, stringToClassConverter()).build())
         .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
         .build());
 
