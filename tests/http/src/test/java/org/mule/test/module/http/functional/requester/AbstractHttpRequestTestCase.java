@@ -62,7 +62,9 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   @After
   public void stopServer() throws Exception {
-    server.stop();
+    if (server != null) {
+      server.stop();
+    }
   }
 
   protected Server createServer() {
@@ -77,7 +79,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
     return false;
   }
 
-  private void enableHttpsServer(Server server) {
+  protected void enableHttpsServer(Server server) {
     SslContextFactory sslContextFactory = new SslContextFactory();
 
     try {
