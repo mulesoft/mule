@@ -57,6 +57,7 @@ public class SMTPTestCase extends EmailConnectorTestCase {
   private static final String WEIRD_CHAR_MESSAGE = "This is a messag\u00ea with weird chars \u00f1.";
 
   private static final String SEND_EMAIL = "sendEmail";
+  private static final String SEND_EMAIL_CUSTOM_HEADERS = "sendEmailHeaders";
   private static final String SEND_EMAIL_WITH_ATTACHMENT = "sendEmailWithAttachment";
   private static final String FORWARD_EMAIL = "forwardEmail";
   private static final String FORWARD_EMAIL_WITH_CONTENT = "forwardEmailWithContent";
@@ -88,6 +89,20 @@ public class SMTPTestCase extends EmailConnectorTestCase {
     Message sentMessage = messages[0];
     assertSubject(sentMessage.getSubject());
     assertBodyContent(process(sentMessage).getBody());
+  }
+
+  @Test
+  public void sendEmailCustomHeaders() throws Exception {
+    runFlow(SEND_EMAIL_CUSTOM_HEADERS);
+    Message[] messages = getReceivedMessagesAndAssertCount(1);
+    Message sentMessage = messages[0];
+    assertSubject(sentMessage.getSubject());
+    assertBodyContent(process(sentMessage).getBody());
+
+    assertThat(sentMessage.getHeader("CustomConfigHeader"), arrayWithSize(1));
+    assertThat(sentMessage.getHeader("CustomConfigHeader")[0], is("Dummy"));
+    assertThat(sentMessage.getHeader("CustomOperationHeader"), arrayWithSize(1));
+    assertThat(sentMessage.getHeader("CustomOperationHeader")[0], is("Dummy"));
   }
 
   @Test

@@ -15,6 +15,17 @@
         </email:smtps-connection>
     </email:smtp>
 
+    <email:smtp name="config-custom-headers">
+        <email:smtps-connection host="127.0.0.1" port="${port}">
+            <tls:context enabledProtocols="TLSv1.2">
+                <tls:trust-store path="greenmail.jks" password="changeit"/>
+            </tls:context>
+        </email:smtps-connection>
+        <email:headers>
+            <email:header key="CustomConfigHeader" value="Dummy"/>
+        </email:headers>
+    </email:smtp>
+
     <spring:beans>
         <spring:import resource="smtp-flows.xml"/>
     </spring:beans>

@@ -14,6 +14,17 @@
         </email:send>
     </flow>
 
+    <flow name="sendEmailHeaders">
+        <email:send config-ref="config-custom-headers" subject="Email Subject" content="emailContent">
+            <email:to-addresses>
+                <email:to-address value="juan.desimoni@mulesoft.com"/>
+            </email:to-addresses>
+            <email:headers>
+                <email:header key="CustomOperationHeader" value="Dummy"/>
+            </email:headers>
+        </email:send>
+    </flow>
+
     <!--TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner -->
     <spring:bean id="jsonAttachmentResource" class="org.springframework.core.io.UrlResource">
         <spring:constructor-arg value="classpath:attachment.json" type="java.net.URL" />

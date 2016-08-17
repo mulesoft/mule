@@ -6,10 +6,10 @@
  */
 package org.mule.extension.email.internal.commands;
 
+import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
-
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
@@ -17,8 +17,8 @@ import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -62,15 +62,23 @@ public final class ReplyCommand {
       subject = "Re: " + attributes.getSubject();
     }
 
-    if (headers == null) {
-      headers = new HashMap<>();
-    }
+    ImmutableMap.Builder<String, String> replyHeaders = ImmutableMap.builder();
+    replyHeaders.putAll(headers)
+        .putAll(attributes.getHeaders())
+        .put(IN_REPLY_TO_HEADER, Integer.toString(attributes.getId()));
 
-    headers.put(IN_REPLY_TO_HEADER, Integer.toString(attributes.getId()));
-    headers.putAll(attributes.getHeaders());
-    List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : new ArrayList<>();
+    List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : emptyList();
     List<EmailAttachment> emailAttachments = mapToEmailAttachments(muleMessage.getPayload());
-    sendCommand.send(connection, content, subject, replyTo, from, defaultCharset, ccAddresses, new ArrayList<>(), headers,
+
+    sendCommand.send(connection,
+                     content,
+                     subject,
+                     replyTo,
+                     from,
+                     defaultCharset,
+                     ccAddresses,
+                     emptyList(),
+                     replyHeaders.build(),
                      emailAttachments);
   }
 }
