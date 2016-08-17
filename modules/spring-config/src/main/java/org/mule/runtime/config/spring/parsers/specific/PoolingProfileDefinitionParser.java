@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.runtime.core.config.PoolingProfile;
+
+import org.mule.runtime.api.config.PoolingProfile;
 
 /**
  * This parser is responsible for processing the <code><pooling-profile><code> configuration elements.

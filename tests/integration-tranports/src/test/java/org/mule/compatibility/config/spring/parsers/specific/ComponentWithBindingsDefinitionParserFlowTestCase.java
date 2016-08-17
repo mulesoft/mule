@@ -13,22 +13,23 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Test;
+
 import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.compatibility.core.component.DefaultInterfaceBinding;
 import org.mule.compatibility.core.component.DefaultJavaWithBindingComponent;
 import org.mule.compatibility.core.component.PooledJavaWithBindingsComponent;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
-import org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -42,9 +43,8 @@ import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
+import org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding;
 
-import org.junit.After;
-import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 
 public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractMuleTestCase {
