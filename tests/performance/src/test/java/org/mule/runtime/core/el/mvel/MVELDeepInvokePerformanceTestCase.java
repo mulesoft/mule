@@ -9,6 +9,12 @@ package org.mule.runtime.core.el.mvel;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.util.Random;
 
 import org.databene.contiperf.PerfTest;
@@ -18,11 +24,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCase {
 
@@ -34,8 +35,12 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
     return 180;
   }
 
-  final protected String mel = "payload.setFirstName('Tom');" + "payload.setLastName('Fennelly');"
-      + "payload.contact.setAddress('Male');" + "payload.contact.setTelnum('4');" + "payload.setSin('Ireland');" + "payload;";
+  final protected String mel = "payload.setFirstName('Tom');"
+      + "payload.setLastName('Fennelly');"
+      + "payload.contact.setAddress('Male');"
+      + "payload.contact.setTelnum('4');"
+      + "payload.setSin('Ireland');"
+      + "payload;";
 
   final protected Payload payload = new Payload();
 
@@ -56,7 +61,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
    */
   @Test
   @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(median = 4000)
+  @Required(average = 630, percentile90 = 700)
   public void mvelColdStart() {
     for (int i = 0; i < 1000; i++) {
       muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent());
@@ -68,7 +73,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
    */
   @Test
   @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(median = 25)
+  @Required(throughput = 750, average = 2, percentile90 = 3)
   public void mvelWarmStart() {
     for (int i = 0; i < 1000; i++) {
       muleContext.getExpressionLanguage().evaluate(mel, event);
@@ -80,7 +85,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
    */
   @Test
   @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(median = 25)
+  @Required(throughput = 750, average = 2, percentile90 = 3)
   public void mvelHotStart() {
     for (int i = 0; i < 1000; i++) {
       muleContext.getExpressionLanguage().evaluate(mel, event);

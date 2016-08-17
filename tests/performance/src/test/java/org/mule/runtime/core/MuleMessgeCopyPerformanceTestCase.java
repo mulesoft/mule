@@ -6,35 +6,43 @@
  */
 package org.mule.runtime.core;
 
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 
 import org.databene.contiperf.PerfTest;
+import org.databene.contiperf.Required;
 import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase {
 
+  private static final int repetitions = 1000;
+  private MuleMessage[] messages;
+  private MuleMessage muleMessageWith0Properties;
+  private MuleMessage muleMessageWith20Properties;
+  private MuleMessage muleMessageWith100Properties;
+
+
+
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
 
-  @Mock
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
   private String payload;
-
-  private MuleMessage message;
 
   @Override
   public int getTestTimeoutSecs() {
@@ -44,76 +52,89 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws IOException {
     payload = IOUtils.getResourceAsString("test-data.json", getClass());
+    messages = new MuleMessage[repetitions];
+    muleMessageWith0Properties = createMuleMessage();
+    muleMessageWith20Properties = createMuleMessageWithProperties(20);
+    muleMessageWith100Properties = createMuleMessageWithProperties(100);
   }
 
   @Test
+  @Required(throughput = 14, average = 27, percentile90 = 30)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copy() {
-    MuleMessage original = createMuleMessage();
-    for (int i = 0; i < 1000; i++) {
-      message = MuleMessage.builder(original).build();
+    MuleMessage original = muleMessageWith0Properties;
+    for (int i = 0; i < repetitions; i++) {
+      messages[i] = MuleMessage.builder(original).build();
     }
   }
 
   @Test
+  @Required(throughput = 14, average = 27, percentile90 = 30)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith20Poperties() {
-    MuleMessage original = createMuleMessageWithProperties(10);
-    for (int i = 0; i < 1000; i++) {
-      message = MuleMessage.builder(original).build();
+  public void copyWith20Properties() {
+    MuleMessage original = muleMessageWith20Properties;
+    for (int i = 0; i < repetitions; i++) {
+      messages[i] = MuleMessage.builder(original).build();
     }
   }
 
   @Test
+  @Required(throughput = 14, average = 27, percentile90 = 30)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith100Poperties() {
-    MuleMessage original = createMuleMessageWithProperties(50);
-    for (int i = 0; i < 1000; i++) {
-      message = MuleMessage.builder(original).build();
+  public void copyWith100Properties() {
+    MuleMessage original = muleMessageWith100Properties;
+    for (int i = 0; i < repetitions; i++) {
+      messages[i] = MuleMessage.builder(original).build();
     }
   }
 
   @Test
+  @Required(throughput = 18, average = 50, percentile90 = 75)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith20PopertiesWrite1Outbound() {
-    MuleMessage original = createMuleMessageWithProperties(10);
-    for (int i = 0; i < 1000; i++) {
-      message = MuleMessage.builder(original).addOutboundProperty("newKey", "val").build();
+  public void copyWith20PropertiesWrite1Outbound() {
+    MuleMessage original = muleMessageWith20Properties;
+    for (int i = 0; i < repetitions; i++) {
+      MuleMessage.Builder builder = MuleMessage.builder(original);
+      messages[i] = builder.addInboundProperty("newKey" + i, "val").build();
     }
   }
 
   @Test
+  @Required(throughput = 14, average = 65, percentile90 = 70)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith20PopertiesWrite10Outbound() {
-    MuleMessage original = createMuleMessageWithProperties(10);
-    for (int i = 0; i < 1000; i++) {
-      final Builder builder = MuleMessage.builder(original);
-      for (int j = 1; j <= 10; j++) {
-        builder.addOutboundProperty("newKey" + i, "val");
+  public void copyWith20PopertiesWrite100Outbound() {
+    MuleMessage original = muleMessageWith20Properties;
+    for (int i = 0; i < repetitions; i++) {
+      MuleMessage.Builder builder = MuleMessage.builder(original);
+      for (int j = 1; j <= 100; j++) {
+        builder.addInboundProperty("newKey" + i, "val");
       }
-      message = builder.build();
+      messages[i] = builder.build();
     }
   }
 
   @Test
+  @Required(throughput = 15, average = 65, percentile90 = 70)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith100PopertiesWrite1Outbound() {
-    MuleMessage original = createMuleMessageWithProperties(50);
-    for (int i = 0; i < 1000; i++) {
-      message = MuleMessage.builder(original).addOutboundProperty("newKey", "val").build();
+  public void copyWith100PropertiesWrite1Outbound() {
+    MuleMessage original = muleMessageWith100Properties;
+    for (int i = 0; i < repetitions; i++) {
+      MuleMessage.Builder builder = MuleMessage.builder(original);
+      messages[i] = builder.addInboundProperty("newKey" + i, "val").build();
     }
   }
 
   @Test
+  @Required(throughput = 15, average = 65, percentile90 = 70)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
-  public void copyWith100PopertiesWrite50Outbound() {
-    MuleMessage original = createMuleMessageWithProperties(50);
-    for (int i = 0; i < 1000; i++) {
-      final Builder builder = MuleMessage.builder(original);
+  public void copyWith100PropertiesWrite50Outbound() {
+    MuleMessage original = muleMessageWith100Properties;
+    for (int i = 0; i < repetitions; i++) {
+      MuleMessage.Builder builder = MuleMessage.builder(original);
       for (int j = 1; j <= 50; j++) {
-        builder.addOutboundProperty("newKey" + i, "val");
+        builder.addInboundProperty("newKey" + i, "val");
       }
-      message = builder.build();
+      messages[i] = builder.build();
     }
   }
 
@@ -122,9 +143,9 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase {
   }
 
   protected MuleMessage createMuleMessageWithProperties(int numProperties) {
-    final Builder builder = MuleMessage.builder().payload(payload);
+    MuleMessage.Builder builder = MuleMessage.builder().payload(payload);
     for (int i = 1; i <= numProperties; i++) {
-      builder.addOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
+      builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
     }
     for (int i = 1; i <= numProperties; i++) {
       builder.addOutboundProperty("OuTBoUnDpRoPeRtYkEy" + i, "val");
