@@ -8,11 +8,16 @@ package org.mule.test.vegan.extension;
 
 
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+
+import java.util.Map;
+import java.util.function.Function;
 
 @Configuration(name = APPLE)
 @Operations({EatAppleOperation.class, SpreadVeganismOperation.class})
@@ -22,6 +27,10 @@ public class AppleConfig {
 
   @Parameter
   private VeganCookBook cookBook;
+
+  @Parameter
+  @Optional
+  private Function<MuleEvent, Map<String, String>> parameterizedFunction;
 
   public VeganCookBook getCookBook() {
     return cookBook;
