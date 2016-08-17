@@ -6,15 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +15,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -100,30 +98,26 @@ public class ObjectFactoryClassRepository {
     Class factoryBeanClass = enhancer.createClass();
     createdClasses.add(factoryBeanClass);
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
-        new MethodInterceptor() {
-
-          @Override
-          public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            if (method.getName().equals("isSingleton")) {
-              return !componentBuildingDefinition.isPrototype();
-            }
-            if (method.getName().equals("getObjectType")) {
-              return createdObjectType;
-            }
-            if (method.getName().equals("getObject")) {
-              Object createdInstance = proxy.invokeSuper(obj, args);
-              instancePostCreationFunction.accept(createdInstance);
-
-              return createdInstance;
-            }
-            if (method.getName().equals("isPrototype")) {
-              return componentBuildingDefinition.isPrototype();
-            }
-            if (method.getName().equals("isEagerInit")) {
-              return !isLazyInitFunction.get();
-            }
-            return proxy.invokeSuper(obj, args);
+        (MethodInterceptor) (obj, method, args, proxy) -> {
+          if (method.getName().equals("isSingleton")) {
+            return !componentBuildingDefinition.isPrototype();
           }
+          if (method.getName().equals("getObjectType")) {
+            return createdObjectType;
+          }
+          if (method.getName().equals("getObject")) {
+            Object createdInstance = proxy.invokeSuper(obj, args);
+            instancePostCreationFunction.accept(createdInstance);
+
+            return createdInstance;
+          }
+          if (method.getName().equals("isPrototype")) {
+            return componentBuildingDefinition.isPrototype();
+          }
+          if (method.getName().equals("isEagerInit")) {
+            return !isLazyInitFunction.get();
+          }
+          return proxy.invokeSuper(obj, args);
         }
     });
     return factoryBeanClass;
