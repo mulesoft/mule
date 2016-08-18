@@ -8,9 +8,9 @@ package org.mule.extension.http.internal.listener.server;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.service.http.api.domain.request.HttpRequestContext;
+import org.mule.service.http.api.server.RequestHandler;
 
 public interface ModuleRequestHandler extends RequestHandler {
 

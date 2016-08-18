@@ -21,7 +21,8 @@ import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

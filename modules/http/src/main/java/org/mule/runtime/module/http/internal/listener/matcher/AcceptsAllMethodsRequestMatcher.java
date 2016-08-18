@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.listener.matcher;
 
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.server.MethodRequestMatcher;
 
 /**
  * Accepts all the http methods
  */
-public class AcceptsAllMethodsRequestMatcher extends MethodRequestMatcher {
+public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher {
 
   private static AcceptsAllMethodsRequestMatcher instance = new AcceptsAllMethodsRequestMatcher();
 

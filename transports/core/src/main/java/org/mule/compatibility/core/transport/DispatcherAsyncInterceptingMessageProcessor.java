@@ -13,10 +13,6 @@ import static org.mule.runtime.core.context.notification.AsyncMessageNotificatio
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.just;
-import static reactor.core.scheduler.Schedulers.fromExecutor;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -30,17 +26,10 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AsyncWorkListener;
-import org.mule.runtime.core.processor.BaseAsyncInterceptingMessageProcessor;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.work.AbstractMuleEventWork;
 
-import java.util.concurrent.Executor;
-
 import javax.resource.spi.work.Work;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
 /**
  * Legacy {@link AbstractInterceptingMessageProcessor} implementation that schedules asynchronous tasks in a {@link WorkManager}.

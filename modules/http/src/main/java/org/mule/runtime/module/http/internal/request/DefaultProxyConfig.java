@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.

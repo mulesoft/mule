@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.api.requester.proxy;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

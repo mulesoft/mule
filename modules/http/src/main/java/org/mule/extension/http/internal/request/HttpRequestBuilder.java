@@ -6,11 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.module.http.internal.CaseInsensitiveParameterMap;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.HttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.entity.HttpEntity;
+import org.mule.service.http.api.domain.request.HttpRequest;
 
 import java.util.Map;
 

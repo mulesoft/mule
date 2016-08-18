@@ -9,7 +9,8 @@ package org.mule.runtime.module.http.internal.multipart;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;

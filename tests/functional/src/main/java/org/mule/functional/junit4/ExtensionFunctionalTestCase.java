@@ -80,7 +80,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
    */
   @Override
-  protected final void addBuilders(List<ConfigurationBuilder> builders) {
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
     builders.add(0, new AbstractConfigurationBuilder() {
 

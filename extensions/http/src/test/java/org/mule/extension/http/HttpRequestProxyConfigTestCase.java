@@ -14,13 +14,13 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
-import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.service.http.api.client.proxy.NtlmProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.runner.RunnerDelegateTo;
 

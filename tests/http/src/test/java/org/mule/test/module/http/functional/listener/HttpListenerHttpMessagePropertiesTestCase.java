@@ -14,12 +14,12 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_1;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_1;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
-import org.mule.runtime.module.http.internal.domain.HttpProtocol;
+import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.google.common.base.Charsets;

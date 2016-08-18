@@ -6,10 +6,11 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import static org.mule.runtime.module.http.internal.request.HttpAuthenticationType.BASIC;
+import static org.mule.service.http.api.client.HttpAuthenticationType.BASIC;
+
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
 
 /**
  * Configures basic authentication for the requests.

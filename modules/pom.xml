@@ -28,6 +28,7 @@
         <module>file-extension-common</module>
         <module>launcher</module>
         <module>http</module>
+        <module>http-impl</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>json</module>

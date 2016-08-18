@@ -162,6 +162,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-tooling-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
+/mule-standalone-${productVersion}/lib/mule/mule-service-http-${productVersion}.jar
 
 #
 # /plugins
@@ -183,6 +184,7 @@
 #
 /mule-standalone-${productVersion}/services
 /mule-standalone-${productVersion}/services/mule-service-scheduler-${productVersion}.zip
+/mule-standalone-${productVersion}/services/mule-http-service-impl-${productVersion}.zip
 
 #
 # /lib/opt

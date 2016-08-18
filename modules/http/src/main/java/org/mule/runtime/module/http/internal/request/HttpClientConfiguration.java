@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 
 public class HttpClientConfiguration {

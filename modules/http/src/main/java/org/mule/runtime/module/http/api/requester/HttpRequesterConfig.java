@@ -11,7 +11,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**

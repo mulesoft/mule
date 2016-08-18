@@ -7,8 +7,8 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.model.ParameterMap;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.response.HttpResponse;
 
 /**
  * Creates {@link HttpResponseAttributes} based on an {@HttpResponse} and it's parts.

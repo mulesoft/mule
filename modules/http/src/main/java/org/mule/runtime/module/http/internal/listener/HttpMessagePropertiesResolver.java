@@ -11,7 +11,7 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
 import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
 import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
 
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.module.http.api.HttpConstants;
 
 import java.io.Serializable;

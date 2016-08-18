@@ -79,6 +79,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-http-service-impl</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Mule Plugins -->
         <dependency>
             <groupId>org.mule.modules</groupId>

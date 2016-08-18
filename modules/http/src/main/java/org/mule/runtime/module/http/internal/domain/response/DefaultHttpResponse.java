@@ -7,7 +7,8 @@
 package org.mule.runtime.module.http.internal.domain.response;
 
 import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
-import org.mule.runtime.module.http.internal.domain.HttpEntity;
+import org.mule.service.http.api.domain.entity.HttpEntity;
+import org.mule.service.http.api.domain.response.HttpResponse;
 
 import java.util.Collection;
 

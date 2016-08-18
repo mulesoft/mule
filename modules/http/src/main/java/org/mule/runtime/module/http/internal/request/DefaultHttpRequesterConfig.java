@@ -30,7 +30,7 @@ import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 

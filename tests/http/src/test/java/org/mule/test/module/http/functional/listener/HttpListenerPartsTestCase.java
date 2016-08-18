@@ -47,7 +47,7 @@ import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -59,7 +59,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Part;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -171,7 +170,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
         final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
         assertThat(parts.size(), is(1));
-        Map<String, Part> partsAsMap = convertPartsToMap(parts);
+        Map<String, org.mule.service.http.api.domain.entity.multipart.Part> partsAsMap = convertPartsToMap(parts);
         assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
         assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
         return response.getFirstHeader(requiredHeader).getValue();
@@ -200,7 +199,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
         final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
         assertThat(parts.size(), is(2));
-        Map<String, Part> partsAsMap = convertPartsToMap(parts);
+        Map<String, org.mule.service.http.api.domain.entity.multipart.Part> partsAsMap = convertPartsToMap(parts);
         assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
         assertThat(partsAsMap.get(FILE_BODY_FIELD_NAME), notNullValue());
         assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
@@ -246,9 +245,9 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
     return format("http://localhost:%s/%s", listenPort.getNumber(), pathToCall);
   }
 
-  private Map<String, Part> convertPartsToMap(Collection<HttpPart> parts) {
-    final Map<String, Part> partsAsMap = new HashMap<>();
-    for (Part part : parts) {
+  private Map<String, org.mule.service.http.api.domain.entity.multipart.Part> convertPartsToMap(Collection<HttpPart> parts) {
+    final Map<String, org.mule.service.http.api.domain.entity.multipart.Part> partsAsMap = new HashMap<>();
+    for (org.mule.service.http.api.domain.entity.multipart.Part part : parts) {
       partsAsMap.put(part.getName(), part);
     }
     return partsAsMap;

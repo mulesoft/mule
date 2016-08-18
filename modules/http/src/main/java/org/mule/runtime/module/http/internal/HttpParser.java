@@ -10,9 +10,9 @@ import static com.google.common.base.Charsets.UTF_8;
 import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 
 import com.google.common.collect.Lists;
 

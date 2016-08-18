@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.api.requester.authentication;
 
-import static org.mule.runtime.module.http.internal.request.HttpAuthenticationType.BASIC;
+import static org.mule.service.http.api.client.HttpAuthenticationType.BASIC;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;

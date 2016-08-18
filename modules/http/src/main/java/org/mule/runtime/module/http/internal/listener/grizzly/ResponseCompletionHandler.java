@@ -7,15 +7,16 @@
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.runtime.module.http.internal.domain.HttpEntity;
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
+import org.mule.service.http.api.domain.entity.HttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import java.io.IOException;
 

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.domain;
 
+import org.mule.service.http.api.domain.HttpMessage;
+
 import java.util.Collection;
 
 /**

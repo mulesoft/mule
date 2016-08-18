@@ -14,14 +14,14 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
 import static org.mule.runtime.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
 
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.ClientConnection;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.DefaultClientConnection;
+import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequestContext;
+import org.mule.service.http.api.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.listener.RequestHandlerProvider;
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -71,7 +71,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter {
     }
 
     final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, httpContent);
-    HttpRequestContext requestContext = createRequestContext(ctx, scheme, httpRequest);
+    DefaultHttpRequestContext requestContext = createRequestContext(ctx, scheme, httpRequest);
     final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(ip, port, httpRequest);
     requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback() {
 
@@ -91,15 +91,16 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter {
     return ctx.getSuspendAction();
   }
 
-  private HttpRequestContext createRequestContext(FilterChainContext ctx, String scheme, GrizzlyHttpRequestAdapter httpRequest) {
-    ClientConnection clientConnection;
+  private DefaultHttpRequestContext createRequestContext(FilterChainContext ctx, String scheme,
+                                                         GrizzlyHttpRequestAdapter httpRequest) {
+    DefaultClientConnection clientConnection;
     SSLSession sslSession = (SSLSession) ctx.getAttributes().getAttribute(SSL_SESSION_ATTRIBUTE_KEY);
     if (sslSession != null) {
-      clientConnection = new ClientConnection(sslSession, (InetSocketAddress) ctx.getConnection().getPeerAddress());
+      clientConnection = new DefaultClientConnection(sslSession, (InetSocketAddress) ctx.getConnection().getPeerAddress());
     } else {
-      clientConnection = new ClientConnection((InetSocketAddress) ctx.getConnection().getPeerAddress());
+      clientConnection = new DefaultClientConnection((InetSocketAddress) ctx.getConnection().getPeerAddress());
     }
-    return new HttpRequestContext(httpRequest, clientConnection, scheme);
+    return new DefaultHttpRequestContext(httpRequest, clientConnection, scheme);
   }
 
 }

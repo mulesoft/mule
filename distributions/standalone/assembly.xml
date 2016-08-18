@@ -130,6 +130,8 @@
                 <include>org.mule.extensions:mule-extensions-api-dsql</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
+                <!--Services-->
+                <include>org.mule.services:mule-service-http</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -180,6 +182,7 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.services:mule-service-scheduler</include>
+                <include>org.mule.modules:mule-http-service-impl</include>
             </includes>
         </dependencySet>
         
@@ -204,6 +207,8 @@
                 <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-xml-dsl</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
+                <!--Services-->
+                <exclude>org.mule.services:mule-service-http</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>

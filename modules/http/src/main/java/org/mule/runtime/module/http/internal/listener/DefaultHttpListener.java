@@ -13,19 +13,18 @@ import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
-import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_0;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -38,15 +37,17 @@ import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.request.HttpRequestContext;
+import org.mule.service.http.api.server.MethodRequestMatcher;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -216,7 +217,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   public synchronized void initialise() throws InitialisationException {
     if (allowedMethods != null) {
       parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new MethodRequestMatcher(parsedAllowedMethods);
+      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
     }
     if (responseBuilder == null) {
       responseBuilder = HttpResponseBuilder.emptyInstance(muleContext);

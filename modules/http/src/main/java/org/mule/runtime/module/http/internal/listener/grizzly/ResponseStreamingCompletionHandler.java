@@ -9,9 +9,9 @@ package org.mule.runtime.module.http.internal.listener.grizzly;
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import com.google.common.base.Preconditions;
 

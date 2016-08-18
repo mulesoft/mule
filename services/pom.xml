@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>http</module>
         <module>scheduler</module>
         <module>services-all</module>
     </modules>

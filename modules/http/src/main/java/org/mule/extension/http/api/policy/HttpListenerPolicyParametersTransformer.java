@@ -14,8 +14,8 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;
 
