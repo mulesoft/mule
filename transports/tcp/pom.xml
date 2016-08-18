@@ -15,6 +15,22 @@
         <skipExportTests>false</skipExportTests>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -47,4 +63,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>
