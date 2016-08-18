@@ -142,6 +142,7 @@ public final class SchemaBuilder {
   private DslSyntaxResolver dslResolver;
   private SubTypesMappingContainer subTypesMapping;
   private Map<MetadataType, String> importedTypes;
+  private DslResolvingContext dslExtensionContext;
 
   public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
                                         DslResolvingContext dslContext) {
@@ -170,6 +171,7 @@ public final class SchemaBuilder {
   }
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
+    this.dslExtensionContext = dslContext;
     this.dslResolver = new DslSyntaxResolver(model, dslContext);
     return this;
   }
@@ -182,7 +184,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder withImportedTypes(Map<MetadataType, String> importedTypes) {
     this.importedTypes = importedTypes;
-    importedTypes.values().forEach(origin -> dslResolver.getContext().getExtension(origin)
+    importedTypes.values().forEach(origin -> dslExtensionContext.getExtension(origin)
         .ifPresent(this::registerExtensionImport));
     return this;
   }

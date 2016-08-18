@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static com.sun.imageio.plugins.jpeg.JPEG.vendor;
-
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * This class is the key that represents an Extension in the {@link ExtensionRegistry} The key is composed by the Extension name
  * and vendor.
@@ -35,7 +31,7 @@ final class ExtensionEntityKey {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder().append(vendor).append(name).toHashCode();
+    return name.hashCode();
   }
 
 }
