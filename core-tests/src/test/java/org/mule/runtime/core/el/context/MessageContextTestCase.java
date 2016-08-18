@@ -68,7 +68,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void correlationId() throws Exception {
-    when(event.getExecutionContext()).thenReturn(DefaultMessageExecutionContext.create(getTestFlow(), "3"));
+    when(event.getCorrelationId()).thenReturn("3");
     assertEquals("3", evaluate("message.correlationId", event));
     assertFinalProperty("message.correlationId=2", event);
   }
@@ -76,15 +76,15 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void correlationSequence() throws Exception {
     when(event.getCorrelation().getSequence()).thenReturn(of(4));
-    assertEquals(4, evaluate("message.correlation.sequence.get()", event));
-    assertFinalProperty("message.correlation.sequence.get()=2", event);
+    assertEquals(4, evaluate("message.correlationSequence", event));
+    assertFinalProperty("message.correlationSequence=2", event);
   }
 
   @Test
   public void correlationGroupSize() throws Exception {
-    when(event.getCorrelation().getGroupSize()).thenReturn(of(4));
-    assertEquals(4, evaluate("message.correlation.groupSize.get()", event));
-    assertFinalProperty("message.correlation.groupSize.get()=2", event);
+    when(event.getCorrelation()).thenReturn(new Correlation(null, 4));
+    assertEquals(4, evaluate("message.correlationGroupSize", event));
+    assertFinalProperty("message.correlationGroupSize=2", event);
   }
 
   @Test

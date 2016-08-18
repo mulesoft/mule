@@ -22,8 +22,9 @@ import org.mule.runtime.core.message.Correlation;
 /**
  * Exposes information about the current Mule message:
  *
- * <li><b>correlation</b> <i>The event correlation information.</i>
- * <li><b>correlationId</b> <i>The event correlationId.</i>
+ * <li> <b>correlationId</b>         <i>The message correlationId.</i>
+ * <li> <b>correlationSequence</b>   <i>The message correlation sequence number.</i>
+ * <li> <b>correlationGroupSize</b>  <i>The message correlation group size.</i>
  * <li><b>dataType</b> <i>The message data type (org.mule.runtime.core.api.transformer.DataType).</i>
  * <li><b>replyTo</b> <i>The message reply to destination. (mutable)</i>
  * <li><b>payload</b> <i>The message payload (mutable). You can also use message.payloadAs(Class clazz). Note: If the message
@@ -43,12 +44,16 @@ public class MessageContext {
     this.muleContext = muleContext;
   }
 
-  public Correlation getCorrelation() {
-    return event.getCorrelation();
-  }
-
   public String getCorrelationId() {
     return event.getCorrelationId();
+  }
+
+  public int getCorrelationSequence() {
+    return event.getCorrelation().getSequence().orElse(-1);
+  }
+
+  public int getCorrelationGroupSize() {
+    return event.getCorrelation().getSequence().orElse(-1);
   }
 
   public DataType getDataType() {
