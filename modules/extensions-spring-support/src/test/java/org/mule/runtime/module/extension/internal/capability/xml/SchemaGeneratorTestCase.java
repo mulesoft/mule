@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
@@ -16,9 +18,11 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -39,8 +43,13 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.vegan.extension.VeganExtension;
 
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,43 +60,81 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
 
+  static final Map<String, RuntimeExtensionModel> extensionModels = new HashMap<>();
+
   @Parameterized.Parameter(0)
-  public Class<?> extensionUnderTest;
+  private ExtensionModel extensionUnderTest;
+
   @Parameterized.Parameter(1)
-  public String expectedXSD;
+  private String expectedXSD;
+
   private SchemaGenerator generator;
-  private ExtensionFactory extensionFactory;
+  private String expectedSchema;
+
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{HeisenbergExtension.class, "heisenberg.xsd"}, {TestConnector.class, "basic.xsd"},
-        {GlobalPojoConnector.class, "global-pojo.xsd"}, {GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"},
-        {MapConnector.class, "map.xsd"}, {ListConnector.class, "list.xsd"}, {StringListConnector.class, "string-list.xsd"},
-        {VeganExtension.class, "vegan.xsd"}, {SubTypesMappingConnector.class, "subtypes.xsd"},
-        {PetStoreConnector.class, "petstore.xsd"}, {MetadataExtension.class, "metadata.xsd"}});
+    final ClassLoader classLoader = SchemaGeneratorTestCase.class.getClassLoader();
+    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+    when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new XmlModelEnricher()));
+
+    final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), classLoader);
+
+    final Map<Class<?>, String> extensions = new LinkedHashMap<Class<?>, String>() {
+
+      {
+        put(HeisenbergExtension.class, "heisenberg.xsd");
+        put(TestConnector.class, "basic.xsd");
+        put(GlobalPojoConnector.class, "global-pojo.xsd");
+        put(GlobalInnerPojoConnector.class, "global-inner-pojo.xsd");
+        put(MapConnector.class, "map.xsd");
+        put(ListConnector.class, "list.xsd");
+        put(StringListConnector.class, "string-list.xsd");
+        put(VeganExtension.class, "vegan.xsd");
+        put(SubTypesMappingConnector.class, "subtypes.xsd");
+        put(PetStoreConnector.class, "petstore.xsd");
+        put(MetadataExtension.class, "metadata.xsd");
+      }
+    };
+
+    Function<Class<?>, ExtensionModel> createExtensionModel = extension -> {
+      ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extension, new StaticVersionResolver(getProductVersion()))
+          .describe(new DefaultDescribingContext(extension.getClassLoader()));
+      RuntimeExtensionModel model = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, classLoader));
+
+      if (extensionModels.put(model.getName(), model) != null) {
+        throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
+                                                  model.getName(), extension.getName()));
+      }
+
+      return model;
+    };
+
+    return extensions.entrySet().stream()
+        .map(e -> new Object[] {createExtensionModel.apply(e.getKey()), e.getValue()})
+        .collect(toList());
   }
 
   @Before
-  public void before() {
-    ClassLoader classLoader = getClass().getClassLoader();
-    ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new XmlModelEnricher()));
-
-    extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+  public void setup() throws IOException {
     generator = new SchemaGenerator();
+    expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
   }
 
   @Test
   public void generate() throws Exception {
-    String expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
+    XmlModelProperty capability = extensionUnderTest.getModelProperty(XmlModelProperty.class).get();
 
-    ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest, new StaticVersionResolver(getProductVersion()))
-        .describe(new DefaultDescribingContext(extensionUnderTest.getClassLoader()));
-    ExtensionModel extensionModel =
-        extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, getClass().getClassLoader()));
-    XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();
-
-    String schema = generator.generate(extensionModel, capability);
+    String schema = generator.generate(extensionUnderTest, capability, new SchemaTestDslContext());
     compareXML(expectedSchema, schema);
   }
+
+  private static class SchemaTestDslContext implements DslResolvingContext {
+
+    @Override
+    public Optional<ExtensionModel> getExtension(String name) {
+      return Optional.ofNullable(extensionModels.get(name));
+    }
+  }
+
 }

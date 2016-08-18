@@ -160,8 +160,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider) {
     RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
-    if (!configurationModel.getOperationModel(operationModel.getName()).isPresent()
-        && !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
+    if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
+        !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
       throw new IllegalOperationException(String.format(
                                                         "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                             + "The selected config does not support that operation.",

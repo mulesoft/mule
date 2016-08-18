@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A helper class for reading annotations.
@@ -78,4 +79,7 @@ public class AnnotationUtils {
     return false;
   }
 
+  public static <T extends Annotation> Optional<T> getAnnotation(Class<?> aClass, Class<T> annotationType) {
+    return aClass != null ? Optional.ofNullable(aClass.getAnnotation(annotationType)) : Optional.empty();
+  }
 }

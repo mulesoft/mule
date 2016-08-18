@@ -47,6 +47,14 @@
             <artifactId>mule-module-tls</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>javassist</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>

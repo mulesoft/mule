@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import org.mule.runtime.extension.api.annotation.Extension;
+import static com.sun.imageio.plugins.jpeg.JPEG.vendor;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -19,10 +19,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 final class ExtensionEntityKey {
 
   private final String name;
-  private final String vendor;
 
-  protected ExtensionEntityKey(String name, String vendor) {
-    this.vendor = vendor == null ? Extension.MULESOFT : vendor;
+  protected ExtensionEntityKey(String name) {
     this.name = name;
   }
 
@@ -30,17 +28,9 @@ final class ExtensionEntityKey {
     return name;
   }
 
-  public String getVendor() {
-    return vendor;
-  }
-
   @Override
   public boolean equals(Object o) {
-    if (o instanceof ExtensionEntityKey) {
-      ExtensionEntityKey entity = (ExtensionEntityKey) o;
-      return name.equals(entity.name) && vendor.equals(entity.vendor);
-    }
-    return false;
+    return o instanceof ExtensionEntityKey && ((ExtensionEntityKey) o).getName().equals(name);
   }
 
   @Override

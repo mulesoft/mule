@@ -60,7 +60,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -191,22 +190,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getExtensions() {
-    testEquals(getTestExtensions(), extensionsManager.getExtensions());
-  }
-
-  @Test
-  public void getExtensionByNameAndVendor() {
-    assertThat(extensionsManager.getExtension(EXTENSION2_NAME, MULESOFT).get(), is(sameInstance(extensionModel2)));
-    assertThat(extensionsManager.getExtension(EXTENSION2_NAME, OTHER_VENDOR).get(),
-               is(sameInstance(extensionModel3WithRepeatedName)));
-    assertThat(extensionsManager.getExtension(EXTENSION1_NAME, OTHER_VENDOR).isPresent(), is(false));
+    testEquals(asList(extensionModel1, extensionModel2), extensionsManager.getExtensions());
   }
 
   @Test
   public void getExtensionsByName() {
-    Set<RuntimeExtensionModel> extensions = extensionsManager.getExtensions(EXTENSION1_NAME);
-    assertThat(extensions, hasSize(1));
-    assertThat(extensions.iterator().next(), is(sameInstance(extensionModel1)));
+    Optional<RuntimeExtensionModel> extension = extensionsManager.getExtension(EXTENSION1_NAME);
+    assertThat(extension.isPresent(), is(true));
+    assertThat(extension.get(), is(sameInstance(extensionModel1)));
   }
 
   @Test
@@ -292,9 +283,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     List<String> extensionVendorList =
         extensionModels.stream().map(ExtensionModel::getVendor).distinct().collect(Collectors.toList());
 
-    assertThat(extensionModels.size(), is(3));
+    assertThat(extensionModels.size(), is(2));
     assertThat(extensionNameList.size(), is(2));
-    assertThat(extensionVendorList.size(), is(2));
+    assertThat(extensionVendorList.size(), is(1));
   }
 
   @Test
@@ -313,10 +304,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     extensionsManager.registerExtension(builder.build(), getClass().getClassLoader());
 
-    Set<RuntimeExtensionModel> registered = extensionsManager.getExtensions(HEISENBERG);
-    assertThat(registered, hasSize(1));
+    Optional<RuntimeExtensionModel> registered = extensionsManager.getExtension(HEISENBERG);
+    assertThat(registered.isPresent(), is(true));
 
-    final ExtensionModel registeredExtension = registered.iterator().next();
+    final ExtensionModel registeredExtension = registered.get();
     assertThat(registeredExtension.getName(), is(HEISENBERG));
     assertThat(registeredExtension.getVersion(), is(version));
   }
@@ -345,11 +336,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
     when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
-  }
-
-  private List<RuntimeExtensionModel> getTestExtensions() {
-    return ImmutableList.<RuntimeExtensionModel>builder().add(extensionModel1).add(extensionModel2)
-        .add(extensionModel3WithRepeatedName).build();
   }
 
   private void testEquals(Collection<RuntimeExtensionModel> expected, Collection<RuntimeExtensionModel> obtained) {
