@@ -8,10 +8,9 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.functional.EventCallback;
+
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -33,13 +32,7 @@ public class CorrelationResequencerTestCase extends AbstractIntegrationTestCase 
     super.doSetUp();
 
     FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
-    testComponent.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        receiveLatch.countDown();
-      }
-    });
+    testComponent.setEventCallback((context, component, muleContext) -> receiveLatch.countDown());
   }
 
   @Test

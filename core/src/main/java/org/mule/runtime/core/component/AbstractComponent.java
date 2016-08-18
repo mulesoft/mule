@@ -186,8 +186,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     }
 
     lifecycleManager.fireInitialisePhase((phaseName, object) -> {
-      DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(
-                                                                                                 flowConstruct);
+      DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(flowConstruct);
       chainBuilder.setName("Component interceptor processor chain for :" + getName());
       for (Interceptor interceptor : interceptors) {
         chainBuilder.chain(interceptor);

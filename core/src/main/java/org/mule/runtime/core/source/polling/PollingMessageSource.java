@@ -9,6 +9,7 @@ package org.mule.runtime.core.source.polling;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -34,8 +35,8 @@ import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.util.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,10 +198,13 @@ public class PollingMessageSource
   }
 
   private void pollWith(final MuleMessage request) throws Exception {
-    ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate
-        .createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
+    ExecutionTemplate<MuleEvent> executionTemplate =
+        createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
     try {
       final MessageProcessorPollingInterceptor interceptor = override.interceptor();
+      if (interceptor instanceof MuleContextAware) {
+        ((MuleContextAware) interceptor).setMuleContext(muleContext);
+      }
       MuleEvent muleEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
 
         @Override

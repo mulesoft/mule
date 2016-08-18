@@ -7,13 +7,12 @@
 package org.mule.test.integration.work;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.functional.EventCallback;
+
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,14 +43,10 @@ public class GracefulShutdownTimeoutTestCase extends AbstractIntegrationTestCase
 
     FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("TestService");
     FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(flowConstruct);
-    testComponent.setEventCallback(new EventCallback() {
+    testComponent.setEventCallback((context, component, muleContext) -> {
+      Thread.sleep(5500);
+      latch.countDown();
 
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        Thread.sleep(5500);
-        latch.countDown();
-
-      }
     });
 
     flowRunner("TestService").withPayload("test").run();

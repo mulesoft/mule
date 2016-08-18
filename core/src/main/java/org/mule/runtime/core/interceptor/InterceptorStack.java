@@ -34,6 +34,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
     this.interceptors = interceptors;
   }
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     return chain.process(event);
   }
@@ -46,8 +47,9 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
     this.interceptors = interceptors;
   }
 
+  @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(muleContext);
     chainBuilder.setName("interceptor stack");
     for (Interceptor interceptor : interceptors) {
       if (interceptor instanceof Initialisable) {
@@ -65,6 +67,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
     }
   }
 
+  @Override
   public void dispose() {
     for (Interceptor interceptor : interceptors) {
       if (interceptor instanceof Disposable) {

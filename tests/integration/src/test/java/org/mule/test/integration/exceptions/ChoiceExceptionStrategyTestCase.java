@@ -9,12 +9,13 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.sql.SQLDataException;
 
@@ -113,7 +114,7 @@ public class ChoiceExceptionStrategyTestCase extends AbstractIntegrationTestCase
   private void callAndThrowException(Object payload, final Exception exceptionToThrow, final String expectedMessage)
       throws Exception {
     FunctionalTestComponent ftc = getFunctionalTestComponent("matchesCorrectExceptionStrategyUsingExceptionType");
-    ftc.setEventCallback((context, component) -> {
+    ftc.setEventCallback((context, component, muleContext) -> {
       throw exceptionToThrow;
     });
     MuleMessage response =

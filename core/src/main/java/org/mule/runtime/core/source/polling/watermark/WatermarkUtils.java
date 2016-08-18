@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
+import static java.lang.String.format;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 
@@ -24,14 +27,14 @@ public abstract class WatermarkUtils {
    * @return The evaluated value
    * @throws NotSerializableException if the evaluated result is not {@link Serializable}
    */
-  public static Serializable evaluate(String expression, MuleEvent event) throws NotSerializableException {
-    ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+  public static Serializable evaluate(String expression, MuleEvent event, MuleContext muleContext)
+      throws NotSerializableException {
+    ExpressionManager expressionManager = muleContext.getExpressionManager();
     if (expressionManager.isExpression(expression) && expressionManager.isValidExpression(expression)) {
       Object evaluated = expressionManager.evaluate(expression, event);
       if (evaluated != null && !(evaluated instanceof Serializable)) {
-        throw new NotSerializableException(String.format(
-                                                         "Expression %s resolves to an object that is not serializable (%s). It can't be used as watermark.",
-                                                         expression, evaluated.getClass().getCanonicalName()));
+        throw new NotSerializableException(format("Expression %s resolves to an object that is not serializable (%s). It can't be used as watermark.",
+                                                  expression, evaluated.getClass().getCanonicalName()));
       }
 
       return (Serializable) evaluated;

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.Credentials;
@@ -60,9 +61,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     trans.setMuleContext(muleContext);
     MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
 
-    // Assert that deserialized event is not null and has muleContext
+    // Assert that deserialized event is not null
     assertNotNull(deserialized);
-    assertNotNull(deserialized.getMuleContext());
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
@@ -104,9 +104,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // Deserialize
     MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
 
-    // Assert that deserialized event is not null and has muleContext
+    // Assert that deserialized event is not null
     assertNotNull(deserialized);
-    assertNotNull(deserialized.getMuleContext());
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());

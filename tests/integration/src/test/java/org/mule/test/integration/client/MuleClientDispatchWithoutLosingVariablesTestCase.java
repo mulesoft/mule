@@ -8,8 +8,8 @@ package org.mule.test.integration.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+
 import org.mule.functional.functional.FlowAssert;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -69,7 +70,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
       return event;
 
     }
@@ -79,7 +80,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }
@@ -88,7 +89,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
+      muleContext.getClient().send(getUrl("innerrequestresponsetest"), MuleMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }

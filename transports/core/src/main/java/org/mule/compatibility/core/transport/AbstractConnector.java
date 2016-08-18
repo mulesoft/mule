@@ -9,6 +9,31 @@ package org.mule.compatibility.core.transport;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -27,6 +52,7 @@ import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.compatibility.core.connector.EndpointReplyToHandler;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.outbound.OutboundNotificationMessageProcessor;
+import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.compatibility.core.transformer.TransportTransformerUtils;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
@@ -76,7 +102,6 @@ import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
@@ -85,32 +110,6 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
-
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1262,10 +1261,11 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    * Fires a server notification to all registered listeners on the {@link MuleContext} of the given {@code event}
    *
    * @param notification the notification to fire.
+   * @param muleContext the Mule node.
    * @param event a {@link MuleEvent}
    */
-  public void fireNotification(ServerNotification notification, MuleEvent event) {
-    notificationHelper.fireNotification(notification, event);
+  public void fireNotification(ServerNotification notification, MuleContext muleContext) {
+    notificationHelper.fireNotification(notification, muleContext);
   }
 
   @Override
@@ -1566,11 +1566,11 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * Indicates if notifications are enabled for the given {@code event}
    *
-   * @param event a {@link MuleEvent}
+   * @param muleContext the Mule node.
    * @return {@code true} if notifications are to be fired for the given {@code event}, {@code false} otherwise
    */
-  public boolean isEnableMessageEvents(MuleEvent event) {
-    return notificationHelper.isNotificationEnabled(event);
+  public boolean isEnableMessageEvents(MuleContext muleContext) {
+    return notificationHelper.isNotificationEnabled(muleContext);
   }
 
   /**
@@ -2128,7 +2128,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading()) {
       return new DispatcherMessageProcessor(endpoint);
     } else {
-      SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
+      SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder(muleContext);
       builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
       LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(() -> getDispatcherWorkManager());
       builder.chain(async);
@@ -2183,7 +2183,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
           if (notificationMessageProcessor == null) {
             notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
           }
-          notificationMessageProcessor.dispatchNotification(notificationMessageProcessor.createBeginNotification(event), event);
+          notificationMessageProcessor.dispatchNotification(notificationMessageProcessor.createBeginNotification(event));
         }
         MuleEvent result = dispatcher.process(event);
 

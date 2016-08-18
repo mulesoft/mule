@@ -8,10 +8,11 @@ package org.mule.test.routing;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public abstract class DynamicRouterTestCase extends AbstractIntegrationTestCase 
 
   protected MuleEvent runFlowAndAssertResponse(String flowName, Object expectedMessage) throws Exception {
     MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
-    assertThat(event.getMessageAsString(), is(expectedMessage));
+    assertThat(event.getMessageAsString(muleContext), is(expectedMessage));
     return event;
   }
 

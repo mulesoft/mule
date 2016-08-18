@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.keygenerator;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -19,14 +21,16 @@ import org.slf4j.LoggerFactory;
  * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} using the Mule expression language to generate the cache
  * keys.
  */
-public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator {
+public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, MuleContextAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   private String expression;
+  private MuleContext muleContext;
 
+  @Override
   public Serializable generateKey(MuleEvent event) throws NotSerializableException {
-    Object key = event.getMuleContext().getExpressionManager().evaluate(expression, event);
+    Object key = muleContext.getExpressionManager().evaluate(expression, event);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Generated key for event: " + event + " key: " + key);
@@ -46,5 +50,11 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator {
 
   public void setExpression(String expression) {
     this.expression = expression;
+  }
+
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

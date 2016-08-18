@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
@@ -82,7 +83,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception {
-    getFunctionalTestComponent("serverFlow").setEventCallback((context, component) -> {
+    getFunctionalTestComponent("serverFlow").setEventCallback((context, component, muleContext) -> {
       requestPayload = getPayloadAsString(context.getMessage());
       requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
     });

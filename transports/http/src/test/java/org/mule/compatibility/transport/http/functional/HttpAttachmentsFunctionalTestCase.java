@@ -38,7 +38,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
   public void testSendAttachment() throws Exception {
     FunctionalTestComponent ftc = getFunctionalTestComponent("testComponent");
     assertNotNull(ftc);
-    ftc.setEventCallback((context, component) -> {
+    ftc.setEventCallback((context, component, muleContext) -> {
       assertThat(context.getMessage().getDataType().getMediaType().toRfcString(),
                  is("application/octet-stream; charset=ISO-8859-1"));
       assertEquals("We should have an attachment", 1, context.getMessage().getInboundAttachmentNames().size());

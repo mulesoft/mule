@@ -8,9 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -23,26 +21,23 @@ import org.junit.Test;
 public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
   private MapSplitter mapSplitter;
-  private List<String> splitPayloads = new ArrayList<String>();
-  private List<String> splitKeyProperties = new ArrayList<String>();
+  private List<String> splitPayloads = new ArrayList<>();
+  private List<String> splitKeyProperties = new ArrayList<>();
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
     mapSplitter = new MapSplitter();
     mapSplitter.setMuleContext(muleContext);
-    mapSplitter.setListener(new MessageProcessor() {
-
-      public MuleEvent process(MuleEvent event) throws MuleException {
-        splitPayloads.add(event.getMessageAsString());
-        return event;
-      }
+    mapSplitter.setListener(event -> {
+      splitPayloads.add(event.getMessageAsString(muleContext));
+      return event;
     });
   }
 
   @Test
   public void testSplit() throws Exception {
-    Map<String, Object> testMap = new HashMap<String, Object>();
+    Map<String, Object> testMap = new HashMap<>();
     testMap.put("1", "one");
     testMap.put("2", "two");
     testMap.put("3", "three");

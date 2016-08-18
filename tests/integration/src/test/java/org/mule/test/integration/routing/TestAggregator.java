@@ -34,7 +34,7 @@ public class TestAggregator extends AbstractAggregator {
           for (Iterator<MuleEvent> iterator = events.iterator(); iterator.hasNext();) {
             MuleEvent event = iterator.next();
             try {
-              buffer.append(event.transformMessageToString());
+              buffer.append(event.transformMessageToString(muleContext));
             } catch (TransformerException e) {
               throw new AggregationException(events, null, e);
             }

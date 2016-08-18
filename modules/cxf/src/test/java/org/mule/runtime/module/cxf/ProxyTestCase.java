@@ -120,7 +120,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   public void testServerClientProxyWithWsdl() throws Exception {
     final Latch latch = new Latch();
     ((FunctionalTestComponent) getComponent("serverClientProxyWithWsdl"))
-        .setEventCallback((context, component) -> latch.countDown());
+        .setEventCallback((context, component, muleContext) -> latch.countDown());
 
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
@@ -137,7 +137,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   public void testServerClientProxyWithWsdl2() throws Exception {
     final Latch latch = new Latch();
     ((FunctionalTestComponent) getComponent("serverClientProxyWithWsdl2"))
-        .setEventCallback((context, component) -> latch.countDown());
+        .setEventCallback((context, component, muleContext) -> latch.countDown());
 
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";

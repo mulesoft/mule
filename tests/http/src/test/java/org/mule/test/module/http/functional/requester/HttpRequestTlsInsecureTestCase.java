@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -56,7 +57,7 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   @Test
   public void insecureRequest() throws Exception {
     final MuleEvent res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
-    assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
+    assertThat(res.getMessageAsString(muleContext), is(TEST_PAYLOAD));
   }
 
   @Test

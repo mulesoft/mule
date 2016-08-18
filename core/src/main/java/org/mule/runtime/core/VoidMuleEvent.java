@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.core;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -28,6 +23,11 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
+
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
 
 /**
  * A {@link VoidMuleEvent} represents a void return from a {@link MessageProcessor} such as a ONE_WAY
@@ -62,32 +62,32 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public byte[] getMessageAsBytes() throws MuleException {
+  public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public <T> T transformMessage(Class<T> outputType) throws TransformerException {
+  public <T> T transformMessage(Class<T> outputType, MuleContext muleContext) throws TransformerException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Object transformMessage(DataType outputType) throws TransformerException {
+  public Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public String transformMessageToString() throws TransformerException {
+  public String transformMessageToString(MuleContext muleContext) throws TransformerException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public String getMessageAsString() throws MuleException {
+  public String getMessageAsString(MuleContext muleContext) throws MuleException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public String getMessageAsString(Charset encoding) throws MuleException {
+  public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
     throw new UnsupportedOperationException();
   }
 
@@ -114,17 +114,6 @@ public class VoidMuleEvent implements MuleEvent {
   @Override
   public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getTimeout() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setTimeout(int timeout) {
-    throw new UnsupportedOperationException();
-
   }
 
   @Override

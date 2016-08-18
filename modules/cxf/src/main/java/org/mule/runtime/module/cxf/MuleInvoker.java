@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
@@ -41,10 +44,12 @@ public class MuleInvoker implements Invoker {
 
   private final CxfInboundMessageProcessor cxfMmessageProcessor;
   private Class<?> targetClass;
+  private FlowConstruct flowConstruct;
 
-  public MuleInvoker(CxfInboundMessageProcessor cxfMmessageProcessor, Class<?> targetClass) {
+  public MuleInvoker(CxfInboundMessageProcessor cxfMmessageProcessor, Class<?> targetClass, FlowConstruct flowConstruct) {
     this.cxfMmessageProcessor = cxfMmessageProcessor;
     this.targetClass = targetClass;
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -78,8 +83,8 @@ public class MuleInvoker implements Invoker {
           event.setFlowVariable(CxfConstants.INBOUND_SERVICE, svc.getName());
         }
 
-        ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate = ErrorHandlingExecutionTemplate
-            .createErrorHandlingExecutionTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
+        ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate =
+            createErrorHandlingExecutionTemplate(flowConstruct.getMuleContext(), flowConstruct.getExceptionListener());
         responseEvent = errorHandlingExecutionTemplate.execute(() -> cxfMmessageProcessor.processNext(event));
       } catch (MuleException e) {
         exchange.put(CxfConstants.MULE_EVENT, event);

@@ -38,9 +38,6 @@ import org.mule.runtime.core.message.Correlation;
 @Deprecated
 public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
-  int TIMEOUT_WAIT_FOREVER = 0;
-  int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
-
   /**
    * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
    */
@@ -79,60 +76,66 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   /**
    * Returns the contents of the message as a byte array.
    * 
+   * @param muleContext the Mule node.
    * @return the contents of the message as a byte array
    * @throws MuleException if the message cannot be converted into an array of bytes
    */
-  byte[] getMessageAsBytes() throws MuleException;
+  byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException;
 
   /**
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
    * this event was received.
    * 
    * @param outputType The requested output type.
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
    */
-  <T> T transformMessage(Class<T> outputType) throws TransformerException;
+  <T> T transformMessage(Class<T> outputType, MuleContext muleContext) throws TransformerException;
 
   /**
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
    * this event was received.
    * 
    * @param outputType The requested output type.
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
    */
-  Object transformMessage(DataType outputType) throws TransformerException;
+  Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException;
 
   /**
    * Returns the message transformed into it's recognised or expected format and then into a String. The transformer used is the
    * one configured on the endpoint through which this event was received. If necessary this will use the encoding set on the
-   * event
+   * event.
    * 
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format as a Strings.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
-  String transformMessageToString() throws TransformerException;
+  String transformMessageToString(MuleContext muleContext) throws TransformerException;
 
   /**
    * Returns the message contents as a string If necessary this will use the encoding set on the event
    * 
+   * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
    */
-  String getMessageAsString() throws MuleException;
+  String getMessageAsString(MuleContext muleContext) throws MuleException;
 
   /**
    * Returns the message contents as a string
    * 
    * @param encoding the encoding to use when converting the message to string
+   * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
    */
-  String getMessageAsString(Charset encoding) throws MuleException;
+  String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException;
 
   /**
    * Retrieves the service session for the current event
@@ -172,22 +175,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param stopFurtherProcessing the value to set.
    */
   void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-  /**
-   * The number of milliseconds to wait for a return event when running synchronously. 0 wait forever -1 try and receive, but do
-   * not wait or a positive millisecond value
-   * 
-   * @return the event timeout in milliseconds
-   */
-  int getTimeout();
-
-  /**
-   * The number of milliseconds to wait for a return event when running synchronously. 0 wait forever -1 try and receive, but do
-   * not wait or a positive millisecod value
-   * 
-   * @param timeout the event timeout in milliseconds
-   */
-  void setTimeout(int timeout);
 
   /**
    * An outputstream the can optionally be used write response data to an incoming message.

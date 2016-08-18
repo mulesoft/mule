@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +26,7 @@ public class CounterCallback implements EventCallback {
     this.callbackCount = callbackCount;
   }
 
-  public void eventReceived(MuleEventContext context, Object Component) throws Exception {
+  public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
     incCallbackCount();
   }
 

@@ -9,7 +9,6 @@ package org.mule.compatibility.core.endpoint.inbound;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
-import org.junit.Test;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
@@ -21,6 +20,8 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
+
+import org.junit.Test;
 
 /**
  * Unit test for configuring message processors on an inbound endpoint.
@@ -44,7 +45,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
   @Test
   public void testProcessors() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
     MessageProcessor mpChain = builder.build();
 
@@ -54,7 +55,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
   @Test
   public void testNoProcessors() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     MessageProcessor mpChain = builder.build();
 
     result = mpChain.process(requestEvent);

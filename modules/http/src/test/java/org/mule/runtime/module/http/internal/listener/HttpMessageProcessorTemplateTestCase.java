@@ -37,6 +37,7 @@ import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallba
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -44,6 +45,13 @@ import org.mockito.ArgumentCaptor;
 public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
   private static final String TEST_MESSAGE = "";
+
+  private MuleContext muleContext;
+
+  @Before
+  public void before() {
+    muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  }
 
   @Test
   public void statusCodeOnFailures() throws Exception {
@@ -54,8 +62,9 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
     doNothing().when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
 
     HttpMessageProcessorTemplate httpMessageProcessorTemplate =
-        new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
-                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+        new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback,
+                                         HttpResponseBuilder.emptyInstance(muleContext),
+                                         HttpResponseBuilder.emptyInstance(muleContext));
 
     httpMessageProcessorTemplate
         .sendFailureResponseToClient(new MessagingException(CoreMessages.createStaticMessage(TEST_MESSAGE), testEvent), null);
@@ -72,7 +81,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
     HttpMessageProcessorTemplate httpMessageProcessorTemplate =
         new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
-                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+                                         HttpResponseBuilder.emptyInstance(muleContext));
 
     ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
     httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
@@ -92,7 +101,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
     HttpMessageProcessorTemplate httpMessageProcessorTemplate =
         new HttpMessageProcessorTemplate(testEvent, mock(MessageProcessor.class), responseReadyCallback, null,
-                                         HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
+                                         HttpResponseBuilder.emptyInstance(muleContext));
 
     ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
 
@@ -112,8 +121,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
     MuleEvent testEvent = mock(MuleEvent.class);
     when(testEvent.getMessage()).thenReturn(testMessage);
-    when(testEvent.getMuleContext()).thenReturn(mock(MuleContext.class, RETURNS_DEEP_STUBS));
-    when(testEvent.getMessageAsBytes()).thenReturn("".getBytes(UTF_8));
+    when(testEvent.getMessageAsBytes(muleContext)).thenReturn("".getBytes(UTF_8));
     return testEvent;
   }
 

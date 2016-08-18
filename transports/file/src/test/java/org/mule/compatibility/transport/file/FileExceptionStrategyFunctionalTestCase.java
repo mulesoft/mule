@@ -11,11 +11,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
@@ -125,13 +123,9 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
   public void testConsumeFileWithExAndRollback() throws Exception {
     final CountDownLatch countDownLatch = new CountDownLatch(2);
     FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollback");
-    ftc.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        countDownLatch.countDown();
-        throw new RuntimeException();
-      }
+    ftc.setEventCallback((context, component, muleContext) -> {
+      countDownLatch.countDown();
+      throw new RuntimeException();
     });
     inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback");
     inputFile = createDataFile(inputDir, "test1.txt");
@@ -145,13 +139,9 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
   public void testConsumeFileWithExAndRollbackWithRedelivery() throws Exception {
     final CountDownLatch countDownLatch = new CountDownLatch(3);
     FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollbackWithRedelivery");
-    ftc.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        countDownLatch.countDown();
-        throw new RuntimeException();
-      }
+    ftc.setEventCallback((context, component, muleContext) -> {
+      countDownLatch.countDown();
+      throw new RuntimeException();
     });
     inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback-with-redelivery");
     inputFile = createDataFile(inputDir, "test1.txt");
@@ -197,13 +187,9 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
   private void attacheLatchCountdownProcessor(String flowName) {
     flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
     DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flow.getExceptionListener();
-    exceptionListener.getMessageProcessors().add(new MessageProcessor() {
-
-      @Override
-      public MuleEvent process(MuleEvent event) throws MuleException {
-        latch.countDown();
-        return event;
-      }
+    exceptionListener.getMessageProcessors().add(event -> {
+      latch.countDown();
+      return event;
     });
   }
 

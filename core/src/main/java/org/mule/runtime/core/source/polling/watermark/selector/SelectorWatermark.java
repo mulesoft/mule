@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
@@ -29,8 +28,6 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
 
   private final WatermarkSelectorBroker selectorBroker;
   private final String selectorExpression;
-
-  private MuleContext muleContext;
 
   public SelectorWatermark(ObjectStore<Serializable> objectStore, String variable, String defaultExpression,
                            WatermarkSelectorBroker selectorBroker, String selectorExpression) {
@@ -68,10 +65,5 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
   @Override
   public MessageProcessorPollingInterceptor interceptor() {
     return new SelectorWatermarkPollingInterceptor(this, this.selectorBroker.newSelector(), this.selectorExpression);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 }

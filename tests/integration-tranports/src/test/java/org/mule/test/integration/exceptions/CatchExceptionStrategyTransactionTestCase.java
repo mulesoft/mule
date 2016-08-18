@@ -132,27 +132,27 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
       TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
       throw new RuntimeException();
     }).when(mockTransaction).commit();
-    return (context, component) -> {
+    return (context, component, muleContext) -> {
       context.getCurrentTransaction().rollback();
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-      processEventCallback.eventReceived(context, component);
+      processEventCallback.eventReceived(context, component, muleContext);
     };
   }
 
   private EventCallback replaceTransactionWithMock() throws Exception {
-    return replaceTransactionWithMock((context, component) -> {
+    return replaceTransactionWithMock((context, component, muleContext) -> {
       // Do nothing
     });
   }
 
   private EventCallback replaceTransactionWithMockAndFailComponent() throws Exception {
-    return replaceTransactionWithMock((context, component) -> {
+    return replaceTransactionWithMock((context, component, muleContext) -> {
       throw new RuntimeException();
     });
   }
 
   private EventCallback getFailureCallback() {
-    return (context, component) -> {
+    return (context, component, muleContext) -> {
       throw new RuntimeException();
     };
   }

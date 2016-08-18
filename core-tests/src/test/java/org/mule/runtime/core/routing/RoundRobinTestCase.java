@@ -14,12 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -30,6 +24,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
@@ -44,6 +45,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testRoundRobin() throws Exception {
     RoundRobin rr = new RoundRobin();
+    rr.setMuleContext(muleContext);
     MuleSession session = getTestSession(null, muleContext);
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
@@ -68,6 +70,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void usesFirstRouteOnFirstRequest() throws Exception {
     RoundRobin roundRobin = new RoundRobin();
+    roundRobin.setMuleContext(muleContext);
     List<MessageProcessor> routes = new ArrayList<>(2);
     MessageProcessor route1 = mock(MessageProcessor.class, "route1");
     routes.add(route1);

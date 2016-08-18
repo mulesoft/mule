@@ -108,7 +108,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
     assertNotSame(Thread.currentThread(), target.thread);
 
     assertSame(VoidMuleEvent.getInstance(), result);

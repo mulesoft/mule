@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.keygenerator;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.NotSerializableException;
@@ -20,13 +22,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's message payload.
  */
-public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator {
+public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator, MuleContextAware {
 
   private static final Logger logger = LoggerFactory.getLogger(SHA256MuleEventKeyGenerator.class);
+  private MuleContext muleContext;
 
+  @Override
   public Serializable generateKey(MuleEvent event) throws NotSerializableException {
     try {
-      byte[] bytesOfMessage = event.getMessageAsBytes();
+      byte[] bytesOfMessage = event.getMessageAsBytes(muleContext);
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       String key = StringUtils.toHexString(md.digest(bytesOfMessage));
 
@@ -44,5 +48,10 @@ public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator {
 
       throw notSerializableException;
     }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

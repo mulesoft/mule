@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.construct;
 
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
@@ -81,7 +81,9 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
     Lifecycle preChainOld = preChain;
     Lifecycle postChainOld = postChain;
     preChain = new SimpleMessageProcessorChain(preMessageProcessors);
+    preChain.setMuleContext(muleContext);
     postChain = new SimpleMessageProcessorChain(postMessageProcessors);
+    postChain.setMuleContext(muleContext);
     initDynamicChains();
 
     // hook chain as last step to avoid synchronization
@@ -107,7 +109,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
   }
 
   private String resetPipeline(String id) throws MuleException {
-    List<MessageProcessor> emptyList = new ArrayList<MessageProcessor>();
+    List<MessageProcessor> emptyList = new ArrayList<>();
     return resetAndUpdatePipeline(id, emptyList, emptyList);
   }
 
@@ -139,8 +141,8 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
 
   private class Builder implements DynamicPipelineBuilder {
 
-    private List<MessageProcessor> preList = new ArrayList<MessageProcessor>();
-    private List<MessageProcessor> postList = new ArrayList<MessageProcessor>();
+    private List<MessageProcessor> preList = new ArrayList<>();
+    private List<MessageProcessor> postList = new ArrayList<>();
 
     @Override
     public DynamicPipelineBuilder injectBefore(MessageProcessor... messageProcessors) {

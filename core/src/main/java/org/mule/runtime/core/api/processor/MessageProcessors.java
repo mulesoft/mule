@@ -29,8 +29,8 @@ public class MessageProcessors {
     // do not instantiate
   }
 
-  public static MessageProcessorChain singletonChain(MessageProcessor mp) {
-    return DefaultMessageProcessorChain.from(mp);
+  public static MessageProcessorChain singletonChain(MuleContext muleContext, MessageProcessor mp) {
+    return DefaultMessageProcessorChain.from(muleContext, mp);
   }
 
   public static MessageProcessor lifecyleAwareMessageProcessorWrapper(final MessageProcessor mp) {

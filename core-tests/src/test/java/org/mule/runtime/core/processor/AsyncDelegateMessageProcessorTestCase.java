@@ -64,7 +64,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -85,7 +85,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -142,7 +142,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertNull(result);
     assertNull(exceptionThrown);

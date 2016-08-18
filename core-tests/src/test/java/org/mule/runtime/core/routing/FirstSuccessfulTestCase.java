@@ -14,10 +14,6 @@ import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -30,6 +26,11 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
@@ -67,7 +68,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.setFailureExpression("#[payload is Integer]");
     fs.initialise();
 
-    assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
+    assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -147,7 +148,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
         MuleMessage msg;
-        String payload = event.getMessageAsString();
+        String payload = event.getMessageAsString(muleContext);
         if (payload.indexOf(rejectIfMatches) >= 0) {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {

@@ -8,18 +8,20 @@ package org.mule.test.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-
-import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+
+import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
 
 public class XStreamAdditionalConvertersTestCase extends AbstractIntegrationTestCase {
 
@@ -60,7 +62,7 @@ public class XStreamAdditionalConvertersTestCase extends AbstractIntegrationTest
     }
 
     @Override
-    public void eventReceived(MuleEventContext context, Object component) throws Exception {
+    public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
       Object payload = context.getMessage().getPayload();
       assertTrue(payload instanceof TestBean);
       assertNotNull(((TestBean) payload).getCreateDate());

@@ -41,10 +41,10 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
     event = mock(MuleEvent.class);
     when(event.getMessage()).thenReturn(message);
-    when(event.getMuleContext()).thenReturn(context);
 
     keyGenerator = new ExpressionMuleEventKeyGenerator();
     keyGenerator.setExpression(EXPRESSION);
+    keyGenerator.setMuleContext(context);
   }
 
   private ExpressionManager expressionManager;

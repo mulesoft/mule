@@ -12,6 +12,7 @@ import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUN
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -174,19 +175,19 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   private Serializable storeEvent(final MuleEvent event, final int deliveryAttemptCount) throws ObjectStoreException {
     event.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
-    final Serializable eventStoreKey = buildQueueKey(event);
+    final Serializable eventStoreKey = buildQueueKey(event, muleContext);
     getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, event);
     return eventStoreKey;
   }
 
-  public static Serializable buildQueueKey(final MuleEvent muleEvent) {
+  public static Serializable buildQueueKey(final MuleEvent muleEvent, MuleContext muleContext) {
     // the key is built in way to prevent UntilSuccessful workers across a
     // cluster to compete for the same
     // events over a shared object store
     // it also adds a random trailer to support events which have been
     // split and thus have the same id. Random number was chosen over
     // UUID for performance reasons
-    String key = String.format("%s-%s-%s-%d", muleEvent.getFlowConstruct(), muleEvent.getMuleContext().getClusterId(),
+    String key = String.format("%s-%s-%s-%d", muleEvent.getFlowConstruct(), muleContext.getClusterId(),
                                muleEvent.getId(), random.nextInt());
 
     return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);

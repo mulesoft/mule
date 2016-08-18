@@ -9,10 +9,8 @@ package org.mule.compatibility.transport.http.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -61,13 +59,9 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
   @Test
   public void testAsyncPost() throws Exception {
     FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
-    component.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object comp) throws Exception {
-        Thread.sleep(200);
-        context.getMessageAsString();
-      }
+    component.setEventCallback((context, comp, muleContext) -> {
+      Thread.sleep(200);
+      context.getMessageAsString(muleContext);
     });
 
     PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
@@ -83,13 +77,9 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
   @Test
   public void testAsyncPostWithPersistentSedaQueue() throws Exception {
     FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
-    component.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object comp) throws Exception {
-        Thread.sleep(200);
-        context.getMessageAsString();
-      }
+    component.setEventCallback((context, comp, muleContext) -> {
+      Thread.sleep(200);
+      context.getMessageAsString(muleContext);
     });
 
     PostMethod request = new PostMethod("http://localhost:" + dynamicPort2.getNumber());

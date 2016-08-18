@@ -65,7 +65,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
   }
 
   protected Authentication getAuthenticationToken(MuleEvent event) throws UnauthorisedException {
-    ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+    ExpressionManager expressionManager = muleContext.getExpressionManager();
 
     Object usernameEval = expressionManager.evaluate(username, event);
     Object passwordEval = expressionManager.evaluate(password, event);

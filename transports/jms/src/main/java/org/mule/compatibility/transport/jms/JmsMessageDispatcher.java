@@ -479,7 +479,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
           if (i > -1) {
             tempReplyTo = tempReplyTo.toString().substring(i + 3);
           } else {
-            EndpointBuilder epb = lookupEndpointBuilder(event.getMuleContext().getRegistry(), tempReplyTo.toString());
+            EndpointBuilder epb = lookupEndpointBuilder(endpoint.getMuleContext().getRegistry(), tempReplyTo.toString());
             if (epb != null) {
               tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();
             }

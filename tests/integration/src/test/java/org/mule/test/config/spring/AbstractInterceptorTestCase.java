@@ -8,8 +8,9 @@ package org.mule.test.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleException;
+import org.mule.test.AbstractIntegrationTestCase;
 
 public abstract class AbstractInterceptorTestCase extends AbstractIntegrationTestCase {
 
@@ -17,6 +18,7 @@ public abstract class AbstractInterceptorTestCase extends AbstractIntegrationTes
 
   public void assertMessageIntercepted() throws MuleException, InterruptedException {
     FunctionalTestAdvice advice = muleContext.getRegistry().lookupObject("advice");
+    advice.setMuleContext(muleContext);
     assertNotNull("Cannot find advice", advice);
     String message = advice.getMessage(RECEIVE_TIMEOUT);
     assertEquals("Bad message", MESSAGE, message);

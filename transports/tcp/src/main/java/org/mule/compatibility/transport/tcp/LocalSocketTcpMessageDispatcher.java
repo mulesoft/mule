@@ -50,7 +50,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
       dispatchToSocket(event);
       if (returnResponse(event)) {
         try {
-          Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
+          Object result = receiveFromSocket(socket, getTimeout(), endpoint);
           if (result == null) {
             return MuleMessage.builder().nullPayload().build();
           }

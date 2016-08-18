@@ -27,7 +27,7 @@ public class FormTransformer extends AbstractMessageTransformer {
   @Override
   public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
     try {
-      String v = event.getMessageAsString();
+      String v = event.getMessageAsString(muleContext);
       Map<String, Object> values = new HashMap<>();
 
       for (StringTokenizer st = new StringTokenizer(v, "&"); st.hasMoreTokens();) {

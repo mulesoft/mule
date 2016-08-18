@@ -9,7 +9,6 @@ package org.mule.runtime.module.ws.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -32,11 +31,9 @@ public class TimeoutFunctionalTestCase extends FunctionalTestCase {
   public void flowAndSessionVarsAreNotRemovedAfterTimeout() throws Exception {
     final Latch serverLatch = new Latch();
 
-    getFunctionalTestComponent("server").setEventCallback((context, component) -> serverLatch.await());
+    getFunctionalTestComponent("server").setEventCallback((context, component, muleContext) -> serverLatch.await());
 
-    FlowRunner runner = flowRunner("client").withPayload("<echo/>");
-    runner.buildEvent().setTimeout(1);
-    runner.run();
+    flowRunner("client").withPayload("<echo/>").run();
     serverLatch.release();
 
     MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);

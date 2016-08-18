@@ -7,9 +7,10 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -56,7 +57,7 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
 
   @Override
   protected List<MessageProcessor> getOwnedMessageProcessors() {
-    List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>(super.getMessageProcessors().size()
+    List<MessageProcessor> messageProcessors = new ArrayList<>(super.getMessageProcessors().size()
         + (redeliveryExceeded == null ? 0 : redeliveryExceeded.getMessageProcessors().size()));
     messageProcessors.addAll(super.getMessageProcessors());
     if (redeliveryExceeded != null) {
@@ -105,4 +106,11 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
     }
   }
 
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
+    if (redeliveryExceeded != null) {
+      redeliveryExceeded.setFlowConstruct(flowConstruct);
+    }
+  }
 }

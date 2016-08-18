@@ -47,7 +47,7 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
 
   private void assertSoapAction(String flowName, final String expectedSoapActionHeader, final String expectedActionInContentType)
       throws Exception {
-    getFunctionalTestComponent("server").setEventCallback((context, component) -> {
+    getFunctionalTestComponent("server").setEventCallback((context, component, muleContext) -> {
       String soapAction = context.getMessage().getInboundProperty("SOAPAction");
 
       String actionInContentType = context.getMessage().getDataType().getMediaType().getParameter("action");

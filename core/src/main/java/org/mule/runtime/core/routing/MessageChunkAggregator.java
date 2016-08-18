@@ -61,7 +61,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
 
         try {
           for (MuleEvent event : collectedEvents) {
-            baos.write(event.getMessageAsBytes());
+            baos.write(event.getMessageAsBytes(muleContext));
           }
 
           final Builder builder = MuleMessage.builder(firstEvent.getMessage());

@@ -9,8 +9,9 @@ package org.mule.test.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
+
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.ByteArrayInputStream;
 
@@ -37,7 +38,7 @@ public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
   public void listenerReceivedChunkedRequest() throws Exception {
     String url = format("http://localhost:%s/", listenPort.getNumber());
     getFunctionalTestComponent("defaultFlow")
-        .setEventCallback((context, component) -> flowReceivedMessage = context.getMessageAsString());
+        .setEventCallback((context, component, muleContext) -> flowReceivedMessage = context.getMessageAsString(muleContext));
     testChunkedRequestContentAndResponse(url);
     // We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
     testChunkedRequestContentAndResponse(url);

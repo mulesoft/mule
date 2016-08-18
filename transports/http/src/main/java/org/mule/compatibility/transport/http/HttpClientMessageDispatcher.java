@@ -14,11 +14,13 @@ import org.mule.compatibility.transport.http.transformers.ObjectToHttpClientMeth
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -45,7 +47,7 @@ import org.apache.commons.lang.BooleanUtils;
 /**
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
  */
-public class HttpClientMessageDispatcher extends AbstractMessageDispatcher {
+public class HttpClientMessageDispatcher extends AbstractMessageDispatcher implements MuleContextAware {
 
   /**
    * Range start for http error status codes.
@@ -55,6 +57,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher {
   protected final HttpConnector httpConnector;
   private volatile HttpClient client = null;
   private final Transformer sendTransformer;
+  private MuleContext muleContext;
 
   public HttpClientMessageDispatcher(OutboundEndpoint endpoint) {
     super(endpoint);
@@ -162,7 +165,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher {
 
   private void processCookies(Object cookieObject, String policy, MuleEvent event) {
     URI uri = this.getEndpoint().getEndpointURI().getUri();
-    CookieHelper.addCookiesToClient(this.client, cookieObject, policy, event, uri);
+    CookieHelper.addCookiesToClient(this.client, cookieObject, policy, event, uri, muleContext);
   }
 
   protected HttpMethod getMethod(MuleEvent event) throws TransformerException {
@@ -210,13 +213,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher {
     if (body instanceof String) {
       httpMethod = (HttpMethod) sendTransformer.transform(body.toString());
     } else if (body instanceof byte[]) {
-      byte[] buffer = (byte[]) event.transformMessage(DataType.BYTE_ARRAY);
+      byte[] buffer = (byte[]) event.transformMessage(DataType.BYTE_ARRAY, muleContext);
       postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getMessage().getDataType().getMediaType().getCharset()
           .get().name()));
       httpMethod = postMethod;
     } else {
       if (!(body instanceof OutputHandler)) {
-        body = event.transformMessage(DataType.fromType(OutputHandler.class));
+        body = event.transformMessage(DataType.fromType(OutputHandler.class), muleContext);
       }
 
       OutputHandler outputHandler = (OutputHandler) body;
@@ -342,4 +345,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher {
     // template method
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

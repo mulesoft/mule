@@ -86,8 +86,8 @@ public class MuleEventToHttpRequest {
 
     builder.setUri(resolvedUri);
     builder.setMethod(resolvedMethod);
-    builder.setHeaders(requestBuilder.getHeaders(event));
-    builder.setQueryParams(requestBuilder.getQueryParams(event));
+    builder.setHeaders(requestBuilder.getHeaders(event, muleContext));
+    builder.setQueryParams(requestBuilder.getQueryParams(event, muleContext));
 
     for (String outboundProperty : event.getMessage().getOutboundPropertyNames()) {
       if (isNotIgnoredProperty(outboundProperty)) {
@@ -192,7 +192,7 @@ public class MuleEventToHttpRequest {
         return new InputStreamHttpEntity((InputStream) payload);
       } else {
         try {
-          return new InputStreamHttpEntity(new ByteArrayInputStream(muleEvent.getMessageAsBytes()));
+          return new InputStreamHttpEntity(new ByteArrayInputStream(muleEvent.getMessageAsBytes(muleContext)));
         } catch (Exception e) {
           throw new MessagingException(muleEvent, e);
         }
@@ -212,7 +212,7 @@ public class MuleEventToHttpRequest {
       }
 
       try {
-        return new ByteArrayHttpEntity(muleEvent.getMessageAsBytes());
+        return new ByteArrayHttpEntity(muleEvent.getMessageAsBytes(muleContext));
       } catch (Exception e) {
         throw new MessagingException(muleEvent, e);
       }

@@ -190,7 +190,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       Throwable ex = e.getTargetException();
 
       if (ex != null && ex.getMessage().contains("Security")) {
-        throw new WebServiceSecurityException(event, e, this);
+        throw new WebServiceSecurityException(event, e, this, muleContext.getSecurityManager());
       } else {
         throw e;
       }

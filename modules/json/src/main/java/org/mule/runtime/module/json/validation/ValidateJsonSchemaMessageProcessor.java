@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.json.validation;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -20,13 +22,14 @@ import java.util.Map;
  *
  * @since 3.6.0
  */
-public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable {
+public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware {
 
   private String schemaLocation;
   private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
   private Map<String, String> schemaRedirects = new HashMap<>();
 
   private JsonSchemaValidator validator;
+  private MuleContext muleContext;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -36,7 +39,7 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    validator.validate(event);
+    validator.validate(event, muleContext);
     return event;
   }
 
@@ -50,5 +53,10 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
 
   public void setSchemaRedirects(Map<String, String> schemaRedirects) {
     this.schemaRedirects = schemaRedirects;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

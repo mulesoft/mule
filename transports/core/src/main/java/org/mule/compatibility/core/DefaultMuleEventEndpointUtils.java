@@ -19,7 +19,7 @@ public class DefaultMuleEventEndpointUtils {
   @Deprecated
   public static void populateFieldsFromInboundEndpoint(DefaultMuleEvent event, InboundEndpoint endpoint) {
     event.setEndpointFields(extractCredentials(endpoint), endpoint.getEncoding(), endpoint.getExchangePattern(),
-                            endpoint.getName(), endpoint.getEndpointURI().getUri(), endpoint.getResponseTimeout(),
+                            endpoint.getName(), endpoint.getEndpointURI().getUri(),
                             endpoint.getTransactionConfig().isTransacted());
 
     fillProperties(event, endpoint);

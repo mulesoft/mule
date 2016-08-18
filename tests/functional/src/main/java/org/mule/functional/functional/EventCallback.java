@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
@@ -18,5 +19,5 @@ import org.mule.runtime.core.api.MuleEventContext;
 
 public interface EventCallback {
 
-  public void eventReceived(MuleEventContext context, Object component) throws Exception;
+  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception;
 }

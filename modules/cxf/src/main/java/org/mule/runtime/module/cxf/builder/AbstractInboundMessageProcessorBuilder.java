@@ -11,6 +11,8 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -56,7 +58,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
  * configured.
  */
 public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject
-    implements MuleContextAware, MessageProcessorBuilder {
+    implements MuleContextAware, FlowConstructAware, MessageProcessorBuilder {
 
   private CxfConfiguration configuration;
   private Server server;
@@ -68,13 +70,14 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
   private String service;
   private String namespace;
   private List<AbstractFeature> features;
-  private List<Interceptor<? extends Message>> inInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-  private List<Interceptor<? extends Message>> inFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-  private List<Interceptor<? extends Message>> outInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-  private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+  private List<Interceptor<? extends Message>> inInterceptors = new CopyOnWriteArrayList<>();
+  private List<Interceptor<? extends Message>> inFaultInterceptors = new CopyOnWriteArrayList<>();
+  private List<Interceptor<? extends Message>> outInterceptors = new CopyOnWriteArrayList<>();
+  private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<>();
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
   private String port;
-  private Map<String, Object> properties = new HashMap<String, Object>();
+  private Map<String, Object> properties = new HashMap<>();
   private boolean validationEnabled;
   private List<String> schemaLocations;
   private WsSecurity wsSecurity;
@@ -176,7 +179,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
     }
 
     sfb.setProperties(properties);
-    sfb.setInvoker(createInvoker(processor));
+    sfb.setInvoker(createInvoker(processor, flowConstruct));
 
     server = sfb.create();
 
@@ -200,8 +203,8 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
     return new WSDLQueryHandler(configuration.getCxfBus());
   }
 
-  protected Invoker createInvoker(CxfInboundMessageProcessor processor) {
-    return new MuleInvoker(processor, getServiceClass());
+  protected Invoker createInvoker(CxfInboundMessageProcessor processor, FlowConstruct flowConstruct) {
+    return new MuleInvoker(processor, getServiceClass(), flowConstruct);
   }
 
   protected void configureServer(Server server2) {
@@ -385,6 +388,11 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   public String getPort() {

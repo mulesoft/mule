@@ -7,9 +7,7 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -25,15 +23,13 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Implementation of {@link Watermark} in which the value is updated through a MEL expression
  */
-public class UpdateExpressionWatermark extends Watermark implements Initialisable, MuleContextAware {
+public class UpdateExpressionWatermark extends Watermark implements Initialisable {
 
   /**
    * The update expression to update the watermark value in the object store. It is optional so it can be null.
    */
   private final String updateExpression;
   private final MessageProcessorPollingInterceptor interceptor;
-
-  private MuleContext muleContext;
 
   public UpdateExpressionWatermark(ObjectStore<Serializable> objectStore, String variable, String defaultExpression,
                                    String updateExpression) {
@@ -65,7 +61,7 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
   protected Object getUpdatedValue(MuleEvent event) {
     try {
       return StringUtils.isEmpty(this.updateExpression) ? event.getFlowVariable(this.resolveVariable(event))
-          : WatermarkUtils.evaluate(this.updateExpression, event);
+          : WatermarkUtils.evaluate(this.updateExpression, event, muleContext);
     } catch (NotSerializableException e) {
       throw new IllegalArgumentException(e);
     }
@@ -74,10 +70,5 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
   @Override
   public MessageProcessorPollingInterceptor interceptor() {
     return this.interceptor;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
@@ -18,13 +19,13 @@ import org.mule.runtime.core.api.MuleEventContext;
 public class ResponseWriterCallback extends CounterCallback {
 
   @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
+  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
     if (context.getExchangePattern().hasResponse()) {
       throw new IllegalStateException("The ResponseWriterCallback should not be used for synchronous tests as it will cause two copies of the message to be written back to the client");
     }
-    super.eventReceived(context, component);
+    super.eventReceived(context, component, muleContext);
 
-    String result = context.getMessageAsString() + " Received Async";
+    String result = context.getMessageAsString(muleContext) + " Received Async";
     if (context.getOutputStream() == null) {
       throw new IllegalArgumentException("event context does not have an OutputStream associated");
     }

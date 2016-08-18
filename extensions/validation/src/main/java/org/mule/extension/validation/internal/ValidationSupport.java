@@ -7,15 +7,19 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
+
+import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
@@ -29,6 +33,8 @@ import org.slf4j.LoggerFactory;
 abstract class ValidationSupport {
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
+  @Inject
+  protected MuleContext muleContext;
 
   protected void validateWith(Validator validator, ValidationContext validationContext, MuleEvent event) throws Exception {
     ValidationResult result = validator.validate(event);
@@ -48,7 +54,7 @@ abstract class ValidationSupport {
   private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext) {
     String customMessage = validationContext.getOptions().getMessage();
     if (!StringUtils.isBlank(customMessage)) {
-      result = error(validationContext.getMuleEvent().getMuleContext().getExpressionManager()
+      result = error(muleContext.getExpressionManager()
           .parse(customMessage, validationContext.getMuleEvent()));
     }
 

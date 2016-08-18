@@ -7,6 +7,7 @@
 package org.mule.runtime.core.enricher;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -93,9 +95,13 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   public void setEnrichmentMessageProcessor(MessageProcessor enrichmentProcessor) {
     if (!(enrichmentProcessor instanceof MessageProcessorChain)) {
-      this.enrichmentProcessor = MessageProcessors.singletonChain(enrichmentProcessor);
+      this.enrichmentProcessor = MessageProcessors.singletonChain(muleContext, enrichmentProcessor);
     } else {
       this.enrichmentProcessor = enrichmentProcessor;
+    }
+
+    if (this.enrichmentProcessor instanceof DefaultMessageProcessorChain) {
+      ((DefaultMessageProcessorChain) this.enrichmentProcessor).setTemplateMuleContext(muleContext);
     }
   }
 
@@ -200,7 +206,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
     @Override
     protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
-      final ExpressionManager expressionManager = eventToEnrich.getMuleContext().getExpressionManager();
+      final ExpressionManager expressionManager = muleContext.getExpressionManager();
 
       if (response != null && !VoidMuleEvent.getInstance().equals(eventToEnrich)) {
         for (EnrichExpressionPair pair : enrichExpressionPairs) {
@@ -211,5 +217,13 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
       return eventToEnrich;
     }
 
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    if (this.enrichmentProcessor instanceof DefaultMessageProcessorChain) {
+      ((DefaultMessageProcessorChain) this.enrichmentProcessor).setTemplateMuleContext(muleContext);
+    }
   }
 }

@@ -86,11 +86,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
   }
 
   protected String getValueForEvent(MuleEvent event) throws MessagingException {
-    return event.getMuleContext().getExpressionManager().parse(valueExpression, event, true);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, true);
   }
 
   protected String getIdForEvent(MuleEvent event) throws MessagingException {
-    return event.getMuleContext().getExpressionManager().parse(idExpression, event, true);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, true);
   }
 
   public String getIdExpression() {

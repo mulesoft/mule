@@ -9,15 +9,12 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
-import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -36,7 +33,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCas
   private Latch exceptionLatch = new Latch();
   private Latch commitLatch = new Latch();
   private Latch rollbackLatch = new Latch();
-  private AtomicReference<Exception> exceptionHolder = new AtomicReference<Exception>();
+  private AtomicReference<Exception> exceptionHolder = new AtomicReference<>();
 
   @Override
   protected String getConfigFile() {
@@ -45,32 +42,20 @@ public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCas
 
   @Before
   public void setUp() throws Exception {
-    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        exceptionLatch.release();
-      }
-    });
+    final ExceptionNotificationListener exceptionListener = notification -> exceptionLatch.release();
+    muleContext.registerListener(exceptionListener);
     FunctionalTestComponent failingFlow = getFunctionalTestComponent("failingFlow");
-    failingFlow.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        throw exceptionHolder.get();
-      }
+    failingFlow.setEventCallback((context, component, muleContext) -> {
+      throw exceptionHolder.get();
     });
-    muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
-
-      @Override
-      public void onNotification(TransactionNotification notification) {
-        if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
-          commitLatch.release();
-        } else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
-          rollbackLatch.release();
-        }
+    final TransactionNotificationListener txListener = notification -> {
+      if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
+        commitLatch.release();
+      } else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
+        rollbackLatch.release();
       }
-    });
+    };
+    muleContext.registerListener(txListener);
   }
 
   @Test

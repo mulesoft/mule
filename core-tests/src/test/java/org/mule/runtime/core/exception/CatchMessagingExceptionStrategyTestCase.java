@@ -73,6 +73,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     }
     catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy();
     catchMessagingExceptionStrategy.setMuleContext(mockMuleContext);
+    catchMessagingExceptionStrategy.setFlowConstruct(getTestFlow());
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
     Flow flow = getTestFlow();

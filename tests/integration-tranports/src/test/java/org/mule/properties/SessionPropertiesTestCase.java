@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
@@ -27,7 +28,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
   public void setSessionPropertyUsingAPIGetInFlow() throws Exception {
     MuleEvent result = flowRunner("A").withPayload("data").withSessionProperty("key", "value").run();
 
-    assertThat(result.getMessageAsString(), is("value"));
+    assertThat(result.getMessageAsString(muleContext), is("value"));
   }
 
   @Test

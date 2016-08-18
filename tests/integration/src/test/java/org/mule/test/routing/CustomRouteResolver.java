@@ -8,9 +8,11 @@ package org.mule.test.routing;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.DynamicRouteResolver;
@@ -55,11 +57,12 @@ public class CustomRouteResolver implements DynamicRouteResolver {
     }
   }
 
-  public static class AddLetterTHenFailsMessageProcessor implements MessageProcessor {
+  public static class AddLetterThenFailsMessageProcessor implements MessageProcessor, MuleContextAware {
 
     private String letter;
+    private MuleContext muleContext;
 
-    public AddLetterTHenFailsMessageProcessor(String letter) {
+    public AddLetterThenFailsMessageProcessor(String letter) {
       this.letter = letter;
     }
 
@@ -67,12 +70,17 @@ public class CustomRouteResolver implements DynamicRouteResolver {
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
         event.setMessage(MuleMessage.builder(event.getMessage())
-            .payload(event.getMuleContext().getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
+            .payload(muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
                 + letter)
             .build());
       } catch (Exception e) {
       }
       throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context) {
+      this.muleContext = context;
     }
   }
 }

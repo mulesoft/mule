@@ -107,7 +107,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
     }
 
-    ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER);
+    ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER, muleContext);
     for (String name : resolvedHeaders.keySet()) {
       final Collection<String> paramValues = resolvedHeaders.getAll(name);
       for (String value : paramValues) {
@@ -172,7 +172,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
       } else {
         try {
-          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes());
+          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes(muleContext));
           resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength,
                           supportsTransferEncoding(event), byteArrayHttpEntity);
           httpEntity = byteArrayHttpEntity;
@@ -362,5 +362,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
   }
 }

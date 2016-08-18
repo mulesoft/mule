@@ -50,7 +50,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent result = component.process(getTestEvent(""));
 
-    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
 
   @Test
@@ -68,7 +68,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent result = component.process(getTestEvent(""));
 
-    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
 
   @Test
@@ -86,7 +86,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent result = component.process(getTestEvent(""));
 
-    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
 
   @Test
@@ -106,7 +106,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent result = component.process(getTestEvent(""));
 
-    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
 
   @Test
@@ -132,7 +132,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + INTERCEPTOR_ONE + BEFORE
         + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
         + INTERCEPTOR_ONE + AFTER + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE + AFTER,
-                 result.getMessageAsString());
+                 result.getMessageAsString(muleContext));
   }
 
   class TestInterceptor extends AbstractEnvelopeInterceptor {
@@ -183,7 +183,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
     @Override
     protected Object doInvoke(MuleEvent event) throws Exception {
-      return event.getMessageAsString() + COMPONENT;
+      return event.getMessageAsString(muleContext) + COMPONENT;
     }
   }
 }

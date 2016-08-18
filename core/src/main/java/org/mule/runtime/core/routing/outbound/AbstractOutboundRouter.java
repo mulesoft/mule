@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -14,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -69,8 +70,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   protected AtomicBoolean initialised = new AtomicBoolean(false);
   protected AtomicBoolean started = new AtomicBoolean(false);
 
-  private MessageProcessorExecutionTemplate notificationTemplate =
-      MessageProcessorExecutionTemplate.createNotificationExecutionTemplate();
+  private MessageProcessorExecutionTemplate notificationTemplate = createNotificationExecutionTemplate();
 
   @Override
   public MuleEvent process(final MuleEvent event) throws MuleException {
@@ -219,13 +219,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     if (route == null) {
       throw new DispatchException(CoreMessages.objectIsNull("connector operation"), originalEvent, null);
     }
-
-    if (awaitResponse) {
-      int timeout = eventToRoute.getMessage().getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
-      if (timeout >= 0) {
-        eventToRoute.setTimeout(timeout);
-      }
-    }
     return doProcessRoute(route, eventToRoute);
   }
 
@@ -305,5 +298,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   @Override
   protected List<MessageProcessor> getOwnedMessageProcessors() {
     return routes;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    notificationTemplate.setMuleContext(context);
   }
 }

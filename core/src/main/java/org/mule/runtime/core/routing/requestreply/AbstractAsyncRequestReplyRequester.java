@@ -222,10 +222,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       addProcessed(asyncReplyCorrelationId);
 
       if (failOnTimeout) {
-        event.getMuleContext()
-            .fireNotification(
-                              new RoutingNotification(event.getMessage(), null,
-                                                      RoutingNotification.ASYNC_REPLY_TIMEOUT));
+        muleContext.fireNotification(new RoutingNotification(event.getMessage(), null, RoutingNotification.ASYNC_REPLY_TIMEOUT));
 
         throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout,
                                                                                      asyncReplyCorrelationId),
@@ -300,10 +297,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     + correlationId + ". Dropping event");
               }
               // Fire a notification to say we received this message
-              event.getMuleContext().fireNotification(
-                                                      new RoutingNotification(event.getMessage(),
-                                                                              event.getMessageSourceURI().toString(),
-                                                                              RoutingNotification.MISSED_ASYNC_REPLY));
+              muleContext.fireNotification(new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
+                                                                   RoutingNotification.MISSED_ASYNC_REPLY));
             } else {
               Latch l = locks.get(correlationId);
               if (l != null) {
@@ -336,7 +331,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     private MuleEvent retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException {
       MuleEvent event = (MuleEvent) store.retrieve(correlationId);
 
-      if (event.getMuleContext() == null) {
+      if (event.getFlowConstruct() == null) {
         try {
           DeserializationPostInitialisable.Implementation.init(event, muleContext);
         } catch (Exception e) {

@@ -8,10 +8,11 @@ package org.mule.test.routing;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -51,7 +52,7 @@ public class UntilSuccessfulWithSplitterTestCase extends AbstractIntegrationTest
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      final String payload = event.getMessageAsString();
+      final String payload = event.getMessageAsString(muleContext);
       seenPayloads.add(payload);
 
       if (seenPayloads.count(payload) == 1) {

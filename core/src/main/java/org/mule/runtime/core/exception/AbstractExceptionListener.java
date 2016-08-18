@@ -77,7 +77,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   public AbstractExceptionListener() {
-    super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+    super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
   }
 
 

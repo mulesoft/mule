@@ -15,6 +15,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -91,7 +92,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
     when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
 
-    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
     MuleEvent response = chain.process(event);
     assertNull(response);
 
@@ -111,7 +112,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     });
     when(mp.process(any(MuleEvent.class))).thenReturn(VoidMuleEvent.getInstance());
 
-    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
     MuleEvent response = chain.process(event);
     assertThat(event.getId(), is(response.getId()));
     assertThat(event.getMessage(), is(response.getMessage()));
@@ -125,7 +126,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
-    when(event.getMuleContext()).thenReturn(muleContext);
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());

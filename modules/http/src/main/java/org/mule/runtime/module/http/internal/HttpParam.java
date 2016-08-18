@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 
 public abstract class HttpParam {
@@ -20,5 +21,5 @@ public abstract class HttpParam {
     return type;
   }
 
-  public abstract void resolve(ParameterMap parameterMap, MuleEvent muleEvent);
+  public abstract void resolve(ParameterMap parameterMap, MuleEvent muleEvent, MuleContext muleContext);
 }

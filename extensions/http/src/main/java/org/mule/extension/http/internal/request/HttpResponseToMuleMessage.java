@@ -22,6 +22,7 @@ import org.mule.runtime.api.message.MuleMessage.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -54,10 +55,12 @@ public class HttpResponseToMuleMessage {
 
   private final Boolean parseResponse;
   private final HttpRequesterConfig config;
+  private final MuleContext muleContext;
 
-  public HttpResponseToMuleMessage(HttpRequesterConfig config, Boolean parseResponse) {
+  public HttpResponseToMuleMessage(HttpRequesterConfig config, Boolean parseResponse, MuleContext muleContext) {
     this.config = config;
     this.parseResponse = parseResponse;
+    this.muleContext = muleContext;
   }
 
   public MuleMessage convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
@@ -68,7 +71,7 @@ public class HttpResponseToMuleMessage {
     }
 
     InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-    Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getCharset().get();
+    Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
 
     Object payload = responseInputStream;
     if (responseContentType != null && parseResponse) {

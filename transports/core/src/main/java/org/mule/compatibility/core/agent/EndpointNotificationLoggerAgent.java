@@ -75,7 +75,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         ((MuleContextAware) endpoint).setMuleContext(muleContext);
       }
       if (endpoint instanceof MessagingExceptionHandlerAware) {
-        ((MessagingExceptionHandlerAware) endpoint).setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+        ((MessagingExceptionHandlerAware) endpoint)
+            .setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
       }
       if (endpoint instanceof Initialisable) {
         ((Initialisable) endpoint).initialise();

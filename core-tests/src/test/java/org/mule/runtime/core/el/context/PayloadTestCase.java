@@ -38,7 +38,6 @@ public class PayloadTestCase extends AbstractELTestCase {
       return null;
     }).when(event).setMessage(any(MuleMessage.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
-    when(event.getMuleContext()).thenReturn(muleContext);
   }
 
   @Test

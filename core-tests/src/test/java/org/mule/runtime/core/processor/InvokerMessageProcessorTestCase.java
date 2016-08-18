@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -56,7 +57,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[#['1']]");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -64,7 +65,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("1-#[#['2']]-3");
     invoker.initialise();
-    assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -72,7 +73,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("1");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -80,7 +81,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArguments(Collections.singletonList(null));
     invoker.initialise();
-    assertEquals("null echo", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("null echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -113,7 +114,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArgumentExpressionsString("#['1'], #['2']");
     invoker.setArgumentTypes(new Class[] {String.class, Integer.TYPE});
     invoker.initialise();
-    assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
 
   }
 
@@ -123,7 +124,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArgumentTypes(new Class<?>[] {String.class, Integer.class});
     invoker.setArguments(asList("some String", 42));
     invoker.initialise();
-    assertEquals("some String42(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("some String42(string and int)", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
 
   }
 
@@ -146,7 +147,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[payload:]");
     invoker.initialise();
-    assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString());
+    assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString(muleContext));
   }
 
   @Test
@@ -200,7 +201,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#['1']");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
   }
 
   private class TestInvokeObject {

@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.transport.ssl;
 
-import org.mule.compatibility.transport.ssl.SslConnector;
 import org.mule.functional.functional.EventCallback;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 
 import java.security.cert.Certificate;
@@ -26,7 +26,7 @@ public class SaveCertificatesCallback implements EventCallback {
   }
 
   @Override
-  public void eventReceived(MuleEventContext context, Object component) throws Exception {
+  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
     // putting a Thread.sleep here doesn't make this less reliable
     // surely it would if it was thread scribbling?
     Thread.sleep(100);

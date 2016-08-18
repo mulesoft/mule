@@ -30,10 +30,10 @@ abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<
    * 
    * @param messageProcessor a {@link MessageProcessor}
    * @param event a {@link MuleEvent}
+   * @param muleContext the Mule node.
    * @return a {@link NestedProcessor}
    */
-  protected NestedProcessor toNestedProcessor(MessageProcessor messageProcessor, MuleEvent event) {
-    MuleContext muleContext = event.getMuleContext();
+  protected NestedProcessor toNestedProcessor(MessageProcessor messageProcessor, MuleEvent event, MuleContext muleContext) {
     try {
       muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), messageProcessor);
     } catch (RegistrationException e) {

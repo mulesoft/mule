@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.tcp;
 
+import static org.mule.compatibility.core.endpoint.AbstractEndpoint.TIMEOUT_WAIT_FOREVER;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
@@ -59,7 +61,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     try {
       if (returnResponse(event)) {
         try {
-          Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
+          Object result = receiveFromSocket(socket, getTimeout(), endpoint);
           if (result == null) {
             return MuleMessage.builder().nullPayload().build();
           }
@@ -83,6 +85,14 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
       }
     }
 
+  }
+
+  protected int getTimeout() {
+    if (endpoint.getMuleContext().getConfiguration().isDisableTimeouts()) {
+      return TIMEOUT_WAIT_FOREVER;
+    } else {
+      return endpoint.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+    }
   }
 
   // Socket management (get and release) is handled outside this method

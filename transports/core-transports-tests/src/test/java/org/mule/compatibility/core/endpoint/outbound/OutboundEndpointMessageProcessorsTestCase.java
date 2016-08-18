@@ -40,7 +40,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
 
   @Test
   public void testProcessors() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
     MessageProcessor mpChain = builder.build();
 
@@ -50,7 +50,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
 
   @Test
   public void testNoProcessors() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     MessageProcessor mpChain = builder.build();
 
     result = mpChain.process(testOutboundEvent);

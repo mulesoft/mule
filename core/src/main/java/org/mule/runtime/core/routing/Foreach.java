@@ -176,7 +176,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     messageProcessorInitialized = true;
 
     try {
-      this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+      this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder(muleContext).chain(messageProcessors).build();
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

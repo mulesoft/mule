@@ -10,6 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.transport.http.HttpConnector;
@@ -21,7 +22,6 @@ import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -302,7 +302,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
                                                          HttpConstants.HTTP11);
       if (HttpConstants.HTTP10.equals(httpVersion)) {
         try {
-          src = event.getMessageAsBytes();
+          src = event.getMessageAsBytes(muleContext);
         } catch (final Exception e) {
           throw new TransformerException(this, e);
         }
@@ -370,7 +370,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
       parts = new Part[msg.getOutboundAttachmentNames().size()];
     } else {
       parts = new Part[msg.getOutboundAttachmentNames().size() + 1];
-      parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", event.getMessageAsBytes()));
+      parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", event.getMessageAsBytes(muleContext)));
     }
 
     for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++) {
@@ -459,14 +459,17 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
       return this.content;
     }
 
+    @Override
     protected void sendData(OutputStream out) throws IOException {
       out.write(this.getContent());
     }
 
+    @Override
     protected long lengthOfData() throws IOException {
-      return (long) this.getContent().length;
+      return this.getContent().length;
     }
 
+    @Override
     public void setCharSet(String charSet) {
       super.setCharSet(charSet);
       this.content = null;

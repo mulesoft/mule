@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.api;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current request. Using the context, developers can
@@ -42,12 +42,13 @@ public interface MuleEventContext {
    *
    * @param dataType The dataType required for the return object. This param just provides a convienient way to manage type
    *        casting of transformed objects
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format.
    * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or if the return type is not the same
    *         as the expected type in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
-  Object transformMessage(DataType dataType) throws TransformerException;
+  Object transformMessage(DataType dataType, MuleContext muleContext) throws TransformerException;
 
   /**
    * Returns the message transformed into it's recognised or expected format. The transformer used is the one configured on the
@@ -55,39 +56,43 @@ public interface MuleEventContext {
    * 
    * @param expectedType The class type required for the return object. This param just provides a convienient way to manage type
    *        casting of transformed objects
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format.
    * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or if the return type is not the same
    *         as the expected type in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
-  Object transformMessage(Class expectedType) throws TransformerException;
+  Object transformMessage(Class expectedType, MuleContext muleContext) throws TransformerException;
 
   /**
    * Returns the message transformed into it's recognised or expected format and then into a String. The transformer used is the
    * one configured on the endpoint through which this event was received. This method will use the encoding set on the event
    * 
+   * @param muleContext the Mule node.
    * @return the message transformed into it's recognised or expected format as a Strings.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    */
-  String transformMessageToString() throws TransformerException;
+  String transformMessageToString(MuleContext muleContext) throws TransformerException;
 
   /**
    * Returns the message contents as a string This method will use the encoding set on the event
    * 
+   * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
    */
-  String getMessageAsString() throws MuleException;
+  String getMessageAsString(MuleContext muleContext) throws MuleException;
 
   /**
    * Returns the message contents as a string
    * 
    * @param encoding The encoding to use when transforming the message
+   * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
    */
-  String getMessageAsString(Charset encoding) throws MuleException;
+  String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException;
 
   /**
    * Returns the current transaction (if any) for the session
@@ -95,28 +100,6 @@ public interface MuleEventContext {
    * @return the current transaction for the session or null if there is no transaction in progress
    */
   Transaction getCurrentTransaction();
-
-  /**
-   * Depending on the session state this methods either Passes an event synchronously to the next available Mule component in the
-   * pool or via the endpoint configured for the event
-   *
-   * @param message the event message payload to send
-   * @param endpointName The endpoint name to disptch the event through. This will be looked up first on the service configuration
-   *        and then on the mule manager configuration
-   * @return the return Message from the call or null if there was no result
-   * @throws MuleException if the event fails to be processed by the service or the transport for the endpoint
-   */
-  MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException;
-
-  /**
-   * Requests a synchronous receive of an event on the service.
-   * 
-   * @param endpointName the endpoint identifying the endpointUri on which the event will be received
-   * @param timeout time in milliseconds before the request timesout
-   * @return The requested event or null if the request times out
-   * @throws MuleException if the request operation fails
-   */
-  MuleMessage requestEvent(String endpointName, long timeout) throws MuleException;
 
   FlowConstruct getFlowConstruct();
 
@@ -154,14 +137,5 @@ public interface MuleEventContext {
    */
   Transaction getTransaction();
 
-  /**
-   * Get the timeout value associated with the event
-   * 
-   * @return the timeout for the event
-   */
-  int getTimeout();
-
   MuleSession getSession();
-
-  MuleContext getMuleContext();
 }

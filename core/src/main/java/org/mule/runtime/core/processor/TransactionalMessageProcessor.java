@@ -16,8 +16,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.processor.DelegateTransactionFactory;
-import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
@@ -44,7 +42,7 @@ public class TransactionalMessageProcessor extends TransactionalInterceptingMess
 
   @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
     txProcessor.setExceptionListener(this.exceptionListener);

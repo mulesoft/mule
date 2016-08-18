@@ -9,7 +9,6 @@ package org.mule.runtime.core.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MessagingException;
@@ -33,6 +32,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
   @Mock
   private MessageProcessor mockMessageProcessor;
   @Mock
+  private MuleContext mockMuleContext;
+  @Mock
   private MuleEvent mockMuleEvent;
   @Mock
   private MuleEvent mockResultMuleEvent;
@@ -40,13 +41,14 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
   private MessagingException mockMessagingException;
   @Mock
   private MuleException mockMuleException;
-  private ExceptionToMessagingExceptionExecutionInterceptor cut = new ExceptionToMessagingExceptionExecutionInterceptor();
+  private ExceptionToMessagingExceptionExecutionInterceptor cut;
 
   @Before
   public void before() {
-    when(mockMuleEvent.getMuleContext()).thenReturn(mock(MuleContext.class));
-
     when(mockMessagingException.getFailingMessageProcessor()).thenCallRealMethod();
+
+    cut = new ExceptionToMessagingExceptionExecutionInterceptor();
+    cut.setMuleContext(mockMuleContext);
   }
 
   @Test

@@ -51,7 +51,7 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
 
   @Override
   protected List<MuleEvent> splitMessage(MuleEvent event) {
-    Object result = event.getMuleContext().getExpressionManager().evaluate(config.getFullExpression(expressionManager), event);
+    Object result = muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), event);
     if (result instanceof Object[]) {
       result = Arrays.asList((Object[]) result);
     }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -31,13 +32,15 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected List processors = new ArrayList();
   protected String name;
   protected FlowConstruct flowConstruct;
+  protected MuleContext muleContext;
 
   public AbstractMessageProcessorChainBuilder() {
     // empty
   }
 
-  public AbstractMessageProcessorChainBuilder(FlowConstruct flowConstruct) {
+  public AbstractMessageProcessorChainBuilder(FlowConstruct flowConstruct, MuleContext muleContext) {
     this.flowConstruct = flowConstruct;
+    this.muleContext = muleContext;
   }
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder

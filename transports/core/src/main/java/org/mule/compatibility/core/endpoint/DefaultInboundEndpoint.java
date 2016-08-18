@@ -104,14 +104,14 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
   }
 
   @Override
-  public MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException {
+  public MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
     EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
     MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct, listener);
     if (processorChain instanceof MuleContextAware) {
       ((MuleContextAware) processorChain).setMuleContext(getMuleContext());
     }
     if (processorChain instanceof FlowConstructAware) {
-      ((FlowConstructAware) processorChain).setFlowConstruct(flowContruct);
+      ((FlowConstructAware) processorChain).setFlowConstruct(flowConstruct);
     }
     if (processorChain instanceof Initialisable) {
       ((Initialisable) processorChain).initialise();

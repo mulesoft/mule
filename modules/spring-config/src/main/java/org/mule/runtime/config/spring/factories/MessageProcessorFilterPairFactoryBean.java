@@ -25,6 +25,7 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
 
   private List<MessageProcessor> messageProcessors;
   private Filter filter = new ExpressionFilter();
+  private MuleContext muleContext;
 
   public void setFilter(Filter filter) {
     this.filter = filter;
@@ -40,7 +41,7 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
 
   @Override
   public MessageProcessorFilterPair getObject() throws Exception {
-    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     for (Object processor : messageProcessors) {
       if (processor instanceof MessageProcessor) {
         builder.chain((MessageProcessor) processor);
@@ -77,5 +78,6 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
     if (filter != null && filter instanceof MuleContextAware) {
       ((MuleContextAware) filter).setMuleContext(context);
     }
+    this.muleContext = context;
   }
 }

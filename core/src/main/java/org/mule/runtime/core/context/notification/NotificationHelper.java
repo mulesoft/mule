@@ -12,13 +12,12 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
@@ -78,10 +77,11 @@ public class NotificationHelper {
    * Checks if the {@link ServerNotificationHandler} associated to the given {@code event} is enabled to fire instances of
    * {@link #notificationClass}
    *
+   * @param muleContext the Mule node.
    * @return {@code true} if there is a {@link ServerNotificationHandler} enabled for {@link #notificationClass}
    */
-  public boolean isNotificationEnabled(MuleEvent event) {
-    return getNotificationHandler(event).isNotificationEnabled(notificationClass);
+  public boolean isNotificationEnabled(MuleContext muleContext) {
+    return getNotificationHandler(muleContext).isNotificationEnabled(notificationClass);
   }
 
   /**
@@ -95,7 +95,8 @@ public class NotificationHelper {
    * @param action the action code for the notification
    */
   public void fireNotification(Object source, MuleEvent event, String uri, FlowConstruct flowConstruct, int action) {
-    doFireNotification(getNotificationHandler(event), source, event.getMessage(), uri, flowConstruct, action);
+    doFireNotification(getNotificationHandler(flowConstruct.getMuleContext()), source, event.getMessage(), uri, flowConstruct,
+                       action);
   }
 
   /**
@@ -113,9 +114,10 @@ public class NotificationHelper {
    * Fires the given {@code notification} using the {@link ServerNotificationHandler} that corresponds to the given {@code event}
    *
    * @param notification a {@link ServerNotification}
+   * @param muleContext the Mule node.
    */
-  public void fireNotification(ServerNotification notification, MuleEvent event) {
-    getNotificationHandler(event).fireNotification(notification);
+  public void fireNotification(ServerNotification notification, MuleContext muleContext) {
+    getNotificationHandler(muleContext).fireNotification(notification);
   }
 
   private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, MuleMessage message,
@@ -135,7 +137,7 @@ public class NotificationHelper {
         : new OptimisedNotificationHandler(serverNotificationHandler, notificationClass);
   }
 
-  private ServerNotificationHandler getNotificationHandler(MuleEvent event) {
-    return serverNotificationHandlers.getUnchecked(event.getMuleContext());
+  private ServerNotificationHandler getNotificationHandler(MuleContext muleContext) {
+    return serverNotificationHandlers.getUnchecked(muleContext);
   }
 }

@@ -18,7 +18,6 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -79,9 +78,8 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     trans.setMuleContext(muleContext);
     MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
 
-    // Assert that deserialized event is not null and has muleContext
+    // Assert that deserialized event is not null
     assertNotNull(deserialized);
-    assertNotNull(deserialized.getMuleContext());
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
@@ -123,9 +121,8 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     // Deserialize
     MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
 
-    // Assert that deserialized event is not null and has muleContext
+    // Assert that deserialized event is not null
     assertNotNull(deserialized);
-    assertNotNull(deserialized.getMuleContext());
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
@@ -203,7 +200,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     trans2.setName("Bumblebee");
     muleContext.getRegistry().registerTransformer(trans2);
 
-    List<Transformer> transformers = new ArrayList<Transformer>();
+    List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
     transformers.add(trans2);
 

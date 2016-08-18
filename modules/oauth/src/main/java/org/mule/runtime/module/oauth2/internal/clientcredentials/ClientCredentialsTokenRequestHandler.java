@@ -9,10 +9,6 @@ package org.mule.runtime.module.oauth2.internal.clientcredentials;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.codec.binary.Base64;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -31,6 +27,11 @@ import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseCo
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.codec.binary.Base64;
+
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
  */
@@ -41,7 +42,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
   private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
   private TokenManagerConfig tokenManager;
   private boolean encodeClientCredentialsInBody = false;
-  private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
+  private MuleEventLogger muleEventLogger;
 
   public void setApplicationCredentials(ApplicationCredentials applicationCredentials) {
     this.applicationCredentials = applicationCredentials;
@@ -58,6 +59,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
   @Override
   public void setMuleContext(MuleContext muleContext) {
     super.setMuleContext(muleContext);
+    muleEventLogger = new MuleEventLogger(logger, muleContext);
   }
 
   private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException {

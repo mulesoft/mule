@@ -10,15 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.functional.functional.EventCallback;
+
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,23 +43,12 @@ public class TransactionalElementLifecycleTestCase extends AbstractIntegrationTe
 
   @Test
   public void testInitializeIsCalledInInnerExceptionStrategy() throws Exception {
-    muleContext.getNotificationManager().addListener(new TransactionNotificationListener<TransactionNotification>() {
-
-      @Override
-      public void onNotification(TransactionNotification notification) {
-        notifications.add(notification);
-      }
-    });
+    final TransactionNotificationListener listener = notification -> notifications.add((TransactionNotification) notification);
+    muleContext.getNotificationManager().addListener(listener);
 
     final Latch endDlqFlowLatch = new Latch();
     FunctionalTestComponent functionalTestComponent = getFunctionalTestComponent("dlq-out");
-    functionalTestComponent.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        endDlqFlowLatch.release();
-      }
-    });
+    functionalTestComponent.setEventCallback((context, component, muleContext) -> endDlqFlowLatch.release());
     flowRunner("in-flow").withPayload("message").run();
     if (!endDlqFlowLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message wasn't received by dlq flow");

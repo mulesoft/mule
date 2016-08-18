@@ -7,8 +7,6 @@
 package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
@@ -24,6 +22,7 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleCo
   protected List messageProcessors;
   private MuleContext muleContext;
 
+  @Override
   public Class getObjectType() {
     return MessageProcessor.class;
   }
@@ -32,8 +31,9 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleCo
     this.messageProcessors = messageProcessors;
   }
 
+  @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("'response' child processor chain");
     for (Object processor : messageProcessors) {
       if (processor instanceof MessageProcessor) {
@@ -50,6 +50,7 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleCo
     return responseAdapter;
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }

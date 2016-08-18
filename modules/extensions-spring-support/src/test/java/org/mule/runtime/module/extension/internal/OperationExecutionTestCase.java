@@ -104,7 +104,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   public void voidOperationWithoutParameters() throws Exception {
     MuleEvent responseEvent = flowRunner("die").withPayload(EMPTY).run();
 
-    assertThat(responseEvent.getMessageAsString(), is(EMPTY));
+    assertThat(responseEvent.getMessageAsString(muleContext), is(EMPTY));
     assertThat(getConfig(HEISENBERG).getEndingHealth(), is(DEAD));
   }
 
@@ -163,7 +163,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     MuleEvent event = runFlow("killOne");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
 
-    assertThat(expected, is(event.getMessageAsString()));
+    assertThat(expected, is(event.getMessageAsString(muleContext)));
   }
 
   @Test
@@ -172,7 +172,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
         + "bye bye, Nazi dudes\n";
 
-    assertThat(event.getMessageAsString(), is(expected));
+    assertThat(event.getMessageAsString(muleContext), is(expected));
   }
 
   @Test
@@ -180,7 +180,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     MuleEvent event = runFlow("killManyButOnlyOneProvided");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
 
-    assertThat(expected, is(event.getMessageAsString()));
+    assertThat(expected, is(event.getMessageAsString(muleContext)));
   }
 
   @Test
@@ -191,7 +191,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void alias() throws Exception {
-    String alias = runFlow("alias").getMessageAsString();
+    String alias = runFlow("alias").getMessageAsString(muleContext);
     assertThat(alias, is("Howdy!, my name is Walter White and I'm 52 years old"));
   }
 
@@ -262,7 +262,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     ricinWeapon.setMicrogramsPerKilo(10L);
 
     MuleEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
-    assertThat(event.getMessageAsString(), is(KILL_RESULT));
+    assertThat(event.getMessageAsString(muleContext), is(KILL_RESULT));
   }
 
 
@@ -383,7 +383,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertKillPayload(MuleEvent event) throws MuleException {
-    assertThat(event.getMessageAsString(), is(String.format("%s, %s", GOODBYE_MESSAGE, VICTIM)));
+    assertThat(event.getMessageAsString(muleContext), is(String.format("%s, %s", GOODBYE_MESSAGE, VICTIM)));
   }
 
   private void assertKillByPayload(String flowName) throws Exception {
@@ -393,7 +393,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   private void doTestExpressionEnemy(Object enemyIndex) throws Exception {
     MuleEvent event = flowRunner("expressionEnemy").withPayload(EMPTY).withFlowVariable("enemy", enemyIndex).run();
 
-    assertThat(event.getMessageAsString(), is(GUSTAVO_FRING));
+    assertThat(event.getMessageAsString(muleContext), is(GUSTAVO_FRING));
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {

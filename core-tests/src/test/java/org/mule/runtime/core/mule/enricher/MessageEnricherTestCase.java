@@ -381,7 +381,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
   }
 
   private MuleEvent processEnricherInChain(MessageEnricher enricher, final MuleEvent in) throws MuleException {
-    return DefaultMessageProcessorChain.from(enricher, event -> {
+    return DefaultMessageProcessorChain.from(muleContext, enricher, event -> {
       assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
       return event;
     }).process(in);

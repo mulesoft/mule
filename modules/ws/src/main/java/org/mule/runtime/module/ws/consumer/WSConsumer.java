@@ -138,7 +138,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
    * transformer, a CXF client proxy and and outbound endpoint.
    */
   private MessageProcessor createMessageProcessor() throws MuleException {
-    MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
+    MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(muleContext);
 
     chainBuilder.chain(createCopyAttachmentsMessageProcessor());
 

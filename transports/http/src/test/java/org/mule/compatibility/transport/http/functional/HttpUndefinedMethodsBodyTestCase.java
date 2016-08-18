@@ -13,6 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
@@ -62,7 +63,7 @@ public class HttpUndefinedMethodsBodyTestCase extends FunctionalTestCase {
     event = flow.process(event);
 
     assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
-    assertThat(event.getMessageAsString(), is(expectedContent));
+    assertThat(event.getMessageAsString(muleContext), is(expectedContent));
   }
 
 }

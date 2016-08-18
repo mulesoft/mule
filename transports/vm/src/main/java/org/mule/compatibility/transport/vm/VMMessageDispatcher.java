@@ -96,7 +96,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     final MuleCompatibilityMessage message = builder.build();
 
     ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate
-        .createTransactionalExecutionTemplate(event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
+        .createTransactionalExecutionTemplate(endpoint.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
     ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall(message);
     retMessage = executionTemplate.execute(processingCallback);
 

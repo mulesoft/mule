@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -31,7 +33,8 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
   private ConnectionProvider connectionProvider = null;
   private Function<MuleEvent, ConnectionProvider> delegate;
 
-  public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel) {
+  public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel,
+                                                 MuleContext muleContext) {
     if (getAllConnectionProviders(configurationModel).isEmpty()) {
       // No connection provider to resolve
       delegate = nextEvent -> null;
@@ -40,7 +43,8 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
         synchronized (this) {
           if (connectionProvider == null) {
             connectionProvider =
-                new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
+                new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event,
+                                                                                                muleContext);
             delegate = nextEvent -> connectionProvider;
           }
           return connectionProvider;

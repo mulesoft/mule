@@ -61,7 +61,7 @@ public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends Fun
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
       return event;
 
     }
@@ -71,7 +71,7 @@ public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends Fun
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }
@@ -80,7 +80,7 @@ public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends Fun
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
+      muleContext.getClient().send(getUrl("innerrequestresponsetest"), MuleMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }

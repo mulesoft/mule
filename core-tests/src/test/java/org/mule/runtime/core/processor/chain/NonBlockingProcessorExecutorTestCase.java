@@ -177,7 +177,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
       throws MuleException, InterruptedException {
     assertNonBlockingExecution(processors);
     assertThat(nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
-    assertThat(nullReplyToHandler.event.getMessageAsString(), equalTo(RESULT));
+    assertThat(nullReplyToHandler.event.getMessageAsString(muleContext), equalTo(RESULT));
   }
 
   private void assertNonBlockingExecutionWithoutReplyTo(List<MessageProcessor> processors)

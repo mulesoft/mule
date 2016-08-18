@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.construct.Flow;
 
 import java.nio.charset.Charset;
@@ -78,11 +77,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
       connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage(), endpoint.getMuleContext());
 
       if (hasResponse) {
-        if (!event.getMuleContext().waitUntilStarted(event.getTimeout())) {
-          throw new MessagingException(MessageFactory
-              .createStaticMessage("Timeout waiting for mule context to be completely started"), event, this);
-        }
-
         if (isNonBlocking(event)) {
           doSendNonBlocking(event, new NonBlockingSendCompletionHandler(event, ((Flow) event.getFlowConstruct()).getWorkManager(),
                                                                         connector));
@@ -111,7 +105,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
       MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                                                                                                resultMessage,
-                                                                                               requestEvent.getMuleContext());
+                                                                                               endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
       MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
       setCurrentEvent(resultEvent);

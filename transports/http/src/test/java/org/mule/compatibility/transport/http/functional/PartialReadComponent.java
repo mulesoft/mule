@@ -7,18 +7,27 @@
 package org.mule.compatibility.transport.http.functional;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.io.InputStream;
 
-public class PartialReadComponent implements Callable {
+public class PartialReadComponent implements Callable, MuleContextAware {
+
+  private MuleContext muleContext;
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
-    InputStream stream = (InputStream) eventContext.getMuleContext().getTransformationService()
+    InputStream stream = (InputStream) muleContext.getTransformationService()
         .transform(eventContext.getMessage(), DataType.INPUT_STREAM).getPayload();
     stream.read();
     return "Hello";
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

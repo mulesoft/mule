@@ -9,10 +9,8 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -44,21 +42,17 @@ public class WorkDirectoryTestCase extends FunctionalTestCase {
   @Test
   public void testWorkDirectory() throws Exception {
     FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("relay");
-    ftc.setEventCallback(new EventCallback() {
-
-      @Override
-      public void eventReceived(MuleEventContext context, Object component) throws Exception {
-        File workDir = getFileInsideWorkingDirectory("work");
-        String[] filenames = workDir.list();
-        assertTrue(filenames.length > 0);
-        for (String filename : filenames) {
-          if (filename.contains(TEST_FILENAME)) {
-            return;
-          }
+    ftc.setEventCallback((context, component, muleContext) -> {
+      File workDir = getFileInsideWorkingDirectory("work");
+      String[] filenames = workDir.list();
+      assertTrue(filenames.length > 0);
+      for (String filename : filenames) {
+        if (filename.contains(TEST_FILENAME)) {
+          return;
         }
-
-        fail("no work dir file matching filename " + TEST_FILENAME);
       }
+
+      fail("no work dir file matching filename " + TEST_FILENAME);
     });
 
     writeTestMessageToInputDirectory();

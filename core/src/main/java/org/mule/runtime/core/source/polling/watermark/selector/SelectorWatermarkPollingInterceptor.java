@@ -7,9 +7,11 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
@@ -25,10 +27,11 @@ import java.util.Iterator;
  * 
  * @since 3.5.0
  */
-public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterceptor {
+public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterceptor implements MuleContextAware {
 
   private final WatermarkSelector selector;
   private final String selectorExpression;
+  private MuleContext muleContext;
 
   public SelectorWatermarkPollingInterceptor(Watermark watermark, WatermarkSelector selector, String selectorExpression) {
     super(watermark);
@@ -56,7 +59,7 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
   public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws ConfigurationException {
     event = super.prepareRouting(sourceEvent, event);
     Object payload = event.getMessage().getPayload();
-    final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector, this.selectorExpression, event);
+    final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector, this.selectorExpression, event, muleContext);
 
     if (payload instanceof Iterable) {
       // consume early since the user could consume this collection in
@@ -112,5 +115,10 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
     public int size() {
       return (delegate instanceof ProvidesTotalHint) ? ((ProvidesTotalHint) delegate).size() : -1;
     }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

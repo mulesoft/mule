@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.junit.Test;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
@@ -22,6 +21,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.construct.Flow;
+
+import org.junit.Test;
 
 public class OutboundResponsePropertiesMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
 
@@ -50,7 +51,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
     MuleEvent result = mp.process(event);
 
     assertNotNull(result);
-    assertThat(result.getMessageAsString(), is(TEST_MESSAGE));
+    assertThat(result.getMessageAsString(muleContext), is(TEST_MESSAGE));
     assertThat(result.getMessage().getOutboundProperty(MY_PROPERTY_KEY), is(MY_PROPERTY_VAL));
   }
 

@@ -9,8 +9,8 @@ package org.mule.test.routing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +89,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase {
   }
 
   private Map<String, Object> getFlowVarsMap(boolean firstRouter, int id) {
-    Map<String, Object> flowVars = new HashMap<String, Object>();
+    Map<String, Object> flowVars = new HashMap<>();
     flowVars.put(FIRST_ROUTER_VAR, firstRouter);
     flowVars.put(ID, id);
     return flowVars;
@@ -118,7 +118,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase {
       }
     }
     MuleEvent response = runner.run();
-    assertThat(response.getMessageAsString(), is(expectedMessage));
+    assertThat(response.getMessageAsString(muleContext), is(expectedMessage));
     return response;
   }
 

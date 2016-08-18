@@ -69,7 +69,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
       return (MuleEvent) args[0];
     });
 
-    List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+    List<MessageProcessor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
@@ -112,7 +112,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     // While a SedaService returns null, a Flow echos the request when there is async hand-off
     assertEquals(event, response);
 
-    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
+    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
   }
 
@@ -122,12 +122,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.start();
     MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
 
-    assertEquals("helloabcdef", response.getMessageAsString());
+    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
 
     // Sensed (out) event also is appended with 'def' because it's the same event
     // instance
-    assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString());
+    assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
 
   }
@@ -199,16 +199,16 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
     MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("hello12abcdef34", response.getMessageAsString());
+    assertEquals("hello12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
     response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("hello2abcdef3", response.getMessageAsString());
+    assertEquals("hello2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
     response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("helloabcdef", response.getMessageAsString());
+    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
   }
 
   @Test
