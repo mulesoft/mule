@@ -9,8 +9,10 @@ package org.mule.functional.junit4;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -36,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Manifest;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
@@ -91,7 +92,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
     if (isEmpty(describers) && !isEmpty(annotatedClasses)) {
       describers = stream(annotatedClasses)
           .map(annotatedClass -> new AnnotationsBasedDescriber(annotatedClass, new StaticVersionResolver(getProductVersion())))
-          .collect(Collectors.toList()).toArray(new Describer[annotatedClasses.length]);
+          .collect(toList()).toArray(new Describer[annotatedClasses.length]);
     }
     if (isEmpty(describers)) {
       throw new IllegalStateException("No extension found");
@@ -100,7 +101,10 @@ public class ExtensionsTestInfrastructureDiscoverer {
 
     ExtensionsTestInfrastructureResourcesGenerator generator =
         new ExtensionsTestInfrastructureResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
-    extensionManager.getExtensions().forEach(generator::generateFor);
+
+    extensionManager.getExtensions()
+        .forEach(e -> withContextClassLoader(getClass().getClassLoader(),
+                                             () -> generator.generateFor(e)));
     return generator.dumpAll();
   }
 

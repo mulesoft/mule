@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
@@ -49,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 3.7.0
  */
-public final class ExtensionRegistry {
+final class ExtensionRegistry {
 
   private final LoadingCache<ExtensionModel, List<ConfigurationProvider>> providersByExtension =
       CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, List<ConfigurationProvider>>() {
@@ -70,7 +69,7 @@ public final class ExtensionRegistry {
    *
    * @param registry the {@link MuleRegistry} to use for holding instances
    */
-  public ExtensionRegistry(MuleRegistry registry) {
+  ExtensionRegistry(MuleRegistry registry) {
     this.registry = registry;
   }
 
@@ -78,11 +77,10 @@ public final class ExtensionRegistry {
    * Registers the given {@code extension}
    *
    * @param name the registration name you want for the {@code extension}
-   * @param vendor the registration vendor name you want for the {@code extension}
    * @param extensionModel a {@link ExtensionModel}
    */
-  void registerExtension(String name, String vendor, RuntimeExtensionModel extensionModel) {
-    extensions.put(new ExtensionEntityKey(name, vendor), extensionModel);
+  void registerExtension(String name, RuntimeExtensionModel extensionModel) {
+    extensions.put(new ExtensionEntityKey(name), extensionModel);
     getParameterClasses(extensionModel).stream().filter(type -> Enum.class.isAssignableFrom(type)).forEach(type -> {
       final Class<Enum> enumClass = (Class<Enum>) type;
       if (enumClasses.add(enumClass)) {
@@ -104,28 +102,19 @@ public final class ExtensionRegistry {
   }
 
   /**
-   * @return an immutable view of the currently registered {@link ExtensionModel extensionModels} which name equals
-   *         {@code extensionName}
-   */
-  Set<RuntimeExtensionModel> getExtensions(String extensionName) {
-    return extensions.entrySet().stream().filter(entry -> entry.getKey().getName().equals(extensionName)).map(Map.Entry::getValue)
-        .collect(new ImmutableSetCollector<>());
-  }
-
-  /**
    * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals {@code extensionName} and
    *         {@code vendor}
    */
-  Optional<RuntimeExtensionModel> getExtension(String extensionName, String vendor) {
-    return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName, vendor)));
+  Optional<RuntimeExtensionModel> getExtension(String extensionName) {
+    return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName)));
   }
 
   /**
    * @param name the registration name of the {@link ExtensionModel} you want to test
    * @return {@code true} if an {@link ExtensionModel} is registered under {@code name}. {@code false} otherwise
    */
-  boolean containsExtension(String name, String vendor) {
-    return extensions.containsKey(new ExtensionEntityKey(name, vendor));
+  boolean containsExtension(String name) {
+    return extensions.containsKey(new ExtensionEntityKey(name));
 
   }
 

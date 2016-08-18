@@ -116,13 +116,13 @@ public final class DefaultExtensionManager
 
     LOGGER.info("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
 
-    if (extensionRegistry.containsExtension(extensionName, extensionVendor)) {
+    if (extensionRegistry.containsExtension(extensionName)) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("A extension of name '{}' (version: {} vendor {}) is already registered. Skipping...", extensionName,
+        LOGGER.debug("An extension of name '{}' (version: {} vendor {}) is already registered. Skipping...", extensionName,
                      extensionVersion, extensionVendor);
       }
     } else {
-      extensionRegistry.registerExtension(extensionName, extensionVendor, extensionModel);
+      extensionRegistry.registerExtension(extensionName, extensionModel);
     }
   }
 
@@ -217,16 +217,8 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public Set<RuntimeExtensionModel> getExtensions(String extensionName) {
-    return extensionRegistry.getExtensions(extensionName);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<RuntimeExtensionModel> getExtension(String extensionName, String vendor) {
-    return extensionRegistry.getExtension(extensionName, vendor);
+  public Optional<RuntimeExtensionModel> getExtension(String extensionName) {
+    return extensionRegistry.getExtension(extensionName);
   }
 
   private ConfigurationExpirationMonitor newConfigurationExpirationMonitor() {

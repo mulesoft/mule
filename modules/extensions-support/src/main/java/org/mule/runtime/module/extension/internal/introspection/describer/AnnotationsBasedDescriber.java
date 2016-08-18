@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
@@ -65,9 +64,9 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
@@ -153,9 +152,14 @@ public final class AnnotationsBasedDescriber implements Describer {
     final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(this.extensionType);
     Extension extension = getExtension(this.extensionType);
     ExtensionDeclarer declaration =
-        context.getExtensionDeclarer().named(extension.name()).onVersion(getVersion(extension)).fromVendor(extension.vendor())
-            .withCategory(extension.category()).withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
-            .describedAs(extension.description()).withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
+        context.getExtensionDeclarer()
+            .named(extension.name())
+            .onVersion(getVersion(extension))
+            .fromVendor(extension.vendor())
+            .withCategory(extension.category())
+            .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
+            .describedAs(extension.description())
+            .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
             .withModelProperty(new ImplementingTypeModelProperty(this.extensionType));
 
     declareConfigurations(declaration, extensionElement);
@@ -227,7 +231,8 @@ public final class AnnotationsBasedDescriber implements Describer {
     if (sourceGenerics.size() != 2) {
       // TODO: MULE-9220: Add a syntax validator for this
       throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types "
-          + "(one for the Payload type and another for the Attributes type) but %d were found", sourceType.getName(),
+          + "(one for the Payload type and another for the Attributes type) but %d were found",
+                                                       sourceType.getName(),
                                                        sourceGenerics.size()));
     }
 
@@ -300,8 +305,10 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this
-      throw new IllegalConnectionProviderModelDefinitionException(format("Connection provider class '%s' was expected to have 1 generic type "
-          + "(for the connection type) but %d were found", providerType.getName(), providerGenerics.size()));
+      throw new IllegalConnectionProviderModelDefinitionException(
+                                                                  format("Connection provider class '%s' was expected to have 1 generic type "
+                                                                      + "(for the connection type) but %d were found",
+                                                                         providerType.getName(), providerGenerics.size()));
     }
 
     providerDeclarer = declarer.withConnectionProvider(name).describedAs(description)
@@ -395,7 +402,8 @@ public final class AnnotationsBasedDescriber implements Describer {
     Class<?>[] operationClasses = getOperationClasses(extensionType);
     for (Class<?> operationClass : operationClasses) {
       if (configurationType.isAssignableFrom(operationClass) || operationClass.isAssignableFrom(configurationType)) {
-        throw new IllegalConfigurationModelDefinitionException(format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
+        throw new IllegalConfigurationModelDefinitionException(
+                                                               format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
                                                                       configurationType.getName(), operationClass.getName()));
       }
     }
@@ -403,7 +411,8 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private void checkOperationIsNotAnExtension(Class<?> operationType) {
     if (operationType.isAssignableFrom(extensionType) || extensionType.isAssignableFrom(operationType)) {
-      throw new IllegalOperationModelDefinitionException(format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
+      throw new IllegalOperationModelDefinitionException(
+                                                         format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
                                                                 operationType.getName(), extensionType.getName()));
     }
   }
@@ -452,7 +461,8 @@ public final class AnnotationsBasedDescriber implements Describer {
     for (Class<? extends Annotation> annotation : annotations) {
       final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
       if (count > 1) {
-        throw new IllegalModelDefinitionException(format("The defined parameters %s from %s, uses the annotation @%s more than once",
+        throw new IllegalModelDefinitionException(
+                                                  format("The defined parameters %s from %s, uses the annotation @%s more than once",
                                                          parameters.stream().map(Named::getName).collect(toList()),
                                                          parameters.get(0).getOwnerDescription(), annotation.getSimpleName()));
       }

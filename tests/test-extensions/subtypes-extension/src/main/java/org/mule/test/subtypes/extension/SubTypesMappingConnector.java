@@ -13,13 +13,11 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.vegan.extension.VeganCookBook;
-import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +26,9 @@ import java.util.Map;
 @Operations(TestOperationsWithSubTypeMapping.class)
 @Sources(SubtypesSource.class)
 @Providers(SubTypesConnectionProvider.class)
-@Import(type = Ricin.class, from = HeisenbergExtension.class)
-@Import(type = Weapon.class, from = HeisenbergExtension.class)
-@Import(type = VeganCookBook.class, from = VeganExtension.class)
+@Import(type = Ricin.class, from = "Heisenberg")
+@Import(type = Weapon.class, from = "Heisenberg")
+@Import(type = VeganCookBook.class, from = "vegan")
 @SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class})
