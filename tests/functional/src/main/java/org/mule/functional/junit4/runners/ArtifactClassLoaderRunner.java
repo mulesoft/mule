@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactIsolatedClassLoaderBuilder;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -75,7 +75,7 @@ import org.junit.runners.model.TestClass;
 public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private final Runner delegate;
-  private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
+  private static ArtifactsClassLoaderHolder artifactsClassLoaderHolder;
   private static boolean artifactClassLoaderHolderInjected = false;
 
   /**
@@ -86,13 +86,13 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * @throws Throwable if there was an error while initializing the runner.
    */
   public ArtifactClassLoaderRunner(Class<?> clazz, RunnerBuilder builder) throws Throwable {
-    if (artifactClassLoaderHolder == null) {
-      artifactClassLoaderHolder = createClassLoaderTestRunner(clazz);
+    if (artifactsClassLoaderHolder == null) {
+      artifactsClassLoaderHolder = createClassLoaderTestRunner(clazz);
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
 
-    final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
+    final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactsClassLoaderHolder
         .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
 
     final AnnotatedBuilder annotatedBuilder = new AnnotatedBuilder(builder);
@@ -100,29 +100,29 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
                                             isolatedTestClass);
 
     if (!artifactClassLoaderHolderInjected) {
-      injectArtifactClassLoaderHolder(artifactClassLoaderHolder, isolatedTestClass);
+      injectArtifactClassLoaderHolder(artifactsClassLoaderHolder, isolatedTestClass);
       artifactClassLoaderHolderInjected = true;
     }
   }
 
   private Class<?> getTestClass(Class<?> clazz) throws InitializationError {
     try {
-      return artifactClassLoaderHolder.loadClassWithApplicationClassLoader(clazz.getName());
+      return artifactsClassLoaderHolder.loadClassWithApplicationClassLoader(clazz.getName());
     } catch (Exception e) {
       throw new InitializationError(e);
     }
   }
 
   /**
-   * Creates the {@link ArtifactClassLoaderHolder} with the isolated class loaders.
+   * Creates the {@link ArtifactsClassLoaderHolder} with the isolated class loaders.
    *
    * @param klass the test class being executed
    * @throws IOException if an error happened while reading
    *         {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
-   * @return creates a {@link ArtifactClassLoaderHolder} that would be used to run the test. This way the test will be isolated
+   * @return creates a {@link ArtifactsClassLoaderHolder} that would be used to run the test. This way the test will be isolated
    *         and it will behave similar as an application running in a Mule standalone container.
    */
-  private static ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) throws IOException {
+  private static ArtifactsClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) throws IOException {
     List<String> extensionBasePackages =
         getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "extensionBasePackage");
     List<Class[]> exportClassesList =
@@ -161,20 +161,20 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   }
 
   /**
-   * Invokes the method to inject the {@link ArtifactClassLoaderHolder} as the test is annotated with
+   * Invokes the method to inject the {@link ArtifactsClassLoaderHolder} as the test is annotated with
    * {@link ArtifactClassLoaderHolderAware}.
    *
-   * @param artifactClassLoaderHolder the {@link ArtifactClassLoader}s for isolation
+   * @param artifactsClassLoaderHolder the {@link ArtifactClassLoader}s for isolation
    * @param isolatedTestClass the test {@link Class} loaded with the isolated {@link ClassLoader}
-   * @throws IllegalStateException if the test doesn't have an annotated method to inject artifactClassLoaderHolder or if it has
+   * @throws IllegalStateException if the test doesn't have an annotated method to inject artifactsClassLoaderHolder or if it has
    *         more than one method annotated
-   * @throws Throwable if an error occurs while setting the {@link ArtifactClassLoaderHolder}
+   * @throws Throwable if an error occurs while setting the {@link ArtifactsClassLoaderHolder}
    */
-  private static void injectArtifactClassLoaderHolder(ArtifactClassLoaderHolder artifactClassLoaderHolder,
+  private static void injectArtifactClassLoaderHolder(ArtifactsClassLoaderHolder artifactsClassLoaderHolder,
                                                       Class<?> isolatedTestClass)
       throws Throwable {
     TestClass testClass = new TestClass(isolatedTestClass);
-    Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactClassLoaderHolder
+    Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactsClassLoaderHolder
         .loadClassWithApplicationClassLoader(ArtifactClassLoaderHolderAware.class.getName());
     List<FrameworkMethod> contextAwareMethods = testClass.getAnnotatedMethods(artifactContextAwareAnn);
     if (contextAwareMethods.size() != 1) {
@@ -184,14 +184,14 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     for (FrameworkMethod method : contextAwareMethods) {
       if (!method.isStatic() || method.isPublic()) {
         throw new IllegalStateException("Method marked with annotation " + ArtifactClassLoaderHolderAware.class.getName()
-            + " should be private static and it should receive a parameter of type <" + ArtifactClassLoaderHolder.class + ">");
+            + " should be private static and it should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">");
       }
       method.getMethod().setAccessible(true);
       try {
-        method.invokeExplosively(null, artifactClassLoaderHolder);
+        method.invokeExplosively(null, artifactsClassLoaderHolder);
       } catch (IllegalArgumentException e) {
         throw new IllegalStateException("Method marked with annotation " + ArtifactClassLoaderHolderAware.class.getName()
-            + " should receive a parameter of type <" + ArtifactClassLoaderHolder.class + ">", e);
+            + " should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">", e);
       } finally {
         method.getMethod().setAccessible(false);
       }
@@ -214,7 +214,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    */
   @Override
   public void run(RunNotifier notifier) {
-    withContextClassLoader(artifactClassLoaderHolder.getApplicationArtifactClassLoader().getClassLoader(),
+    withContextClassLoader(artifactsClassLoaderHolder.getApplicationArtifactClassLoader().getClassLoader(),
                            () -> delegate.run(notifier));
   }
 

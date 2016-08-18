@@ -9,18 +9,18 @@ package org.mule.functional.junit4.runners;
 
 import static org.apache.commons.beanutils.MethodUtils.invokeMethod;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Provides access to an {@link ArtifactClassLoaderHolder} using reflection.
+ * Provides access to an {@link ArtifactsClassLoaderHolder} using reflection.
  * <p/>
- * It has to be accessed using reflection due to {@link ArtifactClassLoaderHolder} is loaded with the launcher class loader during
+ * It has to be accessed using reflection due to {@link ArtifactsClassLoaderHolder} is loaded with the launcher class loader during
  * creation of class loaders as part of the classification process. If reflection is not used the class would be a different one
  * due to when this class is loaded it is going to be loaded with the application class loader  and the injected
- * {@link ArtifactClassLoaderHolder} was loaded with the launcher class loader. So it won't be able to access its methods.
+ * {@link ArtifactsClassLoaderHolder} was loaded with the launcher class loader. So it won't be able to access its methods.
  *
  * @since 4.0
  */
@@ -31,11 +31,11 @@ public class ArtifactClassLoaderHolderReflector {
   /**
    * Creates an instance of the reflector
    *
-   * @param artifactClassLoaderHolder the {@link ArtifactClassLoaderHolder} to be called using reflection.
+   * @param artifactClassLoaderHolder the {@link ArtifactsClassLoaderHolder} to be called using reflection.
    */
   public ArtifactClassLoaderHolderReflector(Object artifactClassLoaderHolder) {
     checkArgument(artifactClassLoaderHolder != null, "artifactClassLoaderHolder cannot be null");
-    checkArgument(artifactClassLoaderHolder.getClass().getName().equals(ArtifactClassLoaderHolder.class.getName()),
+    checkArgument(artifactClassLoaderHolder.getClass().getName().equals(ArtifactsClassLoaderHolder.class.getName()),
                   "artifactClassLoaderHolder is an incorrect type");
 
     this.artifactClassLoaderHolder = artifactClassLoaderHolder;
@@ -54,8 +54,8 @@ public class ArtifactClassLoaderHolderReflector {
   private List<ArtifactClassLoaderReflector> adaptArtifactClassLoaders(List<Object> artifactClassLoaders) {
     return artifactClassLoaders.stream().map(artifactClassLoader -> new ArtifactClassLoaderReflector(artifactClassLoader))
         .collect(
-                 Collectors
-                     .toList());
+            Collectors
+                .toList());
   }
 
   private Object doInvokeMethod(String methodName) {

@@ -36,7 +36,7 @@ import java.util.Set;
  * </ul>
  * For each of these extension points there is a default implementation already provided with this API.
  * <p/>
- * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the
+ * The object built by this builder is a {@link ArtifactsClassLoaderHolder} that references the
  * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for the application, plugins and container.
  *
  * @since 4.0
@@ -185,14 +185,14 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Builds the {@link ArtifactClassLoaderHolder} with the
+   * Builds the {@link ArtifactsClassLoaderHolder} with the
    * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s for application, plugins and container.
    *
-   * @return a {@link ArtifactClassLoaderHolder} as output of the classification process.
+   * @return a {@link ArtifactsClassLoaderHolder} as output of the classification process.
    * @throws {@link IOException} if there was an error while creating the classification context
    * @throws {@link NullPointerException} if any of the required attributes is not set to this builder
    */
-  public ArtifactClassLoaderHolder build() {
+  public ArtifactsClassLoaderHolder build() {
     checkNotNull(rootArtifactClassesFolder, "rootArtifactClassesFolder has to be set");
     checkNotNull(rootArtifactTestClassesFolder, "rootArtifactTestClassesFolder has to be set");
     checkNotNull(classPathUrlProvider, "classPathUrlProvider has to be set");

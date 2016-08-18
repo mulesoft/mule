@@ -7,6 +7,8 @@
 
 package org.mule.functional.junit4.runners;
 
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -15,7 +17,7 @@ import java.lang.annotation.Target;
 
 /**
  * Defines that when the test is going to be run with an {@link ArtifactClassLoaderRunner} it would need to get access to the
- * {@link org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder} created by the launcher class loader
+ * {@link ArtifactsClassLoaderHolder} created by the launcher class loader
  * in order to load classes with the {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s created.
  * <p/>
  * A private static method should be defined and annotated with this annotation in order to be called by the runner so the test
@@ -23,7 +25,7 @@ import java.lang.annotation.Target;
  * should be annotated with this annotation.
  * <p/>
  * Be aware that as the test would be loaded with the isolated class loader it cannot use
- * {@link org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder} neither
+ * {@link ArtifactsClassLoaderHolder} neither
  * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} due to mismatching type between class loader so
  * these objects will need to be used with reflection.
  * <p/>

@@ -33,7 +33,7 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   /**
    * Creates a new instance.
    *
-   * @param serviceArtifactClassLoaderReflectors {@link List} of {@link ArtifactClassLoaderHolder}s created for services discovered
+   * @param serviceArtifactClassLoaderReflectors {@link List} of {@link ArtifactsClassLoaderHolder}s created for services discovered
    *        during classification process. The {@code artifactName} of each {@link ArtifactClassLoaderReflector} represents the
    *        {@value org.mule.functional.classloading.isolation.classification.DefaultClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME}
    *        defined by the service in its

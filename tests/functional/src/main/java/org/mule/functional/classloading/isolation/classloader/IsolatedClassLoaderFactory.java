@@ -14,7 +14,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.MODU
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactsUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
@@ -67,15 +67,15 @@ public class IsolatedClassLoaderFactory {
   private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
 
   /**
-   * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
+   * Creates a {@link ArtifactsClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
    *
    * @param extraBootPackages {@link Set} of {@link String}s of extra boot packages to be appended to the container
    *        {@link ClassLoader}
    * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
    *        {@link ClassLoader}
-   * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
+   * @return a {@link ArtifactsClassLoaderHolder} that would be used to run the test
    */
-  public ArtifactClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages,
+  public ArtifactsClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]));
@@ -98,7 +98,7 @@ public class IsolatedClassLoaderFactory {
     ArtifactClassLoader appClassLoader =
         createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactsUrlClassification);
 
-    return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
+    return new ArtifactsClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
                                          appClassLoader);
   }
 
