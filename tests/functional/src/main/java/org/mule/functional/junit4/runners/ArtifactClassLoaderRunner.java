@@ -12,8 +12,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactIsolatedClassLoaderBuilder;
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
@@ -46,8 +46,8 @@ import org.junit.runners.model.TestClass;
  * <p/>
  * See {@link RunnerDelegateTo} for those scenarios where another JUnit runner needs to be used but still the test has to be
  * executed within an isolated class loading model. {@link ArtifactClassLoaderRunnerConfig} allows to define the Extensions to be
- * discovered in the classpath, for each Extension a plugin class loader would be created. {@link ArtifactClassLoaderHolderAware} allows
- * the test to be injected with the list of {@link ClassLoader}s that were created for each plugin, mostly used in
+ * discovered in the classpath, for each Extension a plugin class loader would be created. {@link ArtifactsClassLoaderHolderAware}
+ * allows the test to be injected with the list of {@link ClassLoader}s that were created for each plugin, mostly used in
  * {@link org.mule.functional.junit4.ArtifactFunctionalTestCase} in order to register the extensions.
  * <p/>
  * The class loading model is built by doing a classification of the ClassPath URLs loaded by IDEs and surfire-maven-plugin. The
@@ -162,7 +162,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   /**
    * Invokes the method to inject the {@link ArtifactsClassLoaderHolder} as the test is annotated with
-   * {@link ArtifactClassLoaderHolderAware}.
+   * {@link ArtifactsClassLoaderHolderAware}.
    *
    * @param artifactsClassLoaderHolder the {@link ArtifactClassLoader}s for isolation
    * @param isolatedTestClass the test {@link Class} loaded with the isolated {@link ClassLoader}
@@ -175,22 +175,22 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       throws Throwable {
     TestClass testClass = new TestClass(isolatedTestClass);
     Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactsClassLoaderHolder
-        .loadClassWithApplicationClassLoader(ArtifactClassLoaderHolderAware.class.getName());
+        .loadClassWithApplicationClassLoader(ArtifactsClassLoaderHolderAware.class.getName());
     List<FrameworkMethod> contextAwareMethods = testClass.getAnnotatedMethods(artifactContextAwareAnn);
     if (contextAwareMethods.size() != 1) {
       throw new IllegalStateException("Isolation tests need to have one method marked with annotation "
-          + ArtifactClassLoaderHolderAware.class.getName());
+          + ArtifactsClassLoaderHolderAware.class.getName());
     }
     for (FrameworkMethod method : contextAwareMethods) {
       if (!method.isStatic() || method.isPublic()) {
-        throw new IllegalStateException("Method marked with annotation " + ArtifactClassLoaderHolderAware.class.getName()
+        throw new IllegalStateException("Method marked with annotation " + ArtifactsClassLoaderHolderAware.class.getName()
             + " should be private static and it should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">");
       }
       method.getMethod().setAccessible(true);
       try {
         method.invokeExplosively(null, artifactsClassLoaderHolder);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("Method marked with annotation " + ArtifactClassLoaderHolderAware.class.getName()
+        throw new IllegalStateException("Method marked with annotation " + ArtifactsClassLoaderHolderAware.class.getName()
             + " should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">", e);
       } finally {
         method.getMethod().setAccessible(false);

@@ -16,7 +16,7 @@ import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.api.classloading.isolation.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
 import org.mule.functional.api.classloading.isolation.IsolatedServiceProviderDiscoverer;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderHolderReflector;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderHolderAware;
+import org.mule.functional.junit4.runners.ArtifactsClassLoaderHolderAware;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunner;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -62,7 +62,7 @@ import org.junit.runner.RunWith;
  * By default this test runs internally with a {@link org.junit.runners.BlockJUnit4ClassRunner} runner. On those cases where the
  * test has to be run with another runner the {@link RunnerDelegateTo} should be used to define it.
  * <p/>
- * {@link ArtifactClassLoaderHolderAware} defines that this class also needs to get access to {@link ArtifactClassLoader}s
+ * {@link ArtifactsClassLoaderHolderAware} defines that this class also needs to get access to {@link ArtifactClassLoader}s
  * created in order to load extension classes (they are not exposed to the application) for registering them
  * to the {@link org.mule.runtime.extension.api.ExtensionManager} and register {@link org.mule.runtime.api.service.Service}s.
  * <p/>
@@ -86,8 +86,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return Thread.currentThread().getContextClassLoader();
   }
 
-  @ArtifactClassLoaderHolderAware
-  private static final void setArtifactClassLoaderHolderReflector(final Object artifactClassLoaderHolder) {
+  @ArtifactsClassLoaderHolderAware
+  private static final void setArtifactsClassLoaderHolder(final Object artifactClassLoaderHolder) {
     checkArgument(artifactClassLoaderHolder != null, "artifactClassLoaderHolder cannot be null");
     checkState(artifactClassLoaderHolderReflector == null,
                "artifactClassLoaderHolderReflector already set, it cannot be set again");
