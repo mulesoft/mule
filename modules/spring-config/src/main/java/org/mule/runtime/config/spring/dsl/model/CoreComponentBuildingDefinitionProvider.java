@@ -968,13 +968,19 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseDefinition
         .copy()
         .withIdentifier("log-component")
-        .withTypeDefinition(fromType(LogComponent.class))
+        .withTypeDefinition(fromType(DefaultJavaComponent.class))
+        .withObjectFactoryType(ComponentObjectFactory.class)
+        .withSetterParameterDefinition("usePrototypeObjectFactory", fromFixedValue(false).build())
+        .withSetterParameterDefinition("clazz", fromFixedValue(LogComponent.class).build())
         .build());
 
     buildingDefinitions.add(baseDefinition
         .copy()
         .withIdentifier("null-component")
-        .withTypeDefinition(fromType(NullComponent.class))
+        .withTypeDefinition(fromType(DefaultJavaComponent.class))
+        .withObjectFactoryType(ComponentObjectFactory.class)
+        .withSetterParameterDefinition("usePrototypeObjectFactory", fromFixedValue(false).build())
+        .withSetterParameterDefinition("clazz", fromFixedValue(NullComponent.class).build())
         .build());
 
     buildingDefinitions.add(baseDefinition
