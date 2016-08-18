@@ -15,7 +15,7 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.api.classloading.isolation.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
 import org.mule.functional.api.classloading.isolation.IsolatedServiceProviderDiscoverer;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderHolderAdapter;
+import org.mule.functional.junit4.runners.ArtifactClassLoaderHolderReflector;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderHolderAware;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunner;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
@@ -76,7 +76,7 @@ import org.junit.runner.RunWith;
 @RunWith(ArtifactClassLoaderRunner.class)
 public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
-  private static ArtifactClassLoaderHolderAdapter artifactClassLoaderHolderAdapter;
+  private static ArtifactClassLoaderHolderReflector artifactClassLoaderHolderReflector;
 
   /**
    * @return thread context class loader has to be the application {@link ClassLoader} created by the runner.
@@ -87,11 +87,11 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   @ArtifactClassLoaderHolderAware
-  private static final void setArtifactClassLoaderHolderAdapter(final Object artifactClassLoaderHolder) {
+  private static final void setArtifactClassLoaderHolderReflector(final Object artifactClassLoaderHolder) {
     checkArgument(artifactClassLoaderHolder != null, "artifactClassLoaderHolder cannot be null");
-    checkState(artifactClassLoaderHolderAdapter == null, "artifactClassLoaderHolderAdapter already set, it cannot be set again");
+    checkState(artifactClassLoaderHolderReflector == null, "artifactClassLoaderHolderReflector already set, it cannot be set again");
 
-    artifactClassLoaderHolderAdapter = new ArtifactClassLoaderHolderAdapter(artifactClassLoaderHolder);
+    artifactClassLoaderHolderReflector = new ArtifactClassLoaderHolderReflector(artifactClassLoaderHolder);
   }
 
   @Override
@@ -107,7 +107,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
         .addServiceConfigurator(
                                 new TestServicesMuleContextConfigurator(
                                                                         new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(
-                                                                                                                                                                  artifactClassLoaderHolderAdapter
+                                                                                                                                                                  artifactClassLoaderHolderReflector
                                                                                                                                                                       .getServicesArtifactClassLoaders()),
                                                                                                                             new ReflectionServiceResolver(
                                                                                                                                                           new ReflectionServiceProviderResolutionHelper())))));
@@ -129,9 +129,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
           + " for defining a delegate runner to be used.");
     }
 
-    if (artifactClassLoaderHolderAdapter != null
-        && !artifactClassLoaderHolderAdapter.getPluginsArtifactClassLoaders().isEmpty()) {
-      builders.add(0, new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(artifactClassLoaderHolderAdapter
+    if (artifactClassLoaderHolderReflector != null
+        && !artifactClassLoaderHolderReflector.getPluginsArtifactClassLoaders().isEmpty()) {
+      builders.add(0, new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(artifactClassLoaderHolderReflector
           .getPluginsArtifactClassLoaders()));
     }
   }

@@ -12,15 +12,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
+import org.mule.functional.api.classloading.isolation.ArtifactsUrlClassification;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifierContext;
 import org.mule.functional.api.classloading.isolation.DependenciesGraph;
 import org.mule.functional.api.classloading.isolation.MavenArtifact;
 import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
-import org.mule.functional.api.classloading.isolation.ServiceUrlClassification;
 import org.mule.functional.classloading.isolation.classification.DefaultClassPathClassifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -49,6 +49,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   public static final String ECHO_SERVICE_CLASS = "org.mule.service.EchoService";
+  public static final String COMPILE_SCOPE = "compile";
+  public static final String JAR = "jar";
+  public static final String ORG_MULE_GROUP_ID = "org.mule";
+  public static final String SERVICE_ARTIFACT_ID = "service";
+  public static final String PROVIDED_SCOPE = "provided";
+  public static final String SERVICE_TEST_ARTIFACT_ID = "service-test";
   @Rule
   public TemporaryFolder folder = new TemporaryFolder();
   @Rule
@@ -87,13 +93,11 @@ public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   }
 
-  /**
-   * Validates the logic to discover extensions by scanning locations of service.properties files.
-   */
   @Test
-  public void testServiceDiscoverProcess() {
-    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId("org.mule").withArtifactId("service")
-        .withType("jar").withScope("provided").build();
+  public void testServiceDiscoverProcessUsingPropertiesFile() {
+    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID)
+        .withArtifactId(SERVICE_ARTIFACT_ID)
+        .withType(JAR).withScope(PROVIDED_SCOPE).build();
 
     String artifactPath = folder.getRoot().getParentFile().getParentFile().getAbsolutePath() + separator;
     when(mapping.getArtifactId(artifactPath)).thenReturn(serviceArtifact.getArtifactId());
@@ -106,43 +110,42 @@ public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(serviceArtifactIdFolder.mkdir(), is(true));
     when(context.getClassPathURLs()).thenReturn(Lists.newArrayList());
 
-    MavenArtifact rootArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId("org.mule").withArtifactId("service-test")
-        .withType("jar").withScope("compile").build();
+    MavenArtifact rootArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID)
+        .withArtifactId(SERVICE_TEST_ARTIFACT_ID)
+        .withType(JAR).withScope(COMPILE_SCOPE).build();
     when(context.getDependencyGraph().getRootArtifact()).thenReturn(rootArtifact);
     when(context.getDependencyGraph().getDependencies()).thenReturn(Sets.newHashSet());
 
-    ArtifactUrlClassification classification = classPathClassifier.classify(context);
+    ArtifactsUrlClassification classification = classPathClassifier.classify(context);
     assertThat(classification.getServiceUrlClassifications().size(), is(1));
-    ServiceUrlClassification serviceUrlClassification = classification.getServiceUrlClassifications().get(0);
+    ArtifactUrlClassification serviceUrlClassification = classification.getServiceUrlClassifications().get(0);
     // No need to test this logic as it is already tested in unit tests for dependency resolver code
     assertThat(serviceUrlClassification.getUrls().size(), is(0));
     assertThat(serviceUrlClassification.getName(), equalTo(ECHO_SERVICE_CLASS));
 
-    verify(context, times(8)).getDependencyGraph();
+    verify(context, atLeastOnce()).getDependencyGraph();
     verify(context).getExtensionBasePackages();
-    verify(context, times(2)).getClassPathURLs();
-    verify(context, times(2)).getMavenMultiModuleArtifactMapping();
+    verify(context, atLeastOnce()).getClassPathURLs();
+    verify(context, atLeastOnce()).getMavenMultiModuleArtifactMapping();
     verify(context).getServicesExclusion();
     verify(context).getClassPathClassLoader();
     verify(context).getRootArtifactClassesFolder();
-    verify(dependencyGraph, times(6)).getRootArtifact();
-    verify(dependencyGraph, times(3)).getDependencies();
+    verify(dependencyGraph, atLeastOnce()).getRootArtifact();
+    verify(dependencyGraph, atLeastOnce()).getDependencies();
     verify(rootArtifactClassesFolder).exists();
     verify(mapping).getArtifactId(artifactPath);
   }
 
-  /**
-   * Validates that a discovered service is not classified due to it is configure to be excluded.
-   */
   @Test
-  public void testExcludedServiceDiscoverProcess() throws IOException {
-    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId("org.mule").withArtifactId("service")
-        .withType("jar").withScope("provided").build();
+  public void testServiceDiscoverProcessExcludeParameter() throws IOException {
+    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID).withArtifactId(
+        SERVICE_ARTIFACT_ID)
+        .withType(JAR).withScope(PROVIDED_SCOPE).build();
 
     String artifactPath = folder.getRoot().getParentFile().getParentFile().getAbsolutePath() + separator;
     when(mapping.getArtifactId(artifactPath)).thenReturn(serviceArtifact.getArtifactId());
     when(context.getMavenMultiModuleArtifactMapping()).thenReturn(mapping);
-    when(context.getServicesExclusion()).thenReturn(Lists.newArrayList("service"));
+    when(context.getServicesExclusion()).thenReturn(Lists.newArrayList(SERVICE_ARTIFACT_ID));
 
     File serviceGroupIdFolder = new File(folder.getRoot(), serviceArtifact.getGroupId());
     assertThat(serviceGroupIdFolder.mkdir(), is(true));
@@ -150,33 +153,32 @@ public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(serviceArtifactIdFolder.mkdir(), is(true));
     when(context.getClassPathURLs()).thenReturn(Lists.newArrayList());
 
-    MavenArtifact rootArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId("org.mule").withArtifactId("service-test")
-        .withType("jar").withScope("compile").build();
+    MavenArtifact rootArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID).withArtifactId(
+        SERVICE_TEST_ARTIFACT_ID)
+        .withType(JAR).withScope(COMPILE_SCOPE).build();
     when(context.getDependencyGraph().getRootArtifact()).thenReturn(rootArtifact);
 
-    ArtifactUrlClassification classification = classPathClassifier.classify(context);
+    ArtifactsUrlClassification classification = classPathClassifier.classify(context);
     assertThat(classification.getServiceUrlClassifications().size(), is(0));
 
-    verify(context, times(6)).getDependencyGraph();
+    verify(context, atLeastOnce()).getDependencyGraph();
     verify(context).getExtensionBasePackages();
-    verify(context, times(2)).getClassPathURLs();
-    verify(context, times(2)).getMavenMultiModuleArtifactMapping();
+    verify(context, atLeastOnce()).getClassPathURLs();
+    verify(context, atLeastOnce()).getMavenMultiModuleArtifactMapping();
     verify(context).getServicesExclusion();
     verify(context).getClassPathClassLoader();
     verify(context).getRootArtifactClassesFolder();
-    verify(dependencyGraph, times(5)).getRootArtifact();
-    verify(dependencyGraph, times(2)).getDependencies();
+    verify(dependencyGraph, atLeastOnce()).getRootArtifact();
+    verify(dependencyGraph, atLeastOnce()).getDependencies();
     verify(rootArtifactClassesFolder).exists();
     verify(mapping).getArtifactId(artifactPath);
   }
 
-  /**
-   * Validates that a discovered service cannot be the root artifact
-   */
   @Test
   public void testRootArtifactCannotBeDiscoveredAsService() throws IOException {
-    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId("org.mule").withArtifactId("service")
-        .withType("jar").withScope("provided").build();
+    MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID)
+        .withArtifactId(SERVICE_ARTIFACT_ID)
+        .withType(JAR).withScope(PROVIDED_SCOPE).build();
 
     String artifactPath = folder.getRoot().getParentFile().getParentFile().getAbsolutePath() + separator;
     when(mapping.getArtifactId(artifactPath)).thenReturn(serviceArtifact.getArtifactId());

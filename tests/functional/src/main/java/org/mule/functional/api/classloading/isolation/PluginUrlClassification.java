@@ -7,6 +7,8 @@
 
 package org.mule.functional.api.classloading.isolation;
 
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+
 import java.net.URL;
 import java.util.List;
 
@@ -17,19 +19,21 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class PluginUrlClassification extends ServiceUrlClassification {
+public class PluginUrlClassification extends ArtifactUrlClassification {
 
   private final List<Class> exportClasses;
 
   /**
    * Creates an instance of the classification.
    *
-   * @param name a {@link String} representing the name of the plugin
-   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
-   * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
+   * @param name a {@link String} representing the name of the plugin. Not null.
+   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}. Not null.
+   * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin. Not null.
    */
   public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses) {
     super(name, urls);
+    checkNotNull(exportClasses, "exportClasses cannot be null");
+
     this.exportClasses = exportClasses;
   }
 

@@ -8,7 +8,7 @@
 package org.mule.functional.api.classloading.isolation;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderAdapter;
+import org.mule.functional.junit4.runners.ArtifactClassLoaderReflector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
@@ -38,18 +38,18 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   private static Logger LOGGER = LoggerFactory.getLogger(IsolatedClassLoaderExtensionsManagerConfigurationBuilder.class);
 
   private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
-  private final List<ArtifactClassLoaderAdapter> pluginsClassLoaders;
+  private final List<ArtifactClassLoaderReflector> pluginsClassLoaders;
 
   /**
-   * Creates an instance of the builder with the list of plugin class loaders. If an {@link ArtifactClassLoaderAdapter} has a extension
+   * Creates an instance of the builder with the list of plugin class loaders. If an {@link ArtifactClassLoaderReflector} has a extension
    * descriptor it will be registered as an extension if not it is assumed that it is not an extension plugin. The extension will
    * be loaded and registered with its corresponding class loader in order to get access to the isolated {@link ClassLoader}
    * defined for the extension.
    *
-   * @param pluginsClassLoaders the list of {@link ArtifactClassLoaderAdapter} created for each plugin found in the dependencies (either
+   * @param pluginsClassLoaders the list of {@link ArtifactClassLoaderReflector} created for each plugin found in the dependencies (either
    *        plugin or extension plugin).
    */
-  public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoaderAdapter> pluginsClassLoaders) {
+  public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoaderReflector> pluginsClassLoaders) {
     this.extensionManagerAdapterFactory = new DefaultExtensionManagerAdapterFactory();
     this.pluginsClassLoaders = pluginsClassLoaders;
   }
@@ -69,7 +69,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   protected void doConfigure(final MuleContext muleContext) throws Exception {
     final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
 
-    for (ArtifactClassLoaderAdapter pluginClassLoader : pluginsClassLoaders) {
+    for (ArtifactClassLoaderReflector pluginClassLoader : pluginsClassLoaders) {
       String artifactName = pluginClassLoader.getArtifactName();
       ClassLoader classLoader = pluginClassLoader.getClassLoader();
       URL manifestUrl = getExtensionManifest(classLoader);

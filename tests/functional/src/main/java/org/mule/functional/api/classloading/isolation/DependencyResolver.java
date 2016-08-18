@@ -43,6 +43,9 @@ public class DependencyResolver {
    */
   public Set<MavenArtifact> resolveDependencies() {
     MavenArtifact rootMavenArtifact = configuration.getDependencyGraph().getRootArtifact();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Resolving Maven dependencies for artifact {}", rootMavenArtifact);
+    }
     Set<MavenArtifact> dependencies = configuration.getDependencyGraph().getDependencies().stream()
         .filter(key -> configuration.getDependenciesFilter().getPredicate().test(key)).collect(Collectors.toSet());
 
@@ -78,6 +81,9 @@ public class DependencyResolver {
   private Set<MavenArtifact> collectTransitiveDependencies(final MavenArtifact dependency,
                                                            final Predicate<MavenArtifact> predicate,
                                                            final boolean traverseWhenNoMatch) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Collecting Maven transitive dependencies for dependency {}", dependency);
+    }
     Set<MavenArtifact> transitiveDependencies = new HashSet<>();
 
     configuration.getDependencyGraph().getTransitiveDependencies(dependency).stream().forEach(transitiveDependency -> {

@@ -36,8 +36,6 @@ public final class Configuration {
   /**
    * It sets the strategy to also include the root artifact in the result of the dependencies resolved. By default it is not
    * included due to the most common usage is to get dependencies instead of the whole set of root artifact plus dependencies.
-   * <p/>
-   * By default it is not included.
    *
    * @return this
    */

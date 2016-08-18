@@ -15,9 +15,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_C
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
-import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
+import org.mule.functional.api.classloading.isolation.ArtifactsUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
-import org.mule.functional.api.classloading.isolation.ServiceUrlClassification;
+import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
@@ -71,32 +71,32 @@ public class IsolatedClassLoaderFactory {
    *
    * @param extraBootPackages {@link Set} of {@link String}s of extra boot packages to be appended to the container
    *        {@link ClassLoader}
-   * @param artifactUrlClassification the {@link ArtifactUrlClassification} that defines the different {@link URL}s for each
+   * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
    *        {@link ClassLoader}
    * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages,
-                                                             ArtifactUrlClassification artifactUrlClassification) {
+                                                             ArtifactsUrlClassification artifactsUrlClassification) {
     final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
-        new TestContainerClassLoaderFactory(extraBootPackages, artifactUrlClassification.getContainerUrls().toArray(new URL[0]));
+        new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]));
 
     ArtifactClassLoader containerClassLoader =
-        createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactUrlClassification);
+        createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
     ClassLoader classLoader = containerClassLoader.getClassLoader();
 
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy = testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
 
     List<ArtifactClassLoader> serviceArtifactClassLoaders =
-        createServiceClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification);
+        createServiceClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactsUrlClassification);
 
     List<ArtifactClassLoader> pluginsArtifactClassLoaders = new ArrayList<>();
-    if (!artifactUrlClassification.getPluginUrlClassifications().isEmpty()) {
-      classLoader = createPluginClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification,
+    if (!artifactsUrlClassification.getPluginUrlClassifications().isEmpty()) {
+      classLoader = createPluginClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactsUrlClassification,
                                              pluginsArtifactClassLoaders);
     }
 
     ArtifactClassLoader appClassLoader =
-        createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification);
+        createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactsUrlClassification);
 
     return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
                                          appClassLoader);
@@ -115,12 +115,12 @@ public class IsolatedClassLoaderFactory {
    *
    * @param testContainerClassLoaderFactory {@link TestContainerClassLoaderFactory} that has the logic to create a container class
    *        loader
-   * @param artifactUrlClassification the classifications to get plugins {@link URL}s
+   * @param artifactsUrlClassification the classifications to get container {@link URL}s
    * @return an {@link ArtifactClassLoader} for the container
    */
   protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
-                                                                   ArtifactUrlClassification artifactUrlClassification) {
-    logClassLoaderUrls("CONTAINER", artifactUrlClassification.getContainerUrls());
+                                                                   ArtifactsUrlClassification artifactsUrlClassification) {
+    logClassLoaderUrls("CONTAINER", artifactsUrlClassification.getContainerUrls());
     MuleArtifactClassLoader launcherArtifact =
         new MuleArtifactClassLoader("launcher", new URL[0], IsolatedClassLoaderFactory.class.getClassLoader(),
                                     new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
@@ -137,14 +137,14 @@ public class IsolatedClassLoaderFactory {
    *
    * @param parent the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactUrlClassification the url classifications to get plugins {@link URL}s
+   * @param artifactsUrlClassification the url classifications to get service {@link URL}s
    * @return a {@link CompositeClassLoader} that represents the service class loaders
    */
   protected List<ArtifactClassLoader> createServiceClassLoaders(ClassLoader parent,
                                                                 ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
-                                                                ArtifactUrlClassification artifactUrlClassification) {
+                                                                ArtifactsUrlClassification artifactsUrlClassification) {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
-    for (ServiceUrlClassification serviceUrlClassification : artifactUrlClassification.getServiceUrlClassifications()) {
+    for (ArtifactUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
       MuleArtifactClassLoader artifactClassLoader = new MuleArtifactClassLoader(serviceUrlClassification.getName(),
                                                                                 serviceUrlClassification.getUrls().toArray(
                                                                                                                            new URL[0]),
@@ -158,20 +158,22 @@ public class IsolatedClassLoaderFactory {
    * For each plugin defined in the classification it creates an {@link ArtifactClassLoader} with the name defined in
    * classification. For extension plugins it also creates the filter based on the extension manifest file. For a plain plugin it
    * collects the exported packages and resources for creating the filter from its
-   * {@value ClasspathModuleDiscoverer#MODULE_PROPERTIES} file. <pr/> It also creates the sharedLibs class loader without any
+   * {@value ClasspathModuleDiscoverer#MODULE_PROPERTIES} file.
+   * <pr/>
+   * It also creates the sharedLibs class loader without any
    * library so far, in order to be a similar representation as mule's container has and also to allow the hierarchy process to
    * look for classes from its parent (see {@link CompositeClassLoader} that doesn't delegate to its parent). <pr/> With the given
    * list of created class loader plugins it will finally create a {@link CompositeClassLoader} and return it.
    *
    * @param parent the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactUrlClassification the url classifications to get plugins {@link URL}s
+   * @param artifactsUrlClassification the url classifications to get plugins {@link URL}s
    * @param pluginsArtifactClassLoaders a list where it would append each {@link ArtifactClassLoader} created for a plugin in
    *        order to allow access them later
    * @return a {@link CompositeClassLoader} that represents the plugin class loaders
    */
   protected ClassLoader createPluginClassLoaders(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
-                                                 ArtifactUrlClassification artifactUrlClassification,
+                                                 ArtifactsUrlClassification artifactsUrlClassification,
                                                  List<ArtifactClassLoader> pluginsArtifactClassLoaders) {
     final List<ClassLoader> pluginClassLoaders = new ArrayList<>();
     // Adds a MuleArtifactClassLoader without a filter due to CompositeClassLoader doesn't delegate to the parent to resolve
@@ -179,7 +181,7 @@ public class IsolatedClassLoaderFactory {
     // the extension xsd that depends on that one.
     pluginClassLoaders.add(new MuleArtifactClassLoader("sharedLibs", new URL[0], parent, childClassLoaderLookupPolicy));
 
-    for (PluginUrlClassification pluginUrlClassification : artifactUrlClassification.getPluginUrlClassifications()) {
+    for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
       logClassLoaderUrls("PLUGIN (" + pluginUrlClassification.getName() + ")", pluginUrlClassification.getUrls());
       MuleArtifactClassLoader pluginCL =
           new MuleArtifactClassLoader(pluginUrlClassification.getName(), pluginUrlClassification.getUrls().toArray(new URL[0]),
@@ -223,14 +225,14 @@ public class IsolatedClassLoaderFactory {
    *
    * @param parent the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactUrlClassification the url classifications to get plugins urls
+   * @param artifactsUrlClassification the url classifications to get application {@link URL}s
    * @return the {@link ArtifactClassLoader} to be used for running the test
    */
   protected ArtifactClassLoader createApplicationArtifactClassLoader(ClassLoader parent,
                                                                      ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
-                                                                     ArtifactUrlClassification artifactUrlClassification) {
-    logClassLoaderUrls("APP", artifactUrlClassification.getApplicationUrls());
-    return new MuleArtifactClassLoader("app", artifactUrlClassification.getApplicationUrls().toArray(new URL[0]), parent,
+                                                                     ArtifactsUrlClassification artifactsUrlClassification) {
+    logClassLoaderUrls("APP", artifactsUrlClassification.getApplicationUrls());
+    return new MuleArtifactClassLoader("app", artifactsUrlClassification.getApplicationUrls().toArray(new URL[0]), parent,
                                        childClassLoaderLookupPolicy);
   }
 

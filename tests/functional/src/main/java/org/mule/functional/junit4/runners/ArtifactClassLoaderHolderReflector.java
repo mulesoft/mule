@@ -15,21 +15,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Just an utility class to have in one place the calls using reflection due to {@link org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder}
- * is loaded with the launcher class loader and used from test classes (loaded with application class loader).
+ * Provides access to an {@link ArtifactClassLoaderHolder} using reflection.
+ * <p/>
+ * It has to be accessed using reflection due to {@link ArtifactClassLoaderHolder} is loaded with the launcher class loader during
+ * creation of class loaders as part of the classification process. If reflection is not used the class would be a different one
+ * due to when this class is loaded it is going to be loaded with the application class loader  and the injected
+ * {@link ArtifactClassLoaderHolder} was loaded with the launcher class loader. So it won't be able to access its methods.
  *
  * @since 4.0
  */
-public class ArtifactClassLoaderHolderAdapter {
+public class ArtifactClassLoaderHolderReflector {
 
   private Object artifactClassLoaderHolder;
 
   /**
-   * Creates an instance of the adapter
+   * Creates an instance of the reflector
    *
-   * @param artifactClassLoaderHolder the {@link ArtifactClassLoaderHolder} to be adapted
+   * @param artifactClassLoaderHolder the {@link ArtifactClassLoaderHolder} to be called using reflection.
    */
-  public ArtifactClassLoaderHolderAdapter(Object artifactClassLoaderHolder) {
+  public ArtifactClassLoaderHolderReflector(Object artifactClassLoaderHolder) {
     checkArgument(artifactClassLoaderHolder != null, "artifactClassLoaderHolder cannot be null");
     checkArgument(artifactClassLoaderHolder.getClass().getName().equals(ArtifactClassLoaderHolder.class.getName()),
                   "artifactClassLoaderHolder is an incorrect type");
@@ -37,18 +41,18 @@ public class ArtifactClassLoaderHolderAdapter {
     this.artifactClassLoaderHolder = artifactClassLoaderHolder;
   }
 
-  public List<ArtifactClassLoaderAdapter> getServicesArtifactClassLoaders() {
+  public List<ArtifactClassLoaderReflector> getServicesArtifactClassLoaders() {
     List<Object> artifactClassLoaders = (List<Object>) doInvokeMethod("getServicesArtifactClassLoaders");
     return adaptArtifactClassLoaders(artifactClassLoaders);
   }
 
-  public List<ArtifactClassLoaderAdapter> getPluginsArtifactClassLoaders() {
+  public List<ArtifactClassLoaderReflector> getPluginsArtifactClassLoaders() {
     List<Object> artifactClassLoaders = (List<Object>) doInvokeMethod("getPluginsArtifactClassLoaders");
     return adaptArtifactClassLoaders(artifactClassLoaders);
   }
 
-  private List<ArtifactClassLoaderAdapter> adaptArtifactClassLoaders(List<Object> artifactClassLoaders) {
-    return artifactClassLoaders.stream().map(artifactClassLoader -> new ArtifactClassLoaderAdapter(artifactClassLoader)).collect(
+  private List<ArtifactClassLoaderReflector> adaptArtifactClassLoaders(List<Object> artifactClassLoaders) {
+    return artifactClassLoaders.stream().map(artifactClassLoader -> new ArtifactClassLoaderReflector(artifactClassLoader)).collect(
                                                                                                                                  Collectors
                                                                                                                                      .toList());
   }
