@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
@@ -16,6 +17,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -87,6 +89,22 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false);
+      }
+
+      @Override
+      public void visitString(StringType stringType) {
+        if (childDsl.supportsChildDeclaration()) {
+          addParameter(fieldName, fromChildConfiguration(String.class).withWrapperIdentifier(fieldName));
+          addDefinition(baseDefinitionBuilder.copy()
+              .withIdentifier(fieldName)
+              .withTypeDefinition(fromType(String.class))
+              .withTypeConverter(value -> resolverOf(fieldName, stringType, value, defaultValue,
+                                                     expressionSupport, false,
+                                                     acceptsReferences))
+              .build());
+        } else {
+          defaultVisit(stringType);
+        }
       }
 
       @Override
