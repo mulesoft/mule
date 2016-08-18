@@ -10,16 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class SimpleCollectionObject {
+public class ParsersTestObject {
 
   private Map<String, List<String>> simpleListTypeMap;
   private List<String> simpleTypeList;
   private Map<String, Integer> simpleTypeMap;
-  private Map<Long, SimpleCollectionObject> complexTypeMap;
+  private Map<Long, ParsersTestObject> complexTypeMap;
   private List<String> simpleTypeListWithConverter;
   private Set<String> simpleTypeSet;
   private Map<Object, Object> simpleParameters = new HashMap<>();
+  private SimplePojo simpleTypeWithConverter;
 
   public void setSimpleParameters(Map<Object, Object> simpleParameters) {
     this.simpleParameters = simpleParameters;
@@ -61,11 +63,11 @@ public class SimpleCollectionObject {
     this.simpleTypeMap = simpleTypeMap;
   }
 
-  public Map<Long, SimpleCollectionObject> getComplexTypeMap() {
+  public Map<Long, ParsersTestObject> getComplexTypeMap() {
     return complexTypeMap;
   }
 
-  public void setComplexTypeMap(Map<Long, SimpleCollectionObject> complexTypeMap) {
+  public void setComplexTypeMap(Map<Long, ParsersTestObject> complexTypeMap) {
     this.complexTypeMap = complexTypeMap;
   }
 
@@ -75,5 +77,13 @@ public class SimpleCollectionObject {
 
   public void setSimpleListTypeMap(Map<String, List<String>> simpleListTypeMap) {
     this.simpleListTypeMap = simpleListTypeMap;
+  }
+
+  public void setSimpleTypeWithConverter(SimplePojo simpleTypeWithConverter) {
+    this.simpleTypeWithConverter = simpleTypeWithConverter;
+  }
+
+  public SimplePojo getSimpleTypeWithConverter() {
+    return simpleTypeWithConverter;
   }
 }

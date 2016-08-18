@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
+import org.mule.test.config.spring.parsers.beans.ParsersTestObject;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +32,10 @@ public class PropertiesTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void propertiesAreCorrectlyConfigured() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("testObject");
-    assertThat(simpleCollectionObject.getSimpleParameters().get("firstname"), is("testPropertyValue"));
-    assertThat(simpleCollectionObject.getSimpleParameters().get("lastname"), is(SYSTEM_PROPERTY_VALUE));
-    assertThat(simpleCollectionObject.getSimpleParameters().get("age"), is("12"));
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("testObject");
+    assertThat(parsersTestObject.getSimpleParameters().get("firstname"), is("testPropertyValue"));
+    assertThat(parsersTestObject.getSimpleParameters().get("lastname"), is(SYSTEM_PROPERTY_VALUE));
+    assertThat(parsersTestObject.getSimpleParameters().get("age"), is("12"));
   }
 
 }

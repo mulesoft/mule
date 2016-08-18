@@ -6,6 +6,7 @@
  */
 package org.mule.test.config.dsl;
 
+import static java.lang.Integer.valueOf;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
@@ -16,10 +17,11 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.test.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
-import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
+import org.mule.test.config.spring.parsers.beans.ParsersTestObject;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParserComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
@@ -42,7 +45,8 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
         new ComponentBuildingDefinition.Builder().withNamespace(PARSERS_TEST_NAMESACE);
 
     ComponentBuildingDefinition.Builder baseParameterCollectionParserBuilder = baseBuilder.copy()
-        .withTypeDefinition(fromType(SimpleCollectionObject.class)).asNamed()
+        .withTypeDefinition(fromType(ParsersTestObject.class)).asNamed()
+        .withSetterParameterDefinition("simpleTypeWithConverter", fromChildConfiguration(String.class).build())
         .withSetterParameterDefinition("simpleTypeList",
                                        fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list").build())
         .withSetterParameterDefinition("simpleTypeListWithConverter",
@@ -57,7 +61,7 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                        fromChildMapConfiguration(String.class, String.class)
                                            .withWrapperIdentifier("simple-list-type-map").build())
         .withSetterParameterDefinition("complexTypeMap",
-                                       fromChildMapConfiguration(Long.class, SimpleCollectionObject.class)
+                                       fromChildMapConfiguration(Long.class, ParsersTestObject.class)
                                            .withWrapperIdentifier("complex-type-map").build())
         .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(newBuilder()
             .withAttributeDefinition(fromSimpleParameter("firstname").build()).withKey("firstname").build(),
@@ -70,12 +74,12 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                                                                            .build())
                                                                                        .withKey("age").build(),
                                                                                    newBuilder()
-                                                                                       .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class)
+                                                                                       .withAttributeDefinition(fromChildConfiguration(ParsersTestObject.class)
                                                                                            .withWrapperIdentifier("first-child")
                                                                                            .build())
                                                                                        .withKey("first-child").build(),
                                                                                    newBuilder()
-                                                                                       .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class)
+                                                                                       .withAttributeDefinition(fromChildConfiguration(ParsersTestObject.class)
                                                                                            .withWrapperIdentifier("second-child")
                                                                                            .build())
                                                                                        .withKey("second-child").build(),
@@ -128,7 +132,7 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
 
     definitions.add(baseBuilder.copy().withIdentifier("simple-type-entry")
         .withTypeDefinition(fromMapEntryType(String.class, Integer.class))
-        .withKeyTypeConverter(input -> input + "-with-converter").withTypeConverter(input -> Integer.valueOf((String) input) + 1)
+        .withKeyTypeConverter(input -> input + "-with-converter").withTypeConverter(input -> valueOf((String) input) + 1)
         .build());
 
     definitions.add(baseBuilder.copy().withIdentifier("simple-list-type-map").withTypeDefinition(fromType(Map.class)).build());
@@ -139,7 +143,7 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
     definitions.add(baseBuilder.copy().withIdentifier("complex-type-map").withTypeDefinition(fromType(Map.class)).build());
 
     definitions.add(baseBuilder.copy().withIdentifier("complex-type-entry")
-        .withTypeDefinition(fromMapEntryType(Long.class, SimpleCollectionObject.class)).build());
+        .withTypeDefinition(fromMapEntryType(Long.class, ParsersTestObject.class)).build());
 
     definitions.add(baseBuilder.copy().withIdentifier("global-element-with-object-factory")
         .withTypeDefinition(fromType(LifecycleSensingMessageProcessor.class))
@@ -168,11 +172,14 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
     definitions.add(baseBuilder.copy().withIdentifier("same-child-type-container")
         .withTypeDefinition(fromType(PojoWithSameTypeChildren.class))
         .withSetterParameterDefinition("elementTypeA",
-                                       fromChildConfiguration(SimpleCollectionObject.class).withIdentifier("elementTypeA")
+                                       fromChildConfiguration(ParsersTestObject.class).withIdentifier("elementTypeA")
                                            .build())
-        .withSetterParameterDefinition("anotherElementTypeA", fromChildConfiguration(SimpleCollectionObject.class)
+        .withSetterParameterDefinition("anotherElementTypeA", fromChildConfiguration(ParsersTestObject.class)
             .withIdentifier("anotherElementTypeA").build())
         .build());
+
+    definitions.add(baseBuilder.copy().withIdentifier("simple-type").withTypeConverter(o -> new SimplePojo((String) o))
+        .withTypeDefinition(fromType(String.class)).build());
     return definitions;
   }
 

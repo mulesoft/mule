@@ -110,6 +110,10 @@
         <parsers-test:anotherElementTypeA firstname="Mariano" lastname="Gonzalez" age="31"/>
     </parsers-test:same-child-type-container>
 
+    <parsers-test:parameter-collection-parser name="simpleTypeWithConverterObject">
+        <parsers-test:simple-type>5</parsers-test:simple-type>
+    </parsers-test:parameter-collection-parser>
+
     <parsers-test:text-pojo name="textPojo">
         <parsers-test:text><![CDATA[select * from PLANET]]></parsers-test:text>
     </parsers-test:text-pojo>

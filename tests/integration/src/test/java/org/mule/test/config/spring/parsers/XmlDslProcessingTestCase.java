@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
-import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
+import org.mule.test.config.spring.parsers.beans.ParsersTestObject;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
 
 import java.util.Collection;
@@ -23,7 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class XmlDslProcessingTestCase extends FunctionalTestCase {
@@ -39,88 +41,88 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase {
 
   @Test
   public void onlySimpleParametersInSingleAttribute() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlySimpleParametersObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("onlySimpleParametersObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(3));
     assertPabloChildParameters(simpleParameters);
   }
 
   @Test
   public void firstComplexChildUsingWrapper() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexFirstChildParameterObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("onlyComplexFirstChildParameterObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(1));
-    assertPabloChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
+    assertPabloChildParameters(((ParsersTestObject) simpleParameters.get("first-child")).getSimpleParameters());
   }
 
   @Test
   public void secondComplexChildUsingWrapper() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexSecondChildParameterObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("onlyComplexSecondChildParameterObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(1));
-    assertMarianoChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
+    assertMarianoChildParameters(((ParsersTestObject) simpleParameters.get("second-child")).getSimpleParameters());
   }
 
   @Test
   public void complexChildrenListUsingWrapper() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexChildrenListParameterObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("onlyComplexChildrenListParameterObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(1));
-    assertCollectionChildrenContent((List<SimpleCollectionObject>) simpleParameters.get("other-children"));
+    assertCollectionChildrenContent((List<ParsersTestObject>) simpleParameters.get("other-children"));
   }
 
   @Test
   public void completeParametersObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("completeParametersObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("completeParametersObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(6));
     assertPabloChildParameters(simpleParameters);
-    assertPabloChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
-    assertMarianoChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
-    assertCollectionChildrenContent((List<SimpleCollectionObject>) simpleParameters.get("other-children"));
+    assertPabloChildParameters(((ParsersTestObject) simpleParameters.get("first-child")).getSimpleParameters());
+    assertMarianoChildParameters(((ParsersTestObject) simpleParameters.get("second-child")).getSimpleParameters());
+    assertCollectionChildrenContent((List<ParsersTestObject>) simpleParameters.get("other-children"));
   }
 
   @Test
   public void customCollectionTypeObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("customCollectionTypeObject");
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("customCollectionTypeObject");
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(1));
-    List<SimpleCollectionObject> collectionObject =
-        (List<SimpleCollectionObject>) simpleParameters.get("other-children-custom-collection-type");
+    List<ParsersTestObject> collectionObject =
+        (List<ParsersTestObject>) simpleParameters.get("other-children-custom-collection-type");
     assertThat(collectionObject, instanceOf(LinkedList.class));
     assertCollectionChildrenContent(collectionObject);
   }
 
   @Test
   public void simpleTypeObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeObject");
-    assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeList());
-    assertThat(simpleCollectionObject.getSimpleTypeSet(), instanceOf(TreeSet.class));
-    assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeSet());
-    Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("simpleTypeObject");
+    assertSimpleTypeCollectionValues(parsersTestObject.getSimpleTypeList());
+    assertThat(parsersTestObject.getSimpleTypeSet(), instanceOf(TreeSet.class));
+    assertSimpleTypeCollectionValues(parsersTestObject.getSimpleTypeSet());
+    Map<Object, Object> simpleParameters = parsersTestObject.getSimpleParameters();
     assertThat(simpleParameters.size(), is(1));
     assertSimpleTypeCollectionValues((List<String>) simpleParameters.get("other-simple-type-child-list-custom-key"));
   }
 
   @Test
   public void simpleTypeChildListWithConverter() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeObjectWithConverter");
-    List<String> simpleTypeListWithConverter = simpleCollectionObject.getSimpleTypeListWithConverter();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("simpleTypeObjectWithConverter");
+    List<String> simpleTypeListWithConverter = parsersTestObject.getSimpleTypeListWithConverter();
     assertThat(simpleTypeListWithConverter.size(), is(2));
     assertThat(simpleTypeListWithConverter, hasItems("value1-with-converter", "value2-with-converter"));
   }
 
   @Test
   public void simpleTypeMapObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeMapObject");
-    Map<String, Integer> simpleTypeMap = simpleCollectionObject.getSimpleTypeMap();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("simpleTypeMapObject");
+    Map<String, Integer> simpleTypeMap = parsersTestObject.getSimpleTypeMap();
     assertThat(simpleTypeMap.size(), is(2));
   }
 
   @Test
   public void simpleListTypeMapObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeCollectionMapObject");
-    Map<String, List<String>> simpleListTypeMap = simpleCollectionObject.getSimpleListTypeMap();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("simpleTypeCollectionMapObject");
+    Map<String, List<String>> simpleListTypeMap = parsersTestObject.getSimpleListTypeMap();
     assertThat(simpleListTypeMap.size(), is(2));
     List<String> firstCollection = simpleListTypeMap.get("1");
     assertThat(firstCollection, hasItems("value1", "value2"));
@@ -130,8 +132,8 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase {
 
   @Test
   public void complexTypeMapObject() {
-    SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("complexTypeMapObject");
-    Map<Long, SimpleCollectionObject> simpleTypeMap = simpleCollectionObject.getComplexTypeMap();
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("complexTypeMapObject");
+    Map<Long, ParsersTestObject> simpleTypeMap = parsersTestObject.getComplexTypeMap();
     assertThat(simpleTypeMap.size(), is(2));
     assertPabloChildParameters(simpleTypeMap.get(1l).getSimpleParameters());
     assertMarianoChildParameters(simpleTypeMap.get(2l).getSimpleParameters());
@@ -169,12 +171,18 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase {
     assertThat(pojo.getSomeParameter(), is("select * from PLANET"));
   }
 
+  @Test
+  public void simpleTypeWithConverterObject() {
+    ParsersTestObject parsersTestObject = muleContext.getRegistry().get("simpleTypeWithConverterObject");
+    assertThat(parsersTestObject.getSimpleTypeWithConverter(), is(new SimplePojo("5")));
+  }
+
   private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues) {
     assertThat(simpleTypeCollectionValues.size(), is(2));
     assertThat(simpleTypeCollectionValues, hasItems("value1", "value2"));
   }
 
-  private void assertCollectionChildrenContent(List<SimpleCollectionObject> collectionObjects) {
+  private void assertCollectionChildrenContent(List<ParsersTestObject> collectionObjects) {
     assertPabloChildParameters(collectionObjects.get(0).getSimpleParameters());
     assertMarianoChildParameters(collectionObjects.get(1).getSimpleParameters());
   }
