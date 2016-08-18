@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Set;
@@ -107,11 +106,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
     throw new UnsupportedOperationException();
   }
 

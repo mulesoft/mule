@@ -29,7 +29,6 @@ import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.OffsetTime;
@@ -187,11 +186,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
       // no action
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-      return null;
     }
 
     @Override

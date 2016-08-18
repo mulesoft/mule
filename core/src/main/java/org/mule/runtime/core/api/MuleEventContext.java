@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.api;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
+
+import java.net.URI;
+import java.nio.charset.Charset;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current request. Using the context, developers can
@@ -113,13 +112,6 @@ public interface MuleEventContext {
    * @param stopFurtherProcessing the value to set.
    */
   void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-  /**
-   * An output stream the can optionally be used write response data to an incoming message.
-   * 
-   * @return an output strem if one has been made available by the message receiver that received the message
-   */
-  OutputStream getOutputStream();
 
   MessageExchangePattern getExchangePattern();
 

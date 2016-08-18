@@ -19,7 +19,6 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Set;
@@ -172,13 +171,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param stopFurtherProcessing the value to set.
    */
   void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-  /**
-   * An outputstream the can optionally be used write response data to an incoming message.
-   * 
-   * @return an output strem if one has been made available by the message receiver that received the message
-   */
-  OutputStream getOutputStream();
 
   /**
    * Returns the muleContext for the Mule node that this event was received in
