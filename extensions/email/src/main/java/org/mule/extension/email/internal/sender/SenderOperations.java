@@ -57,7 +57,8 @@ public class SenderOperations {
   @Summary("Sends an email message")
   public void send(@Connection SenderConnection connection,
                    @UseConfig SMTPConfiguration configuration,
-                   EmailContent content, // TODO: create transformer from string to EmailContentMULE-9181.
+                   // TODO: create transformer from string to EmailContent MULE-9181.
+                   EmailContent content,
                    @Optional(defaultValue = "[No Subject]") String subject,
                    List<String> toAddresses,
                    @Optional List<String> ccAddresses,
