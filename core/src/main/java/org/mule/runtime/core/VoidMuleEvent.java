@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -53,11 +52,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public MuleMessage getMessage() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Credentials getCredentials() {
     throw new UnsupportedOperationException();
   }
 

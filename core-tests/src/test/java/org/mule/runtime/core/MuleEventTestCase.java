@@ -15,7 +15,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -37,16 +36,6 @@ import org.junit.Test;
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   private static final String TEST_PAYLOAD = "anyValuePayload";
-
-  /*
-   * See http://mule.mulesoft.org/jira/browse/MULE-384 for details.
-   */
-  @Test
-  public void testNoPasswordNoNullPointerException() throws Exception {
-    MuleEvent event = getTestEvent(new Object());
-    Credentials credentials = event.getCredentials();
-    assertNull("Credentials must not be created for endpoints without a password.", credentials);
-  }
 
   @Test
   public void testEventSerialization() throws Exception {

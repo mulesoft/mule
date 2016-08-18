@@ -6,24 +6,23 @@
  */
 package org.mule.runtime.core.api;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
+
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
 
 /**
  * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
@@ -70,8 +69,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    */
   @Override
   MuleMessage getMessage();
-
-  Credentials getCredentials();
 
   /**
    * Returns the contents of the message as a byte array.
