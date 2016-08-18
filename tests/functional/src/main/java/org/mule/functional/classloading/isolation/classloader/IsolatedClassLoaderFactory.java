@@ -76,7 +76,7 @@ public class IsolatedClassLoaderFactory {
    * @return a {@link ArtifactsClassLoaderHolder} that would be used to run the test
    */
   public ArtifactsClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages,
-                                                             ArtifactsUrlClassification artifactsUrlClassification) {
+                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]));
 
@@ -99,7 +99,7 @@ public class IsolatedClassLoaderFactory {
         createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactsUrlClassification);
 
     return new ArtifactsClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
-                                         appClassLoader);
+                                          appClassLoader);
   }
 
   /**
