@@ -1642,6 +1642,14 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="abstract-on-error" abstract="true" type="exceptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="exceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
@@ -4017,30 +4025,29 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="catch-exception-strategy" type="catchExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
+    <xsd:element name="on-error-continue" type="onErrorContinueType"
+                 substitutionGroup="abstract-on-error">
         <xsd:annotation>
             <xsd:documentation>
-                Exception strategy used to handle exceptions. It will commit any transaction as if the message was consumed successfully.
+                Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="choice-exception-strategy" type="choiceExceptionStrategyType"
+    <xsd:element name="error-handler" type="errorHandlerType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Exception strategy used to route to different exception strategies. It will execute the exception strategy which expression attribute matches against MuleMessage. In case there's no match, then default exception strategy will be exeucted.
+                Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there's no match, then a default error handler will be executed.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="rollback-exception-strategy" type="rollbackExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
+    <xsd:element name="on-error-propagate" type="onErrorPropagateType"
+                 substitutionGroup="abstract-on-error">
         <xsd:annotation>
             <xsd:documentation>
-                Exception strategy used to rollback inbound message. It will rollback any transaction or not consume
-                inbound message unless a org.mule.runtime.api.exception.MessageRedeliveredException is thrown.
+                Error handler used to propagate errors. It will rollback any transaction and not consume messages.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4054,7 +4061,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="catchExceptionStrategyType">
+    <xsd:complexType name="onErrorContinueType">
         <xsd:complexContent>
             <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>
@@ -4070,11 +4077,11 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="choiceExceptionStrategyType">
+    <xsd:complexType name="errorHandlerType">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-on-error" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
@@ -4087,7 +4094,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="rollbackExceptionStrategyType">
+    <xsd:complexType name="onErrorPropagateType">
         <xsd:complexContent>
             <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>

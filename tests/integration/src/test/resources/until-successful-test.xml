@@ -61,9 +61,11 @@
                 <test:component throwException="true"/>
             </processor-chain>
         </until-successful>
-        <rollback-exception-strategy>
-            <test:invocation-counter name="exceptionStrategy"/>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:invocation-counter name="exceptionStrategy"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="measureSynchronousWait">
@@ -83,9 +85,11 @@
                 <test:component throwException="true"/>
             </processor-chain>
         </until-successful>
-        <rollback-exception-strategy>
-            <test:invocation-counter name="exceptionStrategy2"/>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:invocation-counter name="exceptionStrategy2"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>

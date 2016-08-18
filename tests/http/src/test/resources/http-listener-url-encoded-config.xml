@@ -34,8 +34,10 @@
         <expression-transformer expression="#[message.getAttributes().getQueryParams()]"/>
 
         <!-- The default handler ignores the error and returns 200, so we can't detect if it was handled correctly -->
-        <catch-exception-strategy>
-            <test:component throwException="true"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:component throwException="true"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 </mule>

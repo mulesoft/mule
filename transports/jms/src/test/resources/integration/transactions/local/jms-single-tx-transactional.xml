@@ -54,7 +54,9 @@
             <transports:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <transports:outbound-endpoint ref="out2"/>
-            <catch-exception-strategy/>
+            <error-handler>
+                <on-error-continue/>
+            </error-handler>
         </transactional>
     </flow>
 
@@ -64,7 +66,9 @@
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-            <catch-exception-strategy/>
+            <error-handler>
+                <on-error-continue/>
+            </error-handler>
         </transactional>
     </flow>
 
@@ -122,7 +126,9 @@
             <transactional>
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-                <catch-exception-strategy/>
+                <error-handler>
+                    <on-error-continue/>
+                </error-handler>
             </transactional>
         </transactional>
     </flow>
@@ -152,7 +158,9 @@
             <transactional action="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-                <catch-exception-strategy/>
+                <error-handler>
+                    <on-error-continue/>
+                </error-handler>
             </transactional>
         </transactional>
     </flow>
@@ -163,12 +171,18 @@
             <transactional action="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-                <catch-exception-strategy/>
+                <error-handler>
+                    <on-error-continue/>
+                </error-handler>
             </transactional>
             <test:component throwException="true"/>
-            <rollback-exception-strategy/>
+            <error-handler>
+                <on-error-propagate/>
+            </error-handler>
         </transactional>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
 </mule>

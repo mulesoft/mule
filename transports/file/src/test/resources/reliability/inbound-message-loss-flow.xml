@@ -39,7 +39,9 @@
     <flow name="CatchExceptionStrategy" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/exceptionHandled" />
         <test:component throwException="true"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
     <flow name="DefaultExceptionStrategyCommit" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/commitOnException" />
@@ -53,6 +55,8 @@
             <idempotent-redelivery-policy idExpression="#[header:inbound:originalFilename]"/>
         </file:inbound-endpoint>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="2"/>
+        </error-handler>
     </flow>
 </mule>

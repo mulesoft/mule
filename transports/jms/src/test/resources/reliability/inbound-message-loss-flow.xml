@@ -30,7 +30,9 @@
     <flow name="CatchExceptionStrategy" processingStrategy="synchronous">
         <jms:inbound-endpoint queue="exceptionHandled" connector-ref="jmsConnector"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
     <flow name="DefaultExceptionStrategyCommit" processingStrategy="synchronous">
         <jms:inbound-endpoint queue="commitOnException" connector-ref="jmsConnector"/>
@@ -42,6 +44,8 @@
     <flow name="RollbackExceptionStrategyCommit">
         <jms:inbound-endpoint queue="rollbackOnException" connector-ref="jmsConnectorNoRedelivery"/>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="2"/>
+        </error-handler>
     </flow>
 </mule>

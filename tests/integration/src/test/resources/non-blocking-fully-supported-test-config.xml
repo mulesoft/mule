@@ -242,12 +242,14 @@
     </flow>
     <flow name="catchExceptionStrategyChild">
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread  and assertPayload()]"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+                <test:non-blocking-processor/>
+                <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread  and assertPayload()]"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

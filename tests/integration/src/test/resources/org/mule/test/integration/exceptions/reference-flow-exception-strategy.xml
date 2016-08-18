@@ -8,20 +8,22 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <catch-exception-strategy name="referencedEs">
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
-        <json:object-to-json-transformer/>
-    </catch-exception-strategy>
+    <error-handler name="referencedEs">
+        <on-error-continue>
+            <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </on-error-continue>
+    </error-handler>
 
-    <choice-exception-strategy name="anotherGlobalEs">
-        <catch-exception-strategy>
+    <error-handler name="anotherGlobalEs">
+        <on-error-continue>
             <append-string-transformer message="something"/>
-        </catch-exception-strategy>
-    </choice-exception-strategy>
+        </on-error-continue>
+    </error-handler>
 
     <flow name="referenceExceptionStrategyFlow">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
         <json:object-to-json-transformer/>
         <exception-strategy ref="referencedEs"/>
@@ -38,8 +40,8 @@
     </flow>
 
     <flow name="configuredExceptionStrategyFlow">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
         <json:object-to-json-transformer/>
         <default-exception-strategy/>

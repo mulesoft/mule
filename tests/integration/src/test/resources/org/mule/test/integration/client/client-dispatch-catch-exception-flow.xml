@@ -23,28 +23,34 @@
     <flow name="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow">
         <http:listener path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$SendInnerFlowThrowExceptionJavaComponent"/>
-        <catch-exception-strategy>
-            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
-            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+                <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="catchExceptionJavaComponentToJavaComponent">
         <http:listener path="catchExceptionJavaComponentToJavaComponent" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
-        <catch-exception-strategy>
-            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
-            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+                <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="catchExceptionJavaComponentToMessageProcessor">
         <http:listener path="catchExceptionJavaComponentToMessageProcessor" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
-        <catch-exception-strategy>
-            <processor ref="assertEventProcessor"/>
-            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <processor ref="assertEventProcessor"/>
+                <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <spring:beans>
@@ -57,18 +63,22 @@
     <flow name="catchExceptionMessageProcessorToJavaComponent">
         <http:listener path="catchExceptionMessageProcessorToJavaComponent" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
-        <catch-exception-strategy>
-            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
-            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+                <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="catchExceptionMessageProcessorToMessageProcessor">
         <http:listener path="catchExceptionMessageProcessorToMessageProcessor" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
-        <catch-exception-strategy>
-            <processor ref="assertEventProcessor"/>
-            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <processor ref="assertEventProcessor"/>
+                <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 </mule>

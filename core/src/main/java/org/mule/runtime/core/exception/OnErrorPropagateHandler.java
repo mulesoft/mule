@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
-public class RollbackMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy {
+public class OnErrorPropagateHandler extends TemplateMessagingExceptionStrategy {
 
   private RedeliveryExceeded redeliveryExceeded;
   private Integer maxRedeliveryAttempts;

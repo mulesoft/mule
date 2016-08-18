@@ -28,9 +28,9 @@ import java.util.List;
  * Selects which exception strategy to execute based on filtering.
  * <p/>
  * Exception listeners must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of
- * ChoiceMessagingExceptionStrategy
+ * ErrorHandler
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
+public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject {
 
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
@@ -82,8 +82,8 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         defaultExceptionStrategy = getMuleContext().getDefaultExceptionStrategy();
       } catch (Exception e) {
         throw new InitialisationException(CoreMessages.createStaticMessage("Failure initializing "
-            + "choice-exception-strategy. If choice-exception-strategy is defined as default one "
-            + "check that last exception strategy inside choice catchs all"), e, this);
+            + "error-handler. If error-handler is defined as default one "
+            + "check that last exception strategy inside matches all errors"), e, this);
       }
       this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy));
     }
@@ -107,11 +107,11 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         messagingExceptionHandler =
             ((MessagingExceptionStrategyAcceptorDelegate) messagingExceptionHandler).getExceptionListener();
       }
-      if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy
-          && ((RollbackMessagingExceptionStrategy) messagingExceptionHandler).hasMaxRedeliveryAttempts()) {
+      if (messagingExceptionHandler instanceof OnErrorPropagateHandler
+          && ((OnErrorPropagateHandler) messagingExceptionHandler).hasMaxRedeliveryAttempts()) {
         if (rollbackWithRedelivery) {
           throw new MuleRuntimeException(CoreMessages
-              .createStaticMessage("Only one rollback exception strategy inside <choice-exception-strategy> can handle message redelivery."));
+              .createStaticMessage("Only one rollback exception strategy inside <error-handler> can handle message redelivery."));
         }
         rollbackWithRedelivery = true;
       }
@@ -123,7 +123,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
       MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
       if (messagingExceptionHandlerAcceptor.acceptsAll()) {
         throw new MuleRuntimeException(CoreMessages
-            .createStaticMessage("Only last exception strategy inside <choice-exception-strategy> can accept any message. Maybe expression attribute is empty."));
+            .createStaticMessage("Only last exception strategy inside <error-handler> can accept any message. Maybe expression attribute is empty."));
       }
     }
   }

@@ -9,9 +9,9 @@ package org.mule.runtime.core.exception;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
-public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy {
+public class OnErrorContinueHandler extends TemplateMessagingExceptionStrategy {
 
-  public CatchMessagingExceptionStrategy() {
+  public OnErrorContinueHandler() {
     setHandleException(true);
   }
 

@@ -38,9 +38,11 @@
 
     <flow name="service-5">
         <expression-component>hola</expression-component>
-        <catch-exception-strategy>
-            <test:queue name="owException-out" />
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:queue name="owException-out" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

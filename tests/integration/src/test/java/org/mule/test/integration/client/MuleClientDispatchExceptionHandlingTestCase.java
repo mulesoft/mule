@@ -54,8 +54,8 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
 
   /**
    * Validates that a JavaComponent after doing a dispatch to a sub-flow using MuleClient throws an exception and the
-   * catch-exception-strategy defined in main-flow is called. It also validates that original event passed to JavaComponent is
-   * later propagated to the JavaComponent defined in catch-exception-strategy block.
+   * on-error-continue defined in main-flow is called. It also validates that original event passed to JavaComponent is
+   * later propagated to the JavaComponent defined in on-error-continue block.
    *
    * @throws Exception
    */
@@ -108,7 +108,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
     return String.format("http://localhost:%s/%s", port.getValue(), endpoint);
   }
 
-  // Just a simple JavaComponent used in catch-exception-strategy block
+  // Just a simple JavaComponent used in on-error-continue block
   // in order to check that RequestContext has the correct event and message references
   public static class AssertEventComponent implements Callable {
 
@@ -118,7 +118,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // is the correct, in this case it should be the same that it was set before doing the
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
-      // Checking if message is still the same on catch-exception-strategy
+      // Checking if message is still the same on on-error-continue
       isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
       return eventContext.getMessage();
     }
@@ -132,7 +132,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // is the correct, in this case it should be the same that it was set before doing the
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
-      // Checking if message is still the same on catch-exception-strategy
+      // Checking if message is still the same on on-error-continue
       isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
       return event;
     }

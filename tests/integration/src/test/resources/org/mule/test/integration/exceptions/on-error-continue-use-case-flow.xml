@@ -23,58 +23,68 @@
 
     <flow name="httpContinueProcessingActualMessage">
         <http:listener path="service" config-ref="listenerConfig"/>
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
-            <json:object-to-json-transformer/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
+                <json:object-to-json-transformer/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="httpsContinueProcessingActualMessage">
         <http:listener config-ref="listenerConfigHttps" path="httpsservice"/>
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
-            <json:object-to-json-transformer/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
+                <json:object-to-json-transformer/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="continueProcessingActualMessage">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
-            <json:object-to-json-transformer/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
+                <json:object-to-json-transformer/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="catchWithComponent">
       <test:component throwException="true"/>
-      <catch-exception-strategy>
-        <script:component>
-            <script:script engine="groovy">
-                return "$payload Caught"
-            </script:script>
-        </script:component>
-      </catch-exception-strategy>
+      <error-handler>
+        <on-error-continue>
+            <script:component>
+                <script:script engine="groovy">
+                    return "$payload Caught"
+                </script:script>
+            </script:component>
+        </on-error-continue>
+       </error-handler>
     </flow>
 
     <flow name="fullyDefinedCatchExceptionStrategyWithComponent">
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <append-string-transformer message=" apt2"/>
-	        <script:component>
-	            <script:script engine="groovy">
-	                return "$payload groovified"
-	            </script:script>
-	        </script:component>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <append-string-transformer message=" apt2"/>
+                <script:component>
+                    <script:script engine="groovy">
+                        return "$payload groovified"
+                    </script:script>
+                </script:component>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

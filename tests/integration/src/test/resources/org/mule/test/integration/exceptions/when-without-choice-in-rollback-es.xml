@@ -6,7 +6,9 @@
 
         <flow name="invalidFlow">
             <logger/>
-            <rollback-exception-strategy when="#[exception.causedBy(java.lang.Exception)]"/>
+            <error-handler>
+                <on-error-propagate when="#[exception.causedBy(java.lang.Exception)]"/>
+            </error-handler>
         </flow>
 
 </mule>

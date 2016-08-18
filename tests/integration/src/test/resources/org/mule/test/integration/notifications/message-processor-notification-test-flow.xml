@@ -263,40 +263,46 @@
 
     <flow name="catch-es">
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <logger/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <logger/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="rollback-es">
         <test:component throwException="true"/>
-        <rollback-exception-strategy>
-            <logger/>
-            <on-redelivery-attempts-exceeded>
-                <echo-component/>
-            </on-redelivery-attempts-exceeded>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <logger/>
+                <on-redelivery-attempts-exceeded>
+                    <echo-component/>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="choice-es">
         <test:component throwException="true"/>
-        <choice-exception-strategy>
-            <rollback-exception-strategy when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="1">
+        <error-handler>
+            <on-error-propagate when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="1">
                 <echo-component/>
                 <on-redelivery-attempts-exceeded>
                     <logger/>
                 </on-redelivery-attempts-exceeded>
-            </rollback-exception-strategy>
-            <catch-exception-strategy>
+            </on-error-propagate>
+            <on-error-continue>
                 <echo-component/>
-            </catch-exception-strategy>
-        </choice-exception-strategy>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
-    <catch-exception-strategy name="Global_Exception_Strategy">
-        <logger level="INFO"/>
-        <logger level="INFO"/>
-    </catch-exception-strategy>
+    <error-handler name="Global_Exception_Strategy">
+        <on-error-continue>
+            <logger level="INFO"/>
+            <logger level="INFO"/>
+        </on-error-continue>
+    </error-handler>
 
     <flow name="global-es">
         <test:component throwException="true"/>

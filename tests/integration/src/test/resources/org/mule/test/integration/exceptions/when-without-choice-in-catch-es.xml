@@ -6,7 +6,9 @@
 
     <flow name="invalidFlow">
         <logger/>
-        <catch-exception-strategy when="#[exception.causedBy(java.lang.Exception)]"/>
+        <error-handler>
+            <on-error-continue when="#[exception.causedBy(java.lang.Exception)]"/>
+        </error-handler>
     </flow>
 
 </mule>

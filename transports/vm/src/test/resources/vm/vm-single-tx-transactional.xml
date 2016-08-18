@@ -59,7 +59,9 @@
             <vm:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <vm:outbound-endpoint ref="out2"/>
-            <catch-exception-strategy/>
+            <error-handler>
+                <on-error-continue/>
+            </error-handler>
         </transactional>
     </flow>
 
@@ -69,7 +71,9 @@
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-            <catch-exception-strategy/>
+            <error-handler>
+                <on-error-continue/>
+            </error-handler>
         </transactional>
     </flow>
 
@@ -131,7 +135,9 @@
             <transactional>
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-                <catch-exception-strategy/>
+                <error-handler>
+                    <on-error-continue/>
+                </error-handler>
             </transactional>
         </transactional>
     </flow>
@@ -161,7 +167,9 @@
             <transactional action="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-                <catch-exception-strategy/>
+                <error-handler>
+                    <on-error-continue/>
+                </error-handler>
             </transactional>
         </transactional>
     </flow>

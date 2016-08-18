@@ -248,11 +248,13 @@
     </flow>
     <flow name="catchExceptionStrategyChild">
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <set-variable variableName="beforeThreadChild" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()!=beforeThreadChild  and assertPayload()]"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-variable variableName="beforeThreadChild" value="#[Thread.currentThread()]"/>
+                <test:non-blocking-processor/>
+                <test:assert count="1" expression="#[Thread.currentThread()!=beforeThreadChild  and assertPayload()]"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

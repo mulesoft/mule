@@ -6,10 +6,10 @@
 
     <flow name="test">
         <logger/>
-        <choice-exception-strategy>
-            <rollback-exception-strategy when="#[flowVars['nonsense'].equals('hi')]" maxRedeliveryAttempts="4"/>
-            <rollback-exception-strategy maxRedeliveryAttempts="5"/>
-        </choice-exception-strategy>
+        <error-handler>
+            <on-error-propagate when="#[flowVars['nonsense'].equals('hi')]" maxRedeliveryAttempts="4"/>
+            <on-error-propagate maxRedeliveryAttempts="5"/>
+        </error-handler>
     </flow>
 
 </mule>

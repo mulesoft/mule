@@ -24,7 +24,9 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:inbound-endpoint>
         <test:component />
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
     <flow name="xaTransactionBehavior">
@@ -38,7 +40,9 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:outbound-endpoint>
         <test:component throwException="true"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
     <flow name="transactionCommitFails">
@@ -49,7 +53,9 @@
         <message-filter>
             <expression-filter expression="#[message.inboundProperties['filterMessage']"/>
         </message-filter>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
 </mule>

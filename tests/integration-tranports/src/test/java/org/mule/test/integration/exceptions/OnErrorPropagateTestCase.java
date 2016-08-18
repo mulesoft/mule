@@ -39,7 +39,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RollbackExceptionStrategyTestCase extends FunctionalTestCase {
+public class OnErrorPropagateTestCase extends FunctionalTestCase {
 
   public static final int TIMEOUT = 5000;
   public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
@@ -55,14 +55,14 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase {
   @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-  public RollbackExceptionStrategyTestCase() {
+  public OnErrorPropagateTestCase() {
     System.setProperty("maxRedelivery", String.valueOf(MAX_REDELIVERY));
     System.setProperty("shortMaxRedelivery", String.valueOf(SHORT_MAX_REDELIVERY));
   }
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/rollback-exception-strategy-use-case-flow.xml";
+    return "org/mule/test/integration/exceptions/on-error-propagate-use-case-flow.xml";
   }
 
   @Test

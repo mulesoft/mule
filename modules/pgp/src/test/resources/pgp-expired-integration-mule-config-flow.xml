@@ -39,9 +39,11 @@
         <encrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
         <decrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
         <test:queue name="out"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.runtime.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

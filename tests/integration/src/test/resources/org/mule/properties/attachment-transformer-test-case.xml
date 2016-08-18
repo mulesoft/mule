@@ -108,9 +108,11 @@
             <set-variable variableName="enricherAttachment" value="some text"/>
             <enrich target="#[message.outboundAttachments['attach']]" source="#[flowVars.enricherAttachment]"/>
         </enricher>
-        <catch-exception-strategy>
-            <set-property propertyName="failure" value="failedExecution"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-property propertyName="failure" value="failedExecution"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="copyAttachments" processingStrategy="synchronous">

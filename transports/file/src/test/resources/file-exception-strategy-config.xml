@@ -39,13 +39,17 @@
     <flow name="consumeFileWithStreamingAndCatch" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-catch" connector-ref="fileConnectorStreaming"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
     <flow name="consumeFileWithStreamingAndRollback" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-rollback" connector-ref="fileConnectorStreaming"/>
         <test:component/>
-        <rollback-exception-strategy/>
+        <error-handler>
+            <on-error-propagate/>
+        </error-handler>
     </flow>
 
     <flow name="consumeFileWithStreamingAndRollbackWithRedelivery" processingStrategy="synchronous">
@@ -53,7 +57,9 @@
             <idempotent-redelivery-policy idExpression="#['fixedValue']"/>
         </file:inbound-endpoint>
         <test:component/>
-        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="2"/>
+        </error-handler>
     </flow>
 
     <flow name="consumefileWithStreamingAndAsyncProcessingStrategy" processingStrategy="asynchronous">

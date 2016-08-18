@@ -286,7 +286,7 @@ public class WatermarkPollingTestCase extends AbstractIntegrationTestCase {
    * Scenario:
    * <p>
    * No object store defined The update expression is defined. The key is already present in the Object store The flow fails to
-   * execute but it is catched in a catch-exception-strategy
+   * execute but it is caught in an on-error-continue
    * </p>
    * Result:
    * <p/>

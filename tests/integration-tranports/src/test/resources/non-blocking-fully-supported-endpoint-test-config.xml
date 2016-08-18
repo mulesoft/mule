@@ -37,11 +37,13 @@
     <flow name="testOutboundEndpointError">
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <transports:outbound-endpoint address="test://AlwaysFail" exchange-pattern="request-response" />
-        <catch-exception-strategy>
-            <test:assert expression="#[assertPayload()]" />
-            <test:assert expression="#[exception.causedBy(org.mule.runtime.core.api.routing.RoutingException)]" />
-            <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:assert expression="#[assertPayload()]" />
+                <test:assert expression="#[exception.causedBy(org.mule.runtime.core.api.routing.RoutingException)]" />
+                <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

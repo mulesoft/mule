@@ -26,10 +26,12 @@
 
         <ws:consumer operation="echo"/>
 
-        <catch-exception-strategy>
-            <set-property propertyName="flowVar" value="#[flowVars['flowVarName']]" />
-            <test:queue name="out"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-property propertyName="flowVar" value="#[flowVars['flowVarName']]" />
+                <test:queue name="out"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

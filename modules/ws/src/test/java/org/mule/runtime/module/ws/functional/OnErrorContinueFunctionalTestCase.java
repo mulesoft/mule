@@ -21,7 +21,7 @@ import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
+public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
   private static final String FAIL_REQUEST =
       "<tns:fail xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" + "<text>Hello</text></tns:fail>";
@@ -32,7 +32,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
 
   @Override
   protected String getConfigFile() {
-    return "catch-exception-strategy-config.xml";
+    return "on-error-continue-config.xml";
   }
 
   @Test

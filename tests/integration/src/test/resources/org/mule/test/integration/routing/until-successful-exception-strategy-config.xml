@@ -23,10 +23,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <!--wait until all events fail-->
         <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
         <set-payload value="ok"/>
-        <catch-exception-strategy>
-            <!--release when all events have failed-->
-            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <!--release when all events have failed-->
+                <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 
@@ -39,10 +41,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <!--wait until all events fail-->
         <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
         <set-payload value="ok"/>
-        <catch-exception-strategy>
-            <!--release when all events have failed-->
-            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <!--release when all events have failed-->
+                <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="noRetriesSplitterAggregatorTest">
@@ -57,10 +61,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <!--wait until all events fail-->
         <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
         <set-payload value="ok"/>
-        <catch-exception-strategy>
-            <!--release when all events have failed-->
-            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <!--release when all events have failed-->
+                <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="noRetriesSimpleTest">
@@ -72,10 +78,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <!--wait until all events fail-->
         <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
         <set-payload value="ok"/>
-        <catch-exception-strategy>
-            <!--release when all events have failed-->
-            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <!--release when all events have failed-->
+                <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

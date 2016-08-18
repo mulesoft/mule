@@ -159,11 +159,13 @@
         </poll>
         <set-payload value="#[sing:valueU]"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
-        <catch-exception-strategy>
-            <logger level="ERROR" message="FAILED"/>
-            <set-variable variableName="test7" value="catchedException"/>
-            <logger level="ERROR" message="#[test7]"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <logger level="ERROR" message="FAILED"/>
+                <set-variable variableName="test7" value="catchedException"/>
+                <logger level="ERROR" message="#[test7]"/>
+            </on-error-continue>
+        </error-handler>
 
     </flow>
 

@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyEnricherTestCase extends AbstractIntegrationTestCase {
+public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase {
 
   public static class ErrorProcessor implements MessageProcessor {
 
@@ -32,7 +32,7 @@ public class CatchExceptionStrategyEnricherTestCase extends AbstractIntegrationT
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/catch-exception-strategy-enricher.xml";
+    return "org/mule/test/integration/exceptions/on-error-continue-enricher.xml";
   }
 
   @Test

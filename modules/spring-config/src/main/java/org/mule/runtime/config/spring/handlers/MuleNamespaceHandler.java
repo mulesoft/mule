@@ -98,11 +98,11 @@ import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
@@ -239,14 +239,14 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     // Exception Strategies
     registerBeanDefinitionParser("default-exception-strategy",
                                  new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
-    registerBeanDefinitionParser("catch-exception-strategy",
-                                 new ExceptionStrategyDefinitionParser(CatchMessagingExceptionStrategy.class));
-    registerBeanDefinitionParser("rollback-exception-strategy",
-                                 new ExceptionStrategyDefinitionParser(RollbackMessagingExceptionStrategy.class));
+    registerBeanDefinitionParser("on-error-continue",
+                                 new ExceptionStrategyDefinitionParser(OnErrorContinueHandler.class));
+    registerBeanDefinitionParser("on-error-propagate",
+                                 new ExceptionStrategyDefinitionParser(OnErrorPropagateHandler.class));
     registerBeanDefinitionParser("on-redelivery-attempts-exceeded",
                                  new ChildDefinitionParser("redeliveryExceeded", RedeliveryExceeded.class));
-    registerBeanDefinitionParser("choice-exception-strategy",
-                                 new ExceptionStrategyDefinitionParser(ChoiceMessagingExceptionStrategy.class));
+    registerBeanDefinitionParser("error-handler",
+                                 new ExceptionStrategyDefinitionParser(ErrorHandler.class));
     registerMuleBeanDefinitionParser("exception-strategy", new ReferenceExceptionStrategyDefinitionParser());
     registerBeanDefinitionParser("custom-exception-strategy", new ExceptionStrategyDefinitionParser(null));
     registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));

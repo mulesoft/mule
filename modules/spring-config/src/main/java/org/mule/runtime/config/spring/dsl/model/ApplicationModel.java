@@ -69,7 +69,7 @@ public class ApplicationModel {
   public static final String MULE_ROOT_ELEMENT = "mule";
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
   public static final String ANNOTATIONS = "annotations";
-  public static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
+  public static final String ERROR_HANDLER = "error-handler";
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
@@ -120,8 +120,8 @@ public class ApplicationModel {
   public static final String SINGLETON_OBJECT_ELEMENT = "singleton-object";
   public static final String INTERCEPTOR_STACK_ELEMENT = "interceptor-stack";
 
-  public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
+  public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ERROR_HANDLER).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
@@ -458,7 +458,7 @@ public class ApplicationModel {
 
   private void validateChoiceExceptionStrategyStructure() {
     executeOnEveryMuleComponentTree(component -> {
-      if (component.getIdentifier().equals(CHOICE_EXCEPTION_STRATEGY_IDENTIFIER)) {
+      if (component.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
         validateExceptionStrategiesHaveWhenAttribute(component);
         validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(component);
       }
@@ -469,7 +469,7 @@ public class ApplicationModel {
     if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> {
       return exceptionStrategyComponent.getParameters().get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null;
     }).count() > 1) {
-      throw new MuleRuntimeException(createStaticMessage("Only one rollback-exception-strategy within a choice-exception-strategy can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
+      throw new MuleRuntimeException(createStaticMessage("Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
     }
   }
 
@@ -477,7 +477,7 @@ public class ApplicationModel {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
       if (innerComponents.get(i).getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) == null) {
-        throw new MuleRuntimeException(createStaticMessage("Every exception strategy (except for the last one) within a choice-exception-strategy must specify the when attribute"));
+        throw new MuleRuntimeException(createStaticMessage("Every handler (except for the last one) within an error-handler must specify the when attribute"));
       }
     }
   }
@@ -487,9 +487,9 @@ public class ApplicationModel {
       if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
         Node componentNode = from(component).getNode();
         if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
-            && !componentNode.getParentNode().getLocalName().equals(CHOICE_EXCEPTION_STRATEGY)
+            && !componentNode.getParentNode().getLocalName().equals(ERROR_HANDLER)
             && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT)) {
-          throw new MuleRuntimeException(createStaticMessage("Only exception strategies within a choice-exception-strategy can have when attribute specified"));
+          throw new MuleRuntimeException(createStaticMessage("Only handlers within an error-handler can have when attribute specified"));
         }
       }
     });

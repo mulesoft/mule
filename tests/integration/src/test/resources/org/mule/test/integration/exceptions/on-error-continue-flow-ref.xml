@@ -14,19 +14,21 @@
     </flow>
 
     <flow name="blockWithOwnExceptionStrategy">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="transactionNotResolvedAfterException">
         <transactional action="ALWAYS_BEGIN">
             <flow-ref name="blockWithOwnExceptionStrategy"/>
             <custom-processor
-                    class="org.mule.test.integration.exceptions.CatchExceptionStrategyFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
+                    class="org.mule.test.integration.exceptions.OnErrorContinueFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
             <json:object-to-json-transformer/>
         </transactional>
     </flow>

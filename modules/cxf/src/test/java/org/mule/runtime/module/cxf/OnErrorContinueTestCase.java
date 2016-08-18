@@ -37,7 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
+public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
       + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
@@ -55,7 +55,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "catch-exception-strategy-conf.xml";
+    return "on-error-continue-conf.xml";
   }
 
   @Test

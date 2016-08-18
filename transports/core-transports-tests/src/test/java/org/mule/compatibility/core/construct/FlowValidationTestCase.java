@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
@@ -36,7 +36,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   public InboundEndpoint inboundEndpoint;
   @Mock
-  public RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy;
+  public OnErrorPropagateHandler onErrorPropagateHandler;
   @Mock
   public AbstractRedeliveryPolicy mockRedeliveryPolicy;
   private Flow flow;
@@ -64,9 +64,9 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   private void configureFlowForRedelivery() {
     when(inboundEndpoint.getTransactionConfig().isConfigured()).thenReturn(false);
     when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
-    flow.setExceptionListener(rollbackMessagingExceptionStrategy);
-    when(rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts()).thenReturn(true);
-    when(rollbackMessagingExceptionStrategy.acceptsAll()).thenReturn(true);
+    flow.setExceptionListener(onErrorPropagateHandler);
+    when(onErrorPropagateHandler.hasMaxRedeliveryAttempts()).thenReturn(true);
+    when(onErrorPropagateHandler.acceptsAll()).thenReturn(true);
     when(inboundEndpoint.getRedeliveryPolicy()).thenReturn(mockRedeliveryPolicy);
     flow.setMessageSource(inboundEndpoint);
     // flow.setMessageSource(Mockito.mock(MessageSource.class));

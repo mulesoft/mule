@@ -26,9 +26,11 @@
             <tx:verify-transaction-begun/>
             <tx:fail/>
         </transactional>
-        <catch-exception-strategy>
-            <tx:verify-transaction-rolledback/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <tx:verify-transaction-rolledback/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="executeTransactionless">

@@ -6,6 +6,6 @@
 
     <exception-strategy name="secondBestEs" ref="default"/>
 
-    <catch-exception-strategy name="default"/>
+    <on-error-continue name="default"/>
 
 </mule>

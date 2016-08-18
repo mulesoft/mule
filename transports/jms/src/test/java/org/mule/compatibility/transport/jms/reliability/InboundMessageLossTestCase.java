@@ -100,7 +100,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
   public void testCatchExceptionStrategyConsumesMessage() throws Exception {
     putMessageOnQueue("exceptionHandled");
 
-    // Exception occurs using catch-exception-strategy that will always consume the message
+    // Exception occurs using on-error-continue that will always consume the message
     assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
   }
 
@@ -127,7 +127,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
   public void testDefaultExceptionStrategyConsumesMessage() throws Exception {
     putMessageOnQueue("commitOnException");
 
-    // Exception occurs using catch-exception-strategy that will always consume the message
+    // Exception occurs using on-error-continue that will always consume the message
     assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
   }
 

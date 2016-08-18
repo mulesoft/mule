@@ -31,9 +31,11 @@
 
         <ws:consumer operation="fail"/>
 
-        <catch-exception-strategy>
-            <set-property propertyName="soapFaultException" value="#[exception]" />
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-property propertyName="soapFaultException" value="#[exception]" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>
