@@ -175,7 +175,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * Sets the {@link List} of {@link String}s to define the Maven artifactIds that should be ignore no matter if they are
    * discovered as services.
    *
-   * @param servicesExclusion
+   * @param servicesExclusion {@link List} of Maven artifactIds for services that should be ignored if discovered by the
+   *        classification process.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setServicesExclusion(final List<String> servicesExclusion) {
