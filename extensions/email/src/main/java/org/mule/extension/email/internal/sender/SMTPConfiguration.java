@@ -6,9 +6,9 @@
  */
 package org.mule.extension.email.internal.sender;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.GENERAL;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -19,6 +19,10 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -54,6 +58,14 @@ public class SMTPConfiguration implements Initialisable {
   private String defaultCharset;
 
   /**
+   * A global set of headers that is bounded in each SMTP operation.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = ADVANCED)
+  private Map<String, String> headers;
+
+  /**
    * @return the address of the person that is going to send the messages.
    */
   public String getFrom() {
@@ -69,5 +81,9 @@ public class SMTPConfiguration implements Initialisable {
     if (defaultCharset == null) {
       defaultCharset = muleContext.getConfiguration().getDefaultEncoding();
     }
+  }
+
+  public Map<String, String> getHeaders() {
+    return headers != null ? ImmutableMap.copyOf(headers) : emptyMap();
   }
 }

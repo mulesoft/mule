@@ -10,6 +10,13 @@
         <email:smtp-connection host="127.0.0.1" port="${port}"/>
     </email:smtp>
 
+    <email:smtp name="config-custom-headers">
+        <email:smtp-connection host="127.0.0.1" port="${port}"/>
+        <email:headers>
+            <email:header key="CustomConfigHeader" value="Dummy"/>
+        </email:headers>
+    </email:smtp>
+
     <spring:beans>
         <spring:import resource="smtp-flows.xml"/>
     </spring:beans>

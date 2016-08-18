@@ -207,7 +207,7 @@ public class EmailAttributes extends BaseAttributes {
    * @return all the headers of this email message.
    */
   public Map<String, String> getHeaders() {
-    return headers;
+    return headers != null ? ImmutableMap.copyOf(headers) : ImmutableMap.of();
   }
 
   /**
