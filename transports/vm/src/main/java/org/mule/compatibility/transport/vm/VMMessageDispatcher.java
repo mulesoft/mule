@@ -55,7 +55,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
     final MuleCompatibilityMessageBuilder builder =
         new MuleCompatibilityMessageBuilder(createInboundMessage(eventToDispatch.getMessage()));
-    builder.correlationId(eventToDispatch.getCorrelation().getId().orElse(null));
+    builder.correlationId(eventToDispatch.getCorrelationId());
     builder.correlationSequence(eventToDispatch.getCorrelation().getSequence().orElse(null));
     builder.correlationGroupSize(eventToDispatch.getCorrelation().getGroupSize().orElse(null));
     final MuleCompatibilityMessage message = builder.build();
@@ -90,7 +90,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     MuleEvent eventToSend = DefaultMuleEvent.copy(event);
     final MuleCompatibilityMessageBuilder builder =
         new MuleCompatibilityMessageBuilder(createInboundMessage(eventToSend.getMessage()));
-    builder.correlationId(eventToSend.getCorrelation().getId().orElse(null));
+    builder.correlationId(eventToSend.getCorrelationId());
     builder.correlationSequence(eventToSend.getCorrelation().getSequence().orElse(null));
     builder.correlationGroupSize(eventToSend.getCorrelation().getGroupSize().orElse(null));
     final MuleCompatibilityMessage message = builder.build();

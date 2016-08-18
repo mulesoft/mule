@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
@@ -122,7 +125,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertNull(result.getFlowVariable("key3"));
 
     // Root id
-    assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());
+    assertThat(result.getExecutionContext().getCorrelationId(), equalTo(event1.getExecutionContext().getCorrelationId()));
 
     assertEquals("value", result.getSession().getProperty("key"));
     assertEquals("value1", result.getSession().getProperty("key1"));
@@ -222,7 +225,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertNull(result.getFlowVariable("key3"));
 
     // Root id
-    assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());
+    assertThat(result.getExecutionContext().getCorrelationId(), equalTo(event1.getExecutionContext().getCorrelationId()));
   }
 
 }

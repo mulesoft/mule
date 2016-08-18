@@ -23,6 +23,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.ClassRule;
@@ -118,7 +119,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
       // Checking if message is still the same on catch-exception-strategy
-      isSameMessage = getCurrentEvent().getMessage().equals(messageFromMainFlow);
+      isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
       return eventContext.getMessage();
     }
   }
@@ -132,7 +133,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
       // Checking if message is still the same on catch-exception-strategy
-      isSameMessage = getCurrentEvent().getMessage().equals(messageFromMainFlow);
+      isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
       return event;
     }
   }

@@ -276,14 +276,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private MuleMessage createTestMessage() {
-    return new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).rootId("1").build();
+    return new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).build();
   }
 
   private void assertTestMessage(MuleMessage message) {
     assertThat(message.getPayload(), is(TEST_PAYLOAD));
     assertThat(message.getDataType(), is(TEXT_STRING));
     assertThat(message.getAttributes(), is(TEST_ATTR));
-    assertThat(message.getMessageRootId(), equalTo("1"));
   }
 
 }

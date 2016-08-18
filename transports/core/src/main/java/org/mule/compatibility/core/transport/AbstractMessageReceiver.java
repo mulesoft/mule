@@ -188,7 +188,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   public final MuleEvent routeMessage(MuleCompatibilityMessage message, MuleSession session, OutputStream outputStream)
       throws MuleException {
     message = warnIfMuleClientSendUsed(message);
-    message = propagateRootMessageIdProperty(message);
 
     MuleEvent muleEvent = createMuleEvent(message, outputStream);
 
@@ -197,17 +196,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
 
     return routeEvent(muleEvent);
-  }
-
-  protected MuleCompatibilityMessage propagateRootMessageIdProperty(MuleCompatibilityMessage message) {
-    String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
-    if (rootId != null) {
-      final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(message);
-      builder.rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
-      return builder.build();
-    } else {
-      return message;
-    }
   }
 
   protected MuleCompatibilityMessage warnIfMuleClientSendUsed(MuleCompatibilityMessage message) {
@@ -233,9 +221,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
   protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
     if (logger.isDebugEnabled()) {
-      String messageId;
-      messageId = message.getUniqueId();
-      logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
+      logger.debug("Message " + message + " failed to pass filter on endpoint: " + endpoint
           + ". Message is being ignored");
     }
     return message;
@@ -252,8 +238,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
 
-    final MessageExecutionContext executionContext =
-        create(flowConstruct, message.getCorrelation().getId().orElse(null));
+    final MessageExecutionContext executionContext = create(flowConstruct, message.getCorrelationId());
 
     if (replyToFromMessage != null) {
       newEvent =
@@ -262,6 +247,9 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       newEvent =
           new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null);
     }
+    if(message.getCorrelationId() != null) {
+      newEvent.setLegacyCorrelationId(message.getCorrelationId());
+    }
     newEvent.setCorrelation(message.getCorrelation());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
@@ -269,7 +257,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {
       session.getSecurityContext().getAuthentication().setEvent(event);
     }
-    return event;
+      return event;
   }
 
   protected Object getReplyToDestination(MuleMessage message) {

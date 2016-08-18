@@ -121,7 +121,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   public MuleEvent process(MuleEvent event) throws RoutingException {
     // the correlationId of the event's message
-    final String groupId = event.getCorrelationId();
+    final String groupId = event.getExecutionContext().getCorrelationId();
 
     if (logger.isTraceEnabled()) {
       try {
@@ -192,11 +192,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
           // create the response event
           MuleEvent returnEvent = callback.aggregateEvents(group);
           final Builder builder = MuleMessage.builder(returnEvent.getMessage());
-          String rootId = group.getCommonRootId();
-          if (rootId != null) {
-            builder.rootId(rootId);
-          }
-
           returnEvent.setMessage(builder.build());
 
           // remove the eventGroup as no further message will be received

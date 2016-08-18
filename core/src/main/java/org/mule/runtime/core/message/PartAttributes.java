@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Representation of metadata associated to a part in a {@link MultiPartPayload}.
@@ -86,5 +87,25 @@ public class PartAttributes extends BaseAttributes {
    */
   public Map<String, LinkedList<String>> getHeaders() {
     return headers;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || this.getClass() != o.getClass()) {
+      return false;
+    }
+    PartAttributes that = (PartAttributes) o;
+    return this.size == that.size &&
+        Objects.equals(this.headers, that.headers) &&
+        Objects.equals(this.name, that.name) &&
+        Objects.equals(this.fileName, that.fileName);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.headers, this.name, this.fileName, this.size);
   }
 }

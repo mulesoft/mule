@@ -279,7 +279,6 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
   protected void assertEqualMessages(MuleMessage expect, MuleMessage actual) {
     assertThat(actual.getPayload(), equalTo(expect.getPayload()));
     assertEquals(expect.getDataType(), actual.getDataType());
-    assertEquals(expect.getUniqueId(), actual.getUniqueId());
     assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
   }
 

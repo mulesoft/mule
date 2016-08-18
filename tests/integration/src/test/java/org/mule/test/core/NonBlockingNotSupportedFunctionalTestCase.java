@@ -75,13 +75,13 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
     int correlationGroupSize = 3;
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 1)).nonBlocking().runNoVerify();
+        .withCorrelation(new Correlation(correlationGroupSize, 1)).nonBlocking().runNoVerify();
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 2)).nonBlocking().runNoVerify();
+        .withCorrelation(new Correlation(correlationGroupSize, 2)).nonBlocking().runNoVerify();
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationId, correlationGroupSize, 3)).nonBlocking().run();
+        .withCorrelation(new Correlation(correlationGroupSize, 3)).nonBlocking().run();
   }
 
   @Test

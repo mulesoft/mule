@@ -60,7 +60,7 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
 
   @Override
   public String getCorrelationId() {
-    return correlationId;
+    return correlationId != null ? correlationId : id;
   }
 
   @Override

@@ -49,8 +49,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     List<Object> recipients = getRecipients(event);
     List<MuleEvent> results = new ArrayList<>();
 
-    ((DefaultMuleEvent) event).setCorrelation(new Correlation(event.getExecutionContext().getCorrelationId(),
-                                                              recipients.size(), null));
+    ((DefaultMuleEvent) event).setCorrelation(new Correlation(recipients.size(), null));
 
     OutboundEndpoint endpoint = null;
     for (Object recipient : recipients) {

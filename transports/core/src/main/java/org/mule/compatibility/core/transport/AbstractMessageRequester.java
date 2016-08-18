@@ -13,6 +13,8 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -77,20 +79,17 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
       // Make sure we are connected
       connect();
       MuleMessage result = doRequest(timeout);
-      MuleMessage.Builder builder;
+      MuleCompatibilityMessageBuilder builder;
       if (result != null) {
-        builder = MuleMessage.builder(result);
+        builder = new MuleCompatibilityMessageBuilder(result);
       } else {
-        builder = MuleMessage.builder().nullPayload();
+        builder = new MuleCompatibilityMessageBuilder(MuleMessage.builder().nullPayload().build());
       }
       if (result != null) {
         String rootId = result.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
         if (rootId != null) {
-          builder.rootId(rootId);
+          builder.correlationId(rootId);
           builder.removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
-        }
-        if (beginNotification != null) {
-          builder.rootId(beginNotification.getSource().getMessageRootId());
         }
         result = builder.build();
         if (!endpoint.isDisableTransportTransformer()) {

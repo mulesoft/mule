@@ -34,9 +34,7 @@ public class SetCorrelationIdTransformer extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    ((DefaultMuleEvent) event).setCorrelation(new Correlation(correlationIdEvaluator.resolveValue(event).toString(),
-                                                              event.getCorrelation().getGroupSize().orElse(null),
-                                                              event.getCorrelation().getSequence().orElse(null)));
+    ((DefaultMuleEvent) event).setLegacyCorrelationId(correlationIdEvaluator.resolveValue(event).toString());
     return event.getMessage();
   }
 

@@ -101,8 +101,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
   private MuleEvent createResponseEvent(MuleMessage resultMessage, MuleEvent requestEvent) throws MuleException {
     if (resultMessage != null) {
-      resultMessage = MuleMessage.builder(resultMessage).rootId(requestEvent.getMessage().getMessageRootId()).build();
-
       MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                                                                                                resultMessage,
                                                                                                endpoint.getMuleContext());

@@ -61,8 +61,7 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
     assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
 
     MuleMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
-    assertThat(requestMessage.getUniqueId(), equalTo(message.getUniqueId()));
-    assertThat(requestMessage.getMessageRootId(), equalTo(message.getMessageRootId()));
+    assertThat(requestMessage, equalTo(message));
   }
 
 }

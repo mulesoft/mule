@@ -38,8 +38,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
     }
 
-    ((DefaultMuleEvent) event)
-        .setCorrelation(new Correlation(event.getExecutionContext().getCorrelationId(), routes.size(), null));
+    ((DefaultMuleEvent) event).setCorrelation(new Correlation(routes.size(), null));
 
     List<MuleEvent> results = new ArrayList<>(routes.size());
     try {

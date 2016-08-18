@@ -25,35 +25,24 @@ public class Correlation implements Serializable {
   private static final long serialVersionUID = -5687080761804624442L;
 
   public static final String NOT_SET = "<not set>";
+  public static final Correlation NO_CORRELATION = new Correlation(null, null);
 
-  private final String id;
   private final Integer groupSize;
   private final Integer sequence;
 
   /**
    * Builds a new {@link Correlation} with the given parameters.
    * 
-   * @param id see {@link #getId()}.
    * @param groupSize see {@link #getGroupSize()}.
    * @param sequence see {@link #getSequence()}.
    */
-  public Correlation(String id, Integer groupSize, Integer sequence) {
-    this.id = id;
+  public Correlation(Integer groupSize, Integer sequence) {
     this.groupSize = groupSize;
     this.sequence = sequence;
   }
 
   /**
-   * If present, this id will take precedence over any correlationId already set for the event.
-   *
-   * @return the correlation id for this event or null value if one hasn't been set
-   */
-  public Optional<String> getId() {
-    return ofNullable(id);
-  }
-
-  /**
-   * Gets the sequence or ordering number for this message in the the correlation group (as defined by {@link #getId()}).
+   * Gets the sequence or ordering number for this message in the the correlation group.
    *
    * @return the sequence number or null value if the sequence is not important
    */
@@ -76,7 +65,6 @@ public class Correlation implements Serializable {
 
     // format message for multi-line output, single-line is not readable
     buf.append("{");
-    buf.append(" id=").append(getId().orElse(NOT_SET));
     buf.append("; groupSize=").append(getGroupSize().map(v -> v.toString()).orElse(NOT_SET));
     buf.append("; sequence=").append(getSequence().map(v -> v.toString()).orElse(NOT_SET));
     buf.append('}');

@@ -22,9 +22,11 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.Correlation;
 
 import org.junit.Before;
@@ -65,24 +67,10 @@ public class MessageContextTestCase extends AbstractELTestCase {
   }
 
   @Test
-  public void messageId() throws Exception {
-    when(message.getUniqueId()).thenReturn("1");
-    assertEquals("1", evaluate("message.id", event));
-    assertFinalProperty("message.id=2", event);
-  }
-
-  @Test
-  public void rootId() throws Exception {
-    when(message.getMessageRootId()).thenReturn("2");
-    assertEquals("2", evaluate("message.rootId", event));
-    assertFinalProperty("message.rootId=2", event);
-  }
-
-  @Test
   public void correlationId() throws Exception {
-    when(event.getCorrelation().getId()).thenReturn(of("3"));
-    assertEquals("3", evaluate("message.correlation.id.get()", event));
-    assertFinalProperty("message.correlation.id.get()=2", event);
+    when(event.getExecutionContext()).thenReturn(DefaultMessageExecutionContext.create(getTestFlow(), "3"));
+    assertEquals("3", evaluate("message.correlationId", event));
+    assertFinalProperty("message.correlationId=2", event);
   }
 
   @Test

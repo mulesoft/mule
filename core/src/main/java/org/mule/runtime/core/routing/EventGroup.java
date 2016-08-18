@@ -56,8 +56,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   private final long created;
   private final Integer expectedSize;
   transient private MuleContext muleContext;
-  private String commonRootId = null;
-  private static boolean hasNoCommonRootId = false;
   private int arrivalOrderCounter = 0;
   private Serializable lastStoredEventKey;
 
@@ -223,16 +221,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
       event.setFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
       lastStoredEventKey = key;
       eventsObjectStore.store(key, event, eventsPartitionKey);
-
-      if (!hasNoCommonRootId) {
-        String rootId = event.getMessage().getMessageRootId();
-        if (commonRootId == null) {
-          commonRootId = rootId;
-        } else if (!commonRootId.equals(rootId)) {
-          hasNoCommonRootId = true;
-          commonRootId = null;
-        }
-      }
     }
   }
 
@@ -319,7 +307,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
           Iterator<Serializable> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
           while (i.hasNext()) {
             Serializable id = i.next();
-            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage().getUniqueId());
+            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getExecutionContext().getCorrelationId());
             if (i.hasNext()) {
               buf.append(", ");
             }
@@ -336,10 +324,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     return buf.toString();
   }
 
-  public String getCommonRootId() {
-    return commonRootId;
-  }
-
   public MuleEvent getMessageCollectionEvent() {
     try {
       if (size() > 0) {
@@ -349,9 +333,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         List<MuleMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
         final CollectionBuilder builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
-        if (getCommonRootId() != null) {
-          builder.rootId(getCommonRootId());
-        }
         DefaultMuleEvent muleEvent = new DefaultMuleEvent(builder.build(), retrieveLastStoredEvent(), getMergedSession());
         return muleEvent;
       } else {

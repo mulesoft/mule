@@ -94,16 +94,13 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     assertTrue(router.isMatch(getTestEvent(message)));
 
     Flow flow = getTestFlow();
-    MuleEvent event =
-        new DefaultMuleEvent(create(flow, message.getUniqueId()), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
 
     when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
     when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
     MuleSession session = mock(MuleSession.class);
-    MuleEvent result = router
-        .route(new DefaultMuleEvent(create(flow, message.getUniqueId()),
-                                    message, flow, session));
+    MuleEvent result = router.route(new DefaultMuleEvent(create(flow), message, flow, session));
     assertNotNull(result);
     MuleMessage resultMessage = result.getMessage();
     assertNotNull(resultMessage);

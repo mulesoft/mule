@@ -7,10 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
@@ -18,10 +20,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -37,16 +43,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     setStartContext(true);
   }
 
-  @Ignore
   @Test
   public void testAggregateMultipleEvents() throws Exception {
-    MuleSession session1 = getTestSession(getTestFlow(), muleContext);
-    session1.setProperty("key1", "value1");
-    MuleSession session2 = getTestSession(getTestFlow(), muleContext);
-    session1.setProperty("key1", "value1NEW");
-    session1.setProperty("key2", "value2");
-    MuleSession session3 = getTestSession(getTestFlow(), muleContext);
-    session1.setProperty("key3", "value3");
 
     Flow flow = getTestFlow("test", Apple.class);
     assertNotNull(flow);
@@ -58,25 +56,33 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
+    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
+
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
+
     DefaultMuleEvent event1 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, flow, session1);
-    event1.setCorrelation(new Correlation(message1.getUniqueId(), 3, null));
-    MuleEvent event2 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, flow, session2);
-    MuleEvent event3 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, flow, session3);
+        new DefaultMuleEvent(executionContext, message1, flow);
+    event1.setCorrelation(new Correlation(1, null));
+    MuleEvent event2 = new DefaultMuleEvent(executionContext, message2, flow);
+    event1.setCorrelation(new Correlation(2, null));
+    MuleEvent event3 = new DefaultMuleEvent(executionContext, message3, flow);
+    event1.setCorrelation(new Correlation(3, null));
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
-    assertSame(VoidMuleEvent.getInstance(), router.process(event3));
+
+    MuleEvent resultEvent = router.process(event3);
 
     assertNotNull(sensingMessageProcessor.event);
+    assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
+
     MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
     assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<MuleMessage> list = (List<MuleMessage>) nextMessage.getPayload();
+    List<MuleMessage> list = nextMessage.getPayload();
     assertEquals(3, list.size());
     String[] results = new String[3];
     list.stream().map(MuleMessage::getPayload).collect(toList()).toArray(results);
@@ -85,18 +91,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     assertEquals("test event A", results[0]);
     assertEquals("test event B", results[1]);
     assertEquals("test event C", results[2]);
-
-    // Assert that session was merged correctly
-    assertEquals(3, sensingMessageProcessor.event.getSession().getPropertyNamesAsSet().size());
-    assertEquals("value1NEW", sensingMessageProcessor.event.getSession().getProperty("key1"));
-    assertEquals("value2", sensingMessageProcessor.event.getSession().getProperty("key2"));
-    assertEquals("value3", sensingMessageProcessor.event.getSession().getProperty("key3"));
   }
 
-  @Ignore
   @Test
   public void testAggregateSingleEvent() throws Exception {
-    MuleSession session = getTestSession(getTestFlow(), muleContext);
     Flow flow = getTestFlow("test", Apple.class);
     assertNotNull(flow);
 
@@ -107,19 +105,21 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
+    MuleMessage message1 = MuleMessage.of("test event A");
 
-    DefaultMuleEvent event1 = new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, flow);
-    event1.setCorrelation(new Correlation(message1.getUniqueId(), 1, null));
+    DefaultMuleEvent event1 = new DefaultMuleEvent(executionContext, message1, flow);
+    event1.setCorrelation(new Correlation(1, null));
 
     MuleEvent resultEvent = router.process(event1);
-    assertSame(VoidMuleEvent.getInstance(), resultEvent);
 
     assertNotNull(sensingMessageProcessor.event);
+    assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
+
     MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
     assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<MuleMessage> payload = (List<MuleMessage>) nextMessage.getPayload();
+    List<MuleMessage> payload = nextMessage.getPayload();
     assertEquals(1, payload.size());
     assertEquals("test event A", payload.get(0).getPayload());
   }
@@ -133,6 +133,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
     router.initialise();
+
+    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -148,11 +150,11 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
 
     DefaultMuleEvent event1 =
-        new DefaultMuleEvent(create(flow, messageCollection1.getUniqueId()), messageCollection1, flow);
-    event1.setCorrelation(new Correlation(messageCollection1.getUniqueId(), 2, null));
+        new DefaultMuleEvent(executionContext, messageCollection1, flow);
+    event1.setCorrelation(new Correlation(2, null));
     DefaultMuleEvent event2 =
-        new DefaultMuleEvent(create(flow, messageCollection1.getUniqueId()), messageCollection2, flow);
-    event2.setCorrelation(new Correlation(messageCollection1.getUniqueId(), 2, null));
+        new DefaultMuleEvent(executionContext, messageCollection2, flow);
+    event2.setCorrelation(new Correlation(2, null));
 
     assertNull(router.process(event1));
     MuleEvent resultEvent = router.process(event2);

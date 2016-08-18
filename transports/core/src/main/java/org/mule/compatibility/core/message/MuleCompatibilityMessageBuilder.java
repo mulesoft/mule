@@ -29,7 +29,7 @@ public class MuleCompatibilityMessageBuilder extends DefaultMuleMessageBuilder {
     super(message);
 
     if (message instanceof MuleCompatibilityMessage) {
-      correlationId = ((MuleCompatibilityMessage) message).getCorrelation().getId().orElse(null);
+      correlationId = ((MuleCompatibilityMessage) message).getCorrelationId();
       correlationSequence = ((MuleCompatibilityMessage) message).getCorrelation().getSequence().orElse(null);
       correlationGroupSize = ((MuleCompatibilityMessage) message).getCorrelation().getGroupSize().orElse(null);
     }
@@ -37,7 +37,7 @@ public class MuleCompatibilityMessageBuilder extends DefaultMuleMessageBuilder {
 
   @Override
   public MuleCompatibilityMessage build() {
-    return new MuleCompatibilityMessage(super.build(), new Correlation(correlationId, correlationGroupSize, correlationSequence));
+    return new MuleCompatibilityMessage(super.build(), new Correlation(correlationGroupSize, correlationSequence), correlationId);
   }
 
   public MuleCompatibilityMessageBuilder correlationId(String correlationId) {

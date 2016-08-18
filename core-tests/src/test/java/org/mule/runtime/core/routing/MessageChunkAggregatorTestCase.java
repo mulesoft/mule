@@ -13,11 +13,13 @@ import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 
 import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.util.UUID;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -38,17 +40,21 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+    MuleMessage message1 = MuleMessage.of("test event A");
+    MuleMessage message2 = MuleMessage.of("test event B");
+    MuleMessage message3 = MuleMessage.of("test event C");
+
+    MessageExecutionContext context = create(flow, "foo");
 
     DefaultMuleEvent event1 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, getTestFlow(), session);
-    event1.setCorrelation(new Correlation(null, 3, null));
-    MuleEvent event2 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, getTestFlow(), session);
-    MuleEvent event3 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, getTestFlow(), session);
+        new DefaultMuleEvent(context, message1, getTestFlow(), session);
+    event1.setCorrelation(new Correlation(1, null));
+    DefaultMuleEvent event2 =
+        new DefaultMuleEvent(context, message2, getTestFlow(), session);
+    event1.setCorrelation(new Correlation(2, null));
+    DefaultMuleEvent event3 =
+        new DefaultMuleEvent(context, message3, getTestFlow(), session);
+    event1.setCorrelation(new Correlation(3, null));
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

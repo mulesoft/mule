@@ -68,8 +68,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   private DataType dataType;
   private Attributes attributes = NULL_ATTRIBUTES;
 
-  private String id;
-  private String rootId;
   private ExceptionPayload exceptionPayload;
 
   private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
@@ -84,8 +82,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   private void copyMessageAttributes(MuleMessage message) {
-    this.id = message.getUniqueId();
-    this.rootId = message.getMessageRootId();
     this.exceptionPayload = message.getExceptionPayload();
     message.getInboundPropertyNames().forEach(key -> {
       if (message.getInboundPropertyDataType(key) != null) {
@@ -176,18 +172,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   @Override
   public MuleMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload) {
     this.exceptionPayload = exceptionPayload;
-    return this;
-  }
-
-  @Override
-  public MuleMessage.Builder id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  @Override
-  public MuleMessage.Builder rootId(String rootId) {
-    this.rootId = rootId;
     return this;
   }
 
@@ -295,8 +279,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
   @Override
   public MuleMessage build() {
-    return new MuleMessageImplementation(id != null ? id : UUID.getUUID(), rootId,
-                                         new TypedValue(payload, resolveDataType()), attributes,
+    return new MuleMessageImplementation(new TypedValue(payload, resolveDataType()), attributes,
                                          inboundProperties, outboundProperties, inboundAttachments,
                                          outboundAttachments, exceptionPayload);
   }
@@ -320,12 +303,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     private static final Logger logger = LoggerFactory.getLogger(MuleMessageImplementation.class);
 
     /**
-     * The default UUID for the message. If the underlying transport has the notion of a message id, this uuid will be ignored
-     */
-    private String id;
-    private String rootId;
-
-    /**
      * If an exception occurs while processing this message an exception payload will be attached here
      */
     private ExceptionPayload exceptionPayload;
@@ -346,13 +323,11 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
     private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
 
-    private MuleMessageImplementation(String id, String rootId, TypedValue typedValue, Attributes attributes,
+    private MuleMessageImplementation(TypedValue typedValue, Attributes attributes,
                                       Map<String, TypedValue<Serializable>> inboundProperties,
                                       Map<String, TypedValue<Serializable>> outboundProperties,
                                       Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                       ExceptionPayload exceptionPayload) {
-      this.id = id;
-      this.rootId = rootId != null ? rootId : id;
       this.typedValue = typedValue;
       this.attributes = attributes;
       this.inboundMap.putAll(inboundProperties);
@@ -360,19 +335,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       this.inboundAttachments = inboundAttachments;
       this.outboundAttachments = outboundAttachments;
       this.exceptionPayload = exceptionPayload;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUniqueId() {
-      return id;
-    }
-
-    @Override
-    public String getMessageRootId() {
-      return rootId;
     }
 
     /**
@@ -392,8 +354,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       buf.append(getClass().getName());
       buf.append(LINE_SEPARATOR);
       buf.append("{");
-      buf.append(LINE_SEPARATOR);
-      buf.append("  id=").append(getUniqueId());
       buf.append(LINE_SEPARATOR);
       buf.append("  payload=").append(getDataType().getType().getName());
       buf.append(LINE_SEPARATOR);
@@ -574,19 +534,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     @Override
     public DataType getDataType() {
       return typedValue.getDataType();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof MuleMessageImplementation)) {
-        return false;
-      }
-      return this.id.equals(((MuleMessageImplementation) obj).id);
-    }
-
-    @Override
-    public int hashCode() {
-      return id.hashCode();
     }
 
     @Override

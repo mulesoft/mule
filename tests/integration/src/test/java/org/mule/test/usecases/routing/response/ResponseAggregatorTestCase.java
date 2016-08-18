@@ -60,7 +60,8 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
       MuleEvent event = getTestEvent("message1");
       final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
       event.setMessage(message);
-      ((DefaultMuleEvent) event).setCorrelation(new Correlation(event.getMessage().getUniqueId(), 1, null));
+      ((DefaultMuleEvent) event).setLegacyCorrelationId(event.getCorrelationId());
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(1, null));
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

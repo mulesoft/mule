@@ -93,12 +93,8 @@ public class HttpResponseToMuleEvent {
       }
     }
 
-    String requestMessageId = muleEvent.getMessage().getUniqueId();
-    String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
-
-    // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-    final Builder builder = MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).id(requestMessageId)
-        .rootId(requestMessageRootId).inboundProperties(inboundProperties);
+    final Builder builder =
+        MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).inboundProperties(inboundProperties);
 
     if (StringUtils.isEmpty(responseContentType)) {
       builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());

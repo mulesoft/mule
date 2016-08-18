@@ -146,7 +146,6 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     MuleEvent event = getTestEvent("");
     MuleMessage message = event.getMessage();
     mvel.evaluate("p=m.uniqueId", event);
-    Assert.assertEquals(message.getUniqueId(), event.getMessage().getPayload());
   }
 
   @Test

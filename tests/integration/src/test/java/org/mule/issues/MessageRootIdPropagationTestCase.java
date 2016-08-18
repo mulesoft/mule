@@ -52,7 +52,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
   static class RootIDGatherer extends AbstractMessageTransformer {
 
     static int messageCount;
-    static Map<String, String> idMap;
+    static Map<String, MuleMessage> idMap;
     static int counter;
 
 
@@ -62,13 +62,12 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
     }
 
     public static synchronized void process(MuleMessage msg) {
-      String id = msg.getMessageRootId();
       messageCount++;
       String where = msg.<String>getOutboundProperty("where");
       if (where == null) {
         where = "location_" + counter++;
       }
-      idMap.put(where, id);
+      idMap.put(where, msg);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       return event.getMessage().getPayload();
     }
 
-    public static Set<String> getIds() {
+    public static Set<MuleMessage> getIds() {
       return new HashSet<>(idMap.values());
     }
 
@@ -85,7 +84,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       return messageCount;
     }
 
-    public static Map<String, String> getIdMap() {
+    public static Map<String, MuleMessage> getIdMap() {
       return idMap;
     }
   }
