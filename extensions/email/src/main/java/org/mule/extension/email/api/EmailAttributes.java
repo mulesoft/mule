@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api;
 
-import static java.util.Collections.emptyMap;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.message.BaseAttributes;
 
@@ -208,7 +207,7 @@ public class EmailAttributes extends BaseAttributes {
    * @return all the headers of this email message.
    */
   public Map<String, String> getHeaders() {
-    return headers != null ? ImmutableMap.copyOf(headers) : emptyMap();
+    return headers != null ? ImmutableMap.copyOf(headers) : ImmutableMap.of();
   }
 
   /**

@@ -7,6 +7,7 @@
 package org.mule.extension.email.internal.sender;
 
 
+import static java.util.Collections.emptyList;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
@@ -22,7 +23,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,8 +70,8 @@ public class SenderOperations {
                        toAddresses,
                        configuration.getFrom(),
                        configuration.getDefaultCharset(),
-                       ccAddresses != null ? ccAddresses : new ArrayList<>(),
-                       bccAddresses != null ? bccAddresses : new ArrayList<>(),
+                       ccAddresses != null ? ccAddresses : emptyList(),
+                       bccAddresses != null ? bccAddresses : emptyList(),
                        mergeHeaders(headers, configuration.getHeaders()),
                        attachments);
   }
