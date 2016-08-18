@@ -122,19 +122,17 @@ public abstract class ExtensionDefinitionParser {
 
   static final String CHILD_ELEMENT_KEY_PREFIX = "<<";
   static final String CHILD_ELEMENT_KEY_SUFFIX = ">>";
-  private static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss";
-  private static final String CALENDAR_FORMAT = "yyyy-MM-dd'T'hh:mm:ssX";
   protected final ExtensionParsingContext parsingContext;
   protected final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList
       .of(new FixedTypeParsingDelegate(PoolingProfile.class), new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
           new FixedTypeParsingDelegate(TlsContextFactory.class), new FixedTypeParsingDelegate(ThreadingProfile.class),
           new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslSyntaxResolver;
+  protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private final ConversionService conversionService = new DefaultConversionService();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
-  private final Builder baseDefinitionBuilder;
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
       ImmutableList.of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
@@ -204,13 +202,19 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitString(StringType stringType) {
-          defaultVisit(stringType);
           if (paramDsl.supportsChildDeclaration()) {
             addParameter(getChildKey(getKey(parameter)),
                          fromChildConfiguration(String.class).withWrapperIdentifier(paramDsl.getElementName()));
 
-            addDefinition(baseDefinitionBuilder.copy().withIdentifier(paramDsl.getElementName())
-                .withTypeDefinition(fromType(String.class)).build());
+            addDefinition(baseDefinitionBuilder.copy()
+                .withIdentifier(paramDsl.getElementName())
+                .withTypeDefinition(fromType(String.class))
+                .withTypeConverter(value -> resolverOf(parameter.getName(), stringType, value, parameter.getDefaultValue(),
+                                                       parameter.getExpressionSupport(), parameter.isRequired(),
+                                                       acceptsReferences(parameter)))
+                .build());
+          } else {
+            defaultVisit(stringType);
           }
         }
 
@@ -419,8 +423,8 @@ public abstract class ExtensionDefinitionParser {
     return resolverOf(parameterName, expectedType, value, defaultValue, expressionSupport, required, true);
   }
 
-  private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                      ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences) {
+  protected ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+                                        ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences) {
     if (value instanceof ValueResolver) {
       return (ValueResolver<?>) value;
     }
@@ -607,7 +611,7 @@ public abstract class ExtensionDefinitionParser {
     parsedDefinitions.add(definition);
   }
 
-  private void addParameter(String key, AttributeDefinition.Builder definitionBuilder) {
+  protected void addParameter(String key, AttributeDefinition.Builder definitionBuilder) {
     if (parameters.put(key, definitionBuilder) != null) {
       throw new IllegalArgumentException("An AttributeDefinition builder was already defined for parameter " + key);
     }

@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.deriveModelProperties;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
@@ -270,7 +270,8 @@ final class ObjectTypeSchemaDelegate {
 
   private ImmutableParameterModel asParameter(ObjectFieldType field) {
     return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "", field.getValue(), false, field.isRequired(),
-                                       getExpressionSupport(field), getDefaultValue(field).orElse(null), emptySet());
+                                       getExpressionSupport(field), getDefaultValue(field).orElse(null),
+                                       deriveModelProperties(field));
   }
 
   private ExplicitGroup getOrCreateSequenceGroup(ExtensionType extension) {

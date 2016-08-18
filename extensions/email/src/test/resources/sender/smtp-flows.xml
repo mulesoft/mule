@@ -63,7 +63,9 @@
 
     <flow name="forwardEmailWithContent">
         <email:forward config-ref="config" subject="Email Subject">
-            <email:content body="More Content To Forward"/>
+            <email:content>
+                <email:body>More Content To Forward</email:body>
+            </email:content>
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>
             </email:to-addresses>
@@ -72,13 +74,17 @@
 
     <flow name="sendEncodedMessage">
         <email:send config-ref="config" subject="Email Subject">
-            <email:content body="#[payload]" charset="#[flowVars.encoding]"/>
+            <email:content charset="#[flowVars.encoding]">
+                <email:body>#[payload]</email:body>
+            </email:content>
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>
             </email:to-addresses>
         </email:send>
     </flow>
 
-    <email:email-content name="emailContent" body="Email Content" contentType="text/plain"/>
+    <email:email-content name="emailContent" contentType="text/plain">
+        <email:body>Email Content</email:body>
+    </email:email-content>
 
 </mule>
