@@ -139,7 +139,7 @@ public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
   @Test
   public void testServiceDiscoverProcessExcludeParameter() throws IOException {
     MavenArtifact serviceArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID).withArtifactId(
-        SERVICE_ARTIFACT_ID)
+                                                                                                                           SERVICE_ARTIFACT_ID)
         .withType(JAR).withScope(PROVIDED_SCOPE).build();
 
     String artifactPath = folder.getRoot().getParentFile().getParentFile().getAbsolutePath() + separator;
@@ -154,7 +154,7 @@ public class DefaultClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(context.getClassPathURLs()).thenReturn(Lists.newArrayList());
 
     MavenArtifact rootArtifact = new MavenArtifact.MavenArtifactBuilder().withGroupId(ORG_MULE_GROUP_ID).withArtifactId(
-        SERVICE_TEST_ARTIFACT_ID)
+                                                                                                                        SERVICE_TEST_ARTIFACT_ID)
         .withType(JAR).withScope(COMPILE_SCOPE).build();
     when(context.getDependencyGraph().getRootArtifact()).thenReturn(rootArtifact);
 

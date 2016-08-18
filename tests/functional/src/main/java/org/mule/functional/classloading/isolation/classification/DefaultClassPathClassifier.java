@@ -111,7 +111,8 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
         new ExtendedClassPathClassifierContext(context, artifactToClassPathUrlResolver);
 
     List<URL> appUrls = buildAppUrls(extendedClassPathClassifierContext);
-    List<ArtifactUrlClassification> serviceUrlClassifications = buildServicesUrlClassification(extendedClassPathClassifierContext);
+    List<ArtifactUrlClassification> serviceUrlClassifications =
+        buildServicesUrlClassification(extendedClassPathClassifierContext);
     List<PluginUrlClassification> pluginUrlClassifications = buildPluginsUrlClassification(extendedClassPathClassifierContext);
     List<URL> containerUrls = buildContainerUrls(extendedClassPathClassifierContext, appUrls, pluginUrlClassifications);
 
@@ -206,7 +207,7 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
       if (logger.isDebugEnabled()) {
         logger
             .debug(
-                "Current maven artifact that holds the test class is not an extension, so a plugin class loader would be create with its compile dependencies");
+                   "Current maven artifact that holds the test class is not an extension, so a plugin class loader would be create with its compile dependencies");
       }
       pluginClassifications.add(pluginClassPathClassification(extendedContext));
     }
@@ -309,18 +310,18 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
   private List<URL> serviceClassPathClassification(ExtendedClassPathClassifierContext extendedContext,
                                                    String serviceMavenArtifactId) {
     return new DependencyResolver(new Configuration()
-                .setMavenDependencyGraph(extendedContext.getClassificationContext().getDependencyGraph())
-                .selectDependencies(new DependenciesFilter().match(dependency -> dependency.getArtifactId()
-                    .equals(serviceMavenArtifactId)))
-                .collectTransitiveDependencies(new TransitiveDependenciesFilter()
-                    .match(transitiveDependency -> transitiveDependency.isProvidedScope()
-                        && !extendedContext.getClassificationContext().getExclusions()
-                            .test(transitiveDependency))))
-                                .resolveDependencies()
-                                .stream().filter(d -> !d.isPomType())
-                                .map(dependency -> extendedContext.getArtifactToClassPathURLResolver()
-                                    .resolveURL(dependency, extendedContext.getClassificationContext().getClassPathURLs()))
-                                .collect(toList());
+        .setMavenDependencyGraph(extendedContext.getClassificationContext().getDependencyGraph())
+        .selectDependencies(new DependenciesFilter().match(dependency -> dependency.getArtifactId()
+            .equals(serviceMavenArtifactId)))
+        .collectTransitiveDependencies(new TransitiveDependenciesFilter()
+            .match(transitiveDependency -> transitiveDependency.isProvidedScope()
+                && !extendedContext.getClassificationContext().getExclusions()
+                    .test(transitiveDependency))))
+                        .resolveDependencies()
+                        .stream().filter(d -> !d.isPomType())
+                        .map(dependency -> extendedContext.getArtifactToClassPathURLResolver()
+                            .resolveURL(dependency, extendedContext.getClassificationContext().getClassPathURLs()))
+                        .collect(toList());
   }
 
   /**

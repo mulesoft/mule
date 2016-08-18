@@ -52,9 +52,10 @@ public class ArtifactClassLoaderHolderReflector {
   }
 
   private List<ArtifactClassLoaderReflector> adaptArtifactClassLoaders(List<Object> artifactClassLoaders) {
-    return artifactClassLoaders.stream().map(artifactClassLoader -> new ArtifactClassLoaderReflector(artifactClassLoader)).collect(
-                                                                                                                                 Collectors
-                                                                                                                                     .toList());
+    return artifactClassLoaders.stream().map(artifactClassLoader -> new ArtifactClassLoaderReflector(artifactClassLoader))
+        .collect(
+                 Collectors
+                     .toList());
   }
 
   private Object doInvokeMethod(String methodName) {

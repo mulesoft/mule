@@ -89,7 +89,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @ArtifactClassLoaderHolderAware
   private static final void setArtifactClassLoaderHolderReflector(final Object artifactClassLoaderHolder) {
     checkArgument(artifactClassLoaderHolder != null, "artifactClassLoaderHolder cannot be null");
-    checkState(artifactClassLoaderHolderReflector == null, "artifactClassLoaderHolderReflector already set, it cannot be set again");
+    checkState(artifactClassLoaderHolderReflector == null,
+               "artifactClassLoaderHolderReflector already set, it cannot be set again");
 
     artifactClassLoaderHolderReflector = new ArtifactClassLoaderHolderReflector(artifactClassLoaderHolder);
   }
