@@ -47,6 +47,8 @@ public final class Configuration {
   /**
    * A conditional way to define if the root artifact should be included or not in results. A {@link Predicate} can be passed that
    * will be evaluated with the root artifact during the resolution of the dependencies.
+   * <p/>
+   * By default it is not included.
    *
    * @param rootArtifactPredicate
    * @return this

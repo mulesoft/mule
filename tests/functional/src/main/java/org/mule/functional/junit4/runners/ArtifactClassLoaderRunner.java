@@ -13,7 +13,7 @@ import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFro
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.functional.api.classloading.isolation.ArtifactIsolatedClassLoaderBuilder;
-import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ArtifactsClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
@@ -46,8 +46,8 @@ import org.junit.runners.model.TestClass;
  * <p/>
  * See {@link RunnerDelegateTo} for those scenarios where another JUnit runner needs to be used but still the test has to be
  * executed within an isolated class loading model. {@link ArtifactClassLoaderRunnerConfig} allows to define the Extensions to be
- * discovered in the classpath, for each Extension a plugin class loader would be created. {@link PluginClassLoadersAware} allows
- * the test to be injected with the list of {@link ClassLoader}s that were created for each plugin, mostly used in
+ * discovered in the classpath, for each Extension a plugin class loader would be created. {@link ArtifactsClassLoaderHolderAware}
+ * allows the test to be injected with the list of {@link ClassLoader}s that were created for each plugin, mostly used in
  * {@link org.mule.functional.junit4.ArtifactFunctionalTestCase} in order to register the extensions.
  * <p/>
  * The class loading model is built by doing a classification of the ClassPath URLs loaded by IDEs and surfire-maven-plugin. The
@@ -75,8 +75,8 @@ import org.junit.runners.model.TestClass;
 public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private final Runner delegate;
-  private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
-  private static boolean pluginClassLoadersInjected = false;
+  private static ArtifactsClassLoaderHolder artifactsClassLoaderHolder;
+  private static boolean artifactClassLoaderHolderInjected = false;
 
   /**
    * Creates a Runner to run {@code klass}
@@ -86,48 +86,52 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * @throws Throwable if there was an error while initializing the runner.
    */
   public ArtifactClassLoaderRunner(Class<?> clazz, RunnerBuilder builder) throws Throwable {
-    if (artifactClassLoaderHolder == null) {
-      artifactClassLoaderHolder = createClassLoaderTestRunner(clazz);
+    if (artifactsClassLoaderHolder == null) {
+      artifactsClassLoaderHolder = createClassLoaderTestRunner(clazz);
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
 
-    final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
+    final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactsClassLoaderHolder
         .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
 
     final AnnotatedBuilder annotatedBuilder = new AnnotatedBuilder(builder);
     delegate = annotatedBuilder.buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"),
                                             isolatedTestClass);
 
-    if (!pluginClassLoadersInjected) {
-      injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-      pluginClassLoadersInjected = true;
+    if (!artifactClassLoaderHolderInjected) {
+      injectArtifactClassLoaderHolder(artifactsClassLoaderHolder, isolatedTestClass);
+      artifactClassLoaderHolderInjected = true;
     }
   }
 
   private Class<?> getTestClass(Class<?> clazz) throws InitializationError {
     try {
-      return artifactClassLoaderHolder.loadClassWithApplicationClassLoader(clazz.getName());
+      return artifactsClassLoaderHolder.loadClassWithApplicationClassLoader(clazz.getName());
     } catch (Exception e) {
       throw new InitializationError(e);
     }
   }
 
   /**
-   * Creates the {@link ArtifactClassLoaderHolder} with the isolated class loaders.
+   * Creates the {@link ArtifactsClassLoaderHolder} with the isolated class loaders.
    *
    * @param klass the test class being executed
    * @throws IOException if an error happened while reading
    *         {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
-   * @return creates a {@link ArtifactClassLoaderHolder} that would be used to run the test. This way the test will be isolated
+   * @return creates a {@link ArtifactsClassLoaderHolder} that would be used to run the test. This way the test will be isolated
    *         and it will behave similar as an application running in a Mule standalone container.
    */
-  private static ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) throws IOException {
+  private static ArtifactsClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) throws IOException {
     List<String> extensionBasePackages =
         getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "extensionBasePackage");
     List<Class[]> exportClassesList =
         getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "exportClasses");
     Set<Class> exportedClasses = exportClassesList.stream().flatMap(Arrays::stream).collect(toSet());
+
+    List<String[]> serviceExclusionsList =
+        getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "servicesExclusions");
+    List<String> serviceExclusions = serviceExclusionsList.stream().flatMap(Arrays::stream).collect(toList());
 
     final File targetTestClassesFolder = new File(klass.getProtectionDomain().getCodeSource().getLocation().getPath());
 
@@ -138,6 +142,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     builder.setExtraBootPackages(splitCommaSeparatedAttributeValues("extraBootPackages", klass));
     builder.setExtensionBasePackages(extensionBasePackages);
     builder.setExportClasses(exportedClasses);
+    builder.setServicesExclusion(serviceExclusions);
 
     return builder.build();
   }
@@ -156,35 +161,37 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   }
 
   /**
-   * Invokes the method to inject the plugin class loaders as the test is annotated with {@link PluginClassLoadersAware}.
+   * Invokes the method to inject the {@link ArtifactsClassLoaderHolder} as the test is annotated with
+   * {@link ArtifactsClassLoaderHolderAware}.
    *
-   * @param artifactClassLoaderHolder the result {@link ArtifactClassLoader}s defined for container, plugins and application
+   * @param artifactsClassLoaderHolder the {@link ArtifactClassLoader}s for isolation
    * @param isolatedTestClass the test {@link Class} loaded with the isolated {@link ClassLoader}
-   * @throws IllegalStateException if the test doesn't have an annotated method to inject plugin class loaders or if it has more
-   *         than one method annotated.
-   * @throws Throwable if an error ocurrs while setting the list of {@link ArtifactClassLoader}s for plugins.
+   * @throws IllegalStateException if the test doesn't have an annotated method to inject artifactsClassLoaderHolder or if it has
+   *         more than one method annotated
+   * @throws Throwable if an error occurs while setting the {@link ArtifactsClassLoaderHolder}
    */
-  private static void injectPluginsClassLoaders(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)
+  private static void injectArtifactClassLoaderHolder(ArtifactsClassLoaderHolder artifactsClassLoaderHolder,
+                                                      Class<?> isolatedTestClass)
       throws Throwable {
     TestClass testClass = new TestClass(isolatedTestClass);
-    Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactClassLoaderHolder
-        .loadClassWithApplicationClassLoader(PluginClassLoadersAware.class.getName());
+    Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactsClassLoaderHolder
+        .loadClassWithApplicationClassLoader(ArtifactsClassLoaderHolderAware.class.getName());
     List<FrameworkMethod> contextAwareMethods = testClass.getAnnotatedMethods(artifactContextAwareAnn);
     if (contextAwareMethods.size() != 1) {
       throw new IllegalStateException("Isolation tests need to have one method marked with annotation "
-          + PluginClassLoadersAware.class.getName());
+          + ArtifactsClassLoaderHolderAware.class.getName());
     }
     for (FrameworkMethod method : contextAwareMethods) {
       if (!method.isStatic() || method.isPublic()) {
-        throw new IllegalStateException("Method marked with annotation " + PluginClassLoadersAware.class.getName()
-            + " should be private static and it should receive a parameter of type List<" + ArtifactClassLoader.class + ">");
+        throw new IllegalStateException("Method marked with annotation " + ArtifactsClassLoaderHolderAware.class.getName()
+            + " should be private static and it should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">");
       }
       method.getMethod().setAccessible(true);
       try {
-        method.invokeExplosively(null, artifactClassLoaderHolder.getPluginsClassLoaders());
+        method.invokeExplosively(null, artifactsClassLoaderHolder);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("Method marked with annotation " + PluginClassLoadersAware.class.getName()
-            + " should receive a parameter of type List<" + ArtifactClassLoader.class + ">");
+        throw new IllegalStateException("Method marked with annotation " + ArtifactsClassLoaderHolderAware.class.getName()
+            + " should receive a parameter of type <" + ArtifactsClassLoaderHolder.class + ">", e);
       } finally {
         method.getMethod().setAccessible(false);
       }
@@ -207,7 +214,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    */
   @Override
   public void run(RunNotifier notifier) {
-    withContextClassLoader(artifactClassLoaderHolder.getApplicationClassLoader().getClassLoader(), () -> delegate.run(notifier));
+    withContextClassLoader(artifactsClassLoaderHolder.getApplicationArtifactClassLoader().getClassLoader(),
+                           () -> delegate.run(notifier));
   }
 
   /**

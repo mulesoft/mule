@@ -96,6 +96,11 @@
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
         <dependency>
             <groupId>org.mule.modules</groupId>

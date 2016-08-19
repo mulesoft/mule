@@ -83,6 +83,14 @@ public @interface ArtifactClassLoaderRunnerConfig {
   Class[] exportClasses() default {};
 
   /**
+   * Allows to ignore services discovered for the given Maven artifactIds, this way a service implementation jar could be used
+   * as internal library (dependency) of a another service that uses it internally.
+   *
+   * @return array of {@link String} of Maven artifactIds that would be ignored if they are discovered as services
+   */
+  String[] servicesExclusions() default {};
+
+  /**
    * List of groupId:artifactId:type to define the exclusions of artifacts that shouldn't be added to the application
    * {@link ClassLoader}. Default exclusion is already defined in {@code excluded.properties} file and by using this annotation
    * the ones defined here will be appended to those defined in file.

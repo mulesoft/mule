@@ -7,38 +7,51 @@
 
 package org.mule.functional.api.classloading.isolation;
 
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.List;
 
 /**
- * Holds {@link ClassLoader}s for application, plugins and container.
+ * Holds {@link ClassLoader}s for application, services, plugins and container.
  *
  * @since 4.0
  */
-public final class ArtifactClassLoaderHolder {
+public final class ArtifactsClassLoaderHolder {
 
   private ArtifactClassLoader containerClassLoader;
+  private List<ArtifactClassLoader> servicesArtifactClassLoaders;
   private List<ArtifactClassLoader> pluginsArtifactClassLoaders;
   private ArtifactClassLoader applicationClassLoader;
 
-  public ArtifactClassLoaderHolder(ArtifactClassLoader containerClassLoader,
-                                   List<ArtifactClassLoader> pluginsArtifactClassLoaders,
-                                   ArtifactClassLoader applicationClassLoader) {
+  public ArtifactsClassLoaderHolder(ArtifactClassLoader containerClassLoader,
+                                    List<ArtifactClassLoader> servicesArtifactClassLoaders,
+                                    List<ArtifactClassLoader> pluginsArtifactClassLoaders,
+                                    ArtifactClassLoader applicationClassLoader) {
+    checkNotNull(containerClassLoader, "containerClassLoader cannot be null");
+    checkNotNull(servicesArtifactClassLoaders, "servicesArtifactClassLoaders cannot be null");
+    checkNotNull(pluginsArtifactClassLoaders, "pluginsArtifactClassLoaders cannot be null");
+    checkNotNull(applicationClassLoader, "applicationClassLoader cannot be null");
+
     this.containerClassLoader = containerClassLoader;
+    this.servicesArtifactClassLoaders = servicesArtifactClassLoaders;
     this.pluginsArtifactClassLoaders = pluginsArtifactClassLoaders;
     this.applicationClassLoader = applicationClassLoader;
   }
 
-  public ArtifactClassLoader getContainerClassLoader() {
+  public ArtifactClassLoader getContainerArtifactClassLoader() {
     return containerClassLoader;
   }
 
-  public List<ArtifactClassLoader> getPluginsClassLoaders() {
+  public List<ArtifactClassLoader> getServicesArtifactClassLoaders() {
+    return servicesArtifactClassLoaders;
+  }
+
+  public List<ArtifactClassLoader> getPluginsArtifactClassLoaders() {
     return pluginsArtifactClassLoaders;
   }
 
-  public ArtifactClassLoader getApplicationClassLoader() {
+  public ArtifactClassLoader getApplicationArtifactClassLoader() {
     return applicationClassLoader;
   }
 
