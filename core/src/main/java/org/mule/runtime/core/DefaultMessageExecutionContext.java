@@ -40,23 +40,17 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
    * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
    */
   public static MessageExecutionContext create(FlowConstruct flow, String correlationId) {
-    DefaultMessageExecutionContext executionContext =
-        new DefaultMessageExecutionContext(flow.getMuleContext().getUniqueIdString(), correlationId);
-    executionContext.serverId = flow.getMuleContext().getId();
-    executionContext.flowName = flow.getName();
-    executionContext.processingTime = ProcessingTime.newInstance(flow);
-
-    return executionContext;
+    return new DefaultMessageExecutionContext(flow, correlationId);
   }
 
   private final String id;
   private final String correlationId;
   private final OffsetTime receivedDate = now();
 
-  private String serverId;
-  private String flowName;
+  private final String serverId;
+  private final String flowName;
 
-  private ProcessingTime processingTime;
+  private final ProcessingTime processingTime;
 
   @Override
   public String getId() {
@@ -93,12 +87,15 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   /**
    * Builds a new execution context with the given parameters.
    * 
-   * @param id the unique id that identifies all {@link MuleEvent}s of the same context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of
-   *        this context, if available.
+   * @param flow the flow that processes events of this context.
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this
+   *        context, if available.
    */
-  private DefaultMessageExecutionContext(String id, String correlationId) {
-    this.id = id;
+  private DefaultMessageExecutionContext(FlowConstruct flow, String correlationId) {
+    this.id = flow.getMuleContext().getUniqueIdString();
+    this.serverId = flow.getMuleContext().getId();
+    this.flowName = flow.getName();
+    this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
   }
 
