@@ -25,7 +25,7 @@ import org.junit.Test;
  * href="https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing"<a/>
  * </p>
  */
-public class XsltTransformerXXETest extends FunctionalTestCase
+public class XsltTransformerXXETestCase extends FunctionalTestCase
 {
 
     @Override

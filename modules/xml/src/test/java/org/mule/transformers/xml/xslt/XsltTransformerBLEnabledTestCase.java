@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class XsltTransformerBLEnabledTest extends XsltTransformerBLTest
+public class XsltTransformerBLEnabledTestCase extends XsltTransformerBLTestCase
 {
 
     @Test

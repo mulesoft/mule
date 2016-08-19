@@ -16,7 +16,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
  * href="https://en.wikipedia.org/wiki/Billion_laughs"<a/>
  * </p>
  */
-public class XsltTransformerBLTest extends FunctionalTestCase
+public class XsltTransformerBLTestCase extends FunctionalTestCase
 {
 
     @Override

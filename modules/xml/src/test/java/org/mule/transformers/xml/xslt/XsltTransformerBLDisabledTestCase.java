@@ -15,7 +15,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class XsltTransformerBLDisabledTest extends XsltTransformerBLTest
+public class XsltTransformerBLDisabledTestCase extends XsltTransformerBLTestCase
 {
 
     @Rule
