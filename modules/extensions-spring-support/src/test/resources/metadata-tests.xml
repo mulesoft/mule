@@ -149,7 +149,8 @@
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">
-        <metadata:type-with-declared-subtypes-metadata config-ref="config" plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
+        <metadata:type-with-declared-subtypes-metadata config-ref="config"
+                                                       plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
                                                        rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
                                                        animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
     </flow>
@@ -157,4 +158,9 @@
     <flow name="resolverWithDynamicConfig">
         <metadata:simple-multi-level-key-resolver config-ref="dynamic-config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
+
+    <flow name="pagedOperationMetadata">
+        <metadata:paged-operation-metadata config-ref="dynamic-config" animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+    </flow>
+
 </mule>

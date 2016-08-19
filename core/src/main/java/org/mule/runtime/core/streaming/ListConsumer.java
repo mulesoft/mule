@@ -7,13 +7,12 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
-
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * Implementation of {@link org.mule.runtime.core.streaming.Consumer} that obains a {@link List} from a {@link Producer} and
+ * Implementation of {@link Consumer} that obtains a {@link List} from a {@link Producer} and
  * returns the elements one by one. This implementation is not thread-safe.
  * 
  * @since 3.5.0
@@ -65,7 +64,7 @@ public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
    * {@inheritDoc}
    */
   @Override
-  public void close() throws MuleException {
+  public void close() throws IOException {
     super.close();
     this.currentPage = null;
   }

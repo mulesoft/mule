@@ -7,17 +7,20 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.Closeable;
-import org.mule.runtime.core.api.MuleException;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Implementation of {@link Iterator} that takes its elements from a {@link Consumer} . This iterator also implements
- * {@link Closeable}. Closing this iterator will cause the underlying consumer to be closed. If for any reason the underlying
- * consumer gets closed (either because this iterator closed it or some other reason), then this iterator will consider that it
- * has not next items. {@link #Iterator.remove()} operation is not allowed on this instance
- * 
+ * Implementation of {@link Iterator} that takes its elements from a {@link Consumer}.
+ * <p>
+ * This iterator also implements {@link Closeable}. Closing this iterator will cause the underlying consumer to be closed.
+ * If for any reason the underlying consumer gets closed (either because this iterator closed it or some other reason),
+ * then this iterator will consider that it has no more items.
+ * <p>
+ * The {@link Iterator#remove()} operation is not allowed on this instance
+ *
  * @since 3.5.0
  */
 public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTotalHint {
@@ -32,7 +35,7 @@ public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTota
    * Closes the underlying consumer
    */
   @Override
-  public void close() throws MuleException {
+  public void close() throws IOException {
     this.consumer.close();
   }
 
@@ -54,7 +57,7 @@ public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTota
 
   /**
    * Not allowed on this implementations
-   * 
+   *
    * @throws UnsupportedOperationException
    */
   public void remove() {

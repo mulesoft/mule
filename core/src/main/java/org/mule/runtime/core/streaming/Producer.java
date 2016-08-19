@@ -7,7 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.Closeable;
+
+import java.io.Closeable;
 
 /**
  * A producer implementation that follows the idea of the Producer-Consumer design pattern. Implementing this interface does not
@@ -22,6 +23,6 @@ public interface Producer<T> extends Closeable, ProvidesTotalHint {
    * 
    * @return an item. Might be <code>null<c/code>
    */
-  public T produce();
+  T produce();
 
 }

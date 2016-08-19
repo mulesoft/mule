@@ -57,6 +57,7 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.api.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
@@ -90,6 +91,7 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingPar
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
@@ -257,7 +259,9 @@ public final class AnnotationsBasedDescriber implements Describer {
   }
 
   private void declareOperation(HasOperationDeclarer declarer, OperationContainerElement operationsContainer) {
+
     final Class<?> declaredClass = operationsContainer.getDeclaredClass();
+
     if (operationDeclarers.containsKey(declaredClass)) {
       operationDeclarers.get(declaredClass).forEach(declarer::withOperation);
       return;
@@ -266,17 +270,18 @@ public final class AnnotationsBasedDescriber implements Describer {
     checkOperationIsNotAnExtension(declaredClass);
 
     for (MethodElement operationMethod : operationsContainer.getOperations()) {
-
+      Method method = operationMethod.getMethod();
       final OperationDeclarer operation = declarer.withOperation(operationMethod.getAlias())
-          .withModelProperty(new ImplementingMethodModelProperty(operationMethod.getMethod()))
-          .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaredClass, operationMethod.getMethod()))
+          .withModelProperty(new ImplementingMethodModelProperty(method))
+          .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaredClass, method))
           .withExceptionEnricherFactory(getExceptionEnricherFactory(operationMethod));
 
-      operation.withOutput().ofType(getMethodReturnType(operationMethod.getMethod(), typeLoader));
-      operation.withOutputAttributes().ofType(getMethodReturnAttributesType(operationMethod.getMethod(), typeLoader));
+      operation.withOutput().ofType(getMethodReturnType(method, typeLoader));
+      operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
       addInterceptingCallbackModelProperty(operationMethod, operation);
+      addPagedOperationModelProperty(operationMethod, operation);
       declareMethodBasedParameters(operation, operationMethod.getParameters());
-      calculateExtendedTypes(declaredClass, operationMethod.getMethod(), operation);
+      calculateExtendedTypes(declaredClass, method, operation);
       operationDeclarers.put(declaredClass, operation);
     }
   }
@@ -354,7 +359,7 @@ public final class AnnotationsBasedDescriber implements Describer {
         parameter.describedAs(EMPTY);
         addExpressionModelProperty(extensionParameter, parameter);
         addTypeRestrictions(extensionParameter, parameter);
-        addLayoutModelProperty(extensionParameter, parameter, parameterGroupOwner);
+        addLayoutModelProperty(extensionParameter, parameter);
         addImplementingTypeModelProperty(extensionParameter, parameter);
         addXmlHintsModelProperty(extensionParameter, parameter);
         contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter));
@@ -441,8 +446,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
   }
 
-  private void addLayoutModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter,
-                                      ExtensionParameter parameterGroupOwner) {
+  private void addLayoutModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(extensionParameter, extensionParameter.getAlias());
     if (layoutModelProperty != null) {
       parameter.withModelProperty(layoutModelProperty);
@@ -480,6 +484,12 @@ public final class AnnotationsBasedDescriber implements Describer {
     parameter.withModelProperty(extensionParameter.isFieldBased()
         ? new DeclaringMemberModelProperty(((FieldElement) extensionParameter).getField())
         : new ImplementingParameterModelProperty(((ParameterElement) extensionParameter).getParameter()));
+  }
+
+  private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation) {
+    if (PagingProvider.class.isAssignableFrom(operationMethod.getReturnType())) {
+      operation.withModelProperty(new PagedOperationModelProperty());
+    }
   }
 
   private void addInterceptingCallbackModelProperty(MethodElement operationMethod, OperationDeclarer operation) {

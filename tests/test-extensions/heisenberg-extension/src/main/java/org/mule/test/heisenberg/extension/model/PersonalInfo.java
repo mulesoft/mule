@@ -6,10 +6,10 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
+import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
-
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -28,6 +28,13 @@ public class PersonalInfo {
   @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 2)
   private Integer age;
 
+  public PersonalInfo(String name, Integer age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  public PersonalInfo() {}
+
   public String getName() {
     return name;
   }
@@ -42,5 +49,10 @@ public class PersonalInfo {
 
   public void setAge(Integer age) {
     this.age = age;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return reflectionEquals(obj, this);
   }
 }

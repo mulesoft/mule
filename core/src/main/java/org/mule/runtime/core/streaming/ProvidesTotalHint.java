@@ -18,5 +18,5 @@ public interface ProvidesTotalHint {
    * returns the total amount of items available for storage/processing. In some scenarios, it might not be possible/convenient to
    * actually retrieve this value or it might not be available at this point. -1 is returned in such a case.
    */
-  public int size();
+  int size();
 }

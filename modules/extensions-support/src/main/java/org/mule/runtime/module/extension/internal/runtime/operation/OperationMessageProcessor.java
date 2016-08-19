@@ -65,8 +65,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   private final String target;
 
   private ExecutionMediator executionMediator;
-  private ReturnDelegate returnDelegate;
   private OperationExecutor operationExecutor;
+  protected ReturnDelegate returnDelegate;
 
   public OperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
                                    String configurationProviderName, String target, ResolverSet resolverSet,

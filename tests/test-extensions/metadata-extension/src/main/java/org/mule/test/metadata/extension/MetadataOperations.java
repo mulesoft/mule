@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
+import org.mule.runtime.api.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -29,6 +30,10 @@ import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolv
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
     contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
@@ -156,6 +161,25 @@ public class MetadataOperations extends MetadataOperationsParent {
   @MetadataScope()
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
+  }
+
+  @MetadataScope()
+  public PagingProvider<MetadataConnection, Animal> pagedOperationMetadata(Animal animal) {
+    return new PagingProvider<MetadataConnection, Animal>() {
+
+      @Override
+      public List<Animal> getPage(MetadataConnection connection) {
+        return Collections.singletonList(animal);
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
+        return java.util.Optional.of(1);
+      }
+
+      @Override
+      public void close() throws IOException {}
+    };
   }
 
   @MetadataScope()

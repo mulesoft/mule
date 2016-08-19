@@ -7,11 +7,11 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -76,7 +76,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
   }
 
   @Override
-  public void close() throws MuleException {
+  public void close() throws IOException {
     this.objectStore = null;
     this.keys = null;
   }

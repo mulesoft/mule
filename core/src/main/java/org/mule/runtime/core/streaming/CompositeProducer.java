@@ -7,8 +7,7 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
-
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +96,7 @@ public class CompositeProducer<T> implements Producer<T> {
    * Closes all the producers
    */
   @Override
-  public void close() throws MuleException {
+  public void close() throws IOException {
     for (Producer<T> producer : this.producers) {
       producer.close();
     }

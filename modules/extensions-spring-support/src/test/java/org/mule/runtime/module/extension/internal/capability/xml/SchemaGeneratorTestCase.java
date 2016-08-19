@@ -118,7 +118,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   @Before
   public void setup() throws IOException {
     generator = new SchemaGenerator();
-    expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
+    expectedSchema = IOUtils.getResourceAsString("schemas/" + expectedXSD, getClass());
   }
 
   @Test

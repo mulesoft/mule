@@ -7,9 +7,9 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.size.SmallTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class ListConsumerTestCase {
   public void setUp() {
     this.pages = this.getPages();
     this.producer = Mockito.spy(new TestProducer());
-    this.consumer = Mockito.spy(new ListConsumer<Integer>(this.producer));
+    this.consumer = Mockito.spy(new ListConsumer<>(this.producer));
   }
 
   @Test(expected = ClosedConsumerException.class)
@@ -77,20 +77,20 @@ public class ListConsumerTestCase {
   }
 
   @Test
-  public void doubleClose() throws MuleException {
+  public void doubleClose() throws Exception {
     this.consumer.close();
     this.consumer.close();
   }
 
   private List<List<Integer>> getPages() {
-    List<List<Integer>> pages = new ArrayList<List<Integer>>();
-    List<Integer> page = new ArrayList<Integer>();
+    List<List<Integer>> pages = new ArrayList<>();
+    List<Integer> page = new ArrayList<>();
 
     for (int i = 1; i <= totalCount; i++) {
       page.add(i);
       if (i % pageSize == 0) {
         pages.add(page);
-        page = new ArrayList<Integer>();
+        page = new ArrayList<>();
       }
     }
 
@@ -102,7 +102,7 @@ public class ListConsumerTestCase {
     private int index = 0;
 
     @Override
-    public void close() throws MuleException {}
+    public void close() throws IOException {}
 
     @Override
     public List<Integer> produce() {
@@ -110,10 +110,10 @@ public class ListConsumerTestCase {
 
       if (this.index < pages.size()) {
 
-        ret = pages.get(this.index);
-        this.index++;
+        ret = pages.get(index);
+        index++;
       } else {
-        ret = new ArrayList<Integer>();
+        ret = new ArrayList<>();
       }
 
       return ret;
@@ -121,6 +121,6 @@ public class ListConsumerTestCase {
 
     public int size() {
       return totalCount;
-    };
+    }
   }
 }
