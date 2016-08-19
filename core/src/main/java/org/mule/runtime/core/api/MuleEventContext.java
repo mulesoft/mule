@@ -102,17 +102,6 @@ public interface MuleEventContext {
 
   FlowConstruct getFlowConstruct();
 
-  /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can programmatically
-   * control how events are dispatched.
-   * 
-   * @param stopFurtherProcessing the value to set.
-   */
-  void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
   MessageExchangePattern getExchangePattern();
 
   /**

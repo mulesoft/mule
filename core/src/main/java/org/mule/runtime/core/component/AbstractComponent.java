@@ -113,9 +113,6 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
       }
 
       MuleEvent resultEvent = createResultEvent(event, result);
-      // Components only have access to the original event, so propogate the
-      // stop further processing
-      resultEvent.setStopFurtherProcessing(event.isStopFurtherProcessing());
       fireComponentNotification(resultEvent.getMessage(),
                                 ComponentMessageNotification.COMPONENT_POST_INVOKE);
 

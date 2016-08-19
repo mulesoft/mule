@@ -100,16 +100,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public boolean isStopFurtherProcessing() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public MuleContext getMuleContext() {
     throw new UnsupportedOperationException();
   }

@@ -148,31 +148,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   FlowConstruct getFlowConstruct();
 
   /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can
-   * programmatically control how events are dispatched.
-   * 
-   * @return Returns true is the user has set stopFurtherProcessing.
-   * @see org.mule.runtime.core.api.MuleContext
-   * @see MuleEventContext
-   * @see org.mule.runtime.core.api.lifecycle.Callable
-   */
-  boolean isStopFurtherProcessing();
-
-  /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can
-   * programmatically control how events are dispached.
-   * 
-   * @param stopFurtherProcessing the value to set.
-   */
-  void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-  /**
    * Returns the muleContext for the Mule node that this event was received in
    * 
    * @return the muleContext for the Mule node that this event was received in

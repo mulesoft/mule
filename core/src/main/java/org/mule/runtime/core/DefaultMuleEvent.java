@@ -88,7 +88,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   protected boolean synchronous;
 
   /** Mutable MuleEvent state **/
-  private boolean stopFurtherProcessing = false;
   private final ProcessingTime processingTime;
   private Object replyToDestination;
 
@@ -494,7 +493,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public String toString() {
     StringBuilder buf = new StringBuilder(64);
     buf.append("MuleEvent: ").append(getId());
-    buf.append(", stop processing=").append(isStopFurtherProcessing());
     buf.append(", correlation=").append(getCorrelation().toString());
     buf.append(", ").append(messageSourceURI);
 
@@ -516,29 +514,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public FlowConstruct getFlowConstruct() {
     return flowConstruct;
-  }
-
-  /**
-   * Determines whether the default processing for this event will be executed
-   *
-   * @return Returns the stopFurtherProcessing.
-   */
-  @Override
-  public boolean isStopFurtherProcessing() {
-    return stopFurtherProcessing;
-  }
-
-  /**
-   * Setting this parameter will stop the Mule framework from processing this event in the standard way. This allow for client
-   * code to override default behaviour. The common reasons for doing this are - 1. The service has more than one send endpoint
-   * configured; the service must dispatch to other prviders programmatically by using the service on the current event 2. The
-   * service doesn't send the current event out through a endpoint. i.e. the processing of the event stops in the uMO.
-   *
-   * @param stopFurtherProcessing The stopFurtherProcessing to set.
-   */
-  @Override
-  public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-    this.stopFurtherProcessing = stopFurtherProcessing;
   }
 
   @Override

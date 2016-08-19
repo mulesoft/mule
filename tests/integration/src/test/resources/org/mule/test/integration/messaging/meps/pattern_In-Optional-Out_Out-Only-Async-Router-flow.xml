@@ -34,8 +34,6 @@
                     return message
                 else
                 {
-                    //This shouldn't be needed but null does not stop the async-reply...
-                    eventContext.setStopFurtherProcessing(true)
                     return null
                 }
             </script:script>

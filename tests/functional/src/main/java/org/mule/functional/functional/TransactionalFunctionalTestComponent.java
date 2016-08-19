@@ -21,6 +21,7 @@ public class TransactionalFunctionalTestComponent extends FunctionalTestComponen
   private boolean rollback = true;
 
   /** {@inheritDoc} */
+  @Override
   public Object onCall(MuleEventContext context) throws Exception {
     Object replyMessage = super.onCall(context);
 
@@ -28,7 +29,6 @@ public class TransactionalFunctionalTestComponent extends FunctionalTestComponen
       // Verify transaction has begun.
       Transaction currentTx = context.getCurrentTransaction();
       if (currentTx == null || !currentTx.isBegun()) {
-        context.setStopFurtherProcessing(true);
         throw new TransactionException(MessageFactory
             .createStaticMessage("Trying to roll back transaction but no transaction is underway."));
       }

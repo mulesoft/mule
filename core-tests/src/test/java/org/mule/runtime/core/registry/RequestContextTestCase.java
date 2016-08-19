@@ -179,16 +179,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public boolean isStopFurtherProcessing() {
-      return false;
-    }
-
-    @Override
-    public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-      // no action
-    }
-
-    @Override
     public MuleContext getMuleContext() {
       return null;
     }
