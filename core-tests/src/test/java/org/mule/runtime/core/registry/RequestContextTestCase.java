@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -185,11 +184,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public MuleContext getMuleContext() {
-      return null;
-    }
-
-    @Override
-    public ProcessingTime getProcessingTime() {
       return null;
     }
 

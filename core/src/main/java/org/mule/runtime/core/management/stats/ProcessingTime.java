@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.io.Serializable;
@@ -31,17 +29,13 @@ public class ProcessingTime implements Serializable {
    *
    * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
    */
-  public static ProcessingTime newInstance(MuleEvent event) {
-    if (event != null) {
-      FlowConstruct fc = event.getFlowConstruct();
-      if (fc != null) {
-        FlowConstructStatistics stats = fc.getStatistics();
-        if (stats != null && fc.getStatistics().isEnabled()) {
-          return new ProcessingTime(stats, event.getMuleContext());
-        }
-      }
+  public static ProcessingTime newInstance(FlowConstruct flow) {
+    FlowConstructStatistics stats = flow.getStatistics();
+    if (stats != null && flow.getStatistics().isEnabled()) {
+      return new ProcessingTime(stats, flow.getMuleContext().getProcessorTimeWatcher());
+    } else {
+      return null;
     }
-    return null;
   }
 
   /**
@@ -50,9 +44,8 @@ public class ProcessingTime implements Serializable {
    * @param stats never null
    * @param muleContext
    */
-  private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext) {
+  private ProcessingTime(FlowConstructStatistics stats, ProcessingTimeWatcher processorTimeWatcher) {
     this.statistics = stats;
-    ProcessingTimeWatcher processorTimeWatcher = muleContext.getProcessorTimeWatcher();
     processorTimeWatcher.addProcessingTime(this);
   }
 

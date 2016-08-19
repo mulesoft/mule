@@ -31,7 +31,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -90,7 +89,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   protected boolean synchronous;
 
   /** Mutable MuleEvent state **/
-  private final ProcessingTime processingTime;
   private Object replyToDestination;
 
   protected String[] ignoredPropertyOverrides = new String[] {MULE_METHOD_PROPERTY};
@@ -146,7 +144,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.exchangePattern = exchangePattern;
     this.messageSourceName = messageSourceURI.toString();
     this.messageSourceURI = messageSourceURI;
-    this.processingTime = ProcessingTime.newInstance(this);
     this.replyToHandler = replyToHandler;
     this.replyToDestination = null;
     this.transacted = false;
@@ -183,7 +180,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.session = session;
     setMessage(message);
 
-    this.processingTime = ProcessingTime.newInstance(this);
     this.replyToHandler = replyToHandler;
     this.replyToDestination = replyToDestination;
     // TODO See MULE-9307 - define where to get these values from
@@ -313,7 +309,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.messageSourceName = rewriteEvent.getMessageSourceName();
     this.messageSourceURI = rewriteEvent.getMessageSourceURI();
     if (rewriteEvent instanceof DefaultMuleEvent) {
-      this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
       if (shareFlowVars) {
         this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
       } else {
@@ -321,7 +316,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
       }
       this.legacyCorrelationId = ((DefaultMuleEvent) rewriteEvent).getLegacyCorrelationId();
     } else {
-      this.processingTime = ProcessingTime.newInstance(this);
     }
     setMessage(message);
     this.replyToHandler = replyToHandler;
@@ -350,7 +344,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.exchangePattern = exchangePattern;
     this.messageSourceURI = messageSourceURI;
     this.messageSourceName = messageSourceName;
-    this.processingTime = ProcessingTime.newInstance(this);
     this.replyToHandler = replyToHandler;
     this.replyToDestination = replyToDestination;
     this.transacted = transacted;
@@ -574,11 +567,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public MuleContext getMuleContext() {
     return flowConstruct.getMuleContext();
-  }
-
-  @Override
-  public ProcessingTime getProcessingTime() {
-    return processingTime;
   }
 
   @Override

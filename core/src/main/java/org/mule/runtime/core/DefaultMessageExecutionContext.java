@@ -8,10 +8,12 @@ package org.mule.runtime.core;
 
 import static java.time.OffsetTime.now;
 
+import org.mule.runtime.core.api.CoreMessageExecutionContext;
 import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.Serializable;
 import java.time.OffsetTime;
@@ -21,7 +23,7 @@ import java.time.OffsetTime;
  *
  * @since 4.0
  */
-public final class DefaultMessageExecutionContext implements MessageExecutionContext, Serializable {
+public final class DefaultMessageExecutionContext implements CoreMessageExecutionContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -39,19 +41,17 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
    * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
    */
   public static MessageExecutionContext create(FlowConstruct flow, String correlationId) {
-    DefaultMessageExecutionContext executionContext =
-        new DefaultMessageExecutionContext(flow.getMuleContext().getUniqueIdString(), correlationId);
-    executionContext.serverId = flow.getMuleContext().getId();
-    executionContext.flowName = flow.getName();
-    return executionContext;
+    return new DefaultMessageExecutionContext(flow, correlationId);
   }
 
   private final String id;
   private final String correlationId;
   private final OffsetTime receivedDate = now();
 
-  private String serverId;
-  private String flowName;
+  private final String serverId;
+  private final String flowName;
+
+  private final ProcessingTime processingTime;
 
   @Override
   public String getId() {
@@ -74,6 +74,11 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   }
 
   @Override
+  public ProcessingTime getProcessingTime() {
+    return processingTime;
+  }
+
+  @Override
   public String getServerId() {
     return serverId;
   }
@@ -86,12 +91,15 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   /**
    * Builds a new execution context with the given parameters.
    * 
-   * @param id the unique id that identifies all {@link MuleEvent}s of the same context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of
-   *        this context, if available.
+   * @param flow the flow that processes events of this context.
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this
+   *        context, if available.
    */
-  private DefaultMessageExecutionContext(String id, String correlationId) {
-    this.id = id;
+  private DefaultMessageExecutionContext(FlowConstruct flow, String correlationId) {
+    this.id = flow.getMuleContext().getUniqueIdString();
+    this.serverId = flow.getMuleContext().getId();
+    this.flowName = flow.getName();
+    this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
   }
 

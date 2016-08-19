@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 
 import java.net.URI;
@@ -153,11 +152,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the muleContext for the Mule node that this event was received in
    */
   MuleContext getMuleContext();
-
-  /**
-   * Returns the times spent processing this event (so far)
-   */
-  ProcessingTime getProcessingTime();
 
   /**
    * Returns the message exchange pattern for this event
