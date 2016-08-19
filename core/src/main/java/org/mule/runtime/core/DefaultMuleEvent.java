@@ -578,7 +578,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  @Deprecated // Remove once MuleEvent is immutable
+  @Deprecated // TODO MULE- 9281 Remove once MuleEvent is immutable
   public boolean equals(Object o) {
     if (this == o) {
       return true;
