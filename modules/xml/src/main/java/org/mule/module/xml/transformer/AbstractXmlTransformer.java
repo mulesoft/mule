@@ -6,6 +6,9 @@
  */
 package org.mule.module.xml.transformer;
 
+import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
+import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -41,11 +44,15 @@ import org.dom4j.io.DocumentResult;
  */
 public abstract class AbstractXmlTransformer extends AbstractMessageTransformer implements Initialisable
 {
+    public static final String EXPAND_INTERNAL_ENTITIES_PROPERTY =
+        SYSTEM_PROPERTY_PREFIX + "xml.expandInternalEntities";
+
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
     private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
     private boolean acceptExternalEntities = false;
+    private boolean expandInternalEntities = false;
     
     public AbstractXmlTransformer()
     {
@@ -70,11 +77,12 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     {
         xmlInputFactory = XMLInputFactory.newInstance();
 
-        if (!acceptExternalEntities)
-        {
-            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-            useStaxSource = true;
-        }
+        xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
+        useStaxSource = !acceptExternalEntities;
+
+        String expandInternalEntitiesValue = System.getProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "true");
+        expandInternalEntities = Boolean.parseBoolean(expandInternalEntitiesValue);
+        xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
 
         xmlOutputFactory = XMLOutputFactory.newInstance();
 
