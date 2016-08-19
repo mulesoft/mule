@@ -18,12 +18,12 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-class DefaultDslContext implements DslResolvingContext {
+public class DefaultDslContext implements DslResolvingContext {
 
 
   private final ExtensionManager extensionManager;
 
-  DefaultDslContext(ExtensionManager extensionManager) {
+  public DefaultDslContext(ExtensionManager extensionManager) {
     this.extensionManager = extensionManager;
   }
 

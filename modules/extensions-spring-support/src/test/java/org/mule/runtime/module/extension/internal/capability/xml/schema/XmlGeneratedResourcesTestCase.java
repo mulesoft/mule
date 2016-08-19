@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,16 +22,18 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -91,6 +94,20 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
     return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class,
         SpringSchemaBundleResourceFactory.class};
+  }
+
+  @Test
+  public void spiDiscovery() throws Exception {
+    ServiceLoader<DslResourceFactory> services = ServiceLoader.load(DslResourceFactory.class);
+    assertThat(stream(getResourceFactoryTypes()).allMatch(factoryClass -> {
+      for (GeneratedResourceFactory factory : services) {
+        if (factoryClass.isAssignableFrom(factory.getClass())) {
+          return true;
+        }
+      }
+      return false;
+    }), is(true));
+
   }
 
   @Test

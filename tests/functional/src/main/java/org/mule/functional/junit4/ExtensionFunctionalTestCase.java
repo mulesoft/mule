@@ -6,11 +6,13 @@
  */
 package org.mule.functional.junit4;
 
+import static com.google.common.collect.ImmutableList.copyOf;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
+import org.mule.functional.junit4.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -96,10 +98,12 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     initialiseIfNeeded(extensionManager, muleContext);
 
     ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer =
-        new ExtensionsTestInfrastructureDiscoverer(extensionManager, generatedResourcesDirectory);
-    List<GeneratedResource> generatedResources =
-        extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
-    generateResourcesAndAddToClasspath(generatedResourcesDirectory, generatedResources);
+        new ExtensionsTestInfrastructureDiscoverer(extensionManager);
+    extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
+
+    generateResourcesAndAddToClasspath(generatedResourcesDirectory,
+                                       copyOf(extensionsTestInfrastructureDiscoverer
+                                           .generateDslResources(generatedResourcesDirectory)));
   }
 
   private void generateResourcesAndAddToClasspath(File generatedResourcesDirectory, List<GeneratedResource> resources)

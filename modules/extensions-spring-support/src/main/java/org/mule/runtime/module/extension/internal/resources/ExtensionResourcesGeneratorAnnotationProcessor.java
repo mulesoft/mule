@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
@@ -20,6 +19,7 @@ import org.mule.runtime.extension.api.introspection.declaration.DescribingContex
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.Annota
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -125,6 +126,10 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
   }
 
   private List<GeneratedResourceFactory> fetchResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()));
+
+    return ImmutableList.<GeneratedResourceFactory>builder()
+        .addAll(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()))
+        .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
+
   }
 }
