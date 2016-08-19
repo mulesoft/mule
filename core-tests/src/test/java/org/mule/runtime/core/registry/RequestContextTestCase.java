@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.OffsetTime;
@@ -136,11 +134,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public Credentials getCredentials() {
-      return null;
-    }
-
-    @Override
     public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
       return new byte[0];
     }
@@ -182,21 +175,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public FlowConstruct getFlowConstruct() {
-      return null;
-    }
-
-    @Override
-    public boolean isStopFurtherProcessing() {
-      return false;
-    }
-
-    @Override
-    public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-      // no action
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
       return null;
     }
 

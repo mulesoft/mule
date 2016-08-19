@@ -25,9 +25,6 @@
     <transports:endpoint name="sendManyEndpoint" connector-ref="tlsConnector" address="tls://localhost:${port2}"
               exchange-pattern="request-response"/>
 
-    <transport-tls:endpoint name="asyncEndpoint" connector-ref="tlsConnector" host="localhost" port="${port1}"
-                  exchange-pattern="one-way"/>
-
     <flow name="testComponent1">
         <transport-tls:inbound-endpoint ref="sendEndpoint"/>
         <test:component appendString=" Received">
@@ -41,12 +38,4 @@
             <test:callback class="org.mule.functional.functional.CounterCallback"/>
         </test:component>
     </flow>
-
-    <flow name="testComponent3">
-        <transports:inbound-endpoint ref="asyncEndpoint"/>
-        <test:component appendString=" Received">
-            <test:callback class="org.mule.functional.functional.ResponseWriterCallback"/>
-        </test:component>
-    </flow>
-
 </mule>

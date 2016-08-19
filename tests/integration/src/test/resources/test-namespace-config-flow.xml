@@ -17,15 +17,6 @@
         </test:component>
     </flow>
 
-    <flow name="testService2">
-        <test:component throwException="true"
-            exceptionToThrow="java.io.IOException" exceptionText="boom">
-            <test:return-data file="test-data.txt" />
-            <test:callback
-                class="org.mule.functional.functional.ResponseWriterCallback" />
-        </test:component>
-    </flow>
-
     <flow name="testService3">
         <test:component enableMessageHistory="false"
             appendString=" #[context:serviceName]" />

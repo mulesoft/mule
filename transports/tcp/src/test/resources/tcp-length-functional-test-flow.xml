@@ -14,8 +14,6 @@
 
     <tcp:endpoint name="clientEndpoint" host="localhost"
         port="${port1}" exchange-pattern="request-response" />
-    <tcp:endpoint name="asyncClientEndpoint1" host="localhost"
-        port="${port2}" exchange-pattern="one-way" />
     <tcp:endpoint name="asyncClientEndpoint2" host="localhost"
         port="${port3}" exchange-pattern="one-way" />
 
@@ -25,18 +23,6 @@
         <tcp:inbound-endpoint ref="clientEndpoint" />
 
         <test:component appendString=" Received" />
-    </flow>
-
-    <!-- this doesn't work because it uses the output stream and length encoding 
-        doesn't support streams -->
-    <flow name="testComponent2">
-
-        <tcp:inbound-endpoint ref="asyncClientEndpoint1" />
-
-        <test:component>
-            <test:callback
-                class="org.mule.functional.functional.ResponseWriterCallback" />
-        </test:component>
     </flow>
 
     <!-- this doesn't work because, in essence, the existing socket is opened 

@@ -11,12 +11,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.functional.ResponseWriterCallback;
 import org.mule.test.AbstractIntegrationTestCase;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
@@ -40,28 +38,6 @@ public class MuleTestNamespaceTestCase extends AbstractIntegrationTestCase {
     assertEquals("Foo Bar Car Jar", ftc.getReturnData());
     assertNotNull(ftc.getEventCallback());
     assertTrue(ftc.getEventCallback() instanceof CounterCallback);
-  }
-
-  @Test
-  public void testComponent2Config() throws Exception {
-    String testData = loadResourceAsString("test-data.txt");
-    Object object = getComponent("testService2");
-    assertNotNull(object);
-    assertTrue(object instanceof FunctionalTestComponent);
-    FunctionalTestComponent ftc = (FunctionalTestComponent) object;
-
-    assertTrue(ftc.isThrowException());
-    assertNotNull(ftc.getExceptionToThrow());
-    assertTrue(ftc.getExceptionToThrow().isAssignableFrom(IOException.class));
-    assertEquals("boom", ftc.getExceptionText());
-
-    assertEquals(testData, ftc.getReturnData());
-
-    assertTrue(ftc.isEnableMessageHistory());
-    assertTrue(ftc.isEnableNotifications());
-    assertNull(ftc.getAppendString());
-    assertNotNull(ftc.getEventCallback());
-    assertTrue(ftc.getEventCallback() instanceof ResponseWriterCallback);
   }
 
   @Test

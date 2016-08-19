@@ -26,9 +26,6 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
   public static DynamicPort dynamicPort1 = new DynamicPort("port1");
 
   @ClassRule
-  public static DynamicPort dynamicPort2 = new DynamicPort("port2");
-
-  @ClassRule
   public static DynamicPort dynamicPort3 = new DynamicPort("port3");
 
   public TcpLengthFunctionalTestCase() {
@@ -45,17 +42,6 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-  }
-
-  @Test
-  public void testDispatchAndReplyViaStream() throws Exception {
-    MuleClient client = muleContext.getClient();
-    client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, null);
-    // MULE-2754
-    Thread.sleep(200);
-    MuleMessage result = client.request("asyncClientEndpoint1", timeout);
-    // expect failure - streaming not supported
-    assertNull(result);
   }
 
   @Test

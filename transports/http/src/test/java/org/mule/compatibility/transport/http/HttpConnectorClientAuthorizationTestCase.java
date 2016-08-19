@@ -8,19 +8,17 @@ package org.mule.compatibility.transport.http;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_AUTHORIZATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.security.Credentials;
-import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -30,7 +28,6 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,26 +79,11 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   }
 
   @Test
-  public void testWithCredentials() throws Exception {
-    Credentials credentials = new MuleCredentials(CREDENTIALS_USER, CREDENTIALS_PASSWORD.toCharArray());
-
-    when(mockMuleEvent.getCredentials()).thenReturn(credentials);
-    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
-    when(mockMuleEvent.getMessage()).thenReturn(message);
-
-    connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
-
-    verify(mockHttpClient.getState(), atLeast(1)).setCredentials(isA(AuthScope.class),
-                                                                 isA(org.apache.commons.httpclient.Credentials.class));
-  }
-
-  @Test
   public void testWithUserInfo() throws Exception {
     URI uri = new URI(URI_WITH_CREDENTIALS);
 
     when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
-    when(mockMuleEvent.getCredentials()).thenReturn(null);
     when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(null);
     when(mockImmutableEndpoint.getEncoding()).thenReturn(encoding);
     when(mockImmutableEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI(URI_WITH_CREDENTIALS, muleContext));
@@ -117,7 +99,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
     when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
-    when(mockMuleEvent.getCredentials()).thenReturn(null);
     when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(HEADER_AUTHORIZATION_VALUE);
     when(mockHttpMethod.getRequestHeader(HEADER_AUTHORIZATION)).thenReturn(null);
 
@@ -130,7 +111,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   public void testWithProxyAuth() throws Exception {
     when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
-    when(mockMuleEvent.getCredentials()).thenReturn(null);
 
     connector.setProxyUsername(CREDENTIALS_USER);
     connector.setProxyPassword(CREDENTIALS_PASSWORD);
@@ -143,7 +123,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   public void testClean() throws Exception {
     when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
-    when(mockMuleEvent.getCredentials()).thenReturn(null);
 
     connector.setProxyUsername(null);
     connector.setProxyPassword(null);

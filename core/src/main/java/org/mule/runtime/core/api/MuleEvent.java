@@ -6,24 +6,22 @@
  */
 package org.mule.runtime.core.api;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Set;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Set;
 
 /**
  * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
@@ -70,8 +68,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    */
   @Override
   MuleMessage getMessage();
-
-  Credentials getCredentials();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -150,38 +146,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the service for the event
    */
   FlowConstruct getFlowConstruct();
-
-  /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can
-   * programmatically control how events are dispatched.
-   * 
-   * @return Returns true is the user has set stopFurtherProcessing.
-   * @see org.mule.runtime.core.api.MuleContext
-   * @see MuleEventContext
-   * @see org.mule.runtime.core.api.lifecycle.Callable
-   */
-  boolean isStopFurtherProcessing();
-
-  /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can
-   * programmatically control how events are dispached.
-   * 
-   * @param stopFurtherProcessing the value to set.
-   */
-  void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-  /**
-   * An outputstream the can optionally be used write response data to an incoming message.
-   * 
-   * @return an output strem if one has been made available by the message receiver that received the message
-   */
-  OutputStream getOutputStream();
 
   /**
    * Returns the muleContext for the Mule node that this event was received in

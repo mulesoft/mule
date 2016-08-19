@@ -303,7 +303,7 @@ public class TestEventBuilder {
     DefaultMuleEvent event =
         new DefaultMuleEvent(create(flow, sourceCorrelationId),
                              (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
-                             flow, new DefaultMuleSession(), null, null, transacted, null, replyToHandler);
+                             flow, new DefaultMuleSession(), transacted, null, replyToHandler);
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

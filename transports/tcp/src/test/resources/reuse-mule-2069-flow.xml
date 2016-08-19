@@ -15,9 +15,6 @@
 
     <tcp:endpoint name="clientEndpoint" host="localhost"
         port="${port1}" exchange-pattern="request-response" />
-    <transports:endpoint name="asyncClientEndpoint" address="tcp://localhost:${port2}"
-        exchange-pattern="one-way" />
-
 
     <flow name="testComponent1">
 
@@ -25,15 +22,4 @@
 
         <test:component appendString=" Received" />
     </flow>
-
-    <flow name="testComponent2">
-
-        <transports:inbound-endpoint ref="asyncClientEndpoint" />
-
-        <test:component appendString=" Received">
-            <test:callback
-                class="org.mule.functional.functional.ResponseWriterCallback" />
-        </test:component>
-    </flow>
-
 </mule>

@@ -21,7 +21,6 @@ import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -165,13 +164,13 @@ public class HttpConnector extends TcpConnector {
   public static final Set<String> HTTP_INBOUND_PROPERTIES;
 
   protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers =
-      new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
+      new ConcurrentHashMap<>();
 
   private static OneTimeWarning deprecationWarning =
       new OneTimeWarning(LoggerFactory.getLogger(HttpConnector.class), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE);
 
   static {
-    Set<String> props = new HashSet<String>();
+    Set<String> props = new HashSet<>();
     props.add(HTTP_CONTEXT_PATH_PROPERTY);
     props.add(HTTP_GET_BODY_PARAM_PROPERTY);
     props.add(HTTP_METHOD_PROPERTY);
@@ -457,16 +456,7 @@ public class HttpConnector extends TcpConnector {
     httpMethod.setDoAuthentication(true);
     client.getParams().setAuthenticationPreemptive(true);
 
-    if (event != null && event.getCredentials() != null) {
-      MuleMessage msg = event.getMessage();
-      String authScopeHost = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.host", event.getMessageSourceURI().getHost());
-      int authScopePort = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.port", event.getMessageSourceURI().getPort());
-      String authScopeRealm = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.realm", AuthScope.ANY_REALM);
-      String authScopeScheme = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.scheme", AuthScope.ANY_SCHEME);
-      client.getState().setCredentials(new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                                       new UsernamePasswordCredentials(event.getCredentials().getUsername(),
-                                                                       new String(event.getCredentials().getPassword())));
-    } else if (endpoint.getEndpointURI().getUserInfo() != null
+    if (endpoint.getEndpointURI().getUserInfo() != null
         && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null) {
       // Add User Creds
       StringBuilder header = new StringBuilder(128);

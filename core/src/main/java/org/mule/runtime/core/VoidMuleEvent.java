@@ -18,13 +18,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Set;
@@ -53,11 +51,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public MuleMessage getMessage() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Credentials getCredentials() {
     throw new UnsupportedOperationException();
   }
 
@@ -103,21 +96,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public FlowConstruct getFlowConstruct() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isStopFurtherProcessing() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
     throw new UnsupportedOperationException();
   }
 

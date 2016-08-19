@@ -14,9 +14,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 
-import java.io.OutputStream;
-import java.util.List;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -26,7 +23,6 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageExecutionContext;
@@ -54,6 +50,9 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.work.TrackingWorkManager;
+
+import java.io.OutputStream;
+import java.util.List;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message Receivers provided with Mule. A message receiver
@@ -245,14 +244,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   protected MuleEvent createMuleEvent(MuleCompatibilityMessage message, OutputStream outputStream)
       throws MuleException {
     MuleEvent event;
-    ResponseOutputStream ros = null;
-    if (outputStream != null) {
-      if (outputStream instanceof ResponseOutputStream) {
-        ros = (ResponseOutputStream) outputStream;
-      } else {
-        ros = new ResponseOutputStream(outputStream);
-      }
-    }
     MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message, flowConstruct.getMuleContext());
 
     if (session == null) {
@@ -266,10 +257,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     if (replyToFromMessage != null) {
       newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage);
     } else {
       newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null, ros);
+          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null);
     }
     newEvent.setCorrelation(message.getCorrelation());
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());

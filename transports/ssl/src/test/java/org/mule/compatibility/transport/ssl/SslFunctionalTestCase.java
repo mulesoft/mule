@@ -28,9 +28,6 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
   private static int NUM_MESSAGES = 100;
 
   @Rule
-  public DynamicPort dynamicPort1 = new DynamicPort("port1");
-
-  @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
   @Rule
@@ -67,17 +64,5 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
     assertNotNull("EventCallback is null", cc);
     assertTrue("EventCallback should be a CounterCallback", cc instanceof CounterCallback);
     assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
-  }
-
-  @Test
-  @Ignore("MULE-9628")
-  public void testAsynchronous() throws Exception {
-    MuleClient client = muleContext.getClient();
-    client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
-    // MULE-2757
-    Thread.sleep(100);
-    MuleMessage response = client.request("asyncEndpoint", 5000);
-    assertNotNull("Response is null", response);
-    assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(response));
   }
 }

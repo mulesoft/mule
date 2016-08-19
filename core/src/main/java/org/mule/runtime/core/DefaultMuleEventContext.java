@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -21,6 +17,10 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,30 +141,6 @@ public class DefaultMuleEventContext implements MuleEventContext {
   @Override
   public FlowConstruct getFlowConstruct() {
     return event.getFlowConstruct();
-  }
-
-  /**
-   * Determines whether the default processing for this event will be executed. By default, the Mule server will route events
-   * according to a components configuration. The user can override this behaviour by obtaining a reference to the MuleEvent
-   * context, either by implementing <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
-   * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for the current thread. The user can
-   * programmatically control how events are dispached.
-   *
-   * @param stopFurtherProcessing the value to set.
-   */
-  @Override
-  public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
-    event.setStopFurtherProcessing(stopFurtherProcessing);
-  }
-
-  /**
-   * An output stream the can optionally be used write response data to an incoming message.
-   *
-   * @return an output stream if one has been made available by the message receiver that received the message
-   */
-  @Override
-  public OutputStream getOutputStream() {
-    return event.getOutputStream();
   }
 
   @Override
