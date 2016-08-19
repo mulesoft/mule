@@ -102,7 +102,8 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
 
     generateResourcesAndAddToClasspath(generatedResourcesDirectory,
-                                       copyOf(extensionsTestInfrastructureDiscoverer.generateDslResources(generatedResourcesDirectory)));
+                                       copyOf(extensionsTestInfrastructureDiscoverer
+                                           .generateDslResources(generatedResourcesDirectory)));
   }
 
   private void generateResourcesAndAddToClasspath(File generatedResourcesDirectory, List<GeneratedResource> resources)
