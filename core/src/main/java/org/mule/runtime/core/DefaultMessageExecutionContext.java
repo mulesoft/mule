@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import static java.time.OffsetTime.now;
 
+import org.mule.runtime.core.api.CoreMessageExecutionContext;
 import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -22,7 +23,7 @@ import java.time.OffsetTime;
  *
  * @since 4.0
  */
-public final class DefaultMessageExecutionContext implements MessageExecutionContext, Serializable {
+public final class DefaultMessageExecutionContext implements CoreMessageExecutionContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -72,9 +73,7 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
     return flowName;
   }
 
-  /**
-   * @returns information about the times spent processing the events for this context (so far).
-   */
+  @Override
   public ProcessingTime getProcessingTime() {
     return processingTime;
   }
