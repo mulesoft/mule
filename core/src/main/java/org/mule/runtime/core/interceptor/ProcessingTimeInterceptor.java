@@ -8,7 +8,6 @@ package org.mule.runtime.core.interceptor;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
@@ -21,9 +20,8 @@ public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor {
     super();
   }
 
-  public ProcessingTimeInterceptor(MessageProcessor next, FlowConstruct fc) {
+  public ProcessingTimeInterceptor(MessageProcessor next) {
     setListener(next);
-    setFlowConstruct(fc);
   }
 
   @Override

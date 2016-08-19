@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.message.Correlation;
 
 import java.net.URI;
@@ -101,11 +100,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public MuleContext getMuleContext() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ProcessingTime getProcessingTime() {
     throw new UnsupportedOperationException();
   }
 

@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -57,26 +56,24 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     this.doThreading = threadingProfile.isDoThreading();
     this.threadTimeout = threadingProfile.getThreadWaitTimeout();
     workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
-    workManagerSource = new WorkManagerSource() {
-
-      public WorkManager getWorkManager() throws MuleException {
-        return workManager;
-      }
-    };
+    workManagerSource = () -> workManager;
   }
 
+  @Override
   public void start() throws MuleException {
     if (workManager != null && !workManager.isStarted()) {
       workManager.start();
     }
   }
 
+  @Override
   public void stop() throws MuleException {
     if (workManager != null) {
       workManager.dispose();
     }
   }
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (next == null) {
       return event;
@@ -99,7 +96,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
       MuleEvent response;
       if (event.getFlowConstruct() != null) {
-        response = new ProcessingTimeInterceptor(next, event.getFlowConstruct()).process(event);
+        response = new ProcessingTimeInterceptor(next).process(event);
       } else {
         response = processNext(event);
       }
@@ -161,24 +158,20 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
           .createMainExecutionTemplate(muleContext, new MuleTransactionConfig(), exceptionHandler);
 
       try {
-        executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
-
-          @Override
-          public MuleEvent process() throws Exception {
-            MessagingException exceptionThrown = null;
-            try {
-              processNextTimed(event);
-            } catch (MessagingException e) {
-              exceptionThrown = e;
-              throw e;
-            } catch (Exception e) {
-              exceptionThrown = new MessagingException(event, e, next);
-              throw exceptionThrown;
-            } finally {
-              firePipelineNotification(event, exceptionThrown);
-            }
-            return VoidMuleEvent.getInstance();
+        executionTemplate.execute(() -> {
+          MessagingException exceptionThrown = null;
+          try {
+            processNextTimed(event);
+          } catch (MessagingException e1) {
+            exceptionThrown = e1;
+            throw e1;
+          } catch (Exception e2) {
+            exceptionThrown = new MessagingException(event, e2, next);
+            throw exceptionThrown;
+          } finally {
+            firePipelineNotification(event, exceptionThrown);
           }
+          return VoidMuleEvent.getInstance();
         });
       } catch (MessagingException e) {
         // Already handled by TransactionTemplate

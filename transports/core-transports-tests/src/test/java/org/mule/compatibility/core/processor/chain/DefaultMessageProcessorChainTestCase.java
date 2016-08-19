@@ -129,6 +129,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
+    when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getFlowConstruct()).thenReturn(mockFlow);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

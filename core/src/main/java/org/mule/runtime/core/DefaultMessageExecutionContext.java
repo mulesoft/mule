@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.Serializable;
 import java.time.OffsetTime;
@@ -43,6 +44,8 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
         new DefaultMessageExecutionContext(flow.getMuleContext().getUniqueIdString(), correlationId);
     executionContext.serverId = flow.getMuleContext().getId();
     executionContext.flowName = flow.getName();
+    executionContext.processingTime = ProcessingTime.newInstance(flow);
+
     return executionContext;
   }
 
@@ -52,6 +55,8 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
 
   private String serverId;
   private String flowName;
+
+  private ProcessingTime processingTime;
 
   @Override
   public String getId() {
@@ -71,6 +76,13 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   @Override
   public String getFlowName() {
     return flowName;
+  }
+
+  /**
+   * @returns information about the times spent processing the events for this context (so far).
+   */
+  public ProcessingTime getProcessingTime() {
+    return processingTime;
   }
 
   @Override

@@ -7,6 +7,8 @@
 package org.mule.runtime.core.interceptor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -16,8 +18,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -26,9 +26,7 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after an event is received.
  */
 public abstract class AbstractEnvelopeInterceptor extends AbstractRequestResponseMessageProcessor
-    implements Interceptor, FlowConstructAware {
-
-  protected FlowConstruct flowConstruct;
+    implements Interceptor {
 
   /**
    * This method is invoked before the event is processed
@@ -49,7 +47,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
   @Override
   protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
     long startTime = System.currentTimeMillis();
-    ProcessingTime time = event.getProcessingTime();
+    ProcessingTime time = ((DefaultMessageExecutionContext) event.getExecutionContext()).getProcessingTime();
     boolean exceptionWasThrown = true;
     MuleEvent resultEvent = event;
     try {
@@ -64,7 +62,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
   @Override
   protected MuleEvent processNonBlocking(final MuleEvent event) throws MuleException {
     final long startTime = System.currentTimeMillis();
-    final ProcessingTime time = event.getProcessingTime();
+    final ProcessingTime time = ((DefaultMessageExecutionContext) event.getExecutionContext()).getProcessingTime();
     MuleEvent responseEvent = event;
 
     final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
@@ -82,11 +80,6 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
       throw exception;
     }
     return responseEvent;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   class ResponseReplyToHandler implements NonBlockingReplyToHandler {
