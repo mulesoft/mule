@@ -140,7 +140,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     assertNull(result.getFlowVariable("key3"));
 
     // Root id
-    assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());
+    assertEquals(event1.getCorrelationId(), result.getCorrelationId());
 
     assertEquals("value", result.getSession().getProperty("key"));
     assertEquals("value1", result.getSession().getProperty("key1"));
@@ -253,7 +253,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     assertNull(result.getFlowVariable("key3"));
 
     // Root id
-    assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());
+    assertEquals(event1.getCorrelationId(), result.getCorrelationId());
   }
 
 }

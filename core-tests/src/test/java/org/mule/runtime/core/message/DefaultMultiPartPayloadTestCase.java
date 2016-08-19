@@ -136,7 +136,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
     assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("attachment"));
     assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment").getPayload(), is("this is the attachment"));
-    assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment"), equalTo(attachmentPart));
+    assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment").getAttributes(),
+               equalTo(attachmentPart.getAttributes()));
   }
 
   @Test
@@ -161,7 +162,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
     assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("spi-props"));
     assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props").getPayload(), instanceOf(byte[].class));
-    assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props"), equalTo(attachmentPart));
+    assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props").getAttributes(),
+               equalTo(attachmentPart.getAttributes()));
   }
 
   @Test

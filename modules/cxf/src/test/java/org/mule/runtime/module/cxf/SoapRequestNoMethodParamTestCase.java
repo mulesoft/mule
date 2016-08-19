@@ -38,6 +38,7 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase {
 
   @Test
   public void testCXFSoapRequest() throws Exception {
+    MuleMessage message = getTestMuleMessage(request);
     MuleMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent",
                                                    getTestMuleMessage(request), HTTP_REQUEST_OPTIONS);
 

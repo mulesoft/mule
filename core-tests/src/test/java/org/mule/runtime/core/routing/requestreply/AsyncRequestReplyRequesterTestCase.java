@@ -71,7 +71,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     // Can't assert same because we copy event when we receive async reply
     assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
-    assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
   }
 
   @Test
@@ -90,7 +89,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     // Can't assert same because we copy event for async and also on async reply currently
     assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
-    assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
   }
 
   @Test
@@ -188,7 +186,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
             // Can't assert same because we copy event for async currently
             assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
-            assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
             count.incrementAndGet();
             logger.debug("Finished " + count.get());
           } catch (Exception e) {

@@ -247,7 +247,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
 
     MuleMessage logMessage = event.getMessage();
-    String logUniqueId = defaultString(logMessage.getUniqueId(), NOT_SET);
+    String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =
         format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getCorrelation());

@@ -26,6 +26,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -153,11 +154,11 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     MuleEvent in = getTestEvent("");
     in.setMessage(MuleMessage.builder(in.getMessage()).addOutboundProperty("foo", "bar").build());
     MuleEvent out = enricher.process(in);
-    assertSame(in, out);
-    assertSame(in.getMessage(), out.getMessage());
-    assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
-    assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
-    assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
+    assertThat(out, is(in));
+    assertThat(out.getMessage(), is(in.getMessage()));
+    assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
+    assertThat(out.getMessage().getOutboundPropertyNames(), equalTo(in.getMessage().getOutboundPropertyNames()));
+    assertThat(out.getMessage().getOutboundProperty("foo"), equalTo("bar"));
     assertThat(out.getMessage().getPayload(), equalTo(in.getMessage().getPayload()));
   }
 

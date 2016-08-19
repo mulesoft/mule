@@ -38,7 +38,7 @@ public class JmsMessages extends MessageFactory {
   }
 
   public static Message messageMarkedForRedelivery(MuleMessage message) {
-    String messageDescription = (message == null) ? "[null message]" : message.getUniqueId();
+    String messageDescription = (message == null) ? "[null message]" : message.toString();
     return factory.createMessage(BUNDLE_PATH, 7, messageDescription);
   }
 

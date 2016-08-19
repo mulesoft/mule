@@ -55,7 +55,8 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      ((DefaultMuleEvent) event).setCorrelation(new Correlation(getCid(), event.getCorrelation().getGroupSize().orElse(null),
+      ((DefaultMuleEvent) event).setLegacyCorrelationId(getCid());
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(event.getCorrelation().getGroupSize().orElse(null),
                                                                 event.getCorrelation().getSequence().orElse(null)));
       return event.getMessage();
     }

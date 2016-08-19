@@ -89,7 +89,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
     if (rootId != null) {
       final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(message);
-      builder.rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
+      builder.correlationId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
       return builder.build();
     } else {
       return message;

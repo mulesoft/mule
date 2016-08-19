@@ -58,21 +58,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
   }
 
   /**
-   * gets the unique identifier for the message. It's up to the implementation to ensure a unique id
-   *
-   * @return a unique message id. The Id should never be null. If the underlying transport does not have the notion of a message
-   *         Id, one should be generated. The generated Id should be a UUID.
-   */
-  String getUniqueId();
-
-  /**
-   * gets an identifier that is the same among parent and child messages
-   *
-   * @return a message id for the group of descendant messages. The Id should never be null.
-   */
-  String getMessageRootId();
-
-  /**
    * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
    * and Mule error code, plus any other releated info
    *
@@ -111,18 +96,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @return this builder.
      */
     Builder exceptionPayload(ExceptionPayload exceptionPayload);
-
-    /**
-     * @param id
-     * @return
-     */
-    Builder id(String id);
-
-    /**
-     * @param rootId
-     * @return
-     */
-    Builder rootId(String rootId);
 
     /**
      * @param key

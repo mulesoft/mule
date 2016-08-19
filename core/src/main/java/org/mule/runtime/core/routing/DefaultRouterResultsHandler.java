@@ -107,7 +107,6 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     }
     final MuleMessage coll = MuleMessage.builder()
         .collectionPayload(list, MuleMessage.class)
-        .rootId(previous.getMessage().getMessageRootId())
         .build();
     MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
     for (String name : previous.getFlowVariableNames()) {

@@ -10,9 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import java.util.Comparator;
 
+import org.junit.Test;
+
+import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MessageExecutionContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -25,9 +29,6 @@ import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCal
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.Comparator;
-
-import org.junit.Test;
 
 public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
@@ -46,16 +47,18 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
+    MessageExecutionContext context = DefaultMessageExecutionContext.create(flow, "foo");
+
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
     MuleEvent event1 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, getTestFlow(), session);
+        new DefaultMuleEvent(context, message1, getTestFlow(), session);
     MuleEvent event2 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, getTestFlow(), session);
+        new DefaultMuleEvent(context, message2, getTestFlow(), session);
     MuleEvent event3 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, getTestFlow(), session);
+        new DefaultMuleEvent(context, message3, getTestFlow(), session);
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
@@ -81,15 +84,17 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
+    MessageExecutionContext context = DefaultMessageExecutionContext.create(flow, "foo");
+
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
     MuleEvent event1 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message1, getTestFlow(), session);
+        new DefaultMuleEvent(context, message1, getTestFlow(), session);
     MuleEvent event2 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message2, getTestFlow(), session);
+        new DefaultMuleEvent(context, message2, getTestFlow(), session);
     MuleEvent event3 =
-        new DefaultMuleEvent(create(flow, message1.getUniqueId()), message3, getTestFlow(), session);
+        new DefaultMuleEvent(context, message3, getTestFlow(), session);
 
     // set a resequencing comparator. We need to reset the router since it will
     // not process the same event group

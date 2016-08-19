@@ -89,15 +89,12 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       DefaultMuleEvent event = createEvent(messageSequence.next(), originalEvent);
       event.setParent(originalEvent);
-      event.setCorrelation(new Correlation(correlationId, count, correlationSequence));
+      event.setCorrelation(new Correlation(count, correlationSequence));
 
       if (counterVariableName != null) {
         originalEvent.setFlowVariable(counterVariableName, correlationSequence);
       }
 
-      event.setMessage(MuleMessage.builder(event.getMessage()).rootId(originalEvent.getMessage().getMessageRootId()).build());
-
-      setCurrentEvent(event);
       MuleEvent resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);

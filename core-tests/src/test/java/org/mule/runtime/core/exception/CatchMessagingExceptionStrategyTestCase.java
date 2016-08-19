@@ -127,7 +127,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     catchMessagingExceptionStrategy.initialise();
     MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
     assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
-    assertThat(exceptionHandlingResult.getMessage().getUniqueId(), is(lastEventCreated.getMessage().getUniqueId()));
+    assertThat(exceptionHandlingResult.getCorrelationId(), is(lastEventCreated.getCorrelationId()));
   }
 
   /**

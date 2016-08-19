@@ -185,14 +185,14 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     assertTrue(es.endsWith("events=0}"));
 
     MuleEvent firstEvent = getTestEvent("foo");
-    String firstId = firstEvent.getMessage().getUniqueId();
+    String firstId = firstEvent.getCorrelationId();
     eg.addEvent(firstEvent);
     es = eg.toString();
     assertTrue(es.contains("events=1"));
     assertTrue(es.endsWith("[" + firstId + "]}"));
 
     MuleEvent secondEvent = new DefaultMuleEvent(MuleMessage.builder().payload("foo2").build(), getTestEvent("foo2"));
-    String secondId = secondEvent.getMessage().getUniqueId();
+    String secondId = secondEvent.getCorrelationId();
     eg.addEvent(secondEvent);
     es = eg.toString();
     assertTrue(es.contains("events=2"));

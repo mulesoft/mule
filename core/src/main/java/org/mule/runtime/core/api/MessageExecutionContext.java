@@ -18,7 +18,7 @@ import java.time.OffsetTime;
 public interface MessageExecutionContext {
 
   /**
-   * @return the unique id that identifies all {@link MuleEvent}s of the same context.
+   * @return the unique id that identifies a specifiec external request or message.
    */
   String getId();
 
@@ -48,4 +48,12 @@ public interface MessageExecutionContext {
    * @return a unique identifier of the server where events of this context are being processed.
    */
   String getServerId();
+
+  /**
+   * Internally the {@link #getCorrelationId()} within Mule will default to the value of {@link #getId()} if the source connector
+   * does not define one.  In some specific case it is important to know if the source system provied a correlation If or not.
+   *
+   * @return {@code true} if the source system provided a correlation if, {@code false otherwise}.
+   */
+  boolean isExternalCorrelationId();
 }

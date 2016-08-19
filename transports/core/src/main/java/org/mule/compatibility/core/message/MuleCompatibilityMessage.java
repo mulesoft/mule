@@ -25,11 +25,13 @@ import javax.activation.DataHandler;
 public class MuleCompatibilityMessage implements MuleMessage {
 
   private MuleMessage inner;
+  private String correlationId;
   private Correlation correlation;
 
-  public MuleCompatibilityMessage(MuleMessage inner, Correlation correlation) {
+  public MuleCompatibilityMessage(MuleMessage inner, Correlation correlation, String correlationId) {
     this.inner = inner;
     this.correlation = correlation;
+    this.correlationId = correlationId;
   }
 
   @Override
@@ -78,11 +80,6 @@ public class MuleCompatibilityMessage implements MuleMessage {
   }
 
   @Override
-  public String getUniqueId() {
-    return inner.getUniqueId();
-  }
-
-  @Override
   public Set<String> getOutboundPropertyNames() {
     return inner.getOutboundPropertyNames();
   }
@@ -90,11 +87,6 @@ public class MuleCompatibilityMessage implements MuleMessage {
   @Override
   public <T extends Serializable> T getInboundProperty(String name) {
     return inner.getInboundProperty(name);
-  }
-
-  @Override
-  public String getMessageRootId() {
-    return inner.getMessageRootId();
   }
 
   @Override
@@ -126,16 +118,31 @@ public class MuleCompatibilityMessage implements MuleMessage {
     return correlation;
   }
 
-  @Override
-  public int hashCode() {
-    return inner.hashCode();
+  public String getCorrelationId() {
+    return this.correlationId;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof MuleCompatibilityMessage)) {
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
     }
-    return this.getUniqueId().equals(((MuleCompatibilityMessage) obj).getUniqueId());
+
+    MuleCompatibilityMessage that = (MuleCompatibilityMessage) o;
+
+    if (!this.inner.equals(that.inner)) {
+      return false;
+    }
+    return this.correlation.equals(that.correlation);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = this.inner.hashCode();
+    result = 31 * result + this.correlation.hashCode();
+    return result;
   }
 }
