@@ -14,7 +14,7 @@
     </organization>
 
     <!-- Project -->
-    <name>Mule ESB</name>
+    <name>Mule Runtime</name>
     <description>
         Mule is the world's most widely used open source Enterprise Service
         Bus (ESB). Designed to support high-performance, multi-protocol transactions
