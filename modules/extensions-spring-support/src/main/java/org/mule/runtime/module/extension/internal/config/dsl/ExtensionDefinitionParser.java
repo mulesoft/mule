@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -43,6 +44,7 @@ import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -137,6 +139,7 @@ public abstract class ExtensionDefinitionParser {
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
       ImmutableList.of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
   private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
+  protected final MuleContext muleContext;
 
   /**
    * Creates a new instance
@@ -146,10 +149,11 @@ public abstract class ExtensionDefinitionParser {
    * @param parsingContext the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
   protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
-                                      ExtensionParsingContext parsingContext) {
+                                      ExtensionParsingContext parsingContext, MuleContext muleContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
     this.dslSyntaxResolver = dslSyntaxResolver;
     this.parsingContext = parsingContext;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -402,7 +406,7 @@ public abstract class ExtensionDefinitionParser {
           if (collectionItemDsl.get().supportsTopLevelDeclaration()) {
             try {
               new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslSyntaxResolver,
-                                            parsingContext).parse().forEach(definition -> addDefinition(definition));
+                                            parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
             }
@@ -436,13 +440,14 @@ public abstract class ExtensionDefinitionParser {
 
     if (isExpressionFunction(expectedType) && value != null) {
       resolver =
-          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt((ObjectType) expectedType, 1, typeLoader).get());
+          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt((ObjectType) expectedType, 1, typeLoader).get(),
+                                                muleContext);
     }
 
     final Class<Object> expectedClass = getType(expectedType);
     if (resolver == null) {
       if (isExpression(value, parser)) {
-        resolver = new TypeSafeExpressionValueResolver((String) value, expectedClass);
+        resolver = new TypeSafeExpressionValueResolver((String) value, expectedClass, muleContext);
       }
     }
 
@@ -472,9 +477,10 @@ public abstract class ExtensionDefinitionParser {
         @Override
         protected void defaultVisit(MetadataType metadataType) {
           ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-              .map(delegate -> delegate.parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType)))
+              .map(delegate -> delegate.parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType),
+                                              muleContext))
               .orElseGet(() -> acceptsReferences ? defaultValueResolverParsingDelegate
-                  .parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType))
+                  .parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType), muleContext)
                   : new StaticValueResolver<>(value));
 
           resolverValueHolder.set(delegateResolver);
@@ -578,7 +584,8 @@ public abstract class ExtensionDefinitionParser {
         && !parsingContext.isRegistered(elementName, elementNamespace)) {
       try {
         new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), elementName, elementNamespace, type, getContextClassLoader(),
-                                      dslSyntaxResolver, parsingContext).parse().forEach(definition -> addDefinition(definition));
+                                      dslSyntaxResolver, parsingContext, muleContext).parse()
+                                          .forEach(definition -> addDefinition(definition));
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
       }
@@ -593,7 +600,7 @@ public abstract class ExtensionDefinitionParser {
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "
             + getType(type).getName())));
 
-    addParameter(getChildKey(key), delegate.parse(name, type, elementDsl));
+    addParameter(getChildKey(key), delegate.parse(name, type, elementDsl, muleContext));
   }
 
   private <M extends MetadataType, T> Optional<ParsingDelegate<M, T>> locateParsingDelegate(List<? extends ParsingDelegate<M, T>> delegatesList,
@@ -708,7 +715,7 @@ public abstract class ExtensionDefinitionParser {
 
     Class<?> type = getType(dateType);
     if (isExpression(value, parser)) {
-      return new TypeSafeExpressionValueResolver((String) value, type);
+      return new TypeSafeExpressionValueResolver((String) value, type, muleContext);
     }
 
     if (value == null) {

@@ -11,6 +11,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
+
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -33,16 +34,14 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
 
   private final RuntimeExtensionModel extensionModel;
   private final RuntimeSourceModel sourceModel;
-  private final MuleContext muleContext;
   private final DslElementSyntax sourceDsl;
 
   public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
                                 RuntimeSourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                 ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+    super(definition, dslSyntaxResolver, parsingContext, muleContext);
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
-    this.muleContext = muleContext;
     this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
   }
 

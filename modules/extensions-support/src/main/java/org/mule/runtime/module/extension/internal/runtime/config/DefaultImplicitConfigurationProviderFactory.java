@@ -49,7 +49,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
 
     final String providerName = String.format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
     final ResolverSet resolverSet =
-        buildImplicitResolverSet(implicitConfigurationModel, muleContext.getExpressionManager());
+        buildImplicitResolverSet(implicitConfigurationModel, muleContext);
     try {
       ConfigurationInstance<C> configurationInstance =
           new ConfigurationInstanceFactory<C>(implicitConfigurationModel, resolverSet).createConfiguration(providerName, event,

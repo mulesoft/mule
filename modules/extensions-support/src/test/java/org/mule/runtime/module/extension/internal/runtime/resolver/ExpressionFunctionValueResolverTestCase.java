@@ -13,11 +13,12 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.function.Function;
@@ -28,7 +29,7 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
 
   private static final String INTEGER_EXPRESSION = "#[2+2]";
   private static final ExpressionFunction INTEGER_EXPRESSION_FUNCTION =
-      new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class));
+      new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
 
   private MuleEvent event;
   private DefaultExpressionManager expressionManager;
@@ -45,15 +46,15 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
   @Test
   public void testEqualExpressionFunctions() {
     assertThat(INTEGER_EXPRESSION_FUNCTION,
-               is(equalTo(new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class)))));
+               is(equalTo(new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext))));
   }
 
   @Test
   public void testNotEqualExpressionFunctions() {
-    ExpressionFunction anotherExpressionFunction = new ExpressionFunction("3", toMetadataType(Integer.class));
+    ExpressionFunction anotherExpressionFunction = new ExpressionFunction("3", toMetadataType(Integer.class), muleContext);
     assertThat(INTEGER_EXPRESSION_FUNCTION, is(not(equalTo(anotherExpressionFunction))));
 
-    anotherExpressionFunction = new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(String.class));
+    anotherExpressionFunction = new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(String.class), muleContext);
     assertThat(INTEGER_EXPRESSION_FUNCTION, is(not(equalTo(anotherExpressionFunction))));
   }
 
@@ -76,7 +77,7 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
   }
 
   public <T> Function<MuleEvent, T> getResolvedFunction(String expression, MetadataType type) throws MuleException {
-    return new ExpressionFunctionValueResolver<T>(expression, type).resolve(event);
+    return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(event);
   }
 
 }

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -21,8 +22,8 @@ import org.mule.metadata.api.builder.TypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
+import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -120,12 +121,14 @@ public abstract class ExtensionsTestUtils {
     });
   }
 
-  public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception {
-    return (C) getConfigurationInstanceFromRegistry(key, muleEvent).getValue();
+  public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent, MuleContext muleContext) throws Exception {
+    return (C) getConfigurationInstanceFromRegistry(key, muleEvent, muleContext).getValue();
   }
 
-  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception {
-    ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
+  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent,
+                                                                           MuleContext muleContext)
+      throws Exception {
+    ExtensionManager extensionManager = muleContext.getExtensionManager();
     return extensionManager.getConfiguration(key, muleEvent);
   }
 

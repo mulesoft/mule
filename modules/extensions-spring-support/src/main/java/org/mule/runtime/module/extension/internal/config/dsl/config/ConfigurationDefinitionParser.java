@@ -11,6 +11,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
+
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -32,15 +33,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 public final class ConfigurationDefinitionParser extends ExtensionDefinitionParser {
 
   private final RuntimeConfigurationModel configurationModel;
-  private final MuleContext muleContext;
   private final DslElementSyntax configDsl;
 
   public ConfigurationDefinitionParser(Builder definition, RuntimeConfigurationModel configurationModel,
                                        DslSyntaxResolver dslResolver, MuleContext muleContext,
                                        ExtensionParsingContext parsingContext) {
-    super(definition, dslResolver, parsingContext);
+    super(definition, dslResolver, parsingContext, muleContext);
     this.configurationModel = configurationModel;
-    this.muleContext = muleContext;
     this.configDsl = dslResolver.resolve(configurationModel);
   }
 

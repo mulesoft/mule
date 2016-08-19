@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
@@ -90,6 +91,6 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception {
-    return new TypeSafeExpressionValueResolver(expression, expectedType);
+    return new TypeSafeExpressionValueResolver(expression, expectedType, muleContext);
   }
 }

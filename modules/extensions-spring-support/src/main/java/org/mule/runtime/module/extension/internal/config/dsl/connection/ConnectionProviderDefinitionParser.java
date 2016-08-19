@@ -10,6 +10,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
@@ -31,15 +32,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 public final class ConnectionProviderDefinitionParser extends ExtensionDefinitionParser {
 
   private final ConnectionProviderModel providerModel;
-  private final MuleContext muleContext;
   private final DslElementSyntax connectionDsl;
 
   public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
                                             DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                             ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+    super(definition, dslSyntaxResolver, parsingContext, muleContext);
     this.providerModel = providerModel;
-    this.muleContext = muleContext;
     this.connectionDsl = dslSyntaxResolver.resolve(providerModel);
   }
 

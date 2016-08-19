@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.metadata.api.model.MetadataType;
 
 import java.util.function.Function;
 
@@ -21,15 +22,17 @@ public final class ExpressionFunctionValueResolver<T> implements ValueResolver<F
 
   private final String exp;
   private final MetadataType metadataType;
+  private final MuleContext muleContext;
 
-  public ExpressionFunctionValueResolver(String exp, MetadataType metadataType) {
+  public ExpressionFunctionValueResolver(String exp, MetadataType metadataType, MuleContext muleContext) {
     this.exp = exp;
     this.metadataType = metadataType;
+    this.muleContext = muleContext;
   }
 
   @Override
   public Function<MuleEvent, T> resolve(MuleEvent event) throws MuleException {
-    return new ExpressionFunction<>(exp, metadataType);
+    return new ExpressionFunction<>(exp, metadataType, muleContext);
   }
 
   @Override

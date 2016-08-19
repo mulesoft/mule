@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -30,15 +31,18 @@ import org.apache.commons.lang.StringUtils;
 public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
 
   private final String key;
+  private MuleContext muleContext;
 
   /**
    * Construct a new instance and set the {@link #key} that will be used to access the registry
    *
    * @param key a not blank {@link String}
+   * @param muleContext the Mule node
    */
-  public RegistryLookupValueResolver(String key) {
+  public RegistryLookupValueResolver(String key, MuleContext muleContext) {
     checkArgument(!StringUtils.isBlank(key), "key cannot be null or blank");
     this.key = key;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -51,7 +55,7 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    */
   @Override
   public T resolve(MuleEvent event) throws MuleException {
-    T value = event.getMuleContext().getRegistry().get(key);
+    T value = muleContext.getRegistry().get(key);
     if (value == null) {
       throw new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry", key)));
     }

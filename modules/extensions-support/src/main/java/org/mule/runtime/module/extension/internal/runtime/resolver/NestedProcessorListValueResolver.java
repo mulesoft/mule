@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -13,6 +14,8 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link MuleEvent} in a {@link List} of
@@ -24,13 +27,16 @@ public class NestedProcessorListValueResolver extends AbstractNestedProcessorVal
 
   private List<MessageProcessor> messageProcessors;
 
+  @Inject
+  private MuleContext muleContext;
+
   public NestedProcessorListValueResolver(List<MessageProcessor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
   public List<NestedProcessor> resolve(MuleEvent event) throws MuleException {
-    return messageProcessors.stream().map(mp -> toNestedProcessor(mp, event, event.getMuleContext()))
+    return messageProcessors.stream().map(mp -> toNestedProcessor(mp, event, muleContext))
         .collect(new ImmutableListCollector<>());
   }
 

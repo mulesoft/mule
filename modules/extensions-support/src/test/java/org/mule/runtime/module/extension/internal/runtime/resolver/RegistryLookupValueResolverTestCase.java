@@ -12,6 +12,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,20 +35,23 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleEvent event;
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
+
   private ValueResolver resolver;
 
   @Before
   public void before() throws Exception {
-    when(event.getMuleContext().getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
-    when(event.getMuleContext().getRegistry().get(FAKE_KEY)).thenReturn(null);
-    resolver = new RegistryLookupValueResolver(KEY);
+    when(muleContext.getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
+    when(muleContext.getRegistry().get(FAKE_KEY)).thenReturn(null);
+    resolver = new RegistryLookupValueResolver(KEY, muleContext);
   }
 
   @Test
   public void cache() throws Exception {
     Object value = resolver.resolve(event);
     assertThat(value, is(HELLO_WORLD));
-    verify(event.getMuleContext().getRegistry()).get(KEY);
+    verify(muleContext.getRegistry()).get(KEY);
   }
 
   @Test
@@ -56,16 +61,16 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void nullKey() {
-    new RegistryLookupValueResolver(null);
+    new RegistryLookupValueResolver(null, muleContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void blankKey() {
-    new RegistryLookupValueResolver("");
+    new RegistryLookupValueResolver("", muleContext);
   }
 
   @Test(expected = ConfigurationException.class)
   public void nonExistingKey() throws Exception {
-    new RegistryLookupValueResolver<>(FAKE_KEY).resolve(event);
+    new RegistryLookupValueResolver<>(FAKE_KEY, muleContext).resolve(event);
   }
 }

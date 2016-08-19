@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
@@ -60,7 +61,7 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void tls() throws Exception {
-    PetStoreConnector connector = getConfigurationFromRegistry(configName, getTestEvent(""));
+    PetStoreConnector connector = getConfigurationFromRegistry(configName, getTestEvent(""), muleContext);
     TlsContextFactory tls = connector.getTlsContext();
     assertThat(tls, is(notNullValue()));
 

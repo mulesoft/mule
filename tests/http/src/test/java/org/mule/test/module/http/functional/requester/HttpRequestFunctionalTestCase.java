@@ -18,6 +18,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.runtime.core.api.MuleEvent;
@@ -50,7 +51,8 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void requestConfigDefaultPortHttp() throws Exception {
     MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent);
+    ConfigurationInstance config =
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
     assertThat(provider.getPort().apply(testEvent), is(HTTP.getDefaultPort()));
@@ -59,7 +61,8 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void requestConfigDefaultPortHttps() throws Exception {
     MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
+    ConfigurationInstance config =
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
     assertThat(provider.getPort().apply(testEvent), is(HTTPS.getDefaultPort()));
@@ -68,7 +71,8 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
+    ConfigurationInstance config =
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
     assertThat(provider.getTlsContext(), notNullValue());

@@ -41,20 +41,22 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
 
   private final Class<?> expectedType;
   private final AttributeEvaluator evaluator;
-  private MuleContext muleContext;
-  private EvaluatorDelegate delegate = new CaptureContextEvaluatorDelegate();
+  private final MuleContext muleContext;
 
-  public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType) {
+  public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType, MuleContext muleContext) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
     checkArgument(expectedType != null, "expected type cannot be null");
 
     this.expectedType = expectedType;
     evaluator = new AttributeEvaluator(expression);
+    evaluator.initialize(muleContext.getExpressionManager());
+
+    this.muleContext = muleContext;
   }
 
   @Override
   public T resolve(MuleEvent event) throws MuleException {
-    T evaluated = (T) delegate.resolveValue(event);
+    T evaluated = (T) evaluator.resolveValue(event);
     return evaluated != null ? transform(evaluated, event) : null;
   }
 
@@ -104,25 +106,4 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     Object resolveValue(MuleEvent event);
   }
 
-  private class CaptureContextEvaluatorDelegate implements EvaluatorDelegate {
-
-    @Override
-    public synchronized Object resolveValue(MuleEvent event) {
-      if (muleContext == null) {
-        muleContext = event.getMuleContext();
-        evaluator.initialize(muleContext.getExpressionManager());
-        delegate = new PassThroughEvaluatorDelegate();
-      }
-
-      return delegate.resolveValue(event);
-    }
-  }
-
-  private class PassThroughEvaluatorDelegate implements EvaluatorDelegate {
-
-    @Override
-    public Object resolveValue(MuleEvent event) {
-      return evaluator.resolveValue(event);
-    }
-  }
 }

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.utils;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
@@ -34,17 +34,18 @@ public final class ImplicitObjectUtils {
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
    * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
-   * @param expressionManager a {@link ExpressionManager} for the default values which are expressions
+   * @param muleContext the Mule node.
    * @return a {@link ResolverSet}
    */
-  public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, ExpressionManager expressionManager) {
+  public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
     for (ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
       if (defaultValue != null) {
         ValueResolver<Object> valueResolver;
         if (defaultValue instanceof String && parameterModel.getExpressionSupport() != ExpressionSupport.LITERAL) {
-          valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()));
+          valueResolver =
+              new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()), muleContext);
         } else {
           valueResolver = new StaticValueResolver<>(defaultValue);
         }

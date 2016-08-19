@@ -26,6 +26,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -82,7 +83,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithReturnValueAndWithoutParameters() throws Exception {
-    assertThat(HEISENBERG, is((Object) runFlow("sayMyName").getMessage().getPayload()));
+    assertThat(HEISENBERG, equalTo(runFlow("sayMyName").getMessage().getPayload()));
   }
 
   @Test
@@ -110,12 +111,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithFixedParameter() throws Exception {
-    assertThat(GUSTAVO_FRING, is((Object) runFlow("getFixedEnemy").getMessage().getPayload()));
+    assertThat(GUSTAVO_FRING, equalTo(runFlow("getFixedEnemy").getMessage().getPayload()));
   }
 
   @Test
   public void operationWithDefaulValueParameter() throws Exception {
-    assertThat(GUSTAVO_FRING, is((Object) runFlow("getDefaultEnemy").getMessage().getPayload()));
+    assertThat(GUSTAVO_FRING, equalTo(runFlow("getDefaultEnemy").getMessage().getPayload()));
   }
 
   @Test
@@ -397,6 +398,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(""));
+    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(""), muleContext);
   }
 }

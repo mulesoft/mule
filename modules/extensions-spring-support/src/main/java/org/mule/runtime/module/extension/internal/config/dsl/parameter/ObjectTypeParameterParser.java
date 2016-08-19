@@ -12,6 +12,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -20,6 +21,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
@@ -47,8 +49,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String namespace;
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context) {
-    super(definition, dslSyntaxResolver, context);
+                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context,
+                                   MuleContext muleContext) {
+    super(definition, dslSyntaxResolver, context, muleContext);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslSyntaxResolver.resolve(type);
@@ -57,8 +60,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   }
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context) {
-    super(definition, dslSyntaxResolver, context);
+                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context,
+                                   MuleContext muleContext) {
+    super(definition, dslSyntaxResolver, context, muleContext);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslSyntaxResolver.resolve(type);
