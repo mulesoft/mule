@@ -9,6 +9,7 @@ package org.mule.runtime.core.api;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -69,7 +70,7 @@ public class MessagingException extends MuleException {
     super();
     this.event = event;
     extractMuleMessage(event);
-    setMessage(generateMessage(message, event.getMuleContext()));
+    setMessage(generateMessage(message, null));
   }
 
   public MessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
@@ -77,7 +78,7 @@ public class MessagingException extends MuleException {
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
-    setMessage(generateMessage(message, event.getMuleContext()));
+    setMessage(generateMessage(message, null));
   }
 
   /**
@@ -95,7 +96,7 @@ public class MessagingException extends MuleException {
     super(cause);
     this.event = event;
     extractMuleMessage(event);
-    setMessage(generateMessage(message, event.getMuleContext()));
+    setMessage(generateMessage(message, null));
   }
 
   public MessagingException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
@@ -103,14 +104,14 @@ public class MessagingException extends MuleException {
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
-    setMessage(generateMessage(message, event.getMuleContext()));
+    setMessage(generateMessage(message, null));
   }
 
   public MessagingException(MuleEvent event, Throwable cause) {
     super(cause);
     this.event = event;
     extractMuleMessage(event);
-    setMessage(generateMessage(getI18nMessage(), event.getMuleContext()));
+    setMessage(generateMessage(getI18nMessage(), null));
   }
 
   public MessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
@@ -118,7 +119,7 @@ public class MessagingException extends MuleException {
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
-    setMessage(generateMessage(getI18nMessage(), event.getMuleContext()));
+    setMessage(generateMessage(getI18nMessage(), null));
   }
 
   protected String generateMessage(Message message, MuleContext muleContext) {
@@ -137,11 +138,15 @@ public class MessagingException extends MuleException {
         } else {
           if (payload != null) {
             addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getDataType().getType().getName());
-            try {
-              addInfo(PAYLOAD_INFO_KEY,
-                      muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
-            } catch (Exception e) {
-              addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
+            if (muleContext != null) {
+              // TODO MULE-10266 review how the transformationService is obtained when building an exception.
+              try {
+                addInfo(PAYLOAD_INFO_KEY,
+                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
+              } catch (Exception e) {
+                addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
+              }
+              addInfo(PAYLOAD_INFO_KEY, muleMessage.toString());
             }
           } else {
             addInfo(PAYLOAD_TYPE_INFO_KEY, Objects.toString(null));
