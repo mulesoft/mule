@@ -50,9 +50,9 @@ public class MuleSoapHeaders {
    * @param event
    */
   public MuleSoapHeaders(MuleEvent event) {
-    //if(!((DefaultMuleEvent)event).getLegacyCorrelationId().isEmpty()) {
-    //  setCorrelationId(((DefaultMuleEvent)event).getLegacyCorrelationId());
-    //}
+    if (event.getExecutionContext().isExternalCorrelationId()) {
+      setCorrelationId(event.getExecutionContext().getCorrelationId());
+    }
     event.getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
     event.getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
   }

@@ -47,6 +47,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -355,64 +356,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.transacted = transacted;
     this.synchronous = resolveEventSynchronicity() && replyToHandler == null;
     this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
-<<<<<<< d2ad9fd4308bb21c743b2522e59bfb22f9bbf993
-||||||| merged common ancestors
-    this.outputStream = outputStream;
-  }
-
-  // Constructor with everything just in case
-
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, URI messageSourceURI,
-                          String messageSourceName, MessageExchangePattern exchangePattern, FlowConstruct flowConstruct,
-                          MuleSession session, Credentials credentials, OutputStream outputStream,
-                          boolean transacted, boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler) {
-    this.executionContext = executionContext;
-    this.correlation = new Correlation(null, null, null);
-    this.id = generateEventId(flowConstruct.getMuleContext());
-    this.flowConstruct = flowConstruct;
-    this.session = session;
-    setMessage(message);
-
-    this.credentials = credentials;
-    this.exchangePattern = exchangePattern;
-    this.messageSourceURI = messageSourceURI;
-    this.messageSourceName = messageSourceName;
-    this.processingTime = ProcessingTime.newInstance(this);
-    this.replyToHandler = replyToHandler;
-    this.replyToDestination = replyToDestination;
-    this.transacted = transacted;
-    this.synchronous = synchronous;
-    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
-    this.outputStream = outputStream;
-=======
-    this.outputStream = outputStream;
-  }
-
-  // Constructor with everything just in case
-
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, URI messageSourceURI,
-                          String messageSourceName, MessageExchangePattern exchangePattern, FlowConstruct flowConstruct,
-                          MuleSession session, Credentials credentials, OutputStream outputStream,
-                          boolean transacted, boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler) {
-    this.executionContext = executionContext;
-    this.correlation = NO_CORRELATION;
-    this.id = generateEventId(flowConstruct.getMuleContext());
-    this.flowConstruct = flowConstruct;
-    this.session = session;
-    setMessage(message);
-
-    this.credentials = credentials;
-    this.exchangePattern = exchangePattern;
-    this.messageSourceURI = messageSourceURI;
-    this.messageSourceName = messageSourceName;
-    this.processingTime = ProcessingTime.newInstance(this);
-    this.replyToHandler = replyToHandler;
-    this.replyToDestination = replyToDestination;
-    this.transacted = transacted;
-    this.synchronous = synchronous;
-    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
-    this.outputStream = outputStream;
->>>>>>> MULE-10122 Review messageId, rootId, parentMessage and event.id for tracking of message through Flow.
   }
 
   protected boolean resolveEventSynchronicity() {
@@ -782,7 +725,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * @param exchangePattern
    * @param name
    * @param uri
-   * @param timeout
    * @param transacted
    */
   @Deprecated

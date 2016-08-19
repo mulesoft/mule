@@ -30,7 +30,7 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
    * @param flow the flow that processes events of this context. 
    */
   public static MessageExecutionContext create(FlowConstruct flow) {
-    return create(flow, flow.getMuleContext().getUniqueIdString());
+    return create(flow, null);
   }
 
   /**
@@ -76,6 +76,11 @@ public final class DefaultMessageExecutionContext implements MessageExecutionCon
   @Override
   public String getServerId() {
     return serverId;
+  }
+
+  @Override
+  public boolean isExternalCorrelationId() {
+    return correlationId != null;
   }
 
   /**

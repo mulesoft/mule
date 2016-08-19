@@ -125,6 +125,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         public String getFlowName() {
           return "";
         }
+
+        @Override
+        public boolean isExternalCorrelationId() {
+          return false;
+        }
       };
     }
 
