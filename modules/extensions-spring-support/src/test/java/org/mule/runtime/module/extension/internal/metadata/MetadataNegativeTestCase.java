@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -33,6 +35,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   private static final String LOGGER_FLOW = "loggerFlow";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String FLOW_WITHOUT_SOURCE = "flowWithoutSource";
+  private static final String CONFIGURATION_CANNOT_BE_DYNAMIC = "Configuration used for Metadata fetch cannot be dynamic";
 
   @Override
   protected String getConfigFile() {
@@ -87,6 +90,24 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   }
 
   @Test
+  public void failToGetMetadataFromNonExistingConfig() throws IOException {
+    String configName = "nonexisting-config";
+    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult = metadataManager.getMetadataKeys(configName);
+
+    assertFailure(metadataKeysResult, format("Configuration named [%s] doesn't exist", configName), FailureCode.UNKNOWN,
+                  InvalidComponentIdException.class.getName());
+  }
+
+  @Test
+  public void failToGetMetadataFromDynamicConfig() throws IOException {
+    final String configName = "dynamic-config";
+    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult = metadataManager.getMetadataKeys(configName);
+
+    assertFailure(metadataKeysResult, CONFIGURATION_CANNOT_BE_DYNAMIC, FailureCode.INVALID_CONFIGURATION,
+                  MetadataResolvingException.class.getName());
+  }
+
+  @Test
   public void processorIsNotMetadataAware() throws Exception {
     componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
@@ -106,7 +127,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     componentId = new ProcessorId(RESOLVER_WITH_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
     MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
     MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, key);
-    assertFailure(result, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION,
+    assertFailure(result, CONFIGURATION_CANNOT_BE_DYNAMIC, FailureCode.INVALID_CONFIGURATION,
                   MetadataResolvingException.class.getName());
   }
 

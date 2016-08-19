@@ -8,11 +8,11 @@ package org.mule.runtime.core.internal.metadata;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyAware;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -50,12 +51,18 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
   private static final String EXCEPTION_RESOLVING_COMPONENT_METADATA =
       "An exception occurred while resolving metadata for component '%s'";
   private static final String COMPONENT_NOT_METADATA_AWARE = "Component is not MetadataAware, no information available";
+  private static final String COMPONENT_NOT_METADATA_KEY_AWARE = "Component is not MetadataKeyAware, no information available";
   private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Component MetadataKeys";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
+  private static final String CONFIG_NOT_FOUND = "Configuration named [%s] doesn't exist";
+
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  protected ConnectionManagerAdapter connectionManager;
 
   private final LoadingCache<String, MetadataCache> caches;
 
@@ -98,6 +105,17 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
   @Override
   public MetadataResult<Set<MetadataKey>> getMetadataKeys(ComponentId componentId) {
     return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadataKeys, EXCEPTION_RESOLVING_METADATA_KEYS);
+  }
+
+  @Override
+  public MetadataResult<Map<String, Set<MetadataKey>>> getMetadataKeys(String configName) {
+    try {
+      return findMetadataKeyAwareComponent(configName).getMetadataKeys();
+    } catch (InvalidComponentIdException e) {
+      return MetadataResult.failure(e);
+    } catch (Exception e) {
+      return MetadataResult.failure(null, format("%s: %s", EXCEPTION_RESOLVING_METADATA_KEYS, e.getMessage()), e);
+    }
   }
 
   /**
@@ -172,6 +190,20 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
       }
     } catch (ClassCastException e) {
       throw new InvalidComponentIdException(createStaticMessage(COMPONENT_NOT_METADATA_AWARE), e);
+    }
+  }
+
+  private MetadataKeyAware findMetadataKeyAwareComponent(String configName) throws InvalidComponentIdException {
+    try {
+      MetadataKeyAware configurationProvider = muleContext.getRegistry().lookupObject(configName);
+
+      if (configurationProvider != null) {
+        return configurationProvider;
+      } else {
+        throw new InvalidComponentIdException(createStaticMessage(format(CONFIG_NOT_FOUND, configName)));
+      }
+    } catch (ClassCastException e) {
+      throw new InvalidComponentIdException(createStaticMessage(COMPONENT_NOT_METADATA_KEY_AWARE), e);
     }
   }
 

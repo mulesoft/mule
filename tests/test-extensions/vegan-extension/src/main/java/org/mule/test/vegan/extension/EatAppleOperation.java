@@ -7,9 +7,11 @@
 package org.mule.test.vegan.extension;
 
 
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.tck.testmodels.fruit.Apple;
 
+@MetadataScope(keysResolver = AppleKeyResolver.class)
 public class EatAppleOperation {
 
   public Apple eatApple(@Connection Apple apple) {
