@@ -258,6 +258,7 @@
 /mule-standalone-${productVersion}/lib/opt/jackson-databind-2.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
+/mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.9.jar
@@ -310,7 +311,6 @@
 /mule-standalone-${productVersion}/lib/opt/plexus-utils-3.0.22.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
-/mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-3.jar
