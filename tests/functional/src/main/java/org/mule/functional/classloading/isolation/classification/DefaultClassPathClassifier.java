@@ -20,21 +20,20 @@ import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifierContext;
-import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
-import org.mule.functional.classloading.isolation.classpath.MavenArtifactToClassPathUrlsResolver;
-import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
 import org.mule.functional.api.classloading.isolation.Configuration;
 import org.mule.functional.api.classloading.isolation.DependenciesFilter;
 import org.mule.functional.api.classloading.isolation.DependencyResolver;
+import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
+import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
 import org.mule.functional.api.classloading.isolation.TransitiveDependenciesFilter;
-import org.mule.functional.junit4.ExtensionsTestInfrastructureDiscoverer;
+import org.mule.functional.classloading.isolation.classpath.MavenArtifactToClassPathUrlsResolver;
+import org.mule.functional.junit4.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 
@@ -156,6 +155,9 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
       logger.debug("Extensions found, plugin class loaders would be created for each extension");
       Set<String> extensionsAnnotatedClassesNoDups =
           extensionsAnnotatedClasses.stream().map(beanDefinition -> beanDefinition.getBeanClassName()).collect(toSet());
+
+      ExtensionsTestInfrastructureDiscoverer extensionsInfrastructure =
+          new ExtensionsTestInfrastructureDiscoverer(createExtensionManager());
       for (String extensionClassName : extensionsAnnotatedClassesNoDups) {
         logger.debug("Classifying classpath for extension class: '{}'", extensionClassName);
         Class extensionClass;
@@ -171,8 +173,14 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
                                         extendedContext.getClassificationContext().getMavenMultiModuleArtifactMapping());
         isRootArtifactIdAnExtension |= extendedContext.getRootArtifact().getArtifactId().equals(extensionMavenArtifactId);
 
-        pluginClassifications.add(extensionClassPathClassification(extensionClass, extensionMavenArtifactId, extendedContext));
+        pluginClassifications.add(extensionClassPathClassification(extensionsInfrastructure, extensionClass,
+                                                                   extensionMavenArtifactId, extendedContext));
       }
+
+      File generatedResourcesDirectory = new File(getGeneratedResourcesBase(extendedContext), separator + "META-INF");
+      generatedResourcesDirectory.mkdirs();
+      extensionsInfrastructure.generateDslResources(generatedResourcesDirectory);
+
     } else {
       logger.debug("There are no extensions in the classpath, exportClasses would be ignored");
     }
@@ -295,13 +303,16 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
    * It creates the resources for the given extension and does the classification of dependencies for the given extension and its
    * artifactId in order to collect the URLs to be used for the plugin {@link ClassLoader} for the extension.
    *
+   *
+   * @param extensionsInfrastructure the {@link ExtensionsTestInfrastructureDiscoverer} for the current context
    * @param extension the extension {@link Class} that is annotated with {@link Extension}
    * @param extensionMavenArtifactId the maven artifactId for the current extension being classified
    * @param extendedContext {@link ExtendedClassPathClassifierContext} that holds the data needed for classifying the artifacts
    * @return a {@link PluginUrlClassification} with the list of {@link URL}s defined to be included in this extension
    *         {@link ClassLoader}
    */
-  private PluginUrlClassification extensionClassPathClassification(final Class extension, final String extensionMavenArtifactId,
+  private PluginUrlClassification extensionClassPathClassification(final ExtensionsTestInfrastructureDiscoverer extensionsInfrastructure,
+                                                                   final Class extension, final String extensionMavenArtifactId,
                                                                    final ExtendedClassPathClassifierContext extendedContext) {
     logger.debug("Extension classification for extension class: '{}', using artifactId: '{}'", extension.getName(),
                  extensionMavenArtifactId);
@@ -310,12 +321,12 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
     // First we need to add META-INF folder for generated resources due to they may be already created by another mvn install goal
     // by the extension maven plugin
     File generatedResourcesDirectory =
-        new File(extendedContext.getClassificationContext().getRootArtifactTestClassesFolder(),
-                 GENERATED_TEST_SOURCES + separator + extensionMavenArtifactId + separator + "META-INF");
+        new File(getGeneratedResourcesBase(extendedContext), extensionMavenArtifactId + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
-    ExtensionsTestInfrastructureDiscoverer extensionDiscoverer =
-        new ExtensionsTestInfrastructureDiscoverer(createExtensionManager(), generatedResourcesDirectory);
-    extensionDiscoverer.discoverExtensions(new Describer[0], new Class[] {extension});
+
+    extensionsInfrastructure.generateLoaderResources(extensionsInfrastructure.discoverExtension(extension),
+                                                     generatedResourcesDirectory);
+
     try {
       // Registering parent file as resource to be used from the configuration
       extensionURLs.add(generatedResourcesDirectory.getParentFile().toURI().toURL());
@@ -356,6 +367,11 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
             .collect(toList());
 
     return new PluginUrlClassification(extension.getName(), extensionURLs, exportClassesForExtension);
+  }
+
+  public File getGeneratedResourcesBase(ExtendedClassPathClassifierContext extendedContext) {
+    return new File(extendedContext.getClassificationContext().getRootArtifactTestClassesFolder(),
+                    GENERATED_TEST_SOURCES + separator);
   }
 
   /**

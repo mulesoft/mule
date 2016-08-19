@@ -310,6 +310,7 @@
 /mule-standalone-${productVersion}/lib/opt/plexus-utils-3.0.22.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
+/mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-3.jar

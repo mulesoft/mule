@@ -63,10 +63,10 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   static final Map<String, RuntimeExtensionModel> extensionModels = new HashMap<>();
 
   @Parameterized.Parameter(0)
-  private ExtensionModel extensionUnderTest;
+  public ExtensionModel extensionUnderTest;
 
   @Parameterized.Parameter(1)
-  private String expectedXSD;
+  public String expectedXSD;
 
   private SchemaGenerator generator;
   private String expectedSchema;

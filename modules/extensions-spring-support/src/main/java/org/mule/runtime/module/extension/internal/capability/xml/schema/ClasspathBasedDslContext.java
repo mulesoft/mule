@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.util.annotation.AnnotationUtils.getAnnotation;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
-import static org.reflections.util.ClasspathHelper.forJavaClassPath;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
@@ -67,25 +67,22 @@ class ClasspathBasedDslContext implements DslResolvingContext {
     return Optional.ofNullable(resolvedModels.get(name));
   }
 
-
   private void findExtensionsInClasspath() {
 
-    // default classpath for testing environment, were the extension classloader is not useful
-    Set<Class<?>> annotated = getExtensionTypes(forJavaClassPath());
-
-    if (annotated.isEmpty()) {
-      // we are building an standalone extension, thus the classloader of the extension is required
-      annotated = getExtensionTypes(forClassLoader(classLoader));
-    }
+    Set<Class<?>> annotated = getExtensionTypes(forClassLoader(classLoader));
 
     annotated.forEach(type -> getAnnotation(type, Extension.class)
         .ifPresent(extension -> extensionsByName.put(extension.name(), type)));
   }
 
   private Set<Class<?>> getExtensionTypes(Collection<URL> urls) {
-    return new Reflections(new ConfigurationBuilder()
-        .setUrls(urls)
-        .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()))
-            .getTypesAnnotatedWith(Extension.class);
+    try {
+      return new Reflections(new ConfigurationBuilder()
+          .setUrls(urls)
+          .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()))
+              .getTypesAnnotatedWith(Extension.class);
+    } catch (Exception e) {
+      return emptySet();
+    }
   }
 }

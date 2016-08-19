@@ -9,9 +9,13 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
+import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -22,11 +26,24 @@ import java.util.Properties;
  *
  * @since 4.0
  */
-abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory {
+abstract class AbstractXmlResourceFactory implements DslResourceFactory {
+
+
+  @Override
+  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+    DslResolvingContext dslContext = extensionModel.getModelProperty(ImportedTypesModelProperty.class).isPresent()
+        ? new ClasspathBasedDslContext(
+                                       extensionModel.getModelProperty(ImplementingTypeModelProperty.class)
+                                           .map(mp -> mp.getType().getClassLoader())
+                                           .orElse(Thread.currentThread().getContextClassLoader()))
+        : name -> Optional.empty();
+
+    return generateResource(extensionModel, dslContext);
+  }
 
   /**
    * Tests the given {@code extensionModel} to be enriched with the {@link XmlModelProperty}. If the property is present, then it
-   * delegates into {@link #generateXmlResource(ExtensionModel, XmlModelProperty)}.
+   * delegates into {@link #generateXmlResource(ExtensionModel, XmlModelProperty, DslResolvingContext)}.
    * <p>
    * Otherwise, it returns {@link Optional#empty()}
    *
@@ -34,10 +51,10 @@ abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory {
    * @return an {@link Optional} {@link GeneratedResource}
    */
   @Override
-  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel, DslResolvingContext context) {
     XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
 
-    return xmlProperty == null ? empty() : of(generateXmlResource(extensionModel, xmlProperty));
+    return xmlProperty == null ? empty() : of(generateXmlResource(extensionModel, xmlProperty, context));
   }
 
   /**
@@ -45,9 +62,11 @@ abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory {
    *
    * @param extensionModel the {@link ExtensionModel} that requires the resource
    * @param xmlModelProperty the extension's {@link XmlModelProperty}
+   * @param context
    * @return a {@link GeneratedResource}
    */
-  protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty);
+  protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
+                                                           DslResolvingContext context);
 
   /**
    * Escapes special characters for the {@link Properties} class that Spring uses to parse the bundle.
