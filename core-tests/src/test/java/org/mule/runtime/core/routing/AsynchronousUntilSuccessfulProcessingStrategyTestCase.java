@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -335,13 +336,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     failRoute = failCallback;
     routeCountDownLatch = new CountDownLatch(DEFAULT_TRIES);
     AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    processingStrategy.route(mockEvent);
+    processingStrategy.route(mockEvent, mock(FlowConstruct.class));
   }
 
   private void executeUntilSuccessful() throws Exception {
     routeCountDownLatch = new Latch();
     AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    processingStrategy.route(mockEvent);
+    processingStrategy.route(mockEvent, mock(FlowConstruct.class));
   }
 
   private void configureMockRouteToCountDownRouteLatch() throws MuleException {

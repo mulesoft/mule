@@ -111,7 +111,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
 
   @Override
   protected boolean accept(MuleEvent event) {
-    if (event != null && acceptMessageForFlowConstruct(event) && isNewMessage(event)) {
+    if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
         String value = getValueForEvent(event);
@@ -132,17 +132,6 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
         return false;
       }
     } else {
-      return false;
-    }
-  }
-
-  protected boolean acceptMessageForFlowConstruct(MuleEvent event) {
-    if (flowConstruct.getName().equals(event.getFlowConstruct().getName())) {
-      return true;
-    } else {
-      logger.error("This IdempotentMessageFilter was configured on the service: " + storePrefix
-          + " but has received an event for service: " + flowConstruct.getName()
-          + ". Please check your config to make sure each service" + "has its own instance of IdempotentMessageFilter.");
       return false;
     }
   }

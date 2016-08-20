@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.DefaultMuleEvent.*;
+import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.construct.Flow;
 
 /**
  * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing
@@ -43,7 +42,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
   }
 
   protected boolean isNonBlocking(MuleEvent event) {
-    return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+    return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
   }
 
   @Override

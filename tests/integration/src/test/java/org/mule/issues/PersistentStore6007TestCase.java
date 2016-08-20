@@ -79,7 +79,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
         MuleEvent event =
             new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(str).build(), ONE_WAY, flow,
                                  new DefaultMuleSession());
-        events.put(buildQueueKey(event, muleContext), event);
+        events.put(buildQueueKey(event, getTestFlow(), muleContext), event);
       }
     }
 

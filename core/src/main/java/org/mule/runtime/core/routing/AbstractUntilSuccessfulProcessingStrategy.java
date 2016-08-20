@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
@@ -93,12 +94,12 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
   }
 
   @Override
-  public MuleEvent route(MuleEvent event) throws MessagingException {
+  public MuleEvent route(MuleEvent event, FlowConstruct flow) throws MessagingException {
     prepareAndValidateEvent(event);
-    return doRoute(event);
+    return doRoute(event, flow);
   }
 
-  protected abstract MuleEvent doRoute(final MuleEvent event) throws MessagingException;
+  protected abstract MuleEvent doRoute(final MuleEvent event, FlowConstruct flow) throws MessagingException;
 
   private void prepareAndValidateEvent(final MuleEvent event) throws MessagingException {
     try {

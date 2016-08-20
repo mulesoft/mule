@@ -7,11 +7,13 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -31,7 +33,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event) throws MessagingException {
+  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MessagingException {
     Exception lastExecutionException = null;
     MuleEvent retryEvent = copyEventForRetry(event);
     try {

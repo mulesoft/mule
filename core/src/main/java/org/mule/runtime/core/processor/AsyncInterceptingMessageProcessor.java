@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -13,7 +16,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
-import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -126,12 +128,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
   }
 
   protected void fireAsyncScheduledNotification(MuleEvent event) {
-    if (event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
-      muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next,
-                                                         AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
-    }
-
+    muleContext.getNotificationManager()
+        .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next, PROCESS_ASYNC_SCHEDULED));
   }
 
   @Override
@@ -183,11 +181,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   protected void firePipelineNotification(MuleEvent event, MessagingException exception) {
     // Async completed notification uses same event instance as async listener
-    if (event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
-      muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next,
-                                                         AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, exception));
-    }
+    muleContext.getNotificationManager()
+        .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next, PROCESS_ASYNC_COMPLETE, exception));
   }
 
 }

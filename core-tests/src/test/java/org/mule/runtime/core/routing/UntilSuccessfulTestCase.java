@@ -176,7 +176,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testPreExistingEvents() throws Exception {
     final MuleEvent testEvent = getTestEvent("test_data");
-    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, muleContext), testEvent);
+    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(), muleContext),
+                      testEvent);
     untilSuccessful.initialise();
     untilSuccessful.start();
     ponderUntilEventProcessed(testEvent);
