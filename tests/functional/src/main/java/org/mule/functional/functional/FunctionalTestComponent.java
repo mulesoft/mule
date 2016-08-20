@@ -6,10 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -47,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
 public class FunctionalTestComponent
-    implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable, Startable, Stoppable {
+    implements Callable, Initialisable, Disposable, MuleContextAware, Startable, Stoppable {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -138,26 +135,7 @@ public class FunctionalTestComponent
   }
 
   /**
-   * This method is used by some WebServices tests where you don' want to be introducing the
-   * {@link org.mule.runtime.core.api.MuleEventContext} as a complex type.
-   *
-   * @param data the event data received
-   * @return the processed message
-   * @throws Exception
-   */
-  @Override
-  public Object onReceive(Object data) throws Exception {
-    MuleEventContext context = new DefaultMuleEventContext(getCurrentEvent());
-
-    if (isThrowException()) {
-      throwException();
-    }
-    return process(data, context);
-  }
-
-
-  /**
-   * Always throws a {@link FunctionalTestException}. This methodis only called if {@link #isThrowException()} is true.
+   * Always throws a {@link FunctionalTestException}. This method is only called if {@link #isThrowException()} is true.
    *
    * @throws FunctionalTestException or the exception specified in 'exceptionType
    */
@@ -220,7 +198,7 @@ public class FunctionalTestComponent
       StringBuilder sb = new StringBuilder();
 
       sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-      sb.append((Object) message.getPayload()).append(SystemUtils.LINE_SEPARATOR);
+      sb.append(message.getPayload().toString()).append(SystemUtils.LINE_SEPARATOR);
       sb.append(StringMessageUtils.headersToString(message));
       logger.info(sb.toString());
     }

@@ -6,11 +6,8 @@
  */
 package org.mule.compatibility.transport.http.issues;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestNotification;
-import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -89,49 +86,6 @@ public class NoTransformFunctionalTestComponent implements Callable, MuleContext
    */
   public static String received(String contents) {
     return contents + " Received";
-  }
-
-  /**
-   * @param data the event data received
-   * @return the processed message
-   * @throws Exception
-   *
-   * @deprecated Not sure why we have this duplicate method here. Need to investigate...
-   */
-  @Deprecated
-  public Object onReceive(Object data) throws Exception {
-    MuleEventContext context = new DefaultMuleEventContext(getCurrentEvent());
-
-    String contents = data.toString();
-    String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
-        + context.getFlowConstruct().getName() + ". Content is: "
-        + StringMessageUtils.truncate(contents, 100, true), '*', 80);
-
-    logger.info(msg);
-
-    if (eventCallback != null) {
-      eventCallback.eventReceived(context, this, muleContext);
-    }
-
-    Object replyMessage;
-    if (returnMessage != null) {
-      replyMessage = returnMessage;
-    } else {
-      replyMessage = contents + " Received";
-    }
-
-    muleContext
-        .fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
-
-    if (throwException) {
-      if (returnMessage != null && returnMessage instanceof Exception) {
-        throw (Exception) returnMessage;
-      } else {
-        throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Service Exception"));
-      }
-    }
-
-    return replyMessage;
   }
 
   /**

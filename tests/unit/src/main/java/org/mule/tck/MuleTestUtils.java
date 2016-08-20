@@ -10,9 +10,6 @@ import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -35,6 +32,9 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -201,7 +201,7 @@ public final class MuleTestUtils {
     try {
       final MuleEvent event = getTestEvent(data, mep, context);
       setCurrentEvent(event);
-      return new DefaultMuleEventContext(event);
+      return new DefaultMuleEventContext(getTestFlow(context), event);
     } finally {
       setCurrentEvent(null);
     }
