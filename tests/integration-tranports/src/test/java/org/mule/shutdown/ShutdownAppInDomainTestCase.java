@@ -9,8 +9,8 @@ package org.mule.shutdown;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.infrastructure.report.HeapDumpOnFailure;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -25,16 +26,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Tests that threads in pools defined in a domain do not hold references to objects of the application in their thread locals.
  */
+@Ignore("MULE-10335")
 public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
 
   private static final int PROBER_POLLING_INTERVAL = 100;
   private static final int PROBER_POLIING_TIMEOUT = 5000;
   private static final int MESSAGE_TIMEOUT = 2000;
+
+  @Rule
+  public HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
 
   private static final Set<PhantomReference<MuleEvent>> requestContextRefs = new HashSet<>();
 

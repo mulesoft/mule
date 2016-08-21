@@ -17,6 +17,8 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import org.junit.Test;
 
@@ -37,7 +39,14 @@ public class DefaultRetryPolicyAsyncTestCase extends FunctionalTestCase {
     assertThat(rpf, instanceOf(AsynchronousRetryTemplate.class));
     assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) rpf).getDelegate()).getCount(), is(3));
 
-    assertThat(c.isConnected(), is(true));
-    assertThat(c.isStarted(), is(true));
+    new PollingProber(500, 10).check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(c.isConnected(), is(true));
+        assertThat(c.isStarted(), is(true));
+        return true;
+      }
+    });
   }
 }

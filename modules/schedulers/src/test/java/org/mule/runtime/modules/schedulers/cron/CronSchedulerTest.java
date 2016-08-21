@@ -8,17 +8,16 @@ package org.mule.runtime.modules.schedulers.cron;
 
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.source.polling.PollingTask;
+import org.mule.runtime.core.source.polling.PollingWorker;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.runtime.core.source.polling.PollingTask;
-import org.mule.runtime.core.source.polling.PollingWorker;
 
 import java.util.TimeZone;
 
@@ -56,11 +55,8 @@ public class CronSchedulerTest extends AbstractMuleContextTestCase {
     scheduler.start();
     scheduler.stop();
 
-    reset(mockPollingWorker);
-
-    verify(mockPollingWorker, never()).run();
-
     scheduler.start();
+    reset(mockPollingWorker);
     scheduler.schedule();
 
     pollingProber.check(new Probe() {
