@@ -58,6 +58,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
     filter.setResourceResolver(new Resolver());
     filter.setReturnResult(true);
     filter.setMuleContext(muleContext);
+    filter.setFlowConstruct(getTestFlow());
     filter.initialise();
   }
 

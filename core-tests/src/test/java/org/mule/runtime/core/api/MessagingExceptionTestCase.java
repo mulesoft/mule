@@ -210,6 +210,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void withFailingProcessorNoPathResolver() {
     MessageProcessor mockProcessor = mock(MessageProcessor.class);
     when(mockEvent.getFlowConstruct()).thenReturn(null);
+    when(mockEvent.getFlowName()).thenReturn(null);
     when(mockProcessor.toString()).thenReturn("Mock@1");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor));
@@ -224,6 +225,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
         mock(MessageProcessorPathResolver.class, withSettings().extraInterfaces(FlowConstruct.class));
     when(pathResolver.getProcessorPath(eq(mockProcessor))).thenReturn("/flow/processor");
     when(mockEvent.getFlowConstruct()).thenReturn((FlowConstruct) pathResolver);
+    when(mockEvent.getFlowName()).thenReturn("flow");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor));
     assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(),
@@ -235,6 +237,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     MessageProcessor mockProcessor = mock(MessageProcessor.class);
     FlowConstruct nonPathResolver = mock(FlowConstruct.class);
     when(mockEvent.getFlowConstruct()).thenReturn(nonPathResolver);
+    when(mockEvent.getFlowName()).thenReturn(null);
     when(mockProcessor.toString()).thenReturn("Mock@1");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
@@ -254,6 +257,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
     when(mockEvent.getFlowConstruct()).thenReturn(null);
+    when(mockEvent.getFlowName()).thenReturn(null);
     when(mockProcessor.toString()).thenReturn("Mock@1");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
@@ -272,6 +276,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
         mock(MessageProcessorPathResolver.class, withSettings().extraInterfaces(FlowConstruct.class));
     when(pathResolver.getProcessorPath(eq(mockProcessor))).thenReturn("/flow/processor");
     when(mockEvent.getFlowConstruct()).thenReturn((FlowConstruct) pathResolver);
+    when(mockEvent.getFlowName()).thenReturn("flow");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor));
@@ -287,6 +292,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
     FlowConstruct nonPathResolver = mock(FlowConstruct.class);
     when(mockEvent.getFlowConstruct()).thenReturn(nonPathResolver);
+    when(mockEvent.getFlowName()).thenReturn(null);
     when(mockProcessor.toString()).thenReturn("Mock@1");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);

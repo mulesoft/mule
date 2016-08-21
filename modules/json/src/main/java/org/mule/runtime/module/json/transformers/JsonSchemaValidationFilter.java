@@ -11,6 +11,7 @@ import static org.mule.runtime.module.xml.filters.SchemaValidationFilter.DEFAULT
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
@@ -38,6 +39,7 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
   private LSResourceResolver resourceResolver;
   private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
   private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
   private ErrorHandler errorHandler;
   private boolean returnResult;
   private boolean useStaxSource;
@@ -64,6 +66,14 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
   }
 
   @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    if (delegate != null) {
+      delegate.setFlowConstruct(flowConstruct);
+    }
+    this.flowConstruct = flowConstruct;
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     if (isJsonSchema(schemaLocations)) {
       delegate = new JsonSchemaJsonValidationFilter();
@@ -76,6 +86,7 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
     delegate.setResourceResolver(resourceResolver);
     delegate.setSchemaLanguage(schemaLanguage);
     delegate.setMuleContext(muleContext);
+    delegate.setFlowConstruct(flowConstruct);
     delegate.setErrorHandler(errorHandler);
     delegate.setReturnResult(returnResult);
     delegate.setUseStaxSource(useStaxSource);

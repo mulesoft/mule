@@ -61,7 +61,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
 
     public CopyOnNullNonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                                   MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent) {
-      super(event, processors, executionTemplate, copyOnVoidEvent);
+      super(event, processors, executionTemplate, copyOnVoidEvent, flowConstruct);
     }
 
     @Override

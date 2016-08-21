@@ -147,6 +147,8 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    */
   FlowConstruct getFlowConstruct();
 
+  String getFlowName();
+
   /**
    * Returns the muleContext for the Mule node that this event was received in
    * 

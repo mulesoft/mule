@@ -16,6 +16,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -37,6 +38,8 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
 
   protected OutboundEndpoint endpoint;
   private EndpointURI dynamicEndpointURI;
+
+  private FlowConstruct flowConstruct;
 
   public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint) {
     this.endpoint = endpoint;
@@ -246,5 +249,15 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
     endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
   }
 }

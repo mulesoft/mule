@@ -472,6 +472,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     MuleMessage message = mock(MuleMessage.class);
     when(message.getPayload()).thenReturn(payload);
     when(event.getFlowConstruct()).thenReturn(flowConstruct);
+    when(event.getFlowName()).thenReturn("myFlow");
     when(event.getMessage()).thenReturn(message);
     when(message.getDataType()).thenReturn(dataType);
     return event;

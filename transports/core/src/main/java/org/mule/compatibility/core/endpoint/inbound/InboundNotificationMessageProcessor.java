@@ -29,7 +29,7 @@ public class InboundNotificationMessageProcessor implements MessageProcessor {
   public MuleEvent process(MuleEvent event) throws MuleException {
     AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
     if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
-      connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(),
+      connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint, endpoint.getFlowConstruct(),
                                                                  EndpointMessageNotification.MESSAGE_RECEIVED));
     }
 

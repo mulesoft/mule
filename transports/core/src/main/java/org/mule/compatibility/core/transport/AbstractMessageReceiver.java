@@ -432,7 +432,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
         connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
                                                                    endpoint,
-                                                                   resultEvent.getFlowConstruct(),
+                                                                   flowConstruct,
                                                                    MESSAGE_RESPONSE));
       }
     }

@@ -54,7 +54,8 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
 
   @Override
   protected MuleEvent doProcess(MuleEvent event) throws MuleException {
-    return new ProcessorExecutorFactory().createProcessorExecutor(event, processors, messageProcessorExecutionTemplate, true)
+    return new ProcessorExecutorFactory()
+        .createProcessorExecutor(event, processors, messageProcessorExecutionTemplate, true, flowConstruct)
         .execute();
   }
 

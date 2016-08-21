@@ -24,7 +24,7 @@ public class ExceptionStrategyNotification extends ServerNotification {
   public ExceptionStrategyNotification(Object message, int action) {
     super(message, action);
     if (message instanceof MuleEvent) {
-      resourceIdentifier = ((MuleEvent) message).getFlowConstruct().getName();
+      resourceIdentifier = ((MuleEvent) message).getFlowName();
     }
   }
 }

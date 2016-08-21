@@ -243,7 +243,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       statistics.incFatalError();
     }
 
-    MuleMessage logMessage = event.getMessage();
     String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =

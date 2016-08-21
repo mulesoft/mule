@@ -89,6 +89,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
     when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
     when(mockMuleEvent.getFlowConstruct()).thenReturn(mockPipeline);
+    when(mockMuleEvent.getFlowName()).thenReturn("flow");
     when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
     when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
@@ -195,6 +196,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
     when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
     when(mockMuleEvent.getFlowConstruct()).thenReturn(mockPipeline);
+    when(mockMuleEvent.getFlowName()).thenReturn("flow");
     when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
     doAnswer(invocationOnMock -> {

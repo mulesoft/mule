@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
@@ -22,9 +23,10 @@ import java.util.List;
 public class ProcessorExecutorFactory {
 
   public ProcessorExecutor createProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
-                                                   MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent) {
+                                                   MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent,
+                                                   FlowConstruct flowConstruct) {
     if (event.isAllowNonBlocking()) {
-      return new NonBlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
+      return new NonBlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent, flowConstruct);
     } else {
       return new BlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
     }

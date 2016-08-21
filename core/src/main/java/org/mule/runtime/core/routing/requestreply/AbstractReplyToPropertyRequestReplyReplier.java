@@ -10,10 +10,10 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -47,12 +47,13 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = result.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-      if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName())) || requestor == null) {
+      if ((requestor != null && !requestor.equals(event.getFlowName())) || requestor == null) {
         replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
       }
     }
   }
 
+  @Override
   public void setReplyProcessor(MessageProcessor replyMessageProcessor) {
     // Not used
   }

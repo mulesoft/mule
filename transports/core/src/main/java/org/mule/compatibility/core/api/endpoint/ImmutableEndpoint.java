@@ -8,10 +8,11 @@ package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -191,4 +192,5 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
 
   boolean isDisableTransportTransformer();
 
+  FlowConstruct getFlowConstruct();
 }

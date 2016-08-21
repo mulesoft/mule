@@ -9,7 +9,6 @@ package org.mule.compatibility.core;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -66,10 +65,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     assertNotNull(deserialized.getSession());
 
     // Assert that deserialized event has service and that the service is the same instance
-    assertNotNull(deserialized.getFlowConstruct());
-    assertEquals(event.getFlowConstruct(), deserialized.getFlowConstruct());
-    assertSame(event.getFlowConstruct(), deserialized.getFlowConstruct());
-
+    assertEquals(event.getFlowName(), deserialized.getFlowName());
   }
 
   private Transformer createSerializableToByteArrayTransformer() {
@@ -112,16 +108,8 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     // same instance
     assertNotNull(deserialized.getFlowConstruct());
 
-    Flow flow = (Flow) event.getFlowConstruct();
-    Flow deserializedService = (Flow) deserialized.getFlowConstruct();
-
-    // Unable to test services for equality because of need for equals() everywhere. See MULE-3720
-    // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
-    assertEquals(flow.getName(), deserializedService.getName());
-    assertEquals(flow.getInitialState(), deserializedService.getInitialState());
-    assertEquals(flow.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
-    assertEquals(flow.getMessageProcessors(), deserializedService.getMessageProcessors());
-
+    // Assert that deserialized event has service and that the service is the same instance
+    assertEquals(event.getFlowName(), deserialized.getFlowName());
   }
 
   private MuleEvent createEventToSerialize() throws Exception {

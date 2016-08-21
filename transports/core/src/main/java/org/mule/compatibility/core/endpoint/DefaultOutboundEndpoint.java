@@ -42,6 +42,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
   private static final long serialVersionUID = 8860985949279708638L;
   private List<String> responseProperties;
   private MessagingExceptionHandler exceptionHandler;
+  private FlowConstruct flowConstruct;
 
   public DefaultOutboundEndpoint(Connector connector, EndpointURI endpointUri, String name, Map properties,
                                  TransactionConfig transactionConfig, boolean deleteUnacceptedMessage,
@@ -80,7 +81,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent result = getMessageProcessorChain(event.getFlowConstruct()).process(event);
+    MuleEvent result = getMessageProcessorChain(flowConstruct).process(event);
     // A filter in a one-way outbound endpoint (sync or async) should not filter the flow.
     if (!getExchangePattern().hasResponse()) {
       return VoidMuleEvent.getInstance();
@@ -118,5 +119,15 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
     this.exceptionHandler = messagingExceptionHandler;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
   }
 }

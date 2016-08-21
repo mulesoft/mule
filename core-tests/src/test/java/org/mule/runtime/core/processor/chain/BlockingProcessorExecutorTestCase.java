@@ -71,6 +71,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     setCurrentEvent(event);
 
     when(event.getFlowConstruct()).thenReturn(getTestFlow());
+    when(event.getFlowName()).thenReturn(getTestFlow().getName());
     MuleMessage message = MuleMessage.builder().payload("").build();
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);

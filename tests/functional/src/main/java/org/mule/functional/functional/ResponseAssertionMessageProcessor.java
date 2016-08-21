@@ -103,7 +103,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   private MuleEvent processNext(MuleEvent event) throws MuleException {
     if (event != null || event instanceof VoidMuleEvent) {
       return new ProcessorExecutorFactory()
-          .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false)
+          .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false,
+                                   flowConstruct)
           .execute();
     } else {
       return event;

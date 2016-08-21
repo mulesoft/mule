@@ -178,6 +178,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     }
 
     @Override
+    public String getFlowName() {
+      return null;
+    }
+
+    @Override
     public MuleContext getMuleContext() {
       return null;
     }

@@ -36,7 +36,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor {
       } else {
         notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_END;
       }
-      dispatchNotification(new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(),
+      dispatchNotification(new EndpointMessageNotification(event.getMessage(), endpoint, endpoint.getFlowConstruct(),
                                                            notificationAction));
     }
 
@@ -59,7 +59,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor {
       } else {
         notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN;
       }
-      return new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(), notificationAction);
+      return new EndpointMessageNotification(event.getMessage(), endpoint, endpoint.getFlowConstruct(), notificationAction);
     }
 
     return null;

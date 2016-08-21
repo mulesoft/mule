@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.el.mvel;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE;
+
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 
 public class EventVariableResolverFactory extends MessageVariableResolverFactory {
 
@@ -42,10 +43,9 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   public VariableResolver getVariableResolver(String name) {
     if (event != null) {
       if (FLOW.equals(name)) {
-        return new MuleImmutableVariableResolver<FlowContext>(FLOW, (new FlowContext(event.getFlowConstruct())), null);
-      } else if (MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
-        return new MuleImmutableVariableResolver<MuleEvent>(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event,
-                                                            null);
+        return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(event.getFlowName())), null);
+      } else if (MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
+        return new MuleImmutableVariableResolver<>(MULE_EVENT_INTERNAL_VARIABLE, event, null);
       }
     }
     return super.getVariableResolver(name);
@@ -53,19 +53,19 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
 
   @Override
   public boolean isTarget(String name) {
-    return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name) || super.isTarget(name);
+    return FLOW.equals(name) || MULE_EVENT_INTERNAL_VARIABLE.equals(name) || super.isTarget(name);
   }
 
   public static class FlowContext {
 
-    private FlowConstruct flowConstruct;
+    private final String flowConstructName;
 
-    public FlowContext(FlowConstruct flowConstruct) {
-      this.flowConstruct = flowConstruct;
+    public FlowContext(String flowConstructName) {
+      this.flowConstructName = flowConstructName;
     }
 
     public String getName() {
-      return flowConstruct.getName();
+      return flowConstructName;
     }
   }
 }

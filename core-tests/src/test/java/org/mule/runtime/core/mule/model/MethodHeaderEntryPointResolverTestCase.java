@@ -111,7 +111,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception {
     return new DefaultMuleEventContext(getTestFlow(),
                                        getTestEvent(MuleMessage.builder().payload(payload).inboundProperties(inboundProperties)
-        .build()));
+                                           .build()));
   }
 
   public static class TestFruitCleaner {

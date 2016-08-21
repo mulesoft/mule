@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -16,10 +16,12 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.util.OneTimeWarning;
 
@@ -39,6 +41,8 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
   private static final Logger logger = LoggerFactory.getLogger(NonBlockingProcessorExecutor.class);
   private final ReplyToHandler replyToHandler;
   private final MessageExchangePattern messageExchangePattern;
+  private FlowConstruct flowConstruct;
+
   final OneTimeWarning fallbackWarning =
       new OneTimeWarning(logger, "The message processor {} does not currently support non-blocking execution and " +
           "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
@@ -46,10 +50,12 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
 
 
   public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
-                                      MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent) {
+                                      MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent,
+                                      FlowConstruct flowConstruct) {
     super(event, processors, executionTemplate, copyOnVoidEvent);
     this.replyToHandler = event.getReplyToHandler();
     this.messageExchangePattern = event.getExchangePattern();
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -59,7 +65,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
         fallbackWarning.warn(processor.getClass());
         // Make event synchronous so that non-blocking is not used
         event =
-            new DefaultMuleEvent(event, event.getFlowConstruct(), event.getReplyToHandler(), event.getReplyToDestination(), true);
+            new DefaultMuleEvent(event, flowConstruct, event.getReplyToHandler(), event.getReplyToDestination(), true);
         // Update RequestContext ThreadLocal for backwards compatibility
         setCurrentEvent(event);
       }
@@ -124,7 +130,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
       if (replyToHandler != null) {
         replyToHandler.processExceptionReplyTo(exception, replyTo);
       } else {
-        event.getFlowConstruct().getExceptionListener().handleException(exception, exception.getEvent());
+        flowConstruct.getExceptionListener().handleException(exception, exception.getEvent());
       }
     }
   }

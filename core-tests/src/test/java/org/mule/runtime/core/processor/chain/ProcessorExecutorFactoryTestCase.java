@@ -9,9 +9,11 @@ package org.mule.runtime.core.processor.chain;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.BlockingProcessorExecutor;
 import org.mule.runtime.core.processor.NonBlockingProcessorExecutor;
@@ -34,6 +36,7 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void flow() {
     when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
+    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(false);
     assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo((BlockingProcessorExecutor.class)));
   }
@@ -41,6 +44,7 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void flowReplyHandler() {
     when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
+    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(false);
     when(muleEvent.getReplyToHandler()).thenReturn(mock(ReplyToHandler.class));
     assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo((BlockingProcessorExecutor.class)));
@@ -49,6 +53,7 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void flowNonBlockingAllowed() {
     when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
+    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(true);
     assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo((NonBlockingProcessorExecutor.class)));
   }
@@ -56,13 +61,14 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void flowNonBlockingAllowedReplyHandler() {
     when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
+    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(true);
     when(muleEvent.getReplyToHandler()).thenReturn(mock(ReplyToHandler.class));
     assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo((NonBlockingProcessorExecutor.class)));
   }
 
   private ProcessorExecutor createProcessorExecutor() {
-    return new ProcessorExecutorFactory().createProcessorExecutor(muleEvent, null, null, false);
+    return new ProcessorExecutorFactory().createProcessorExecutor(muleEvent, null, null, false, mock(FlowConstruct.class));
   }
 
 }

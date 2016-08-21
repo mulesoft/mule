@@ -99,6 +99,11 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
+  public String getFlowName() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public MuleContext getMuleContext() {
     throw new UnsupportedOperationException();
   }

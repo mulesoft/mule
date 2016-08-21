@@ -35,7 +35,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
   protected void setAsyncReplyProperties(MuleEvent event) throws MuleException {
     event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
-        .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, event.getFlowConstruct().getName()).build());
+        .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, event.getFlowName()).build());
   }
 
   protected String getReplyTo() {
