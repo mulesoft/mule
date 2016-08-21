@@ -27,6 +27,7 @@ public class NestedProcessorListValueResolver extends AbstractNestedProcessorVal
 
   private List<MessageProcessor> messageProcessors;
 
+  // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   private MuleContext muleContext;
 

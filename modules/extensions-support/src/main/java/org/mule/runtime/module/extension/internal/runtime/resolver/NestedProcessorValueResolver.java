@@ -24,6 +24,7 @@ public final class NestedProcessorValueResolver extends AbstractNestedProcessorV
 
   private final MessageProcessor messageProcessor;
 
+  // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   private MuleContext muleContext;
 

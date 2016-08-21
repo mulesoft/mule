@@ -30,6 +30,7 @@ import javax.inject.Inject;
 public abstract class AbstractMuleObjectOwner<T>
     implements Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
 
+  // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
