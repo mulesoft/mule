@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link MuleEvent} in a {@link NestedProcessor}. This
@@ -20,6 +23,10 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 public final class NestedProcessorValueResolver extends AbstractNestedProcessorValueResolver<NestedProcessor> {
 
   private final MessageProcessor messageProcessor;
+
+  // TODO MULE-10332: Review MuleContextAware vs @Inject usage
+  @Inject
+  private MuleContext muleContext;
 
   public NestedProcessorValueResolver(MessageProcessor messageProcessor) {
     this.messageProcessor = messageProcessor;
@@ -34,6 +41,10 @@ public final class NestedProcessorValueResolver extends AbstractNestedProcessorV
    */
   @Override
   public NestedProcessor resolve(MuleEvent event) throws MuleException {
-    return toNestedProcessor(messageProcessor, event, event.getMuleContext());
+    return toNestedProcessor(messageProcessor, event, muleContext);
+  }
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

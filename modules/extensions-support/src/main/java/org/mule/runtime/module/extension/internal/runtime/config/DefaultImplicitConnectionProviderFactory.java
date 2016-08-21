@@ -44,7 +44,7 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
                                              configName, configurationModel.getName()));
     }
 
-    final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, muleContext.getExpressionManager());
+    final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, muleContext);
     ConnectionProviderObjectBuilder builder =
         new ConnectionProviderObjectBuilder(implicitModel, resolverSet, muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER));
     builder.setOwnerConfigName(configName);

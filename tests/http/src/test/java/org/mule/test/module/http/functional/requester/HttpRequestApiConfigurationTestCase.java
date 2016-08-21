@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
@@ -24,7 +25,7 @@ public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
   @Test
   public void parseApiConfigurationFromConfig() throws Exception {
-    HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", getTestEvent(TEST_PAYLOAD));
+    HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", getTestEvent(TEST_PAYLOAD), muleContext);
 
     assertNotNull(config.getApiConfiguration());
     assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));

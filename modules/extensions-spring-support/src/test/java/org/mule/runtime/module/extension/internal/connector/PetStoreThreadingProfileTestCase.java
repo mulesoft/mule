@@ -10,11 +10,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import org.mule.runtime.core.api.config.ThreadingProfile;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import org.junit.Test;
 
@@ -32,13 +33,15 @@ public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCas
 
   @Test
   public void customThreadingProfile() throws Exception {
-    PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", getTestEvent(""));
+    PetStoreConnector connector =
+        ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", getTestEvent(""), muleContext);
     assertThreadingProfile(connector.getThreadingProfile());
   }
 
   @Test
   public void noThreadingProfile() throws Exception {
-    PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", getTestEvent(""));
+    PetStoreConnector connector =
+        ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", getTestEvent(""), muleContext);
     assertThat(connector.getThreadingProfile(), is(nullValue()));
   }
 

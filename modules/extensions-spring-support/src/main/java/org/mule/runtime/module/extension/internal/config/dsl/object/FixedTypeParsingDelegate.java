@@ -8,8 +8,10 @@ package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 
 /**
@@ -43,7 +45,8 @@ public class FixedTypeParsingDelegate implements ObjectParsingDelegate {
    * {@inheritDoc}
    */
   @Override
-  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl) {
+  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl,
+                                           MuleContext muleContext) {
     return fromChildConfiguration(type);
   }
 }

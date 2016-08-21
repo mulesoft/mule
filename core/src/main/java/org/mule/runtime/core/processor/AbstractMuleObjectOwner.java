@@ -22,20 +22,26 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
 public abstract class AbstractMuleObjectOwner<T>
     implements Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
 
+  // TODO MULE-10332: Review MuleContextAware vs @Inject usage
+  @Inject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
   protected MessagingExceptionHandler messagingExceptionHandler;
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
+  @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
   }
@@ -55,6 +61,7 @@ public abstract class AbstractMuleObjectOwner<T>
     return flowConstruct;
   }
 
+  @Override
   public void initialise() throws InitialisationException {
     for (T object : getOwnedObjects()) {
       if (object instanceof MuleContextAware) {
@@ -72,6 +79,7 @@ public abstract class AbstractMuleObjectOwner<T>
     }
   }
 
+  @Override
   public void dispose() {
     for (T processor : getOwnedObjects()) {
 
@@ -82,6 +90,7 @@ public abstract class AbstractMuleObjectOwner<T>
   }
 
 
+  @Override
   public void start() throws MuleException {
 
     for (T processor : getOwnedObjects()) {
@@ -92,6 +101,7 @@ public abstract class AbstractMuleObjectOwner<T>
   }
 
 
+  @Override
   public void stop() throws MuleException {
 
     for (T processor : getOwnedObjects()) {

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 
@@ -40,7 +41,8 @@ public interface ParsingDelegate<M extends MetadataType, T> {
    * @param key the parsed entity key
    * @param metadataType a {@link MetadataType}
    * @param elementDsl the {@link DslElementSyntax} of the parsed element
+   * @param muleContext the Mule node
    * @return
    */
-  T parse(String key, M metadataType, DslElementSyntax elementDsl);
+  T parse(String key, M metadataType, DslElementSyntax elementDsl, MuleContext muleContext);
 }
