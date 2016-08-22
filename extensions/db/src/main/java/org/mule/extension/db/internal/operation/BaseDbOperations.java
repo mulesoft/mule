@@ -98,7 +98,7 @@ abstract class BaseDbOperations {
 
   protected void validateQueryType(QueryTemplate queryTemplate, List<QueryType> validTypes) {
     if (validTypes == null || !validTypes.contains(queryTemplate.getType())) {
-      throw new IllegalArgumentException(format("Query type must be one of [%s] but query '%s' is of type",
+      throw new IllegalArgumentException(format("Query type must be one of [%s] but query '%s' is of type '%s'",
                                                 Joiner.on(", ").join(validTypes), queryTemplate.getSqlText(),
                                                 queryTemplate.getType()));
     }

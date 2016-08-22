@@ -47,19 +47,12 @@ public class ExecuteDdlTestCase extends AbstractDbIntegrationTestCase {
   @Before
   public void deleteTestDdlTable() throws Exception {
 
-    Connection connection = null;
-    try {
-      DataSource dataSource = getDefaultDataSource();
-      connection = dataSource.getConnection();
-
+    DataSource dataSource = getDefaultDataSource();
+    try (Connection connection = dataSource.getConnection()) {
       QueryRunner qr = new QueryRunner(dataSource);
       qr.update(connection, "DROP TABLE TestDdl");
     } catch (SQLException e) {
       // Ignore: table does not exist
-    } finally {
-      if (connection != null) {
-        connection.close();
-      }
     }
   }
 
