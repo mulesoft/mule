@@ -211,7 +211,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     List<ProcessingMuleEventWork> works = new ArrayList<>(routes.size());
     try {
       for (final MessageProcessor route : routes) {
-        ProcessingMuleEventWork work = new ProcessingMuleEventWork(route, event, muleContext);
+        ProcessingMuleEventWork work = new ProcessingMuleEventWork(route, event, muleContext, flowConstruct);
         workManager.scheduleWork(work);
         works.add(work);
       }

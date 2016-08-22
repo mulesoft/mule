@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.lifecycle;
 
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -13,8 +15,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
-
-import org.mockito.Mockito;
 
 /**
  * @author David Dossot (david@dossot.net)
@@ -36,8 +36,10 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
 
   @Override
   public void setFlowConstruct(final FlowConstruct flowConstruct) {
-    getTracker().add("setService");
-    this.flowConstruct = flowConstruct;
+    if (this.flowConstruct != flowConstruct) {
+      getTracker().add("setService");
+      this.flowConstruct = flowConstruct;
+    }
   }
 
   public FlowConstruct getFlowConstruct() {
@@ -45,7 +47,7 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
   }
 
   public ComponentStatistics getStatistics() {
-    return Mockito.mock(ComponentStatistics.class);
+    return mock(ComponentStatistics.class);
   }
 
   @Override

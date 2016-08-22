@@ -8,13 +8,14 @@ package org.mule.runtime.core.processor.chain;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
-import java.util.List;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+
+import java.util.List;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -57,5 +58,11 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
   public void setTemplateMuleContext(MuleContext context) {
     messageProcessorExecutionTemplate.setMuleContext(context);
     chain.setTemplateMuleContext(context);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    chain.setFlowConstruct(flowConstruct);
+    super.setFlowConstruct(flowConstruct);
   }
 }

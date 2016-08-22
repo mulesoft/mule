@@ -48,6 +48,9 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
+    if (next instanceof FlowConstructAware) {
+      ((FlowConstructAware) next).setFlowConstruct(flowConstruct);
+    }
   }
 
   public final MessageProcessor getListener() {

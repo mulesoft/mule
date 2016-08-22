@@ -102,4 +102,11 @@ public class MessageProcessorNotification extends ServerNotification implements 
   public String getProcessorPath() {
     return processorPath;
   }
+
+  @Override
+  public String toString() {
+    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + processorPath + ", resourceId="
+        + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+  }
+
 }

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,6 +17,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -39,6 +39,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SmallTest
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
@@ -66,6 +68,9 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
 
   private MessageProcessingFlowTraceManager manager;
 
+  private FlowConstruct rootFlowConstruct;
+  private FlowConstruct nestedFlowConstruct;
+
   @Before
   public void before() {
     manager = new MessageProcessingFlowTraceManager();
@@ -74,28 +79,31 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     when(config.getId()).thenReturn(APP_ID);
     when(context.getConfiguration()).thenReturn(config);
     manager.setMuleContext(context);
+
+    rootFlowConstruct = mock(FlowConstruct.class);
+    when(rootFlowConstruct.getName()).thenReturn(ROOT_FLOW_NAME);
+    nestedFlowConstruct = mock(FlowConstruct.class);
+    when(nestedFlowConstruct.getName()).thenReturn(NESTED_FLOW_NAME);
   }
 
   @Test
   public void newFlowInvocation() {
     MuleEvent event = buildEvent("newFlowInvocation");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
-    assertThat(getContextInfo(event), is("at " + flowName));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
   }
 
   @Test
   public void nestedFlowInvocations() {
     MuleEvent event = buildEvent("nestedFlowInvocations");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class),
@@ -104,46 +112,44 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     PipelineMessageNotification pipelineNotificationNested = buildPipelineNotification(event, NESTED_FLOW_NAME);
     manager.onPipelineNotificationStart(pipelineNotificationNested);
 
-    String rootEntry = "at " + flowName + "(" + NESTED_FLOW_NAME + "_ref @ " + APP_ID + ")";
-    assertThat(getContextInfo(event), is("at " + NESTED_FLOW_NAME + System.lineSeparator() + rootEntry));
+    String rootEntry = "at " + rootFlowConstruct.getName() + "(" + NESTED_FLOW_NAME + "_ref @ " + APP_ID + ")";
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + NESTED_FLOW_NAME + System.lineSeparator() + rootEntry));
 
     manager.onPipelineNotificationComplete(pipelineNotificationNested);
-    assertThat(getContextInfo(event), is(rootEntry));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(rootEntry));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
   }
 
   @Test
   public void newComponentCall() {
     MuleEvent event = buildEvent("newComponentCall");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
-    assertThat(getContextInfo(event), is("at " + ROOT_FLOW_NAME));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + ROOT_FLOW_NAME));
 
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class), "/comp"));
-    assertThat(getContextInfo(event), is("at " + ROOT_FLOW_NAME + "(/comp @ " + APP_ID + ")"));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + ROOT_FLOW_NAME + "(/comp @ " + APP_ID + ")"));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
   }
 
-  protected String getContextInfo(MuleEvent event) {
-    return (String) manager.getContextInfo(event, null).get(FLOW_STACK_INFO_KEY);
+  protected String getContextInfo(MuleEvent event, FlowConstruct flow) {
+    return (String) manager.getContextInfo(event, null, flow).get(FLOW_STACK_INFO_KEY);
   }
 
   @Test
   public void newAnnotatedComponentCall() {
     MuleEvent event = buildEvent("newAnnotatedComponentCall");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
-    assertThat(getContextInfo(event), is("at " + flowName));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     AnnotatedObject annotatedMessageProcessor =
         (AnnotatedObject) mock(MessageProcessor.class, withSettings().extraInterfaces(AnnotatedObject.class));
@@ -153,45 +159,47 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager
         .onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, (MessageProcessor) annotatedMessageProcessor,
                                                                             "/comp"));
-    assertThat(getContextInfo(event), is("at " + flowName + "(/comp @ " + APP_ID + ":muleApp.xml:10 (annotatedName))"));
+    assertThat(getContextInfo(event, rootFlowConstruct),
+               is("at " + rootFlowConstruct.getName() + "(/comp @ " + APP_ID + ":muleApp.xml:10 (annotatedName))"));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
   }
 
   @Test
   public void splitStack() {
     MuleEvent event = buildEvent("newAnnotatedComponentCall");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
-    assertThat(getContextInfo(event), is("at " + flowName));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class), "/comp"));
-    assertThat(getContextInfo(event), is("at " + flowName + "(/comp @ " + APP_ID + ")"));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName() + "(/comp @ " + APP_ID + ")"));
 
     MuleEvent eventCopy = buildEvent("newAnnotatedComponentCall", event.getFlowCallStack().clone(), event.getProcessorsTrace());
-    assertThat(getContextInfo(eventCopy), is("at " + flowName + "(/comp @ " + APP_ID + ")"));
+    assertThat(getContextInfo(eventCopy, rootFlowConstruct),
+               is("at " + rootFlowConstruct.getName() + "(/comp @ " + APP_ID + ")"));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
-    String asyncFlowName = "asyncFlow";
-    manager.onPipelineNotificationStart(buildPipelineNotification(eventCopy, asyncFlowName));
+    final FlowConstruct asyncFlowConstruct = mock(FlowConstruct.class);
+    when(asyncFlowConstruct.getName()).thenReturn("asyncFlow");
+    manager.onPipelineNotificationStart(buildPipelineNotification(eventCopy, asyncFlowConstruct.getName()));
 
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(eventCopy, mock(MessageProcessor.class),
                                                                                "/asyncComp"));
-    assertThat(getContextInfo(eventCopy), is("at " + asyncFlowName + "(/asyncComp @ " + APP_ID + ")" + System.lineSeparator()
-        + "at " + flowName + "(/comp @ " + APP_ID + ")"));
+    assertThat(getContextInfo(eventCopy, asyncFlowConstruct),
+               is("at " + asyncFlowConstruct.getName() + "(/asyncComp @ " + APP_ID + ")" + System.lineSeparator()
+                   + "at " + rootFlowConstruct.getName() + "(/comp @ " + APP_ID + ")"));
   }
 
   @Test
   public void splitStackEnd() {
     MuleEvent event = buildEvent("newAnnotatedComponentCall");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
 
     manager.onPipelineNotificationStart(pipelineNotification);
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class), "/comp"));
@@ -209,16 +217,16 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   @Test
   public void joinStack() {
     MuleEvent event = buildEvent("joinStack");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
-    assertThat(getContextInfo(event), is(""));
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification);
-    assertThat(getContextInfo(event), is("at " + flowName));
+    assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class),
                                                                                "/scatter-gather"));
-    assertThat(getContextInfo(event), is("at " + flowName + "(/scatter-gather @ " + APP_ID + ")"));
+    assertThat(getContextInfo(event, rootFlowConstruct),
+               is("at " + rootFlowConstruct.getName() + "(/scatter-gather @ " + APP_ID + ")"));
 
     MuleEvent eventCopy0 = buildEvent("joinStack_0", event.getFlowCallStack().clone(), event.getProcessorsTrace());
     MuleEvent eventCopy1 = buildEvent("joinStack_1", event.getFlowCallStack().clone(), event.getProcessorsTrace());
@@ -232,22 +240,23 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager.onPipelineNotificationStart(pipelineNotificationNested);
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(eventCopy1, mock(MessageProcessor.class),
                                                                                "/route_1"));
-    assertThat(getContextInfo(eventCopy1), is("at " + NESTED_FLOW_NAME + "(/route_1 @ " + APP_ID + ")" + System.lineSeparator()
-        + "at " + ROOT_FLOW_NAME + "(" + NESTED_FLOW_NAME + "_ref @ " + APP_ID + ")"));
+    assertThat(getContextInfo(eventCopy1, rootFlowConstruct),
+               is("at " + NESTED_FLOW_NAME + "(/route_1 @ " + APP_ID + ")" + System.lineSeparator()
+                   + "at " + ROOT_FLOW_NAME + "(" + NESTED_FLOW_NAME + "_ref @ " + APP_ID + ")"));
 
     manager.onPipelineNotificationComplete(pipelineNotificationNested);
 
-    assertThat(getContextInfo(event), is("at " + flowName + "(/scatter-gather @ " + APP_ID + ")"));
+    assertThat(getContextInfo(event, rootFlowConstruct),
+               is("at " + rootFlowConstruct.getName() + "(/scatter-gather @ " + APP_ID + ")"));
 
     manager.onPipelineNotificationComplete(pipelineNotification);
-    assertThat(getContextInfo(event), is(""));
+    assertThat(getContextInfo(event, rootFlowConstruct), is(""));
   }
 
   @Test
   public void joinStackEnd() {
     MuleEvent event = buildEvent("joinStack");
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, flowName);
+    PipelineMessageNotification pipelineNotification = buildPipelineNotification(event, rootFlowConstruct.getName());
 
     manager.onPipelineNotificationStart(pipelineNotification);
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, mock(MessageProcessor.class),
@@ -279,27 +288,26 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     MuleEvent event1 = buildEvent("mixedEvents_1");
     MuleEvent event2 = buildEvent("mixedEvents_2");
 
-    String flowName = ROOT_FLOW_NAME;
-    PipelineMessageNotification pipelineNotification1 = buildPipelineNotification(event1, flowName);
-    PipelineMessageNotification pipelineNotification2 = buildPipelineNotification(event2, flowName);
-    assertThat(getContextInfo(event1), is(""));
-    assertThat(getContextInfo(event2), is(""));
+    PipelineMessageNotification pipelineNotification1 = buildPipelineNotification(event1, rootFlowConstruct.getName());
+    PipelineMessageNotification pipelineNotification2 = buildPipelineNotification(event2, rootFlowConstruct.getName());
+    assertThat(getContextInfo(event1, rootFlowConstruct), is(""));
+    assertThat(getContextInfo(event2, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification1);
-    assertThat(getContextInfo(event1), is("at " + flowName));
-    assertThat(getContextInfo(event2), is(""));
+    assertThat(getContextInfo(event1, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
+    assertThat(getContextInfo(event2, rootFlowConstruct), is(""));
 
     manager.onPipelineNotificationStart(pipelineNotification2);
-    assertThat(getContextInfo(event1), is("at " + flowName));
-    assertThat(getContextInfo(event2), is("at " + flowName));
+    assertThat(getContextInfo(event1, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
+    assertThat(getContextInfo(event2, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     manager.onPipelineNotificationComplete(pipelineNotification1);
-    assertThat(getContextInfo(event1), is(""));
-    assertThat(getContextInfo(event2), is("at " + flowName));
+    assertThat(getContextInfo(event1, rootFlowConstruct), is(""));
+    assertThat(getContextInfo(event2, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
     manager.onPipelineNotificationComplete(pipelineNotification2);
-    assertThat(getContextInfo(event1), is(""));
-    assertThat(getContextInfo(event2), is(""));
+    assertThat(getContextInfo(event1, rootFlowConstruct), is(""));
+    assertThat(getContextInfo(event2, rootFlowConstruct), is(""));
   }
 
   protected MuleEvent buildEvent(String eventId) {

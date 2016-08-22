@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.LocatedMuleException.INFO_SOURCE_XML_KEY
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
@@ -33,11 +34,12 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   }
 
   @Override
-  public Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed) {
+  public Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed, FlowConstruct flowConstruct) {
     Map<String, Object> contextInfo = new HashMap<>();
 
-    contextInfo.put(INFO_LOCATION_KEY, resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
-                                                                      getProcessorPath(event, lastProcessed), lastProcessed));
+    contextInfo.put(INFO_LOCATION_KEY,
+                    resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
+                                                   getProcessorPath(event, lastProcessed, flowConstruct), lastProcessed));
     if (lastProcessed instanceof AnnotatedObject) {
       String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
       if (sourceXML != null) {
@@ -48,9 +50,9 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
     return contextInfo;
   }
 
-  protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed) {
-    if (event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
-      return ((MessageProcessorPathResolver) event.getFlowConstruct()).getProcessorPath(lastProcessed);
+  protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed, FlowConstruct flowConstruct) {
+    if (flowConstruct instanceof MessageProcessorPathResolver) {
+      return ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(lastProcessed);
     } else {
       return lastProcessed.toString();
     }

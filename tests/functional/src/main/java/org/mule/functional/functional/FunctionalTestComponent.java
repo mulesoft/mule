@@ -6,12 +6,17 @@
  */
 package org.mule.functional.functional;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -44,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
 public class FunctionalTestComponent
-    implements Callable, Initialisable, Disposable, MuleContextAware, Startable, Stoppable {
+    implements Callable, Initialisable, Disposable, MuleContextAware, FlowConstructAware, Receiveable, Startable, Stoppable {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -64,6 +69,7 @@ public class FunctionalTestComponent
   private boolean logMessageDetails = false;
   private String id = "<none>";
   private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
 
@@ -72,6 +78,7 @@ public class FunctionalTestComponent
    * subsequent changes to the objects will change the history.
    */
   private List<Object> messageHistory;
+
 
   @Override
   public void initialise() {
@@ -93,6 +100,11 @@ public class FunctionalTestComponent
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -135,7 +147,26 @@ public class FunctionalTestComponent
   }
 
   /**
-   * Always throws a {@link FunctionalTestException}. This method is only called if {@link #isThrowException()} is true.
+   * This method is used by some WebServices tests where you don' want to be introducing the
+   * {@link org.mule.runtime.core.api.MuleEventContext} as a complex type.
+   *
+   * @param data the event data received
+   * @return the processed message
+   * @throws Exception
+   */
+  @Override
+  public Object onReceive(Object data) throws Exception {
+    MuleEventContext context = new DefaultMuleEventContext(flowConstruct, getCurrentEvent());
+
+    if (isThrowException()) {
+      throwException();
+    }
+    return process(data, context);
+  }
+
+
+  /**
+   * Always throws a {@link FunctionalTestException}. This methodis only called if {@link #isThrowException()} is true.
    *
    * @throws FunctionalTestException or the exception specified in 'exceptionType
    */

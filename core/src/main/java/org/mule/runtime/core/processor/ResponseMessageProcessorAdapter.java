@@ -32,7 +32,6 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
   protected MessageProcessor responseProcessor;
-  protected FlowConstruct flowConstruct;
 
   public ResponseMessageProcessorAdapter() {
     super();
@@ -106,7 +105,8 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
+    super.setFlowConstruct(flowConstruct);
+    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
   }
 
   @Override

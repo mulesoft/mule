@@ -12,6 +12,7 @@ import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
@@ -61,5 +62,11 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
 
   public void setTemplateMuleContext(MuleContext context) {
     messageProcessorExecutionTemplate.setMuleContext(context);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
+    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
   }
 }

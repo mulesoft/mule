@@ -12,12 +12,13 @@ import org.mule.runtime.core.config.ExceptionHelper;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor {
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     try {
       return processNext(event);
     } catch (Exception e) {
       e = (Exception) ExceptionHelper.sanitizeIfNeeded(e);
-      return event.getFlowConstruct().getExceptionListener().handleException(e, event);
+      return flowConstruct.getExceptionListener().handleException(e, event);
     }
   }
 }
