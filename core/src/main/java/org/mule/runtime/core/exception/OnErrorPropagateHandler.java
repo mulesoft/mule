@@ -19,7 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
-public class OnErrorPropagateHandler extends TemplateMessagingExceptionStrategy {
+
+
+/**
+ * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
+ *
+ * @since 4.0
+ */
+public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private RedeliveryExceeded redeliveryExceeded;
   private Integer maxRedeliveryAttempts;

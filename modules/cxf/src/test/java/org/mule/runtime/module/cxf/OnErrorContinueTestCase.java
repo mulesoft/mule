@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.TemplateMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -146,7 +146,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     }
   }
 
-  public static class RethrowExceptionStrategy extends TemplateMessagingExceptionStrategy {
+  public static class RethrowExceptionStrategy extends TemplateOnErrorHandler {
 
     @Override
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {

@@ -28,7 +28,7 @@ import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener
+public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
 
   private MessageProcessorChain configuredMessageProcessors;

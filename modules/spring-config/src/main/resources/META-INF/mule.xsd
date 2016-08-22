@@ -1645,7 +1645,7 @@
     <xsd:element name="abstract-on-error" abstract="true" type="exceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
+                A placeholder for an on-error element. These handlers define how Mule should react to errors.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.exception.TemplateMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class ExceptionStrategyLifecycleTestCase extends AbstractIntegrationTestC
   public void testLifecycle() throws Exception {
     FlowConstruct flowA = getFlowConstruct("flowA");
     FlowConstruct flowB = getFlowConstruct("flowB");
-    TemplateMessagingExceptionStrategy flowAExceptionStrategy =
-        (TemplateMessagingExceptionStrategy) ((ErrorHandler) flowA.getExceptionListener()).getExceptionListeners().get(0);
-    TemplateMessagingExceptionStrategy flowBExceptionStrategy =
-        (TemplateMessagingExceptionStrategy) ((ErrorHandler) flowB.getExceptionListener()).getExceptionListeners().get(0);
+    TemplateOnErrorHandler flowAExceptionStrategy =
+        (TemplateOnErrorHandler) ((ErrorHandler) flowA.getExceptionListener()).getExceptionListeners().get(0);
+    TemplateOnErrorHandler flowBExceptionStrategy =
+        (TemplateOnErrorHandler) ((ErrorHandler) flowB.getExceptionListener()).getExceptionListeners().get(0);
     LifecycleCheckerMessageProcessor lifecycleCheckerMessageProcessorFlowA =
         (LifecycleCheckerMessageProcessor) flowAExceptionStrategy.getMessageProcessors().get(0);
     LifecycleCheckerMessageProcessor lifecycleCheckerMessageProcessorFlowB =
@@ -49,10 +49,10 @@ public class ExceptionStrategyLifecycleTestCase extends AbstractIntegrationTestC
 
     FlowConstruct flowC = getFlowConstruct("flowC");
     FlowConstruct flowD = getFlowConstruct("flowD");
-    TemplateMessagingExceptionStrategy flowCExceptionStrategy =
-        (TemplateMessagingExceptionStrategy) ((ErrorHandler) flowC.getExceptionListener()).getExceptionListeners().get(0);
-    TemplateMessagingExceptionStrategy flowDExceptionStrategy =
-        (TemplateMessagingExceptionStrategy) ((ErrorHandler) flowD.getExceptionListener()).getExceptionListeners().get(0);
+    TemplateOnErrorHandler flowCExceptionStrategy =
+        (TemplateOnErrorHandler) ((ErrorHandler) flowC.getExceptionListener()).getExceptionListeners().get(0);
+    TemplateOnErrorHandler flowDExceptionStrategy =
+        (TemplateOnErrorHandler) ((ErrorHandler) flowD.getExceptionListener()).getExceptionListeners().get(0);
     LifecycleCheckerMessageProcessor lifecycleCheckerMessageProcessorFlowC =
         (LifecycleCheckerMessageProcessor) flowCExceptionStrategy.getMessageProcessors().get(0);
     LifecycleCheckerMessageProcessor lifecycleCheckerMessageProcessorFlowD =

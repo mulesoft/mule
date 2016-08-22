@@ -25,10 +25,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Selects which exception strategy to execute based on filtering.
- * <p/>
- * Exception listeners must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of
- * ErrorHandler
+ * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3.
+ * On error handlers must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of
+ * ErrorHandler.
+ *
+ * @since 4.0
  */
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject {
