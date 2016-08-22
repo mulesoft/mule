@@ -6,18 +6,47 @@
  */
 package org.mule.extension.db.internal.operation;
 
+import static org.mule.extension.db.internal.domain.query.QueryType.DDL;
+import org.mule.extension.db.api.param.QueryDefinition;
+import org.mule.extension.db.internal.DbConnector;
+import org.mule.extension.db.internal.domain.connection.DbConnection;
+import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
-public class DdlOperations {
+import java.sql.SQLException;
+
+/**
+ * Operations to manipulate data definitions in a relational Database
+ *
+ * @since 4.0
+ */
+public class DdlOperations extends BaseDbOperations {
 
   /**
    * Enables execution of DDL queries against a database.
    *
-   * @param dynamicQuery
-   * @param settings
+   * @param sql The text of the SQL query to be executed
+   * @param settings Parameters to configure the query
+   * @param connector           the acting connector
+   * @param connection          the acting connection
+   * @return the affected rows count
+   * @return the number of affected rows
    */
-  public void executeDdl(@Text String dynamicQuery, @ParameterGroup QuerySettings settings) {
+  public int executeDdl(@DisplayName("SQL Query Text") @Text String sql,
+                        @ParameterGroup QuerySettings settings,
+                        @UseConfig DbConnector connector,
+                        @Connection DbConnection connection)
+      throws SQLException {
 
+    QueryDefinition query = new QueryDefinition();
+    query.setSql(sql);
+    query.setSettings(settings);
+
+    final Query resolvedQuery = resolveQuery(query, connector, connection, DDL);
+    return executeUpdate(query, null, null, connection, resolvedQuery).getAffectedRows();
   }
 }

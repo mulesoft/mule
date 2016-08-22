@@ -51,8 +51,7 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
   protected List<InputParameter> inputParameters = new LinkedList<>();
 
   /**
-   * A reference to a globally defined procedure call
-   * to be used as a template
+   * Parameters to configure the query
    */
   @ParameterGroup
   protected QuerySettings settings = new QuerySettings();
@@ -187,5 +186,9 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
 
   public QuerySettings getSettings() {
     return settings;
+  }
+
+  public void setSettings(QuerySettings settings) {
+    this.settings = settings;
   }
 }

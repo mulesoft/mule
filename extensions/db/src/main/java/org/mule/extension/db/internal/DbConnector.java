@@ -22,6 +22,7 @@ import org.mule.extension.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.extension.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.extension.db.internal.domain.type.ResolvedDbType;
 import org.mule.extension.db.internal.domain.type.StaticDbTypeManager;
+import org.mule.extension.db.internal.operation.DdlOperations;
 import org.mule.extension.db.internal.operation.DmlOperations;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -46,8 +47,8 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 4.0
  */
-@Extension(name = "DB Connector", description = "Connector for connecting to relation Databases through the JDBC API")
-@Operations({DmlOperations.class})
+@Extension(name = "Database", description = "Connector for connecting to relation Databases through the JDBC API")
+@Operations({DmlOperations.class, DdlOperations.class})
 @Providers({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
 @Xml(namespace = "dbn")
 @Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class},
