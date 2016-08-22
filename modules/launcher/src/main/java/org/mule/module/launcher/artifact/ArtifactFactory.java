@@ -21,7 +21,7 @@ public interface ArtifactFactory<T extends Artifact>
      * @param artifactName artifact identifier
      * @return the newly created Artifact
      */
-    public T createArtifact(String artifactName) throws IOException;
+    T createArtifact(String artifactName) throws IOException;
 
     /**
      * @return the directory of the Artifact. Usually this directory contains the Artifact resources

@@ -55,7 +55,10 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
             for (Application domainApplication : domainApplications)
             {
                 applicationDeployer.preTrackArtifact(domainApplication);
-                applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName());
+                if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName()))
+                {
+                    applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName());
+                }
             }
         }
         domainApplications = Collections.emptyList();

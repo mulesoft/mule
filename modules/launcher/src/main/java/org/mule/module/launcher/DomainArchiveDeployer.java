@@ -39,7 +39,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     private final DeploymentService deploymentService;
     private final ArchiveDeployer<Application> applicationDeployer;
 
-    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, ArtifactDeployer<Application> applicationArtifactDeployer, DeploymentService deploymentService)
+    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService)
     {
         this.domainDeployer = domainDeployer;
         this.applicationDeployer = applicationDeployer;
@@ -60,6 +60,13 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
         Domain domain = domainDeployer.deployExplodedArtifact(artifactDir);
         deployBundledAppsIfDomainWasCreated(domain);
         return domain;
+    }
+
+    @Override
+    public boolean isUpdatedZombieArtifact(String artifactName)
+    {
+        // Domains does not manage zombie artifacts
+        return true;
     }
 
     @Override
