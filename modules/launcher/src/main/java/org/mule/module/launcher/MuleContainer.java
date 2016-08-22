@@ -88,10 +88,11 @@ public class MuleContainer
 
     public MuleContainer(String[] args)
     {
+        init(args);
+
         this.deploymentService = new MuleDeploymentService(pluginClassLoaderManager);
         this.coreExtensionManager = new DefaultMuleCoreExtensionManager();
 
-        init(args);
     }
 
     public MuleContainer(DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager)
@@ -104,11 +105,12 @@ public class MuleContainer
      */
     public MuleContainer(String[] args, DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager) throws IllegalArgumentException
     {
+        init(args);
+
         //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
         this.deploymentService = deploymentService;
         this.coreExtensionManager = coreExtensionManager;
 
-        init(args);
     }
 
     protected void init(String[] args) throws IllegalArgumentException

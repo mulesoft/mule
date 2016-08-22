@@ -22,11 +22,11 @@ import java.util.Map;
 public class ApplicationStatusMapper
 {
 
-    private static Map<String, ApplicationStatus> statusMapping;
+    private static final Map<String, ApplicationStatus> statusMapping = getStatusMapping();
 
     public static ApplicationStatus getApplicationStatus(String currentPhase)
     {
-        final ApplicationStatus applicationStatus = getStatusMapping().get(currentPhase);
+        final ApplicationStatus applicationStatus = statusMapping.get(currentPhase);
 
         if (applicationStatus == null)
         {
@@ -38,22 +38,13 @@ public class ApplicationStatusMapper
 
     private static Map<String, ApplicationStatus> getStatusMapping()
     {
-        if (statusMapping == null)
-        {
-            synchronized (ApplicationStatusMapper.class)
-            {
-                if (statusMapping == null)
-                {
-                    statusMapping = new HashMap<String, ApplicationStatus>();
+        Map<String, ApplicationStatus> statusMapping = new HashMap<>();
 
-                    statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
-                    statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
-                    statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
-                    statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
-                    statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
-                }
-            }
-        }
+        statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
+        statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
+        statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
+        statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
+        statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
 
         return statusMapping;
     }
