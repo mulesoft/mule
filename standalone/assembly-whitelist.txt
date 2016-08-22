@@ -164,6 +164,7 @@
 # /app-plugins
 #
 /mule-standalone-${productVersion}/plugins
+/mule-standalone-${productVersion}/plugins/mule-module-dbn-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}.zip
