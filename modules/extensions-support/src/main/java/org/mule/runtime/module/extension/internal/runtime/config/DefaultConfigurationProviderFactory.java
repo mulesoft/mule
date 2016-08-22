@@ -64,7 +64,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                          e);
       }
 
-      return new DefaultConfigurationProviderMetadataAdapter<>(name, configurationModel, configuration);
+      return new ConfigurationProviderMetadataAdapter<>(name, configurationModel, configuration);
     });
   }
 

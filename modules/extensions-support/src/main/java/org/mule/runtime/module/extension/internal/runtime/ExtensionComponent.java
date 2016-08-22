@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
@@ -47,7 +48,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -202,7 +202,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<Set<MetadataKey>> getMetadataKeys() throws MetadataResolvingException {
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
     final MetadataContext metadataContext = getMetadataContext();
     return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
   }

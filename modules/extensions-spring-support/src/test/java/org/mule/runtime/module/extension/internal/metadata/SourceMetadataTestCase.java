@@ -15,6 +15,7 @@ import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
@@ -48,9 +49,9 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Test
   public void getSourceMetadataKeys() {
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
     assertThat(metadataKeys.size(), is(3));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
   }

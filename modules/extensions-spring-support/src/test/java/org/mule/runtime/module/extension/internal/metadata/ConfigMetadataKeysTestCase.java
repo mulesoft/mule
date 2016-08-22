@@ -8,9 +8,11 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.test.vegan.extension.AppleKeyResolver;
@@ -43,13 +45,13 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
-  public void getMetadataKeysWithKeyId() throws Exception {
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
-        metadataManager.getMetadataKeys(new ConfigurationId("apple"));
+  public void getMetadataKeysForConfig() throws Exception {
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult =
+        metadataManager.getMetadataKeysForConfig(new ConfigurationId("apple"));
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Map<String, Set<MetadataKey>> metadataKeys = metadataKeysResult.get();
+    final Map<String, Set<MetadataKey>> metadataKeys = metadataKeysResult.get().getAllKeys();
     assertThat(metadataKeys.size(), is(2));
-    assertThat(metadataKeys.get(AppleKeyResolver.class.getName()).size(), is(1));
-    assertThat(metadataKeys.get(HarvestAppleKeyResolver.class.getName()).size(), is(1));
+    assertThat(metadataKeys.get(getAliasName(AppleKeyResolver.class)).size(), is(1));
+    assertThat(metadataKeys.get(getAliasName(HarvestAppleKeyResolver.class)).size(), is(1));
   }
 }

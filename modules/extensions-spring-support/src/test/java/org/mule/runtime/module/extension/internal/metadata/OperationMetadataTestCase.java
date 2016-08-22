@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -32,12 +33,12 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
-
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -63,8 +64,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-
 public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
   private static final String MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA = "messageAttributesPersonTypeMetadata";
@@ -80,9 +79,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getMetadataKeysWithKeyId() throws Exception {
     componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
     assertThat(metadataKeys.size(), is(3));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
   }
@@ -90,19 +89,19 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getMetadataKeysWithoutKeyId() throws Exception {
     componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_ID, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeys = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeys.isSuccess(), is(true));
-    assertThat(metadataKeys.get().size(), is(1));
-    assertThat(metadataKeys.get().iterator().next(), instanceOf(NullMetadataKey.class));
+    assertThat(metadataKeys.get().getKeys().size(), is(1));
+    assertThat(metadataKeys.get().getKeys().iterator().next(), instanceOf(NullMetadataKey.class));
   }
 
   @Test
   public void getMultilevelKeys() throws Exception {
     componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
 
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
     assertThat(metadataKeys, hasSize(2));
 
     assertThat(metadataKeys, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));

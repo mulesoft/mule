@@ -13,6 +13,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.SourceId;
@@ -22,8 +23,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -31,7 +30,6 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   private static final String FAIL_WITH_RESOLVING_EXCEPTION = "failWithResolvingException";
   private static final String FAIL_WITH_RUNTIME_EXCEPTION = "failWithRuntimeException";
-  private static final String FAIL_KEYS_RETRIEVER = "Failing keysResolver retriever";
   private static final String NON_EXISTING_FLOW = "nonExistingFlow";
   private static final String LOGGER_FLOW = "loggerFlow";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
@@ -53,7 +51,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void getKeysWithRuntimeException() throws Exception {
     componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
-    MetadataResult<Set<MetadataKey>> metadata = metadataManager.getMetadataKeys(componentId);
+    MetadataResult<MetadataKeysContainer> metadata = metadataManager.getMetadataKeys(componentId);
 
     assertFailure(metadata, "", FailureCode.UNKNOWN, RuntimeException.class.getName());
   }
@@ -85,7 +83,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataFromNonExistingSource() throws IOException {
     final SourceId notExistingSource = new SourceId(FLOW_WITHOUT_SOURCE);
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
 
     assertFailure(metadataKeysResult, SOURCE_NOT_FOUND, FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
   }
@@ -93,20 +91,22 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataFromNonExistingConfig() throws IOException {
     String configName = "nonexisting-config";
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
-        metadataManager.getMetadataKeys(new ConfigurationId(configName));
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult =
+        metadataManager.getMetadataKeysForConfig(new ConfigurationId(configName));
 
-    assertFailure(metadataKeysResult, format("Configuration named [%s] doesn't exist", configName), FailureCode.UNKNOWN,
+    assertFailure(metadataKeysResult, format("Configuration named [%s] doesn't exist", configName),
+                  FailureCode.UNKNOWN,
                   InvalidComponentIdException.class.getName());
   }
 
   @Test
   public void failToGetMetadataFromDynamicConfig() throws IOException {
     final String configName = "dynamic-config";
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
-        metadataManager.getMetadataKeys(new ConfigurationId(configName));
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult =
+        metadataManager.getMetadataKeysForConfig(new ConfigurationId(configName));
 
-    assertFailure(metadataKeysResult, format("Cannot fetch MetadataKeys from component [%s]", configName), FailureCode.UNKNOWN,
+    assertFailure(metadataKeysResult, format("Component [%s] is not MetadataKeyAware, no information available", configName),
+                  FailureCode.UNKNOWN,
                   InvalidComponentIdException.class.getName());
   }
 

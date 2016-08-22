@@ -7,11 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ConfigurationProviderMetadataAdapter;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysAware;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -26,12 +29,8 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolve
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
-
-import org.apache.commons.collections.map.HashedMap;
 
 /**
  * Adds the capability to expose all the {@link MetadataKey}s associated with the {@link StaticConfigurationProvider}'s
@@ -39,13 +38,8 @@ import org.apache.commons.collections.map.HashedMap;
  *
  * @since 1.0
  */
-public final class DefaultConfigurationProviderMetadataAdapter<T> extends StaticConfigurationProvider<T>
-    implements ConfigurationProviderMetadataAdapter<T> {
-
-  public DefaultConfigurationProviderMetadataAdapter(String name, RuntimeConfigurationModel model,
-                                                     ConfigurationInstance<T> configuration) {
-    super(name, model, configuration);
-  }
+public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigurationProvider<T>
+    implements MetadataKeysAware {
 
   @Inject
   private MuleMetadataManager metadataManager;
@@ -53,30 +47,35 @@ public final class DefaultConfigurationProviderMetadataAdapter<T> extends Static
   @Inject
   protected ConnectionManagerAdapter connectionManager;
 
-  public MetadataResult<Map<String, Set<MetadataKey>>> getMetadataKeys() throws MetadataResolvingException {
+  public ConfigurationProviderMetadataAdapter(String name, RuntimeConfigurationModel model,
+                                              ConfigurationInstance<T> configuration) {
+    super(name, model, configuration);
+  }
 
-    Map<String, Set<MetadataKey>> keys = new HashedMap();
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
+
+    MetadataKeysContainerBuilder keysBuilder = new MetadataKeysContainerBuilder();
     MetadataContext metadataContext = getMetadataContext();
     try {
-      addComponentKeys(this.getModel().getOperationModels(), metadataContext, keys);
-      addComponentKeys(this.getModel().getSourceModels(), metadataContext, keys);
+      addComponentKeys(this.getModel().getOperationModels(), metadataContext, keysBuilder);
+      addComponentKeys(this.getModel().getSourceModels(), metadataContext, keysBuilder);
     } catch (Exception e) {
       return MetadataResult.failure(null, format("%s: %s"), e);
     }
 
-    return MetadataResult.success(keys);
+    return MetadataResult.success(keysBuilder.build());
   }
 
   private void addComponentKeys(List<? extends ComponentModel> components, MetadataContext metadataContext,
-                                Map<String, Set<MetadataKey>> keys)
+                                MetadataKeysContainerBuilder keysBuilder)
       throws MetadataResolvingException, ConnectionException {
     for (ComponentModel component : components) {
       MetadataKeysResolver keysResolver =
           ((MetadataEnrichableModel) component).getMetadataResolverFactory().getKeyResolver();
 
-      String resolverName = keysResolver.getClass().getName();
-      if (!(keysResolver instanceof NullMetadataResolver) && !keys.containsKey(resolverName)) {
-        keys.put(resolverName, keysResolver.getMetadataKeys(metadataContext));
+      String resolverName = getAliasName(keysResolver.getClass());
+      if (!(keysResolver instanceof NullMetadataResolver) && !keysBuilder.containsResolver(resolverName)) {
+        keysBuilder.add(resolverName, keysResolver.getMetadataKeys(metadataContext));
       }
     }
   }

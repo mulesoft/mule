@@ -64,7 +64,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                   ImmutableExpirationPolicy.getDefault(new TimeSupplier()));
       }
 
-      return new DefaultConfigurationProviderMetadataAdapter<>(configName, configurationModel, configurationInstance);
+      return new ConfigurationProviderMetadataAdapter<>(configName, configurationModel, configurationInstance);
 
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);

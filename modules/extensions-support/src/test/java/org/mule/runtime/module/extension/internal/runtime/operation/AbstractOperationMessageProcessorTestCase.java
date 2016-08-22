@@ -19,6 +19,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -28,6 +29,7 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
@@ -286,13 +288,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Test
   public void getMetadataKeys() throws Exception {
-    MetadataResult<Set<MetadataKey>> metadataKeysResult = messageProcessor.getMetadataKeys();
+    MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
 
-    verify(operationModel).getMetadataResolverFactory();
+    verify(operationModel, times(2)).getMetadataResolverFactory();
     verify(metadataResolverFactory).getKeyResolver();
 
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
     assertThat(metadataKeys.size(), is(2));
 
     assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(BOOLEAN.name())));
