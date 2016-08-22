@@ -9,7 +9,6 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.registry.ResolverException;
@@ -19,18 +18,19 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import java.sql.SQLDataException;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ChoiceExceptionStrategyTestCase extends AbstractIntegrationTestCase {
+public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/choice-exception-strategy.xml";
+    return "org/mule/test/integration/exceptions/error-handler.xml";
   }
 
   @Test
@@ -103,6 +103,7 @@ public class ChoiceExceptionStrategyTestCase extends AbstractIntegrationTestCase
   }
 
   @Test
+  @Ignore("MULE-10323: Define handlers reutilisation (refs)")
   public void testNoMatchThenCallDefaultExceptionStrategy() throws Exception {
     callAndThrowException(new ArithmeticException(), "0 global catch es");
   }

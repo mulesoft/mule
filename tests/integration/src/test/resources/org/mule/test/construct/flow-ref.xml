@@ -120,9 +120,11 @@
     </flow>
     <flow name="NonBlockingExceptionFlow2">
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <set-payload value="ERROR"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="ERROR"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="httpEcho">

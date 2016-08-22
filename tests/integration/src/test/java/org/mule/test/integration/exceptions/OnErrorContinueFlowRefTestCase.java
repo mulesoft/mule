@@ -8,8 +8,8 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_REQUEST;
-import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_RESPONSE;
+import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_REQUEST;
+import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_RESPONSE;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -24,13 +24,13 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
-public class CatchExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase {
+public class OnErrorContinueFlowRefTestCase extends AbstractIntegrationTestCase {
 
   public static final int TIMEOUT = 5000;
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/catch-exception-strategy-flow-ref.xml";
+    return "org/mule/test/integration/exceptions/on-error-continue-flow-ref.xml";
   }
 
   @Test

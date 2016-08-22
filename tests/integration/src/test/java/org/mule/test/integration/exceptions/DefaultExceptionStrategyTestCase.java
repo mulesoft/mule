@@ -9,11 +9,11 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,7 +65,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractIntegrationTestCas
 
     FlowConstruct flowExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("flowExceptionStrategy");
     MessagingExceptionHandler flowExceptionStrategyExceptionListener = flowExceptionStrategy.getExceptionListener();
-    assertThat(flowExceptionStrategyExceptionListener, instanceOf(CatchMessagingExceptionStrategy.class));
+    assertThat(flowExceptionStrategyExceptionListener, instanceOf(ErrorHandler.class));
     assertThat(usedExceptionStrategies.add(flowExceptionStrategyExceptionListener), is(true));
 
   }

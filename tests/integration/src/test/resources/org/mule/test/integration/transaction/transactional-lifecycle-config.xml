@@ -12,9 +12,11 @@ http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/tes
         <transactional action="BEGIN_OR_JOIN">
             <test:component throwException="true"
                 exceptionToThrow="java.lang.RuntimeException" />
-            <catch-exception-strategy>
-                <flow-ref name="dlq-out"/>
-            </catch-exception-strategy>
+            <error-handler>
+                <on-error-continue>
+                    <flow-ref name="dlq-out"/>
+                </on-error-continue>
+            </error-handler>
         </transactional>
     </flow>
 

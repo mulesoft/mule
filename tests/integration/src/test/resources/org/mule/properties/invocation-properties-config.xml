@@ -317,9 +317,11 @@
     <flow name="catchExceptionStrategy">
         <processor ref="addP1" />
         <test:component throwException="true" />
-        <catch-exception-strategy>
-            <test:assert expression="#[P1]" />
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:assert expression="#[P1]" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="defaultExceptionStrategyAfterCallingSubflow">

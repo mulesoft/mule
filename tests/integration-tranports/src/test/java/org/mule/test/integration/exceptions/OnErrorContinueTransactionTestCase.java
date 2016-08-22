@@ -27,7 +27,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase {
+public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
   private static final int SHORT_TIMEOUT = 100;
@@ -45,7 +45,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
+    return "org/mule/test/integration/exceptions/on-error-continue-transaction-flow.xml";
   }
 
   @Test

@@ -7,13 +7,15 @@
 package org.mule.test.integration.exceptions;
 
 import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -21,10 +23,10 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -63,31 +65,13 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
-  public void testOutboundEndpointInFlow() throws Exception {
-    flowRunner("outboundEndpointInFlow").withPayload(TEST_MESSAGE).asynchronously().run();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outFlow2", 3000);
-    assertNotNull(response);
-  }
-
-  @Test
-  public void testOutboundDynamicEndpointInFlow() throws Exception {
-    flowRunner("outboundDynamicEndpointInFlow").withPayload(MESSAGE).asynchronously().run();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outFlow3", 3000);
-    assertNotNull(response);
-  }
-
-  @Test
   public void testAsyncInFlow() throws Exception {
     flowRunner("asyncInFlow").withPayload(MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
     MuleMessage response = client.request("test://outFlow4", 3000);
     assertNotNull(response);
-    assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
   @Test
@@ -98,7 +82,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     MuleMessage response = client.request("test://outFlow5", 3000);
 
     assertNotNull(response);
-    assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
   @Test
@@ -110,40 +94,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
     assertNotNull(response);
     assertTrue(muleEvent.getFlowVariable("expectedHandler"));
-    assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
-  }
-
-  @Test
-  public void testOutboundEndpointInScope() throws Exception {
-    LinkedList<String> list = new LinkedList<String>();
-    list.add(MESSAGE);
-    flowRunner("outboundEndpointInScope").withPayload(list).asynchronously().run();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outScope2", 3000);
-
-    assertNotNull(response);
-
-    FlowAssert.verify("outboundEndpointInScope");
-
-    assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
-  }
-
-  @Test
-  public void testOutboundDynamicEndpointInScope() throws Exception {
-    LinkedList<String> list = new LinkedList<String>();
-    list.add(MESSAGE);
-    flowRunner("outboundDynamicEndpointInScope").withPayload(list).withInboundProperties(getMessageProperties()).asynchronously()
-        .run();
-
-    MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outScope3", 3000);
-
-    assertNotNull(response);
-
-    FlowAssert.verify("outboundDynamicEndpointInScope");
-
-    assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
   @Test
@@ -157,17 +108,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
     FlowAssert.verify("customProcessorInTransactionalScope");
 
-    assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
-  }
-
-  @Test
-  public void testOutboundEndpointInTransactionalScope() throws Exception {
-    testTransactionalScope("outboundEndpointInTransactionalScope", "test://outTransactional2", emptyMap());
-  }
-
-  @Test
-  public void testOutboundDynamicEndpointInTransactionalScope() throws Exception {
-    testTransactionalScope("outboundDynamicEndpointInTransactionalScope", "test://outTransactional3", getMessageProperties());
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
   @Test
@@ -178,7 +119,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testUntilSuccessfulInTransactionalScope() throws Exception {
     testTransactionalScope("untilSuccessfulInTransactionalScope", "test://outTransactional5", emptyMap());
-    assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
   @Test
@@ -193,16 +134,6 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     FlowAssert.verify("customProcessorInExceptionStrategy");
 
     assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
-  }
-
-  @Test
-  public void testOutboundEndpointInExceptionStrategy() throws Exception {
-    testExceptionStrategy("outboundEndpointInExceptionStrategy", emptyMap());
-  }
-
-  @Test
-  public void testOutboundDynamicEndpointInExceptionStrategy() throws Exception {
-    testExceptionStrategy("outboundDynamicEndpointInExceptionStrategy", getMessageProperties());
   }
 
   @Test
@@ -241,7 +172,11 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   private void testExceptionStrategy(String flowName, Map<String, Serializable> messageProperties) throws Exception {
     latch = spy(new CountDownLatch(2));
-    flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
+    try {
+      flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
+    } catch (Exception e) {
+      //do nothing
+    }
 
     assertFalse(latch.await(3, TimeUnit.SECONDS));
     verify(latch).countDown();

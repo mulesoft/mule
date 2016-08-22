@@ -125,27 +125,33 @@
     <flow name="catchRollbackExceptionStrategy">
         <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
         <flow-ref name="rollbackExceptionStrategyChild"/>
-        <catch-exception-strategy>
-            <test:assert expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
-            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-            <test:non-blocking-processor/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:assert expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
+                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <test:non-blocking-processor/>
+            </on-error-continue>
+        </error-handler>
     </flow>
     <flow name="rollbackRollbackExceptionStrategy">
         <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
         <flow-ref name="rollbackExceptionStrategyChild"/>
-        <rollback-exception-strategy>
-            <test:assert expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
-            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-            <test:non-blocking-processor/>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:assert expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+                <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+                <test:non-blocking-processor/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
     <flow name="rollbackExceptionStrategyChild">
         <test:component throwException="true"/>
-        <rollback-exception-strategy>
-            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-            <test:non-blocking-processor/>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+                <test:non-blocking-processor/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>

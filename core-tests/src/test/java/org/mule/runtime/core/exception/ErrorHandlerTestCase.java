@@ -31,7 +31,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCase {
+public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy1;
@@ -52,16 +52,16 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
 
   @Test
   public void testNonMatchThenCallDefault() throws Exception {
-    ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
+    ErrorHandler errorHandler = new ErrorHandler();
     when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
-    choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-    choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<>(Arrays
+    errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-    choiceMessagingExceptionStrategy.initialise();
+    errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
     when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
     when(mockDefaultTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
-    choiceMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(Exception.class),
                                                                                          any(MuleEvent.class));
     verify(mockTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(Exception.class),
@@ -71,16 +71,16 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
 
   @Test
   public void testSecondMatches() throws Exception {
-    ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
-    choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-    choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<>(Arrays
+    ErrorHandler errorHandler = new ErrorHandler();
+    errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
-    choiceMessagingExceptionStrategy.initialise();
+    errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
     when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
     when(mockDefaultTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
-    choiceMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(Exception.class),
                                                                                          any(MuleEvent.class));
     verify(mockDefaultTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(Exception.class),
@@ -90,15 +90,15 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
 
   @Test(expected = MuleRuntimeException.class)
   public void testFirstAcceptsAllMatches() throws Exception {
-    ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
-    choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-    choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<>(Arrays
+    ErrorHandler errorHandler = new ErrorHandler();
+    errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
     when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
     when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
     when(mockDefaultTestExceptionStrategy2.acceptsAll()).thenReturn(true);
-    choiceMessagingExceptionStrategy.initialise();
+    errorHandler.initialise();
   }
 
 }

@@ -6,6 +6,6 @@
 
     <configuration defaultExceptionStrategy-ref="exception-strategy-with-expression"/>
 
-    <catch-exception-strategy when="#[exception is something]" name="exception-strategy-with-expression"/>
+    <on-error-continue when="#[exception is something]" name="exception-strategy-with-expression"/>
 
 </mule>

@@ -12,7 +12,7 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.CatchExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
+    <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$CxfTransformerThrowsExceptions"/>
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
@@ -23,10 +23,12 @@
         <http:listener path="testServiceWithFaultCatchException" config-ref="listenerConfig"/>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
-        <catch-exception-strategy>
-            <object-to-string-transformer/>
-            <append-string-transformer message=" Anonymous"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <object-to-string-transformer/>
+                <append-string-transformer message=" Anonymous"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <!-- Jaxws Service with exception thrown by component with catch exception strategy and Fault rethrown-->
@@ -34,8 +36,8 @@
         <http:listener path="testServiceWithFaultCatchExceptionRethrown" config-ref="listenerConfig"/>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
-        <custom-exception-strategy class="org.mule.runtime.module.cxf.CatchExceptionStrategyTestCase$RethrowExceptionStrategy">
-            <custom-processor class="org.mule.runtime.module.cxf.CatchExceptionStrategyTestCase$RethrowFaultProcessor"/>
+        <custom-exception-strategy class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$RethrowExceptionStrategy">
+            <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$RethrowFaultProcessor"/>
         </custom-exception-strategy>
     </flow>
 
@@ -47,7 +49,9 @@
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>
         <transformer ref="throwsException"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
     <!-- End test service -->
@@ -69,22 +73,26 @@
     <flow name="FlowWithClientAndSOAPFaultCatchException" processingStrategy="synchronous">
         <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
         <http:request path="helloFault" config-ref="requestConfig"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.cxf.CatchExceptionStrategyTestCase$ProxyCustomProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="FlowWithClientAndSOAPFaultCatchExceptionRedirect" processingStrategy="synchronous">
         <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
         <set-variable variableName="originalPayload" value="#[message.payloadAs(String)]"/>
         <http:request path="helloFault" method="POST" config-ref="requestConfig"/>
-        <catch-exception-strategy>
-            <processor-chain>
-                <set-payload value="#[flowVars['originalPayload']]"/>
-                <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
-                <http:request path="hello" method="POST" config-ref="requestConfig"/>
-            </processor-chain>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <processor-chain>
+                    <set-payload value="#[flowVars['originalPayload']]"/>
+                    <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
+                    <http:request path="hello" method="POST" config-ref="requestConfig"/>
+                </processor-chain>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="FlowWithClientAndTransformerExceptionCatchException" processingStrategy="synchronous">
@@ -93,7 +101,9 @@
         <object-to-string-transformer/>
         <append-string-transformer message=" Anonymous"/>
         <transformer ref="throwsException"/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
     <!--- End test Client -->
@@ -107,9 +117,11 @@
         <object-to-string-transformer/>
         <transformer ref="throwsException"/>
         <http:request path="hello" method="POST" config-ref="requestConfig"/>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.cxf.CatchExceptionStrategyTestCase$ProxyCustomProcessor"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <!-- End testing Proxy -->

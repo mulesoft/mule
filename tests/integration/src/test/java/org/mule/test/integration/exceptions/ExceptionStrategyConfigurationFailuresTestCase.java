@@ -71,12 +71,12 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testChoiceExceptionStrategyCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
+  public void testErrorHandlerCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testChoiceExceptionStrategyCantHaveDefaultExceptionStrategy() throws Exception {
+  public void testErrorHandlerCantHaveDefaultExceptionStrategy() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
   }
 
@@ -98,18 +98,8 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategies() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback.xml");
-  }
-
-  @Test(expected = ConfigurationException.class)
-  public void testCatchExceptionStrategyWithWhenWithoutChoice() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-catch-es.xml");
-  }
-
-  @Test(expected = ConfigurationException.class)
-  public void testRollbackExceptionStrategyWithWhenWithoutChoice() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-rollback-es.xml");
+  public void testErrorHandlerWithMultipleHandleRedeliveryExceptionStrategies() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/error-handler-multiple-propagate.xml");
   }
 
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {

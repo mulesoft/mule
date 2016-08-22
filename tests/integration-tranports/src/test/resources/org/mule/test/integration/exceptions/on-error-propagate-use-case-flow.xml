@@ -26,13 +26,17 @@
           <vm:transaction action="ALWAYS_BEGIN"/>
       </vm:inbound-endpoint>
       <test:component throwException="true"/>
-      <rollback-exception-strategy/>
+        <error-handler>
+            <on-error-propagate/>
+        </error-handler>
     </flow>
 
     <flow name="alwaysRollbackJmsNoTransaction" processingStrategy="synchronous">
       <jms:inbound-endpoint queue="in" connector-ref="activeMq"/>
       <test:component throwException="true"/>
-      <rollback-exception-strategy/>
+        <error-handler>
+            <on-error-propagate/>
+        </error-handler>
     </flow>
     
     <flow name="rollbackWithComponent">
@@ -40,31 +44,35 @@
           <vm:transaction action="ALWAYS_BEGIN"/>
       </vm:inbound-endpoint>
       <test:component throwException="true"/>
-      <rollback-exception-strategy>
-        <script:component>
-            <script:script engine="groovy">
-                return "$payload Rolled Back"
-            </script:script>
-        </script:component>
-      </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <script:component>
+                    <script:script engine="groovy">
+                        return "$payload Rolled Back"
+                    </script:script>
+                </script:component>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="fullyDefinedRollbackExceptionStrategyWithComponent">
         <vm:inbound-endpoint path="in6" exchange-pattern="request-response"/>
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
-            <append-string-transformer message=" apt2"/>
-            <append-string-transformer message=" apt3"/>
-            <on-redelivery-attempts-exceeded>
-                <append-string-transformer message=" apt4"/>
-		        <script:component>
-		            <script:script engine="groovy">
-		                return "$payload groovified"
-		            </script:script>
-		        </script:component>
-            </on-redelivery-attempts-exceeded>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
+                <append-string-transformer message=" apt2"/>
+                <append-string-transformer message=" apt3"/>
+                <on-redelivery-attempts-exceeded>
+                    <append-string-transformer message=" apt4"/>
+                    <script:component>
+                        <script:script engine="groovy">
+                            return "$payload groovified"
+                        </script:script>
+                    </script:component>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="redeliveryExhaustedTransactional">
@@ -72,56 +80,66 @@
           <jms:transaction action="ALWAYS_BEGIN"/>
        </jms:inbound-endpoint>
        <test:component throwException="true"/>
-       <rollback-exception-strategy>
-          <on-redelivery-attempts-exceeded>
-              <jms:jmsmessage-to-object-transformer/>
-              <append-string-transformer message=" consumed successfully"/>
-              <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery">
-                  <jms:transaction action="ALWAYS_JOIN"/>
-              </jms:outbound-endpoint>
-          </on-redelivery-attempts-exceeded>
-       </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <on-redelivery-attempts-exceeded>
+                    <jms:jmsmessage-to-object-transformer/>
+                    <append-string-transformer message=" consumed successfully"/>
+                    <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="redeliveryExhaustedNoTransaction">
        <jms:inbound-endpoint queue="in3" connector-ref="activeMq"/>
        <test:component throwException="true"/>
-       <rollback-exception-strategy maxRedeliveryAttempts="${maxRedelivery}">
-           <on-redelivery-attempts-exceeded>
-               <append-string-transformer message=" consumed successfully"/>
-               <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery"/>
-           </on-redelivery-attempts-exceeded>
-       </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="${maxRedelivery}">
+                <on-redelivery-attempts-exceeded>
+                    <append-string-transformer message=" consumed successfully"/>
+                    <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery"/>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="httpRollbackOnly">
         <http:listener path="*" config-ref="listenerConfig1"/>
         <test:component throwException="true"/>
-        <rollback-exception-strategy/>
+        <error-handler>
+            <on-error-propagate/>
+        </error-handler>
     </flow>
 
     <flow name="httpWithRedeliveryExhausted">
         <http:listener path="*" config-ref="listenerConfig2"/>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
-            <on-redelivery-attempts-exceeded>
-                <append-string-transformer message=" consumed successfully"/>
-            </on-redelivery-attempts-exceeded>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
+                <on-redelivery-attempts-exceeded>
+                    <append-string-transformer message=" consumed successfully"/>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="fullyDefinedRollbackExceptionStrategy">
         <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
-            <append-string-transformer message=" apt2"/>
-            <append-string-transformer message=" apt3"/>
-            <on-redelivery-attempts-exceeded>
-                <append-string-transformer message=" apt4"/>
-                <append-string-transformer message=" apt5"/>
-            </on-redelivery-attempts-exceeded>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
+                <append-string-transformer message=" apt2"/>
+                <append-string-transformer message=" apt3"/>
+                <on-redelivery-attempts-exceeded>
+                    <append-string-transformer message=" apt4"/>
+                    <append-string-transformer message=" apt5"/>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="redeliveryPolicyRedefinition">
@@ -130,7 +148,9 @@
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true"/>
-        <rollback-exception-strategy/>
+        <error-handler>
+            <on-error-propagate/>
+        </error-handler>
     </flow>
 
     <flow name="inboundEndpointMaxRedeliveryTakesPrecendence">
@@ -139,7 +159,9 @@
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="7"/>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="7"/>
+        </error-handler>
     </flow>
 
     <flow name="rollbackExceptionStrategyCatchMessageRedeliveryDespiteChoiceConfiguration">
@@ -147,14 +169,14 @@
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true" exceptionToThrow="java.io.IOException"/>
-        <choice-exception-strategy>
-            <rollback-exception-strategy when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="2">
+        <error-handler>
+            <on-error-propagate when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="2">
                 <on-redelivery-attempts-exceeded>
-                    <custom-processor class="org.mule.test.integration.exceptions.RollbackExceptionStrategyTestCase$CallMessageProcessor"/>
+                    <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$CallMessageProcessor"/>
                 </on-redelivery-attempts-exceeded>
-            </rollback-exception-strategy>
-            <catch-exception-strategy/>
-        </choice-exception-strategy>
+            </on-error-propagate>
+            <on-error-continue/>
+        </error-handler>
     </flow>
     
 </mule>

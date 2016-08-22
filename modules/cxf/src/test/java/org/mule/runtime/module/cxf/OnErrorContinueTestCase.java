@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.TemplateMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -37,7 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
+public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
       + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
@@ -55,7 +55,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "catch-exception-strategy-conf.xml";
+    return "on-error-continue-conf.xml";
   }
 
   @Test
@@ -146,7 +146,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase {
     }
   }
 
-  public static class RethrowExceptionStrategy extends TemplateMessagingExceptionStrategy {
+  public static class RethrowExceptionStrategy extends TemplateOnErrorHandler {
 
     @Override
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {

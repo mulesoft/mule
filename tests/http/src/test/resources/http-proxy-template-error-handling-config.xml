@@ -27,20 +27,24 @@
     <flow name="catchExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
         <httpn:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false"  key="ANY"/>
-        <catch-exception-strategy>
-            <processor ref="catchSensingMessageProcessor"/>
-            <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
-            <set-payload value="Service Down"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <processor ref="catchSensingMessageProcessor"/>
+                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
+                <set-payload value="Service Down"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="rollbackExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
         <httpn:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false"  key="ANY"/>
-        <rollback-exception-strategy>
-            <processor ref="rollbackSensingMessageProcessor"/>
-            <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
-            <set-payload value="Service Down"/>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <processor ref="rollbackSensingMessageProcessor"/>
+                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
+                <set-payload value="Service Down"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 </mule>

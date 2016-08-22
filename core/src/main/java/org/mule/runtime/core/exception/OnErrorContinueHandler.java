@@ -9,9 +9,14 @@ package org.mule.runtime.core.exception;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
-public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy {
+/**
+ * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.
+ *
+ * @since 4.0
+ */
+public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
-  public CatchMessagingExceptionStrategy() {
+  public OnErrorContinueHandler() {
     setHandleException(true);
   }
 

@@ -7,10 +7,12 @@
 
     <flow name="inbound">
         <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <set-property propertyName="prop" value="#[message.inboundProperties.foo]" />
-            <test:queue name="out"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-property propertyName="prop" value="#[message.inboundProperties.foo]" />
+                <test:queue name="out"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

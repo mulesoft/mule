@@ -15,7 +15,9 @@
 
     <flow name="flowExceptionStrategy">
         <logger/>
-        <catch-exception-strategy/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
 </mule>

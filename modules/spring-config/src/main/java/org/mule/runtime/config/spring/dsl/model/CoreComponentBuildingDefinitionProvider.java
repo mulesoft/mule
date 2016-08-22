@@ -35,7 +35,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETO
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -43,20 +42,19 @@ import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
-import org.mule.runtime.config.spring.dsl.api.CommonTypeConverters;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
 import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
@@ -98,11 +96,11 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
-import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.AbstractExpressionTransformer;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -197,13 +195,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String MESSAGE_PROCESSORS = "messageProcessors";
   private static final String NAME = "name";
   private static final String EXCEPTION_STRATEGY = "exception-strategy";
-  private static final String CATCH_EXCEPTION_STRATEGY = "catch-exception-strategy";
+  private static final String ON_ERROR_CONTINUE = "on-error-continue";
   private static final String WHEN = "when";
-  private static final String ROLLBACK_EXCEPTION_STRATEGY = "rollback-exception-strategy";
+  private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   private static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   private static final String NAME_EXCEPTION_STRATEGY_ATTRIBUTE = "globalName";
   private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
-  private static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
+  private static final String ERROR_HANDLER = "error-handler";
   private static final String SET_PAYLOAD = "set-payload";
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String PROCESSOR = "processor";
@@ -253,12 +251,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(EXCEPTION_STRATEGY).withTypeDefinition(fromType(Object.class))
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build()).build());
-    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(CATCH_EXCEPTION_STRATEGY)
-        .withTypeDefinition(fromType(CatchMessagingExceptionStrategy.class))
+    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ON_ERROR_CONTINUE)
+        .withTypeDefinition(fromType(OnErrorContinueHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build()).asPrototype().build());
-    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ROLLBACK_EXCEPTION_STRATEGY)
-        .withTypeDefinition(fromType(RollbackMessagingExceptionStrategy.class))
+    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ON_ERROR_PROPAGATE)
+        .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
@@ -286,11 +284,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(CHOICE_EXCEPTION_STRATEGY)
-        .withTypeDefinition(fromType(ChoiceMessagingExceptionStrategy.class))
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(ERROR_HANDLER)
+        .withTypeDefinition(fromType(ErrorHandler.class))
         .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(MessagingExceptionHandler.class).build())
+        .asPrototype()
         .build());
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))

@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CatchExceptionStrategyTestCase extends AbstractIntegrationTestCase {
+public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   public static final int TIMEOUT = 5000;
   public static final String ERROR_PROCESSING_NEWS = "error processing news";
@@ -52,7 +52,7 @@ public class CatchExceptionStrategyTestCase extends AbstractIntegrationTestCase 
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml";
+    return "org/mule/test/integration/exceptions/on-error-continue-use-case-flow.xml";
   }
 
   @Before

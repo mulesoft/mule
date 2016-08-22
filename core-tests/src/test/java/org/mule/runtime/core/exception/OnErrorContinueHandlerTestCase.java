@@ -46,7 +46,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContextTestCase {
+public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
   private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
   @Mock
@@ -63,7 +63,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
   private TestTransaction mockXaTransaction = new TestTransaction(mockMuleContext, true);
 
 
-  private CatchMessagingExceptionStrategy catchMessagingExceptionStrategy;
+  private OnErrorContinueHandler onErrorContinueHandler;
 
   @Before
   public void before() throws Exception {
@@ -71,9 +71,9 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     if (currentTransaction != null) {
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
-    catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy();
-    catchMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-    catchMessagingExceptionStrategy.setFlowConstruct(getTestFlow());
+    onErrorContinueHandler = new OnErrorContinueHandler();
+    onErrorContinueHandler.setMuleContext(mockMuleContext);
+    onErrorContinueHandler.setFlowConstruct(getTestFlow());
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
     Flow flow = getTestFlow();
@@ -84,7 +84,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
   public void testHandleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
 
-    MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    MuleEvent resultEvent = onErrorContinueHandler.handleException(mockException, mockMuleEvent);
     assertThat(resultEvent, is(mockMuleEvent));
 
     verify(mockTransaction, times(0)).setRollbackOnly();
@@ -100,10 +100,10 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
   public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {
     mockMuleEvent = spy(mockMuleEvent);
 
-    catchMessagingExceptionStrategy
+    onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
-    catchMessagingExceptionStrategy.initialise();
-    final MuleEvent result = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    onErrorContinueHandler.initialise();
+    final MuleEvent result = onErrorContinueHandler.handleException(mockException, mockMuleEvent);
 
     verify(mockMuleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
@@ -120,12 +120,12 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
     Flow flow = getTestFlow();
     MuleEvent lastEventCreated = new DefaultMuleEvent(create(flow), muleMessage, flow);
-    catchMessagingExceptionStrategy
+    onErrorContinueHandler
         .setMessageProcessors(asList(createChagingEventMessageProcessor(new DefaultMuleEvent(create(flow),
                                                                                              muleMessage, flow)),
                                      createChagingEventMessageProcessor(lastEventCreated)));
-    catchMessagingExceptionStrategy.initialise();
-    MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    onErrorContinueHandler.initialise();
+    MuleEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, mockMuleEvent);
     assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
     assertThat(exceptionHandlingResult.getCorrelationId(), is(lastEventCreated.getCorrelationId()));
   }
@@ -141,17 +141,17 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
 
     Flow flow = getTestFlow();
     MuleEvent lastEventCreated = new DefaultMuleEvent(create(flow), muleMessage, flow);
-    catchMessagingExceptionStrategy
+    onErrorContinueHandler
         .setMessageProcessors(asList(createFailingEventMessageProcessor(new DefaultMuleEvent(create(flow),
                                                                                              muleMessage,
                                                                                              flow)),
                                      createFailingEventMessageProcessor(lastEventCreated)));
-    catchMessagingExceptionStrategy.initialise();
+    onErrorContinueHandler.initialise();
 
     when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
 
     MuleEvent exceptionHandlingResult =
-        exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+        exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, mockMuleEvent);
   }
 
   private MuleEvent createNonBlockingTestEvent() throws Exception {

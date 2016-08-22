@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -205,7 +205,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
     final MuleEvent mockResultEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
-      CatchMessagingExceptionStrategy exceptionStrategy = new CatchMessagingExceptionStrategy();
+      OnErrorContinueHandler exceptionStrategy = new OnErrorContinueHandler();
       exceptionStrategy.setMuleContext(mockMuleContext);
       when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
       when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));

@@ -29,8 +29,8 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.beans.ExceptionListener;
@@ -155,28 +155,28 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
      * it flowConstruct should be responsible of redelivery policy use
      */
     AbstractRedeliveryPolicy redeliveryPolicy = super.getRedeliveryPolicy();
-    RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy = null;
+    OnErrorPropagateHandler onErrorPropagateHandler = null;
     if (flowConstruct != null && flowConstruct.getExceptionListener() != null) {
       MessagingExceptionHandler exceptionListener = flowConstruct.getExceptionListener();
-      if (exceptionListener instanceof RollbackMessagingExceptionStrategy) {
-        rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) exceptionListener;
-      } else if (exceptionListener instanceof ChoiceMessagingExceptionStrategy) {
-        ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = (ChoiceMessagingExceptionStrategy) exceptionListener;
-        for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy
+      if (exceptionListener instanceof OnErrorPropagateHandler) {
+        onErrorPropagateHandler = (OnErrorPropagateHandler) exceptionListener;
+      } else if (exceptionListener instanceof ErrorHandler) {
+        ErrorHandler errorHandler = (ErrorHandler) exceptionListener;
+        for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : errorHandler
             .getExceptionListeners()) {
-          if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy
-              && ((RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts()) {
-            rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor;
+          if (messagingExceptionHandlerAcceptor instanceof OnErrorPropagateHandler
+              && ((OnErrorPropagateHandler) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts()) {
+            onErrorPropagateHandler = (OnErrorPropagateHandler) messagingExceptionHandlerAcceptor;
             break;
           }
         }
       }
     }
-    if (rollbackMessagingExceptionStrategy != null && rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts()) {
+    if (onErrorPropagateHandler != null && onErrorPropagateHandler.hasMaxRedeliveryAttempts()) {
       if (redeliveryPolicy == null) {
-        redeliveryPolicy = createDefaultRedeliveryPolicy(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
+        redeliveryPolicy = createDefaultRedeliveryPolicy(onErrorPropagateHandler.getMaxRedeliveryAttempts());
       } else {
-        redeliveryPolicy.setMaxRedeliveryCount(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
+        redeliveryPolicy.setMaxRedeliveryCount(onErrorPropagateHandler.getMaxRedeliveryAttempts());
       }
     }
     return redeliveryPolicy;

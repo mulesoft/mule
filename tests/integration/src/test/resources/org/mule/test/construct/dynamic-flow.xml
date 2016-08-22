@@ -15,8 +15,10 @@
 
     <flow name="exceptionFlow">
         <append-string-transformer message="(fail)" />
-        <catch-exception-strategy>
-            <append-string-transformer message="(handled)" />
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <append-string-transformer message="(handled)" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 </mule>

@@ -6,17 +6,23 @@
 
     <configuration defaultExceptionStrategy-ref="defaultEs"/>
 
-    <catch-exception-strategy name="esA">
-        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
-    </catch-exception-strategy>
+    <error-handler name="esA">
+        <on-error-continue>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+        </on-error-continue>
+    </error-handler>
 
-    <catch-exception-strategy name="esB">
-        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
-    </catch-exception-strategy>
+    <error-handler name="esB">
+        <on-error-continue>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+        </on-error-continue>
+    </error-handler>
 
-    <catch-exception-strategy name="defaultEs">
-        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
-    </catch-exception-strategy>
+    <error-handler name="defaultEs">
+        <on-error-continue>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+        </on-error-continue>
+    </error-handler>
 
     <flow name="flowA">
         <logger/>

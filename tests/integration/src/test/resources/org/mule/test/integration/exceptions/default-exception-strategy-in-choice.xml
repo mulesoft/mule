@@ -6,10 +6,10 @@
 
     <flow name="flowA">
         <logger/>
-        <choice-exception-strategy name="choice">
-            <catch-exception-strategy when="#[exception is java.lang.NullPointerException]"/>
+        <error-handler name="choice">
+            <on-error-continue when="#[exception is java.lang.NullPointerException]"/>
             <defaul-exception-strategy/>
-        </choice-exception-strategy>
+        </error-handler>
     </flow>
 
 </mule>

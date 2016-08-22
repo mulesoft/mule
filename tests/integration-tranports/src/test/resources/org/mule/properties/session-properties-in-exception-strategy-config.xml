@@ -19,9 +19,11 @@
     <flow name="splitterFlow">
         <test:component throwException="true"/>
 
-        <catch-exception-strategy>
-            <flow-ref name="exceptionFlow"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <flow-ref name="exceptionFlow"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="exceptionFlow">

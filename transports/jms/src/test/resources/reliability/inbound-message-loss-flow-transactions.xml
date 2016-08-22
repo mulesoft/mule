@@ -40,6 +40,8 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:inbound-endpoint>
         <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="2"/>
+        </error-handler>
     </flow>
 </mule>

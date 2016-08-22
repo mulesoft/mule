@@ -10,9 +10,11 @@
         <enricher source="#[payload]" target="#[variable:blob]">
             <test:component throwException="true" />
         </enricher>
-        <catch-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyEnricherTestCase$ErrorProcessor" />
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueEnricherTestCase$ErrorProcessor" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
 </mule>

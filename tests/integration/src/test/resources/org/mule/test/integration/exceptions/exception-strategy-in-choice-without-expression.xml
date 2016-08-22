@@ -4,10 +4,10 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <choice-exception-strategy name="choice">
-        <catch-exception-strategy/>
-        <catch-exception-strategy/>
-    </choice-exception-strategy>
+    <error-handler name="choice">
+        <on-error-continue/>
+        <on-error-continue/>
+    </error-handler>
 
     <flow name="flowA">
         <logger/>

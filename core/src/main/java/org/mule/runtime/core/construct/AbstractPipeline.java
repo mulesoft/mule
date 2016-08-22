@@ -37,8 +37,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -275,22 +275,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       setProcessingStrategy(new SynchronousProcessingStrategy());
       if (LOGGER.isWarnEnabled()) {
         LOGGER
-            .warn("Using message redelivery and rollback-exception-strategy requires synchronous processing strategy. Processing strategy re-configured to synchronous");
+            .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");
       }
     }
   }
 
   protected boolean isRedeliveryPolicyConfigured() {
     boolean isRedeliveredPolicyConfigured = false;
-    if (this.exceptionListener instanceof RollbackMessagingExceptionStrategy
-        && ((RollbackMessagingExceptionStrategy) exceptionListener).hasMaxRedeliveryAttempts()) {
+    if (this.exceptionListener instanceof OnErrorPropagateHandler
+        && ((OnErrorPropagateHandler) exceptionListener).hasMaxRedeliveryAttempts()) {
       isRedeliveredPolicyConfigured = true;
-    } else if (this.exceptionListener instanceof ChoiceMessagingExceptionStrategy) {
-      ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy =
-          (ChoiceMessagingExceptionStrategy) this.exceptionListener;
-      for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy
+    } else if (this.exceptionListener instanceof ErrorHandler) {
+      ErrorHandler errorHandler =
+          (ErrorHandler) this.exceptionListener;
+      for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : errorHandler
           .getExceptionListeners()) {
-        if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy) {
+        if (messagingExceptionHandlerAcceptor instanceof OnErrorPropagateHandler) {
           isRedeliveredPolicyConfigured = true;
           break;
         }

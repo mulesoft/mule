@@ -42,13 +42,15 @@
         <jms:outbound-endpoint queue="out" connector-ref="jmsConnectorNoRedelivery">
             <jms:transaction action="ALWAYS_JOIN" />
         </jms:outbound-endpoint>
-        <rollback-exception-strategy maxRedeliveryAttempts="${maxRedeliveryAttempts}">
-            <on-redelivery-attempts-exceeded>
-                <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorNoRedelivery">
-                    <jms:transaction action="ALWAYS_JOIN" />
-                </jms:outbound-endpoint>
-            </on-redelivery-attempts-exceeded>
-        </rollback-exception-strategy>
+        <error-handler>
+            <on-error-propagate maxRedeliveryAttempts="${maxRedeliveryAttempts}">
+                <on-redelivery-attempts-exceeded>
+                    <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorNoRedelivery">
+                        <jms:transaction action="ALWAYS_JOIN" />
+                    </jms:outbound-endpoint>
+                </on-redelivery-attempts-exceeded>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>
