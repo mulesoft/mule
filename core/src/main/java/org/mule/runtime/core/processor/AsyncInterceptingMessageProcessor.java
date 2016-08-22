@@ -96,13 +96,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
       }
 
-      MuleEvent response;
-      if (event.getFlowConstruct() != null) {
-        response = new ProcessingTimeInterceptor(next).process(event);
-      } else {
-        response = processNext(event);
-      }
-      return response;
+      return new ProcessingTimeInterceptor(next).process(event);
     }
   }
 

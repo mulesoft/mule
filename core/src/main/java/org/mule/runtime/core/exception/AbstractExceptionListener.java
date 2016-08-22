@@ -173,10 +173,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
           logger.debug("Message being processed is: "
               + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
         }
-        String component = "Unknown";
-        if (event.getFlowConstruct() != null) {
-          component = event.getFlowConstruct().getName();
-        }
+        String component = event.getFlowName();
         URI endpointUri = event.getMessageSourceURI();
 
         // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.

@@ -49,7 +49,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   }
 
   protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed) {
-    if (event.getFlowConstruct() != null && event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
+    if (event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
       return ((MessageProcessorPathResolver) event.getFlowConstruct()).getProcessorPath(lastProcessed);
     } else {
       return lastProcessed.toString();
