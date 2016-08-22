@@ -21,8 +21,10 @@
             </dbn:select>
         </transactional>
         <set-payload value="#[true]"/>
-        <catch-exception-strategy>
-            <set-payload value="#[planets.payload.hasNext()]"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="#[planets.payload.hasNext()]"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 </mule>

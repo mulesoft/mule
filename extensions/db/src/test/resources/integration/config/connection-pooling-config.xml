@@ -16,9 +16,10 @@
         </transactional>
 
         <test:queue name="testOut"/>
-
-        <catch-exception-strategy>
-            <test:queue name="connectionError"/>
-        </catch-exception-strategy>
+        <error-handler>
+            <on-error-continue>
+                <test:queue name="connectionError"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 </mule>
