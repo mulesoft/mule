@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import javax.inject.Inject;
 
@@ -34,6 +36,7 @@ public abstract class FileConnectorConfig implements Initialisable {
    */
   @Parameter
   @Optional
+  @Placement(group = ADVANCED)
   private String defaultWriteEncoding;
 
   /**
