@@ -22,6 +22,7 @@ import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.script.ScriptException;
 
@@ -92,7 +93,14 @@ public class MuleInvoker implements Invoker {
         Throwable cause = e;
 
         // See MULE-6329
-        if (Boolean.valueOf((String) event.getFlowVariable(CxfConstants.UNWRAP_MULE_EXCEPTIONS))) {
+        String unwrapMuleExceptions = null;
+        try {
+          unwrapMuleExceptions = event.getFlowVariable(CxfConstants.UNWRAP_MULE_EXCEPTIONS);
+        } catch (NoSuchElementException nsee) {
+          // Ignore.
+        }
+
+        if (Boolean.valueOf(unwrapMuleExceptions)) {
           cause = ExceptionHelper.getNonMuleException(e);
           // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
           // ScriptException

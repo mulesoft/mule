@@ -307,7 +307,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
           Iterator<Serializable> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
           while (i.hasNext()) {
             Serializable id = i.next();
-            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getExecutionContext().getCorrelationId());
+            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getContext().getCorrelationId());
             if (i.hasNext()) {
               buf.append(", ");
             }

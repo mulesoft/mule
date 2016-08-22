@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
@@ -22,7 +23,13 @@ public abstract class AbstractMapContext<V> implements Map<String, V> {
     if (!(key instanceof String)) {
       return null;
     }
-    return doGet((String) key);
+    V value = null;
+    try {
+      value = doGet((String) key);
+    } catch (NoSuchElementException nsse) {
+      // Ignore
+    }
+    return value;
   }
 
   protected abstract V doGet(String key);
@@ -41,7 +48,12 @@ public abstract class AbstractMapContext<V> implements Map<String, V> {
 
   @Override
   public V put(String key, V value) {
-    V previousValue = doGet(key);
+    V previousValue = null;
+    try {
+      previousValue = doGet(key);
+    } catch (NoSuchElementException nsee) {
+      // Ignore
+    }
     doPut(key, value);
     return previousValue;
   }

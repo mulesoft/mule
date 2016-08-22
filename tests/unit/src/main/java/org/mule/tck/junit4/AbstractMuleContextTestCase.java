@@ -6,7 +6,7 @@
  */
 package org.mule.tck.junit4;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 

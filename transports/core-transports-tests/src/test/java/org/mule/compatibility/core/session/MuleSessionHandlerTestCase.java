@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.AfterClass;
@@ -175,7 +176,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
     outbound.set(event.getMessage().getOutboundProperty(MULE_SESSION_PROPERTY));
     event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_SESSION_PROPERTY).build());
 
-    final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
+    Object invocation = null;
+    try {
+      invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
+    } catch (NoSuchElementException nsse) {
+      // Ignore
+    }
     event.removeFlowVariable(MULE_SESSION_PROPERTY);
     return outbound.get() != null ? outbound.get() : (Serializable) invocation;
   }

@@ -17,20 +17,21 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.DefaultMuleEventBuilder;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.Set;
+import java.util.Map;
 
 /**
- * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
+ * Legacy implementation of {@link MuleEvent}
  * <p/>
  * Holds a MuleMessage payload and provides helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
- * @see org.mule.runtime.api.message.MuleEvent
+ * @see MuleEvent
  * @see MuleMessage
- * @deprecated Use {@link org.mule.runtime.api.message.MuleEvent} instead
+ * @deprecated Use {@link MuleEvent} instead
  */
 @Deprecated
 public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
@@ -38,7 +39,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   /**
    * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
    */
-  MessageExecutionContext getExecutionContext();
+  MessageContext getContext();
 
   /**
    * Returns the correlation metadata of this message. See {@link Correlation}.
@@ -185,18 +186,19 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   boolean isSynchronous();
 
+  // TODO MULE-9281 Make MuleEvent immutable
   void setMessage(MuleMessage message);
 
-  /**
-   * Gets the data type for a given flow variable
-   *
-   * @param key the name or key of the variable. This must be non-null.
-   * @return the property data type or null if the flow variable does not exist
-   */
-  DataType getFlowVariableDataType(String key);
+  // TODO MULE-9281 Make MuleEvent immutable
+  void setFlowVariable(String key, Object value);
 
-  Set<String> getFlowVariableNames();
+  // TODO MULE-9281 Make MuleEvent immutable
+  void setFlowVariable(String key, Object value, DataType dataType);
 
+  // TODO MULE-9281 Make MuleEvent immutable
+  void removeFlowVariable(String key);
+
+  // TODO MULE-9281 Make MuleEvent immutable
   void clearFlowVariables();
 
   /**
@@ -208,6 +210,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   /**
    * Enables the firing of notifications when processing the message.
+   * TODO MULE-9281 Make MuleEvent immutable
    *
    * @param enabled
    */
@@ -256,9 +259,85 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context
+   * this context.
+   * TODO MULE-9281 Make MuleEvent immutable
    *
    * @param context the context for this session or null if the request is not secure.
    */
   void setSecurityContext(SecurityContext context);
+
+  /**
+   * Create new {@link Builder}.
+   *
+   * @param eventContext the event context to create event instance with.
+   * @return new builder instance.
+   */
+  static Builder builder(MessageContext eventContext) {
+    return new DefaultMuleEventBuilder(eventContext);
+  }
+
+  /**
+   * Create new {@link Builder} based on an existing {@link org.mule.runtime.api.message.MuleEvent} instance.
+   * The existing {@link MessageContext} is conserved.
+   *
+   * @param event existing event to use as a template to create builder instance
+   * @return new builder instance.
+   */
+  static Builder builder(MuleEvent event) {
+    return new DefaultMuleEventBuilder(event);
+  }
+
+  interface Builder {
+
+    /**
+     * Set the {@link MuleMessage} to construct {@link MuleEvent} with.
+     *
+     * @param message the message instance.
+     * @return the builder instance
+     */
+    Builder message(MuleMessage message);
+
+    /**
+     * Set a map of flow variables.  Any existing flow variables added to the builder will be removed.
+     *
+     * @param flowVariables flow variables to be set.
+     * @return the builder instance
+     */
+    Builder flowVariables(Map<String, Object> flowVariables);
+
+    /**
+     * Add a flow variable.
+     *
+     * @param key the key of the flow variable to add.
+     * @param value the value of the flow varibale to add.
+     * @return the builder instance.
+     */
+    Builder addFlowVariable(String key, Object value);
+
+    /**
+     * Add a flow variable.
+     *
+     * @param key the key of the flow variable to add.
+     * @param value the value of the flow varibale to add.
+     * @param mediaType the flow variable media this
+     * @return the builder instance
+     */
+    Builder addFlowVariable(String key, Object value, DataType mediaType);
+
+    /**
+     * Remove a flow variable.
+     *
+     * @param key the flow variable key.
+     * @return the builder instance
+     */
+    Builder removeFlowVariable(String key);
+
+    /**
+     * Build a new {@link MuleEvent} based on the state confgured in the {@link Builder}.
+     *
+     * @return new {@link MuleEvent} instance.
+     */
+    MuleEvent build();
+
+  }
 }

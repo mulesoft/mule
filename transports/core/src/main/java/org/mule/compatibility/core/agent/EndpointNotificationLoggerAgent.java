@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.agent;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.util.ArrayList;
 import java.util.List;

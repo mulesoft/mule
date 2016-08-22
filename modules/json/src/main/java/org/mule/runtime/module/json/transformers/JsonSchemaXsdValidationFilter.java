@@ -66,7 +66,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
       String xmlString = (String) jToX
           .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
       MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
-      boolean accepted = super.accept(new DefaultMuleEvent(event.getExecutionContext(), xmlMessage, event.getFlowConstruct()));
+      boolean accepted = super.accept(new DefaultMuleEvent(event.getContext(), xmlMessage, event.getFlowConstruct()));
       if (jsonString != null) {
         msg = MuleMessage.builder(msg).payload(jsonString).build();
         event.setMessage(msg);

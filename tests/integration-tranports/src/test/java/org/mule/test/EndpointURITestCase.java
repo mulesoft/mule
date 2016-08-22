@@ -7,7 +7,7 @@
 package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.io.Serializable;
 import java.util.HashMap;

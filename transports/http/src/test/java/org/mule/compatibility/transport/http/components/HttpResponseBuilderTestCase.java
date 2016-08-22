@@ -16,7 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
@@ -25,7 +25,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -93,8 +93,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MessageExecutionContext executionContext = create(flow);
-    when(mockEvent.getExecutionContext()).thenReturn(executionContext);
+    MessageContext executionContext = create(flow);
+    when(mockEvent.getContext()).thenReturn(executionContext);
     mockExpressionManager = mock(ExpressionManager.class);
     when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }

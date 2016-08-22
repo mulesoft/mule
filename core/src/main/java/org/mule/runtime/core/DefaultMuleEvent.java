@@ -13,7 +13,7 @@ import static org.mule.runtime.core.message.Correlation.NO_CORRELATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -41,11 +41,11 @@ import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -76,7 +76,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    */
   @Deprecated
   private final String id;
-  private MessageExecutionContext executionContext;
+  private MessageContext context;
   private MuleMessage message;
   private final MuleSession session;
   private transient FlowConstruct flowConstruct;
@@ -106,35 +106,35 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   /**
    * Constructor used to create an event with no message source with minimal arguments
    */
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, MessageExchangePattern exchangePattern,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct) {
-    this(executionContext, message, exchangePattern, flowConstruct, new DefaultMuleSession());
+    this(context, message, exchangePattern, flowConstruct, new DefaultMuleSession());
   }
 
   /**
    * Constructor used to create an event with no message source with minimal arguments and a
    * {@link org.mule.runtime.core.api.connector.ReplyToHandler}
    */
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, MessageExchangePattern exchangePattern,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
                           ReplyToHandler replyToHandler, FlowConstruct flowConstruct) {
-    this(executionContext, message, URI.create("none"), exchangePattern, flowConstruct, new DefaultMuleSession(), replyToHandler);
+    this(context, message, URI.create("none"), exchangePattern, flowConstruct, new DefaultMuleSession(), replyToHandler);
   }
 
   /**
    * Constructor used to create an event with no message source with all additional arguments
    */
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, MessageExchangePattern exchangePattern,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct, MuleSession session) {
-    this(executionContext, message, URI.create("none"), exchangePattern, flowConstruct, session);
+    this(context, message, URI.create("none"), exchangePattern, flowConstruct, session);
   }
 
   /**
    * Constructor used to create an event with a identifiable message source with all additional arguments
    */
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, URI messageSourceURI,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, URI messageSourceURI,
                           MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
                           ReplyToHandler replyToHandler) {
-    this.executionContext = executionContext;
+    this.context = context;
     this.correlation = NO_CORRELATION;
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
@@ -155,25 +155,25 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * Constructor used to create an event with a identifiable message source with all additional arguments except a
    * {@link org.mule.runtime.core.api.connector.ReplyToHandler}
    */
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, URI messageSourceURI,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, URI messageSourceURI,
                           MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session) {
-    this(executionContext, message, messageSourceURI, exchangePattern, flowConstruct, session, null);
+    this(context, message, messageSourceURI, exchangePattern, flowConstruct, session, null);
   }
 
   // Constructors for inbound endpoint
 
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, FlowConstruct flowConstruct,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, FlowConstruct flowConstruct,
                           MuleSession session) {
-    this(executionContext, message, flowConstruct, session, null, null);
+    this(context, message, flowConstruct, session, null, null);
   }
 
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, FlowConstruct flowConstruct) {
-    this(executionContext, message, flowConstruct, new DefaultMuleSession(), null, null);
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, FlowConstruct flowConstruct) {
+    this(context, message, flowConstruct, new DefaultMuleSession(), null, null);
   }
 
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, FlowConstruct flowConstruct,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, FlowConstruct flowConstruct,
                           MuleSession session, ReplyToHandler replyToHandler, Object replyToDestination) {
-    this.executionContext = executionContext;
+    this.context = context;
     this.correlation = NO_CORRELATION;
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
@@ -298,7 +298,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                              Object replyToDestination,
                              boolean shareFlowVars,
                              MessageExchangePattern messageExchangePattern) {
-    this.executionContext = rewriteEvent.getExecutionContext();
+    this.context = rewriteEvent.getContext();
     this.correlation = rewriteEvent.getCorrelation();
     this.parent = rewriteEvent.getParent();
     this.id = rewriteEvent.getId();
@@ -331,10 +331,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.processorsTrace = rewriteEvent.getProcessorsTrace();
   }
 
-  public DefaultMuleEvent(MessageExecutionContext executionContext, MuleMessage message, URI messageSourceURI,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, URI messageSourceURI,
                           String messageSourceName, MessageExchangePattern exchangePattern, FlowConstruct flowConstruct,
                           MuleSession session, boolean transacted, Object replyToDestination, ReplyToHandler replyToHandler) {
-    this.executionContext = executionContext;
+    this.context = context;
     this.correlation = NO_CORRELATION;
     this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
@@ -394,14 +394,14 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public MessageExecutionContext getExecutionContext() {
-    return executionContext;
+  public MessageContext getContext() {
+    return context;
   }
 
   // TODO MULE-9281 Remove when the builder is in place.
   @Deprecated
-  public void setExecutionContext(MessageExecutionContext executionContext) {
-    this.executionContext = executionContext;
+  public void setContext(MessageContext executionContext) {
+    this.context = executionContext;
   }
 
   @Override
@@ -559,8 +559,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
     }
     // Can be null if service call originates from MuleClient
-    if (executionContext.getFlowName() != null) {
-      flowConstruct = muleContext.getRegistry().lookupFlowConstruct(executionContext.getFlowName());
+    if (context.getOriginatingFlowName() != null) {
+      flowConstruct = muleContext.getRegistry().lookupFlowConstruct(context.getOriginatingFlowName());
     }
   }
 
@@ -653,18 +653,25 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> T getFlowVariable(String key) {
     TypedValue typedValue = flowVariables.get(key);
 
-    return typedValue == null ? null : (T) typedValue.getValue();
+    if (typedValue == null) {
+      throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");
+    } else {
+      return (T) typedValue.getValue();
+    }
   }
 
   @Override
   public DataType getFlowVariableDataType(String key) {
     TypedValue typedValue = flowVariables.get(key);
 
-    return typedValue == null ? null : typedValue.getDataType();
+    if (typedValue == null) {
+      throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");
+    } else {
+      return typedValue.getDataType();
+    }
   }
 
   @Override
@@ -765,7 +772,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public String getCorrelationId() {
-    return legacyCorrelationId != null ? legacyCorrelationId : getExecutionContext().getCorrelationId()
+    return legacyCorrelationId != null ? legacyCorrelationId : getContext().getCorrelationId()
         + (getParent() != null && !getParent().getFlowCallStack().getElements().isEmpty()
             ? ":" + getParent().getFlowCallStack().getElements().get(0).getProcessorPath() : "")
         + getCorrelation().getSequence().map(s -> ":" + s.toString()).orElse("");

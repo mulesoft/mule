@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
@@ -324,10 +325,20 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // People can specify a CXF operation, which may in fact be different
     // than the method name. If that's not found, we'll default back to the
     // mule method property.
-    String method = event.getFlowVariable(CxfConstants.OPERATION);
+    String method = null;
+    try {
+      method = event.getFlowVariable(CxfConstants.OPERATION);
+    } catch (NoSuchElementException nsee) {
+      // Ignore
+    }
 
     if (method == null) {
-      Object muleMethodProperty = event.getFlowVariable(MuleProperties.MULE_METHOD_PROPERTY);
+      Object muleMethodProperty = null;
+      try {
+        muleMethodProperty = event.getFlowVariable(MuleProperties.MULE_METHOD_PROPERTY);
+      } catch (NoSuchElementException nsee) {
+        // Ignore
+      }
 
       if (muleMethodProperty != null) {
         if (muleMethodProperty instanceof Method) {

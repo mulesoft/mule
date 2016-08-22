@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.junit.Test;

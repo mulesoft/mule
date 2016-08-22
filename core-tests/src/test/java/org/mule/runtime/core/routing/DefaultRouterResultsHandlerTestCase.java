@@ -7,22 +7,23 @@
 package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
@@ -79,11 +80,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertNull(result.getFlowVariable("key1"));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getFlowVariableNames(), not(contains("key1")));
+    assertThat(result.getFlowVariable("key2"), equalTo("value2"));
 
-    assertEquals("valueNEW", result.getSession().getProperty("key"));
-    assertEquals("value1", result.getSession().getProperty("key1"));
+    assertThat(result.getSession().getProperty("key"), equalTo("valueNEW"));
+    assertThat(result.getSession().getProperty("key1"), equalTo("value1"));
 
   }
 
@@ -121,11 +122,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // original event
     assertEquals("value1", result.getFlowVariable("key1"));
     assertTrue(simpleDateType1.equals(result.getFlowVariableDataType("key1")));
-    assertNull(result.getFlowVariable("key2"));
-    assertNull(result.getFlowVariable("key3"));
+    assertThat(result.getFlowVariableNames(), not(contains("key2")));
+    assertThat(result.getFlowVariableNames(), not(contains("key3")));
 
     // Root id
-    assertThat(result.getExecutionContext().getCorrelationId(), equalTo(event1.getExecutionContext().getCorrelationId()));
+    assertThat(result.getContext().getCorrelationId(), equalTo(event1.getContext().getCorrelationId()));
 
     assertEquals("value", result.getSession().getProperty("key"));
     assertEquals("value1", result.getSession().getProperty("key1"));
@@ -153,8 +154,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertNull(result.getFlowVariable("key1"));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getFlowVariableNames(), not(contains("key1")));
+    assertThat(result.getFlowVariable("key2"), equalTo("value2"));
   }
 
   @Test
@@ -178,8 +179,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertNull(result.getFlowVariable("key1"));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getFlowVariableNames(), not(contains("key1")));
+    assertThat(result.getFlowVariable("key2"), equalTo("value2"));
   }
 
   @Test
@@ -220,12 +221,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertEquals("value1", result.getFlowVariable("key1"));
-    assertNull(result.getFlowVariable("key2"));
-    assertNull(result.getFlowVariable("key3"));
+    assertThat(result.getFlowVariable("key1"), equalTo("value1"));
+    assertThat(result.getFlowVariableNames(), not(contains("key2")));
+    assertThat(result.getFlowVariableNames(), not(contains("key3")));
 
     // Root id
-    assertThat(result.getExecutionContext().getCorrelationId(), equalTo(event1.getExecutionContext().getCorrelationId()));
+    assertThat(result.getContext().getCorrelationId(), equalTo(event1.getContext().getCorrelationId()));
   }
 
 }

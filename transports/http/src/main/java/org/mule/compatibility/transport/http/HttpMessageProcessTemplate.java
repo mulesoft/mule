@@ -29,7 +29,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
@@ -223,7 +223,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
           HttpResponse expected = new HttpResponse();
           expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
           final DefaultMuleEvent event =
-              new DefaultMuleEvent(muleEvent.getExecutionContext(), MuleMessage.builder().payload(expected).build(),
+              new DefaultMuleEvent(muleEvent.getContext(), MuleMessage.builder().payload(expected).build(),
                                    getFlowConstruct());
           DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 

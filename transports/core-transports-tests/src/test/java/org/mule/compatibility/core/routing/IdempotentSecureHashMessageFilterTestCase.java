@@ -9,7 +9,7 @@ package org.mule.compatibility.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.junit.Test;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;

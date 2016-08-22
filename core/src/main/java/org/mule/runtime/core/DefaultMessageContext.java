@@ -8,8 +8,8 @@ package org.mule.runtime.core;
 
 import static java.time.OffsetTime.now;
 
-import org.mule.runtime.core.api.CoreMessageExecutionContext;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.CoreMessageContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -19,11 +19,11 @@ import java.io.Serializable;
 import java.time.OffsetTime;
 
 /**
- * Default immutable implementation of {@link MessageExecutionContext}.
+ * Default immutable implementation of {@link MessageContext}.
  *
  * @since 4.0
  */
-public final class DefaultMessageExecutionContext implements CoreMessageExecutionContext, Serializable {
+public final class DefaultMessageContext implements CoreMessageContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -31,17 +31,17 @@ public final class DefaultMessageExecutionContext implements CoreMessageExecutio
    * Builds a new execution context with the given parameters.
    * @param flow the flow that processes events of this context. 
    */
-  public static MessageExecutionContext create(FlowConstruct flow) {
+  public static MessageContext create(FlowConstruct flow) {
     return create(flow, null);
   }
 
   /**
    * Builds a new execution context with the given parameters.
    * @param flow the flow that processes events of this context.
-   * @param correlationId See {@link MessageExecutionContext#getCorrelationId()}.
+   * @param correlationId See {@link MessageContext#getCorrelationId()}.
    */
-  public static MessageExecutionContext create(FlowConstruct flow, String correlationId) {
-    return new DefaultMessageExecutionContext(flow, correlationId);
+  public static MessageContext create(FlowConstruct flow, String correlationId) {
+    return new DefaultMessageContext(flow, correlationId);
   }
 
   private final String id;
@@ -69,7 +69,7 @@ public final class DefaultMessageExecutionContext implements CoreMessageExecutio
   }
 
   @Override
-  public String getFlowName() {
+  public String getOriginatingFlowName() {
     return flowName;
   }
 
@@ -79,12 +79,7 @@ public final class DefaultMessageExecutionContext implements CoreMessageExecutio
   }
 
   @Override
-  public String getServerId() {
-    return serverId;
-  }
-
-  @Override
-  public boolean isExternalCorrelationId() {
+  public boolean isCorrelationIdFromSource() {
     return correlationId != null;
   }
 
@@ -95,7 +90,7 @@ public final class DefaultMessageExecutionContext implements CoreMessageExecutio
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this
    *        context, if available.
    */
-  private DefaultMessageExecutionContext(FlowConstruct flow, String correlationId) {
+  private DefaultMessageContext(FlowConstruct flow, String correlationId) {
     this.id = flow.getMuleContext().getUniqueIdString();
     this.serverId = flow.getMuleContext().getId();
     this.flowName = flow.getName();

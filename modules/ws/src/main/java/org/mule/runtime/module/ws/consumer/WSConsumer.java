@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -209,11 +210,15 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
   private MessageProcessor createPropertyRemoverMessageProcessor(final String propertyName) {
     return new AbstractRequestResponseMessageProcessor() {
 
-      private Object propertyValue;
+      private Object propertyValue = null;
 
       @Override
       protected MuleEvent processRequest(MuleEvent event) throws MuleException {
-        propertyValue = event.getFlowVariable(propertyName);
+        try {
+          propertyValue = event.getFlowVariable(propertyName);
+        } catch (NoSuchElementException nsee) {
+          // Ignore
+        }
         event.removeFlowVariable(propertyName);
         return super.processRequest(event);
       }

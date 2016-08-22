@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.processor;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.io.Serializable;
 import java.util.ArrayList;

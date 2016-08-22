@@ -14,6 +14,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -49,7 +50,12 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
     Object[] payload = getPayloadFromMessage(context);
 
-    Object methodProp = context.getEvent().getFlowVariable(getMethodProperty());
+    Object methodProp = null;
+    try {
+      methodProp = context.getEvent().getFlowVariable(getMethodProperty());
+    } catch (NoSuchElementException e) {
+      // Ignore
+    }
     context.getEvent().removeFlowVariable(getMethodProperty());
     if (methodProp == null) {
       methodProp = context.getMessage().getInboundProperty(getMethodProperty());

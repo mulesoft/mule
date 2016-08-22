@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
@@ -194,6 +195,18 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertEquals("bar2", event.getFlowVariable("foo"));
 
     assertEquals("bar2", copy.getFlowVariable("foo"));
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetFlowVarNonexistent() throws Exception {
+    MuleEvent event = getTestEvent("whatever");
+    event.getFlowVariable("foo");
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetFlowVarDataTypeNonexistent() throws Exception {
+    MuleEvent event = getTestEvent("whatever");
+    event.getFlowVariableDataType("foo");
   }
 
   private static class TestEventTransformer extends AbstractTransformer {
