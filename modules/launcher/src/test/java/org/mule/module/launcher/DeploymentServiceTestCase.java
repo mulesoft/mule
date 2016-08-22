@@ -1909,12 +1909,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         doDomainUndeployAndVerifyAppsAreUndeployed(createUndeployDummyDomainAction());
     }
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 120000;
-    }
-
     @Test
     public void undeployDomainDoesNotDeployAllApplications() throws Exception
     {

@@ -65,7 +65,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public boolean isUpdatedZombieArtifact(String artifactName)
     {
-        //TODO(pablo.kraan): MULE-10337: need to track zombie domains, similar to how apps are managed
+        // Domains does not manage zombie artifacts
         return true;
     }
 

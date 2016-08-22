@@ -23,6 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provides parallel deployment of Mule applications.
+ *
+ * @since 3.8.2
  */
 public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatcher
 {
