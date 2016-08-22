@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="executeDdl">
+        <db:execute-ddl config-ref="dbConfig">
+            <db:dynamic-query>CREATE TABLE TestDdl(NAME VARCHAR(255))</db:dynamic-query>
+        </db:execute-ddl>
+    </flow>
+
+    <flow name="executeDdlOneWay" processingStrategy="asynchronous">
+        <db:execute-ddl config-ref="dbConfig">
+            <db:dynamic-query>CREATE TABLE TestDdl(NAME VARCHAR(255))</db:dynamic-query>
+        </db:execute-ddl>
+
+        <test:queue name="testOut"/>
+    </flow>
+</mule>

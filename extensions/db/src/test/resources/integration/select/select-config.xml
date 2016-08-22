@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="select">
+        <dbn:select>
+            <dbn:sql>select * from PLANET order by ID</dbn:sql>
+        </dbn:select>
+    </flow>
+
+    <flow name="fixedParam">
+        <dbn:select>
+            <dbn:sql>SELECT * FROM PLANET WHERE POSITION = 4</dbn:sql>
+        </dbn:select>
+    </flow>
+
+    <flow name="expressionAndFixedParamMixed">
+        <set-variable variableName="position" value="3"/>
+        <dbn:select>
+            <dbn:sql>SELECT * FROM PLANET WHERE POSITION = #[position] AND NAME = 'Earth'</dbn:sql>
+        </dbn:select>
+    </flow>
+
+    <flow name="dynamicQuery">
+        <set-variable variableName="tableName" value="PLANET"/>
+        <dbn:select>
+            <dbn:sql>select * from #[tableName] order by ID</dbn:sql>
+        </dbn:select>
+    </flow>
+
+    <flow name="selectMaxRows">
+        <dbn:select maxRows="2">
+            <dbn:sql>select * from PLANET order by ID</dbn:sql>
+        </dbn:select>
+    </flow>
+
+    <flow name="selectMaxStreamedRows">
+        <dbn:select maxRows="2">
+            <dbn:sql>select * from PLANET order by ID</dbn:sql>
+        </dbn:select>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <foreach>
+            <expression-component>flowVars['records'].add(payload)</expression-component>
+        </foreach>
+
+        <set-payload value="#[flowVars['records']]"/>
+    </flow>
+
+    <flow name="selectParameterizedQuery">
+        <dbn:select>
+            <dbn:sql>select * from Planet where name = :name</dbn:sql>
+            <dbn:input-parameters>
+                <dbn:input-parameter paramName="name" value="#[payload]"/>
+            </dbn:input-parameters>
+        </dbn:select>
+    </flow>
+
+    <flow name="selectStreamingChunks">
+        <dbn:select streaming="true">
+            <dbn:sql>select * from PLANET order by ID</dbn:sql>
+        </dbn:select>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <foreach batchSize="2">
+            <expression-component>flowVars['records'].add(payload)</expression-component>
+        </foreach>
+
+        <set-payload value="#[flowVars['records']]"/>
+    </flow>
+
+    <flow name="selectStreaming">
+        <dbn:select streaming="true">
+            <dbn:sql>select * from PLANET order by ID</dbn:sql>
+        </dbn:select>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <foreach>
+            <expression-component>flowVars['records'].add(payload)</expression-component>
+        </foreach>
+    </flow>
+
+    <flow name="usesAlias">
+        <dbn:select>
+            <dbn:sql>select name as planetName from PLANET order by ID</dbn:sql>
+        </dbn:select>
+    </flow>
+
+</mule>

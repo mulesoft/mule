@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <dbn:query name="namedParamsQueryTemplate">
+        <dbn:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</dbn:sql>
+        <dbn:input-parameters>
+            <dbn:input-parameter paramName="position" value="4"/>
+            <dbn:input-parameter paramName="name" value="Venus"/>
+        </dbn:input-parameters>
+    </dbn:query>
+
+    <dbn:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
+        <dbn:input-parameters>
+            <dbn:input-parameter paramName="name" value="Mars"/>
+        </dbn:input-parameters>
+    </dbn:query>
+
+    <flow name="overriddenParamsByName">
+        <dbn:select template="overridenQueryParamByName"/>
+    </flow>
+
+    <flow name="inlineOverriddenParamsByName">
+        <dbn:select template="namedParamsQueryTemplate">
+            <dbn:input-parameters>
+                <!-- Note that parameters are in different order-->
+                <dbn:input-parameter paramName="name" value="Venus"/>
+                <dbn:input-parameter paramName="position" value="2"/>
+            </dbn:input-parameters>
+        </dbn:select>
+    </flow>
+</mule>

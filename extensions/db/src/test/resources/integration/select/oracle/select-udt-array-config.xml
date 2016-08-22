@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="returnsDefaultArray">
+        <transactional>
+            <dbn:select>
+                <dbn:sql>select * from regions</dbn:sql>
+            </dbn:select>
+
+            <!--Converts SQL ARRAY to Java Array -->
+            <foreach>
+                <expression-component>
+                    payload.put("ZIPS", payload.get("ZIPS").getArray())
+                </expression-component>
+            </foreach>
+        </transactional>
+
+    </flow>
+
+    <flow name="returnsCustomArray">
+        <transactional>
+            <dbn:select>
+                <dbn:sql>select * from contacts</dbn:sql>
+            </dbn:select>
+
+            <!--Converts SQL ARRAY to Java Array -->
+            <foreach>
+                <expression-component>
+                    payload.put("DETAILS", payload.get("DETAILS").getArray())
+                </expression-component>
+            </foreach>
+        </transactional>
+    </flow>
+</mule>

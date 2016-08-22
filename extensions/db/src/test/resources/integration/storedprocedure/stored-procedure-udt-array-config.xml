@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="returnsDefaultArrayValue">
+        <transactional>
+            <dbn:stored-procedure>
+                <dbn:sql>{ CALL getZipCodes('Southwest', :out) }</dbn:sql>
+                <dbn:output-parameters>
+                    <dbn:output-parameter paramName="out" type="ZIPARRAY"/>
+                </dbn:output-parameters>
+            </dbn:stored-procedure>
+
+            <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload['out'].getArray()]"/>
+        </transactional>
+    </flow>
+
+    <flow name="returnsCustomArrayValue">
+        <transactional>
+            <dbn:stored-procedure>
+                <dbn:sql>{ CALL getContactDetails('Contact1', :out) }</dbn:sql>
+                <dbn:output-parameters>
+                    <dbn:output-parameter paramName="out" type="CONTACT_DETAILS_ARRAY"/>
+                </dbn:output-parameters>
+            </dbn:stored-procedure>
+
+            <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload['out'].getArray()]"/>
+        </transactional>
+    </flow>
+</mule>

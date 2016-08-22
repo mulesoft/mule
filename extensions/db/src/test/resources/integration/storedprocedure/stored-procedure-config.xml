@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="inOutParameter">
+        <dbn:stored-procedure>
+            <dbn:sql>{ call doubleMyInt(:myInt) }</dbn:sql>
+            <dbn:in-out-parameters>
+                <dbn:input-parameter paramName="myInt" value="3"/>
+            </dbn:in-out-parameters>
+        </dbn:stored-procedure>
+    </flow>
+
+    <flow name="outParam">
+        <dbn:stored-procedure>
+            <dbn:sql>{ CALL countTestRecords(:count) }</dbn:sql>
+            <dbn:output-parameters>
+                <dbn:outut-parameter paramName="count"/>
+            </dbn:output-parameters>
+        </dbn:stored-procedure>
+    </flow>
+
+    <flow name="multiplyInts">
+        <dbn:stored-procedure>
+            <dbn:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</dbn:sql>
+            <dbn:input-parameters>
+                <dbn:input-parameter paramName="int1" value="3"/>
+                <dbn:input-parameter paramName="int2" value="4"/>
+                <dbn:input-parameter paramName="int3" value="5"/>
+            </dbn:input-parameters>
+            <dbn:output-parameters>
+                <dbn:output-parameter paramName="result1"/>
+                <dbn:output-parameter paramName="result2"/>
+            </dbn:output-parameters>
+        </dbn:stored-procedure>
+    </flow>
+
+    <flow name="concatenateStrings">
+        <dbn:stored-procedure config-ref="dbConfig">
+            <dbn:sql>{ call concatenateStrings(:s1, :s2, :result) }</dbn:sql>
+            <dbn:input-parameters>
+                <dbn:input-parameter paramName="s1" value="foo"/>
+                <dbn:input-parameter paramName="s2" value="bar"/>
+            </dbn:input-parameters>
+            <dbn:output-parameters>
+                <dbn:output-parameter paramName="result"/>
+            </dbn:output-parameters>
+        </dbn:stored-procedure>
+    </flow>
+
+</mule>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:generic-config name="dbConfig"
+                       driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
+                       url="jdbc:derby:muleEmbeddedDB;create=true">
+        <db:data-types>
+            <db:data-type name="CUSTOM_TYPE1" id="3001"/>
+            <db:data-type name="CUSTOM_TYPE2" id="3002"/>
+        </db:data-types>
+    </db:generic-config>
+</mule>

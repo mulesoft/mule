@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="getResultSet">
+        <dbn:stored-procedure streaming="true">
+            <dbn:sql>{ call getSplitTestRecords() }</dbn:sql>
+        </dbn:stored-procedure>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <enricher target="flowVars.unused">
+            <processor-chain>
+                <set-payload value="#[payload.get('resultSet1')]"/>
+
+                <foreach>
+                    <expression-component>flowVars['records'].add(payload)</expression-component>
+                </foreach>
+            </processor-chain>
+        </enricher>
+
+        <enricher target="flowVars.unused">
+            <processor-chain>
+                <set-payload value="#[payload.get('resultSet2')]"/>
+
+                <foreach>
+                    <expression-component>flowVars['records'].add(payload)</expression-component>
+                </foreach>
+            </processor-chain>
+        </enricher>
+
+        <set-payload value="#[flowVars['records']]"/>
+    </flow>
+</mule>
