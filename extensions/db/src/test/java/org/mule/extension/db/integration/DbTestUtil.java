@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertTrue;
 
 import com.mysql.jdbc.Statement;
@@ -32,7 +33,7 @@ public class DbTestUtil {
   }
 
   public static void assertExpectedUpdateCount(int expected, int actual) {
-    assertTrue(String.format("Update count is neither the expected one %s nor Statement.SUCCESS_NO_INFO", expected),
+    assertTrue(format("Update count is neither the expected one %s nor Statement.SUCCESS_NO_INFO", expected),
                expected == actual || Statement.SUCCESS_NO_INFO == actual);
   }
 }

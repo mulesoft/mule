@@ -12,6 +12,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import javax.sql.DataSource;
 
+/**
+ * A Group of connection related parameters
+ *
+ * @since 4.0
+ */
 public class ConnectionParameters {
 
   /**

@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.model;
 
+import static org.mule.common.metadata.datatype.DataType.DECIMAL;
 import org.mule.common.metadata.datatype.DataType;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -143,17 +144,17 @@ public class OracleTestDatabase extends AbstractTestDatabase {
 
   @Override
   public DataType getIdFieldInputMetaDataType() {
-    return DataType.DECIMAL;
+    return DECIMAL;
   }
 
   @Override
   public DataType getIdFieldOutputMetaDataType() {
-    return DataType.DECIMAL;
+    return DECIMAL;
   }
 
   @Override
   public DataType getPositionFieldOutputMetaDataType() {
-    return DataType.DECIMAL;
+    return DECIMAL;
   }
 
   @Override

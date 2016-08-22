@@ -7,10 +7,11 @@
 
 package org.mule.runtime.module.db.internal.domain.type;
 
+import static java.sql.Types.OTHER;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
 /**
  * Represents a data type for a template, which real type is unknown until it is instantiated
@@ -22,7 +23,7 @@ public class UnknownDbType extends AbstractDbType {
   private static final UnknownDbType instance = new UnknownDbType();
 
   private UnknownDbType() {
-    super(Types.OTHER, UNKNOWN_TYPE_NAME);
+    super(OTHER, UNKNOWN_TYPE_NAME);
   }
 
   @Override

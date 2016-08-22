@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.db.internal.domain.type;
 
+import static java.lang.String.format;
+
 /**
  * Thrown to indicate that a data type ID can not be mapped to a database type
  */
@@ -19,10 +21,10 @@ public class UnknownDbTypeException extends RuntimeException {
    * @param name type name
    */
   public UnknownDbTypeException(int typeId, String name) {
-    super(String.format("Unable to find a mapping for type ID: %s Name: %s", typeId, name));
+    super(format("Unable to find a mapping for type ID: %s Name: %s", typeId, name));
   }
 
   public UnknownDbTypeException(String name) {
-    super(String.format("Unable to find a mapping for type: %s", name));
+    super(format("Unable to find a mapping for type: %s", name));
   }
 }

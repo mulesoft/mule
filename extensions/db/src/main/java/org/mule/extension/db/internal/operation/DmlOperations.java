@@ -6,6 +6,7 @@
  */
 package org.mule.extension.db.internal.operation;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.extension.db.internal.domain.query.QueryType.DELETE;
@@ -271,9 +272,9 @@ public class DmlOperations {
 
   private void validateQueryType(QueryTemplate queryTemplate, List<QueryType> validTypes) {
     if (validTypes == null || !validTypes.contains(queryTemplate.getType())) {
-      throw new IllegalArgumentException(String.format("Query type must be one of [%s] but query '%s' is of type",
-                                                       Joiner.on(", ").join(validTypes), queryTemplate.getSqlText(),
-                                                       queryTemplate.getType()));
+      throw new IllegalArgumentException(format("Query type must be one of [%s] but query '%s' is of type",
+                                                Joiner.on(", ").join(validTypes), queryTemplate.getSqlText(),
+                                                queryTemplate.getType()));
     }
   }
 
