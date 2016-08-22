@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getKeysFromContainer;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
@@ -81,7 +82,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(3));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
   }
@@ -91,8 +92,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_ID, FIRST_PROCESSOR_INDEX);
     final MetadataResult<MetadataKeysContainer> metadataKeys = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeys.isSuccess(), is(true));
-    assertThat(metadataKeys.get().getKeys().size(), is(1));
-    assertThat(metadataKeys.get().getKeys().iterator().next(), instanceOf(NullMetadataKey.class));
+    final Set<MetadataKey> keys = getKeysFromContainer(metadataKeys.get());
+    assertThat(keys.size(), is(1));
+    assertThat(keys.iterator().next(), instanceOf(NullMetadataKey.class));
   }
 
   @Test
@@ -101,7 +103,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
 
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get().getKeys();
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys, hasSize(2));
 
     assertThat(metadataKeys, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));

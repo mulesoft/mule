@@ -21,6 +21,7 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -49,9 +50,16 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
         metadataManager.getMetadataKeysForConfig(new ConfigurationId("apple"));
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Map<String, Set<MetadataKey>> metadataKeys = metadataKeysResult.get().getAllKeys();
+    final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
     assertThat(metadataKeys.size(), is(2));
     assertThat(metadataKeys.get(getAliasName(AppleKeyResolver.class)).size(), is(1));
     assertThat(metadataKeys.get(getAliasName(HarvestAppleKeyResolver.class)).size(), is(1));
+  }
+
+  private Map<String, Set<MetadataKey>> getKeyMapFromContainer(MetadataResult<MetadataKeysContainer> metadataKeysResult) {
+    return metadataKeysResult.get()
+        .getResolvers()
+        .stream()
+        .collect(Collectors.toMap(resolver -> resolver, resolver -> metadataKeysResult.get().getKeys(resolver).get()));
   }
 }
