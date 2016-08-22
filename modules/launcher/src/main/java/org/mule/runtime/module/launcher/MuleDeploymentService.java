@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.lang.System.getProperties;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.application.DefaultApplicationFactory;
@@ -41,6 +45,7 @@ public class MuleDeploymentService implements DeploymentService {
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
+  public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
   // fair lock
@@ -69,17 +74,38 @@ public class MuleDeploymentService implements DeploymentService {
     ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
-                                                            deploymentLock, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
+                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = new DomainArchiveDeployer(
                                                     new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                                                                 deploymentLock,
                                                                                  new DomainDeploymentTemplate(applicationDeployer,
                                                                                                               this)),
                                                     applicationDeployer, this);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
-    this.deploymentDirectoryWatcher =
-        new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+
+    if (useParallelDeployment()) {
+      if (isDeployingSelectedAppsInOrder()) {
+        throw new IllegalArgumentException("Deployment parameters 'app' and '" + PARALLEL_DEPLOYMENT_PROPERTY
+            + "' cannot be used together");
+      }
+      logger.info("Using parallel deployment");
+      this.deploymentDirectoryWatcher =
+          new ParallelDeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+    } else {
+      this.deploymentDirectoryWatcher =
+          new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+    }
+  }
+
+  private boolean useParallelDeployment() {
+    return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
+  }
+
+  private boolean isDeployingSelectedAppsInOrder() {
+    final Map<String, Object> options = StartupContext.get().getStartupOptions();
+    String appString = (String) options.get("app");
+
+    return !isEmpty(appString);
   }
 
   @Override

@@ -24,6 +24,14 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   T deployExplodedArtifact(String artifactDir) throws DeploymentException;
 
+  /**
+   * Indicates if a previously failed artifact (zombie) configuration was updated on the file system.
+   *
+   * @param artifactName name of the artifact to check. Non empty.
+   * @return true if the zombie artifact was updated, false it the artifact is not a zombie or it was not updated.
+   */
+  boolean isUpdatedZombieArtifact(String artifactName);
+
   T deployPackagedArtifact(URL artifactAchivedUrl);
 
   void undeployArtifact(String artifactId);

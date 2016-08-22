@@ -24,8 +24,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
@@ -40,13 +38,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
-  public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
-  private final ReentrantLock deploymentLock;
   private final Map<String, ZombieFile> artifactZombieMap = new HashMap<String, ZombieFile>();
   private final File artifactDir;
   private final ObservableList<T> artifacts;
@@ -56,12 +51,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory,
-                                final ObservableList<T> artifacts, final ReentrantLock lock,
+                                final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate) {
     this.deployer = deployer;
     this.artifactFactory = artifactFactory;
     this.artifacts = artifacts;
-    this.deploymentLock = lock;
     this.deploymentTemplate = deploymentTemplate;
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
@@ -85,22 +79,29 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
-    String artifactName = artifactDir;
+    if (!isUpdatedZombieArtifact(artifactDir)) {
+      return null;
+    }
+
+    return deployExplodedApp(artifactDir);
+  }
+
+  @Override
+  public boolean isUpdatedZombieArtifact(String artifactName) {
     @SuppressWarnings("rawtypes")
     Collection<String> deployedAppNames =
         CollectionUtils.collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
 
     if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
-      return null;
+      return false;
     }
 
     ZombieFile zombieFile = artifactZombieMap.get(artifactName);
 
     if ((zombieFile != null) && (!zombieFile.updatedZombieApp())) {
-      return null;
+      return false;
     }
-
-    return deployExplodedApp(artifactName);
+    return true;
   }
 
   @Override
@@ -125,7 +126,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     try {
       try {
-        artifact = guardedInstallFrom(artifactAchivedUrl);
+
+        artifact = installFrom(artifactAchivedUrl);
         trackArtifact(artifact);
       } catch (Throwable t) {
         File artifactArchive = new File(artifactAchivedUrl.toURI());
@@ -179,22 +181,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public void undeployArtifactWithoutUninstall(T artifact) {
     logRequestToUndeployArtifact(artifact);
     try {
-      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
-        return;
-      }
-
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
       throw e;
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } finally {
-      if (deploymentLock.isHeldByCurrentThread()) {
-        deploymentLock.unlock();
-      }
     }
   }
 
@@ -262,27 +254,15 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return artifact;
   }
 
-
-  private void guardedDeploy(T artifact) {
-    try {
-      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
-        return;
-      }
-      deployer.deploy(artifact);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } finally {
-      if (deploymentLock.isHeldByCurrentThread()) {
-        deploymentLock.unlock();
-      }
-    }
-  }
-
   @Override
   public void deployArtifact(T artifact) throws DeploymentException {
     try {
+      // add to the list of known artifacts first to avoid deployment loop on failure
+      trackArtifact(artifact);
+
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      guardedDeploy(artifact);
+      deployer.deploy(artifact);
+
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
       artifactZombieMap.remove(artifact.getArtifactName());
@@ -353,7 +333,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
-      guardedUndeploy(artifact);
+      deployer.undeploy(artifact);
+      artifactArchiveInstaller.desinstallArtifact(artifact.getArtifactName());
 
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
@@ -376,42 +357,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  private T guardedInstallFrom(URL artifactUrl) throws IOException {
-    try {
-      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
-        throw new IOException(ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS);
-      }
-      return installFrom(artifactUrl);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new IOException(INSTALL_OPERATION_HAS_BEEN_INTERRUPTED);
-    } finally {
-      if (deploymentLock.isHeldByCurrentThread()) {
-        deploymentLock.unlock();
-      }
-    }
-  }
-
   private T installFrom(URL url) throws IOException {
     String artifactName = artifactArchiveInstaller.installArtifact(url);
     return artifactFactory.createArtifact(artifactName);
-  }
-
-  private void guardedUndeploy(T artifact) {
-    try {
-      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
-        return;
-      }
-
-      deployer.undeploy(artifact);
-      artifactArchiveInstaller.desinstallArtifact(artifact.getArtifactName());
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } finally {
-      if (deploymentLock.isHeldByCurrentThread()) {
-        deploymentLock.unlock();
-      }
-    }
   }
 
   @Override
@@ -440,6 +388,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     } catch (Throwable t) {
       try {
         logDeploymentFailure(t, artifact.getArtifactName());
+        addZombieApp(artifact);
         if (t instanceof DeploymentException) {
           throw (DeploymentException) t;
         }

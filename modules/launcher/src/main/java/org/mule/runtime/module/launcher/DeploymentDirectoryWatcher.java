@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
@@ -66,7 +67,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<Domain> domainArchiveDeployer;
-  private final ArchiveDeployer<Application> applicationArchiveDeployer;
+  protected final ArchiveDeployer<Application> applicationArchiveDeployer;
   private final ArtifactTimestampListener<Application> applicationTimestampListener;
   private final ArtifactTimestampListener<Domain> domainTimestampListener;
   private final ObservableList<Application> applications;
@@ -151,7 +152,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
             if (applicationFile.exists() && applicationFile.isFile()) {
               applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
             } else {
-              applicationArchiveDeployer.deployExplodedArtifact(app);
+              if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
+                applicationArchiveDeployer.deployExplodedArtifact(app);
+              }
             }
           } catch (Exception e) {
             // Ignore and continue
@@ -219,11 +222,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
     artifactDirMonitorTimer.scheduleWithFixedDelay(this, 0, reloadIntervalMs, TimeUnit.MILLISECONDS);
 
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+      logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
     }
   }
 
-  private void deployPackedApps(String[] zips) {
+  protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
         applicationArchiveDeployer.deployPackagedArtifact(zip);
@@ -233,7 +236,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  private void deployExplodedApps(String[] apps) {
+  protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
         applicationArchiveDeployer.deployExplodedArtifact(addedApp);
@@ -330,9 +333,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
     String[] currentAnchors = artifactDir.list(new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
-      sb.append(String.format("Current anchors:%n"));
+      sb.append(format("Current anchors:%n"));
       for (String currentAnchor : currentAnchors) {
-        sb.append(String.format("  %s%n", currentAnchor));
+        sb.append(format("  %s%n", currentAnchor));
       }
       logger.debug(sb.toString());
     }
@@ -343,9 +346,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
         CollectionUtils.subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
-      sb.append(String.format("Deleted anchors:%n"));
+      sb.append(format("Deleted anchors:%n"));
       for (String deletedAnchor : deletedAnchors) {
-        sb.append(String.format("  %s%n", deletedAnchor));
+        sb.append(format("  %s%n", deletedAnchor));
       }
       logger.debug(sb.toString());
     }
@@ -356,7 +359,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         if (findArtifact(artifactName, artifacts) != null) {
           archiveDeployer.undeployArtifact(artifactName);
         } else if (logger.isDebugEnabled()) {
-          logger.debug(String.format("Artifact [%s] has already been undeployed via API", artifactName));
+          logger.debug(format("Artifact [%s] has already been undeployed via API", artifactName));
         }
       } catch (Throwable t) {
         logger.error("Failed to undeployArtifact artifact: " + artifactName, t);
@@ -379,9 +382,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void deployExplodedDomains(String[] domains) {
-    for (String addedApp : domains) {
+    for (String addedDomain : domains) {
       try {
-        domainArchiveDeployer.deployExplodedArtifact(addedApp);
+        if (domainArchiveDeployer.isUpdatedZombieArtifact(addedDomain)) {
+          domainArchiveDeployer.deployExplodedArtifact(addedDomain);
+        }
       } catch (DeploymentException e) {
         // Ignore and continue
       }

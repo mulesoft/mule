@@ -46,6 +46,12 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
+  public boolean isUpdatedZombieArtifact(String artifactName) {
+    // Domains does not manage zombie artifacts
+    return true;
+  }
+
+  @Override
   public Domain deployPackagedArtifact(String zip) throws DeploymentException {
     Domain domain = domainDeployer.deployPackagedArtifact(zip);
     deployBundledAppsIfDomainWasCreated(domain);

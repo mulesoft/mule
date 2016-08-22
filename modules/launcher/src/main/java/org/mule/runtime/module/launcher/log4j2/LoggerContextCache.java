@@ -99,7 +99,7 @@ final class LoggerContextCache implements Disposable {
     }
   }
 
-  LoggerContext getLoggerContext(final ClassLoader classLoader) {
+  synchronized LoggerContext getLoggerContext(final ClassLoader classLoader) {
     final LoggerContext ctx;
     try {
       final Integer key = computeKey(classLoader);

@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.launcher;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
@@ -36,6 +29,12 @@ import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +90,8 @@ public class MuleContainer {
   }
 
   public MuleContainer(String[] args) {
+    init(args);
+
     artifactResourcesRegistry = new MuleArtifactResourcesRegistry();
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
@@ -105,8 +106,6 @@ public class MuleContainer {
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
                                                                           new ReflectionMuleCoreExtensionDependencyResolver());
-
-    init(args);
   }
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
@@ -122,12 +121,13 @@ public class MuleContainer {
                        ServiceManager serviceManager)
       throws IllegalArgumentException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
+    init(args);
+
     this.deploymentService = deploymentService;
     this.coreExtensionManager = coreExtensionManager;
     this.repositoryService = repositoryService;
     this.serviceManager = serviceManager;
     this.toolingService = toolingService;
-    init(args);
   }
 
   protected void init(String[] args) throws IllegalArgumentException {

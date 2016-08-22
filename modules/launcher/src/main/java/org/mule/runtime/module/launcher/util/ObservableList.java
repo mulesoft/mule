@@ -45,13 +45,13 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public void add(int index, E element) {
+  public synchronized void add(int index, E element) {
     delegate.add(index, element);
     pcs.firePropertyChange(new ElementAddedEvent(this, element, index));
   }
 
   @Override
-  public boolean addAll(Collection<? extends E> c) {
+  public synchronized boolean addAll(Collection<? extends E> c) {
     int index = size() - 1;
     index = index < 0 ? 0 : index;
 
@@ -71,7 +71,7 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public boolean addAll(int index, Collection<? extends E> c) {
+  public synchronized boolean addAll(int index, Collection<? extends E> c) {
     boolean success = delegate.addAll(index, c);
 
     if (success && c != null) {
@@ -88,7 +88,7 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public void clear() {
+  public synchronized void clear() {
     List<E> values = new ArrayList<E>();
     values.addAll(delegate);
     delegate.clear();
@@ -98,69 +98,69 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public boolean contains(Object o) {
+  public synchronized boolean contains(Object o) {
     return delegate.contains(o);
   }
 
   @Override
-  public boolean containsAll(Collection<?> c) {
+  public synchronized boolean containsAll(Collection<?> c) {
     return delegate.containsAll(c);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public synchronized boolean equals(Object o) {
     return delegate.equals(o);
   }
 
   @Override
-  public E get(int index) {
+  public synchronized E get(int index) {
     return delegate.get(index);
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     return delegate.hashCode();
   }
 
   @Override
-  public int indexOf(Object o) {
+  public synchronized int indexOf(Object o) {
     return delegate.indexOf(o);
   }
 
   @Override
-  public boolean isEmpty() {
+  public synchronized boolean isEmpty() {
     return delegate.isEmpty();
   }
 
   @Override
-  public Iterator<E> iterator() {
-    return new ObservableIterator(delegate.iterator());
+  public synchronized Iterator<E> iterator() {
+    return new ObservableIterator(new ArrayList(delegate).iterator());
   }
 
   @Override
-  public int lastIndexOf(Object o) {
+  public synchronized int lastIndexOf(Object o) {
     return delegate.lastIndexOf(o);
   }
 
   @Override
-  public ListIterator<E> listIterator() {
-    return new ObservableListIterator(delegate.listIterator(), 0);
+  public synchronized ListIterator<E> listIterator() {
+    return new ObservableListIterator(new ArrayList(delegate).listIterator(), 0);
   }
 
   @Override
-  public ListIterator<E> listIterator(int index) {
-    return new ObservableListIterator(delegate.listIterator(index), index);
+  public synchronized ListIterator<E> listIterator(int index) {
+    return new ObservableListIterator(new ArrayList<E>(delegate).listIterator(index), index);
   }
 
   @Override
-  public E remove(int index) {
+  public synchronized E remove(int index) {
     E element = delegate.remove(index);
     pcs.firePropertyChange(new ElementRemovedEvent(this, element, index));
     return element;
   }
 
   @Override
-  public boolean remove(Object o) {
+  public synchronized boolean remove(Object o) {
     int index = delegate.indexOf(o);
     boolean success = delegate.remove(o);
     if (success) {
@@ -170,7 +170,7 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public boolean removeAll(Collection<?> c) {
+  public synchronized boolean removeAll(Collection<?> c) {
     if (c == null) {
       return false;
     }
@@ -191,7 +191,7 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public boolean retainAll(Collection<?> c) {
+  public synchronized boolean retainAll(Collection<?> c) {
     if (c == null) {
       return false;
     }
@@ -214,29 +214,29 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public E set(int index, E element) {
+  public synchronized E set(int index, E element) {
     E oldValue = delegate.set(index, element);
     pcs.firePropertyChange(new ElementUpdatedEvent(this, oldValue, element, index));
     return oldValue;
   }
 
   @Override
-  public int size() {
+  public synchronized int size() {
     return delegate.size();
   }
 
   @Override
-  public List<E> subList(int fromIndex, int toIndex) {
+  public synchronized List<E> subList(int fromIndex, int toIndex) {
     return delegate.subList(fromIndex, toIndex);
   }
 
   @Override
-  public Object[] toArray() {
+  public synchronized Object[] toArray() {
     return delegate.toArray();
   }
 
   @Override
-  public boolean add(E o) {
+  public synchronized boolean add(E o) {
     boolean success = delegate.add(o);
     if (success) {
       pcs.firePropertyChange(new ElementAddedEvent(this, o, size() - 1));
@@ -245,7 +245,7 @@ public class ObservableList<E> implements List<E> {
   }
 
   @Override
-  public Object[] toArray(Object[] a) {
+  public synchronized Object[] toArray(Object[] a) {
     return delegate.toArray(a);
   }
 
