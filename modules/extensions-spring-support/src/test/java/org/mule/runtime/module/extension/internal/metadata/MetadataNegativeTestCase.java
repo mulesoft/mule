@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetad
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
@@ -92,7 +93,8 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataFromNonExistingConfig() throws IOException {
     String configName = "nonexisting-config";
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult = metadataManager.getMetadataKeys(configName);
+    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
+        metadataManager.getMetadataKeys(new ConfigurationId(configName));
 
     assertFailure(metadataKeysResult, format("Configuration named [%s] doesn't exist", configName), FailureCode.UNKNOWN,
                   InvalidComponentIdException.class.getName());
@@ -101,10 +103,11 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataFromDynamicConfig() throws IOException {
     final String configName = "dynamic-config";
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult = metadataManager.getMetadataKeys(configName);
+    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
+        metadataManager.getMetadataKeys(new ConfigurationId(configName));
 
-    assertFailure(metadataKeysResult, CONFIGURATION_CANNOT_BE_DYNAMIC, FailureCode.INVALID_CONFIGURATION,
-                  MetadataResolvingException.class.getName());
+    assertFailure(metadataKeysResult, format("Cannot fetch MetadataKeys from component [%s]", configName), FailureCode.UNKNOWN,
+                  InvalidComponentIdException.class.getName());
   }
 
   @Test

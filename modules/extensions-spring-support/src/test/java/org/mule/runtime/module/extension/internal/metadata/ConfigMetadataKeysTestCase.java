@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
@@ -43,7 +44,8 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getMetadataKeysWithKeyId() throws Exception {
-    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult = metadataManager.getMetadataKeys("apple");
+    final MetadataResult<Map<String, Set<MetadataKey>>> metadataKeysResult =
+        metadataManager.getMetadataKeys(new ConfigurationId("apple"));
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = metadataKeysResult.get();
     assertThat(metadataKeys.size(), is(2));

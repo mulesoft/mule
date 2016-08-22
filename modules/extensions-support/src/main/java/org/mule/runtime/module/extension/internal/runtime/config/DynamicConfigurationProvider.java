@@ -10,10 +10,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -33,7 +29,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -181,11 +176,5 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
   private boolean isExpired(ConfigurationInstance<T> configuration) {
     ConfigurationStats stats = configuration.getStatistics();
     return stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), TimeUnit.MILLISECONDS);
-  }
-
-  @Override
-  public MetadataResult<Map<String, Set<MetadataKey>>> getMetadataKeys() throws MetadataResolvingException {
-    throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic",
-                                         FailureCode.INVALID_CONFIGURATION);
   }
 }

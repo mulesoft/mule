@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import org.mule.runtime.api.metadata.MetadataKeyAware;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> the generic type for the supplied {@link ConfigurationInstance}
  * @since 4.0
  */
-public abstract class LifecycleAwareConfigurationProvider<T> implements ConfigurationProvider<T>, Lifecycle, MetadataKeyAware {
+public abstract class LifecycleAwareConfigurationProvider<T> implements ConfigurationProvider<T>, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationProvider.class);
 
