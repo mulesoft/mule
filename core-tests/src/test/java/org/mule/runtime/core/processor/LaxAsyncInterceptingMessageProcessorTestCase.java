@@ -57,6 +57,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
       throws Exception {
     LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor(new TestWorkManagerSource());
     mp.setMuleContext(muleContext);
+    mp.setFlowConstruct(getTestFlow());
     mp.setListener(listener);
     return mp;
   }

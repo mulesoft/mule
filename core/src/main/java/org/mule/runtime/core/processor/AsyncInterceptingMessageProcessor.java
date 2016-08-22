@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -26,7 +28,6 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
-import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.work.AbstractMuleEventWork;
@@ -117,13 +118,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                                                       new AsyncWorkListener(next));
       fireAsyncScheduledNotification(event);
     } catch (Exception e) {
-      new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next), event, e, this);
+      new MessagingException(errorSchedulingMessageProcessorForAsyncInvocation(next), event, e, this);
     }
   }
 
   protected void fireAsyncScheduledNotification(MuleEvent event) {
     muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next, PROCESS_ASYNC_SCHEDULED));
+        .fireNotification(new AsyncMessageNotification(flowConstruct, event, next, PROCESS_ASYNC_SCHEDULED));
   }
 
   @Override
@@ -146,8 +147,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     @Override
     protected void doRun() {
       MessagingExceptionHandler exceptionHandler = messagingExceptionHandler;
-      ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate
-          .createMainExecutionTemplate(muleContext, new MuleTransactionConfig(), exceptionHandler);
+      ExecutionTemplate<MuleEvent> executionTemplate =
+          createMainExecutionTemplate(muleContext, new MuleTransactionConfig(), exceptionHandler);
 
       try {
         executionTemplate.execute(() -> {
@@ -176,7 +177,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
   protected void firePipelineNotification(MuleEvent event, MessagingException exception) {
     // Async completed notification uses same event instance as async listener
     muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(event.getFlowConstruct(), event, next, PROCESS_ASYNC_COMPLETE, exception));
+        .fireNotification(new AsyncMessageNotification(flowConstruct, event, next, PROCESS_ASYNC_COMPLETE, exception));
   }
 
 }

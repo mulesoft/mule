@@ -11,6 +11,8 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -31,14 +33,21 @@ import org.slf4j.LoggerFactory;
  * of setNext and holds the next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
-    implements MessageProcessor, MuleContextAware, MessageProcessorContainer {
+    implements MessageProcessor, MuleContextAware, FlowConstructAware, MessageProcessorContainer {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   public final MessageProcessor getListener() {
