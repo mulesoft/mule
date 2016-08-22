@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

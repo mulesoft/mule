@@ -27,7 +27,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;

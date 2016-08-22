@@ -57,7 +57,7 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;

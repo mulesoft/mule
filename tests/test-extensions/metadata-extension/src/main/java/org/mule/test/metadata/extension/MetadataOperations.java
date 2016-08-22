@@ -6,7 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;

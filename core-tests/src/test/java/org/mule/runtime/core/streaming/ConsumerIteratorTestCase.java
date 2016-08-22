@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.size.SmallTest;

@@ -7,7 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.Collections.emptyList;
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 

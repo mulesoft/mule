@@ -7,7 +7,7 @@
 package org.mule.runtime.core.streaming;
 
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.api.streaming.PagingProvider;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 
 import java.io.IOException;
 import java.util.List;
