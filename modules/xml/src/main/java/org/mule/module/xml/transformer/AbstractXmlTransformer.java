@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.transformer;
 
+import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
+import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -42,11 +44,13 @@ import org.dom4j.io.DocumentResult;
  */
 public abstract class AbstractXmlTransformer extends AbstractMessageTransformer implements Initialisable
 {
+
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
     private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
     private boolean acceptExternalEntities = false;
+    private boolean expandInternalEntities = false;
     
     public AbstractXmlTransformer()
     {
@@ -70,13 +74,17 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     {
         xmlInputFactory = XMLInputFactory.newInstance();
 
-        if (!acceptExternalEntities)
-        {
-            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-            useStaxSource = true;
-        }
+        xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
+        useStaxSource = !acceptExternalEntities;
+
+        xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
 
         xmlOutputFactory = XMLOutputFactory.newInstance();
+
+        if (acceptExternalEntities && !expandInternalEntities)
+        {
+            logger.warn("External entities are enabled (acceptExternalEntities=true) but won't be expanded in the XML body because expandInternalEntities=false");
+        }
 
         this.doInitialise();
     }
@@ -369,8 +377,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         this.acceptExternalEntities = acceptExternalEntities;
     }
 
-    public boolean getAcceptExternalEntities()
+    public void setExpandInternalEntities(boolean expandInternalEntities)
     {
-        return this.acceptExternalEntities;
+        this.expandInternalEntities = expandInternalEntities;
     }
 }
