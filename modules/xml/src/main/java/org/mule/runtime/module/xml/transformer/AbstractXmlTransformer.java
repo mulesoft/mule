@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
+import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -48,6 +50,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
   private XMLOutputFactory xmlOutputFactory;
   private boolean useStaxSource = false;
   private boolean acceptExternalEntities = false;
+  private boolean expandInternalEntities = false;
 
   public AbstractXmlTransformer() {
     registerSourceType(DataType.STRING);
@@ -70,8 +73,18 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     xmlInputFactory = XMLInputFactory.newInstance();
 
     if (!acceptExternalEntities) {
-      xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+      xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, false);
       useStaxSource = true;
+    }
+
+    xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
+    useStaxSource = !acceptExternalEntities;
+
+    xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
+
+    if (acceptExternalEntities && !expandInternalEntities) {
+      logger
+          .warn("External entities are enabled (acceptExternalEntities=true) but won't be expanded in the XML body because expandInternalEntities=false");
     }
 
     xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -321,7 +334,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     this.acceptExternalEntities = acceptExternalEntities;
   }
 
-  public boolean getAcceptExternalEntities() {
-    return this.acceptExternalEntities;
+  public void setExpandInternalEntities(boolean expandInternalEntities) {
+    this.expandInternalEntities = expandInternalEntities;
   }
 }

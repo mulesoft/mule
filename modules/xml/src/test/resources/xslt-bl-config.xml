@@ -5,8 +5,8 @@
         http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
 
-    <flow name="safeXxe">
-        <mulexml:xslt-transformer name="xslt" expandInternalEntities="true">
+    <flow name="flowBLEnabled">
+        <mulexml:xslt-transformer name="xslt-bl-enabled" expandInternalEntities="true">
             <mulexml:xslt-text>
                 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                     <xsl:template match="/">
@@ -20,8 +20,8 @@
         <object-to-string-transformer />
     </flow>
 
-    <flow name="unsafeXxe">
-        <mulexml:xslt-transformer name="unsafeXslt" acceptExternalEntities="true" expandInternalEntities="true">
+    <flow name="flowBLDisabled">
+        <mulexml:xslt-transformer name="xslt-bl-disabled">
             <mulexml:xslt-text>
                 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                     <xsl:template match="/">

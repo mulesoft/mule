@@ -23,7 +23,7 @@ import org.junit.Test;
  * <b>EIP Reference:</b> <a href="https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing"<a/>
  * </p>
  */
-public class XsltTransformerXXETest extends FunctionalTestCase {
+public class XsltTransformerXXETestCase extends FunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

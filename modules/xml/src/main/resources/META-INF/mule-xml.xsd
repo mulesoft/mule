@@ -137,8 +137,18 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether to accept XML documents with references to external files.
+                            Note that even if allowed, these won't be expanded when expandInternalEntities is false.
                             Default value is false. Setting this value to true will make your application
                             vulnerable to XXE attacks. Use with extreme care.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expandInternalEntities" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to expand internal entity references in the XML body.
+                            Default value is false. Setting this value to true will make your application
+                            vulnerable to Billion Laughs (DoS) attacks. Use with extreme care.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
