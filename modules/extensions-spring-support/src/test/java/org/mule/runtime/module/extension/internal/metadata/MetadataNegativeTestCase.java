@@ -106,7 +106,8 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
         metadataManager.getMetadataKeys(componentId);
 
-    assertFailure(metadataKeysResult, format("Component [%s] is not MetadataKeyAware, no information available", componentId),
+    assertFailure(metadataKeysResult,
+                  format("Component [%s] is not a MetadataKeyProvider, no information available", componentId),
                   FailureCode.UNKNOWN,
                   InvalidComponentIdException.class.getName());
   }
@@ -116,7 +117,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
 
-    assertFailure(metadata, "not a MetadataProvider", FailureCode.UNKNOWN, ClassCastException.class.getName());
+    assertFailure(metadata, "not a MetadataProvider", FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
   }
 
   @Test

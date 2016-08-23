@@ -24,7 +24,6 @@ import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetad
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getKeysFromContainer;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import org.mule.metadata.api.model.StringType;
@@ -324,5 +323,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   public void dispose() throws Exception {
     messageProcessor.dispose();
     verify((Disposable) operationExecutor).dispose();
+  }
+
+  private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
+    return metadataKeysContainer.getKeys(metadataKeysContainer.getResolvers().iterator().next()).get();
   }
 }

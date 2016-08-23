@@ -16,8 +16,6 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
@@ -26,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Set of utility operations to handle {@link MetadataType}
@@ -135,9 +132,5 @@ public final class MetadataTypeUtils {
 
   public static boolean isEnum(MetadataType metadataType) {
     return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
-  }
-
-  public static Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
-    return metadataKeysContainer.getKeys(metadataKeysContainer.getResolvers().iterator().next()).get();
   }
 }

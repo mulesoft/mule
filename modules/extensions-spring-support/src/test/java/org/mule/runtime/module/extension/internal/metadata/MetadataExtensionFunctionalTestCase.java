@@ -15,6 +15,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -34,6 +35,7 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -189,5 +191,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     if (!StringUtils.isBlank(name)) {
       assertThat(descriptor.get().getName(), is(name));
     }
+  }
+
+  protected Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
+    return metadataKeysContainer.getKeys(metadataKeysContainer.getResolvers().iterator().next()).get();
   }
 }
