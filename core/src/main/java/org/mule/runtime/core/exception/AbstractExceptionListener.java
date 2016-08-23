@@ -7,7 +7,9 @@
 package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
@@ -16,7 +18,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.runtime.core.util.CollectionUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -150,7 +150,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected void fireNotification(Exception ex) {
     if (enableNotifications) {
       if (ex instanceof SecurityException) {
-        fireNotification(new SecurityNotification((SecurityException) ex, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+        fireNotification(new SecurityNotification((SecurityException) ex, SECURITY_AUTHENTICATION_FAILED));
       } else {
         fireNotification(new ExceptionNotification(ex));
       }
@@ -192,7 +192,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       }
     }
 
-    processOutboundRouterStatistics(event.getFlowConstruct());
+    processOutboundRouterStatistics();
   }
 
   protected MulticastingRouter buildRouter() {
@@ -238,7 +238,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the fatal exception to log
    */
   protected void logFatal(MuleEvent event, Throwable t) {
-    FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }
@@ -329,10 +329,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  void processOutboundRouterStatistics(FlowConstruct construct) {
+  void processOutboundRouterStatistics() {
     List<MessageProcessor> processors = getMessageProcessors();
-    FlowConstructStatistics statistics = construct.getStatistics();
-    if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
+    FlowConstructStatistics statistics = flowConstruct.getStatistics();
+    if (isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
       if (statistics.isEnabled()) {
         for (MessageProcessor endpoint : processors) {
           ((ServiceStatistics) statistics).getOutboundRouterStat().incrementRoutedMessage(endpoint);

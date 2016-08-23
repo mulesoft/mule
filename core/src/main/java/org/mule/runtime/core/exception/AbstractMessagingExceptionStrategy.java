@@ -8,13 +8,14 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
+import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -44,7 +45,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
   public MuleEvent handleException(Exception ex, MuleEvent event) {
     try {
       muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
+          .fireNotification(new ExceptionStrategyNotification(event, PROCESS_START));
 
       // keep legacy notifications
       fireNotification(ex);
@@ -68,12 +69,12 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       return event;
     } finally {
       muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_END));
+          .fireNotification(new ExceptionStrategyNotification(event, PROCESS_END));
     }
   }
 
   protected void doHandleException(Exception ex, MuleEvent event) {
-    FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
     }
@@ -95,18 +96,18 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     closeStream(event.getMessage());
 
     if (stopMessageProcessing) {
-      stopFlow(event.getFlowConstruct());
+      stopFlow();
     }
   }
 
-  protected void stopFlow(FlowConstruct flow) {
-    if (flow instanceof Stoppable) {
-      logger.info("Stopping flow '" + flow.getName() + "' due to exception");
+  protected void stopFlow() {
+    if (flowConstruct instanceof Stoppable) {
+      logger.info("Stopping flow '" + flowConstruct.getName() + "' due to exception");
 
       try {
-        ((Lifecycle) flow).stop();
+        ((Lifecycle) flowConstruct).stop();
       } catch (MuleException e) {
-        logger.error("Unable to stop flow '" + flow.getName() + "'", e);
+        logger.error("Unable to stop flow '" + flowConstruct.getName() + "'", e);
       }
     } else {
       logger.warn("Flow is not stoppable");

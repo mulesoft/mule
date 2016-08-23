@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.lifecycle;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +15,12 @@ public class LifecycleTrackerCheckComponent extends LifecycleTrackerComponent {
 
   private final List<String> tracker = new ArrayList<String>() {
 
+    @Override
     public boolean add(String phase) {
       if (isValidTransition(phase)) {
         return super.add(phase);
       }
-      throw new IllegalStateException(String.format("Invalid phase transition: %s -> %s", this.toString(), phase));
+      throw new IllegalStateException(format("Invalid phase transition: %s -> %s", this.toString(), phase));
     }
 
     private boolean isValidTransition(String phase) {
@@ -26,6 +29,7 @@ public class LifecycleTrackerCheckComponent extends LifecycleTrackerComponent {
     }
   };
 
+  @Override
   public List<String> getTracker() {
     return tracker;
   }
