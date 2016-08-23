@@ -48,7 +48,7 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void getMetadataKeysForConfig() throws Exception {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
-        metadataManager.getMetadataKeysForConfig(new ConfigurationId("apple"));
+        metadataManager.getMetadataKeys(new ConfigurationId("apple"));
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
     assertThat(metadataKeys.size(), is(2));

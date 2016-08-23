@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetad
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -92,7 +93,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   public void failToGetMetadataFromNonExistingConfig() throws IOException {
     String configName = "nonexisting-config";
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
-        metadataManager.getMetadataKeysForConfig(new ConfigurationId(configName));
+        metadataManager.getMetadataKeys(new ConfigurationId(configName));
 
     assertFailure(metadataKeysResult, format("Configuration named [%s] doesn't exist", configName),
                   FailureCode.UNKNOWN,
@@ -101,21 +102,21 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void failToGetMetadataFromDynamicConfig() throws IOException {
-    final String configName = "dynamic-config";
+    ComponentId componentId = new ConfigurationId("dynamic-config");
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
-        metadataManager.getMetadataKeysForConfig(new ConfigurationId(configName));
+        metadataManager.getMetadataKeys(componentId);
 
-    assertFailure(metadataKeysResult, format("Component [%s] is not MetadataKeyAware, no information available", configName),
+    assertFailure(metadataKeysResult, format("Component [%s] is not MetadataKeyAware, no information available", componentId),
                   FailureCode.UNKNOWN,
                   InvalidComponentIdException.class.getName());
   }
 
   @Test
-  public void processorIsNotMetadataAware() throws Exception {
+  public void processorIsNotMetadataProvider() throws Exception {
     componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
 
-    assertFailure(metadata, "not MetadataAware", FailureCode.UNKNOWN, ClassCastException.class.getName());
+    assertFailure(metadata, "not a MetadataProvider", FailureCode.UNKNOWN, ClassCastException.class.getName());
   }
 
   @Test

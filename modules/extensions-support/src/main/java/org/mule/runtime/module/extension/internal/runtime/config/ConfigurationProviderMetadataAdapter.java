@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.*;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeysAware;
+import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -39,7 +40,7 @@ import javax.inject.Inject;
  * @since 1.0
  */
 public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigurationProvider<T>
-    implements MetadataKeysAware {
+    implements MetadataKeyProvider {
 
   @Inject
   private MuleMetadataManager metadataManager;
@@ -57,13 +58,13 @@ public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigu
     MetadataKeysContainerBuilder keysBuilder = new MetadataKeysContainerBuilder();
     MetadataContext metadataContext = getMetadataContext();
     try {
-      addComponentKeys(this.getModel().getOperationModels(), metadataContext, keysBuilder);
-      addComponentKeys(this.getModel().getSourceModels(), metadataContext, keysBuilder);
+      addComponentKeys(getModel().getOperationModels(), metadataContext, keysBuilder);
+      addComponentKeys(getModel().getSourceModels(), metadataContext, keysBuilder);
     } catch (Exception e) {
-      return MetadataResult.failure(null, format("%s: %s"), e);
+      return failure(null, format("%s: %s"), e);
     }
 
-    return MetadataResult.success(keysBuilder.build());
+    return success(keysBuilder.build());
   }
 
   private void addComponentKeys(List<? extends ComponentModel> components, MetadataContext metadataContext,
@@ -80,11 +81,10 @@ public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigu
     }
   }
 
-
   private MetadataContext getMetadataContext() throws MetadataResolvingException {
     MuleEvent fakeEvent = getInitialiserEvent(muleContext);
-    return new DefaultMetadataContext((ConfigurationInstance<Object>) this.get(fakeEvent),
+    return new DefaultMetadataContext((ConfigurationInstance<Object>) get(fakeEvent),
                                       connectionManager,
-                                      metadataManager.getMetadataCache(this.getName()));
+                                      metadataManager.getMetadataCache(getName()));
   }
 }
