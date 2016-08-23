@@ -45,7 +45,7 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
 
   @Test
   public void basicPagedOperation() throws Exception {
-    Object payload = runFlow("getPersonalInfo").getMessage().getPayload();
+    Object payload = flowRunner("getPersonalInfo").run().getMessage().getPayload();
     assertThat(payload, is(instanceOf(ConsumerIterator.class)));
     ConsumerIterator consumerIterator = (ConsumerIterator) payload;
     assertThat(consumerIterator.size(), is(11));
@@ -56,7 +56,7 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
 
   @Test
   public void emptyPagedOperation() throws Exception {
-    ConsumerIterator iterator = runFlow("emptyPagedOperation").getMessage().getPayload();
+    ConsumerIterator iterator = flowRunner("emptyPagedOperation").run().getMessage().getPayload();
     assertThat(iterator.hasNext(), is(false));
     assertThat(iterator.size(), is(0));
   }
@@ -64,13 +64,13 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
   @Test
   public void pagedOperationException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    ConsumerIterator iterator = runFlow("failingPagedOperation").getMessage().getPayload();
+    ConsumerIterator iterator = flowRunner("failingPagedOperation").run().getMessage().getPayload();
     iterator.next();
   }
 
   @Test
   public void pagedOperationUsingConnection() throws Exception {
-    ConsumerIterator iterator = runFlow("pagedOperationUsingConnection").getMessage().getPayload();
+    ConsumerIterator iterator = flowRunner("pagedOperationUsingConnection").run().getMessage().getPayload();
     while (iterator.hasNext()) {
       assertThat(iterator.next().toString(), containsString(SAUL_NEW_NUMBER));
     }

@@ -5,13 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
@@ -25,7 +26,7 @@ import java.util.function.Function;
  * @param <T> the type of the elements returned by the {@link PagingProvider}.
  * @since 3.5.0
  */
-public class PagingProviderProducer<T> implements Producer<List<T>> {
+public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance<?> config;

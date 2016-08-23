@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.module.extension.internal.runtime.streaming;
 
-import org.mule.runtime.core.util.CollectionUtils;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 
 import java.io.IOException;
@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  * @param <T> the type of the elements in the returned pages.
  * @since 3.5.0
  */
-public class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
+final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(PagingProviderWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PagingProviderWrapper.class);
 
   private final PagingProvider<C, T> wrapped;
   private boolean closed = false;
@@ -46,8 +46,8 @@ public class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
   }
 
   private void handleCloseException(Throwable t) {
-    if (logger.isWarnEnabled()) {
-      logger.warn("Exception was found trying to close paging delegate. Execution will continue", t);
+    if (LOGGER.isWarnEnabled()) {
+      LOGGER.warn("Exception was found trying to close paging delegate. Execution will continue", t);
     }
   }
 
@@ -58,17 +58,17 @@ public class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
   @Override
   public List<T> getPage(C connection) {
     if (this.closed) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("paging delegate is closed. Returning null");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("paging delegate is closed. Returning null");
       }
       return null;
     }
 
     List<T> page = this.wrapped.getPage(connection);
-    if (CollectionUtils.isEmpty(page)) {
+    if (isEmpty(page)) {
       try {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
         }
 
         this.close();

@@ -153,7 +153,6 @@ public final class IntrospectionUtils {
 
     ResolvableType methodType = getMethodResolvableType(method);
     methodType = unwrapInterceptingCallback(methodType);
-    methodType = unwrapPagingProvider(methodType);
 
     if (methodType.getRawClass().equals(OperationResult.class)) {
       ResolvableType genericType = methodType.getGenerics()[1];

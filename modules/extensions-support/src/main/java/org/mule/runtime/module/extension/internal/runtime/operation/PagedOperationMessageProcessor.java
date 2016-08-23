@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.streaming.Consumer;
 import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
-import org.mule.runtime.core.streaming.PagingProviderProducer;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
@@ -25,8 +25,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
- * <p>
-
  *
  * @since 4.0
  */

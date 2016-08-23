@@ -9,14 +9,7 @@ package org.mule.runtime.core.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
-import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
@@ -26,7 +19,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -39,20 +31,27 @@ public class ConsumerIteratorTestCase {
   private static final int PAGE_SIZE = 100;
   private static final int TOP = 3000;
 
-  private ConnectionManager connectionManager = mock(ConnectionManager.class);
-  private ConfigurationInstance config = mock(ConfigurationInstance.class);
   private PagingProvider<Object, String> delegate = new TestPagingProvider();
 
   @InjectMocks
-  private PagingProviderProducer<String> producer = new PagingProviderProducer<>(delegate, config, connectionManager);
+  private Producer<List<String>> producer = new Producer<List<String>>()
+  {
 
-  @Before
-  public void setup() throws ConnectionException {
-    when(config.getValue()).thenReturn("config");
-    ConnectionHandler handler = mock(ConnectionHandler.class);
-    when(handler.getConnection()).thenReturn(new Object());
-    when(connectionManager.getConnection(anyObject())).thenReturn(handler);
-  }
+    @Override
+    public int size() {
+      return delegate.getTotalResults(new Object()).get();
+    }
+
+    @Override
+    public void close() throws IOException {
+      delegate.close();
+    }
+
+    @Override
+    public List<String> produce() {
+      return delegate.getPage(new Object());
+    }
+  };
 
   @Test
   public void iterateStreaming() throws Exception {

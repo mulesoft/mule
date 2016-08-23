@@ -6,9 +6,10 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.io.IOException;
@@ -16,24 +17,21 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MoneyLaunderingOperation {
 
-  public static final List<PersonalInfo> INVOLVED_PEOPLE = Stream.of(
-                                                                     new PersonalInfo("Skyler", 34),
-                                                                     new PersonalInfo("BabySkyler", 0),
-                                                                     new PersonalInfo("Walter Jr", 17),
-                                                                     new PersonalInfo("Walter", 50),
-                                                                     new PersonalInfo("Lydia", 33),
-                                                                     new PersonalInfo("Mike", 62),
-                                                                     new PersonalInfo("Jesse", 21),
-                                                                     new PersonalInfo("Saul", 49),
-                                                                     new PersonalInfo("Marie", 34),
-                                                                     new PersonalInfo("Gus", 45),
-                                                                     new PersonalInfo("Tood", 22))
-      .collect(Collectors.toList());
+  public static final List<PersonalInfo> INVOLVED_PEOPLE = asList(
+                                                                  new PersonalInfo("Skyler", 34),
+                                                                  new PersonalInfo("BabySkyler", 0),
+                                                                  new PersonalInfo("Walter Jr", 17),
+                                                                  new PersonalInfo("Walter", 50),
+                                                                  new PersonalInfo("Lydia", 33),
+                                                                  new PersonalInfo("Mike", 62),
+                                                                  new PersonalInfo("Jesse", 21),
+                                                                  new PersonalInfo("Saul", 49),
+                                                                  new PersonalInfo("Marie", 34),
+                                                                  new PersonalInfo("Gus", 45),
+                                                                  new PersonalInfo("Tood", 22));
 
   private long totalLaunderedAmount = 0;
 
@@ -137,6 +135,4 @@ public class MoneyLaunderingOperation {
       }
     };
   }
-
-
 }

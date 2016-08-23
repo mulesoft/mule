@@ -7,16 +7,18 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class ListConsumerTestCase {
@@ -32,8 +34,8 @@ public class ListConsumerTestCase {
   @Before
   public void setUp() {
     this.pages = this.getPages();
-    this.producer = Mockito.spy(new TestProducer());
-    this.consumer = Mockito.spy(new ListConsumer<>(this.producer));
+    this.producer = spy(new TestProducer());
+    this.consumer = spy(new ListConsumer<>(this.producer));
   }
 
   @Test(expected = ClosedConsumerException.class)
@@ -43,15 +45,15 @@ public class ListConsumerTestCase {
       elements.add(this.consumer.consume());
     }
 
-    Assert.assertEquals(elements.size(), totalCount);
-    Assert.assertTrue(this.consumer.isConsumed());
+    assertEquals(elements.size(), totalCount);
+    assertTrue(this.consumer.isConsumed());
 
     for (List<Integer> page : pages) {
-      Assert.assertTrue(elements.containsAll(page));
+      assertTrue(elements.containsAll(page));
     }
 
-    Mockito.verify(this.consumer).close();
-    Mockito.verify(this.producer).close();
+    verify(this.consumer).close();
+    verify(this.producer).close();
 
     this.consumer.consume();
   }
@@ -65,15 +67,15 @@ public class ListConsumerTestCase {
     }
 
     this.consumer.close();
-    Assert.assertEquals(pageSize, elements.size());
-    Assert.assertTrue(elements.containsAll(this.pages.get(0)));
-    Assert.assertTrue(this.consumer.isConsumed());
+    assertEquals(pageSize, elements.size());
+    assertTrue(elements.containsAll(this.pages.get(0)));
+    assertTrue(this.consumer.isConsumed());
     this.consumer.consume();
   }
 
   @Test
   public void totalAvailable() {
-    Assert.assertEquals(this.consumer.size(), totalCount);
+    assertEquals(this.consumer.size(), totalCount);
   }
 
   @Test

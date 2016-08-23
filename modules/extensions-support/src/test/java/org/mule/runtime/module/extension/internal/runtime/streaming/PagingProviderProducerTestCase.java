@@ -4,19 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.size.SmallTest;
 
@@ -28,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -67,12 +68,12 @@ public class PagingProviderProducerTestCase {
   @Test
   public void closeQuietly() throws Exception {
     producer.close();
-    Mockito.verify(delegate).close();
+    verify(delegate).close();
   }
 
   @Test(expected = Exception.class)
   public void closeNoisely() throws Exception {
-    Mockito.doThrow(new DefaultMuleException(new Exception())).when(delegate).close();
+    doThrow(new DefaultMuleException(new Exception())).when(delegate).close();
     producer.close();
 
   }
