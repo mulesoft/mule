@@ -119,4 +119,10 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
     assertThat(config.getNonBananasCount(), is(0));
     assertThat(config.getExceptionCount(), is(0));
   }
+
+  @Test
+  public void interceptingWithoutGenerics() throws Exception {
+    MuleEvent event = flowRunner("InterceptingWithoutGenerics").run();
+    assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
+  }
 }
