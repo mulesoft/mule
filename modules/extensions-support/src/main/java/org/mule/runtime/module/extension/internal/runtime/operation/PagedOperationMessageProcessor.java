@@ -6,22 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.streaming.Consumer;
 import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
-import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
@@ -30,8 +28,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  */
 public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
-  public PagedOperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
-                                        String configurationProviderName, String target, ResolverSet resolverSet,
+  public PagedOperationMessageProcessor(RuntimeExtensionModel extensionModel,
+                                        RuntimeOperationModel operationModel,
+                                        String configurationProviderName,
+                                        String target,
+                                        ResolverSet resolverSet,
                                         ExtensionManagerAdapter extensionManager) {
     super(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
   }
@@ -43,10 +44,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
     PagingProvider pagingProvider = resultEvent.getMessage().getPayload();
 
     if (pagingProvider == null) {
-      throw new DefaultMuleException("Obtained paging delegate cannot be null");
+      throw new IllegalStateException("Obtained paging delegate cannot be null");
     }
-
-    ConnectionManager connectionManager = operationContext.getMuleContext().getRegistry().lookupObject(ConnectionManager.class);
 
     Producer<?> producer = new PagingProviderProducer(pagingProvider, operationContext.getConfiguration(), connectionManager);
     Consumer<?> consumer = new ListConsumer(producer);

@@ -42,8 +42,6 @@ public class MoneyLaunderingOperation {
   }
 
   public PagingProvider<HeisenbergConnection, PersonalInfo> getPagedPersonalInfo() {
-
-
     return new PagingProvider<HeisenbergConnection, PersonalInfo>() {
 
       private int accumulator = 1;
