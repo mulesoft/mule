@@ -9,6 +9,7 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -214,7 +215,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
       @Override
       protected MuleEvent processRequest(MuleEvent event) throws MuleException {
-        propertyValue = DefaultMuleEvent.getFlowVariableOrNull(propertyName, event);
+        propertyValue = getFlowVariableOrNull(propertyName, event);
         event.removeFlowVariable(propertyName);
         return super.processRequest(event);
       }
