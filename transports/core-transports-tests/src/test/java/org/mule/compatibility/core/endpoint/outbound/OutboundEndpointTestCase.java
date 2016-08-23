@@ -50,7 +50,9 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.security.TestSecurityFilter;
@@ -95,11 +97,15 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     Transformer resTransformer = mock(Transformer.class);
     when(resTransformer.process(any(MuleEvent.class))).then(echoEventAnswer);
 
+    final Flow flow = new Flow("", muleContext);
+    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    muleContext.getRegistry().registerFlowConstruct(flow);
+
     OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(getTestFlow());
+    endpoint.setFlowConstruct(flow);
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler);
+    MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, flow);
 
     MuleEvent response = endpoint.process(event);
     assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));
@@ -111,10 +117,14 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
   @Test
   public void testDefaultFlowNonBlockingError() throws Exception {
+    final Flow flow = new Flow("", muleContext);
+    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    muleContext.getRegistry().registerFlowConstruct(flow);
+
     OutboundEndpoint endpoint = createOutboundEndpoint("test://AlwaysFail", null, null, null, null, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(getTestFlow());
+    endpoint.setFlowConstruct(flow);
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler);
+    MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, flow);
 
     MuleEvent response = endpoint.process(event);
     assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));

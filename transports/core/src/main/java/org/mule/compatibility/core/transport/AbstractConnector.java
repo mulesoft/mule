@@ -7,33 +7,9 @@
 package org.mule.compatibility.core.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.compatibility.core.config.i18n.TransportCoreMessages.connectorCausedError;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
-
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -62,7 +38,6 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -110,6 +85,32 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1800,14 +1801,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
     logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
 
-    if (e instanceof MessagingException) {
-      MuleEvent failedEvent = ((MessagingException) e).getEvent();
-      failedEvent.getFlowConstruct().getExceptionListener().handleException((MessagingException) e, failedEvent);
-    } else if (e instanceof Exception) {
+    // if (e instanceof MessagingException) {
+    // MuleEvent failedEvent = ((MessagingException) e).getEvent();
+    // failedEvent.getFlowConstruct().getExceptionListener().handleException((MessagingException) e, failedEvent);
+    // } else
+    if (e instanceof Exception) {
       muleContext.getExceptionListener().handleException((Exception) e);
     } else {
-      muleContext.getExceptionListener()
-          .handleException(new MuleRuntimeException(TransportCoreMessages.connectorCausedError(this.getName()), e));
+      muleContext.getExceptionListener().handleException(new MuleRuntimeException(connectorCausedError(this.getName()), e));
     }
   }
 

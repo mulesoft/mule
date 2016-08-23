@@ -7,6 +7,7 @@
 
 package org.mule.compatibility.core.processor.chain;
 
+import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -15,6 +16,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -36,10 +39,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,14 +57,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
   protected boolean synchronous;
   private volatile int threads = 1;
 
-  private Executor executor = Executors.newCachedThreadPool();
-
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{MessageExchangePattern.REQUEST_RESPONSE, false, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, false, false}, {MessageExchangePattern.REQUEST_RESPONSE, true, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, true, false}, {MessageExchangePattern.ONE_WAY, false, true},
-        {MessageExchangePattern.ONE_WAY, false, false}, {MessageExchangePattern.ONE_WAY, true, true}});
+    return Arrays.asList(new Object[][] {{REQUEST_RESPONSE, false, true},
+        {REQUEST_RESPONSE, false, false},
+        {REQUEST_RESPONSE, true, true},
+        {REQUEST_RESPONSE, true, false},
+        {ONE_WAY, false, true},
+        {ONE_WAY, false, false},
+        {ONE_WAY, true, true}});
   }
 
   public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking, boolean synchronous) {
@@ -78,7 +79,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     muleContext = mock(MuleContext.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
-    when(muleConfiguration.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
+    when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
   }
@@ -86,11 +87,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
   @Test
   public void testOneWayOutboundEndpointWithService() throws Exception {
     MuleEvent event = getTestEventUsingFlow("");
-    when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
 
     MessageProcessor mp = mock(MessageProcessor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
-    when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
+    when(outboundEndpoint.getExchangePattern()).thenReturn(ONE_WAY);
 
     MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
     MuleEvent response = chain.process(event);
@@ -105,7 +105,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
 
     MessageProcessor mp = mock(MessageProcessor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
-    when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
+    when(outboundEndpoint.getExchangePattern()).thenReturn(ONE_WAY);
     when(outboundEndpoint.mayReturnVoidEvent()).thenAnswer(invocation -> {
       MessageExchangePattern exchangePattern = ((OutboundEndpoint) invocation.getMock()).getExchangePattern();
       return exchangePattern == null ? true : !exchangePattern.hasResponse();
@@ -123,14 +123,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
   protected MuleEvent getTestEventUsingFlow(Object data) throws Exception {
     MuleEvent event = mock(MuleEvent.class);
     MuleMessage message = MuleMessage.builder().payload(data).build();
-    when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
+    when(event.getId()).thenReturn(randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
-    when(event.getFlowConstruct()).thenReturn(mockFlow);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);
     when(event.isAllowNonBlocking()).thenReturn(!synchronous && nonBlocking);

@@ -78,11 +78,10 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
       if (hasResponse) {
         if (isNonBlocking(event)) {
-          doSendNonBlocking(event, new NonBlockingSendCompletionHandler(event, ((Flow) event.getFlowConstruct()).getWorkManager(),
-                                                                        connector));
-          // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with
-          // this
-          // thread.
+          doSendNonBlocking(event,
+                            new NonBlockingSendCompletionHandler(event, ((Flow) endpoint.getFlowConstruct()).getWorkManager(),
+                                                                 connector));
+          // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this thread.
           setCurrentEvent(null);
           return NonBlockingVoidMuleEvent.getInstance();
         } else {
@@ -114,7 +113,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   }
 
   private boolean isNonBlocking(MuleEvent event) {
-    return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
+    return endpoint.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
         isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
   }
 

@@ -103,13 +103,6 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
-
-    // Assert that deserialized event has service and that the service is the
-    // same instance
-    assertNotNull(deserialized.getFlowConstruct());
-
-    // Assert that deserialized event has service and that the service is the same instance
-    assertEquals(event.getFlowName(), deserialized.getFlowName());
   }
 
   private MuleEvent createEventToSerialize() throws Exception {

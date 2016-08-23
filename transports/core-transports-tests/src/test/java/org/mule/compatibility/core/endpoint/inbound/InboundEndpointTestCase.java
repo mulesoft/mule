@@ -190,7 +190,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
       result = mpChain.process(requestEvent);
       fail("Exception expected");
     } catch (TestSecurityFilter.StaticMessageUnauthorisedException e) {
-      requestEvent.getFlowConstruct().getExceptionListener().handleException(e, requestEvent);
+      endpoint.getFlowConstruct().getExceptionListener().handleException(e, requestEvent);
     }
 
     assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
