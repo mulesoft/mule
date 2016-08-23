@@ -7,16 +7,18 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import org.mule.tck.size.SmallTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class ListConsumerTestCase {
@@ -32,8 +34,8 @@ public class ListConsumerTestCase {
   @Before
   public void setUp() {
     this.pages = this.getPages();
-    this.producer = Mockito.spy(new TestProducer());
-    this.consumer = Mockito.spy(new ListConsumer<Integer>(this.producer));
+    this.producer = spy(new TestProducer());
+    this.consumer = spy(new ListConsumer<>(this.producer));
   }
 
   @Test(expected = ClosedConsumerException.class)
@@ -43,15 +45,15 @@ public class ListConsumerTestCase {
       elements.add(this.consumer.consume());
     }
 
-    Assert.assertEquals(elements.size(), totalCount);
-    Assert.assertTrue(this.consumer.isConsumed());
+    assertEquals(elements.size(), totalCount);
+    assertTrue(this.consumer.isConsumed());
 
     for (List<Integer> page : pages) {
-      Assert.assertTrue(elements.containsAll(page));
+      assertTrue(elements.containsAll(page));
     }
 
-    Mockito.verify(this.consumer).close();
-    Mockito.verify(this.producer).close();
+    verify(this.consumer).close();
+    verify(this.producer).close();
 
     this.consumer.consume();
   }
@@ -65,32 +67,32 @@ public class ListConsumerTestCase {
     }
 
     this.consumer.close();
-    Assert.assertEquals(pageSize, elements.size());
-    Assert.assertTrue(elements.containsAll(this.pages.get(0)));
-    Assert.assertTrue(this.consumer.isConsumed());
+    assertEquals(pageSize, elements.size());
+    assertTrue(elements.containsAll(this.pages.get(0)));
+    assertTrue(this.consumer.isConsumed());
     this.consumer.consume();
   }
 
   @Test
   public void totalAvailable() {
-    Assert.assertEquals(this.consumer.size(), totalCount);
+    assertEquals(this.consumer.size(), totalCount);
   }
 
   @Test
-  public void doubleClose() throws MuleException {
+  public void doubleClose() throws Exception {
     this.consumer.close();
     this.consumer.close();
   }
 
   private List<List<Integer>> getPages() {
-    List<List<Integer>> pages = new ArrayList<List<Integer>>();
-    List<Integer> page = new ArrayList<Integer>();
+    List<List<Integer>> pages = new ArrayList<>();
+    List<Integer> page = new ArrayList<>();
 
     for (int i = 1; i <= totalCount; i++) {
       page.add(i);
       if (i % pageSize == 0) {
         pages.add(page);
-        page = new ArrayList<Integer>();
+        page = new ArrayList<>();
       }
     }
 
@@ -102,7 +104,7 @@ public class ListConsumerTestCase {
     private int index = 0;
 
     @Override
-    public void close() throws MuleException {}
+    public void close() throws IOException {}
 
     @Override
     public List<Integer> produce() {
@@ -110,10 +112,10 @@ public class ListConsumerTestCase {
 
       if (this.index < pages.size()) {
 
-        ret = pages.get(this.index);
-        this.index++;
+        ret = pages.get(index);
+        index++;
       } else {
-        ret = new ArrayList<Integer>();
+        ret = new ArrayList<>();
       }
 
       return ret;
@@ -121,6 +123,6 @@ public class ListConsumerTestCase {
 
     public int size() {
       return totalCount;
-    };
+    }
   }
 }

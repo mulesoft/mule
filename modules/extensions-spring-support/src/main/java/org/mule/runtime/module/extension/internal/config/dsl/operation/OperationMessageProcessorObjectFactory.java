@@ -16,8 +16,10 @@ import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationMo
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.InterceptingOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.PagedOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -61,6 +63,9 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
       return new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target,
                                                        resolverSet, (ExtensionManagerAdapter) muleContext.getExtensionManager());
+    } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet,
+                                                (ExtensionManagerAdapter) muleContext.getExtensionManager());
     } else {
       return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet,
                                            (ExtensionManagerAdapter) muleContext.getExtensionManager());

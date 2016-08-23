@@ -11,10 +11,9 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
-
-import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.size.SmallTest;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,7 +60,7 @@ public class SimpleConsumerTestCase {
   }
 
   @Test
-  public void doubleClose() throws MuleException {
+  public void doubleClose() throws Exception {
     this.consumer.close();
     this.consumer.close();
   }
@@ -99,7 +98,7 @@ public class SimpleConsumerTestCase {
     }
 
     @Override
-    public void close() throws MuleException {
+    public void close() throws IOException {
       this.closed = true;
     }
   }

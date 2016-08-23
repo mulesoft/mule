@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -32,7 +33,6 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
-
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
@@ -62,8 +62,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
@@ -438,6 +436,13 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
     assertThat(caches.keySet(), hasSize(2));
     assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));
+  }
+
+  @Test
+  public void pagedOperationMetadataTestCase() throws Exception {
+    componentId = new ProcessorId("pagedOperationMetadata", FIRST_PROCESSOR_INDEX);
+    ComponentMetadataDescriptor metadata = getComponentStaticMetadata();
+    assertExpectedType(metadata.getParametersMetadata().get(0), "animal", Bear.class);
   }
 
   @Test

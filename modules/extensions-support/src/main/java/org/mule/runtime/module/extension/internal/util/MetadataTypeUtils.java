@@ -82,8 +82,7 @@ public final class MetadataTypeUtils {
    * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined, or the {@link UnionType
    *         union} of all the mapped subtypes for the given {@code baseType}
    */
-  public static MetadataType subTypesUnion(MetadataType baseType, SubTypesMappingContainer subtypesContainer,
-                                           ClassLoader classLoader) {
+  public static MetadataType subTypesUnion(MetadataType baseType, SubTypesMappingContainer subtypesContainer) {
     List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);
     if (subTypes.isEmpty()) {
       return baseType;

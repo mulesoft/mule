@@ -75,8 +75,8 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
     ExtendedPersonalInfo info2 = builder.build(event);
     ExtendedPersonalInfo info3 = builder.build(event);
 
-    assertThat(info1, is(not(info2)));
-    assertThat(info1, is(not(info3)));
+    assertThat(info1, is(not(sameInstance(info2))));
+    assertThat(info1, is(not(sameInstance(info3))));
     verify(info1);
     verify(info2);
     verify(info3);

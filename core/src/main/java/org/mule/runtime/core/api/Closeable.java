@@ -9,6 +9,7 @@ package org.mule.runtime.core.api;
 /**
  * Marking interface to identity resources that need to be closed in order to release resources.
  */
+@Deprecated
 public interface Closeable {
 
   /**

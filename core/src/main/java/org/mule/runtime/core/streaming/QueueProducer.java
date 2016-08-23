@@ -7,8 +7,9 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.queue.Queue;
+
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class QueueProducer<T> implements Producer<T> {
 
   /**
    * Creates an instance with 5000 milliseconds as the default polling value
-   * 
+   *
    * @param queue the queue to stream from
    */
   public QueueProducer(Queue queue) {
@@ -67,7 +68,7 @@ public class QueueProducer<T> implements Producer<T> {
   }
 
   @Override
-  public void close() throws MuleException {
+  public void close() throws IOException {
     this.queue = null;
   }
 

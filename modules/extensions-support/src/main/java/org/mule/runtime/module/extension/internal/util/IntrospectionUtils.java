@@ -27,6 +27,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -118,7 +119,9 @@ public final class IntrospectionUtils {
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader) {
-    ResolvableType methodType = unwrapInterceptingCallback(method);
+    ResolvableType methodType = getMethodResolvableType(method);
+    methodType = unwrapInterceptingCallback(methodType);
+    methodType = unwrapPagingProvider(methodType);
 
     Type type = methodType.getType();
     if (methodType.getRawClass().equals(OperationResult.class)) {
@@ -148,7 +151,8 @@ public final class IntrospectionUtils {
   public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader) {
     Type type = null;
 
-    ResolvableType methodType = unwrapInterceptingCallback(method);
+    ResolvableType methodType = getMethodResolvableType(method);
+    methodType = unwrapInterceptingCallback(methodType);
 
     if (methodType.getRawClass().equals(OperationResult.class)) {
       ResolvableType genericType = methodType.getGenerics()[1];
@@ -160,10 +164,19 @@ public final class IntrospectionUtils {
     return type != null ? typeLoader.load(type) : typeBuilder().nullType().build();
   }
 
-  private static ResolvableType unwrapInterceptingCallback(Method method) {
-    ResolvableType methodType = getMethodResolvableType(method);
+  private static ResolvableType unwrapInterceptingCallback(ResolvableType methodType) {
     if (InterceptingCallback.class.isAssignableFrom(methodType.getRawClass())) {
       ResolvableType genericType = methodType.getGenerics()[0];
+      if (genericType.getRawClass() != null) {
+        methodType = genericType;
+      }
+    }
+    return methodType;
+  }
+
+  private static ResolvableType unwrapPagingProvider(ResolvableType methodType) {
+    if (PagingProvider.class.isAssignableFrom(methodType.getRawClass())) {
+      ResolvableType genericType = methodType.getGenerics()[1];
       if (genericType.getRawClass() != null) {
         methodType = genericType;
       }

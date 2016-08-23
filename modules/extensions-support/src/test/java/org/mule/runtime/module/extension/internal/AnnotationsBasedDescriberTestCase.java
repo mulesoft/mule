@@ -72,6 +72,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.PagedOperationModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -85,6 +86,7 @@ import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
@@ -128,6 +130,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   private static final String KILL_WITH_MULTIPLE_WILDCARD_WEAPONS = "killWithMultipleWildCardWeapons";
   private static final String GET_PAYMENT_FROM_EVENT_OPERATION = "getPaymentFromEvent";
   private static final String GET_PAYMENT_FROM_MESSAGE_OPERATION = "getPaymentFromMessage";
+  private static final String GET_PAGED_PERSONAL_INFO_OPERATION = "getPagedPersonalInfo";
+  private static final String EMPTY_PAGED_OPERATION = "emptyPagedOperation";
+  private static final String FAILING_PAGED_OPERATION = "failingPagedOperation";
+  private static final String CONNECTION_PAGED_OPERATION = "pagedOperationUsingConnection";
   private static final String DIE = "die";
   private static final String KILL_MANY = "killMany";
   private static final String KILL_ONE = "killOne";
@@ -408,7 +414,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(26));
+    assertThat(extensionDeclaration.getOperations(), hasSize(30));
     assertOperation(extensionDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(extensionDeclaration, GET_ENEMY_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
@@ -431,6 +437,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
     assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
     assertOperation(extensionDeclaration, APPROVE_INVESTMENT, "");
+    assertOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION, "");
+    assertOperation(extensionDeclaration, EMPTY_PAGED_OPERATION, "");
+    assertOperation(extensionDeclaration, FAILING_PAGED_OPERATION, "");
+    assertOperation(extensionDeclaration, CONNECTION_PAGED_OPERATION, "");
 
     OperationDeclaration operation = getOperation(extensionDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -541,6 +551,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
     assertThat(operation, is(nullValue()));
 
+    operation = getOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
+    assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
+    assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(PersonalInfo.class)));
   }
 
   private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {

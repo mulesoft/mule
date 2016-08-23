@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.Closeable;
 
+import java.io.Closeable;
 import java.util.NoSuchElementException;
 
 /**
@@ -26,7 +26,7 @@ public interface Consumer<T> extends Closeable, ProvidesTotalHint {
    * @return an object of type T if available. <code>null</code> otherwise
    * @throws {@link ClosedConsumerException} if the consumer is already closed
    */
-  public T consume() throws NoSuchElementException;
+  T consume() throws NoSuchElementException;
 
   /**
    * Returns <code>true</code> if no more items are available or if the consumer was closed. When this method returns
@@ -36,6 +36,6 @@ public interface Consumer<T> extends Closeable, ProvidesTotalHint {
    * 
    * @return <code>true</code> if no more items are available. <code>false</code> otherwise
    */
-  public boolean isConsumed();
+  boolean isConsumed();
 
 }

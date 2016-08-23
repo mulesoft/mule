@@ -7,46 +7,48 @@
 
 package org.mule.runtime.core.streaming;
 
-import org.mule.runtime.core.api.MuleException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.tck.size.SmallTest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class ConsumerIteratorTestCase {
 
   private static final int PAGE_SIZE = 100;
   private static final int TOP = 3000;
 
-  private PagingDelegate<String> delegate = new PagingDelegate<String>() {
+  private PagingProvider<Object, String> delegate = new TestPagingProvider();
 
-    long counter = 0;
-
-    public List<String> getPage() {
-      if (counter < TOP) {
-        List<String> page = new ArrayList<String>(100);
-        for (int i = 0; i < PAGE_SIZE; i++) {
-          counter++;
-          String value = RandomStringUtils.randomAlphabetic(5000);
-          page.add(value);
-        }
-
-        return page;
-      }
-
-      return null;
-    };
-
-    public void close() throws MuleException {};
+  @InjectMocks
+  private Producer<List<String>> producer = new Producer<List<String>>() {
 
     @Override
-    public int getTotalResults() {
-      return TOP;
+    public int size() {
+      return delegate.getTotalResults(new Object()).get();
+    }
+
+    @Override
+    public void close() throws IOException {
+      delegate.close();
+    }
+
+    @Override
+    public List<String> produce() {
+      return delegate.getPage(new Object());
     }
   };
 
@@ -73,27 +75,46 @@ public class ConsumerIteratorTestCase {
 
   @Test
   public void closedConsumer() throws Exception {
-    Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
-    Consumer<String> consumer = new ListConsumer<String>(producer);
-
-    ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
-
+    Consumer<String> consumer = new ListConsumer<>(producer);
+    ConsumerIterator<String> it = new ConsumerIterator<>(consumer);
     consumer.close();
-    Assert.assertFalse(it.hasNext());
+    assertThat(it.hasNext(), is(false));
   }
 
   @Test
   public void size() throws Exception {
     ConsumerIterator<String> it = this.newIterator();
-    Assert.assertEquals(it.size(), TOP);
+    assertThat(it.size(), is(TOP));
   }
 
   private ConsumerIterator<String> newIterator() {
-    Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
-    Consumer<String> consumer = new ListConsumer<String>(producer);
-
-    ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
-    return it;
+    Consumer<String> consumer = new ListConsumer<>(producer);
+    return new ConsumerIterator<>(consumer);
   }
 
+  public class TestPagingProvider implements PagingProvider<Object, String> {
+
+    long counter = 0;
+
+    public List<String> getPage(Object con) {
+      if (counter < TOP) {
+        List<String> page = new ArrayList<>(100);
+        for (int i = 0; i < PAGE_SIZE; i++) {
+          counter++;
+          String value = RandomStringUtils.randomAlphabetic(5000);
+          page.add(value);
+        }
+
+        return page;
+      }
+
+      return null;
+    }
+
+    public void close() throws IOException {}
+
+    public Optional<Integer> getTotalResults(Object con) {
+      return Optional.of(TOP);
+    }
+  }
 }

@@ -11,13 +11,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.runtime.core.streaming.Consumer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
