@@ -51,7 +51,7 @@ public class OneWayHttpRequesterAdapter implements MessageProcessor, FlowConstru
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    if(httpRequester instanceof FlowConstructAware) { 
+    if (httpRequester instanceof FlowConstructAware) {
       ((FlowConstructAware) httpRequester).setFlowConstruct(flowConstruct);
     }
   }
