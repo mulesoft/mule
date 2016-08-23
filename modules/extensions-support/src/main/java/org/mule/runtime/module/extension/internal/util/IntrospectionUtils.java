@@ -12,6 +12,7 @@ import static java.lang.reflect.Modifier.PUBLIC;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -22,13 +23,12 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
+import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
-import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -55,6 +55,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -120,8 +121,11 @@ public final class IntrospectionUtils {
    */
   public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader) {
     ResolvableType methodType = getMethodResolvableType(method);
-    methodType = unwrapInterceptingCallback(methodType);
-    methodType = unwrapPagingProvider(methodType);
+    if (isInterceptingCallback(methodType)) {
+      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
+    } else if (isPagingProvider(methodType)) {
+      methodType = unwrapGenericFromClass(PagingProvider.class, methodType, 1);
+    }
 
     Type type = methodType.getType();
     if (methodType.getRawClass().equals(OperationResult.class)) {
@@ -152,7 +156,9 @@ public final class IntrospectionUtils {
     Type type = null;
 
     ResolvableType methodType = getMethodResolvableType(method);
-    methodType = unwrapInterceptingCallback(methodType);
+    if (isInterceptingCallback(methodType)) {
+      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
+    }
 
     if (methodType.getRawClass().equals(OperationResult.class)) {
       ResolvableType genericType = methodType.getGenerics()[1];
@@ -164,24 +170,34 @@ public final class IntrospectionUtils {
     return type != null ? typeLoader.load(type) : typeBuilder().nullType().build();
   }
 
-  private static ResolvableType unwrapInterceptingCallback(ResolvableType methodType) {
-    if (InterceptingCallback.class.isAssignableFrom(methodType.getRawClass())) {
-      ResolvableType genericType = methodType.getGenerics()[0];
+  static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
+    if (!isEmpty(type.getGenerics())) {
+      ResolvableType genericType = type.getGenerics()[genericIndex];
       if (genericType.getRawClass() != null) {
-        methodType = genericType;
+        type = genericType;
       }
+    } else {
+      if (clazz.isAssignableFrom(type.getRawClass().getSuperclass())) {
+        return unwrapGenericFromClass(clazz, type.getSuperType(), genericIndex);
+      } else {
+        ResolvableType interfaceType = stream(type.getInterfaces())
+            .filter(i -> clazz.isAssignableFrom(i.getRawClass()))
+            .findFirst()
+            .orElse(forType(Object.class));
+
+        return unwrapGenericFromClass(clazz, interfaceType, genericIndex);
+      }
+
     }
-    return methodType;
+    return type;
   }
 
-  private static ResolvableType unwrapPagingProvider(ResolvableType methodType) {
-    if (PagingProvider.class.isAssignableFrom(methodType.getRawClass())) {
-      ResolvableType genericType = methodType.getGenerics()[1];
-      if (genericType.getRawClass() != null) {
-        methodType = genericType;
-      }
-    }
-    return methodType;
+  private static boolean isInterceptingCallback(ResolvableType type) {
+    return InterceptingCallback.class.isAssignableFrom(type.getRawClass());
+  }
+
+  private static boolean isPagingProvider(ResolvableType type) {
+    return PagingProvider.class.isAssignableFrom(type.getRawClass());
   }
 
   private static ResolvableType getMethodResolvableType(Method method) {
@@ -205,7 +221,7 @@ public final class IntrospectionUtils {
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
     checkArgument(method != null, "Can't introspect a null method");
     Class<?>[] parameters = method.getParameterTypes();
-    if (ArrayUtils.isEmpty(parameters)) {
+    if (isEmpty(parameters)) {
       return new MetadataType[] {};
     }
 

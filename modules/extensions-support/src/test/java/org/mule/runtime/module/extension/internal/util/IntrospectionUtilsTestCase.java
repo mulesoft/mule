@@ -19,11 +19,17 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
+import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -34,6 +40,7 @@ import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.heisenberg.extension.model.LifetimeInfo;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -44,8 +51,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.junit.Test;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -90,18 +99,18 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getFieldDataType() throws Exception {
-    MetadataType type = IntrospectionUtils.getFieldMetadataType(getClass().getDeclaredField("baskets"), TYPE_LOADER);
+    MetadataType type = getFieldMetadataType(getClass().getDeclaredField("baskets"), TYPE_LOADER);
     assertList(type, FruitBasket.class);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void getNullFieldDataType() throws Exception {
-    IntrospectionUtils.getFieldMetadataType(null, TYPE_LOADER);
+    getFieldMetadataType(null, TYPE_LOADER);
   }
 
   @Test
   public void getNoAnnotatedExposedPojoFields() {
-    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(LifetimeInfo.class);
+    Collection<Field> exposedFields = getExposedFields(LifetimeInfo.class);
     assertThat(exposedFields, is(not(empty())));
     assertThat(exposedFields.size(), is(3));
     assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
@@ -111,14 +120,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getEmptyExposedPojoFields() {
-    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBasket.class);
+    Collection<Field> exposedFields = getExposedFields(FruitBasket.class);
     assertThat(exposedFields, is(empty()));
   }
 
   @Test
   public void getWildCardFieldsDataTypes() {
 
-    Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBox.class);
+    Collection<Field> exposedFields = getExposedFields(FruitBox.class);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
@@ -130,6 +139,24 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
                 exposedFields);
     assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Fruit.class)),
                 exposedFields);
+  }
+
+  @Test
+  public void unwrapInterceptingCallbackGeneric() {
+    ResolvableType type = unwrapGenericFromClass(InterceptingCallback.class, forType(TestInterceptingCallback.class), 0);
+    assertThat(type.getRawClass(), equalTo(Banana.class));
+  }
+
+  @Test
+  public void unwrapInterceptingCallbackGenericFromParentClass() {
+    ResolvableType type = unwrapGenericFromClass(InterceptingCallback.class, forType(InterceptingCallbackWithParent.class), 0);
+    assertThat(type.getRawClass(), equalTo(Banana.class));
+  }
+
+  @Test
+  public void unwrapPagingProviderGenericFromParentClass() {
+    ResolvableType type = unwrapGenericFromClass(PagingProvider.class, forType(TestPagingProvider.class), 1);
+    assertThat(type.getRawClass(), equalTo(Banana.class));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
@@ -181,5 +208,35 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   public void setBaskets(List<FruitBasket> baskets) {
     this.baskets = baskets;
+  }
+
+  private class InterceptingCallbackWithParent extends TestInterceptingCallback {
+
+  }
+
+
+  private class TestInterceptingCallback implements InterceptingCallback<Banana> {
+
+    @Override
+    public Banana getResult() throws Exception {
+      return new Banana();
+    }
+  }
+
+
+  private class TestPagingProvider extends InterceptingCallbackWithParent implements PagingProvider<Object, Banana> {
+
+    @Override
+    public List<Banana> getPage(Object connection) {
+      return null;
+    }
+
+    @Override
+    public Optional<Integer> getTotalResults(Object connection) {
+      return null;
+    }
+
+    @Override
+    public void close() throws IOException {}
   }
 }

@@ -36,4 +36,8 @@
         <vegan:get-lunch target="banana"/>
     </flow>
 
+    <flow name="InterceptingWithoutGenerics">
+        <vegan:get-raw-lunch />
+    </flow>
+
 </mule>

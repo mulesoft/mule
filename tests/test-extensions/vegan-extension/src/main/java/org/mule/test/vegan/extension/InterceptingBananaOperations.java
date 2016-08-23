@@ -25,6 +25,18 @@ public class InterceptingBananaOperations {
     };
   }
 
+  public NoGenericsInterceptingCallback getRawLunch(@UseConfig BananaConfig config) {
+    return new NoGenericsInterceptingCallback();
+  }
+
+  private class NoGenericsInterceptingCallback implements InterceptingCallback {
+
+    @Override
+    public Object getResult() throws Exception {
+      return new Banana();
+    }
+  }
+
   public InterceptingCallback<OperationResult<Fruit, VeganAttributes>> getQualifiedLunch(@UseConfig BananaConfig config) {
     return new VeganInterceptor<OperationResult<Fruit, VeganAttributes>>(config) {
 
