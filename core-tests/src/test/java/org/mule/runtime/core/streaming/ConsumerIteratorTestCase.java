@@ -34,8 +34,7 @@ public class ConsumerIteratorTestCase {
   private PagingProvider<Object, String> delegate = new TestPagingProvider();
 
   @InjectMocks
-  private Producer<List<String>> producer = new Producer<List<String>>()
-  {
+  private Producer<List<String>> producer = new Producer<List<String>>() {
 
     @Override
     public int size() {
