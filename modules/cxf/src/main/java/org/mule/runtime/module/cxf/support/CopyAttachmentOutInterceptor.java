@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.cxf.support;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.module.cxf.CxfConstants.ATTACHMENTS;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
@@ -35,13 +36,7 @@ public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor {
       return;
     }
 
-    Collection<Attachment> a = null;
-    try {
-      a = event.getFlowVariable(CxfConstants.ATTACHMENTS);
-    } catch (NoSuchElementException nsse) {
-      // Ignore
-    }
-
+    Collection<Attachment> a = getFlowVariableOrNull(ATTACHMENTS, event);
     if (a != null) {
       message.setAttachments(a);
     }

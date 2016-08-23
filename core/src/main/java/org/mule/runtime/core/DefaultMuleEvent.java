@@ -803,4 +803,15 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public String getLegacyCorrelationId() {
     return this.legacyCorrelationId;
   }
+
+  public static <T> T getFlowVariableOrNull(String key, MuleEvent event) {
+    T value = null;
+    try {
+      value = event.getFlowVariable(key);
+    } catch (NoSuchElementException nsse) {
+      // Ignore
+    }
+    return value;
+  }
+
 }

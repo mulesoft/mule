@@ -33,7 +33,6 @@ import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 import org.mule.runtime.core.util.store.QueuePersistenceObjectStore;
 
 import java.io.Serializable;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -168,12 +167,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   private Serializable storeEvent(final MuleEvent event) throws ObjectStoreException {
-    Integer configuredAttempts = null;
-    try {
-      configuredAttempts = event.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME);
-    } catch (NoSuchElementException nsee) {
-      // Ignore
-    }
+    Integer configuredAttempts = DefaultMuleEvent.getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
     final Integer deliveryAttemptCount =
         configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
     return storeEvent(event, deliveryAttemptCount);
