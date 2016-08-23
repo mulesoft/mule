@@ -121,7 +121,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     };
 
     messageProcessor.setListener(next);
-
+    messageProcessor.setMuleContext(muleContext);
+    messageProcessor.setFlowConstruct(flow);
     messageProcessor.process(event);
 
     assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
@@ -143,6 +144,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
     messageProcessor.setListener(next);
     messageProcessor.setMuleContext(muleContext);
+    messageProcessor.setFlowConstruct(flow);
     messageProcessor.process(event);
 
     assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));

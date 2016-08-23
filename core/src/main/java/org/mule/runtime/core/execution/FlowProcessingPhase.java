@@ -55,6 +55,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
             final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
             TransactionalErrorHandlingExecutionTemplate transactionTemplate =
                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+                                            messageProcessContext.getFlowConstruct(),
                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
                                                 : messageProcessContext.getTransactionConfig()),
                                             messageProcessContext.getFlowConstruct().getExceptionListener());

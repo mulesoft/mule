@@ -87,7 +87,8 @@ public class MuleInvoker implements Invoker {
         }
 
         ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate =
-            createErrorHandlingExecutionTemplate(flowConstruct.getMuleContext(), flowConstruct.getExceptionListener());
+            createErrorHandlingExecutionTemplate(flowConstruct.getMuleContext(), flowConstruct,
+                                                 flowConstruct.getExceptionListener());
         responseEvent = errorHandlingExecutionTemplate.execute(() -> cxfMmessageProcessor.processNext(event));
       } catch (MuleException e) {
         exchange.put(CxfConstants.MULE_EVENT, event);

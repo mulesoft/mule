@@ -12,13 +12,14 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 /**
  * {@link org.mule.runtime.core.api.connector.ReplyToHandler} implementation that uses a
  * {@link org.mule.runtime.core.api.exception .MessagingExceptionHandler} to handle errors before delegating to the delegate
  * ReplyToHandler instance.
- * <p/>
+ * <p>
  * Invocations of {@link #processReplyTo(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MuleMessage, Object)} are
  * passed straight through to the delegate ReplyToHandler where as invocations of
  * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(org.mule.runtime.core.api.MessagingException, Object)}
@@ -32,10 +33,13 @@ public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingRepl
 
   private final MessagingExceptionHandler messagingExceptionHandler;
   private final ReplyToHandler delegate;
+  private final FlowConstruct flow;
 
-  public ExceptionHandlingReplyToHandlerDecorator(ReplyToHandler replyToHandler, MessagingExceptionHandler exceptionHandler) {
+  public ExceptionHandlingReplyToHandlerDecorator(ReplyToHandler replyToHandler, MessagingExceptionHandler exceptionHandler,
+                                                  FlowConstruct flow) {
     this.delegate = replyToHandler;
     this.messagingExceptionHandler = exceptionHandler;
+    this.flow = flow;
   }
 
   @Override
@@ -49,7 +53,7 @@ public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingRepl
     if (messagingExceptionHandler != null) {
       result = messagingExceptionHandler.handleException(exception, exception.getEvent());
     } else {
-      result = exception.getEvent().getFlowConstruct().getExceptionListener().handleException(exception, exception.getEvent());
+      result = flow.getExceptionListener().handleException(exception, exception.getEvent());
     }
     exception.setProcessedEvent(result);
     if (!exception.handled()) {

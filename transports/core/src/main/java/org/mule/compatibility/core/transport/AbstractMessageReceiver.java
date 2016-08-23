@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessTemplate;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -344,9 +344,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   protected ExecutionTemplate<MuleEvent> createExecutionTemplate() {
-    return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(),
-                                                                                   endpoint.getTransactionConfig(),
-                                                                                   flowConstruct.getExceptionListener());
+    return createMainExecutionTemplate(endpoint.getMuleContext(), flowConstruct, endpoint.getTransactionConfig(),
+                                       flowConstruct.getExceptionListener());
   }
 
   /**

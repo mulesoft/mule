@@ -65,6 +65,7 @@ public class AsyncResponseFlowProcessingPhase
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
             TransactionalErrorHandlingExecutionTemplate transactionTemplate =
                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+                                            messageProcessContext.getFlowConstruct(),
                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
                                                 : messageProcessContext.getTransactionConfig()),
                                             exceptionHandler);
@@ -80,7 +81,8 @@ public class AsyncResponseFlowProcessingPhase
                                                                                                                                   phaseResultNotifier,
                                                                                                                                   exceptionHandler),
                                                                                       messageProcessContext.getFlowConstruct()
-                                                                                          .getExceptionListener()));
+                                                                                          .getExceptionListener(),
+                                                                                      messageProcessContext.getFlowConstruct()));
                 // Update RequestContext ThreadLocal for backwards compatibility
                 setCurrentEvent(muleEvent);
               }

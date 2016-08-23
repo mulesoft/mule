@@ -8,6 +8,8 @@ package org.mule.compatibility.core.transport;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
@@ -20,8 +22,6 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.message.SessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -80,8 +80,8 @@ public abstract class AbstractReceiverWorker implements Work {
    */
   public void processMessages() throws Exception {
     // No need to do error handling. It will be done by inner TransactionTemplate per Message
-    ExecutionTemplate<List<MuleEvent>> executionTemplate = TransactionalExecutionTemplate
-        .createTransactionalExecutionTemplate(receiver.getEndpoint().getMuleContext(), endpoint.getTransactionConfig());
+    ExecutionTemplate<List<MuleEvent>> executionTemplate =
+        createTransactionalExecutionTemplate(receiver.getEndpoint().getMuleContext(), endpoint.getTransactionConfig());
 
     // Receive messages and process them in a single transaction
     // Do not enable threading here, but serveral workers
@@ -94,8 +94,9 @@ public abstract class AbstractReceiverWorker implements Work {
       List<MuleEvent> results = new ArrayList<>(messages.size());
 
       for (final Object payload : messages) {
-        ExecutionTemplate<MuleEvent> perMessageExecutionTemplate = TransactionalErrorHandlingExecutionTemplate
-            .createMainExecutionTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
+        ExecutionTemplate<MuleEvent> perMessageExecutionTemplate =
+            createMainExecutionTemplate(endpoint.getMuleContext(), receiver.flowConstruct,
+                                        receiver.flowConstruct.getExceptionListener());
         MuleEvent resultEvent;
         try {
           resultEvent = perMessageExecutionTemplate.execute(() -> {

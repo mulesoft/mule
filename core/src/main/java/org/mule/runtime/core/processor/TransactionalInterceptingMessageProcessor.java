@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -21,8 +22,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
@@ -30,32 +29,26 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
  * {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  */
-public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Lifecycle, MuleContextAware, FlowConstructAware {
+public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle {
 
   protected MessagingExceptionHandler exceptionListener;
   protected MuleTransactionConfig transactionConfig;
-  protected FlowConstruct flowConstruct;
 
+  @Override
   public MuleEvent process(final MuleEvent event) throws MuleException {
     if (next == null) {
       return event;
     } else {
-      ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate
-          .createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
-      ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>() {
-
-        public MuleEvent process() throws Exception {
-          return processNext(event);
-        }
-      };
+      ExecutionTemplate<MuleEvent> executionTemplate =
+          createScopeExecutionTemplate(muleContext, flowConstruct, transactionConfig, exceptionListener);
+      ExecutionCallback<MuleEvent> processingCallback = () -> processNext(event);
 
       try {
         return executionTemplate.execute(processingCallback);
       } catch (MuleException e) {
         throw e;
       } catch (Exception e) {
-        throw new DefaultMuleException(CoreMessages.errorInvokingMessageProcessorWithinTransaction(next, transactionConfig), e);
+        throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(next, transactionConfig), e);
       }
     }
   }
@@ -100,10 +93,5 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     if (this.exceptionListener instanceof Stoppable) {
       ((Stoppable) this.exceptionListener).stop();
     }
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 }

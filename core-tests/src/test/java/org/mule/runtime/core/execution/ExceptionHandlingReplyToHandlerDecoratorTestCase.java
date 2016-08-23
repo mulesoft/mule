@@ -9,10 +9,13 @@ package org.mule.runtime.core.execution;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -22,10 +25,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -33,6 +33,8 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
 
   @Mock
   private MessagingExceptionHandler messagingExceptionHandler;
+  @Mock
+  private FlowConstruct flow;
   @Mock
   private MuleEvent sourceEvent;
   @Mock
@@ -42,20 +44,14 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
   public void handleException() {
     SensingNullReplyToHandler sensingReplyToHandler = new SensingNullReplyToHandler();
     ExceptionHandlingReplyToHandlerDecorator errorHandlingreplyToHandler =
-        new ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler);
+        new ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler, flow);
     MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
-    when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>() {
-
-      @Override
-      public MuleEvent answer(InvocationOnMock invocation) throws Throwable {
-        return handledEvent;
-      }
-    });
+    when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(invocation -> handledEvent);
 
     errorHandlingreplyToHandler.processExceptionReplyTo(messagingException, null);
 
-    verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
+    verify(messagingExceptionHandler, times(1)).handleException(messagingException, sourceEvent);
     assertThat(sensingReplyToHandler.exception, CoreMatchers.<Exception>equalTo(messagingException));
     assertThat(((MessagingException) sensingReplyToHandler.exception).getEvent(), equalTo(handledEvent));
     assertThat(sensingReplyToHandler.event, nullValue());
@@ -65,21 +61,17 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
   public void handleExceptionAndMarkHandled() {
     SensingNullReplyToHandler sensingReplyToHandler = new SensingNullReplyToHandler();
     ExceptionHandlingReplyToHandlerDecorator errorHandlingReplyToHandler =
-        new ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler);
+        new ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler, flow);
     MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
-    when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>() {
-
-      @Override
-      public MuleEvent answer(InvocationOnMock invocation) throws Throwable {
-        ((MessagingException) invocation.getArguments()[0]).setHandled(true);
-        return handledEvent;
-      }
+    when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(invocation -> {
+      ((MessagingException) invocation.getArguments()[0]).setHandled(true);
+      return handledEvent;
     });
 
     errorHandlingReplyToHandler.processExceptionReplyTo(messagingException, null);
 
-    verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
+    verify(messagingExceptionHandler, times(1)).handleException(messagingException, sourceEvent);
     assertThat(sensingReplyToHandler.exception, nullValue());
     assertThat(sensingReplyToHandler.event, equalTo(handledEvent));
   }

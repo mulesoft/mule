@@ -8,6 +8,7 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -15,10 +16,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
- *
  * Creates an execution context that should be used when: - A flow execution starts because a message was received by a
  * MessageReceiver - Any other entry point of execution with no parent execution context
- *
+ * <p>
  * Created a ExecutionTemplate that will: Resolve non xa transactions created before it if the TransactionConfig action requires
  * it suspend-resume xa transaction created before it if the TransactionConfig action requires it start a transaction if required
  * by TransactionConfig action resolve transaction if was started by this TransactionTemplate route any exception to exception
@@ -30,33 +30,32 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
 
   private TransactionalErrorHandlingExecutionTemplate(MuleContext muleContext,
                                                       MessagingExceptionHandler messagingExceptionHandler,
-                                                      boolean resolveAnyTransaction) {
-    this(muleContext, new MuleTransactionConfig(), messagingExceptionHandler, resolveAnyTransaction);
+                                                      FlowConstruct flowConstruct, boolean resolveAnyTransaction) {
+    this(muleContext, new MuleTransactionConfig(), messagingExceptionHandler, flowConstruct, resolveAnyTransaction);
   }
 
   private TransactionalErrorHandlingExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig,
                                                       MessagingExceptionHandler messagingExceptionHandler,
-                                                      boolean resolveAnyTransaction) {
+                                                      FlowConstruct flowConstruct, boolean resolveAnyTransaction) {
     final boolean processTransactionOnException = true;
-    ExecutionInterceptor<MuleEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<MuleEvent>();
+    ExecutionInterceptor<MuleEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
     tempExecutionInterceptor = new CommitTransactionInterceptor(tempExecutionInterceptor);
-    tempExecutionInterceptor = new HandleExceptionInterceptor(tempExecutionInterceptor, messagingExceptionHandler);
+    tempExecutionInterceptor = new HandleExceptionInterceptor(tempExecutionInterceptor, messagingExceptionHandler, flowConstruct);
     tempExecutionInterceptor =
-        new BeginAndResolveTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig, muleContext,
-                                                             processTransactionOnException, resolveAnyTransaction);
-    tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig);
-    tempExecutionInterceptor = new SuspendXaTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig,
+        new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, muleContext,
+                                                    processTransactionOnException, resolveAnyTransaction);
+    tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
+    tempExecutionInterceptor = new SuspendXaTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig,
                                                                               processTransactionOnException);
-    tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig);
+    tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig);
     tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
-    tempExecutionInterceptor =
-        new ExternalTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig, muleContext);
+    tempExecutionInterceptor = new ExternalTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, muleContext);
     this.executionInterceptor = new RethrowExceptionInterceptor(tempExecutionInterceptor);
   }
 
   private TransactionalErrorHandlingExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig,
-                                                      boolean resolveAnyTransaction) {
-    this(muleContext, transactionConfig, null, resolveAnyTransaction);
+                                                      FlowConstruct flowConstruct, boolean resolveAnyTransaction) {
+    this(muleContext, transactionConfig, null, flowConstruct, resolveAnyTransaction);
   }
 
   /**
@@ -67,8 +66,9 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
    * @param messagingExceptionHandler exception listener to use for any MessagingException thrown
    */
   public static TransactionalErrorHandlingExecutionTemplate createMainExecutionTemplate(MuleContext muleContext,
+                                                                                        FlowConstruct flowConstruct,
                                                                                         MessagingExceptionHandler messagingExceptionHandler) {
-    return new TransactionalErrorHandlingExecutionTemplate(muleContext, messagingExceptionHandler, true);
+    return new TransactionalErrorHandlingExecutionTemplate(muleContext, messagingExceptionHandler, flowConstruct, true);
   }
 
   /**
@@ -79,9 +79,11 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
    * @param messagingExceptionHandler Exception listener for any MessagingException thrown
    */
   public static TransactionalErrorHandlingExecutionTemplate createMainExecutionTemplate(MuleContext muleContext,
+                                                                                        FlowConstruct flowConstruct,
                                                                                         TransactionConfig transactionConfig,
                                                                                         MessagingExceptionHandler messagingExceptionHandler) {
-    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, messagingExceptionHandler, true);
+    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, messagingExceptionHandler,
+                                                           flowConstruct, true);
   }
 
   /**
@@ -92,8 +94,9 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
    * @param transactionConfig Transaction configuration
    */
   public static TransactionalErrorHandlingExecutionTemplate createMainExecutionTemplate(MuleContext muleContext,
+                                                                                        FlowConstruct flowConstruct,
                                                                                         TransactionConfig transactionConfig) {
-    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, true);
+    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, flowConstruct, true);
   }
 
   /**
@@ -104,9 +107,11 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
    * @return
    */
   public static TransactionalErrorHandlingExecutionTemplate createScopeExecutionTemplate(MuleContext muleContext,
+                                                                                         FlowConstruct flowConstruct,
                                                                                          TransactionConfig transactionConfig,
                                                                                          MessagingExceptionHandler messagingExceptionHandler) {
-    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, messagingExceptionHandler, false);
+    return new TransactionalErrorHandlingExecutionTemplate(muleContext, transactionConfig, messagingExceptionHandler,
+                                                           flowConstruct, false);
   }
 
 

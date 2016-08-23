@@ -7,6 +7,8 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -18,7 +20,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
@@ -33,7 +34,6 @@ import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.execution.ExceptionHandlingReplyToHandlerDecorator;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
@@ -97,14 +97,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     final MuleEvent newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
     try {
       ExecutionTemplate<MuleEvent> executionTemplate =
-          ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());
-      MuleEvent result = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
-
-        @Override
-        public MuleEvent process() throws Exception {
-          return pipeline.process(newEvent);
-        }
-      });
+          createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
+      MuleEvent result = executionTemplate.execute(() -> pipeline.process(newEvent));
       return createReturnEventForParentFlowConstruct(result, event);
     } catch (MessagingException e) {
       e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
@@ -144,7 +138,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
         replyToHandler.processExceptionReplyTo(exception, null);
       }
-    }, getExceptionListener());
+    }, getExceptionListener(), this);
   }
 
   private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original) {
@@ -210,13 +204,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
   @Override
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
     getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                                                new StageNameSource() {
-
-                                                  @Override
-                                                  public String getName() {
-                                                    return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
-                                                  }
-                                                }, builder, muleContext);
+                                                () -> String.format("%s.stage%s", Flow.this.getName(), ++stageCount), builder, muleContext);
   }
 
   /**

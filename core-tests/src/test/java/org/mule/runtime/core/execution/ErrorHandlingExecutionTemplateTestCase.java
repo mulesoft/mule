@@ -85,7 +85,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   }
 
   private ExecutionTemplate createExceptionHandlingTransactionTemplate() {
-    return createErrorHandlingExecutionTemplate(mockMuleContext, mockMessagingExceptionHandler);
+    return createErrorHandlingExecutionTemplate(mockMuleContext, mockFlow, mockMessagingExceptionHandler);
   }
 
   @Test
