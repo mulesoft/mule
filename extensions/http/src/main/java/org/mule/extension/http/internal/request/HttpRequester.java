@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
@@ -74,14 +75,13 @@ public class HttpRequester {
   }
 
   public MuleMessage doRequest(MuleEvent muleEvent, HttpClient client, HttpRequesterRequestBuilder requestBuilder,
-                               boolean checkRetry, MuleContext muleContext)
+                               boolean checkRetry, MuleContext muleContext, FlowConstruct flowConstruct)
       throws MuleException {
     HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication, muleContext);
 
     HttpResponse response;
     try {
-      notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(),
-                                          MESSAGE_REQUEST_BEGIN);
+      notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
       response = client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication));
     } catch (Exception e) {
       checkIfRemotelyClosed(e, client.getDefaultUriParameters());
@@ -96,9 +96,9 @@ public class HttpRequester {
                                                    muleEvent, muleEvent.isSynchronous());
     if (resendRequest(responseEvent, checkRetry, authentication)) {
       consumePayload(responseEvent, muleContext);
-      responseMessage = doRequest(responseEvent, client, requestBuilder, false, muleContext);
+      responseMessage = doRequest(responseEvent, client, requestBuilder, false, muleContext, flowConstruct);
     }
-    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
     responseValidator.validate(responseMessage, muleContext);
     return responseMessage;
   }

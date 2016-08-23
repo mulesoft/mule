@@ -99,6 +99,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
         {ONE_WAY, true, true}});
   }
 
+  private Pipeline mockFlow = mock(Flow.class);
+
   public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking, boolean synchronous) {
     this.exchangePattern = exchangePattern;
     this.nonBlocking = nonBlocking;
@@ -491,14 +493,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     final MessageProcessor nested =
         new DefaultMessageProcessorChainBuilder(muleContext).chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
-    builder.chain(getAppendingMP("1"), (MessageProcessor) event -> {
-      try {
-        final Flow flow = getTestFlow();
-        return nested.process(new DefaultMuleEvent(create(flow), event.getMessage(), REQUEST_RESPONSE, flow));
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    },
+    builder.chain(getAppendingMP("1"), (MessageProcessor) event -> nested
+        .process(new DefaultMuleEvent(create(mockFlow), event.getMessage(), REQUEST_RESPONSE, mockFlow)),
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 
@@ -1093,7 +1089,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
-    Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);

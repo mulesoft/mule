@@ -10,6 +10,8 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.io.IOException;
@@ -20,7 +22,7 @@ import org.apache.commons.io.IOUtils;
 /**
  * Adapts an HTTP operation to be one-way.
  */
-public class OneWayHttpRequesterAdapter implements MessageProcessor {
+public class OneWayHttpRequesterAdapter implements MessageProcessor, FlowConstructAware {
 
   private MessageProcessor httpRequester;
 
@@ -44,6 +46,13 @@ public class OneWayHttpRequesterAdapter implements MessageProcessor {
       } catch (IOException e) {
         throw new MessagingException(event, e, this);
       }
+    }
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    if(httpRequester instanceof FlowConstructAware) { 
+      ((FlowConstructAware) httpRequester).setFlowConstruct(flowConstruct);
     }
   }
 }
