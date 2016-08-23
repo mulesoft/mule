@@ -204,7 +204,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
   @Override
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
     getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                                                () -> String.format("%s.stage%s", Flow.this.getName(), ++stageCount), builder, muleContext);
+                                                () -> String.format("%s.stage%s", Flow.this.getName(), ++stageCount), builder,
+                                                muleContext);
   }
 
   /**

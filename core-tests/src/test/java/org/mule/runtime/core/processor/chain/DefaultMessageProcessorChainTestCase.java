@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -89,10 +90,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{MessageExchangePattern.REQUEST_RESPONSE, false, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, false, false}, {MessageExchangePattern.REQUEST_RESPONSE, true, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, true, false}, {MessageExchangePattern.ONE_WAY, false, true},
-        {MessageExchangePattern.ONE_WAY, false, false}, {MessageExchangePattern.ONE_WAY, true, true}});
+    return Arrays.asList(new Object[][] {{REQUEST_RESPONSE, false, true},
+        {REQUEST_RESPONSE, false, false},
+        {REQUEST_RESPONSE, true, true},
+        {REQUEST_RESPONSE, true, false},
+        {ONE_WAY, false, true},
+        {ONE_WAY, false, false},
+        {ONE_WAY, true, true}});
   }
 
   public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking, boolean synchronous) {
@@ -487,9 +491,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     final MessageProcessor nested =
         new DefaultMessageProcessorChainBuilder(muleContext).chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
-    builder.chain(getAppendingMP("1"), (MessageProcessor) event -> nested
-        .process(new DefaultMuleEvent(create(event.getFlowConstruct()),
-                                      event.getMessage(), REQUEST_RESPONSE, event.getFlowConstruct())),
+    builder.chain(getAppendingMP("1"), (MessageProcessor) event -> {
+      try {
+        final Flow flow = getTestFlow();
+        return nested.process(new DefaultMuleEvent(create(flow), event.getMessage(), REQUEST_RESPONSE, flow));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    },
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 

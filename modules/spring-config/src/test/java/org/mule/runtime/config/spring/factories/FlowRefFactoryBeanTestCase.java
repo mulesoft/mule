@@ -115,12 +115,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   public void dynamicFlowRefSubFlowConstructAware() throws Exception {
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     MuleEvent event = mock(MuleEvent.class);
-    when(event.getFlowConstruct()).thenReturn(flowConstruct);
     FlowConstructAware targetSubFlowConstructAware = mock(FlowConstructAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(((MessageProcessor) targetSubFlowConstructAware).process(event)).thenReturn(result);
 
     FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean((MessageProcessor) targetSubFlowConstructAware);
-    assertSame(result, flowRefFactoryBean.getObject().process(event));
+    final MessageProcessor flowRefProcessor = flowRefFactoryBean.getObject();
+    ((FlowConstructAware) flowRefProcessor).setFlowConstruct(flowConstruct);
+    assertSame(result, flowRefProcessor.process(event));
 
     verify(targetSubFlowConstructAware).setFlowConstruct(flowConstruct);
   }
@@ -141,7 +142,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   public void dynamicFlowRefSubFlowMessageProcessorChain() throws Exception {
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     MuleEvent event = mock(MuleEvent.class);
-    when(event.getFlowConstruct()).thenReturn(flowConstruct);
 
     MessageProcessor targetSubFlowConstructAware =
         (MessageProcessor) mock(FlowConstructAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -155,7 +155,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .thenReturn(Arrays.asList(targetSubFlowConstructAware, targetMuleContextAwareAware));
 
     FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlowChain);
-    flowRefFactoryBean.getObject().process(event);
+    final MessageProcessor flowRefProcessor = flowRefFactoryBean.getObject();
+    ((FlowConstructAware) flowRefProcessor).setFlowConstruct(flowConstruct);
+    flowRefProcessor.process(event);
 
     verify((FlowConstructAware) targetSubFlowConstructAware).setFlowConstruct(flowConstruct);
     verify((MuleContextAware) targetMuleContextAwareAware).setMuleContext(muleContext);

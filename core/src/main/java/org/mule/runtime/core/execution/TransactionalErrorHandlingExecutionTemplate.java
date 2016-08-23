@@ -46,7 +46,7 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
                                                     processTransactionOnException, resolveAnyTransaction);
     tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
     tempExecutionInterceptor = new SuspendXaTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig,
-                                                                              processTransactionOnException);
+                                                                     processTransactionOnException);
     tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig);
     tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
     tempExecutionInterceptor = new ExternalTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, muleContext);

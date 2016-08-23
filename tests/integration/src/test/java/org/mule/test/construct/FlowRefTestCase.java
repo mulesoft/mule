@@ -19,6 +19,8 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
@@ -72,15 +74,21 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
                  flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString(muleContext));
   }
 
-  public static class ProcessorPathAssertingProcessor implements MessageProcessor {
+  public static class ProcessorPathAssertingProcessor implements MessageProcessor, FlowConstructAware {
 
     private static List<String> traversedProcessorPaths = new ArrayList<>();
+    private FlowConstruct flowConstruct;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       traversedProcessorPaths
-          .add(((Flow) muleContext.getRegistry().lookupFlowConstruct(event.getFlowConstruct().getName())).getProcessorPath(this));
+          .add(((Flow) muleContext.getRegistry().lookupFlowConstruct(flowConstruct.getName())).getProcessorPath(this));
       return event;
+    }
+
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct) {
+      this.flowConstruct = flowConstruct;
     }
   }
 

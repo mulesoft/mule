@@ -8,8 +8,8 @@ package org.mule.runtime.config.spring.factories;
 
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
-import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -44,7 +44,9 @@ import org.springframework.context.ApplicationContextAware;
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<MessageProcessor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
 
-  private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject {
+  private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject, FlowConstructAware {
+
+    protected FlowConstruct flowConstruct;
 
     @Override
     public Object getAnnotation(QName name) {
@@ -59,6 +61,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     @Override
     public void setAnnotations(Map<QName, Object> annotations) {
       FlowRefFactoryBean.this.setAnnotations(annotations);
+    }
+
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct) {
+      this.flowConstruct = flowConstruct;
     }
   }
 
@@ -99,7 +106,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   private ApplicationContext applicationContext;
   private MuleContext muleContext;
   private MessageProcessor referencedMessageProcessor;
-  private ConcurrentMap<String, MessageProcessor> referenceCache = new ConcurrentHashMap<String, MessageProcessor>();
+  private ConcurrentMap<String, MessageProcessor> referenceCache = new ConcurrentHashMap<>();
 
   public void setName(String name) {
     this.refName = name;
@@ -144,7 +151,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         public MuleEvent process(MuleEvent event) throws MuleException {
           // Need to initialize because message processor won't be managed by parent
           String flowName = muleContext.getExpressionManager().parse(refName, event);
-          final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
+          final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, flowConstruct);
           setResolvedMessageProcessor(dynamicMessageProcessor);
 
           // Because this is created dynamically annotations cannot be injected by Spring and so
