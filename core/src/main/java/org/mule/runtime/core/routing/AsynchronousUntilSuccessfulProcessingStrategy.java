@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
@@ -147,8 +148,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       final MuleEvent event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
       final MuleEvent mutableEvent = threadSafeCopy(event);
 
-      final MuleMessage message = mutableEvent.getMessage();
-      final Integer configuredAttempts = mutableEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME);
+      final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, mutableEvent);
       final Integer deliveryAttemptCount =
           configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 
@@ -167,7 +167,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   private Serializable storeEvent(final MuleEvent event) throws ObjectStoreException {
-    final Integer configuredAttempts = event.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME);
+    Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
     final Integer deliveryAttemptCount =
         configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
     return storeEvent(event, deliveryAttemptCount);

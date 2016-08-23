@@ -8,7 +8,7 @@ package org.mule.compatibility.module.client;
 
 import static java.util.Collections.EMPTY_MAP;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;

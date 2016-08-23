@@ -14,9 +14,9 @@ import java.util.Comparator;
 
 import org.junit.Test;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -47,7 +47,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageExecutionContext context = DefaultMessageExecutionContext.create(flow, "foo");
+    MessageContext context = DefaultMessageContext.create(flow, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -84,7 +84,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageExecutionContext context = DefaultMessageExecutionContext.create(flow, "foo");
+    MessageContext context = DefaultMessageContext.create(flow, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;

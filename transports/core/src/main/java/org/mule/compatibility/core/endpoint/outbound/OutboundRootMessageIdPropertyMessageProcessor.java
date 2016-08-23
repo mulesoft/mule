@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -23,7 +22,7 @@ public class OutboundRootMessageIdPropertyMessageProcessor implements MessagePro
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     event.setMessage(MuleMessage.builder(event.getMessage())
-        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getExecutionContext().getCorrelationId()).build());
+        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getContext().getCorrelationId()).build());
     return event;
   }
 

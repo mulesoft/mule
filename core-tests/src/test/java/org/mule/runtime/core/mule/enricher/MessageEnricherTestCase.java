@@ -18,15 +18,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -226,7 +226,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     MuleEvent out = enricher.process(in);
 
-    assertNull(out.getFlowVariable("flowFoo"));
+    assertThat(out.getFlowVariableNames(), not(contains("flowFoo")));
   }
 
   @Test

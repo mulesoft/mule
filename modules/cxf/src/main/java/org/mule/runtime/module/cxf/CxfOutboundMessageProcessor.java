@@ -7,11 +7,15 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -256,7 +260,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
   public Method getMethod(MuleEvent event) throws Exception {
     Method method = null;
-    String opName = (String) event.getMessage().getOutboundProperty(CxfConstants.OPERATION);
+    String opName = (String) event.getMessage().getOutboundProperty(OPERATION);
     if (opName != null) {
       method = getMethodFromOperation(opName);
     }
@@ -324,11 +328,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // People can specify a CXF operation, which may in fact be different
     // than the method name. If that's not found, we'll default back to the
     // mule method property.
-    String method = event.getFlowVariable(CxfConstants.OPERATION);
-
+    String method = getFlowVariableOrNull(OPERATION, event);
     if (method == null) {
-      Object muleMethodProperty = event.getFlowVariable(MuleProperties.MULE_METHOD_PROPERTY);
-
+      Object muleMethodProperty = getFlowVariableOrNull(MULE_METHOD_PROPERTY, event);
       if (muleMethodProperty != null) {
         if (muleMethodProperty instanceof Method) {
           method = ((Method) muleMethodProperty).getName();

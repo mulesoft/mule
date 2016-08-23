@@ -12,7 +12,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -97,8 +97,8 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     private MuleMessage message = MuleMessage.builder().payload("").build();
 
     @Override
-    public MessageExecutionContext getExecutionContext() {
-      return new MessageExecutionContext() {
+    public MessageContext getContext() {
+      return new MessageContext() {
 
         @Override
         public String getId() {
@@ -116,17 +116,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         }
 
         @Override
-        public String getServerId() {
+        public String getOriginatingFlowName() {
           return "";
         }
 
         @Override
-        public String getFlowName() {
-          return "";
-        }
-
-        @Override
-        public boolean isExternalCorrelationId() {
+        public boolean isCorrelationIdFromSource() {
           return false;
         }
       };

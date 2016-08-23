@@ -15,7 +15,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
 import javax.activation.DataHandler;

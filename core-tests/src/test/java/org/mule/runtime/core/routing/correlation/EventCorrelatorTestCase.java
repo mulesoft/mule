@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -72,7 +72,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct mockFlowConstruct;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MessageExecutionContext mockExecutionContext;
+  private MessageContext mockExecutionContext;
   private PartitionableObjectStore memoryObjectStore = new PartitionedInMemoryObjectStore();
 
   @Before
@@ -103,7 +103,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Test
   public void initAfterDeserializationAfterProcess() throws Exception {
     when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
-    when(mockMuleEvent.getExecutionContext()).thenReturn(mockExecutionContext);
+    when(mockMuleEvent.getContext()).thenReturn(mockExecutionContext);
     when(mockExecutionContext.getCorrelationId()).thenReturn(TEST_GROUP_ID);
     EventCorrelator eventCorrelator = createEventCorrelator();
     eventCorrelator.process(mockMuleEvent);

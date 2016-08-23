@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.el;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import java.util.Collections;
@@ -119,8 +123,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
     MuleEvent event =
         new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("sessionVars['foo']", event, "bar");
-    Assert.assertEquals("bar", event.getSession().getProperty("foo"));
-    Assert.assertNull(event.getFlowVariable("foo"));
+    assertThat(event.getSession().getProperty("foo"), equalTo("bar"));
+    assertThat(event.getFlowVariableNames(), not(contains("foo")));
   }
 
   @Test

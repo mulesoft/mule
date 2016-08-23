@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Iterator;
@@ -50,8 +49,8 @@ public class MuleSoapHeaders {
    * @param event
    */
   public MuleSoapHeaders(MuleEvent event) {
-    if (event.getExecutionContext().isExternalCorrelationId()) {
-      setCorrelationId(event.getExecutionContext().getCorrelationId());
+    if (event.getContext().isCorrelationIdFromSource()) {
+      setCorrelationId(event.getContext().getCorrelationId());
     }
     event.getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
     event.getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));

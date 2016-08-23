@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyTransformerTestCase;
@@ -16,6 +19,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 
 @SmallTest
 public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase {
@@ -36,7 +42,7 @@ public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePrope
 
   @Override
   protected void verifyRemoved(MuleEvent event, String key) {
-    assertThat(event.getFlowVariable(key), is(nullValue()));
+    assertThat(event.getFlowVariableNames(), not(contains(key)));
   }
 
   @Override

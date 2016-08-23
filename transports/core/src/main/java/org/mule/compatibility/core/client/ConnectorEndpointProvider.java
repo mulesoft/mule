@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.client;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.util.Collections;
 import java.util.HashSet;

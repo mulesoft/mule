@@ -14,23 +14,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -56,7 +52,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -105,7 +101,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, "foo");
     MuleMessage message1 = MuleMessage.of("test event A");
 
     DefaultMuleEvent event1 = new DefaultMuleEvent(executionContext, message1, flow);
@@ -134,7 +130,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageExecutionContext executionContext = DefaultMessageExecutionContext.create(flow, "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();

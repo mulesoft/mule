@@ -9,12 +9,14 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -213,7 +215,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
       @Override
       protected MuleEvent processRequest(MuleEvent event) throws MuleException {
-        propertyValue = event.getFlowVariable(propertyName);
+        propertyValue = getFlowVariableOrNull(propertyName, event);
         event.removeFlowVariable(propertyName);
         return super.processRequest(event);
       }

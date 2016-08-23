@@ -9,6 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +33,7 @@ public class RemoveFlowVariableTransformerTestCase extends AbstractRemoveVariabl
 
   @Override
   protected void verifyRemoved(MuleEvent mockEvent, String key) {
-    assertThat(mockEvent.getFlowVariable(key), is(nullValue()));
+    assertThat(mockEvent.getFlowVariableNames(), not(contains(key)));
   }
 
   @Override

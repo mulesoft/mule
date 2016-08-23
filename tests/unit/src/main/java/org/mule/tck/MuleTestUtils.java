@@ -7,7 +7,7 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import java.util.ArrayList;

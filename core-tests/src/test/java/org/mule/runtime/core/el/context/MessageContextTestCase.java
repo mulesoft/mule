@@ -22,11 +22,9 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.Correlation;
 
 import org.junit.Before;

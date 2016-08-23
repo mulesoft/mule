@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.io.File;
 import java.io.FileFilter;

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;

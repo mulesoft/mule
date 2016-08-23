@@ -9,7 +9,7 @@ package org.mule.compatibility.core.endpoint.outbound;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;

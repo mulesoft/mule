@@ -14,7 +14,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;

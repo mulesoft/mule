@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.runtime.core.DefaultMessageExecutionContext;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -38,7 +38,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
     DefaultMuleEvent event =
-        new DefaultMuleEvent(DefaultMessageExecutionContext.create(flow), muleMessage, flow);
+        new DefaultMuleEvent(DefaultMessageContext.create(flow), muleMessage, flow);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(true));
@@ -50,7 +50,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
     DefaultMuleEvent event =
-        new DefaultMuleEvent(DefaultMessageExecutionContext.create(flow), muleMessage, flow);
+        new DefaultMuleEvent(DefaultMessageContext.create(flow), muleMessage, flow);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(true));

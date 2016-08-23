@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.scripting.filter;
 
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 

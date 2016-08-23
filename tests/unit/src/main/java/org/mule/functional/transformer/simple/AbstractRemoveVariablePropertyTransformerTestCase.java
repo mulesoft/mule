@@ -10,7 +10,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;

@@ -39,8 +39,8 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   @Override
   public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext) {
     MuleEvent event = operationContext.getEvent();
-    event.setFlowVariable(target, toMessage(value, operationContext));
-
+    // TODO MULE-9281 Make MuleEvent immutable
+    ((org.mule.runtime.core.api.MuleEvent) event).setFlowVariable(target, toMessage(value, operationContext));
     return event;
   }
 }

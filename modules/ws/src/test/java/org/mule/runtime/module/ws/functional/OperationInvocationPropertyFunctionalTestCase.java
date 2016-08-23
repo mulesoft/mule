@@ -9,11 +9,14 @@ package org.mule.runtime.module.ws.functional;
 import static junit.framework.Assert.assertNull;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.cxf.CxfConstants;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
@@ -45,6 +48,6 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
     MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
 
-    assertNull(event.getFlowVariable(CxfConstants.OPERATION));
+    assertThat(event.getFlowVariableNames(), not(contains(CxfConstants.OPERATION)));
   }
 }
