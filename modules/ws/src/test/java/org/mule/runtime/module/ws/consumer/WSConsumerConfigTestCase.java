@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.ws.consumer;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 @SmallTest
 public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase {
@@ -20,10 +19,10 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase {
 
   @Ignore("See MULE-9210")
   @Test(expected = MuleException.class)
-  public void failToCreateOutboundEndpointWithUnsupportedProtocol() throws MuleException {
+  public void failToCreateOutboundEndpointWithUnsupportedProtocol() throws Exception {
     WSConsumerConfig config = createConsumerConfig();
     config.setServiceAddress("unsupported://test");
-    config.createOutboundMessageProcessor();
+    config.createOutboundMessageProcessor(getTestFlow());
   }
 
   @Ignore("See MULE-9210")
@@ -33,10 +32,10 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void failToCreateOutboundEndpointWithEmptyServiceAddress() throws MuleException {
+  public void failToCreateOutboundEndpointWithEmptyServiceAddress() throws Exception {
     WSConsumerConfig config = createConsumerConfig();
     config.setServiceAddress(null);
-    config.createOutboundMessageProcessor();
+    config.createOutboundMessageProcessor(getTestFlow());
   }
 
   private WSConsumerConfig createConsumerConfig() {

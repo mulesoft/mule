@@ -10,11 +10,17 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessageExecutionContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,14 +33,6 @@ import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.test.AbstractIntegrationTestCase;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
@@ -108,7 +106,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
       List<MuleEvent> eventList = new ArrayList<>();
       Iterator<MuleEvent> iter = null;
       FlowConstruct fc = null;
-      MessageExecutionContext executionContext = null;
+      MessageContext executionContext = null;
       try {
         iter = events.iterator(true);
       } catch (ObjectStoreException e) {
@@ -117,7 +115,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
       while (iter.hasNext()) {
         MuleEvent event = iter.next();
         eventList.add(event);
-        executionContext = event.getExecutionContext();
+        executionContext = event.getContext();
         fc = event.getFlowConstruct();
       }
 
