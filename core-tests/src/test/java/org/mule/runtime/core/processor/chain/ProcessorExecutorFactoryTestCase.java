@@ -34,14 +34,12 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void flow() {
-    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(false);
     assertThat(createProcessorExecutor(), instanceOf(BlockingProcessorExecutor.class));
   }
 
   @Test
   public void flowReplyHandler() {
-    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(false);
     when(muleEvent.getReplyToHandler()).thenReturn(mock(ReplyToHandler.class));
     assertThat(createProcessorExecutor(), instanceOf(BlockingProcessorExecutor.class));
@@ -49,14 +47,12 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void flowNonBlockingAllowed() {
-    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(true);
     assertThat(createProcessorExecutor(), instanceOf(NonBlockingProcessorExecutor.class));
   }
 
   @Test
   public void flowNonBlockingAllowedReplyHandler() {
-    when(muleEvent.getFlowName()).thenReturn("flow");
     when(muleEvent.isAllowNonBlocking()).thenReturn(true);
     when(muleEvent.getReplyToHandler()).thenReturn(mock(ReplyToHandler.class));
     assertThat(createProcessorExecutor(), instanceOf(NonBlockingProcessorExecutor.class));

@@ -7,7 +7,6 @@
 package org.mule.compatibility.core;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
@@ -63,9 +62,6 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
     // Assert that deserialized event has session with same id
     assertNotNull(deserialized.getSession());
-
-    // Assert that deserialized event has service and that the service is the same instance
-    assertEquals(event.getFlowName(), deserialized.getFlowName());
   }
 
   private Transformer createSerializableToByteArrayTransformer() {

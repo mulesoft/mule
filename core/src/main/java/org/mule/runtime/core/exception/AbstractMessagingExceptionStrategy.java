@@ -86,10 +86,10 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       rollback(ex);
 
       logger.debug("Routing exception message");
-      routeException(event, ex);
+      routeException(event, flowConstruct, ex);
     } else {
       logger.debug("Routing exception message");
-      routeException(event, ex);
+      routeException(event, flowConstruct, ex);
     }
 
     closeStream(event.getMessage());

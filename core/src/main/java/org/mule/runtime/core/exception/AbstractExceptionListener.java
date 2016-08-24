@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -163,21 +164,21 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * contains the exception thrown the MuleMessage and any context information.
    *
    * @param event the MuleEvent being processed when the exception occurred
+   * @param flowConstruct the flow that was processing the event when the exception occurred.
    * @param t the exception thrown. This will be sent with the ExceptionMessage
    * @see ExceptionMessage
    */
-  protected void routeException(MuleEvent event, Throwable t) {
+  protected void routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
     if (!messageProcessors.isEmpty()) {
       try {
         if (logger.isDebugEnabled()) {
           logger.debug("Message being processed is: "
               + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
         }
-        String component = event.getFlowName();
         URI endpointUri = event.getMessageSourceURI();
 
         // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
-        ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
+        ExceptionMessage msg = new ExceptionMessage(event, t, flowConstruct.getName(), endpointUri);
 
         MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
 

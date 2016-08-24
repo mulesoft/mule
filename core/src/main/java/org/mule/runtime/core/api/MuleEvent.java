@@ -144,16 +144,18 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Retrieves the service for the current event
    * 
    * @return the service for the event
+   * @deprecated TODO MULE-10302 remove this.
    */
+  @Deprecated
   FlowConstruct getFlowConstruct();
-
-  String getFlowName();
 
   /**
    * Returns the muleContext for the Mule node that this event was received in
    * 
    * @return the muleContext for the Mule node that this event was received in
+   * @deprecated TODO MULE-10013 remove this
    */
+  @Deprecated
   MuleContext getMuleContext();
 
   /**

@@ -331,6 +331,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     private MuleEvent retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException {
       MuleEvent event = (MuleEvent) store.retrieve(correlationId);
 
+      // TODO MULE-10302 remove this.
       if (event.getFlowConstruct() == null) {
         try {
           DeserializationPostInitialisable.Implementation.init(event, muleContext);

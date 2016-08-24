@@ -58,7 +58,6 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(mockFlow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-    when(event.getFlowName()).thenReturn("flow");
   }
 
   @Test

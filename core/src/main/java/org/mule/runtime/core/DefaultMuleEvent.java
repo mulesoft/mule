@@ -515,12 +515,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public String getFlowName() {
-    return getFlowConstruct().getName();
-  }
-
-  @Override
-  @Deprecated // TODO MULE- 9281 Remove once MuleEvent is immutable
+  // TODO MULE- 9281 Remove once MuleEvent is immutable
+  @Deprecated
   public boolean equals(Object o) {
     if (this == o) {
       return true;
