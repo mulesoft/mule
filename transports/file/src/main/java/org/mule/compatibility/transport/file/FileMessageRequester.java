@@ -8,13 +8,6 @@ package org.mule.compatibility.transport.file;
 
 import static org.mule.runtime.core.DefaultMessageContext.create;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
@@ -30,6 +23,13 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.FileUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * <code>FileMessageRequester</code> is used to read/write files to the filesystem
@@ -206,7 +206,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
       }
     };
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), fileParserMessasge, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct, endpoint.getAddress()), fileParserMessasge, flowConstruct);
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);
   }

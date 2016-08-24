@@ -85,7 +85,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct));
+    return accept(new DefaultMuleEvent(create(flowConstruct, "ExpressionFilter"), message, ONE_WAY, flowConstruct));
   }
 
   /**

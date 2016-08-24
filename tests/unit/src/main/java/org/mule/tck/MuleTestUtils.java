@@ -167,7 +167,7 @@ public final class MuleTestUtils {
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), message, mep, flowConstruct, session);
+        new DefaultMuleEvent(create(flowConstruct, "test"), message, mep, flowConstruct, session);
     return event;
   }
 
@@ -177,7 +177,7 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct, "test"),
                                                         MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
     return event;
   }
@@ -189,7 +189,7 @@ public final class MuleTestUtils {
   public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct, "test"),
                                                         MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }

@@ -19,10 +19,6 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -33,6 +29,11 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 
 public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
 
@@ -50,7 +51,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
 
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, ONE_WAY, flow);
 
     event.getSession().setProperty("key", "value");
 
@@ -86,7 +87,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void serializationSessionPropertyPropagation() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, ONE_WAY, flow);
 
     event.getSession().setProperty("key", "value");
 
@@ -120,7 +121,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void defaultSessionHandlerSessionPropertyPropagation() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, ONE_WAY, flow);
 
     event.getSession().setProperty("key", "value");
 
@@ -156,7 +157,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void serializationNonSerializableSessionPropertyPropagation() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, ONE_WAY, flow);
 
     Object nonSerializable = new Object();
     event.getSession().setProperty("key", nonSerializable);
@@ -183,7 +184,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void defaultSessionHandlerNonSerializableSessionPropertyPropagation() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, ONE_WAY, flow);
 
     Object nonSerializable = new Object();
     event.getSession().setProperty("key", nonSerializable);
@@ -216,7 +217,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void processFlowSessionPropertyPropagation() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("data").build();
     Flow testFlow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(testFlow), message, REQUEST_RESPONSE, testFlow);
+    MuleEvent event = new DefaultMuleEvent(create(testFlow, "test"), message, REQUEST_RESPONSE, testFlow);
 
     SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
     Flow flow = new Flow("flow", muleContext);

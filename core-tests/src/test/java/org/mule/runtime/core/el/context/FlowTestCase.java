@@ -30,14 +30,14 @@ public class FlowTestCase extends AbstractELTestCase {
   @Test
   public void flowName() throws Exception {
     MuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
     assertEquals("flowName", evaluate("flow.name", event));
   }
 
   @Test
   public void assignToFlowName() throws Exception {
     MuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
     assertFinalProperty("flow.name='foo'", event);
   }
 

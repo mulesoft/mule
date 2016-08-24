@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
@@ -143,11 +142,6 @@ public class DefaultMuleEventContext implements MuleEventContext {
   @Override
   public FlowConstruct getFlowConstruct() {
     return flow;
-  }
-
-  @Override
-  public URI getEndpointURI() {
-    return event.getMessageSourceURI();
   }
 
   @Override

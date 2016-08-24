@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultMessageContext.create;
@@ -20,6 +19,14 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
+
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,13 +37,8 @@ import java.io.ObjectOutputStream;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase {
 
@@ -128,7 +130,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow, "test"), message, flow));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
@@ -154,7 +156,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow, "test"), message, flow));
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

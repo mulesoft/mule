@@ -526,6 +526,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
       throws Exception {
-    return new DefaultMuleEvent(create(flow), getTestMuleMessage(payload), REQUEST_RESPONSE, replyToHandler, flow);
+    return new DefaultMuleEvent(create(flow, "test"), getTestMuleMessage(payload), REQUEST_RESPONSE, replyToHandler, flow);
   }
 }

@@ -35,7 +35,6 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -175,10 +174,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
           logger.debug("Message being processed is: "
               + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
         }
-        URI endpointUri = event.getMessageSourceURI();
-
         // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
-        ExceptionMessage msg = new ExceptionMessage(event, t, flowConstruct.getName(), endpointUri);
+        ExceptionMessage msg =
+            new ExceptionMessage(event, t, flowConstruct.getName(), event.getContext().getOriginatingConnectorName());
 
         MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
 

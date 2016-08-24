@@ -31,7 +31,6 @@ import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.OffsetTime;
 import java.util.Collections;
@@ -126,6 +125,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         }
 
         @Override
+        public String getOriginatingConnectorName() {
+          return "test";
+        }
+
+        @Override
         public boolean isCorrelationIdFromSource() {
           return false;
         }
@@ -199,16 +203,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public boolean isTransacted() {
       return false;
-    }
-
-    @Override
-    public URI getMessageSourceURI() {
-      return URI.create("test://test");
-    }
-
-    @Override
-    public String getMessageSourceName() {
-      return "test";
     }
 
     @Override

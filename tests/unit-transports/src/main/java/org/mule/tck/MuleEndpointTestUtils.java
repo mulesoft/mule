@@ -10,11 +10,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.MuleTestUtils.getTestSession;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -45,6 +40,11 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class MuleEndpointTestUtils {
 
@@ -233,7 +233,7 @@ public final class MuleEndpointTestUtils {
     final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), message, flowConstruct, session);
+        new DefaultMuleEvent(create(flowConstruct, "test"), message, flowConstruct, session);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

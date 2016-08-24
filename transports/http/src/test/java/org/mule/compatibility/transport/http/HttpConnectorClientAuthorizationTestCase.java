@@ -82,7 +82,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   public void testWithUserInfo() throws Exception {
     URI uri = new URI(URI_WITH_CREDENTIALS);
 
-    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
     when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(null);
     when(mockImmutableEndpoint.getEncoding()).thenReturn(encoding);
@@ -97,7 +96,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   public void testWithAuthorizationHeader() throws Exception {
     message = MuleMessage.builder(message).addOutboundProperty(HEADER_AUTHORIZATION, HEADER_AUTHORIZATION_VALUE).build();
 
-    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
     when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(HEADER_AUTHORIZATION_VALUE);
     when(mockHttpMethod.getRequestHeader(HEADER_AUTHORIZATION)).thenReturn(null);
@@ -109,7 +107,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
   @Test
   public void testWithProxyAuth() throws Exception {
-    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
 
     connector.setProxyUsername(CREDENTIALS_USER);
@@ -121,7 +118,6 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
   @Test
   public void testClean() throws Exception {
-    when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
     when(mockMuleEvent.getMessage()).thenReturn(message);
 
     connector.setProxyUsername(null);

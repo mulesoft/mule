@@ -9,6 +9,14 @@ package org.mule.runtime.core.transformer.simple;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.testmodels.fruit.Apple;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -18,13 +26,6 @@ import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Ignore;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.testmodels.fruit.Apple;
 
 public class SerializedMuleMessageTransformersTestCase extends AbstractTransformerTestCase {
 
@@ -39,7 +40,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(create(flow), testObject, flow,
+    setCurrentEvent(new DefaultMuleEvent(create(flow, "test"), testObject, flow,
                                          MuleTestUtils.getTestSession(muleContext)));
   }
 

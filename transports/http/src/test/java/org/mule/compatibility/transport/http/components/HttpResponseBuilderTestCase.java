@@ -94,7 +94,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MessageContext executionContext = create(flow);
+    MessageContext executionContext = create(flow, "test");
     when(mockEvent.getContext()).thenReturn(executionContext);
     mockExpressionManager = mock(ExpressionManager.class);
     when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);

@@ -31,7 +31,7 @@ public class TestClusterizableMessageSource
   public void start() throws MuleException {
     MuleMessage muleMessage = MuleMessage.builder().payload("TEST").build();
     DefaultMuleEvent defaultMuleEvent =
-        new DefaultMuleEvent(create(flowConstruct), muleMessage, ONE_WAY, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct, "test"), muleMessage, ONE_WAY, flowConstruct);
     listener.process(defaultMuleEvent);
   }
 

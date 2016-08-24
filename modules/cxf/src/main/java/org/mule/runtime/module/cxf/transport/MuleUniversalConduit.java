@@ -172,7 +172,8 @@ public class MuleUniversalConduit extends AbstractConduit {
             return null;
           }
         };
-        event = new DefaultMuleEvent(create(flowConstruct), muleMsg, flowConstruct);
+        event = new DefaultMuleEvent(event == null ? create(flowConstruct, "MuleUniversalConduit") : event.getContext(), muleMsg,
+                                     flowConstruct);
       } catch (Exception e) {
         throw new Fault(e);
       }

@@ -495,7 +495,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
         new DefaultMessageProcessorChainBuilder(muleContext).chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
     builder.chain(getAppendingMP("1"), (MessageProcessor) event -> nested
-        .process(new DefaultMuleEvent(create(mockFlow), event.getMessage(), REQUEST_RESPONSE, mockFlow)),
+        .process(new DefaultMuleEvent(create(mockFlow, "test"), event.getMessage(), REQUEST_RESPONSE, mockFlow)),
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 

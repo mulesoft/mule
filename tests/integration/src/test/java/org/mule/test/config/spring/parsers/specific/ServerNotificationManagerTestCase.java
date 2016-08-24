@@ -12,9 +12,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.util.Collection;
-
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,6 +26,10 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.test.AbstractIntegrationTestCase;
+
+import java.util.Collection;
+
+import org.junit.Test;
 
 public class ServerNotificationManagerTestCase extends AbstractIntegrationTestCase {
 
@@ -196,7 +197,7 @@ public class ServerNotificationManagerTestCase extends AbstractIntegrationTestCa
 
     public TestSecurityEvent(MuleContext muleContext) throws Exception {
       super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                                      new DefaultMuleEvent(create(getTestFlow()),
+                                      new DefaultMuleEvent(create(getTestFlow(), "test"),
                                                            MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE,
                                                            getTestFlow(), getTestSession(null, muleContext))),
             0);

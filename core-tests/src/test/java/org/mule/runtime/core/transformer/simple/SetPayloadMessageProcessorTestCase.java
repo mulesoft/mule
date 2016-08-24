@@ -63,7 +63,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     muleMessage = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    muleEvent = new DefaultMuleEvent(create(flow), muleMessage, flow);
+    muleEvent = new DefaultMuleEvent(create(flow, "test"), muleMessage, flow);
   }
 
   @Test

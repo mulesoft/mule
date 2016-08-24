@@ -7,7 +7,6 @@
 package org.mule.runtime.core.mule.enricher;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
-import static junit.framework.Assert.assertSame;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,9 +24,6 @@ import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -47,6 +43,10 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
@@ -297,7 +297,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in = new DefaultMuleEvent(create(flow),
+    MuleEvent in = new DefaultMuleEvent(create(flow, "test"),
                                         MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                         MessageExchangePattern.REQUEST_RESPONSE, flow);
     MuleEvent out = enricher.process(in);
@@ -367,7 +367,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return new DefaultMuleEvent(create(flow),
+    return new DefaultMuleEvent(create(flow, "test"),
                                 MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
                                 flow);

@@ -18,15 +18,6 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -65,6 +56,15 @@ import org.mule.runtime.module.extension.internal.model.property.RequireNameFiel
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -261,7 +261,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return new DefaultMuleEvent(create(flowConstruct),
+    return new DefaultMuleEvent(create(flowConstruct, "InitializerEvent"),
                                 MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, flowConstruct);
   }
 

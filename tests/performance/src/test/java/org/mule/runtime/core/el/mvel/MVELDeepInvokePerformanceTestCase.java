@@ -110,7 +110,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY,
+    return new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload(payload).build(), ONE_WAY,
                                 flow);
   }
 

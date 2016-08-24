@@ -12,7 +12,9 @@ import org.mule.runtime.core.api.CoreMessageContext;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.Serializable;
@@ -29,19 +31,23 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
 
   /**
    * Builds a new execution context with the given parameters.
-   * @param flow the flow that processes events of this context. 
+   * 
+   * @param flow the flow that processes events of this context.
+   * @param connectorName the name of the connector that received the first message for this context.
    */
-  public static MessageContext create(FlowConstruct flow) {
-    return create(flow, null);
+  public static MessageContext create(FlowConstruct flow, String connectorName) {
+    return create(flow, connectorName, null);
   }
 
   /**
    * Builds a new execution context with the given parameters.
+   * 
    * @param flow the flow that processes events of this context.
+   * @param connectorName the name of the connector that received the first message for this context.
    * @param correlationId See {@link MessageContext#getCorrelationId()}.
    */
-  public static MessageContext create(FlowConstruct flow, String correlationId) {
-    return new DefaultMessageContext(flow, correlationId);
+  public static MessageContext create(FlowConstruct flow, String connectorName, String correlationId) {
+    return new DefaultMessageContext(flow, connectorName, correlationId);
   }
 
   private final String id;
@@ -50,8 +56,11 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
 
   private final String serverId;
   private final String flowName;
+  private final String connectorName;
 
   private final ProcessingTime processingTime;
+
+  private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
   @Override
   public String getId() {
@@ -74,6 +83,11 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
   }
 
   @Override
+  public String getOriginatingConnectorName() {
+    return connectorName;
+  }
+
+  @Override
   public ProcessingTime getProcessingTime() {
     return processingTime;
   }
@@ -87,13 +101,15 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
    * Builds a new execution context with the given parameters.
    * 
    * @param flow the flow that processes events of this context.
+   * @param connectorName the name of the connector that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link MuleEvent} of this
    *        context, if available.
    */
-  private DefaultMessageContext(FlowConstruct flow, String correlationId) {
+  private DefaultMessageContext(FlowConstruct flow, String connectorName, String correlationId) {
     this.id = flow.getMuleContext().getUniqueIdString();
     this.serverId = flow.getMuleContext().getId();
     this.flowName = flow.getName();
+    this.connectorName = connectorName;
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
   }

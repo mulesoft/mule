@@ -20,7 +20,6 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleEventBuilder;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -168,16 +167,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Returns true is this event is being processed in a transaction
    */
   boolean isTransacted();
-
-  /**
-   * Returns the {@link URI} of the MessageSource that recieved or generated the message being processed.
-   */
-  URI getMessageSourceURI();
-
-  /**
-   * Returns the message source name if it has one, otherwise returns toString() of the URI returned be getMessageSourceURI()
-   */
-  String getMessageSourceName();
 
   /**
    * Return the replyToHandler (if any) that will be used to perform async reply

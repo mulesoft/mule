@@ -12,12 +12,13 @@ import static org.mule.runtime.core.api.context.notification.ServerNotification.
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.test.module.http.functional.TestConnectorMessageNotificationListener.register;
+
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
-import org.mule.test.module.http.functional.TestConnectorMessageNotificationListener;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.test.module.http.functional.TestConnectorMessageNotificationListener;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,7 @@ public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
     CountDownLatch latch = new CountDownLatch(2);
     // for now use none since we have no way of sending the endpoint
-    TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "none");
+    TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "listenerConfig");
     muleContext.getNotificationManager().addListener(listener);
 
     Request.Post(listenerUrl).execute();

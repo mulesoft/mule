@@ -70,7 +70,7 @@ public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends 
 
     message = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(create(flow), message, flow, mockSession);
+    event = new DefaultMuleEvent(create(flow, "test"), message, flow, mockSession);
   }
 
   @Test

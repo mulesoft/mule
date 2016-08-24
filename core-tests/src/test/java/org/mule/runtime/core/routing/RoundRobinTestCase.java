@@ -82,7 +82,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = getTestFlow();
     roundRobin
-        .process(new DefaultMuleEvent(create(flow), message, REQUEST_RESPONSE, flow, (MuleSession) null));
+        .process(new DefaultMuleEvent(create(flow, "test"), message, REQUEST_RESPONSE, flow, (MuleSession) null));
 
     verify(route1).process(any(MuleEvent.class));
     verify(route2, never()).process(any(MuleEvent.class));
@@ -107,7 +107,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE + messageNumber.getAndIncrement()).build();
         MuleEvent event =
-            new DefaultMuleEvent(create(flowConstruct), msg, REQUEST_RESPONSE, flowConstruct, session);
+            new DefaultMuleEvent(create(flowConstruct, "test"), msg, REQUEST_RESPONSE, flowConstruct, session);
         try {
           target.process(event);
         } catch (MuleException e) {

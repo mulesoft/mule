@@ -77,7 +77,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   public boolean accept(MuleMessage message) {
     // TODO MULE-9341 Remove Filters that are not needed
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct));
+    return accept(new DefaultMuleEvent(create(flowConstruct, "RegExFilter"), message, ONE_WAY, flowConstruct));
   }
 
   @Override

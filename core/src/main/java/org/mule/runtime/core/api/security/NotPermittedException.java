@@ -7,13 +7,13 @@
 package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
-
-import java.net.URI;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized to perform an action.
@@ -42,20 +42,19 @@ public class NotPermittedException extends SecurityException {
   }
 
   public NotPermittedException(MuleEvent event, SecurityContext context, SecurityFilter filter) {
-    super(constructMessage(context, event.getMessageSourceURI(), filter), event);
+    super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter), event);
   }
 
   private static Message constructMessage(SecurityContext context,
-                                          URI endpointURI,
+                                          String originatingConnectorName,
                                           SecurityFilter filter) {
-
     Message m;
     if (context == null) {
-      m = CoreMessages.authSetButNoContext(filter.getClass().getName());
+      m = authSetButNoContext(filter.getClass().getName());
     } else {
-      m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
+      m = authFailedForUser(context.getAuthentication().getPrincipal());
     }
-    m.setNextMessage(CoreMessages.authorizationDeniedOnEndpoint(endpointURI));
+    m.setNextMessage(authorizationDeniedOnEndpoint(originatingConnectorName));
     return m;
   }
 }

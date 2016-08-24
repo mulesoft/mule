@@ -198,11 +198,11 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(create(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
+    return new DefaultMuleEvent(create(flowConstruct, "muleClient"), message, REQUEST_RESPONSE, flowConstruct);
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct);
+    return new DefaultMuleEvent(create(flowConstruct, "muleClient"), message, ONE_WAY, flowConstruct);
   }
 
   protected MuleEvent returnEvent(MuleEvent event) {

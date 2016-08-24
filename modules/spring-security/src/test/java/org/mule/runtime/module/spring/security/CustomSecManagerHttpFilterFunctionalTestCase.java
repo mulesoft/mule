@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.spring.security;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -45,8 +47,9 @@ public class CustomSecManagerHttpFilterFunctionalTestCase extends FunctionalTest
 
     try {
       int status = client.executeMethod(get);
-      assertEquals(UNAUTHORIZED.getStatusCode(), status);
-      assertTrue(get.getResponseBodyAsString().contains("no security context on the session. Authentication denied on endpoint"));
+      assertThat(status, is(UNAUTHORIZED.getStatusCode()));
+      assertThat(get.getResponseBodyAsString(),
+                 containsString("no security context on the session. Authentication denied on connector"));
     } finally {
       get.releaseConnection();
     }

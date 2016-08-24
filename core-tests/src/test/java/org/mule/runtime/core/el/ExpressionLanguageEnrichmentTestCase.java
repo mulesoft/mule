@@ -113,7 +113,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   public void enrichFlowVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
     MuleEvent event =
-        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+        new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("flowVars['foo']", event, flowConstruct, "bar");
     assertThat(event.getFlowVariable("foo"), is("bar"));
     assertThat(event.getSession().getProperty("foo"), nullValue());
@@ -123,7 +123,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   public void enrichSessionVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
     MuleEvent event =
-        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+        new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("sessionVars['foo']", event, flowConstruct, "bar");
     assertThat(event.getSession().getProperty("foo"), equalTo("bar"));
     assertThat(event.getFlowVariableNames(), not(contains("foo")));

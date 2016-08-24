@@ -37,7 +37,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
       // return event with same payload but no properties
       try {
         Flow flow = getTestFlow();
-        return new DefaultMuleEvent(create(flow),
+        return new DefaultMuleEvent(create(flow, "test"),
                                     MuleMessage.builder().payload(event.getMessage().getPayload()).build(), REQUEST_RESPONSE,
                                     flow, getTestSession(null, muleContext));
       } catch (Exception e) {

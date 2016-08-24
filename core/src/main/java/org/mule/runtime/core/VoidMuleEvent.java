@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.Correlation;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Set;
 
@@ -115,16 +114,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public boolean isTransacted() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public URI getMessageSourceURI() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getMessageSourceName() {
     throw new UnsupportedOperationException();
   }
 

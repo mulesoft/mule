@@ -10,11 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Comparator;
+import static org.mule.runtime.core.DefaultMessageContext.create;
 
-import org.junit.Test;
-
-import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -28,6 +25,10 @@ import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Comparator;
+
+import org.junit.Test;
 
 
 public class ResequencerTestCase extends AbstractMuleContextTestCase {
@@ -47,7 +48,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext context = DefaultMessageContext.create(flow, "foo");
+    MessageContext context = create(flow, "test", "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -84,7 +85,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext context = DefaultMessageContext.create(flow, "foo");
+    MessageContext context = create(flow, "test", "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();

@@ -11,6 +11,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -18,12 +25,6 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {
 
@@ -47,7 +48,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow, "test"), message, flow));
     MuleMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload() instanceof byte[]);
@@ -59,7 +60,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(create(flow), message, flow));
+    setCurrentEvent(new DefaultMuleEvent(create(flow, "test"), message, flow));
     MuleMessage deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(byte[].class, deserializedMessage.getDataType().getType());

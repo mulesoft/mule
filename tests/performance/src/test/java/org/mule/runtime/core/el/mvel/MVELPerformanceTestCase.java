@@ -113,7 +113,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
+    return new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
   }
 
 }

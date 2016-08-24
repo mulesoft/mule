@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -346,9 +347,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
       }
 
-      String eventRequestUri = event.getMessageSourceURI().toString();
-      if (eventRequestUri.startsWith(JMS_TRANSPORT)
-          || SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId())) {
+      if (SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId())) {
         String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
         if (contentType == null) {
           contentType = "text/xml";
@@ -357,7 +356,15 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
         String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD);
         if (requestUri == null) {
-          requestUri = eventRequestUri;
+          if (muleReqMsg.getAttributes() instanceof HttpRequestAttributes) {
+            final HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) muleReqMsg.getAttributes();
+            requestUri = httpRequestAttributes.getScheme() + "://" + httpRequestAttributes.getHeaders().get("host")
+                + httpRequestAttributes.getRequestUri();
+          } else {
+            // TODO MULE-9705 remove this when http is fully migrated to the extension
+            requestUri = muleReqMsg.getInboundProperty("http.scheme") + "://" + muleReqMsg.getInboundProperty("host")
+                + muleReqMsg.getInboundProperty("http.request.uri");
+          }
         }
         protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
       }

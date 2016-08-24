@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -21,6 +20,8 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import org.junit.Test;
 
 public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -43,7 +44,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     MuleMessage message2 = MuleMessage.of("test event B");
     MuleMessage message3 = MuleMessage.of("test event C");
 
-    MessageContext context = create(flow, "foo");
+    MessageContext context = create(flow, "test", "foo");
 
     DefaultMuleEvent event1 =
         new DefaultMuleEvent(context, message1, getTestFlow(), session);

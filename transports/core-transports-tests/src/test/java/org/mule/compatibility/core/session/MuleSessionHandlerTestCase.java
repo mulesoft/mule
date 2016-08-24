@@ -17,17 +17,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYST
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -49,6 +38,18 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.base.Charsets;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
 
@@ -89,7 +90,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     String string = "bar";
@@ -129,7 +130,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testNonSerializableSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     NotSerializableClass clazz = new NotSerializableClass();
@@ -152,7 +153,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSecurityContext() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow), message, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());

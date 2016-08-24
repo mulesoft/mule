@@ -41,7 +41,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
 
     MuleEvent response = endpoint.process(event);
 
-    assertEquals("test://test", response.getMessageSourceURI().toString());
+    assertEquals("test", response.getContext().getOriginatingConnectorName());
   }
 
   @Test(expected = MalformedEndpointException.class)

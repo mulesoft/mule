@@ -93,7 +93,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
       final MuleMessage msg = MuleMessage.builder().nullPayload().build();
-      return new DefaultMuleEvent(create(flowConstruct, lastRootMessageId.get()), msg, REQUEST_RESPONSE, flowConstruct);
+      return new DefaultMuleEvent(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get()), msg,
+                                  REQUEST_RESPONSE, flowConstruct);
     } else {
       return null;
     }

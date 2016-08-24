@@ -118,7 +118,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
     requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
     // TODO can a correlation id come as a header?
-    MuleEvent event = new DefaultMuleEvent(create(flowConstruct), requestBuider.build(),
+    MuleEvent event = new DefaultMuleEvent(create(flowConstruct, getEndpoint().getAddress()), requestBuider.build(),
                                            outboundEndpoint.getExchangePattern(), flowConstruct);
 
     MuleEvent result = outboundEndpoint.process(event);

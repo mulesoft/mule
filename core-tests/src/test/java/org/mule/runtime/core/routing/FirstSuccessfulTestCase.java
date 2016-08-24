@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -126,7 +125,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     try {
       Flow flow = getTestFlow();
       MuleEvent event =
-          mp.process(new DefaultMuleEvent(create(flow), msg, REQUEST_RESPONSE, flow, session));
+          mp.process(new DefaultMuleEvent(create(flow, "test"), msg, REQUEST_RESPONSE, flow, session));
       MuleMessage returnedMessage = event.getMessage();
       if (event.getError() != null) {
         return EXCEPTION_SEEN;
@@ -161,7 +160,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        DefaultMuleEvent muleEvent = new DefaultMuleEvent(create(getTestFlow()), msg, ONE_WAY, getTestFlow(), event.getSession());
+        DefaultMuleEvent muleEvent =
+            new DefaultMuleEvent(create(getTestFlow(), "test"), msg, ONE_WAY, getTestFlow(), event.getSession());
         muleEvent.setError(error);
         return muleEvent;
       } catch (Exception e) {

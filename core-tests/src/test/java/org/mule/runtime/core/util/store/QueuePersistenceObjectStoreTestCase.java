@@ -165,7 +165,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     MuleMessage msg = MuleMessage.builder().payload("Hello").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow), msg, ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), msg, ONE_WAY, flow);
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);

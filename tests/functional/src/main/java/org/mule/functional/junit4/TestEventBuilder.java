@@ -27,7 +27,6 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -301,9 +300,8 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flow, sourceCorrelationId),
-                             (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
-                             flow, new DefaultMuleSession(), transacted, null, replyToHandler);
+        new DefaultMuleEvent(create(flow, "test", sourceCorrelationId), (MuleMessage) spyTransformer.transform(muleMessage),
+                             exchangePattern, flow, new DefaultMuleSession(), transacted, null, replyToHandler);
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

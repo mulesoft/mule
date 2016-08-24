@@ -10,21 +10,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.ws.Holder;
-
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -52,6 +37,22 @@ import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
 import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.ws.Holder;
+
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
@@ -138,7 +139,8 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             return null;
           }
         };
-        event = new DefaultMuleEvent(create(flowConstruct), muleMsg, ep.getExchangePattern(), flowConstruct);
+        event = new DefaultMuleEvent(event == null ? create(flowConstruct, "EndpointMuleUniversalConduit") : event.getContext(),
+                                     muleMsg, ep.getExchangePattern(), flowConstruct);
       } catch (Exception e) {
         throw new Fault(e);
       }

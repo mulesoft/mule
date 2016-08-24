@@ -24,7 +24,7 @@ public class MessageRedeliveredException extends org.mule.compatibility.core.api
   }
 
   protected static DefaultMuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage) {
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flow), muleMessage, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(create(flow, "MessageRedeliveredException"), muleMessage, flow);
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
     return event;
   }

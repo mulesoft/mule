@@ -144,7 +144,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
       return !store.contains(id);
     } catch (MuleException e) {
       logger.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
-          + " from the endpoint " + event.getMessageSourceURI(), e);
+          + " from the connector " + event.getContext().getOriginatingConnectorName(), e);
       return false;
     }
   }

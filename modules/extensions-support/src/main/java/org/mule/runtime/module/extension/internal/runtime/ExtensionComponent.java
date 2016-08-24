@@ -291,4 +291,8 @@ public abstract class ExtensionComponent
                                         this);
     }
   }
+
+  protected String getConfigurationProviderName() {
+    return configurationProviderName;
+  }
 }

@@ -10,13 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.CountDownLatch;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -29,6 +22,14 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextEndpointTestCase {
 
@@ -77,7 +78,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      DefaultMuleEvent newEvent = new DefaultMuleEvent(create(flow), okMessage, flow, session);
+      DefaultMuleEvent newEvent = new DefaultMuleEvent(create(flow, "test"), okMessage, flow, session);
       DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
       MuleEvent event = newEvent;
 
