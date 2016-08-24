@@ -6,6 +6,11 @@
  */
 package org.mule.compatibility.transport.http;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -30,10 +35,6 @@ import org.apache.commons.httpclient.cookie.RFC2109Spec;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -529,7 +530,7 @@ enum CookieStorageType {
 
         final String value;
         if (event != null) {
-          value = muleContext.getExpressionManager().parse(cookieValue, event);
+          value = muleContext.getExpressionManager().parse(cookieValue, event, null);
         } else {
           value = cookieValue;
         }

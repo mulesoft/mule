@@ -6,27 +6,30 @@
  */
 package org.mule.test.tck;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
-import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
@@ -50,10 +53,12 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
     expressionManager = mock(DefaultExpressionManager.class);
     when(expressionManager.isValidExpression(anyString())).thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))
-        .thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))
-        .thenReturn(false);
+    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+                                           anyBoolean()))
+                                               .thenReturn(true);
+    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+                                           anyBoolean()))
+                                               .thenReturn(false);
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
 

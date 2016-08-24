@@ -81,7 +81,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     }
 
     event.setMessage(MuleMessage.builder(event.getMessage())
-        .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event))
+        .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event, null))
         .build());
     return event;
   }

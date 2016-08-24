@@ -45,7 +45,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
   public MuleEvent handleException(Exception ex, MuleEvent event) {
     try {
       muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(event, PROCESS_START));
+          .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
 
       // keep legacy notifications
       fireNotification(ex);
@@ -68,8 +68,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
           .build());
       return event;
     } finally {
-      muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(event, PROCESS_END));
+      muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
   }
 

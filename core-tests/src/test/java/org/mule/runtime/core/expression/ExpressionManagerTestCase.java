@@ -24,9 +24,9 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testManager() throws Exception {
     MuleEvent event = getTestEvent("test");
-    Object o = muleContext.getExpressionManager().evaluate("org.mule.runtime.core.util.UUID.getUUID()", event);
+    Object o = muleContext.getExpressionManager().evaluate("org.mule.runtime.core.util.UUID.getUUID()", event, getTestFlow());
     assertNotNull(o);
-    o = muleContext.getExpressionManager().evaluate("server.dateTime.toDate()", event);
+    o = muleContext.getExpressionManager().evaluate("server.dateTime.toDate()", event, getTestFlow());
     assertNotNull(o);
     assertTrue(o instanceof Date);
   }
@@ -68,7 +68,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
 
     String result = muleContext.getExpressionManager().parse(
                                                              "http://#[message.outboundProperties.user]:#[message.outboundProperties.password]@#[message.outboundProperties.host]:#[message.outboundProperties.port]/foo/bar",
-                                                             event);
+                                                             event, getTestFlow());
     assertNotNull(result);
     assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
   }
@@ -81,28 +81,32 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
         .build());
 
     // Non-boolean string value
-    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event));
-    assertTrue(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, false, true));
-    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, false, false));
+    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, getTestFlow()));
+    assertTrue(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, getTestFlow(), false,
+                                                                  true));
+    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, getTestFlow(), false,
+                                                                   false));
 
     // Null
-    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event));
-    assertTrue(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event, true, false));
-    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event, false, false));
+    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event, getTestFlow()));
+    assertTrue(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event, getTestFlow(), true,
+                                                                  false));
+    assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.ur", event, getTestFlow(), false,
+                                                                   false));
 
     // Boolean value
-    assertTrue(muleContext.getExpressionManager().evaluateBoolean("true", event));
-    assertFalse(muleContext.getExpressionManager().evaluateBoolean("false", event));
+    assertTrue(muleContext.getExpressionManager().evaluateBoolean("true", event, getTestFlow()));
+    assertFalse(muleContext.getExpressionManager().evaluateBoolean("false", event, getTestFlow()));
   }
 
   @Test
   public void testELExpression() {
-    assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", null));
+    assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", null, null));
   }
 
   @Test
   public void testBooleanELExpression() {
-    assertEquals(true, muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null));
+    assertEquals(true, muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null, null));
   }
 
   @Test
@@ -117,12 +121,12 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testEvaluateELExpressionWithNullEvaluator() {
-    assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", null, false));
+    assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", null, null, false));
   }
 
   @Test
   public void testEvaluateBooleanELExpressionWithNullEvaluator() {
-    assertTrue(muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null, false, false));
+    assertTrue(muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null, null, false, false));
   }
 
 }

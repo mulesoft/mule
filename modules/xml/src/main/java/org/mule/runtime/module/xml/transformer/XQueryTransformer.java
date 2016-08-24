@@ -409,7 +409,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
    */
   protected Object evaluateTransformParameter(String name, Object value, MuleEvent event) throws TransformerException {
     if (value instanceof String) {
-      return muleContext.getExpressionManager().evaluate(value.toString(), event);
+      return muleContext.getExpressionManager().evaluate(value.toString(), event, null);
     }
     return value;
   }

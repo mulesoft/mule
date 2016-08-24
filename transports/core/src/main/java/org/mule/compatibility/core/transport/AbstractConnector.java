@@ -1801,10 +1801,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
     logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
 
-    // if (e instanceof MessagingException) {
-    // MuleEvent failedEvent = ((MessagingException) e).getEvent();
-    // failedEvent.getFlowConstruct().getExceptionListener().handleException((MessagingException) e, failedEvent);
-    // } else
     if (e instanceof Exception) {
       muleContext.getExceptionListener().handleException((Exception) e);
     } else {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -62,7 +63,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       if (!handleException && request.getReplyToHandler() instanceof NonBlockingReplyToHandler) {
         request = new DefaultMuleEvent(request, flowConstruct, null, null, true);
       }
-      muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(request, PROCESS_START));
+      muleContext.getNotificationManager()
+          .fireNotification(new ExceptionStrategyNotification(request, flowConstruct, PROCESS_START));
       fireNotification(exception);
       logException(exception, request);
       processStatistics();
@@ -110,8 +112,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     @Override
     protected void processFinally(MuleEvent event, MessagingException exception) {
-      muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_END));
+      muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
   }
 
@@ -181,7 +182,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   public boolean accept(MuleEvent event) {
-    return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event);
+    return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct);
   }
 
   /**

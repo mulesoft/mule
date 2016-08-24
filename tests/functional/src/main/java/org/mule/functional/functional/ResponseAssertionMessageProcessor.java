@@ -94,7 +94,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     }
     responseThread = Thread.currentThread();
     this.responseEvent = event;
-    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, false, true);
+    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
     increaseResponseCount();
     responseLatch.countDown();
     return event;

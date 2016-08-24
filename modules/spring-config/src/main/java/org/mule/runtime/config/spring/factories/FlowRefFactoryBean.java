@@ -150,7 +150,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException {
           // Need to initialize because message processor won't be managed by parent
-          String flowName = muleContext.getExpressionManager().parse(refName, event);
+          String flowName = muleContext.getExpressionManager().parse(refName, event, flowConstruct);
           final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, flowConstruct);
           setResolvedMessageProcessor(dynamicMessageProcessor);
 

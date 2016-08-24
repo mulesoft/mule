@@ -7,22 +7,20 @@
 package org.mule.compatibility.transport.http;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class CacheControlTestCase extends AbstractMuleTestCase {
@@ -80,23 +78,18 @@ public class CacheControlTestCase extends AbstractMuleTestCase {
     cacheControl.setNoCache(HEADER_NO_CACHE);
     cacheControl.setNoStore(HEADER_NO_STORE);
 
-    when(expressionManager.parse(HEADER_DIRECTIVE, muleEvent)).thenReturn("public");
-    when(expressionManager.parse(HEADER_MAX_AGE, muleEvent)).thenReturn("3600");
-    when(expressionManager.parse(HEADER_MUST_REVALIDATE, muleEvent)).thenReturn("true");
-    when(expressionManager.parse(HEADER_NO_CACHE, muleEvent)).thenReturn("true");
-    when(expressionManager.parse(HEADER_NO_STORE, muleEvent)).thenReturn("true");
+    when(expressionManager.parse(HEADER_DIRECTIVE, muleEvent, null)).thenReturn("public");
+    when(expressionManager.parse(HEADER_MAX_AGE, muleEvent, null)).thenReturn("3600");
+    when(expressionManager.parse(HEADER_MUST_REVALIDATE, muleEvent, null)).thenReturn("true");
+    when(expressionManager.parse(HEADER_NO_CACHE, muleEvent, null)).thenReturn("true");
+    when(expressionManager.parse(HEADER_NO_STORE, muleEvent, null)).thenReturn("true");
 
     cacheControl.parse(muleEvent, expressionManager);
     assertEquals("public,no-cache,no-store,must-revalidate,max-age=3600", cacheControl.toString());
   }
 
   private void mockParse() {
-    when(expressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return invocation.getArguments()[0];
-      }
-    });
+    when(expressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 }

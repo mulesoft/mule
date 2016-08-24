@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.expression;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.metadata.TypedValue;
 
 /**
@@ -27,11 +28,12 @@ public interface ExpressionManager {
    * 
    * @param expression a single expression i.e. xpath://foo
    * @param event The current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @return the result of the evaluation
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
    *         to true.
    */
-  Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException;
+  Object evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
 
   /**
    * Evaluates the given expression. The expression should be a single expression definition with or without enclosing braces.
@@ -41,13 +43,15 @@ public interface ExpressionManager {
    * 
    * @param expression a single expression i.e. xpath://foo
    * @param event The current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns null. @return
    *        the result of the evaluation
    * @return the parsered expression string
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
    *         to true.
    */
-  Object evaluate(String expression, MuleEvent event, boolean failIfNull) throws ExpressionRuntimeException;
+  Object evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean failIfNull)
+      throws ExpressionRuntimeException;
 
   /**
    * Evaluates the given expression resolving the result of the evaluation to a boolean. The expression should be a single
@@ -56,8 +60,9 @@ public interface ExpressionManager {
    * 
    * @param expression a single expression i.e. header:foo=bar
    * @param event The current event being processed
+   * @param flowConstruct the flow where the event is being processed
    */
-  boolean evaluateBoolean(String expression, MuleEvent event) throws ExpressionRuntimeException;
+  boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
 
   /**
    * Evaluates the given expression resolving the result of the evaluation to a boolean. The expression should be a single
@@ -66,31 +71,35 @@ public interface ExpressionManager {
    * 
    * @param expression a single expression i.e. header:foo=bar
    * @param event The current message being processed
+   * @param flowConstruct the flow where the event is being processed
    * @param nullReturnsTrue determines if true should be returned if the result of the evaluation is null
    * @param nonBooleanReturnsTrue determines if true should returned if the result is not null but isn't recognised as a boolean
    */
-  boolean evaluateBoolean(String expression, MuleEvent event, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue)
+  boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
+                          boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException;
 
-  TypedValue evaluateTyped(String expression, MuleEvent event);
+  TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct);
 
   /**
    * Enriches the current message using
    * 
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The current event being processed that will be enriched
+   * @param flowConstruct the flow where the event is being processed
    * @param object The object that will be used to enrich the message
    */
-  void enrich(String expression, MuleEvent event, Object object);
+  void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, Object object);
 
   /**
    * Enriches the current message using a typed value
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The current event being processed that will be enriched
+   * @param flowConstruct the flow where the event is being processed
    * @param object The typed value that will be used to enrich the message
    */
-  void enrichTyped(String expression, MuleEvent event, TypedValue object);
+  void enrichTyped(String expression, MuleEvent event, FlowConstruct flowConstruct, TypedValue object);
 
   /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
@@ -99,11 +108,12 @@ public interface ExpressionManager {
    * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
    *        #[header:foo]."
    * @param event The current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @return the result of the evaluation
    * @throws org.mule.runtime.core.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is found for
    *         the expression and 'failIfNull is set to true.
    */
-  String parse(String expression, MuleEvent event) throws ExpressionRuntimeException;
+  String parse(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
 
   /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
@@ -112,13 +122,15 @@ public interface ExpressionManager {
    * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
    *        #[header:foo]."
    * @param event The current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns null. @return
    *        the result of the evaluation
    * @return the parsered expression string
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
    *         to true.
    */
-  String parse(final String expression, final MuleEvent event, final boolean failIfNull) throws ExpressionRuntimeException;
+  String parse(final String expression, final MuleEvent event, FlowConstruct flowConstruct, final boolean failIfNull)
+      throws ExpressionRuntimeException;
 
   /**
    * Determines if the expression is valid or not. This method will validate a single expression or expressions embedded in a

@@ -173,7 +173,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   @Test(expected = MuleRuntimeException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
     when(expressionManager.isExpression(anyString())).thenReturn(true);
-    when(expressionManager.parse(eq(DYNAMIC_NON_EXISTANT), any(MuleEvent.class))).thenReturn("other");
+    when(expressionManager.parse(eq(DYNAMIC_NON_EXISTANT), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn("other");
 
     createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT).getObject().process(mock(MuleEvent.class));
   }
@@ -196,7 +196,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(MessageProcessor target) throws InitialisationException {
     when(expressionManager.isExpression(anyString())).thenReturn(true);
-    when(expressionManager.parse(eq(DYNAMIC_REFERENCED_FLOW), any(MuleEvent.class))).thenReturn(PARSED_DYNAMIC_REFERENCED_FLOW);
+    when(expressionManager.parse(eq(DYNAMIC_REFERENCED_FLOW), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenReturn(PARSED_DYNAMIC_REFERENCED_FLOW);
     when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
 
     return createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW);

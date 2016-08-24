@@ -100,7 +100,7 @@ public class ExpressionArgument implements MuleContextAware {
     // certain ExpressionEvaluators further in.
     Object result =
         withContextClassLoader(expressionEvaluationClassLoader,
-                               () -> muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional()));
+                               () -> muleContext.getExpressionManager().evaluate(getExpression(), event, null, !isOptional()));
 
     if (getReturnClass() != null && result != null) {
       if (!getReturnClass().isInstance(result)) {

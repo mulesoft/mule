@@ -19,12 +19,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
-import java.nio.charset.Charset;
-
-import javax.activation.MimeTypeParseException;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -33,6 +27,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -41,6 +36,13 @@ import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.transformer.simple.AbstractAddVariablePropertyTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.nio.charset.Charset;
+
+import javax.activation.MimeTypeParseException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public abstract class AbstractAddVariablePropertyTransformerTestCase extends AbstractMuleContextTestCase {
@@ -70,10 +72,13 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
 
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(EXPRESSION_VALUE);
+    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenReturn(EXPRESSION_VALUE);
     TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataType.STRING);
-    when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(typedValue);
+    when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenReturn(typedValue);
     addVariableTransformer.setMuleContext(mockMuleContext);
 
     message = MuleMessage.builder().payload("").build();
@@ -172,7 +177,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
   public void testAddVariableWithNullExpressionValueResult() throws InitialisationException, TransformerException {
     addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockExpressionManager.evaluateTyped(NULL_EXPRESSION, event)).thenReturn(typedValue);
+    when(mockExpressionManager.evaluateTyped(NULL_EXPRESSION, event, null)).thenReturn(typedValue);
     addVariableTransformer.setValue(NULL_EXPRESSION);
     addVariableTransformer.initialise();
     addVariableTransformer.transform(event, ENCODING);
@@ -184,7 +189,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
     addVariableTransformer.setValue(EXPRESSION);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockExpressionManager.evaluateTyped(EXPRESSION, event)).thenReturn(typedValue);
+    when(mockExpressionManager.evaluateTyped(EXPRESSION, event, null)).thenReturn(typedValue);
     addVariableTransformer.initialise();
 
     addVariableTransformer.transform(event, ENCODING);

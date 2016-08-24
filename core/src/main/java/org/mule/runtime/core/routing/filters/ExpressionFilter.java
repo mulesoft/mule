@@ -12,8 +12,6 @@ import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
-import java.text.MessageFormat;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -22,6 +20,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.expression.ExpressionConfig;
+
+import java.text.MessageFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +97,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
   @Override
   public boolean accept(MuleEvent event) {
     return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> muleContext.getExpressionManager()
-        .evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue));
+        .evaluateBoolean(getFullExpression(), event, null, nullReturnsTrue, !nullReturnsTrue));
   }
 
   protected String getFullExpression() {

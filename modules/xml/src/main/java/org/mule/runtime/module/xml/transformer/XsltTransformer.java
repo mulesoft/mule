@@ -435,7 +435,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
     if (value instanceof String) {
       String stringValue = (String) value;
       if (muleContext.getExpressionManager().isExpression(stringValue)) {
-        return muleContext.getExpressionManager().evaluate(stringValue, event);
+        return muleContext.getExpressionManager().evaluate(stringValue, event, null);
       }
     }
 

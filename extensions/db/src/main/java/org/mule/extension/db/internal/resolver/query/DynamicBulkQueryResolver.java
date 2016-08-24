@@ -26,6 +26,6 @@ public class DynamicBulkQueryResolver extends AbstractBulkQueryResolver {
 
   @Override
   protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
-    return expressionManager.parse(bulkQuery.trim(), muleEvent);
+    return expressionManager.parse(bulkQuery.trim(), muleEvent, null);
   }
 }

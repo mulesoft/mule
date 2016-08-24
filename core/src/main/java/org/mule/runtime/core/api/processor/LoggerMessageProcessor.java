@@ -10,6 +10,8 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -26,7 +28,8 @@ import org.slf4j.LoggerFactory;
  * 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category. The level and category can both be configured to suit
  * your needs.
  */
-public class LoggerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware {
+public class LoggerMessageProcessor extends AbstractAnnotatedObject
+    implements MessageProcessor, Initialisable, MuleContextAware, FlowConstructAware {
 
   protected transient Logger logger;
 
@@ -35,8 +38,10 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
   protected String level = "DEBUG";
 
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
   protected ExpressionManager expressionManager;
 
+  @Override
   public void initialise() throws InitialisationException {
     initLogger();
     expressionManager = muleContext.getExpressionManager();
@@ -50,6 +55,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
     }
   }
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     log(event);
     return event;
@@ -64,7 +70,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
         if (LogLevel.valueOf(level).isEnabled(logger)) {
-          logLevel.log(logger, expressionManager.parse(message, event));
+          logLevel.log(logger, expressionManager.parse(message, event, flowConstruct));
         }
       }
     }
@@ -77,8 +83,14 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
     }
   }
 
+  @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   public void setMessage(String message) {

@@ -13,6 +13,7 @@ import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 
 public class EventVariableResolverFactory extends MessageVariableResolverFactory {
 
@@ -20,10 +21,13 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
 
   private final String FLOW = "flow";
   private MuleEvent event;
+  private FlowConstruct flowConstruct;
 
-  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event) {
+  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
+                                      FlowConstruct flowConstruct) {
     super(parserConfiguration, muleContext, event);
     this.event = event;
+    this.flowConstruct = flowConstruct;
   }
 
   /**
@@ -34,16 +38,16 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
    * @param next
    */
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                      VariableResolverFactory next) {
-    this(parserConfiguration, muleContext, event);
+                                      FlowConstruct flowConstruct, VariableResolverFactory next) {
+    this(parserConfiguration, muleContext, event, flowConstruct);
     setNextFactory(next);
   }
 
   @Override
   public VariableResolver getVariableResolver(String name) {
     if (event != null) {
-      if (FLOW.equals(name)) {
-        return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(event.getFlowName())), null);
+      if (FLOW.equals(name) && flowConstruct != null) {
+        return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(flowConstruct.getName())), null);
       } else if (MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
         return new MuleImmutableVariableResolver<>(MULE_EVENT_INTERNAL_VARIABLE, event, null);
       }

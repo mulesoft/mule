@@ -11,6 +11,7 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -31,7 +32,7 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase 
   public void resolvesDynamicQuery() throws Exception {
     ExpressionManager expressionManager = mock(ExpressionManager.class);
     String staticSqlText = STATIC_SQL_TEXT;
-    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent)).thenReturn(staticSqlText);
+    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent, null)).thenReturn(staticSqlText);
 
     QueryTemplate expectedQueryTemplate = createQueryTemplate(staticSqlText);
     QueryTemplateParser queryTemplateParser = mock(QueryTemplateParser.class);
@@ -48,7 +49,7 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase 
   public void throwsErrorOnParsingError() throws Exception {
     ExpressionManager expressionManager = mock(ExpressionManager.class);
     String staticSqlText = STATIC_SQL_TEXT;
-    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent)).thenReturn(staticSqlText);
+    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent, null)).thenReturn(staticSqlText);
 
     QueryTemplateParser queryTemplateParser = mock(QueryTemplateParser.class);
     when(queryTemplateParser.parse(staticSqlText)).thenThrow(new QueryTemplateParsingException("Parse error"));
@@ -61,7 +62,7 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase 
   @Test(expected = QueryResolutionException.class)
   public void throwsErrorOnExpressionEvaluationError() throws Exception {
     ExpressionManager expressionManager = mock(ExpressionManager.class);
-    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent))
+    when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent, null))
         .thenThrow(new ExpressionRuntimeException(CoreMessages.createStaticMessage("Error")));
 
     DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, null, expressionManager);

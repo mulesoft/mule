@@ -30,7 +30,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
   public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
   private final transient MessageProcessor processor;
-  protected transient FlowConstruct flowConstruct;
+  private final transient FlowConstruct flowConstruct;
   private final String processorPath;
 
   static {

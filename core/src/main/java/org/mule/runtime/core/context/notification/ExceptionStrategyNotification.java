@@ -7,6 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 public class ExceptionStrategyNotification extends ServerNotification {
@@ -21,10 +22,8 @@ public class ExceptionStrategyNotification extends ServerNotification {
     registerAction("exception strategy process end", PROCESS_END);
   }
 
-  public ExceptionStrategyNotification(Object message, int action) {
-    super(message, action);
-    if (message instanceof MuleEvent) {
-      resourceIdentifier = ((MuleEvent) message).getFlowName();
-    }
+  public ExceptionStrategyNotification(MuleEvent event, FlowConstruct flowConstruct, int action) {
+    super(event, action);
+    resourceIdentifier = flowConstruct.getName();
   }
 }

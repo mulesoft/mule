@@ -70,9 +70,9 @@ public class AttributeEvaluator {
 
   public TypedValue resolveTypedValue(MuleEvent event) {
     if (isExpression()) {
-      return expressionManager.evaluateTyped(attributeValue, event);
+      return expressionManager.evaluateTyped(attributeValue, event, null);
     } else if (isParseExpression()) {
-      final String value = expressionManager.parse(attributeValue, event);
+      final String value = expressionManager.parse(attributeValue, event, null);
       return new TypedValue(value, DataType.builder().type(String.class).build());
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
@@ -82,9 +82,9 @@ public class AttributeEvaluator {
 
   public Object resolveValue(MuleEvent event) {
     if (isExpression()) {
-      return expressionManager.evaluate(attributeValue, event);
+      return expressionManager.evaluate(attributeValue, event, null);
     } else if (isParseExpression()) {
-      return expressionManager.parse(attributeValue, event);
+      return expressionManager.parse(attributeValue, event, null);
     } else {
       return attributeValue;
     }

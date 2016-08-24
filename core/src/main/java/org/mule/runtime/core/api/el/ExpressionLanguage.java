@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.el;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.metadata.TypedValue;
@@ -53,9 +54,10 @@ public interface ExpressionLanguage {
    * @param <T> the return type expected
    * @param expression the expression to be executed
    * @param event the current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @return the result of execution of the expression.
    */
-  <T> T evaluate(String expression, MuleEvent event);
+  <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct);
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
@@ -66,10 +68,11 @@ public interface ExpressionLanguage {
    * @param <T> the return type expected
    * @param expression the expression to be executed
    * @param event the current event being processed
+   * @param flowConstruct the flow where the event is being processed
    * @param vars a map of expression variables
    * @return the result of execution of the expression.
    */
-  <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars);
+  <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, Map<String, Object> vars);
 
   /**
    * Validates the expression returning true is the expression is valid, false otherwise.. All implementors should should validate
@@ -94,10 +97,11 @@ public interface ExpressionLanguage {
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The event to be enriched
+   * @param flowConstruct the flow where the event is being processed
    * @param value The typed value used for enrichment
    */
-  void enrich(String expression, MuleEvent event, TypedValue value);
+  void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, TypedValue value);
 
-  TypedValue evaluateTyped(String expression, MuleEvent event);
+  TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct);
 
 }

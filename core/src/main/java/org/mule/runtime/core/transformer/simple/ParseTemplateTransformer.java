@@ -54,7 +54,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
       throw new IllegalArgumentException("Template cannot be null");
     }
 
-    return muleContext.getExpressionManager().parse(template, event);
+    return muleContext.getExpressionManager().parse(template, event, null);
   }
 
   public void setLocation(String location) {

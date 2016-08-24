@@ -310,12 +310,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, mockEvent))
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, mockEvent, null))
         .thenReturn(expressionEvalutaionResult);
     executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(mockEvent);
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, mockEvent);
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, mockEvent,
+                                                                                                        null);
     verify(mockEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
       @Override

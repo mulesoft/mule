@@ -48,21 +48,21 @@ public class TokenResponseProcessor {
   }
 
   public void process(final MuleEvent muleEvent) {
-    accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent);
+    accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, null);
     accessToken = isEmpty(accessToken) ? null : accessToken;
     if (accessToken == null) {
       logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was "
           + tokenResponseConfiguration.getAccessToken());
     }
     if (retrieveRefreshToken) {
-      refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent);
+      refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, null);
       refreshToken = isEmpty(refreshToken) ? null : refreshToken;
     }
-    expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent);
+    expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, null);
     customResponseParameters = new HashMap<>();
     for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors()) {
       customResponseParameters.put(parameterExtractor.getParamName(),
-                                   expressionManager.evaluate(parameterExtractor.getValue(), muleEvent));
+                                   expressionManager.evaluate(parameterExtractor.getValue(), muleEvent, null));
     }
   }
 

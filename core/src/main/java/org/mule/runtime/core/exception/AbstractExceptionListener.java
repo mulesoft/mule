@@ -216,7 +216,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the exception thrown
    */
   protected void logException(Throwable t, MuleEvent event) {
-    if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, true, true)) {
+    if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, flowConstruct, true, true)) {
       doLogException(t);
     }
   }

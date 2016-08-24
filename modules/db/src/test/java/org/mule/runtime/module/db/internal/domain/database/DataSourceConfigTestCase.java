@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
@@ -151,7 +152,7 @@ public class DataSourceConfigTestCase extends AbstractMuleTestCase {
     MuleContext context = mock(MuleContext.class);
     when(context.getExpressionManager()).thenReturn(expressionManager);
     when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
-    when(expressionManager.parse(MULE_EXPRESSION, muleEvent)).thenReturn(RESOLVED_EXPRESSION);
+    when(expressionManager.parse(MULE_EXPRESSION, muleEvent, null)).thenReturn(RESOLVED_EXPRESSION);
     dataSourceConfig.setMuleContext(context);
     dataSourceConfig.setUrl(MULE_EXPRESSION);
   }

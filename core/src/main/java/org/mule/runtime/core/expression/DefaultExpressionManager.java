@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.expression;
 
+import static java.util.Collections.singletonMap;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
@@ -17,12 +20,11 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.TemplateParser.TemplateCallback;
 
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -55,33 +57,35 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
   }
 
   @Override
-  public Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException {
-    return evaluate(expression, event, false);
+  public Object evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
+    return evaluate(expression, event, flowConstruct, false);
   }
 
   @Override
-  public Object evaluate(String expression, MuleEvent event, boolean failIfNull) throws ExpressionRuntimeException {
+  public Object evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean failIfNull)
+      throws ExpressionRuntimeException {
     expression = removeExpressionMarker(expression);
-    return expressionLanguage.evaluate(expression, event);
+    return expressionLanguage.evaluate(expression, event, flowConstruct);
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, Object object) {
+  public void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, Object object) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    expressionLanguage.evaluate(expression, event, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
+    expressionLanguage.evaluate(expression, event, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, object));
   }
 
   @Override
-  public void enrichTyped(String expression, MuleEvent event, TypedValue object) {
+  public void enrichTyped(String expression, MuleEvent event, FlowConstruct flowConstruct, TypedValue object) {
     expression = removeExpressionMarker(expression);
-    expressionLanguage.enrich(createEnrichmentExpression(expression), event, object);
+    expressionLanguage.enrich(createEnrichmentExpression(expression), event, flowConstruct, object);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, MuleEvent event, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue)
+  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
+                                 boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
-    return resolveBoolean(evaluate(expression, event, false), nullReturnsTrue, nonBooleanReturnsTrue, expression);
+    return resolveBoolean(evaluate(expression, event, flowConstruct, false), nullReturnsTrue, nonBooleanReturnsTrue, expression);
   }
 
   protected boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue, String expression) {
@@ -104,30 +108,27 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
   }
 
   @Override
-  public String parse(String expression, MuleEvent event) throws ExpressionRuntimeException {
-    return parse(expression, event, false);
+  public String parse(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
+    return parse(expression, event, flowConstruct, false);
   }
 
   @Override
-  public String parse(String expression, final MuleEvent event, final boolean failIfNull) throws ExpressionRuntimeException {
-    return parser.parse(new TemplateParser.TemplateCallback() {
-
-      @Override
-      public Object match(String token) {
-        Object result = evaluate(token, event, failIfNull);
-        if (result instanceof MuleMessage) {
-          return ((MuleMessage) result).getPayload();
-        } else {
-          return result;
-        }
+  public String parse(String expression, final MuleEvent event, FlowConstruct flowConstruct, final boolean failIfNull)
+      throws ExpressionRuntimeException {
+    return parser.parse((TemplateCallback) token -> {
+      Object result = evaluate(token, event, flowConstruct, failIfNull);
+      if (result instanceof MuleMessage) {
+        return ((MuleMessage) result).getPayload();
+      } else {
+        return result;
       }
     }, expression);
   }
 
   @Override
-  public TypedValue evaluateTyped(String expression, MuleEvent event) {
+  public TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct) {
     expression = removeExpressionMarker(expression);
-    return expressionLanguage.evaluateTyped(expression, event);
+    return expressionLanguage.evaluateTyped(expression, event, flowConstruct);
   }
 
   @Override
@@ -191,8 +192,9 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, MuleEvent event) throws ExpressionRuntimeException {
-    return evaluateBoolean(expression, event, false, false);
+  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException {
+    return evaluateBoolean(expression, event, flowConstruct, false, false);
   }
 
   public static String removeExpressionMarker(String expression) {
