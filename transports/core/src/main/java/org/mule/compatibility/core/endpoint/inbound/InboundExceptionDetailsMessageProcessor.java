@@ -41,11 +41,8 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
-      MuleMessage resultMessage = event.getMessage();
-      if (resultMessage != null) {
-        if (resultMessage.getExceptionPayload() != null) {
-          setExceptionDetails(event, connector, resultMessage.getExceptionPayload().getException());
-        }
+      if (event.getMessage().getExceptionPayload() != null) {
+        setExceptionDetails(event, connector, event.getMessage().getExceptionPayload().getException());
       }
     }
     return event;

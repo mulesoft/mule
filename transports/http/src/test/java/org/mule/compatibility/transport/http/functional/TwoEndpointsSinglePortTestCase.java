@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
@@ -46,7 +47,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase {
     sendWithResponse("mycomponent2", "test", "mycomponent2", 5);
 
     String url = String.format("http://localhost:%d/mycomponent-notfound", port1.getNumber());
-    MuleMessage result = client.send(url, "test", null);
+    MuleMessage result = client.send(url, "test", null).getRight();
     assertNotNull(result);
     assertNotNull(result.getExceptionPayload());
     final int status = result.getInboundProperty("http.status", 0);
@@ -64,7 +65,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase {
     for (int i = 0; i < noOfMessages; i++) {
       results.add(getPayloadAsBytes(client
           .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject(flowName)).getMessageSource()).getAddress(),
-                message, null)));
+                message, null)
+          .getRight()));
     }
 
     assertEquals(noOfMessages, results.size());

@@ -30,7 +30,7 @@ public class HttpsPollingFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void httpsPolling() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://toTest", 60000);
+    MuleMessage message = client.request("vm://toTest", 60000).getRight().get();
     assertNotNull(message);
     assertEquals("/ received", getPayloadAsString(message));
   }

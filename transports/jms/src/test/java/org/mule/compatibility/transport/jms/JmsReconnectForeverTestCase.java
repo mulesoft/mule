@@ -94,7 +94,7 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
 
   private void assertMessageRouted(String entryFlow) throws Exception {
     flowRunner(entryFlow).withPayload(TEST_MESSAGE).run();
-    MuleMessage message = muleContext.getClient().request("vm://out" + entryFlow, RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("vm://out" + entryFlow, RECEIVE_TIMEOUT).getRight().get();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(TEST_MESSAGE));
   }

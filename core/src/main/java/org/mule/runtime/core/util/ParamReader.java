@@ -131,7 +131,7 @@ public class ParamReader extends ClassReader {
       return pr.getParameterNames(method);
     } catch (IOException e) {
       // log it and leave
-      // log.info(Messages.getMessage("error00") + ":" + e);
+      // log.info(Messages.getResult("error00") + ":" + e);
       return null;
     }
   }

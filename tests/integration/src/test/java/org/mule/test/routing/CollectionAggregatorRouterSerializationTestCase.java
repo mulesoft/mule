@@ -41,7 +41,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends AbstractInt
     flowRunner("splitter").withPayload(list).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(request);
     assertThat(request.getPayload(), instanceOf(List.class));
     assertThat(((List<MuleMessage>) request.getPayload()), hasSize(list.size()));

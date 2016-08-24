@@ -30,7 +30,7 @@ public class TcpJmsResponseBridgeTestCase extends FunctionalTestCase {
   @Test
   public void testSyncResponse() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("tcp://localhost:" + tcpPort.getNumber(), "request", null);
+    MuleMessage message = client.send("tcp://localhost:" + tcpPort.getNumber(), "request", null).getRight();
     assertNotNull(message);
     assertEquals("Received: request", getPayloadAsString(message));
   }

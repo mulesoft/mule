@@ -38,11 +38,12 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
 
   @Test
   public void testReturnPayloadCustomStrategy() throws Exception {
-    MuleMessage msg = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run().getMessage();
+    MuleEvent event = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run();
+    MuleMessage msg = event.getMessage();
 
     assertNotNull(msg);
-    assertNotNull(msg.getExceptionPayload());
-    assertEquals("Functional Test Service Exception", msg.getExceptionPayload().getMessage());
+    assertNotNull(event.getError());
+    assertEquals("Functional Test Service Exception", event.getError().getDescription());
 
     assertNotNull(msg.getPayload());
     assertEquals("Ka-boom!", msg.getPayload());

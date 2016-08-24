@@ -49,7 +49,7 @@ public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase {
 
     muleContext.start();
 
-    MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6);
+    MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6).getRight().get();
 
     assertTrue(response.getPayload() instanceof Map);
     Map<String, String> payload = (Map<String, String>) response.getPayload();

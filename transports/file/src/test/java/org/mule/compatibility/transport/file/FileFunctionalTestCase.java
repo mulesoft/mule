@@ -53,7 +53,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase {
     MuleClient client = muleContext.getClient();
     String url = fileToUrl(target) + "?connector=receiveConnector";
     logger.debug(url);
-    MuleMessage message = client.request(url, 100000);
+    MuleMessage message = client.request(url, 100000).getRight().get();
     checkReceivedMessage(message);
   }
 
@@ -73,7 +73,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     Thread.sleep(1000);
-    MuleMessage message = client.request("vm://receive?connector=vmQueue", 100000);
+    MuleMessage message = client.request("vm://receive?connector=vmQueue", 100000).getRight().get();
     assertEquals(TEST_MESSAGE, getPayloadAsString(message));
   }
 }

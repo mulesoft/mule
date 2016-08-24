@@ -35,14 +35,14 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
   public void requestResponse() throws Exception {
     MuleMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
     assertThat(response.getPayload().toString(), is(TEST_PAYLOAD));
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
   @Test
   public void oneWay() throws Exception {
     flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(Thread.currentThread().getName())));
   }
 
@@ -51,7 +51,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
@@ -60,7 +60,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .asynchronously().run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
@@ -68,7 +68,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 

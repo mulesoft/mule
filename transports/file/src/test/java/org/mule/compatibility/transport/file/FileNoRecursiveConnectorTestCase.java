@@ -8,6 +8,7 @@
 package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,8 +38,7 @@ public class FileNoRecursiveConnectorTestCase extends FunctionalTestCase {
   public void findsInRootDirectoryOnly() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.request("vm://testOut", RECEIVE_TIMEOUT);
-
-    assertNull("Found a file from a sub directory", result);
+    assertThat("Found a file from a sub directory", client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().isPresent(),
+               Is.is(false));
   }
 }

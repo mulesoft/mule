@@ -54,7 +54,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     for (int i = 0; i < numberOfMessages; ++i) {
       String msg = TEST_MESSAGE + i;
-      MuleMessage result = client.send("in", msg, null);
+      MuleMessage result = client.send("in", msg, null).getRight();
       assertEquals(msg + " Received", getPayloadAsString(result));
     }
 

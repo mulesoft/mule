@@ -57,8 +57,7 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
-    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
-    assertThat(request, nullValue());
+    assertThat(client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -72,7 +71,7 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
     systemExceptionListener.waitUntilAllNotificationsAreReceived();
-    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
+    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().get();
     assertThat(request, notNullValue());
   }
 
@@ -84,12 +83,11 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     client.dispatch(IN_2_JMS_ENDPOINT, MESSAGE, null);
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(XA_TRANSACTION_BEHAVIOR_FLOW);
-    MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT);
+    MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT).getRight().get();
     assertThat(outMessage, notNullValue());
     assertThat(getPayloadAsString(outMessage), is(MESSAGE));
-    MuleMessage inMessage = client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT);
-    assertThat(inMessage, nullValue());
-    MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT);
+    assertThat(client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().isPresent(), is(false));
+    MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT).getRight().get();
     assertThat(inVmMessage, notNullValue());
     assertThat(getPayloadAsString(inVmMessage), is(MESSAGE));
   }

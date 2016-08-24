@@ -47,7 +47,7 @@ public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase {
     flowRunner("bulkUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertBulkModeResult(response.getPayload());
   }

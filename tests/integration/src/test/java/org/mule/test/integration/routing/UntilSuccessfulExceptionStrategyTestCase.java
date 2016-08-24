@@ -9,6 +9,7 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -59,8 +60,9 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
   }
 
   private void testHandlingOfFailures(String entryPoint) throws Exception {
-    MuleMessage response = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run().getMessage();
-    assertThat(response.getExceptionPayload(), is(nullValue()));
+    MuleEvent event = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run();
+    MuleMessage response = event.getMessage();
+    assertThat(event.getError(), is(nullValue()));
     assertThat(getPayloadAsString(response), is("ok"));
   }
 
@@ -70,8 +72,10 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
         if (!latch.await(TIMEOUT, TimeUnit.SECONDS)) {
+          RuntimeException exception = new RuntimeException();
+          event.setError(new ErrorBuilder(exception).build());
           event.setMessage(MuleMessage.builder(event.getMessage())
-              .exceptionPayload(new DefaultExceptionPayload(new RuntimeException())).build());
+              .exceptionPayload(new DefaultExceptionPayload(exception)).build());
         }
       } catch (InterruptedException e) {
         // do nothing

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,26 +30,29 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testService1() throws Exception {
-    MuleMessage message = flowRunner("testService1").withPayload("foo").run().getMessage();
+    MuleEvent event = flowRunner("testService1").withPayload("foo").run();
+    MuleMessage message = event.getMessage();
 
     assertNotNull(message);
-    assertNull(message.getExceptionPayload());
+    assertNull(event.getError());
     assertThat(getPayloadAsString(message), is("Foo Bar Car Jar"));
   }
 
   @Test
   public void testService2() throws Exception {
-    MuleMessage message = flowRunner("testService2").withPayload("foo").run().getMessage();
+    MuleEvent event = flowRunner("testService2").withPayload("foo").run();
+    MuleMessage message = event.getMessage();
     assertNotNull(message);
-    assertNull(message.getExceptionPayload());
+    assertNull(event.getError());
     assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
   }
 
   @Test
   public void testService3() throws Exception {
-    MuleMessage message = flowRunner("testService3").withPayload("foo").run().getMessage();
+    MuleEvent event = flowRunner("testService3").withPayload("foo").run();
+    MuleMessage message = event.getMessage();
     assertNotNull(message);
-    assertNull(message.getExceptionPayload());
+    assertNull(event.getError());
     assertThat(getPayloadAsString(message), is("foo received"));
   }
 

@@ -38,7 +38,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testAuthenticationFailureNoContext() throws Exception {
     org.mule.runtime.core.api.client.MuleClient client = muleContext.getClient();
-    MuleMessage m = client.send(getUrl(), getTestMuleMessage());
+    MuleMessage m = client.send(getUrl(), getTestMuleMessage()).getRight();
     assertNotNull(m);
     int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
     assertEquals(UNAUTHORIZED.getStatusCode(), status);
@@ -49,7 +49,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     MuleMessage message = createRequestMessage("anonX", "anonX");
-    MuleMessage response = client.send(getUrl(), message);
+    MuleMessage response = client.send(getUrl(), message).getRight();
     assertNotNull(response);
     int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
     assertEquals(UNAUTHORIZED.getStatusCode(), status);
@@ -60,7 +60,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     MuleMessage message = createRequestMessage("anon", "anon");
-    MuleMessage response = client.send(getUrl(), message);
+    MuleMessage response = client.send(getUrl(), message).getRight();
     assertNotNull(response);
     int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
     assertEquals(OK, status);

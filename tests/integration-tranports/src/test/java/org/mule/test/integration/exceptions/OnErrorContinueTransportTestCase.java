@@ -73,7 +73,7 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
-    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions);
+    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();

@@ -178,6 +178,6 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
 
   protected MuleMessage request(File file) throws MuleException, MalformedURLException {
     MuleClient muleClient = muleContext.getClient();
-    return muleClient.request(fileToUrl(file) + "?connector=moveDeleteConnector", 2000);
+    return muleClient.request(fileToUrl(file) + "?connector=moveDeleteConnector", 2000).getRight().get();
   }
 }

@@ -57,6 +57,8 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
         if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
           failed = false;
+        } else if (returnEvent.getMessage() == null) {
+          failed = true;
         } else {
           failed = returnEvent == null || failureExpressionFilter.accept(returnEvent);
         }

@@ -36,7 +36,7 @@ public class InOutOutInTestCase extends FunctionalTestCase {
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
-    MuleMessage result = client.send("inboundEndpoint", "some data", props);
+    MuleMessage result = client.send("inboundEndpoint", "some data", props).getRight();
     assertNotNull(result);
     assertEquals("bar header received", result.getPayload());
   }

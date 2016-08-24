@@ -10,6 +10,7 @@ import static java.time.OffsetTime.now;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessageContext;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -81,8 +83,10 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public void run() {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(new Exception()))
+        Exception exception = new Exception();
+        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
             .build());
+        event.setError(new ErrorBuilder(exception).build());
         setCurrentEvent(event);
         success.set(true);
       } catch (RuntimeException e) {
@@ -133,6 +137,10 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     }
 
     @Override
+    public Error getError() {
+      return null;
+    }
+
     public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
       return new byte[0];
     }
@@ -279,6 +287,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public void setSecurityContext(SecurityContext context) {
+
+    }
+
+    @Override
+    public void setError(Error error) {
 
     }
 

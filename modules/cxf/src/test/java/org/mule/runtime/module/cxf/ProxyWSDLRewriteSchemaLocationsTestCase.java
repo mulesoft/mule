@@ -70,7 +70,8 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
   public void testProxyWSDLRewriteAllSchemaLocations() throws Exception {
     String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
     MuleMessage response =
-        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
+        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
+            .getRight();
 
     Set<String> expectedParametersValues = new HashSet<String>();
     expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));

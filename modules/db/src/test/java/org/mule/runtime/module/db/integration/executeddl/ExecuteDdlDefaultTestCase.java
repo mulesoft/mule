@@ -48,7 +48,7 @@ public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase {
     flowRunner("executeDdlOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertTableCreation(response.getPayload());
   }

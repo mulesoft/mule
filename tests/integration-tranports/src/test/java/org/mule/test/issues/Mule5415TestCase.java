@@ -34,10 +34,9 @@ public class Mule5415TestCase extends FunctionalTestCase {
   @Test
   public void testFirstRequestDoesntFail() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message =
-        client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
-                    MuleMessage.builder().payload("message").mediaType(APPLICATION_X_WWW_FORM_URLENCODED).build(),
-                    newOptions().method(POST.name()).build());
-    assertThat(message.getExceptionPayload(), nullValue());
+    client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
+                MuleMessage.builder().payload("message").mediaType(APPLICATION_X_WWW_FORM_URLENCODED).build(),
+                newOptions().method(POST.name()).build())
+        .getRight();
   }
 }

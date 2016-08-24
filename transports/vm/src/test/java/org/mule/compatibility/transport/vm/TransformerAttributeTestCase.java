@@ -28,7 +28,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase {
   @Test
   public void testSimple() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null);
+    MuleMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null).getRight();
     assertNotNull(message);
     assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE) + " Received", getPayloadAsString(message));
   }
@@ -36,7 +36,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase {
   @Test
   public void testThrough() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null);
+    MuleMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null).getRight();
     assertNotNull(message);
     assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE) + " Received", getPayloadAsString(message));
   }

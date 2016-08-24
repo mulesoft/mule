@@ -6,9 +6,11 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
@@ -16,6 +18,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.message.ExceptionMessage;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class DLQExceptionHandlerTestCase extends FunctionalTestCase {
@@ -30,11 +33,11 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     client.dispatch("jms://request.queue", "testing 1 2 3", null);
 
-    MuleMessage message = client.request("jms://out.queue", 3000);
-    assertNull(message);
+    assertThat(client.request("jms://out.queue", 3000).getRight().isPresent(), is(false));
 
+    MuleMessage message = null;
     try {
-      message = client.request("jms://DLQ", 20000);
+      message = client.request("jms://DLQ", 20000).getRight().get();
     } catch (MuleException e) {
       e.printStackTrace(System.err);
     }

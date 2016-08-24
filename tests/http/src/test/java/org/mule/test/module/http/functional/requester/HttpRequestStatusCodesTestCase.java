@@ -66,8 +66,7 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase 
     MessagingException e =
         flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).runExpectingException();
 
-    MuleMessage response = e.getEvent().getMessage();
-    assertThat(response.getExceptionPayload().getException().getCause(), instanceOf(ResponseValidatorException.class));
+    assertThat(e.getEvent().getError().getException().getCause(), instanceOf(ResponseValidatorException.class));
   }
 
   @Override

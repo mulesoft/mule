@@ -60,7 +60,7 @@ public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase {
     final String payload = "payload";
     flowRunner("dispatch").withPayload(payload).run();
 
-    MuleMessage response = muleContext.getClient().request("vm://in", 5000);
+    MuleMessage response = muleContext.getClient().request("vm://in", 5000).getRight().get();
     assertThat(response, is(notNullValue()));
     assertThat(getPayloadAsString(response), is(payload));
 

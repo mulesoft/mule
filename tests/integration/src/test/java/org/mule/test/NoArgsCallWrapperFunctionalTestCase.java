@@ -31,9 +31,8 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
   public void testNoArgsCallWrapper() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
-    MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
-    assertNull(reply.getExceptionPayload());
     assertThat(reply.getPayload(), is("Just an apple."));
   }
 
@@ -41,9 +40,8 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
   public void testWithInjectedDelegate() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("WrapperUMOInjected").withPayload("test").asynchronously().run();
-    MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT);
+    MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
-    assertNull(reply.getExceptionPayload());
     // same as original input
     assertThat(reply.getPayload(), is("test"));
   }

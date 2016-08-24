@@ -37,7 +37,7 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
     MuleClient client = muleContext.getClient();
     final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
 
-    MuleMessage response = client.send(url, TEST_MESSAGE, null);
+    MuleMessage response = client.send(url, TEST_MESSAGE, null).getRight();
 
     assertNoContentTypeProperty(response);
     assertThat(getPayloadAsString(response), equalTo("invalidMimeType"));

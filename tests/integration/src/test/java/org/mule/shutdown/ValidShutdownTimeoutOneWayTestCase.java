@@ -57,7 +57,7 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
         try {
           flowRunner(flowName).withPayload(payload).asynchronously().run();
 
-          MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);
+          MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT).getRight().get();
           results[0] = payload.equals(getPayloadAsString(response));
         } catch (Exception e) {
           // Ignore

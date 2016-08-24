@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.api;
 
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Map;
+
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -18,10 +23,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleEventBuilder;
-
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * Legacy implementation of {@link MuleEvent}
@@ -269,6 +270,13 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param context the context for this session or null if the request is not secure.
    */
   void setSecurityContext(SecurityContext context);
+
+  /**
+   * Sets an error related to this event.
+   *
+   * @param error the error associated with this event
+   */
+  void setError(Error error);
 
   /**
    * Create new {@link Builder}.

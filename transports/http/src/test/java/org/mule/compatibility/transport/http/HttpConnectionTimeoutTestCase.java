@@ -35,7 +35,7 @@ public class HttpConnectionTimeoutTestCase extends FunctionalTestCase {
 
     MuleMessage message = null;
     try {
-      message = result.getMessage(1000);
+      message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {
       fail("Connection timeout not honored.");
     }

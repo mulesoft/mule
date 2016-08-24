@@ -94,17 +94,15 @@ public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase {
     }));
   }
 
-  private void assertNoAliens(MuleMessage response) throws SQLException {
-    assertThat(response.getExceptionPayload(), is(notNullValue()));
+  private void assertNoAliens(MuleEvent event) throws SQLException {
+    assertThat(event.getError(), is(notNullValue()));
 
     List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
     assertRecords(result);
   }
 
-  private void assertAlienWasInserted(MuleMessage response) throws SQLException {
-    assertThat(response.getExceptionPayload(), is(nullValue()));
-
-    assertThat((Integer) response.getPayload(), is(equalTo(1)));
+  private void assertAlienWasInserted(MuleEvent event) throws SQLException {
+    assertThat(event.getMessage().getPayload(), is(equalTo(1)));
 
     List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", Alien.ET.getName())));
@@ -115,7 +113,7 @@ public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase {
     Object build(Connection connection) throws Exception;
   }
 
-  private MuleMessage doTest(XmlContentBuilder builder) throws Exception {
+  private MuleEvent doTest(XmlContentBuilder builder) throws Exception {
     DataSource defaultDataSource = getDefaultDataSource();
     Connection connection = defaultDataSource.getConnection();
 
@@ -125,7 +123,7 @@ public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase {
       final MuleEvent responseEvent =
           flowRunner("insertXmlType").withPayload(TEST_MESSAGE).withInboundProperty("name", Alien.ET.getName()).run();
 
-      return responseEvent.getMessage();
+      return responseEvent;
     } finally {
       if (connection != null) {
         connection.close();

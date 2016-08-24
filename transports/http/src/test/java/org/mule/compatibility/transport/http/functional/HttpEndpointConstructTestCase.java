@@ -29,7 +29,7 @@ public class HttpEndpointConstructTestCase extends FunctionalTestCase {
   @Test
   public void testHttpEndpointConstruct() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null);
+    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE, getPayloadAsString(response));
   }
 }

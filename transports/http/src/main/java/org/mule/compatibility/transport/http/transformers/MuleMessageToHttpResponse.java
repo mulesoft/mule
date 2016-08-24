@@ -18,6 +18,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -94,7 +95,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
         response = (HttpResponse) src;
       } else {
         response =
-            createResponse(src, outputEncoding, event.getMessage(), event.getCorrelationId(), event.getCorrelation());
+            createResponse(src, outputEncoding, event.getMessage(), event.getError(), event.getCorrelationId(),
+                           event.getCorrelation());
       }
 
       // Ensure there's a content type header
@@ -154,7 +156,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
   }
 
-  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg, String correlationId,
+  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg, Error error, String correlationId,
                                         Correlation correlation)
       throws IOException, TransformerException {
     HttpResponse response = new HttpResponse();
@@ -164,7 +166,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
     if (tmp != null) {
       status = Integer.valueOf(tmp.toString());
-    } else if (msg.getExceptionPayload() != null) {
+    } else if (error != null) {
       status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
     }
 

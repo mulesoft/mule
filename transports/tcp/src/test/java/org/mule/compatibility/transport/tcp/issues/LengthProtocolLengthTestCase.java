@@ -53,12 +53,12 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     if (ok) {
-      MuleMessage response = client.send(endpoint, message, null);
+      MuleMessage response = client.send(endpoint, message, null).getRight();
       assertNotNull(response);
       assertNotNull(response.getPayload());
       assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
     } else {
-      assertResponseBad(client.send(endpoint, message, null));
+      assertResponseBad(client.send(endpoint, message, null).getRight());
     }
   }
 

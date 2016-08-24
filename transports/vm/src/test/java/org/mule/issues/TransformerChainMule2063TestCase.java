@@ -31,7 +31,7 @@ public class TransformerChainMule2063TestCase extends FunctionalTestCase {
   protected void doTest(String name, String result) throws Exception {
     MuleClient client = muleContext.getClient();
     client.send("vm://" + name + "-in", IN, null);
-    MuleMessage message = client.request("vm://" + name + "-out", WAIT_MS);
+    MuleMessage message = client.request("vm://" + name + "-out", WAIT_MS).getRight().get();
 
     assertNotNull(message);
     assertNotNull(getPayloadAsString(message));

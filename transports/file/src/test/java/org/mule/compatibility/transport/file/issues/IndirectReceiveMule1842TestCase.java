@@ -45,7 +45,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
 
     // then read from the queue that the polling receiver will write to
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("receive", 3000);
+    MuleMessage message = client.request("receive", 3000).getRight().get();
     checkReceivedMessage(message);
   }
 }

@@ -6,9 +6,11 @@
  */
 package org.mule.compatibility.transport.jms.integration;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -48,6 +50,7 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.hamcrest.core.Is;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -422,19 +425,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
   }
 
   protected MuleMessage receiveMessage(Object expected) throws Exception {
-    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
+    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
-    assertNull(result.getExceptionPayload());
     assertEquals(expected, result.getPayload());
     return result;
   }
 
   protected MuleMessage receiveMessage(byte[] expected) throws Exception {
-    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
+    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
-    assertNull(result.getExceptionPayload());
     byte[] bytes = getPayloadAsBytes(result);
     assertEquals("Wrong number of bytes", expected.length, bytes.length);
     for (int i = 0; i < expected.length; ++i) {
@@ -446,8 +447,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
   public void runAsynchronousDispatching() throws Exception {
     dispatchMessage();
     receiveMessage();
-    MuleMessage result = client.request(getOutboundEndpoint(), getSmallTimeout());
-    assertNull(result);
+    assertThat(client.request(getOutboundEndpoint(), getSmallTimeout()).getRight().isPresent(), is(false));
   }
 
   @Override

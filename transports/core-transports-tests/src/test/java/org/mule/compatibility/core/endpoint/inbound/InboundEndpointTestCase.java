@@ -45,6 +45,7 @@ import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
@@ -232,9 +233,11 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     endpoint.setFlowConstruct(getTestFlow());
     requestEvent = createTestRequestEvent(endpoint);
     responseEvent = createTestResponseEvent(endpoint);
+    RuntimeException exception = new RuntimeException();
     responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
-        .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
+        .exceptionPayload(new DefaultExceptionPayload(exception))
         .build());
+    responseEvent.setError(new ErrorBuilder(exception).build());
 
     MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(endpoint.getFlowConstruct());
     result = mpChain.process(requestEvent);

@@ -41,7 +41,7 @@ public class CustomByteProtocolTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < messages; i++) {
-      MuleMessage msg = client.request("vm://out", 30000);
+      MuleMessage msg = client.request("vm://out", 30000).getRight().get();
       assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
       NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload();
       assertEquals("Hello", received.s);

@@ -47,7 +47,8 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
     MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()),
-                                      MuleMessage.builder().payload("request").build(), httpRequestOptions);
+                                      MuleMessage.builder().payload("request").build(), httpRequestOptions)
+        .getRight();
     assertNotNull(message);
     assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
   }

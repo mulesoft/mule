@@ -47,7 +47,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
 
     MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
 
-    HttpResponse response = transformer.createResponse(null, UTF_8, msg, null, null);
+    HttpResponse response = transformer.createResponse(null, UTF_8, msg, null, null, null);
     Header[] headers = response.getHeaders();
     int cookiesSet = 0;
     for (Header header : headers) {
@@ -63,7 +63,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
     MuleMessage msg = createMockMessage();
 
     MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
-    HttpResponse response = transformer.createResponse(null, UTF_8, msg, null, null);
+    HttpResponse response = transformer.createResponse(null, UTF_8, msg, null, null, null);
     Header[] headers = response.getHeaders();
 
     boolean hasDateHeader = false;

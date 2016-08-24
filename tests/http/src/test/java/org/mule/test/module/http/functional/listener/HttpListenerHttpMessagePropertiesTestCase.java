@@ -72,7 +72,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void get() throws Exception {
     final String url = String.format("http://localhost:%s", listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getRequestUri(), is(BASE_PATH));
     assertThat(attributes.getRequestPath(), is(BASE_PATH));
@@ -95,7 +95,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String uri = "/?" + buildQueryString(queryParams);
     final String url = String.format("http://localhost:%s" + uri, listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getRequestUri(), is(uri));
     assertThat(attributes.getRequestPath(), is(BASE_PATH));
@@ -113,7 +113,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
         .put(QUERY_PARAM_NAME, Arrays.asList(QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE)).build();
     final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     ParameterMap retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
@@ -130,7 +130,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
         ImmutableMap.<String, Object>builder().put(QUERY_PARAM_NAME, QUERY_PARAM_VALUE_WITH_SPACES).build();
     final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     ParameterMap retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
@@ -144,7 +144,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
         ImmutableMap.<String, Object>builder().put(QUERY_PARAM_NAME, Arrays.asList(QUERY_PARAM_VALUE, QUERY_PARAM_VALUE)).build();
     final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
     Request.Put(url).version(HttpVersion.HTTP_1_0).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getMethod(), is("PUT"));
     assertThat(attributes.getVersion(), is(HttpProtocol.HTTP_1_0.asString()));
@@ -154,7 +154,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void getFullUriAndPath() throws Exception {
     final String url = String.format("http://localhost:%s%s", listenPort.getNumber(), CONTEXT_PATH);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getRequestUri(), is(CONTEXT_PATH));
     assertThat(attributes.getRequestPath(), is(CONTEXT_PATH));
@@ -166,7 +166,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String url = String.format("http://localhost:%s/%s/%s/%s", listenPort.getNumber(), FIRST_URI_PARAM,
                                      SECOND_URI_PARAM_VALUE, THIRD_URI_PARAM_VALUE);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     ParameterMap uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(3));
@@ -179,7 +179,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void getUriParamInTheMiddle() throws Exception {
     final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), FIRST_URI_PARAM);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     ParameterMap uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(1));
@@ -193,7 +193,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String url =
         String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     ParameterMap uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(1));
@@ -205,13 +205,13 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
 
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getRemoteAddress(), startsWith("/127.0.0.1:"));
     assertThat(attributes.getHeaders().get(X_FORWARDED_FOR), nullValue());
 
     Post(url).addHeader(X_FORWARDED_FOR, "clientIp, proxy1Ip").connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage forwardedMessage = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage forwardedMessage = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes forwardedAttributes = getAttributes(forwardedMessage);
     assertThat(forwardedAttributes.getRemoteAddress(), startsWith("/127.0.0.1:"));
     assertThat(forwardedAttributes.getHeaders().get(X_FORWARDED_FOR.toLowerCase()), is("clientIp, proxy1Ip"));
@@ -221,7 +221,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void getBasePath() throws Exception {
     final String url = String.format("http://localhost:%s%s", listenBasePort.getNumber(), API_CONTEXT_PATH);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getListenerPath(), is("/api/*"));
     assertThat(attributes.getRequestPath(), is(API_CONTEXT_PATH));

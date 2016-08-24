@@ -25,7 +25,7 @@ public class TransactionWithRecipientListTestCase extends FunctionalTestCase {
   public void testRecipientListRouterUseDefinedTransaction() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("vm://input", "test", null);
+    MuleMessage response = client.send("vm://input", "test", null).getRight();
     assertEquals("test Received", getPayloadAsString(response));
   }
 }

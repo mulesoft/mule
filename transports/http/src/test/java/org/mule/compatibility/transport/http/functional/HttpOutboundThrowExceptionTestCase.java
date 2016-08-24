@@ -49,7 +49,8 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     MuleClient client = muleContext.getClient();
     MuleMessage result =
         client.send("errorPropagationEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
+                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+            .getRight();
     assertThat((String) result.getInboundProperty("http.status"), is("400"));
   }
 
@@ -58,7 +59,8 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     MuleClient client = muleContext.getClient();
     MuleMessage result =
         client.send("exceptionOnErrorStatusEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
+                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+            .getRight();
     assertThat((String) result.getInboundProperty("http.status"), is("500"));
   }
 

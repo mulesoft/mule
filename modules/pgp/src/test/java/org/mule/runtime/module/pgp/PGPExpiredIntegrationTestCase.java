@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.pgp;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.util.ExceptionUtils;
 
 import org.junit.Test;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
@@ -36,8 +37,7 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
     flowRunner("pgpEncryptProcessor").withPayload(payload).asynchronously().run();
 
-    MuleMessage message = client.request("test://out", 5000);
-    assertNull(message);
+    assertThat(client.request("test://out", 5000).getRight().isPresent(), is(false));
 
     assertNotNull("flow's exception strategy should have caught an exception", exceptionFromFlow);
     InvalidPublicKeyException ipke = ExceptionUtils.getDeepestOccurenceOfType(exceptionFromFlow, InvalidPublicKeyException.class);
@@ -49,8 +49,8 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      ExceptionPayload exceptionPayload = event.getMessage().getExceptionPayload();
-      exceptionFromFlow = exceptionPayload.getException();
+      Error error = event.getError();
+      exceptionFromFlow = error.getException();
 
       return null;
     }

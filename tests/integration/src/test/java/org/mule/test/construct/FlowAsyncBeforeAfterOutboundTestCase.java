@@ -33,8 +33,8 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
 
     MuleMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
 
-    MuleMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT);
-    MuleMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT);
+    MuleMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT).getRight().get();
+    MuleMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
 
@@ -46,8 +46,8 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
 
     MuleMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
 
-    MuleMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT);
-    MuleMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT);
+    MuleMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT).getRight().get();
+    MuleMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
   }

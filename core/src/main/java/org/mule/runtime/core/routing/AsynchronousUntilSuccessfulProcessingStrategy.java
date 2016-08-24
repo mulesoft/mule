@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
@@ -205,6 +206,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     try {
       mutableEvent.setMessage(MuleMessage.builder(mutableEvent.getMessage())
           .exceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException))).build());
+      mutableEvent.setError(new ErrorBuilder(buildRetryPolicyExhaustedException(lastException)).build());
 
       getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
     } catch (MessagingException e) {

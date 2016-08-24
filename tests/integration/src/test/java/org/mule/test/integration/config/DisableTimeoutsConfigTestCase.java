@@ -8,6 +8,7 @@ package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -35,9 +36,10 @@ public class DisableTimeoutsConfigTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void httpOutboundEndpointResponseTimeout() throws Exception {
-    MuleMessage result = flowRunner("HttpTimeout").withPayload("hi").run().getMessage();
+    MuleEvent event = flowRunner("HttpTimeout").withPayload("hi").run();
+    MuleMessage result = event.getMessage();
     assertNotNull(result);
-    assertNull(result.getExceptionPayload());
+    assertNull(event.getError());
   }
 
 }

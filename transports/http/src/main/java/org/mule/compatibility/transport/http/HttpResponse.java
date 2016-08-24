@@ -305,7 +305,7 @@ public class HttpResponse {
   // MultiPartOutputStream partStream = new MultiPartOutputStream(out, event.getEncoding());
   // try
   // {
-  // MuleMessage msg = event.getMessage();
+  // MuleMessage msg = event.getResult();
   // if (!(msg.getPayload() instanceof NullPayload))
   // {
   // String contentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, MimeTypes.BINARY);
@@ -320,9 +320,9 @@ public class HttpResponse {
   // }
   // }
   // //Write attachments
-  // for (String name : event.getMessage().getOutboundAttachmentNames())
+  // for (String name : event.getResult().getOutboundAttachmentNames())
   // {
-  // DataHandler dh = event.getMessage().getOutboundAttachment(name);
+  // DataHandler dh = event.getResult().getOutboundAttachment(name);
   // partStream.startPart(dh.getContentType());
   // partStream.getOut().write(IOUtils.toByteArray(dh.getInputStream()));
   // }

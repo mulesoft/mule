@@ -30,7 +30,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testInlineScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("inlineScript").withPayload("hello").asynchronously().run();
-    MuleMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload());
   }
@@ -39,7 +39,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testFileBasedScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("fileBasedScript").withPayload("hello").asynchronously().run();
-    MuleMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload());
   }
@@ -48,7 +48,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testReferencedTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("referencedTransformer").withPayload("hello").asynchronously().run();
-    MuleMessage response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload());
   }
@@ -57,7 +57,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testReferencedTransformerWithParameters() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("referencedTransformerWithParameters").withPayload("hello").asynchronously().run();
-    MuleMessage response = client.request("test://referencedTransformerWithParametersTestOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://referencedTransformerWithParametersTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload());
   }

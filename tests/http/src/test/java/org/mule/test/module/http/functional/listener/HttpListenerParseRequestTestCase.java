@@ -57,7 +57,7 @@ public class HttpListenerParseRequestTestCase extends AbstractHttpTestCase {
   }
 
   private void assertMessageContains(Class type) throws Exception {
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getPayload(), instanceOf(type));
   }
 

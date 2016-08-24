@@ -27,7 +27,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     client.dispatch("dispatch",
                     MuleMessage.builder().payload("Message").addOutboundProperty(MULE_REPLY_TO_PROPERTY, "receive").build());
-    MuleMessage response = client.request("receive", 3000L);
+    MuleMessage response = client.request("receive", 3000L).getRight().get();
     assertNotNull("Response is null", response);
     assertEquals("Message Received", response.getPayload());
   }

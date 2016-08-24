@@ -42,15 +42,15 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationT
 
     MuleClient client = muleContext.getClient();
     // We have to wait a lot longer here since groovy takes an age to compile the first time
-    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add(result.getPayload());
 
-    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add(result.getPayload());
 
-    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add(result.getPayload());
 

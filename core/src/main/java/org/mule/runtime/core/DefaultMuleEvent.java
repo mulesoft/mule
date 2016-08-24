@@ -12,6 +12,15 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 import static org.mule.runtime.core.message.Correlation.NO_CORRELATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Set;
+
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
@@ -101,6 +110,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
   protected boolean nonBlocking;
   private String legacyCorrelationId;
+  private Error error;
 
   // Constructors
 
@@ -410,6 +420,14 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return message;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Error getError() {
+    return error;
+  }
+
   @Override
   public byte[] getMessageAsBytes(MuleContext muleContext) throws DefaultMuleException {
     try {
@@ -641,6 +659,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public static MuleEvent copy(MuleEvent event) {
     DefaultMuleEvent eventCopy = new DefaultMuleEvent(event.getMessage(), event, new DefaultMuleSession(event.getSession()));
     eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
+    eventCopy.error = event.getError();
     return eventCopy;
   }
 
@@ -816,4 +835,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return value;
   }
 
+  public void setError(Error error) {
+    this.error = error;
+  }
 }

@@ -24,7 +24,8 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
     MuleClient client = muleContext.getClient();
     long now = System.currentTimeMillis();
     MuleMessage result =
-        client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(), "request", null);
+        client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(), "request", null)
+            .getRight();
     assertNotNull(result);
     assertNotNull(result.getPayload());
     assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);

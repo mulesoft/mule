@@ -69,7 +69,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     request.setRequestEntity(entity);
     httpClient.executeMethod(request);
 
-    MuleMessage message = muleClient.request("vm://out", 1000);
+    MuleMessage message = muleClient.request("vm://out", 1000).getRight().get();
     assertNotNull(message);
     assertEquals(MESSAGE, getPayloadAsString(message));
   }
@@ -87,7 +87,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     request.setRequestEntity(entity);
 
     httpClient.executeMethod(request);
-    MuleMessage message = muleClient.request("vm://out", 1000);
+    MuleMessage message = muleClient.request("vm://out", 1000).getRight().get();
     assertNotNull(message);
     assertEquals(MESSAGE, getPayloadAsString(message));
   }

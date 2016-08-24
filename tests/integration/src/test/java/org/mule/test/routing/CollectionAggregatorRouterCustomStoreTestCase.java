@@ -37,7 +37,7 @@ public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractInteg
 
     flowRunner("splitter").withPayload(list).run();
 
-    MuleMessage request = client.request("test://out", 10000);
+    MuleMessage request = client.request("test://out", 10000).getRight().get();
     assertNotNull(request);
     assertEquals(list.size(), ((List) request.getPayload()).size());
 

@@ -6,7 +6,9 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -17,6 +19,7 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 /**
@@ -38,7 +41,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase {
     client.dispatch("InputQueueClient", "payload", null);
 
     // There should be a message on ExceptionQueue
-    assertNotNull(client.request("ExceptionQueue", 10000));
+    assertThat(client.request("ExceptionQueue", 10000).getRight().isPresent(), is(true));
 
     if (failure != null) {
       fail(failure);

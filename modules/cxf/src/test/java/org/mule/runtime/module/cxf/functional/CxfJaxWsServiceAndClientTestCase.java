@@ -45,7 +45,7 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
     String url = "http://localhost:" + port.getNumber() + "/hello";
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
+    MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS).getRight();
 
     assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
   }

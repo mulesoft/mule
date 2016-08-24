@@ -341,7 +341,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected void assertEqualMessages(MuleMessage expect, MuleMessage actual) {
     assertThat(actual.getPayload(), equalTo(expect.getPayload()));
     assertEquals(expect.getDataType(), actual.getDataType());
-    assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
   }
 
   protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,

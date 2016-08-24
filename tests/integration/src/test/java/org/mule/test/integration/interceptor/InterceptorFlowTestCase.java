@@ -20,7 +20,7 @@ public class InterceptorFlowTestCase extends AbstractIntegrationTestCase {
   public void testDefaultJavaComponentShortcut() throws Exception {
     flowRunner("interceptorFlow").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("test://out", 3000);
+    MuleMessage message = client.request("test://out", 3000).getRight().get();
     assertNotNull(message);
     String payload = (String) message.getPayload();
     assertNotNull(payload);

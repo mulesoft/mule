@@ -51,11 +51,11 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     Map<String, Serializable> props = new HashMap<>();
-    MuleMessage result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
+    MuleMessage result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props).getRight();
     assertEquals(TEST_TCP_MESSAGE + " Received", getPayloadAsString(result));
 
     // try an extra message in case it's a problem on repeat
-    result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
+    result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props).getRight();
     assertEquals(TEST_TCP_MESSAGE + " Received", getPayloadAsString(result));
   }
 

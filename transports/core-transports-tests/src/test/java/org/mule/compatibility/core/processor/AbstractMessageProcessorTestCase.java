@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -278,6 +279,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event) {
       sensedException = exception;
+      event.setError(new ErrorBuilder(exception).build());
       event.setMessage(MuleMessage.builder(event.getMessage()).nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception)).build());
       return event;

@@ -58,8 +58,8 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
 
     MuleEvent resultEvent = mp.process(event);
     assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+    assertNotNull("exception expected", resultEvent.getError());
+    assertTrue(resultEvent.getError().getException() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload());
     assertNotNull(exceptionListener.sensedException);
@@ -75,8 +75,8 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
 
     MuleEvent resultEvent = mp.process(event);
     assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+    assertNotNull("exception expected", resultEvent.getError());
+    assertTrue(resultEvent.getError().getException() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload());
     assertNotNull(exceptionListener.sensedException);
@@ -92,8 +92,8 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
 
     MuleEvent resultEvent = mp.process(event);
     assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+    assertNotNull("exception expected", resultEvent.getError());
+    assertTrue(resultEvent.getError().getException() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload());
     assertNotNull(exceptionListener.sensedException);
@@ -109,8 +109,8 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
 
     MuleEvent resultEvent = mp.process(event);
     assertNotNull(resultEvent);
-    assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-    assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
+    assertNotNull("exception expected", resultEvent.getError());
+    assertTrue(resultEvent.getError().getException() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload());
     assertNotNull(exceptionListener.sensedException);

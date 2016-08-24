@@ -41,7 +41,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
+    MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 
@@ -50,7 +50,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
   public void testSendMany() throws Exception {
     MuleClient client = muleContext.getClient();
     for (int i = 0; i < NUM_MESSAGES; ++i) {
-      MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
+      MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null).getRight();
       assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 

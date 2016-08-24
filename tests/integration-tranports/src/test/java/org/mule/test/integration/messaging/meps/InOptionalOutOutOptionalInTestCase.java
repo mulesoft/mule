@@ -36,7 +36,7 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null);
+    MuleMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
     assertThat(result.getPayload(), is(nullValue()));
     // TODO Even though the component returns a null the remoteSync is honoured.
@@ -45,7 +45,7 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase {
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
-    result = client.send("inboundEndpoint", "some data", props);
+    result = client.send("inboundEndpoint", "some data", props).getRight();
     assertNotNull(result);
     assertEquals("bar header received", result.getPayload());
     assertEquals("Received", result.getInboundProperty("externalApp"));

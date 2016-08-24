@@ -38,13 +38,13 @@ public class InOutTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     String listenerUrl = format("http://localhost:%s/", httpPort.getNumber());
-    MuleMessage result = client.send(listenerUrl, "some data", null);
+    MuleMessage result = client.send(listenerUrl, "some data", null).getRight();
     assertNotNull(result);
     assertEquals("foo header not received", getPayloadAsString(result));
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
-    result = client.send(listenerUrl, "some data", props);
+    result = client.send(listenerUrl, "some data", props).getRight();
     assertNotNull(result);
     assertEquals("foo header received", getPayloadAsString(result));
   }

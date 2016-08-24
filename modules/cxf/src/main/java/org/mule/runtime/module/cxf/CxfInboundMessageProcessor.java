@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
@@ -253,6 +254,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
               ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
               responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload(exceptionPayload)
                   .addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
+              responseEvent.setError(new ErrorBuilder(e).build());
               processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
           }
@@ -429,6 +431,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       if (ex != null) {
         builder.exceptionPayload(new DefaultExceptionPayload(ex));
         builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
+        responseEvent.setError(new ErrorBuilder(ex).build());
       }
     }
     responseEvent.setMessage(builder.build());

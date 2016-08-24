@@ -42,7 +42,7 @@ public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCa
     client.dispatch("vm://in", MuleMessage.builder().payload("HelloWorld!")
         .addOutboundProperty("custom-header", "value-custom-header").build());
 
-    MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     Map<String, Object> headers = (Map<String, Object>) reply.getPayload();
 
     for (String header : HttpConstants.REQUEST_HEADER_NAMES.values()) {

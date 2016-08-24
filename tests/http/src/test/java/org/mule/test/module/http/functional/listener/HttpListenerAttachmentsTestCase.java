@@ -135,7 +135,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void respondWithSeveralAttachments() throws Exception {
-    MuleMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage());
+    MuleMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
     assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
     assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
 
@@ -190,7 +190,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
       httpPost.setEntity(multipart);
       final CloseableHttpResponse response = httpClient.execute(httpPost);
       try {
-        final MuleMessage receivedMessage = muleContext.getClient().request("test://out", 1000);
+        final MuleMessage receivedMessage = muleContext.getClient().request("test://out", 1000).getRight().get();
         assertThat(receivedMessage.getPayload(), instanceOf(MultiPartPayload.class));
         MultiPartPayload receivedParts = ((MultiPartPayload) receivedMessage.getPayload());
         assertThat(receivedParts.getParts().size(), is(2));

@@ -68,7 +68,7 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     assertQueueIsEmpty("test://component.out");
 
-    MuleMessage message = client.request("test://error.queue", 2000);
+    MuleMessage message = client.request("test://error.queue", 2000).getRight().get();
     assertNotNull(message);
     Object payload = message.getPayload();
     assertTrue(payload instanceof ExceptionMessage);
@@ -103,7 +103,6 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
   }
 
   private void assertQueueIsEmpty(String queueName) throws MuleException {
-    MuleMessage message = client.request(queueName, 2000);
-    assertNull(message);
+    assertThat(client.request(queueName, 2000).getRight().isPresent(), is(false));
   }
 }

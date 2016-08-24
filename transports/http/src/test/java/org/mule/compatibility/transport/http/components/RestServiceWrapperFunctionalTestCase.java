@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.http.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -44,7 +45,8 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testErrorExpressionOnRegexFilterFail() throws Exception {
-    MuleMessage result = muleContext.getClient().send("restServiceEndpoint", MuleMessage.builder().payload(TEST_REQUEST).build());
+    MuleMessage result =
+        muleContext.getClient().send("restServiceEndpoint", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertNotNull(result);
     assertNotNull(result.getExceptionPayload());
     assertEquals(RestServiceException.class, result.getExceptionPayload().getException().getClass());
@@ -53,7 +55,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testErrorExpressionOnRegexFilterPass() throws Exception {
     MuleMessage result =
-        muleContext.getClient().send("restServiceEndpoint2", MuleMessage.builder().payload(TEST_REQUEST).build());
+        muleContext.getClient().send("restServiceEndpoint2", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertEquals("echo=" + TEST_REQUEST, getPayloadAsString(result));
   }
 
@@ -64,20 +66,23 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
     props.put("bar-optional-header", "bar");
 
     MuleMessage result = muleContext.getClient().send("restServiceEndpoint3",
-                                                      MuleMessage.builder().nullPayload().outboundProperties(props).build());
+                                                      MuleMessage.builder().nullPayload().outboundProperties(props).build())
+        .getRight();
     assertEquals("foo=boo&faz=baz&far=bar", getPayloadAsString(result));
   }
 
   @Test
   public void testOptionalParametersMissing() throws Exception {
     MuleMessage result = muleContext.getClient()
-        .send("restServiceEndpoint3", MuleMessage.builder().nullPayload().addOutboundProperty("baz-header", "baz").build());
+        .send("restServiceEndpoint3", MuleMessage.builder().nullPayload().addOutboundProperty("baz-header", "baz").build())
+        .getRight();
     assertEquals("foo=boo&faz=baz", getPayloadAsString(result));
   }
 
   @Test
   public void testRequiredParametersMissing() throws Exception {
-    MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().build());
+    MuleMessage result =
+        muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().build()).getRight();
     assertNotNull(result);
     assertNotNull(result.getExceptionPayload());
     assertEquals(ComponentException.class, result.getExceptionPayload().getException().getClass());
@@ -85,14 +90,16 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testRestServiceComponentInFlow() throws Exception {
-    MuleMessage result = muleContext.getClient().send("vm://toFlow", MuleMessage.builder().payload(TEST_REQUEST).build());
+    MuleMessage result =
+        muleContext.getClient().send("vm://toFlow", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertNotNull(result);
     assertEquals("echo=Test Http Request", getPayloadAsString(result));
   }
 
   @Test
   public void restServiceComponentShouldPreserveContentTypeOnIncomingMessage() throws Exception {
-    MuleMessage result = muleContext.getClient().send("vm://restservice4", MuleMessage.builder().payload(TEST_REQUEST).build());
+    MuleMessage result =
+        muleContext.getClient().send("vm://restservice4", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertNotNull(result);
     assertEquals("foo/bar", MediaType.parse(getPayloadAsString(result)).withoutParameters().toRfcString());
   }

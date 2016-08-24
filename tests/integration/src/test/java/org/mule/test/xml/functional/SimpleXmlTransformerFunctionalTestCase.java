@@ -49,7 +49,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationT
   }
 
   protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException {
-    MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
+    MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
     assertNotNull(message.getPayload());
     assertThat(message.getDataType().getType().getName(), message.getPayload(), instanceOf(clazz));

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.listener.ExceptionListener;
@@ -38,11 +39,10 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
   @Test
   public void soapFaultThrowsException() throws Exception {
     MessagingException e = flowRunner("soapFaultWithoutCatchExceptionStrategy").withPayload(FAIL_REQUEST).runExpectingException();
-    MuleMessage response = e.getEvent().getMessage();
 
-    assertNotNull(response.getExceptionPayload());
+    assertNotNull(e.getEvent().getError());
 
-    SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException();
+    SoapFaultException soapFault = (SoapFaultException) e.getEvent().getError().getException();
     assertThat(soapFault.getMessage(), startsWith("Hello"));
     assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
   }
@@ -50,16 +50,16 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
   @Test
   public void catchExceptionStrategyHandlesSoapFault() throws Exception {
     ExceptionListener listener = new ExceptionListener(muleContext);
-    MuleMessage response = flowRunner("soapFaultWithCatchExceptionStrategy").withPayload(FAIL_REQUEST).run().getMessage();
+    MuleEvent event = flowRunner("soapFaultWithCatchExceptionStrategy").withPayload(FAIL_REQUEST).run();
 
     // Assert that the exception was thrown
     listener.waitUntilAllNotificationsAreReceived();
 
-    assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(response));
+    assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(event.getMessage()));
 
-    assertNull(response.getExceptionPayload());
+    assertNull(event.getError());
 
-    SoapFaultException soapFault = response.getOutboundProperty("soapFaultException");
+    SoapFaultException soapFault = ((MuleMessage) event.getMessage()).getOutboundProperty("soapFaultException");
     assertThat(soapFault.getMessage(), startsWith("Hello"));
     assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
   }

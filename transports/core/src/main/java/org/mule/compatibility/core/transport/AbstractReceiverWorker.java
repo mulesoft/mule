@@ -125,7 +125,7 @@ public abstract class AbstractReceiverWorker implements Work {
             }
           });
         } catch (MessagingException e) {
-          if (e.getEvent().getMessage().getExceptionPayload() != null) {
+          if (e.getEvent().getError() != null) {
             throw e;
           }
           resultEvent = e.getEvent();

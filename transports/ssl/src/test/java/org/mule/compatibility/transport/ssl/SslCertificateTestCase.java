@@ -53,7 +53,7 @@ public class SslCertificateTestCase extends FunctionalTestCase {
     for (int i = 0; i < n; ++i) {
       callback.clear();
       String msg = TEST_MESSAGE + n;
-      MuleMessage result = client.send("in", msg, null);
+      MuleMessage result = client.send("in", msg, null).getRight();
       assertTrue(callback.isCalled());
       assertNotNull("Null certificates", callback.getCertificates());
       assertEquals(msg + " Received", getPayloadAsString(result));

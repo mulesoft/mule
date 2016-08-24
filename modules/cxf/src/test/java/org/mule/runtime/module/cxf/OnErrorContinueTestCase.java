@@ -63,7 +63,8 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
     MuleClient client = muleContext.getClient();
     MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException",
-                                       request, HTTP_REQUEST_OPTIONS);
+                                       request, HTTP_REQUEST_OPTIONS)
+        .getRight();
     assertNotNull(response);
     assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
     assertTrue(getPayloadAsString(response).contains("Anonymous"));
@@ -75,7 +76,8 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage response =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request,
-                    HTTP_REQUEST_OPTIONS);
+                    HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(response);
     assertEquals(String.valueOf(HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode()),
                  response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
@@ -87,7 +89,8 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
     MuleClient client = muleContext.getClient();
     MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException",
-                                       request, HTTP_REQUEST_OPTIONS);
+                                       request, HTTP_REQUEST_OPTIONS)
+        .getRight();
     assertNotNull(response);
     assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
     assertTrue(getPayloadAsString(response).contains("APPEND"));
@@ -95,17 +98,18 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientWithSOAPFaultCatchException() throws Exception {
-    MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run().getMessage();
-    assertNotNull(response);
-    assertThat(response.getExceptionPayload(), is(nullValue()));
+    MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run();
+    assertNotNull(event);
+    assertThat(event.getError(), is(nullValue()));
   }
 
   @Test
   public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception {
-    MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run().getMessage();
-    assertNotNull(response);
-    assertTrue(getPayloadAsString(response).contains("TEST"));
-    assertThat(response.getExceptionPayload(), is(nullValue()));
+    MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run();
+    assertNotNull(event);
+    assertNotNull(event.getMessage());
+    assertTrue(getPayloadAsString(event.getMessage()).contains("TEST"));
+    assertThat(event.getError(), is(nullValue()));
   }
 
   @Test
@@ -121,7 +125,8 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage result =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy",
-                    getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
+                    getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+            .getRight();
     String resString = getPayloadAsString(result);
     assertEquals(String.valueOf(OK.getStatusCode()), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
     assertTrue(resString.contains("Anonymous"));
@@ -142,7 +147,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      throw new Fault(event.getMessage().getExceptionPayload().getException().getCause());
+      throw new Fault(event.getError().getException().getCause());
     }
   }
 

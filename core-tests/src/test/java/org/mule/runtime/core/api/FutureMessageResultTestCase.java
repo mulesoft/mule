@@ -73,7 +73,7 @@ public class FutureMessageResultTestCase extends AbstractMuleContextTestCase {
     f.setExecutor(defaultExecutor);
     f.execute();
 
-    assertNull(f.getMessage());
+    assertNull(f.getResult());
     assertTrue(wasCalled);
   }
 
@@ -109,7 +109,7 @@ public class FutureMessageResultTestCase extends AbstractMuleContextTestCase {
     f.execute();
 
     try {
-      f.getMessage(500L);
+      f.getResult(500L);
       fail();
     } catch (TimeoutException tex) {
       // OK: we did not wait long enough for our straggler, so let's tell him

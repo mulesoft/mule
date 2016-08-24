@@ -35,15 +35,15 @@ public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase {
     List<Apple> results = new ArrayList<>(3);
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add((Apple) result.getPayload());
 
-    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add((Apple) result.getPayload());
 
-    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add((Apple) result.getPayload());
 

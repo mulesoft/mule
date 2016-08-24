@@ -70,7 +70,8 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
     MuleMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains("<faultstring>"));
     assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
@@ -85,7 +86,8 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
     MuleMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS);
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains("<faultstring>"));
     assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
@@ -113,7 +115,8 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
     MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy",
-                                       getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
+                                       getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+        .getRight();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains("<faultstring>"));
 

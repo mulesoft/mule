@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrationTestCase {
@@ -85,6 +86,6 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
       }
     });
 
-    assertNotNull(client.request("test://out", RECEIVE_TIMEOUT));
+    assertThat(client.request("test://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
   }
 }

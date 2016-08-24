@@ -91,6 +91,7 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
     public MuleEvent handleException(Exception e, MuleEvent event) {
       caught = true;
       MuleEvent resultEvent = super.handleException(e, event);
+      event.setError(null);
       event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
       ((MessagingException) e).setHandled(true);
       return resultEvent;

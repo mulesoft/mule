@@ -28,7 +28,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     String message = "Mule";
     client.dispatch("jms://invoker.in", message, null);
-    MuleMessage reply = client.request("jms://invoker.out", 10000);
+    MuleMessage reply = client.request("jms://invoker.out", 10000).getRight().get();
     assertNotNull(reply);
     assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload());
   }

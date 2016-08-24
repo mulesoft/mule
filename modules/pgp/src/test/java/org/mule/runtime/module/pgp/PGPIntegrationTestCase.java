@@ -33,7 +33,7 @@ public class PGPIntegrationTestCase extends FunctionalTestCase {
   private void doEncryptDecryptTest(String payload) throws Exception {
     flowRunner("pgpEncryptProcessor").withPayload(payload).run();
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("test://out", 5000);
+    MuleMessage message = client.request("test://out", 5000).getRight().get();
     assertEquals(payload, getPayloadAsString(message));
   }
 }

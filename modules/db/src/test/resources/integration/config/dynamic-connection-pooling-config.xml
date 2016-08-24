@@ -22,6 +22,7 @@
 
         <error-handler>
             <on-error-continue>
+                <set-payload value="#[exception]"/>
                 <test:queue name="connectionError"/>
             </on-error-continue>
         </error-handler>

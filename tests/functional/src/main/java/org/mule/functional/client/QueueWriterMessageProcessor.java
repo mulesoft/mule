@@ -26,7 +26,11 @@ public class QueueWriterMessageProcessor implements MessageProcessor, MuleContex
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    connectorConfig.write(name, DefaultMuleEvent.copy(event));
+    MuleEvent copy = DefaultMuleEvent.copy(event);
+    //Queue works based on MuleEvent for testing purposes. A real operation
+    //would not be aware of the error field and just the plain message would be sent.
+    copy.setError(null);
+    connectorConfig.write(name, copy);
 
     return event;
   }

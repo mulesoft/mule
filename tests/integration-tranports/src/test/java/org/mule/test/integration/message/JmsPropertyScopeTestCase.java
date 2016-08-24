@@ -31,7 +31,7 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
         .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://reply").build();
 
     client.dispatch("inbound", message);
-    MuleMessage result = client.request("jms://reply", 10000);
+    MuleMessage result = client.request("jms://reply", 10000).getRight().get();
 
     assertNotNull(result);
     assertEquals("test bar", result.getPayload());

@@ -13,13 +13,16 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.functional.Either;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -40,7 +43,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
   @Test
   public void testInExceptionDoRollbackHttpSync() throws Exception {
     String url = String.format("http://localhost:%d/flowWithoutExceptionStrategySync", port1.getNumber());
-    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
+    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
     assertThat(response.getPayload(), not(nullValue()));
     assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
@@ -51,7 +54,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
   @Test
   public void testCustomStatusCodeOnExceptionWithCustomExceptionStrategy() throws Exception {
     String url = String.format("http://localhost:%d/flowWithtCESAndStatusCode", port1.getNumber());
-    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
+    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
     assertThat(response.<String>getInboundProperty("http.status"), is(valueOf(SC_FORBIDDEN)));
   }

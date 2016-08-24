@@ -51,7 +51,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
     }, "polledUMO");
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://toclient", 50000);
+    MuleMessage result = client.request("vm://toclient", 50000).getRight().get();
     assertNotNull(result.getPayload());
     assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
     assertEquals("/foo toClient-only", getPayloadAsString(result));

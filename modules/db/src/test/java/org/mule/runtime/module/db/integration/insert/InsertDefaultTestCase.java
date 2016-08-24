@@ -50,7 +50,7 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase {
     flowRunner("jdbcInsertUpdateCountOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertThat(response.getPayload(), equalTo(1));
   }

@@ -39,7 +39,7 @@ public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://flowIn", "echo", null);
-    MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("echo", result.getPayload());
   }

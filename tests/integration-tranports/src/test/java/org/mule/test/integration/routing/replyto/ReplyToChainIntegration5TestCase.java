@@ -41,7 +41,7 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase {
         MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
     client.dispatch("jms://jmsIn1", muleMessage);
     flowExecutedLatch.await(TIMEOUT, MILLISECONDS);
-    MuleMessage response = client.request("jms://response", TIMEOUT);
+    MuleMessage response = client.request("jms://response", TIMEOUT).getRight().get();
     assertThat(response, notNullValue());
     assertThat(getPayloadAsString(response), is(EXPECTED_PAYLOAD));
   }

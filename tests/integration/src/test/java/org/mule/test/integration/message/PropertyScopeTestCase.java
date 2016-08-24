@@ -33,7 +33,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT).getRight().get();
     assertThat(result.getPayload(), is("test bar"));
     assertThat(result.getOutboundProperty("foo2"), is("fooValue"));
   }
@@ -43,7 +43,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "rrfooValue").asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT).getRight().get();
     assertThat(result.getPayload(), is("test baz"));
     assertThat(result.getOutboundProperty("foo2"), is("rrfooValue"));
   }

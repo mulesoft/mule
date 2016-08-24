@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +69,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCas
     if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("exception should be thrown");
     }
-    MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+    MuleMessage muleMessage = client.request("jms://out", TIMEOUT).getRight().get();
     assertThat(muleMessage, IsNull.notNullValue());
   }
 
@@ -80,7 +82,6 @@ public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCas
     if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("exception should be thrown");
     }
-    MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
-    assertThat(muleMessage, IsNull.nullValue());
+    assertThat(client.request("jms://out", TIMEOUT).getRight().isPresent(), is(false));
   }
 }

@@ -42,11 +42,11 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
 
     MuleClient client = muleContext.getClient();
     List<MuleMessage> responses = new LinkedList<MuleMessage>();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     responses.add(response);
-    response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     responses.add(response);
-    response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     responses.add(response);
 
     assertEquals(3, responses.size());

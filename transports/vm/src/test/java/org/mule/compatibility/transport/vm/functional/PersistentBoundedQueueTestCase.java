@@ -6,8 +6,10 @@
  */
 package org.mule.compatibility.transport.vm.functional;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -17,6 +19,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class PersistentBoundedQueueTestCase extends FunctionalTestCase {
@@ -51,15 +54,11 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase {
     assertTrue(results.contains("Test2"));
 
     Thread.sleep(SLEEP);
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
-    if (result != null) {
-      System.out.println("result = " + getPayloadAsString(result));
-    }
-    assertNull(result);
+    assertThat(client.request("vm://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 
   private void pollOutQueue(MuleClient client, Set<String> results) throws Exception {
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add(getPayloadAsString(result));
   }

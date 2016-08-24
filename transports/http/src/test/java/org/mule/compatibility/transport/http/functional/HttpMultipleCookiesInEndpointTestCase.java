@@ -30,7 +30,7 @@ public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase {
   @Test
   public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("vm://in", "HELLO", null);
+    MuleMessage response = client.send("vm://in", "HELLO", null).getRight();
     assertNotNull(response);
     assertNotNull(response.getPayload());
     assertEquals("Both Cookies Found!", getPayloadAsString(response));

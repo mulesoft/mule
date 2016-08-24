@@ -31,7 +31,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithoutReplyTo() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
+    MuleMessage response = client.send("out1", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
     assertJmsMessageIdPresent(response);
@@ -41,7 +41,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithoutReplyToEndpointProperties() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
+    MuleMessage response = client.send("out2", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
     assertJmsMessageIdPresent(response);
@@ -51,7 +51,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithReplyTo() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
+    MuleMessage response = client.send("out3", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertFalse("Response should not be NullPayload", response.getPayload() == null);
   }

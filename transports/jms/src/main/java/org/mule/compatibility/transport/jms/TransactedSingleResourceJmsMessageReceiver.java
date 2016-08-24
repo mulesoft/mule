@@ -171,7 +171,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     } catch (MessagingException e) {
       // already handled by TransactionTemplate
       // This will cause a negative ack for JMS
-      if (e.getEvent().getMessage().getExceptionPayload() != null) {
+      if (e.getEvent().getError() != null) {
         throw new MuleRuntimeException(e);
       }
     } catch (Exception e) {

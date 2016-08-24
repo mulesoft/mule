@@ -6,14 +6,17 @@
  */
 package org.mule.compatibility.transport.tcp;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.hamcrest.core.Is;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -40,7 +43,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
+    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 
@@ -50,8 +53,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
     client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, null);
     // MULE-2754
     Thread.sleep(200);
-    MuleMessage result = client.request("asyncClientEndpoint2", timeout);
     // expect failure - TCP simply can't work like this
-    assertNull(result);
+    assertThat(client.request("asyncClientEndpoint2", timeout).getRight().isPresent(), is(false));
   }
 }

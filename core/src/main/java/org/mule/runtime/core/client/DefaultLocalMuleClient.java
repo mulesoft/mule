@@ -6,12 +6,22 @@
  */
 package org.mule.runtime.core.client;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.functional.Either.left;
+import static org.mule.runtime.core.functional.Either.right;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Optional;
+
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -19,8 +29,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
@@ -30,15 +40,14 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-
-import java.io.Serializable;
-import java.util.Map;
+import org.mule.runtime.core.message.ErrorBuilder;
 
 public class DefaultLocalMuleClient implements MuleClient {
 
+  public static final String MESSAGE_FILTERED_ERROR_MESSAGE = "message filtered";
   protected final MuleContext muleContext;
   private FlowConstruct flowConstruct;
   private ConnectorOperationLocator connectorOperatorLocator;
@@ -52,9 +61,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     if (connectorOperatorLocator == null) {
       this.connectorOperatorLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
       if (this.connectorOperatorLocator == null) {
-        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s",
-                                                                        ConnectorOperationLocator.class.getName(),
-                                                                        OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
+        throw new MuleRuntimeException(createStaticMessage("Could not find required %s in the registry under key %s",
+                                                           ConnectorOperationLocator.class.getName(),
+                                                           OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
       }
     }
     return connectorOperatorLocator;
@@ -66,33 +75,47 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException {
+  public Either<Error, MuleMessage> send(String url, Object payload, Map<String, Serializable> messageProperties)
+      throws MuleException {
     return send(url, createMessage(payload, messageProperties));
   }
 
   @Override
-  public MuleMessage send(String url, MuleMessage message) throws MuleException {
+  public Either<Error, MuleMessage> send(String url, MuleMessage message) throws MuleException {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
+      return createEitherResult(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
     } else {
       throw createUnsupportedUrlException(url);
     }
   }
 
+  private Either<Error, MuleMessage> createEitherResult(MuleEvent muleEvent) {
+    if (muleEvent == null) {
+      //This should never return a null event. This happen because of mule 3.x behaviour with filters.
+      //We will just return an error in this case.
+      return left(new ErrorBuilder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).build());
+    }
+    if (muleEvent.getError() == null) {
+      return right(muleEvent.getMessage());
+    }
+    return left(muleEvent.getError());
+  }
+
   @Override
-  public MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException {
-    final MessageProcessor connectorMessageProcessor =
-        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
+  public Either<Error, MuleMessage> send(String url, MuleMessage message, OperationOptions operationOptions)
+      throws MuleException {
+    final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
+        .locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
+      return createEitherResult(returnEvent(connectorMessageProcessor.process(createRequestResponseMuleEvent(message))));
     } else {
       throw createUnsupportedUrlException(url);
     }
@@ -103,14 +126,14 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
+  public Either<Error, MuleMessage> send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
       throws MuleException {
     return send(url, createMessage(payload, messageProperties), timeout);
 
   }
 
   @Override
-  public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException {
+  public Either<Error, MuleMessage> send(String url, MuleMessage message, long timeout) throws MuleException {
     return send(url, message, newOptions().outbound().responseTimeout(timeout).build());
   }
 
@@ -151,7 +174,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public MuleMessage request(String url, long timeout) throws MuleException {
+  public Either<Error, Optional<MuleMessage>> request(String url, long timeout) throws MuleException {
     final OperationOptions operationOptions = newOptions().responseTimeout(timeout).build();
     final MessageProcessor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
@@ -161,10 +184,15 @@ public class DefaultLocalMuleClient implements MuleClient {
       }
       final MuleEvent event =
           connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().nullPayload().build()));
-
-      return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
+      if (event == null || event instanceof VoidMuleEvent) {
+        return right(empty());
+      }
+      if (event.getError() != null) {
+        return left(event.getError());
+      }
+      return right(ofNullable(event.getMessage()));
     } else {
-      return null;
+      return right(empty());
     }
   }
 
@@ -176,9 +204,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     return new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct);
   }
 
-  protected MuleMessage returnMessage(MuleEvent event) {
+  protected MuleEvent returnEvent(MuleEvent event) {
     if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
-      return event.getMessage();
+      return event;
     } else {
       return null;
     }

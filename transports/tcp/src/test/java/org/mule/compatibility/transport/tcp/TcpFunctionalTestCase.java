@@ -31,7 +31,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
+    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 
@@ -40,7 +40,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase {
     long now = System.currentTimeMillis();
     int count = 1000;
     for (int i = 0; i < count; i++) {
-      MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
+      MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
       assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
     long later = System.currentTimeMillis();

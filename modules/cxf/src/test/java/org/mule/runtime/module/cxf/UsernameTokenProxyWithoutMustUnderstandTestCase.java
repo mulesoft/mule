@@ -59,6 +59,6 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
   }
 
   protected MuleMessage sendRequest(String url, String payload) throws MuleException {
-    return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
+    return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS).getRight();
   }
 }

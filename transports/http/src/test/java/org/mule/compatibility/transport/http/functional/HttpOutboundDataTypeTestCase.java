@@ -44,7 +44,7 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase {
 
     client.dispatch("vm://testInput", muleMessage);
 
-    MuleMessage response = client.request("vm://testOutput", 120000);
+    MuleMessage response = client.request("vm://testOutput", 120000).getRight().get();
 
     assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
     assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
