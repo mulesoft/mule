@@ -2,6 +2,7 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:file="http://www.mulesoft.org/schema/mule/file"
       xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
@@ -27,4 +28,29 @@
     <flow name="listWithoutPath">
         <file:list />
     </flow>
+
+
+    <flow name="pollWithWatermark" processingStrategy="synchronous">
+        <!--<poll doc:name="Poll" >-->
+            <!--<fixed-frequency-scheduler frequency="40" timeUnit="SECONDS"/>-->
+            <!--<watermark variable="timestamp" default-expression="#[server.dateTime]" selector="MAX" selector-expression="#[payload.getAttributes().lastModifiedTime]"/>-->
+            <!--<watermark variable="timestamp" default-expression="#[import java.time.LocalDateTime; LocalDateTime.parse(server.dateTime.format(&quot;yyyy-MM-dd'T'HH:mm:ss&quot;).toString())]" selector="MAX" selector-expression="#[payload.metadata.lastModifiedTime]"/>-->
+
+            <!--<logger message="======&gt;&gt;&gt; file attributes" level="INFO" doc:name="Logger"/>-->
+            <!--<logger message="#[message.attributes]" doc:name="Logger"/>-->
+
+
+            <file:list directoryPath="/Users/alejandro/LogConfig" recursive="true">
+                <file:match-with>
+                    <file:matcher updatedSince="#[flowVars['timestamp']]" directory="false" filename-pattern="*.xml" />
+                </file:match-with>
+
+            </file:list>
+
+        <!--</poll>-->
+        <!--<logger level="INFO" doc:name="Logger"/>-->
+        <!--<logger level="INFO" message="#[message.attributes]" doc:name="Logger"/>-->
+
+    </flow>
+
 </mule>

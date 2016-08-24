@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.TreeNode;
@@ -99,6 +100,22 @@ public class FileListTestCase extends FileConnectorTestCase {
   @Test
   public void listWithGlobalMatcher() throws Exception {
     TreeNode node = doList("listWithGlobalMatcher", ".", true);
+    List<TreeNode> childs = node.getChilds();
+
+    assertThat(childs, hasSize(1));
+
+    FileAttributes file = childs.get(0).getAttributes();
+    assertThat(file.isDirectory(), is(true));
+    assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
+  }
+
+  @Test
+  public void listWithPoll() throws Exception {
+    //TreeNode node = doList("listWithGlobalMatcher", ".", true);
+
+    MuleMessage message = flowRunner("pollWithWatermark").run().getMessage();
+    TreeNode node = message.getPayload();
+
     List<TreeNode> childs = node.getChilds();
 
     assertThat(childs, hasSize(1));
