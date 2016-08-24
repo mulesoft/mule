@@ -90,7 +90,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{REQUEST_RESPONSE, false, true},
+    return Arrays.asList(new Object[][] {
+        {REQUEST_RESPONSE, false, true},
         {REQUEST_RESPONSE, false, false},
         {REQUEST_RESPONSE, true, true},
         {REQUEST_RESPONSE, true, false},
@@ -1092,7 +1093,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
-    when(event.getFlowConstruct()).thenReturn(mockFlow);
     when(event.getFlowName()).thenReturn("flow");
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

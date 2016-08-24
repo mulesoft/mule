@@ -99,7 +99,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final MuleMessage mockMessage = MuleMessage.builder().payload("").build();
-    when(mockEvent.getFlowConstruct()).thenReturn(mockFlow);
     when(mockEvent.getMessage()).thenReturn(mockMessage);
     when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>() {
 
