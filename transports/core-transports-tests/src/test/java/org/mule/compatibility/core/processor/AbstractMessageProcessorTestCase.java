@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.processor;
 
 import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -279,7 +280,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event) {
       sensedException = exception;
-      event.setError(new ErrorBuilder(exception).build());
+      event.setError(builder(exception).build());
       event.setMessage(MuleMessage.builder(event.getMessage()).nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception)).build());
       return event;

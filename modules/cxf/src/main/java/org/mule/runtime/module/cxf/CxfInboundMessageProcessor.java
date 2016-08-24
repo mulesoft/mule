@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -254,7 +255,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
               ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
               responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload(exceptionPayload)
                   .addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
-              responseEvent.setError(new ErrorBuilder(e).build());
+              responseEvent.setError(builder(e).build());
               processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
           }
@@ -431,7 +432,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       if (ex != null) {
         builder.exceptionPayload(new DefaultExceptionPayload(ex));
         builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
-        responseEvent.setError(new ErrorBuilder(ex).build());
+        responseEvent.setError(builder(ex).build());
       }
     }
     responseEvent.setMessage(builder.build());

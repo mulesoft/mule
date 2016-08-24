@@ -25,6 +25,7 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -237,7 +238,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
         .exceptionPayload(new DefaultExceptionPayload(exception))
         .build());
-    responseEvent.setError(new ErrorBuilder(exception).build());
+    responseEvent.setError(builder(exception).build());
 
     MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(endpoint.getFlowConstruct());
     result = mpChain.process(requestEvent);

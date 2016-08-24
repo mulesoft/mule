@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.http.reliability;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -139,7 +140,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
           .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
       DefaultMuleEvent resultEvent = new DefaultMuleEvent(message, event);
-      resultEvent.setError(new ErrorBuilder(exception).build());
+      resultEvent.setError(builder(exception).build());
       return resultEvent;
     }
   }

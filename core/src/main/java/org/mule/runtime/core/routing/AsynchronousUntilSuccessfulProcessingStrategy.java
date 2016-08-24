@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
@@ -206,7 +207,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     try {
       mutableEvent.setMessage(MuleMessage.builder(mutableEvent.getMessage())
           .exceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException))).build());
-      mutableEvent.setError(new ErrorBuilder(buildRetryPolicyExhaustedException(lastException)).build());
+      mutableEvent.setError(builder(buildRetryPolicyExhaustedException(lastException)).build());
 
       getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
     } catch (MessagingException e) {

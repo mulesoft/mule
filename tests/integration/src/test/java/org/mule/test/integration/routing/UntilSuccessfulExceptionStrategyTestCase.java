@@ -9,6 +9,7 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
@@ -73,7 +74,7 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
       try {
         if (!latch.await(TIMEOUT, TimeUnit.SECONDS)) {
           RuntimeException exception = new RuntimeException();
-          event.setError(new ErrorBuilder(exception).build());
+          event.setError(builder(exception).build());
           event.setMessage(MuleMessage.builder(event.getMessage())
               .exceptionPayload(new DefaultExceptionPayload(exception)).build());
         }

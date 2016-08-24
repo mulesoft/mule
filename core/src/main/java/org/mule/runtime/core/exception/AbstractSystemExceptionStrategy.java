@@ -8,6 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
@@ -40,7 +41,7 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     }
 
     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-    Error error = new ErrorBuilder(ex).build();
+    Error error = builder(ex).build();
     if (getCurrentEvent() != null) {
       MuleEvent currentEvent = getCurrentEvent();
       currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build());

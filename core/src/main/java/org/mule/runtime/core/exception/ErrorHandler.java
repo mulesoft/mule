@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -52,7 +53,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public MuleEvent handleException(Exception exception, MuleEvent event) {
     event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build());
-    event.setError(new ErrorBuilder(exception).build());
+    event.setError(builder(exception).build());
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
         event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());

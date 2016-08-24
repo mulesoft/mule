@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_M
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     if (muleEvent == null) {
       //This should never return a null event. This happen because of mule 3.x behaviour with filters.
       //We will just return an error in this case.
-      return left(new ErrorBuilder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).build());
+      return left(builder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).build());
     }
     if (muleEvent.getError() == null) {
       return right(muleEvent.getMessage());

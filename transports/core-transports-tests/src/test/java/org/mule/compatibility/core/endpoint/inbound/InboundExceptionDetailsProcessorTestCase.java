@@ -8,6 +8,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
@@ -30,7 +31,7 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
     RuntimeException exception = new RuntimeException();
     event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
         .build());
-    event.setError(new ErrorBuilder(exception).build());
+    event.setError(builder(exception).build());
 
     MuleEvent result = mp.process(event);
 

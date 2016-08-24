@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import java.io.IOException;
 
@@ -48,7 +49,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     assertTrue(!filter.accept(m));
 
     Exception exception = new IllegalArgumentException("test");
-    when(event.getError()).thenReturn(new ErrorBuilder(exception).build());
+    when(event.getError()).thenReturn(builder(exception).build());
     m = MuleMessage.builder(m).build();
     assertTrue(filter.accept(event));
 
@@ -56,7 +57,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     filter = new ExceptionTypeFilter(IOException.class);
     assertTrue(!filter.accept(event));
     exception = new IOException("test");
-    when(event.getError()).thenReturn(new ErrorBuilder(exception).build());
+    when(event.getError()).thenReturn(builder(exception).build());
     assertTrue(filter.accept(event));
   }
 

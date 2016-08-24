@@ -23,13 +23,19 @@ public final class ErrorTypeBuilder {
   private static final String GENERAL_STRING_REPRESENTATION = "GENERAL";
 
   public static final ErrorType ANY =
-      new ErrorTypeBuilder().setNamespace(MULE_NAMESPACE).setStringRepresentation(ANY_STRING_REPRESENTATION).build();
-  public static final ErrorType GENERAL = new ErrorTypeBuilder().setNamespace(MULE_NAMESPACE)
-      .setStringRepresentation(GENERAL_STRING_REPRESENTATION).setParentErrorType(ANY).build();
+      ErrorTypeBuilder.builder().namespace(MULE_NAMESPACE).stringRepresentation(ANY_STRING_REPRESENTATION).build();
+  public static final ErrorType GENERAL = ErrorTypeBuilder.builder().namespace(MULE_NAMESPACE)
+      .stringRepresentation(GENERAL_STRING_REPRESENTATION).parentErrorType(ANY).build();
 
   private String stringRepresentation;
   private String namespace;
   private ErrorType parentErrorType;
+
+  public static ErrorTypeBuilder builder() {
+    return new ErrorTypeBuilder();
+  }
+
+  private ErrorTypeBuilder() {}
 
   /**
    * Sets the error type string representation. @see {@link ErrorType#getStringRepresentation()}
@@ -37,7 +43,7 @@ public final class ErrorTypeBuilder {
    * @param stringRepresentation the string representation
    * @return {@code this} builder
      */
-  public ErrorTypeBuilder setStringRepresentation(String stringRepresentation) {
+  public ErrorTypeBuilder stringRepresentation(String stringRepresentation) {
     this.stringRepresentation = stringRepresentation;
     return this;
   }
@@ -48,7 +54,7 @@ public final class ErrorTypeBuilder {
    * @param namespace the error type namespace
    * @return {@code this} builder
      */
-  public ErrorTypeBuilder setNamespace(String namespace) {
+  public ErrorTypeBuilder namespace(String namespace) {
     this.namespace = namespace;
     return this;
   }
@@ -59,7 +65,7 @@ public final class ErrorTypeBuilder {
    * @param parentErrorType the parent error type
    * @return {@code this} builder
      */
-  public ErrorTypeBuilder setParentErrorType(ErrorType parentErrorType) {
+  public ErrorTypeBuilder parentErrorType(ErrorType parentErrorType) {
     this.parentErrorType = parentErrorType;
     return this;
   }
@@ -81,7 +87,7 @@ public final class ErrorTypeBuilder {
   /**
    * Default and only implementation of {@link ErrorType}
    */
-  public final static class ErrorTypeImplementation implements ErrorType {
+  private final static class ErrorTypeImplementation implements ErrorType {
 
     private String stringRepresentation;
     private String namespace;

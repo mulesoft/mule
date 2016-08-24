@@ -8,6 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -69,7 +70,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       fireNotification(exception);
       logException(exception, request);
       processStatistics();
-      request.setError(new ErrorBuilder(exception).build());
+      request.setError(builder(exception).build());
       request.setMessage(MuleMessage.builder(request.getMessage()).build());
 
       markExceptionAsHandledIfRequired(exception);
@@ -107,7 +108,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         // Do nothing
       }
 
-      event.setError(new ErrorBuilder(exception).build());
+      event.setError(builder(exception).build());
       event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build());
       return event;
     }
@@ -155,7 +156,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected MuleEvent route(MuleEvent event, Exception t) {
     if (!getMessageProcessors().isEmpty()) {
       try {
-        event.setError(new ErrorBuilder(t).build());
+        event.setError(builder(t).build());
         event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build());
         MuleEvent result = configuredMessageProcessors.process(event);
         return result;

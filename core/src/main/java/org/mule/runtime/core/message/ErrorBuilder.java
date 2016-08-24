@@ -16,6 +16,7 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleException;
 
 /**
+ * Builder for {@link Error} instances.
  *
  * @since 4.0
  */
@@ -27,10 +28,19 @@ public final class ErrorBuilder {
   private ErrorType errorType;
   private MuleMessage errorMessage;
 
+  public static ErrorBuilder builder() {
+    return new ErrorBuilder();
+  }
+
+  public static ErrorBuilder builder(Throwable e) {
+    return new ErrorBuilder(e);
+  }
+
+
   /**
    * Constructor to create a new builder from scratch.
    */
-  public ErrorBuilder() {}
+  private ErrorBuilder() {}
 
   /**
    * Constructor to create a new builder using the information of an exception
@@ -38,7 +48,7 @@ public final class ErrorBuilder {
    *
    * @param e the exception to use from which the error will be created.
    */
-  public ErrorBuilder(Throwable e) {
+  private ErrorBuilder(Throwable e) {
     this.exception = e;
     String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
@@ -56,7 +66,7 @@ public final class ErrorBuilder {
    * @param exception the exception that caused the error
    * @return {@code this} builder
      */
-  public ErrorBuilder setException(Exception exception) {
+  public ErrorBuilder exception(Exception exception) {
     this.exception = exception;
     return this;
   }
@@ -67,22 +77,22 @@ public final class ErrorBuilder {
    * @param description
    * @return
      */
-  public ErrorBuilder setDescription(String description) {
+  public ErrorBuilder description(String description) {
     this.description = description;
     return this;
   }
 
-  public ErrorBuilder setDetailedDescription(String detailedDescription) {
+  public ErrorBuilder detailedDescription(String detailedDescription) {
     this.detailedDescription = detailedDescription;
     return this;
   }
 
-  public ErrorBuilder setErrorType(ErrorType errorType) {
+  public ErrorBuilder errorType(ErrorType errorType) {
     this.errorType = errorType;
     return this;
   }
 
-  public ErrorBuilder setErrorMessage(MuleMessage errorMessage) {
+  public ErrorBuilder errorMessage(MuleMessage errorMessage) {
     this.errorMessage = errorMessage;
     return this;
   }
@@ -98,7 +108,7 @@ public final class ErrorBuilder {
   /**
    * Default and only implementation of {@link Error}.
    */
-  public final static class ErrorImplementation implements Error {
+  private final static class ErrorImplementation implements Error {
 
     private Throwable exception;
     private String description;

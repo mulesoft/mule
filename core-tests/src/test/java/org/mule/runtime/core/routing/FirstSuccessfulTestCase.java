@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -155,7 +156,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
           Exception exception = new Exception();
-          error = new ErrorBuilder(exception).build();
+          error = builder(exception).build();
           msg = MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(exception)).build();
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();

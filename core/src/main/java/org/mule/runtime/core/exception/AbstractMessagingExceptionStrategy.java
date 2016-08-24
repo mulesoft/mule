@@ -10,6 +10,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -59,7 +60,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       doHandleException(ex, event);
 
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-      Error error = new ErrorBuilder(ex).build();
+      Error error = builder(ex).build();
       if (getCurrentEvent() != null) {
         MuleEvent currentEvent = getCurrentEvent();
         currentEvent.setError(error);

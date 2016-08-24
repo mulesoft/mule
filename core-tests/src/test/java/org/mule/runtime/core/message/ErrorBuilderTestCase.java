@@ -9,6 +9,8 @@ package org.mule.runtime.core.message;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
+import static org.mule.runtime.core.message.ErrorTypeBuilder.GENERAL;
 
 import org.junit.Test;
 
@@ -28,36 +30,36 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void buildErrorFromException() {
     RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
-    Error error = new ErrorBuilder(exception).build();
+    Error error = builder(exception).build();
     assertThat(error.getException(), is(exception));
     assertThat(error.getDescription(), is(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), is(EXCEPTION_MESSAGE));
-    assertThat(error.getErrorType(), is(ErrorTypeBuilder.GENERAL));
+    assertThat(error.getErrorType(), is(GENERAL));
   }
 
   @Test
   public void buildErrorFromMuleException() {
     MuleException exception = new DefaultMuleException(new RuntimeException(EXCEPTION_MESSAGE));
-    Error error = new ErrorBuilder(exception).build();
+    Error error = builder(exception).build();
     assertThat(error.getException(), is(exception));
     assertThat(error.getDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
-    assertThat(error.getErrorType(), is(ErrorTypeBuilder.GENERAL));
+    assertThat(error.getErrorType(), is(GENERAL));
   }
 
   @Test
   public void buildError() {
     String detailedDescription = "detailed description";
     String description = "description";
-    ErrorType errorType = ErrorTypeBuilder.GENERAL;
+    ErrorType errorType = GENERAL;
     MuleMessage errorMessage = MuleMessage.builder().nullPayload().build();
     IllegalArgumentException exception = new IllegalArgumentException("some message");
-    Error error = new ErrorBuilder()
-        .setErrorType(errorType)
-        .setDescription(description)
-        .setDetailedDescription(detailedDescription)
-        .setException(exception)
-        .setErrorMessage(errorMessage)
+    Error error = builder()
+        .errorType(errorType)
+        .description(description)
+        .detailedDescription(detailedDescription)
+        .exception(exception)
+        .errorMessage(errorMessage)
         .build();
     assertThat(error.getDescription(), is(description));
     assertThat(error.getDetailedDescription(), is(detailedDescription));

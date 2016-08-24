@@ -9,6 +9,7 @@ package org.mule.runtime.core.registry;
 import static java.time.OffsetTime.now;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
@@ -86,7 +87,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         Exception exception = new Exception();
         event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
             .build());
-        event.setError(new ErrorBuilder(exception).build());
+        event.setError(builder(exception).build());
         setCurrentEvent(event);
         success.set(true);
       } catch (RuntimeException e) {
