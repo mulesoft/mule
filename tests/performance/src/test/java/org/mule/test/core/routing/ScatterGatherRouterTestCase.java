@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.routing;
+package org.mule.test.core.routing;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
@@ -15,7 +15,7 @@ import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ScatterGatherRouterTestCase extends FunctionalTestCase {
+public class ScatterGatherRouterTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
