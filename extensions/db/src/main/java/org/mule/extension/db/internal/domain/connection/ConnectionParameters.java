@@ -6,6 +6,7 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
  *
  * @since 4.0
  */
+@ExclusiveOptionals
 public class ConnectionParameters {
 
   /**

@@ -105,9 +105,8 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     @Optional
     private String validType;
 
-    @Parameter
-    @Optional
-    private String anotherValidType;
+    @ParameterGroup
+    private SimpleGroup simpleGroup;
 
     @ParameterGroup
     private SimplePojo simplePojo;
@@ -177,6 +176,18 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
     @Parameter
     private Integer number;
+
+  }
+
+  public static class SimpleGroup {
+
+    @Parameter
+    @Optional
+    private String domain;
+
+    @Parameter
+    @Optional
+    private String url;
 
   }
 
