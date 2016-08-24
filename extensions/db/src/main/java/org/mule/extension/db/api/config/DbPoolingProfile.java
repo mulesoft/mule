@@ -6,7 +6,9 @@
  */
 package org.mule.extension.db.api.config;
 
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -27,6 +29,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "5")
+  @Expression(NOT_SUPPORTED)
   private int maxPoolSize = 5;
 
   /**
@@ -34,6 +37,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "0")
+  @Expression(NOT_SUPPORTED)
   private int minPoolSize = 0;
 
   /**
@@ -41,6 +45,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "1")
+  @Expression(NOT_SUPPORTED)
   private int acquireIncrement = 1;
 
   /**
@@ -48,6 +53,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "5")
+  @Expression(NOT_SUPPORTED)
   private int preparedStatementCacheSize = 5;
 
   /**
@@ -56,6 +62,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "30")
+  @Expression(NOT_SUPPORTED)
   private int maxWait = 30;
 
   /**
@@ -63,6 +70,7 @@ public class DbPoolingProfile {
    */
   @Parameter
   @Optional(defaultValue = "SECONDS")
+  @Expression(NOT_SUPPORTED)
   private TimeUnit maxWaitUnit;
 
 

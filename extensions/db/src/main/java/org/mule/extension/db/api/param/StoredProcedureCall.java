@@ -40,6 +40,10 @@ public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall
   @Optional
   private List<InputParameter> inOutParameters = new LinkedList<>();
 
+  /**
+   * A reference to a globally defined call
+   * to be used as a template
+   */
   @Parameter
   @Optional
   @XmlHints(allowInlineDefinition = false)

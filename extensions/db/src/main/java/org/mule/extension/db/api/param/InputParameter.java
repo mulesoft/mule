@@ -8,7 +8,6 @@ package org.mule.extension.db.api.param;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * An input parameter
@@ -21,7 +20,6 @@ public class InputParameter extends QueryParameter {
    * The parameter's value
    */
   @Parameter
-  @Optional
   @XmlHints(allowReferences = false)
   private Object value;
 

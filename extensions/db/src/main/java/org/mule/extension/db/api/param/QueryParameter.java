@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.api.param;
 
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -20,6 +22,7 @@ public abstract class QueryParameter {
    * The name of the input parameter.
    */
   @Parameter
+  @Expression(NOT_SUPPORTED)
   private String paramName;
 
   /**
@@ -27,6 +30,7 @@ public abstract class QueryParameter {
    */
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   private JdbcType type;
 
   public String getParamName() {

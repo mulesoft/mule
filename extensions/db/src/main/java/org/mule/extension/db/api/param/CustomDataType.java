@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.api.param;
 
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -20,11 +22,13 @@ public class CustomDataType {
    * Type identifier used by the JDBC driver.
    */
   @Parameter
+  @Expression(NOT_SUPPORTED)
   private int id;
 
   /**
    * Name of the data type used by the JDBC driver.
    */
+  @Expression(NOT_SUPPORTED)
   @Parameter
   private String typeName;
 
@@ -33,6 +37,7 @@ public class CustomDataType {
    */
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   private String className;
 
   public int getId() {
