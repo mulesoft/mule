@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -48,6 +49,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase {
 
   protected MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  @Mock
+  protected FlowConstruct mockFlow = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   @Mock
   protected MuleEvent RETURN_VALUE;
   @Spy

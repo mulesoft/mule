@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
 import static org.mule.runtime.core.expression.DefaultExpressionManager.removeExpressionMarker;
 
@@ -20,6 +21,7 @@ import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -36,7 +38,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -122,12 +123,12 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> T evaluate(String expression, MuleEvent event) {
-    return (T) evaluate(expression, event, null);
+  public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct) {
+    return (T) evaluate(expression, event, flowConstruct, null);
   }
 
   @Override
-  public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars) {
+  public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, Map<String, Object> vars) {
     if (event == null) {
       return evaluate(expression, vars);
     }
@@ -136,7 +137,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         new DelegateVariableResolverFactory(globalContext, createVariableVariableResolverFactory(event));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new EventVariableResolverFactory(parserConfiguration, muleContext,
-                                                                                            event, innerDelegate));
+                                                                                            event, flowConstruct, innerDelegate));
     if (vars != null) {
       context.setNextFactory(new CachedMapVariableResolverFactory(vars, delegate));
     } else {
@@ -146,8 +147,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, TypedValue typedValue) {
-    evaluate(expression, event, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+  public void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, TypedValue typedValue) {
+    evaluate(expression, event, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
     expression = removeExpressionMarker(expression);
 
@@ -157,10 +158,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public TypedValue evaluateTyped(String expression, MuleEvent event) {
+  public TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct) {
     expression = removeExpressionMarker(expression);
 
-    final Object value = evaluate(expression, event);
+    final Object value = evaluate(expression, event, flowConstruct);
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
     final DataType dataType = dataTypeResolver.resolve(value, event, compiledExpression);
 

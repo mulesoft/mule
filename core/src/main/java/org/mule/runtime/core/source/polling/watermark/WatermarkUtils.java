@@ -31,7 +31,7 @@ public abstract class WatermarkUtils {
       throws NotSerializableException {
     ExpressionManager expressionManager = muleContext.getExpressionManager();
     if (expressionManager.isExpression(expression) && expressionManager.isValidExpression(expression)) {
-      Object evaluated = expressionManager.evaluate(expression, event);
+      Object evaluated = expressionManager.evaluate(expression, event, null);
       if (evaluated != null && !(evaluated instanceof Serializable)) {
         throw new NotSerializableException(format("Expression %s resolves to an object that is not serializable (%s). It can't be used as watermark.",
                                                   expression, evaluated.getClass().getCanonicalName()));

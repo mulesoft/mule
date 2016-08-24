@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -47,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
 public class FunctionalTestComponent
-    implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable, Startable, Stoppable {
+    implements Callable, Initialisable, Disposable, MuleContextAware, FlowConstructAware, Receiveable, Startable, Stoppable {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -67,6 +69,7 @@ public class FunctionalTestComponent
   private boolean logMessageDetails = false;
   private String id = "<none>";
   private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
 
@@ -75,6 +78,7 @@ public class FunctionalTestComponent
    * subsequent changes to the objects will change the history.
    */
   private List<Object> messageHistory;
+
 
   @Override
   public void initialise() {
@@ -96,6 +100,11 @@ public class FunctionalTestComponent
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -147,7 +156,7 @@ public class FunctionalTestComponent
    */
   @Override
   public Object onReceive(Object data) throws Exception {
-    MuleEventContext context = new DefaultMuleEventContext(getCurrentEvent());
+    MuleEventContext context = new DefaultMuleEventContext(flowConstruct, getCurrentEvent());
 
     if (isThrowException()) {
       throwException();
@@ -189,7 +198,7 @@ public class FunctionalTestComponent
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, MuleEvent event) {
-    return contents + muleContext.getExpressionManager().parse(appendString, event);
+    return contents + muleContext.getExpressionManager().parse(appendString, event, flowConstruct);
   }
 
   /**
@@ -220,7 +229,7 @@ public class FunctionalTestComponent
       StringBuilder sb = new StringBuilder();
 
       sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-      sb.append((Object) message.getPayload()).append(SystemUtils.LINE_SEPARATOR);
+      sb.append(message.getPayload().toString()).append(SystemUtils.LINE_SEPARATOR);
       sb.append(StringMessageUtils.headersToString(message));
       logger.info(sb.toString());
     }
@@ -232,7 +241,7 @@ public class FunctionalTestComponent
     Object replyMessage;
     if (returnData != null) {
       if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
-        replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getEvent());
+        replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getEvent(), flowConstruct);
       } else {
         replyMessage = returnData;
       }

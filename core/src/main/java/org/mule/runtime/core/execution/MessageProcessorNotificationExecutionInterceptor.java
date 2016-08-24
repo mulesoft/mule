@@ -7,6 +7,8 @@
 package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -32,6 +34,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
 
   private MessageProcessorExecutionInterceptor next;
   private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
 
   MessageProcessorNotificationExecutionInterceptor(MessageProcessorExecutionInterceptor next) {
     this.next = next;
@@ -47,8 +50,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
     final ServerNotificationManager notificationManager = muleContext.getNotificationManager();
     final boolean fireNotification = event.isNotificationsEnabled();
     if (fireNotification) {
-      fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
-                       null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+      fireNotification(notificationManager, flowConstruct, event, messageProcessor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
     }
 
     MuleEvent eventToProcess = event;
@@ -67,9 +69,8 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
 
           if (fireNotification) {
-            fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
-                             messageProcessor,
-                             null, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, null,
+                             MESSAGE_PROCESSOR_POST_INVOKE);
           }
           originalReplyToHandler.processReplyTo(result, returnMessage, replyTo);
         }
@@ -78,9 +79,8 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
           if (fireNotification) {
             MuleEvent result = exception.getEvent();
-            fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
-                             messageProcessor,
-                             null, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, null,
+                             MESSAGE_PROCESSOR_POST_INVOKE);
           }
           originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
         }
@@ -104,9 +104,8 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
       throw exceptionThrown;
     } finally {
       if (!NonBlockingVoidMuleEvent.getInstance().equals(result) && fireNotification) {
-        fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
-                         messageProcessor,
-                         exceptionThrown, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+        fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, exceptionThrown,
+                         MESSAGE_PROCESSOR_POST_INVOKE);
       }
     }
     return result;
@@ -129,6 +128,14 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
     this.muleContext = context;
     if (next != null) {
       next.setMuleContext(context);
+    }
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+    if (next != null) {
+      next.setFlowConstruct(flowConstruct);
     }
   }
 }

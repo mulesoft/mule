@@ -9,14 +9,13 @@ package org.mule.compatibility.transport.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.transport.http.CookieWrapper;
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -30,23 +29,18 @@ import java.util.TimeZone;
 import org.apache.commons.httpclient.Cookie;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
   private CookieWrapper cookieWrapper;
   private ExpressionManager mockExpressionManager;
-  private MuleMessage mockMuleMessage;
   private MuleEvent mockMuleEvent;
 
   @Before
   public void setUp() {
     cookieWrapper = new CookieWrapper();
     mockExpressionManager = mock(ExpressionManager.class);
-    mockMuleMessage = mock(MuleMessage.class);
     mockMuleEvent = mock(MuleEvent.class);
   }
 
@@ -83,13 +77,13 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setSecure("#[secure]");
     cookieWrapper.setVersion("#[version]");
 
-    when(mockExpressionManager.parse("#[name]", mockMuleEvent)).thenReturn("test");
-    when(mockExpressionManager.parse("#[value]", mockMuleEvent)).thenReturn("test");
-    when(mockExpressionManager.parse("#[domain]", mockMuleEvent)).thenReturn("localhost");
-    when(mockExpressionManager.parse("#[path]", mockMuleEvent)).thenReturn("/");
-    when(mockExpressionManager.parse("#[maxAge]", mockMuleEvent)).thenReturn("3600");
-    when(mockExpressionManager.parse("#[secure]", mockMuleEvent)).thenReturn("true");
-    when(mockExpressionManager.parse("#[version]", mockMuleEvent)).thenReturn("1");
+    when(mockExpressionManager.parse("#[name]", mockMuleEvent, null)).thenReturn("test");
+    when(mockExpressionManager.parse("#[value]", mockMuleEvent, null)).thenReturn("test");
+    when(mockExpressionManager.parse("#[domain]", mockMuleEvent, null)).thenReturn("localhost");
+    when(mockExpressionManager.parse("#[path]", mockMuleEvent, null)).thenReturn("/");
+    when(mockExpressionManager.parse("#[maxAge]", mockMuleEvent, null)).thenReturn("3600");
+    when(mockExpressionManager.parse("#[secure]", mockMuleEvent, null)).thenReturn("true");
+    when(mockExpressionManager.parse("#[version]", mockMuleEvent, null)).thenReturn("1");
 
     cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
@@ -155,7 +149,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setExpiryDate("#[expiryDate]");
 
     when(mockExpressionManager.isExpression("#[expiryDate]")).thenReturn(true);
-    when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent)).thenReturn(now);
+    when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent, null)).thenReturn(now);
     mockParse();
 
     cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
@@ -167,13 +161,8 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
 
   private void mockParse() {
-    when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return invocation.getArguments()[0];
-      }
-    });
+    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
 

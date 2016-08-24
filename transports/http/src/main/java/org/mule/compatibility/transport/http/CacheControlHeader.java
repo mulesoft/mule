@@ -80,7 +80,7 @@ public class CacheControlHeader {
 
   private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
     if (value != null) {
-      return expressionManager.parse(value, event);
+      return expressionManager.parse(value, event, null);
     }
     return value;
   }

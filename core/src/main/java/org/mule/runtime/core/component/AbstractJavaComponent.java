@@ -98,6 +98,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
       lifecycleAdapter =
           new DefaultComponentLifecycleAdapterFactory().create(object, this, flowConstruct, entryPointResolverSet, muleContext);
     }
+    if (object instanceof FlowConstructAware) {
+      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
+    }
     lifecycleAdapter.initialise();
     return lifecycleAdapter;
   }

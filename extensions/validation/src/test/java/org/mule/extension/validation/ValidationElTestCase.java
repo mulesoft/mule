@@ -12,6 +12,7 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
+
 import org.mule.extension.validation.api.NumberType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -202,7 +203,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   }
 
   private boolean evaluate(String expression, MuleEvent event) {
-    return expressionLanguage.evaluate(expression, event);
+    return expressionLanguage.evaluate(expression, event, null);
   }
 
   private void assertValid(String expression, MuleEvent event) {

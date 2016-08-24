@@ -7,7 +7,9 @@
 package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.runtime.core.util.CollectionUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -150,7 +151,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected void fireNotification(Exception ex) {
     if (enableNotifications) {
       if (ex instanceof SecurityException) {
-        fireNotification(new SecurityNotification((SecurityException) ex, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+        fireNotification(new SecurityNotification((SecurityException) ex, SECURITY_AUTHENTICATION_FAILED));
       } else {
         fireNotification(new ExceptionNotification(ex));
       }
@@ -163,24 +164,21 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * contains the exception thrown the MuleMessage and any context information.
    *
    * @param event the MuleEvent being processed when the exception occurred
+   * @param flowConstruct the flow that was processing the event when the exception occurred.
    * @param t the exception thrown. This will be sent with the ExceptionMessage
    * @see ExceptionMessage
    */
-  protected void routeException(MuleEvent event, Throwable t) {
+  protected void routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
     if (!messageProcessors.isEmpty()) {
       try {
         if (logger.isDebugEnabled()) {
           logger.debug("Message being processed is: "
               + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
         }
-        String component = "Unknown";
-        if (event.getFlowConstruct() != null) {
-          component = event.getFlowConstruct().getName();
-        }
         URI endpointUri = event.getMessageSourceURI();
 
         // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
-        ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
+        ExceptionMessage msg = new ExceptionMessage(event, t, flowConstruct.getName(), endpointUri);
 
         MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
 
@@ -195,7 +193,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       }
     }
 
-    processOutboundRouterStatistics(event.getFlowConstruct());
+    processOutboundRouterStatistics();
   }
 
   protected MulticastingRouter buildRouter() {
@@ -219,7 +217,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the exception thrown
    */
   protected void logException(Throwable t, MuleEvent event) {
-    if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, true, true)) {
+    if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, flowConstruct, true, true)) {
       doLogException(t);
     }
   }
@@ -241,12 +239,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the fatal exception to log
    */
   protected void logFatal(MuleEvent event, Throwable t) {
-    FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }
 
-    MuleMessage logMessage = event.getMessage();
     String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =
@@ -333,10 +330,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  void processOutboundRouterStatistics(FlowConstruct construct) {
+  void processOutboundRouterStatistics() {
     List<MessageProcessor> processors = getMessageProcessors();
-    FlowConstructStatistics statistics = construct.getStatistics();
-    if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
+    FlowConstructStatistics statistics = flowConstruct.getStatistics();
+    if (isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
       if (statistics.isEnabled()) {
         for (MessageProcessor endpoint : processors) {
           ((ServiceStatistics) statistics).getOutboundRouterStat().incrementRoutedMessage(endpoint);

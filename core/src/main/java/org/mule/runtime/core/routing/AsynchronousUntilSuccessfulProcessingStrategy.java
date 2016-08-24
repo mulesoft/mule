@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -17,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -31,7 +34,6 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
-import org.mule.runtime.core.util.store.QueuePersistenceObjectStore;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -89,9 +91,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event) throws MessagingException {
+  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MessagingException {
     try {
-      final Serializable eventStoreKey = storeEvent(threadSafeCopy(event));
+      final Serializable eventStoreKey = storeEvent(threadSafeCopy(event), flow);
       scheduleForProcessing(eventStoreKey, true);
       if (getUntilSuccessfulConfiguration().getAckExpression() == null) {
         return VoidMuleEvent.getInstance();
@@ -166,31 +168,28 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     }
   }
 
-  private Serializable storeEvent(final MuleEvent event) throws ObjectStoreException {
+  private Serializable storeEvent(final MuleEvent event, FlowConstruct flow) throws ObjectStoreException {
     Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
     final Integer deliveryAttemptCount =
         configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
-    return storeEvent(event, deliveryAttemptCount);
+    return storeEvent(event, flow, deliveryAttemptCount);
   }
 
-  private Serializable storeEvent(final MuleEvent event, final int deliveryAttemptCount) throws ObjectStoreException {
+  private Serializable storeEvent(final MuleEvent event, FlowConstruct flow, final int deliveryAttemptCount)
+      throws ObjectStoreException {
     event.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
-    final Serializable eventStoreKey = buildQueueKey(event, muleContext);
+    final Serializable eventStoreKey = buildQueueKey(event, flow, muleContext);
     getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, event);
     return eventStoreKey;
   }
 
-  public static Serializable buildQueueKey(final MuleEvent muleEvent, MuleContext muleContext) {
-    // the key is built in way to prevent UntilSuccessful workers across a
-    // cluster to compete for the same
-    // events over a shared object store
-    // it also adds a random trailer to support events which have been
-    // split and thus have the same id. Random number was chosen over
-    // UUID for performance reasons
-    String key = String.format("%s-%s-%s-%d", muleEvent.getFlowConstruct(), muleContext.getClusterId(),
-                               muleEvent.getId(), random.nextInt());
+  public static Serializable buildQueueKey(final MuleEvent muleEvent, FlowConstruct flow, MuleContext muleContext) {
+    // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same events over a shared
+    // object store it also adds a random trailer to support events which have been split and thus have the same id. Random number
+    // was chosen over UUID for performance reasons
+    String key = format("%s-%s-%s-%d", flow, muleContext.getClusterId(), muleEvent.getId(), random.nextInt());
 
-    return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);
+    return new QueueKey(DEFAULT_QUEUE_STORE, key);
   }
 
   private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent, final Exception lastException) {

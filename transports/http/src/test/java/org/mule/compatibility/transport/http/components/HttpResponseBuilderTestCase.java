@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
@@ -136,9 +137,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     httpResponseBuilder.setStatus(HEADER_STATUS);
     httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
 
-    when(mockExpressionManager.parse(HEADER_STATUS, mockEvent))
+    when(mockExpressionManager.parse(HEADER_STATUS, mockEvent, null))
         .thenReturn(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
-    when(mockExpressionManager.parse(HEADER_CONTENT_TYPE, mockEvent)).thenReturn("text/html");
+    when(mockExpressionManager.parse(HEADER_CONTENT_TYPE, mockEvent, null)).thenReturn("text/html");
 
 
     HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
@@ -158,13 +159,13 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     headers.put("Location", HEADER_LOCATION);
     httpResponseBuilder.setHeaders(headers);
 
-    when(mockExpressionManager.parse("Cache-Control", mockEvent)).thenReturn("Cache-Control");
-    when(mockExpressionManager.parse("Expires", mockEvent)).thenReturn("Expires");
-    when(mockExpressionManager.parse("Location", mockEvent)).thenReturn("Location");
-    when(mockExpressionManager.parse(HEADER_CACHE_CONTROL, mockEvent)).thenReturn("max-age=3600");
+    when(mockExpressionManager.parse("Cache-Control", mockEvent, null)).thenReturn("Cache-Control");
+    when(mockExpressionManager.parse("Expires", mockEvent, null)).thenReturn("Expires");
+    when(mockExpressionManager.parse("Location", mockEvent, null)).thenReturn("Location");
+    when(mockExpressionManager.parse(HEADER_CACHE_CONTROL, mockEvent, null)).thenReturn("max-age=3600");
     when(mockExpressionManager.isExpression(HEADER_EXPIRES)).thenReturn(true);
-    when(mockExpressionManager.evaluate(HEADER_EXPIRES, mockEvent)).thenReturn("Thu, 01 Dec 1994 16:00:00 GMT");
-    when(mockExpressionManager.parse(HEADER_LOCATION, mockEvent)).thenReturn("http://localhost:8080");
+    when(mockExpressionManager.evaluate(HEADER_EXPIRES, mockEvent, null)).thenReturn("Thu, 01 Dec 1994 16:00:00 GMT");
+    when(mockExpressionManager.parse(HEADER_LOCATION, mockEvent, null)).thenReturn("http://localhost:8080");
 
     HttpResponse response = new HttpResponse();
     httpResponseBuilder.setHeaders(response, mockEvent);
@@ -196,8 +197,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     headers.put(HEADER_LOCATION, "http://localhost:9090");
     httpResponseBuilder.setHeaders(headers);
 
-    when(mockExpressionManager.parse(HEADER_LOCATION, mockEvent)).thenReturn("Location");
-    when(mockExpressionManager.parse("http://localhost:9090", mockEvent)).thenReturn("http://localhost:9090");
+    when(mockExpressionManager.parse(HEADER_LOCATION, mockEvent, null)).thenReturn("Location");
+    when(mockExpressionManager.parse("http://localhost:9090", mockEvent, null)).thenReturn("http://localhost:9090");
 
     HttpResponse response = new HttpResponse();
     httpResponseBuilder.setHeaders(response, mockEvent);
@@ -237,14 +238,14 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
                              HEADER_VERSION));
     httpResponseBuilder.setCookies(cookies);
 
-    when(mockExpressionManager.parse(HEADER_NAME, mockEvent)).thenReturn("userName");
-    when(mockExpressionManager.parse(HEADER_VALUE, mockEvent)).thenReturn("John_Galt");
-    when(mockExpressionManager.parse(HEADER_DOMAIN, mockEvent)).thenReturn("localhost");
-    when(mockExpressionManager.parse(HEADER_PATH, mockEvent)).thenReturn("/");
+    when(mockExpressionManager.parse(HEADER_NAME, mockEvent, null)).thenReturn("userName");
+    when(mockExpressionManager.parse(HEADER_VALUE, mockEvent, null)).thenReturn("John_Galt");
+    when(mockExpressionManager.parse(HEADER_DOMAIN, mockEvent, null)).thenReturn("localhost");
+    when(mockExpressionManager.parse(HEADER_PATH, mockEvent, null)).thenReturn("/");
     when(mockExpressionManager.isExpression(HEADER_EXPIRY_DATE)).thenReturn(true);
-    when(mockExpressionManager.evaluate(HEADER_EXPIRY_DATE, mockEvent)).thenReturn("Sun, 15 Dec 2013 16:00:00 GMT");
-    when(mockExpressionManager.parse(HEADER_SECURE, mockEvent)).thenReturn("true");
-    when(mockExpressionManager.parse(HEADER_VERSION, mockEvent)).thenReturn("1");
+    when(mockExpressionManager.evaluate(HEADER_EXPIRY_DATE, mockEvent, null)).thenReturn("Sun, 15 Dec 2013 16:00:00 GMT");
+    when(mockExpressionManager.parse(HEADER_SECURE, mockEvent, null)).thenReturn("true");
+    when(mockExpressionManager.parse(HEADER_VERSION, mockEvent, null)).thenReturn("1");
 
     HttpResponse response = new HttpResponse();
     httpResponseBuilder.setCookies(response, mockEvent);
@@ -318,11 +319,11 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     cacheControl.setNoStore(HEADER_NO_STORE);
     httpResponseBuilder.setCacheControl(cacheControl);
 
-    when(mockExpressionManager.parse(HEADER_DIRECTIVE, mockEvent)).thenReturn("public");
-    when(mockExpressionManager.parse(HEADER_MAX_AGE, mockEvent)).thenReturn("3600");
-    when(mockExpressionManager.parse(HEADER_MUST_REVALIDATE, mockEvent)).thenReturn("true");
-    when(mockExpressionManager.parse(HEADER_NO_CACHE, mockEvent)).thenReturn("true");
-    when(mockExpressionManager.parse(HEADER_NO_STORE, mockEvent)).thenReturn("true");
+    when(mockExpressionManager.parse(HEADER_DIRECTIVE, mockEvent, null)).thenReturn("public");
+    when(mockExpressionManager.parse(HEADER_MAX_AGE, mockEvent, null)).thenReturn("3600");
+    when(mockExpressionManager.parse(HEADER_MUST_REVALIDATE, mockEvent, null)).thenReturn("true");
+    when(mockExpressionManager.parse(HEADER_NO_CACHE, mockEvent, null)).thenReturn("true");
+    when(mockExpressionManager.parse(HEADER_NO_STORE, mockEvent, null)).thenReturn("true");
 
     HttpResponse response = new HttpResponse();
     httpResponseBuilder.setCacheControl(response, mockEvent);
@@ -424,9 +425,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
     Date now = new Date();
 
-    when(mockExpressionManager.parse("Expires", mockEvent)).thenReturn("Expires");
+    when(mockExpressionManager.parse("Expires", mockEvent, null)).thenReturn("Expires");
     when(mockExpressionManager.isExpression("#[now]")).thenReturn(true);
-    when(mockExpressionManager.evaluate("#[now]", mockEvent)).thenReturn(now);
+    when(mockExpressionManager.evaluate("#[now]", mockEvent, null)).thenReturn(now);
 
     HttpResponse httpResponse = new HttpResponse();
     httpResponseBuilder.setHeaders(httpResponse, mockEvent);
@@ -447,9 +448,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     httpResponseBuilder.setCookies(cookies);
 
     when(mockExpressionManager.isExpression("#[now]")).thenReturn(true);
-    when(mockExpressionManager.evaluate("#[now]", mockEvent)).thenReturn(now);
-    when(mockExpressionManager.parse("test", mockEvent)).thenReturn("test");
-    when(mockExpressionManager.parse("test", mockEvent)).thenReturn("test");
+    when(mockExpressionManager.evaluate("#[now]", mockEvent, null)).thenReturn(now);
+    when(mockExpressionManager.parse("test", mockEvent, null)).thenReturn("test");
+    when(mockExpressionManager.parse("test", mockEvent, null)).thenReturn("test");
 
     HttpResponse response = new HttpResponse();
     httpResponseBuilder.setCookies(response, mockEvent);
@@ -531,7 +532,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void mockParse() {
-    when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class)))
+    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 }

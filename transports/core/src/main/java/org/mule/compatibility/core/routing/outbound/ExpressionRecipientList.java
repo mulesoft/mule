@@ -34,14 +34,14 @@ public class ExpressionRecipientList extends AbstractRecipientList {
       throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
     }
 
-    Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event);
+    Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event, flowConstruct);
     if (msgRecipients == null) {
       throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
     } else if (msgRecipients instanceof String) {
       Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
       return Arrays.asList(recipients);
     } else if (msgRecipients instanceof List) {
-      return new ArrayList<Object>((List<?>) msgRecipients);
+      return new ArrayList<>((List<?>) msgRecipients);
     } else {
       logger.error("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
       throw new CouldNotRouteOutboundMessageException(CoreMessages

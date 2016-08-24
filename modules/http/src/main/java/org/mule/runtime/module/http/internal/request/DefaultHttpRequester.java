@@ -7,6 +7,7 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -209,8 +209,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     final HttpAuthentication authentication = requestConfig.getAuthentication();
     final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
-    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(),
-                                        MESSAGE_REQUEST_BEGIN);
+    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent),
                          resolveAuthentication(muleEvent),
                          new BlockingCompletionHandler<HttpResponse, Exception, Void>() {
@@ -232,7 +231,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
 
                                httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
                                notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(),
-                                                                   muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+                                                                   flowConstruct, MESSAGE_REQUEST_END);
                                resetMuleEventForNewThread(muleEvent);
 
 
@@ -262,16 +261,15 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   }
 
   private void checkIfRemotelyClosed(Exception exception) {
-    if (requestConfig.getTlsContext() != null && StringUtils.containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
-      logger
-          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
+    if (requestConfig.getTlsContext() != null && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
+      logger.error("Remote host closed connection. Possible SSL/TLS handshake issue."
+          + " Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
     }
   }
 
   private WorkManager getWorkManager(MuleEvent event) {
-    FlowConstruct currentFlowConstruct = flowConstruct != null ? flowConstruct : event.getFlowConstruct();
-    if (currentFlowConstruct != null && currentFlowConstruct instanceof Flow) {
-      return ((Flow) currentFlowConstruct).getWorkManager();
+    if (flowConstruct instanceof Flow) {
+      return ((Flow) flowConstruct).getWorkManager();
     } else {
       return null;
     }
@@ -283,8 +281,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
 
     HttpResponse response;
     try {
-      notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(),
-                                          MESSAGE_REQUEST_BEGIN);
+      notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
       response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent),
                                       followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent));
     } catch (Exception e) {
@@ -293,7 +290,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     }
 
     httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
-    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
 
     if (resendRequest(muleEvent, checkRetry, authentication)) {
       consumePayload(muleEvent);

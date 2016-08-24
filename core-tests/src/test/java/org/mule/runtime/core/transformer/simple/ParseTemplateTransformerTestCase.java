@@ -74,7 +74,7 @@ public class ParseTemplateTransformerTestCase {
     when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
     String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
 
-    when(mockExpressionManager.parse(expectedExpression, mockMuleEvent)).thenReturn("Parsed");
+    when(mockExpressionManager.parse(expectedExpression, mockMuleEvent, null)).thenReturn("Parsed");
 
     Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertNotNull(response);

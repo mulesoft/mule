@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
@@ -90,7 +90,8 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testFailEntryPointMultiplePayloadMatches() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     setCurrentEvent(getTestEvent("Hello"));
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), new DefaultMuleEventContext(getCurrentEvent()));
+    InvocationResult result =
+        resolver.invoke(new MultiplePayloadsTestObject(), new DefaultMuleEventContext(getTestFlow(), getCurrentEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
   }
 

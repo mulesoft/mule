@@ -36,7 +36,7 @@ public class DynamicQueryResolver implements QueryResolver {
   public Query resolve(DbConnection connection, MuleEvent muleEvent) {
     try {
       QueryTemplate queryTemplate = query.getQueryTemplate();
-      String resolvedSqlText = expressionManager.parse(queryTemplate.getSqlText(), muleEvent);
+      String resolvedSqlText = expressionManager.parse(queryTemplate.getSqlText(), muleEvent, null);
       queryTemplate = queryTemplateParser.parse(resolvedSqlText);
 
       return new Query(queryTemplate, Collections.<QueryParamValue>emptyList());

@@ -276,6 +276,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint {
   }
 
   @Override
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
+
+  @Override
   public void setListener(MessageProcessor listener) {
     this.listener = listener;
   }

@@ -7,10 +7,26 @@
 package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMessageContext.create;
+
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.simple.AbstractRemoveVariablePropertyTransformer;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -19,20 +35,6 @@ import java.util.HashSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.transformer.simple.AbstractRemoveVariablePropertyTransformer;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.size.SmallTest;
 
 @SmallTest
 public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends AbstractMuleContextTestCase {
@@ -61,9 +63,9 @@ public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends 
   public void setUpTest() throws Exception {
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class)))
+    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(mockExpressionManager.evaluate(EXPRESSION, event)).thenReturn(EXPRESSION_VALUE);
+    when(mockExpressionManager.evaluate(EXPRESSION, event, null)).thenReturn(EXPRESSION_VALUE);
     removeVariableTransformer.setMuleContext(mockMuleContext);
 
     message = MuleMessage.builder().payload("").build();

@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
+
+import org.junit.Test;
 
 public class FlowTestCase extends AbstractELTestCase {
 
@@ -22,19 +22,22 @@ public class FlowTestCase extends AbstractELTestCase {
     super(variant, mvelOptimizer);
   }
 
+  @Override
+  public void setupFlowConstruct() throws Exception {
+    flowConstruct = getTestFlow("flowName", Object.class);
+  }
+
   @Test
   public void flowName() throws Exception {
-    Flow flow = getTestFlow("flowName", Object.class);
     MuleEvent event =
-        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+        new DefaultMuleEvent(create(flowConstruct), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
     assertEquals("flowName", evaluate("flow.name", event));
   }
 
   @Test
   public void assignToFlowName() throws Exception {
-    Flow flow = getTestFlow("flowName", Object.class);
     MuleEvent event =
-        new DefaultMuleEvent(create(flow), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+        new DefaultMuleEvent(create(flowConstruct), MuleMessage.builder().payload("").build(), ONE_WAY, flowConstruct);
     assertFinalProperty("flow.name='foo'", event);
   }
 

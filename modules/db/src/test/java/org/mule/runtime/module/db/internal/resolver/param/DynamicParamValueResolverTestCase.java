@@ -9,12 +9,14 @@ package org.mule.runtime.module.db.internal.resolver.param;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
 import org.mule.tck.size.SmallTest;
@@ -38,7 +40,7 @@ public class DynamicParamValueResolverTestCase extends AbstractQueryParamResolve
 
     assertThat(resolvedParams.size(), equalTo(1));
     assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedValue));
-    verify(expressionManager, times(0)).evaluate(anyString(), eq(muleEvent));
+    verify(expressionManager, times(0)).evaluate(anyString(), eq(muleEvent), any());
   }
 
   @Test
@@ -73,7 +75,7 @@ public class DynamicParamValueResolverTestCase extends AbstractQueryParamResolve
 
   protected void addResolvableExpression(String expectedParamValue, String paramExpressionValue) {
     when(expressionManager.isExpression(paramExpressionValue)).thenReturn(true);
-    when(expressionManager.evaluate(paramExpressionValue, muleEvent)).thenReturn(expectedParamValue);
+    when(expressionManager.evaluate(paramExpressionValue, muleEvent, null)).thenReturn(expectedParamValue);
   }
 
 }

@@ -13,8 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
-import org.mule.compatibility.core.endpoint.DynamicURIBuilder;
-import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
@@ -110,7 +108,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(expressionManager.isExpression(expression)).thenReturn(true);
-    when(expressionManager.parse(expression, event, true)).thenReturn(expressionValue);
+    when(expressionManager.parse(expression, event, null, true)).thenReturn(expressionValue);
   }
 
   private void doDynamicUriResolverTest(URIBuilder uriBuilder)

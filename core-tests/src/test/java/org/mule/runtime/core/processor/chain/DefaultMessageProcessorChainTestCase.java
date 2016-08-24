@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -89,11 +90,17 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{MessageExchangePattern.REQUEST_RESPONSE, false, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, false, false}, {MessageExchangePattern.REQUEST_RESPONSE, true, true},
-        {MessageExchangePattern.REQUEST_RESPONSE, true, false}, {MessageExchangePattern.ONE_WAY, false, true},
-        {MessageExchangePattern.ONE_WAY, false, false}, {MessageExchangePattern.ONE_WAY, true, true}});
+    return Arrays.asList(new Object[][] {
+        {REQUEST_RESPONSE, false, true},
+        {REQUEST_RESPONSE, false, false},
+        {REQUEST_RESPONSE, true, true},
+        {REQUEST_RESPONSE, true, false},
+        {ONE_WAY, false, true},
+        {ONE_WAY, false, false},
+        {ONE_WAY, true, true}});
   }
+
+  private Pipeline mockFlow = mock(Flow.class);
 
   public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking, boolean synchronous) {
     this.exchangePattern = exchangePattern;
@@ -488,8 +495,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
         new DefaultMessageProcessorChainBuilder(muleContext).chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
     builder.chain(getAppendingMP("1"), (MessageProcessor) event -> nested
-        .process(new DefaultMuleEvent(create(event.getFlowConstruct()),
-                                      event.getMessage(), REQUEST_RESPONSE, event.getFlowConstruct())),
+        .process(new DefaultMuleEvent(create(mockFlow), event.getMessage(), REQUEST_RESPONSE, mockFlow)),
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 
@@ -1084,11 +1090,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
-    Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
-    when(event.getFlowConstruct()).thenReturn(mockFlow);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);
     when(event.isAllowNonBlocking()).thenReturn(!synchronous && nonBlocking);

@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.api.transport.MessageRequesting;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -23,10 +24,14 @@ public interface InboundEndpoint
 
   AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
 
+  @Override
   default boolean isCompatibleWithAsync() {
     return true;
   }
 
+  FlowConstruct getFlowConstruct();
+
+  @Override
   default String getCanonicalURI() {
     return getConnector().getCanonicalURI(getEndpointURI());
   }

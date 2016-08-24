@@ -15,17 +15,21 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
@@ -191,15 +195,17 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  public static class ExceptionHandlerVerifierProcessor implements MessageProcessor, MessagingExceptionHandlerAware {
+  public static class ExceptionHandlerVerifierProcessor
+      implements MessageProcessor, MessagingExceptionHandlerAware, FlowConstructAware {
 
     private MessagingExceptionHandler messagingExceptionHandler;
+    private FlowConstruct flowConstruct;
 
     @Override
     public synchronized MuleEvent process(MuleEvent event) throws MuleException {
       Boolean expectedHandler = messagingExceptionHandler != null;
       if (expectedHandler) {
-        expectedHandler = messagingExceptionHandler.equals(event.getFlowConstruct().getExceptionListener());
+        expectedHandler = messagingExceptionHandler.equals(flowConstruct.getExceptionListener());
       }
       event.setFlowVariable("expectedHandler", expectedHandler);
       injectedMessagingExceptionHandler = messagingExceptionHandler;
@@ -213,5 +219,9 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
       }
     }
 
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct) {
+      this.flowConstruct = flowConstruct;
+    }
   }
 }

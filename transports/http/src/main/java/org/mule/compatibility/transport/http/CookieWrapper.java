@@ -43,7 +43,7 @@ public class CookieWrapper extends NameValuePair {
 
   private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
     if (value != null) {
-      return expressionManager.parse(value, event);
+      return expressionManager.parse(value, event, null);
     }
     return value;
   }
@@ -51,7 +51,7 @@ public class CookieWrapper extends NameValuePair {
   private Object evaluateDate(Object date, MuleEvent event, ExpressionManager expressionManager) {
 
     if (date != null && date instanceof String && expressionManager.isExpression(date.toString())) {
-      return expressionManager.evaluate(date.toString(), event);
+      return expressionManager.evaluate(date.toString(), event, null);
     }
     return date;
   }

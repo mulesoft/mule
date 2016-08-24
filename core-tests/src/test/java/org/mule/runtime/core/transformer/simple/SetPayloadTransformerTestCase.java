@@ -11,12 +11,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -25,7 +28,6 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
@@ -50,7 +52,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class)))
+    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 
@@ -79,7 +81,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     setPayloadTransformer.setValue(EXPRESSION);
     when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();
-    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(PLAIN_TEXT);
+    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent, null)).thenReturn(PLAIN_TEXT);
 
     Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertEquals(PLAIN_TEXT, response);

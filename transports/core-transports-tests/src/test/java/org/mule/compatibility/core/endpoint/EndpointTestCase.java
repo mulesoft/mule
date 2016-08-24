@@ -118,6 +118,11 @@ public class EndpointTestCase extends AbstractMuleTestCase {
       protected MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
         return null;
       }
+
+      @Override
+      public FlowConstruct getFlowConstruct() {
+        return null;
+      }
     };
   }
 }

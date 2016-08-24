@@ -24,6 +24,7 @@ public class TimerInterceptor extends AbstractInterceptingMessageProcessor imple
    */
   private static Logger logger = LoggerFactory.getLogger(TimerInterceptor.class);
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     long startTime = System.currentTimeMillis();
 
@@ -31,8 +32,7 @@ public class TimerInterceptor extends AbstractInterceptingMessageProcessor imple
 
     if (logger.isInfoEnabled()) {
       long executionTime = System.currentTimeMillis() - startTime;
-      logger.info(resultEvent.getFlowConstruct().getName() + " took " + executionTime + "ms to process event ["
-          + resultEvent.getId() + "]");
+      logger.info(flowConstruct.getName() + " took " + executionTime + "ms to process event [" + resultEvent.getId() + "]");
     }
 
     return resultEvent;

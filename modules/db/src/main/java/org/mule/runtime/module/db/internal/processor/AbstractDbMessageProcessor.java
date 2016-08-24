@@ -9,6 +9,7 @@ package org.mule.runtime.module.db.internal.processor;
 
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
+
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
@@ -83,7 +84,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
       if (target == null || "".equals(target) || "#[payload]".equals(target)) {
         muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(result).build());
       } else {
-        muleContext.getExpressionManager().enrich(target, muleEvent, result);
+        muleContext.getExpressionManager().enrich(target, muleEvent, flowConstruct, result);
       }
 
       return processNext(muleEvent);
@@ -106,7 +107,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
     MuleEvent eventToUse = muleEvent;
 
     if (!StringUtils.isEmpty(source) && !("#[payload]".equals(source))) {
-      Object payload = muleContext.getExpressionManager().evaluate(source, muleEvent);
+      Object payload = muleContext.getExpressionManager().evaluate(source, muleEvent, flowConstruct);
       eventToUse = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), muleEvent);
     }
     return eventToUse;

@@ -8,36 +8,40 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
- * ExecutionTemplate created by this method should be used on the beginning of the execution of a chain of MessageProcessor that
- * should manage exceptions. Should be used when: An asynchronous MessageProcessor chain is being executed Because of an <async>
- * element Because of an asynchronous processing strategy A Flow is called using a <flow-ref> element
- *
- * Instance of ErrorHandlingExecutionTemplate will: Route any exception to exception strategy
- *
+ * ExecutionTemplate created by this method should be used on the beginning of the execution of a chain of
+ * {@link MessageProcessor}s that should manage exceptions. Should be used when: An asynchronous MessageProcessor chain is being
+ * executed Because of an {@code <async>} element Because of an asynchronous processing strategy A Flow is called using a
+ * {@code <flow-ref>} element.
+ * <p>
+ * Instance of ErrorHandlingExecutionTemplate will: Route any exception to exception strategy.
  */
 public class ErrorHandlingExecutionTemplate implements ExecutionTemplate<MuleEvent> {
 
   private final ExecutionInterceptor<MuleEvent> processingInterceptor;
 
   private ErrorHandlingExecutionTemplate(final MuleContext muleContext,
+                                         final FlowConstruct flowConstruct,
                                          final MessagingExceptionHandler messagingExceptionHandler) {
     final TransactionConfig transactionConfig = new MuleTransactionConfig();
     final boolean processTransactionOnException = false;
-    ExecutionInterceptor<MuleEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<MuleEvent>();
+    ExecutionInterceptor<MuleEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
     tempExecutionInterceptor = new CommitTransactionInterceptor(tempExecutionInterceptor);
-    tempExecutionInterceptor = new HandleExceptionInterceptor(tempExecutionInterceptor, messagingExceptionHandler);
+    tempExecutionInterceptor = new HandleExceptionInterceptor(tempExecutionInterceptor, messagingExceptionHandler, flowConstruct);
+    tempExecutionInterceptor = new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig,
+                                                                           muleContext, processTransactionOnException, false);
+    tempExecutionInterceptor = new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig,
+                                                                           muleContext, processTransactionOnException, false);
     tempExecutionInterceptor =
-        new BeginAndResolveTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig, muleContext,
-                                                             processTransactionOnException, false);
-    tempExecutionInterceptor = new SuspendXaTransactionInterceptor<MuleEvent>(tempExecutionInterceptor, transactionConfig,
-                                                                              processTransactionOnException);
+        new SuspendXaTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, processTransactionOnException);
     this.processingInterceptor = new RethrowExceptionInterceptor(tempExecutionInterceptor);
   }
 
@@ -46,11 +50,13 @@ public class ErrorHandlingExecutionTemplate implements ExecutionTemplate<MuleEve
    * exception listener
    *
    * @param muleContext MuleContext for this application
+   * @param flowConstruct
    * @param messagingExceptionHandler exception listener to execute for any MessagingException exception
    */
   public static ErrorHandlingExecutionTemplate createErrorHandlingExecutionTemplate(final MuleContext muleContext,
+                                                                                    final FlowConstruct flowConstruct,
                                                                                     final MessagingExceptionHandler messagingExceptionHandler) {
-    return new ErrorHandlingExecutionTemplate(muleContext, messagingExceptionHandler);
+    return new ErrorHandlingExecutionTemplate(muleContext, flowConstruct, messagingExceptionHandler);
   }
 
   @Override

@@ -267,7 +267,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
   @Override
   public Object invoke(MuleEvent event) throws MuleException {
     // Invoke method
-    MuleEventContext eventContext = new DefaultMuleEventContext(event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     Object result;
     try {
       if (componentObject == null) {

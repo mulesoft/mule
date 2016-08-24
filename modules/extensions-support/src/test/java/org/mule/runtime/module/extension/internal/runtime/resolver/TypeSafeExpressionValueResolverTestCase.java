@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -87,7 +88,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private void verifyExpressionManager(VerificationMode mode) {
-    verify(expressionManager, mode).parse(anyString(), any(MuleEvent.class));
+    verify(expressionManager, mode).parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class));
   }
 
   private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception {

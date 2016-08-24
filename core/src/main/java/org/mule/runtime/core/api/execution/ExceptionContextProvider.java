@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.Map;
@@ -24,8 +25,9 @@ public interface ExceptionContextProvider {
   /**
    * 
    * @param event
+   * @param flowConstruct
    * @return info entries to be added to the logged exception message
    */
-  Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed);
+  Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed, FlowConstruct flowConstruct);
 
 }

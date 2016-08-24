@@ -9,6 +9,7 @@ package org.mule.runtime.core.source.polling;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -199,7 +200,7 @@ public class PollingMessageSource
 
   private void pollWith(final MuleMessage request) throws Exception {
     ExecutionTemplate<MuleEvent> executionTemplate =
-        createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
+        createMainExecutionTemplate(muleContext, flowConstruct, flowConstruct.getExceptionListener());
     try {
       final MessageProcessorPollingInterceptor interceptor = override.interceptor();
       if (interceptor instanceof MuleContextAware) {
@@ -218,7 +219,7 @@ public class PollingMessageSource
           if (isNewMessage(sourceEvent)) {
             muleContext.getNotificationManager()
                 .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
-                                                                   flowConstruct, ConnectorMessageNotification.MESSAGE_RECEIVED));
+                                                                   flowConstruct, MESSAGE_RECEIVED));
             event = interceptor.prepareRouting(sourceEvent, new DefaultMuleEvent(sourceEvent.getMessage(), sourceEvent));
             listener.process(event);
             interceptor.postProcessRouting(event);

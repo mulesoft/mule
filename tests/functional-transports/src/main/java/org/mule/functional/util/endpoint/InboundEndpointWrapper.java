@@ -51,6 +51,11 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint {
   }
 
   @Override
+  public FlowConstruct getFlowConstruct() {
+    return delegate.getFlowConstruct();
+  }
+
+  @Override
   public EndpointURI getEndpointURI() {
     return delegate.getEndpointURI();
   }

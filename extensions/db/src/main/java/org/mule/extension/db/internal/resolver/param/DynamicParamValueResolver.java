@@ -33,7 +33,7 @@ public class DynamicParamValueResolver implements ParamValueResolver {
       for (QueryParamValue templateParam : templateParams) {
         if (templateParam != null && templateParam.getValue() instanceof String
             && expressionManager.isExpression((String) templateParam.getValue())) {
-          Object newValue = expressionManager.evaluate((String) templateParam.getValue(), muleEvent);
+          Object newValue = expressionManager.evaluate((String) templateParam.getValue(), muleEvent, null);
           QueryParamValue queryParamValue = new QueryParamValue(templateParam.getName(), newValue);
 
           params.add(queryParamValue);

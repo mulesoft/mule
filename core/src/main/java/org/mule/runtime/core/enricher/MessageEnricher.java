@@ -76,7 +76,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
       sourceExpressionArg = "#[payload:]";
     }
 
-    TypedValue typedValue = expressionManager.evaluateTyped(sourceExpressionArg, enrichmentEvent);
+    TypedValue typedValue = expressionManager.evaluateTyped(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
     if (typedValue.getValue() instanceof MuleMessage) {
       MuleMessage muleMessage = (MuleMessage) typedValue.getValue();
@@ -84,7 +84,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
-      expressionManager.enrichTyped(targetExpressionArg, currentEvent, typedValue);
+      expressionManager.enrichTyped(targetExpressionArg, currentEvent, flowConstruct, typedValue);
     } else {
       currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage())
           .payload(typedValue.getValue())

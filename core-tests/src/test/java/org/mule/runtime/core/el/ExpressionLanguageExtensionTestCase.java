@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.el;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -19,8 +22,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
-import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
-import org.mule.runtime.core.api.el.VariableAssignmentCallback;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -29,7 +30,6 @@ import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
-import org.mule.mvel2.compiler.AbstractParser;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -70,22 +70,22 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void importClass() throws RegistrationException, InitialisationException {
-    Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("Calendar"));
+    assertThat(expressionLanguage.evaluate("Calendar"), equalTo(Calendar.class));
   }
 
   @Test
   public void importClassWithName() throws RegistrationException, InitialisationException {
-    Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("CAL"));
+    assertThat(expressionLanguage.evaluate("CAL"), equalTo(Calendar.class));
   }
 
   @Test
   public void importStaticMethod() throws RegistrationException, InitialisationException {
-    Assert.assertEquals(DateFormat.getInstance(), expressionLanguage.evaluate("dateFormat()"));
+    assertThat(expressionLanguage.evaluate("dateFormat()"), is(DateFormat.getInstance()));
   }
 
   @Test
   public void variable() throws RegistrationException, InitialisationException {
-    Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
+    assertThat(expressionLanguage.evaluate("a"), is("hi"));
   }
 
   @Test
@@ -100,13 +100,13 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void mutableVariable() throws RegistrationException, InitialisationException {
-    Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
+    assertThat(expressionLanguage.evaluate("b"), is("hi"));
   }
 
   @Test
   public void assignValueToMutableVariable() throws RegistrationException, InitialisationException {
-    Assert.assertEquals("hi", expressionLanguage.evaluate("b='1'"));
-    Assert.assertEquals("1", b);
+    assertThat(expressionLanguage.evaluate("b='1'"), is("hi"));
+    assertThat(b, is("1"));
   }
 
   @Test
@@ -114,7 +114,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
-    Assert.assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("appShortcut.name"));
+    assertThat(mvel.evaluate("appShortcut.name"), is(muleContext.getConfiguration().getId()));
   }
 
   @Test
@@ -124,7 +124,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
     MuleEvent event = getTestEvent("foo");
 
-    Assert.assertEquals("foo", mvel.evaluate("p", event));
+    assertThat(mvel.evaluate("p", event, flowConstruct), is("foo"));
   }
 
   @Test
@@ -134,8 +134,8 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
     MuleEvent event = getTestEvent("");
 
-    mvel.evaluate("p='bar'", event);
-    Assert.assertEquals("bar", event.getMessage().getPayload());
+    mvel.evaluate("p='bar'", event, flowConstruct);
+    assertThat(event.getMessage().getPayload(), is("bar"));
   }
 
   @Test
@@ -145,7 +145,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
     MuleEvent event = getTestEvent("");
     MuleMessage message = event.getMessage();
-    mvel.evaluate("p=m.uniqueId", event);
+    mvel.evaluate("p=m.uniqueId", event, flowConstruct);
   }
 
   @Test
@@ -153,8 +153,8 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
-    Assert.assertEquals("called param[0]=one,param[1]=two,app.name=" + muleContext.getConfiguration().getId(),
-                        mvel.evaluate("f('one','two')"));
+    assertThat(mvel.evaluate("f('one','two')"),
+               is("called param[0]=one,param[1]=two,app.name=" + muleContext.getConfiguration().getId()));
   }
 
   @Test
@@ -162,7 +162,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
-    Assert.assertEquals(muleContext, mvel.evaluate("muleContext()"));
+    assertThat(mvel.evaluate("muleContext()"), is(muleContext));
   }
 
   @Test
@@ -174,7 +174,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     MuleMessage message = mock(MuleMessage.class);
     when(event.getMessage()).thenReturn(message);
 
-    Assert.assertEquals(message, mvel.evaluate("muleMessage()", event));
+    Assert.assertEquals(message, mvel.evaluate("muleMessage()", event, flowConstruct));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
@@ -207,13 +207,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
         throw new RuntimeException(e);
       }
       context.addVariable("a", a);
-      context.addVariable("b", b, new VariableAssignmentCallback<String>() {
-
-        @Override
-        public void assignValue(String name, String value, String newValue) {
-          b = newValue;
-        }
-      });
+      context.addVariable("b", b, (name, value, newValue) -> b = newValue);
       context.addAlias("appShortcut", "app");
       context.addFinalVariable("final", "final");
       context.addAlias("p", "message.payload");
@@ -222,28 +216,12 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
       } catch (Exception e) {
         // continue - test will fail.
       }
-      context.declareFunction("f", new ExpressionLanguageFunction() {
-
-        @Override
-        public Object call(Object[] params, ExpressionLanguageContext context) {
-          return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
-              + ((AppContext) context.getVariable("app")).getName();
-        }
-      });
-      context.declareFunction("muleContext", new ExpressionLanguageFunction() {
-
-        @Override
-        public Object call(Object[] params, ExpressionLanguageContext context) {
-          return context.getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE);
-        }
-      });
-      context.declareFunction("muleMessage", new ExpressionLanguageFunction() {
-
-        @Override
-        public Object call(Object[] params, ExpressionLanguageContext context) {
-          return context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE);
-        }
-      });
+      context.declareFunction("f", (params, context1) -> "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
+          + ((AppContext) context1.getVariable("app")).getName());
+      context.declareFunction("muleContext", (params, context1) -> context1
+          .getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE));
+      context.declareFunction("muleMessage", (params, context1) -> context1
+          .getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE));
     }
   }
 }

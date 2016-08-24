@@ -12,6 +12,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
@@ -36,6 +37,7 @@ import java.io.Writer;
 public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implements JsonSchemaFilter {
 
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
   protected JsonToXml jToX;
 
   @Override
@@ -66,7 +68,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
       String xmlString = (String) jToX
           .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
       MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
-      boolean accepted = super.accept(new DefaultMuleEvent(event.getContext(), xmlMessage, event.getFlowConstruct()));
+      boolean accepted = super.accept(new DefaultMuleEvent(event.getContext(), xmlMessage, flowConstruct));
       if (jsonString != null) {
         msg = MuleMessage.builder(msg).payload(jsonString).build();
         event.setMessage(msg);
@@ -81,6 +83,11 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   @Override

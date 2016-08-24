@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,6 +26,8 @@ import static org.mule.compatibility.core.context.notification.EndpointMessageNo
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_SEND_BEGIN;
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_SEND_END;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -57,7 +60,6 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.functors.NOPClosure;
@@ -90,7 +92,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
   @Test
   public void testDefaultFlowRequestResponse() throws Exception {
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
     testOutboundEvent = createTestOutboundEvent();
 
     MuleEvent result = endpoint.process(testOutboundEvent);
@@ -101,7 +103,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
   @Test
   public void testDefaultFlowOneWay() throws Exception {
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
+    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, ONE_WAY, null);
     assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
     testOutboundEvent = createTestOutboundEvent();
@@ -116,7 +118,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
   @Test
   public void testSecurityFilterAccept() throws Exception {
     OutboundEndpoint endpoint =
-        createOutboundEndpoint(null, new TestSecurityFilter(true), null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+        createOutboundEndpoint(null, new TestSecurityFilter(true), null, null, REQUEST_RESPONSE, null);
     testOutboundEvent = createTestOutboundEvent();
 
     MuleEvent result = endpoint.process(testOutboundEvent);
@@ -133,19 +135,20 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     muleContext.registerListener(securityNotificationListener);
 
     OutboundEndpoint endpoint =
-        createOutboundEndpoint(null, new TestSecurityFilter(false), null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+        createOutboundEndpoint(null, new TestSecurityFilter(false), null, null, REQUEST_RESPONSE, null);
+    endpoint.setFlowConstruct(getTestFlow());
     testOutboundEvent = createTestOutboundEvent();
 
     try {
       endpoint.process(testOutboundEvent);
       fail("Exception expected");
     } catch (TestSecurityFilter.StaticMessageUnauthorisedException e) {
-      testOutboundEvent.getFlowConstruct().getExceptionListener().handleException(e, testOutboundEvent);
+      endpoint.getFlowConstruct().getExceptionListener().handleException(e, testOutboundEvent);
     }
 
     assertNull(MyMessageDispatcherFactory.dispatcher);
 
-    assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
     assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
                  securityNotificationListener.securityNotification.getAction());
     assertEquals(securityNotificationListener.securityNotification.getResourceIdentifier(),
@@ -159,11 +162,11 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
     final MuleEvent outboundEvent = createTestOutboundEvent();
 
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
 
     MyMessageDispatcherFactory.afterSend = input -> {
       try {
-        assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, MILLISECONDS));
       } catch (InterruptedException e) {
         fail(e.getMessage());
       }
@@ -177,7 +180,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     endpoint.process(outboundEvent);
 
     assertEventSent();
-    assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(listener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
     assertThat(listener.messageNotificationList, hasSize(2));
     assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
     assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_SEND_END));
@@ -193,12 +196,12 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     final TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
     muleContext.registerListener(listener);
 
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
+    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, ONE_WAY, null);
     final MuleEvent outboundEvent = createTestOutboundEvent();
 
     MyMessageDispatcherFactory.afterDispatch = input -> {
       try {
-        assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, MILLISECONDS));
       } catch (InterruptedException e) {
         fail(e.getMessage());
       }
@@ -212,7 +215,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     endpoint.process(outboundEvent);
 
     assertEventDispatched();
-    assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(listener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
     assertThat(listener.messageNotificationList, hasSize(2));
     assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
     assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_DISPATCH_END));
@@ -242,7 +245,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
   @Test(expected = UnsupportedOperationException.class)
   public void testConnectorNotAvailableOnDynamicEndpoint() throws Exception {
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
 
     endpoint.getConnector();
   }

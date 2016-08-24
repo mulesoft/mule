@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.TemplateParser.TemplateCallback;
 
 import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicLong;
@@ -75,13 +76,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
   }
 
   protected String getFilename(final MuleEvent event, String expression, TemplateParser parser) {
-    return parser.parse(new TemplateParser.TemplateCallback() {
-
-      @Override
-      public Object match(String token) {
-        return muleContext.getExpressionManager().evaluate(token, event);
-      }
-    }, expression);
+    return parser.parse((TemplateCallback) token -> muleContext.getExpressionManager().evaluate(token, event, null), expression);
   }
 
   public static Long count() {

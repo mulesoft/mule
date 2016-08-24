@@ -17,6 +17,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transport.LegacyConnector;
@@ -48,7 +50,7 @@ public class WSConsumerConfig implements MuleContextAware {
   /**
    * Creates an outbound endpoint for the service address.
    */
-  public MessageProcessor createOutboundMessageProcessor() throws MuleException {
+  public MessageProcessor createOutboundMessageProcessor(FlowConstruct flowConstruct) throws MuleException {
     Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
 
     if (connectorConfig != null && connector != null) {
@@ -57,10 +59,10 @@ public class WSConsumerConfig implements MuleContextAware {
     }
 
     // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
-    return createHttpRequester();
+    return createHttpRequester(flowConstruct);
   }
 
-  private MessageProcessor createHttpRequester() throws MuleException {
+  private MessageProcessor createHttpRequester(FlowConstruct flowConstruct) throws MuleException {
     return new MessageProcessor() {
 
       private HttpRequestOptions requestOptions;
@@ -71,6 +73,9 @@ public class WSConsumerConfig implements MuleContextAware {
             muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
         MessageProcessor messageProcessor =
             connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
+        if (messageProcessor instanceof FlowConstructAware) {
+          ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
+        }
         return messageProcessor.process(event);
       }
 

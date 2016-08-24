@@ -123,6 +123,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
       }
     }
+    this.flowConstruct = flowConstruct;
   }
 
   @Override

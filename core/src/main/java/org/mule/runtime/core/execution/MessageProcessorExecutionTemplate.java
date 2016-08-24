@@ -9,6 +9,8 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
@@ -17,7 +19,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  *
  * Provides all a set of functionality common to all MessageProcessor execution.
  */
-public class MessageProcessorExecutionTemplate implements MuleContextAware {
+public class MessageProcessorExecutionTemplate implements MuleContextAware, FlowConstructAware {
 
   private MessageProcessorExecutionInterceptor executionInterceptor;
 
@@ -44,5 +46,10 @@ public class MessageProcessorExecutionTemplate implements MuleContextAware {
   @Override
   public void setMuleContext(MuleContext context) {
     executionInterceptor.setMuleContext(context);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    executionInterceptor.setFlowConstruct(flowConstruct);
   }
 }

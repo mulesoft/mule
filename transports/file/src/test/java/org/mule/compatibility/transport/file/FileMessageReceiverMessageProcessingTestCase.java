@@ -210,7 +210,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockMessage.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY)).thenReturn(UUID.getUUID());
     when(mockHandledMessagingException.getEvent()).thenReturn(mockMuleEvent);
     when(mockUnhandledMessagingException.getEvent()).thenReturn(mockMuleEvent);
-    when(mockMuleEvent.getFlowConstruct().getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
+    when(mockFlowConstruct.getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
     when(mockHandledMessagingException.causedRollback()).thenReturn(false);
     when(mockUnhandledMessagingException.causedRollback()).thenReturn(true);
     when(mockMessagingExceptionHandler.handleException(any(Exception.class), any(MuleEvent.class)))

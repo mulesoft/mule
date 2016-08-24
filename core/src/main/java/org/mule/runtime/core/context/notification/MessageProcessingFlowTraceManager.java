@@ -8,6 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.logging.LogConfigChangeSubject;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Map;
@@ -42,13 +42,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   private MuleContext muleContext;
 
-  private PropertyChangeListener logConfigChangeListener = new PropertyChangeListener() {
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-      handleNotificationListeners();
-    }
-  };
+  private PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
 
   public MessageProcessingFlowTraceManager() {
     messageProcessorTextDebugger = new MessageProcessorTextDebugger(this);
@@ -151,7 +145,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   }
 
   @Override
-  public Map<String, Object> getContextInfo(MuleEvent muleEvent, MessageProcessor lastProcessed) {
+  public Map<String, Object> getContextInfo(MuleEvent muleEvent, MessageProcessor lastProcessed, FlowConstruct flowConstruct) {
     if (DefaultMuleConfiguration.isFlowTrace()) {
       return Collections.<String, Object>singletonMap(FLOW_STACK_INFO_KEY, muleEvent.getFlowCallStack().toString());
     } else {

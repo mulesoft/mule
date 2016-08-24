@@ -156,8 +156,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        return new DefaultMuleEvent(create(event.getFlowConstruct()), msg, ONE_WAY,
-                                    event.getFlowConstruct(), event.getSession());
+        return new DefaultMuleEvent(create(getTestFlow()), msg, ONE_WAY, getTestFlow(), event.getSession());
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

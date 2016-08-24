@@ -94,7 +94,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     }
     responseThread = Thread.currentThread();
     this.responseEvent = event;
-    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, false, true);
+    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
     increaseResponseCount();
     responseLatch.countDown();
     return event;
@@ -103,7 +103,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   private MuleEvent processNext(MuleEvent event) throws MuleException {
     if (event != null || event instanceof VoidMuleEvent) {
       return new ProcessorExecutorFactory()
-          .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false)
+          .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false,
+                                   flowConstruct)
           .execute();
     } else {
       return event;

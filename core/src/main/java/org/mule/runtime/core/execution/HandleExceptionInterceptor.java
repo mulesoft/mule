@@ -8,17 +8,21 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 
 class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
 
-  final private ExecutionInterceptor<MuleEvent> next;
-  private MessagingExceptionHandler messagingExceptionHandler;
+  private final ExecutionInterceptor<MuleEvent> next;
+  private final MessagingExceptionHandler messagingExceptionHandler;
+  private final FlowConstruct flow;
 
-  public HandleExceptionInterceptor(ExecutionInterceptor<MuleEvent> next, MessagingExceptionHandler messagingExceptionHandler) {
+  public HandleExceptionInterceptor(ExecutionInterceptor<MuleEvent> next, MessagingExceptionHandler messagingExceptionHandler,
+                                    FlowConstruct flow) {
     this.next = next;
     this.messagingExceptionHandler = messagingExceptionHandler;
+    this.flow = flow;
   }
 
   @Override
@@ -30,7 +34,7 @@ class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
       if (messagingExceptionHandler != null) {
         result = messagingExceptionHandler.handleException(e, e.getEvent());
       } else {
-        result = e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+        result = flow.getExceptionListener().handleException(e, e.getEvent());
       }
       e.setProcessedEvent(result);
       throw e;

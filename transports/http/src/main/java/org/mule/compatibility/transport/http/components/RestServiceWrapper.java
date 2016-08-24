@@ -146,7 +146,7 @@ public class RestServiceWrapper extends AbstractComponent {
     String tempUrl = serviceUrl;
     if (muleContext.getExpressionManager().isExpression(serviceUrl)) {
       muleContext.getExpressionManager().validateExpression(serviceUrl);
-      tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
+      tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, flowConstruct, true);
     }
 
     StringBuilder urlBuffer = new StringBuilder(tempUrl);
@@ -178,7 +178,7 @@ public class RestServiceWrapper extends AbstractComponent {
     endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
     OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
-    MuleEventContext eventContext = new DefaultMuleEventContext(event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     MuleEvent result =
         new DefaultMuleEvent(event.getContext(),
                              muleContext.getClient().send(outboundEndpoint.getEndpointURI().toString(),
@@ -237,7 +237,7 @@ public class RestServiceWrapper extends AbstractComponent {
 
       if (muleContext.getExpressionManager().isExpression(exp)) {
         muleContext.getExpressionManager().validateExpression(exp);
-        value = muleContext.getExpressionManager().evaluate(exp, event);
+        value = muleContext.getExpressionManager().evaluate(exp, event, flowConstruct);
       } else {
         value = exp;
       }

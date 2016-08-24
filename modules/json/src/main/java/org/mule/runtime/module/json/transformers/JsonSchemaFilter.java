@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -25,7 +26,7 @@ import org.xml.sax.SAXException;
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link JsonSchemaValidator} instead
  */
 @Deprecated
-public interface JsonSchemaFilter extends Filter, Initialisable, MuleContextAware {
+public interface JsonSchemaFilter extends Filter, Initialisable, MuleContextAware, FlowConstructAware {
 
   Validator createValidator() throws SAXException;
 

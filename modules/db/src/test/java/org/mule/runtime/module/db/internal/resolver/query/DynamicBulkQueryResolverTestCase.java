@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.module.db.internal.domain.query.BulkQuery;
 import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
@@ -37,7 +38,7 @@ public class DynamicBulkQueryResolverTestCase extends AbstractBulkQueryResolverT
     QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
     ExpressionManager expressionManager = mock(ExpressionManager.class);
-    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn("");
+    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent, null)).thenReturn("");
 
     DynamicBulkQueryResolver bulkQueryResolver =
         new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);
@@ -50,7 +51,7 @@ public class DynamicBulkQueryResolverTestCase extends AbstractBulkQueryResolverT
     QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
     ExpressionManager expressionManager = mock(ExpressionManager.class);
-    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent)).thenReturn(BULK_SQL_QUERY);
+    when(expressionManager.parse(DYNAMIC_BULK_QUERY, muleEvent, null)).thenReturn(BULK_SQL_QUERY);
 
     DynamicBulkQueryResolver bulkQueryResolver =
         new DynamicBulkQueryResolver(DYNAMIC_BULK_QUERY, queryTemplateParser, expressionManager);

@@ -8,22 +8,35 @@ package org.mule.runtime.core.api.processor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 
 public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
+
+  private Flow flow;
+
+  @Before
+  public void before() {
+    flow = new Flow("flow", mock(MuleContext.class, RETURNS_DEEP_STUBS));
+  }
 
   @Test
   public void logNullEvent() {
@@ -78,7 +91,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.log(muleEvent);
-    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent);
+    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent, flow);
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -86,7 +99,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     verifyLogCall(loggerMessageProcessor, level, level, null, null); // Level is enabled
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    verifyLogCall(loggerMessageProcessor, level, "not" + level, null, null); // Level is disabled by prepending it with "not"
+    // Level is disabled by prepending it with "not"
+    verifyLogCall(loggerMessageProcessor, level, "not" + level, null, null);
   }
 
   // Orchestrates the verifications for a call with a MuleEvent
@@ -95,31 +109,23 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     MuleEvent muleEvent = buildMuleEvent();
     verifyLogCall(loggerMessageProcessor, level, level, muleEvent, muleEvent.getMessage().toString()); // Level is enabled
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    verifyLogCall(loggerMessageProcessor, level, "not" + level, muleEvent, muleEvent.getMessage().toString()); // Level is
-                                                                                                               // disabled by
-                                                                                                               // prepending it
-                                                                                                               // with "not"
+    // Level is disabled by prepending it with "not"
+    verifyLogCall(loggerMessageProcessor, level, "not" + level, muleEvent, muleEvent.getMessage().toString());
   }
 
   // Orchestrates the verifications for a call with a 'message' set on the logger
   private void verifyLoggerMessageByLevel(String level) {
     MuleEvent muleEvent = buildMuleEvent();
-    verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, "text to log".toString()); // Level
-                                                                                                                                 // is
-                                                                                                                                 // enabled
+    // Level is enabled
+    verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, "text to log".toString());
+    // Level is disabled by prepending it with "not"
     verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, "not" + level, muleEvent,
-                  "text to log".toString()); // Level is disabled by prepending it with "not"
-    verifyExpressionEvaluation(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, times(1)); // Expression
-                                                                                                                              // should
-                                                                                                                              // be
-                                                                                                                              // evaluated
-                                                                                                                              // when
-                                                                                                                              // the
-                                                                                                                              // level
-                                                                                                                              // is
-                                                                                                                              // enabled
+                  "text to log".toString());
+    // Expression should be evaluated when the level is enabled
+    verifyExpressionEvaluation(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, times(1));
+    // Expression should not be evaluated when the level is enabled
     verifyExpressionEvaluation(buildLoggerMessageProcessorForExpressionEvaluation(level), level, "not" + level, muleEvent,
-                               never()); // Expression should not be evaluated when the level is enabled
+                               never());
   }
 
   private Logger buildMockLogger() {
@@ -144,6 +150,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     loggerMessageProcessor.initLogger();
     loggerMessageProcessor.logger = buildMockLogger();
     loggerMessageProcessor.setLevel(level);
+    loggerMessageProcessor.setFlowConstruct(flow);
     return loggerMessageProcessor;
   }
 
@@ -152,6 +159,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.setMessage("some expression");
+    loggerMessageProcessor.setFlowConstruct(flow);
     return loggerMessageProcessor;
   }
 
@@ -165,7 +173,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExpressionManager buildExpressionManager() {
     ExpressionManager expressionManager = mock(ExpressionManager.class);
-    when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenReturn("text to log");
+    when(expressionManager.parse(anyString(), any(MuleEvent.class), eq(flow))).thenReturn("text to log");
     return expressionManager;
   }
 

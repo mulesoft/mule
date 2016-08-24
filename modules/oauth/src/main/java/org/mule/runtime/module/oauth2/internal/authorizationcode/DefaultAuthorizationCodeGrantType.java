@@ -8,6 +8,7 @@ package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
@@ -23,8 +25,6 @@ import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.AttributeEvaluator;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -73,6 +73,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     return tokenManagerConfig.getConfigOAuthContext();
   }
 
+  @Override
   public String getRedirectionUrl() {
     return redirectionUrl;
   }
@@ -82,10 +83,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     return tokenRequestHandler.getRefreshTokenWhen();
   }
 
+  @Override
   public AttributeEvaluator getLocalAuthorizationUrlResourceOwnerIdEvaluator() {
     return localAuthorizationUrlResourceOwnerIdEvaluator;
   }
 
+  @Override
   public AttributeEvaluator getResourceOwnerIdEvaluator() {
     return resourceOwnerIdEvaluator;
   }
@@ -100,10 +103,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     return tokenManagerConfig.getConfigOAuthContext();
   }
 
+  @Override
   public String getClientSecret() {
     return clientSecret;
   }
 
+  @Override
   public String getClientId() {
     return clientId;
   }
@@ -113,6 +118,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     this.muleContext = context;
   }
 
+  @Override
   public TlsContextFactory getTlsContext() {
     return tlsContextFactory;
   }
@@ -161,7 +167,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   @Override
   public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException {
     if (!StringUtils.isBlank(getRefreshTokenWhen())) {
-      final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent);
+      final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
       if (!(value instanceof Boolean)) {
         throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
                                                            getRefreshTokenWhen(), value));

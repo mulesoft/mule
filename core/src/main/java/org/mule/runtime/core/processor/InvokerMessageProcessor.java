@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -15,6 +16,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -49,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
 public class InvokerMessageProcessor extends AbstractAnnotatedObject
-    implements MessageProcessor, Initialisable, MuleContextAware {
+    implements MessageProcessor, Initialisable, MuleContextAware, FlowConstructAware {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -64,6 +67,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   protected Method method;
   protected ExpressionManager expressionManager;
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -193,9 +197,9 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       // parse. We can't use parse() always because that will convert
       // everything to a string
       if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())) {
-        arg = expressionManager.evaluate(expression, event);
+        arg = expressionManager.evaluate(expression, event, flowConstruct);
       } else {
-        arg = expressionManager.parse(expression, event);
+        arg = expressionManager.parse(expression, event, flowConstruct);
       }
 
       // If expression evaluates to a MuleMessage then use it's payload
@@ -269,6 +273,11 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   public void setObjectType(Class<?> objectType) {

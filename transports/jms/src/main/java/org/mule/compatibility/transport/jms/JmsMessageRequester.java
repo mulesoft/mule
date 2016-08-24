@@ -6,6 +6,9 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static org.mule.runtime.core.context.notification.TransactionNotification.TRANSACTION_COMMITTED;
+import static org.mule.runtime.core.context.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
@@ -73,18 +76,14 @@ public class JmsMessageRequester extends AbstractMessageRequester {
       if (transacted && !tx.isXA()) {
         // register a session close listener
         final Session finalSession = session;
-        getEndpoint().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>() {
-
-          @Override
-          public void onNotification(TransactionNotification txNotification) {
-            final int txAction = txNotification.getAction();
-            final String txId = txNotification.getTransactionStringId();
-            if ((txAction == TransactionNotification.TRANSACTION_COMMITTED
-                || txAction == TransactionNotification.TRANSACTION_ROLLEDBACK) && txId.equals(tx.getId())) {
-              connector.closeQuietly(finalSession);
-            }
-          }
-        }, tx.getId());
+        getEndpoint().getMuleContext()
+            .registerListener((TransactionNotificationListener<TransactionNotification>) txNotification -> {
+              final int txAction = txNotification.getAction();
+              final String txId = txNotification.getTransactionStringId();
+              if ((txAction == TRANSACTION_COMMITTED || txAction == TRANSACTION_ROLLEDBACK) && txId.equals(tx.getId())) {
+                connector.closeQuietly(finalSession);
+              }
+            }, tx.getId());
 
         cleanupListenerRegistered = true;
       }
@@ -97,14 +96,14 @@ public class JmsMessageRequester extends AbstractMessageRequester {
       if (selectorFilter != null) {
         final String expressionTemplate = selectorFilter.getExpression();
         if (StringUtils.isNotBlank(expressionTemplate)) {
-          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null, null);
         }
       } else if (endpoint.getProperties() != null) {
         // still allow the selector to be set as a property on the endpoint
         // to be backward compatable
         final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
         if (StringUtils.isNotBlank(expressionTemplate)) {
-          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null, null);
         }
       }
       String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);

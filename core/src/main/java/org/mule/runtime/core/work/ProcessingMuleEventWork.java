@@ -9,17 +9,18 @@ package org.mule.runtime.core.work;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of {@link AbstractMuleEventWork} that executes a {@link MessageProcessor} using this work's event. Instances of
@@ -38,10 +39,12 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
   private MuleEvent resultEvent;
   private MuleException exception;
 
-  public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent, MuleContext muleContext) {
+  public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent, MuleContext muleContext,
+                                 FlowConstruct flowConstruct) {
     super(muleEvent);
     messageProcessorExecutionTemplate = createExecutionTemplate();
     messageProcessorExecutionTemplate.setMuleContext(muleContext);
+    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
     this.messageProcessor = messageProcessor;
   }
 

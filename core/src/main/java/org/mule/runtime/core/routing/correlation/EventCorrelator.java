@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.api.MessagingException;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
-import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -403,8 +403,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         logger.warn("expiry failed dues to ObjectStoreException " + e);
       }
       for (final EventGroup group : expired) {
-        ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate
-            .createErrorHandlingExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
+        ExecutionTemplate<MuleEvent> executionTemplate =
+            createErrorHandlingExecutionTemplate(muleContext, flowConstruct, flowConstruct.getExceptionListener());
         try {
           executionTemplate.execute(() -> {
             handleGroupExpiry(group);

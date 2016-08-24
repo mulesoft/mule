@@ -16,6 +16,8 @@ import org.mule.runtime.core.api.lifecycle.Callable;
  */
 public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker implements FlowConstructAware, Callable {
 
+  private FlowConstruct flowConstruct;
+
   public void springInitialize() {
     getTracker().add("springInitialize");
   }
@@ -26,9 +28,13 @@ public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker im
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    getTracker().add("setFlowConstruct");
+    if (this.flowConstruct != flowConstruct) {
+      getTracker().add("setFlowConstruct");
+      this.flowConstruct = flowConstruct;
+    }
   }
 
+  @Override
   public Object onCall(final MuleEventContext eventContext) throws Exception {
     // dirty trick to get the component instance that was used for the
     // request

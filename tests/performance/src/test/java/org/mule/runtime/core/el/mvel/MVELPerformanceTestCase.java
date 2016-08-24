@@ -48,14 +48,16 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 
   protected MuleEvent event;
+  protected Flow flow;
 
   @Before
-  public void before() {
+  public void before() throws Exception {
     ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
     event = createMuleEvent();
+    flow = getTestFlow();
     // Warmup
     for (int i = 0; i < 5000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event);
+      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
     }
   }
 
@@ -67,7 +69,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 1000)
   public void mvelColdStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent());
+      muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent(), flow);
     }
   }
 
@@ -79,7 +81,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 25)
   public void mvelWarmStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event);
+      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
     }
   }
 
@@ -91,7 +93,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 25)
   public void mvelHotStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event);
+      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
     }
   }
 

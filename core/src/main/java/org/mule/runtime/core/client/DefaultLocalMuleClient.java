@@ -12,9 +12,6 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -28,6 +25,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -36,13 +34,18 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
+import java.io.Serializable;
+import java.util.Map;
+
 public class DefaultLocalMuleClient implements MuleClient {
 
   protected final MuleContext muleContext;
+  private FlowConstruct flowConstruct;
   private ConnectorOperationLocator connectorOperatorLocator;
 
   public DefaultLocalMuleClient(MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.flowConstruct = new MuleClientFlowConstruct(muleContext);
   }
 
   protected ConnectorOperationLocator getConnectorMessageProcessLocator() {
@@ -72,6 +75,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
+      if (connectorMessageProcessor instanceof FlowConstructAware) {
+        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
+      }
       return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
     } else {
       throw createUnsupportedUrlException(url);
@@ -80,9 +86,12 @@ public class DefaultLocalMuleClient implements MuleClient {
 
   @Override
   public MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException {
-    final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
-        .locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
+    final MessageProcessor connectorMessageProcessor =
+        getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
+      if (connectorMessageProcessor instanceof FlowConstructAware) {
+        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
+      }
       return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
     } else {
       throw createUnsupportedUrlException(url);
@@ -118,6 +127,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), ONE_WAY);
     if (connectorMessageProcessor != null) {
+      if (connectorMessageProcessor instanceof FlowConstructAware) {
+        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
+      }
       connectorMessageProcessor.process(createOneWayMuleEvent(message));
     } else {
       throw createUnsupportedUrlException(url);
@@ -129,6 +141,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     final MessageProcessor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
+      if (connectorMessageProcessor instanceof FlowConstructAware) {
+        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
+      }
       connectorMessageProcessor.process(createOneWayMuleEvent(message));
     } else {
       dispatch(url, message);
@@ -141,6 +156,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     final MessageProcessor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
+      if (connectorMessageProcessor instanceof FlowConstructAware) {
+        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
+      }
       final MuleEvent event =
           connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().nullPayload().build()));
 
@@ -151,12 +169,10 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
     return new DefaultMuleEvent(create(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
     return new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct);
   }
 

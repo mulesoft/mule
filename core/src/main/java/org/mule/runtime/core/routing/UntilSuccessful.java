@@ -177,7 +177,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
   @Override
   protected MuleEvent route(final MuleEvent event) throws MessagingException {
-    return untilSuccessfulStrategy.route(event);
+    return untilSuccessfulStrategy.route(event, flowConstruct);
   }
 
   @Override

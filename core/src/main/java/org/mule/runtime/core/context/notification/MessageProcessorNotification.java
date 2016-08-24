@@ -30,6 +30,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
   public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
   private final transient MessageProcessor processor;
+  private final transient FlowConstruct flowConstruct;
+  private final String processorPath;
 
   static {
     registerAction("message processor pre invoke", MESSAGE_PROCESSOR_PRE_INVOKE);
@@ -39,11 +41,20 @@ public class MessageProcessorNotification extends ServerNotification implements 
   private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<>();
   private MessagingException exceptionThrown;
 
+
   public MessageProcessorNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor,
                                       MessagingException exceptionThrown, int action) {
-    super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
+    super(produceEvent(event, flowConstruct), action, flowConstruct.getName());
     this.exceptionThrown = exceptionThrown;
     this.processor = processor;
+
+    if (flowConstruct instanceof MessageProcessorPathResolver) {
+      this.processorPath = ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(processor);
+    } else {
+      this.processorPath = null;
+    }
+
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -93,10 +104,17 @@ public class MessageProcessorNotification extends ServerNotification implements 
   }
 
   public String getProcessorPath() {
-    FlowConstruct fc = getSource().getFlowConstruct();
-    if (!(fc instanceof MessageProcessorPathResolver)) {
-      return null;
-    }
-    return ((MessageProcessorPathResolver) fc).getProcessorPath(processor);
+    return processorPath;
   }
+
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
+
+  @Override
+  public String toString() {
+    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + processorPath + ", resourceId="
+        + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+  }
+
 }

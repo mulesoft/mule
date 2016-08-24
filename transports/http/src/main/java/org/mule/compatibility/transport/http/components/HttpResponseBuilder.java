@@ -268,7 +268,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   private String parse(String value, MuleEvent event) {
     if (value != null) {
-      return muleContext.getExpressionManager().parse(value, event);
+      return muleContext.getExpressionManager().parse(value, event, flowConstruct);
     }
     return value;
   }
@@ -277,7 +277,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     Object realValue = value;
 
     if (value != null && muleContext.getExpressionManager().isExpression(value)) {
-      realValue = muleContext.getExpressionManager().evaluate(value, event);
+      realValue = muleContext.getExpressionManager().evaluate(value, event, flowConstruct);
     }
 
     if (realValue instanceof Date) {

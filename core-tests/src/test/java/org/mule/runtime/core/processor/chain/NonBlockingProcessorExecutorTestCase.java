@@ -58,7 +58,6 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(mockFlow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-    when(event.getFlowConstruct()).thenReturn(mockFlow);
   }
 
   @Test
@@ -149,7 +148,11 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
 
   @Override
   protected ProcessorExecutor createProcessorExecutor(List<MessageProcessor> processors) {
-    return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true);
+    try {
+      return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true, getTestFlow());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void assertNonBlockingExecution(List<MessageProcessor> processors) throws MuleException, InterruptedException {

@@ -8,16 +8,18 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import org.mule.mvel2.ImmutableElementException;
+import org.mule.mvel2.PropertyAccessException;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.mvel2.ImmutableElementException;
-import org.mule.mvel2.PropertyAccessException;
-import org.mule.mvel2.optimizers.OptimizerFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   protected Variant variant;
   protected ExpressionLanguage expressionLanguage;
+  protected Flow flowConstruct;
 
   public AbstractELTestCase(Variant variant, String mvelOptimizer) {
     this.variant = variant;
@@ -39,7 +42,12 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   }
 
   @Before
-  public void setupExprssionEvaluator() throws Exception {
+  public void setupFlowConstruct() throws Exception {
+    flowConstruct = getTestFlow();
+  }
+
+  @Before
+  public void setupExpressionEvaluator() throws Exception {
     expressionLanguage = getExpressionLanguage();
     if (expressionLanguage instanceof Initialisable) {
       ((Initialisable) expressionLanguage).initialise();
@@ -52,7 +60,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       case EVALUATOR_LANGUAGE:
         return expressionLanguage.evaluate(expression);
       case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, null);
+        return muleContext.getExpressionManager().evaluate(expression, null, flowConstruct);
     }
     return null;
   }
@@ -61,9 +69,9 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   protected Object evaluate(String expression, MuleEvent event) {
     switch (variant) {
       case EVALUATOR_LANGUAGE:
-        return expressionLanguage.evaluate(expression, event);
+        return expressionLanguage.evaluate(expression, event, flowConstruct);
       case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, event);
+        return muleContext.getExpressionManager().evaluate(expression, event, flowConstruct);
     }
     return null;
   }

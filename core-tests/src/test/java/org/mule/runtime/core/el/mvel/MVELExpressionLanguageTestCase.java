@@ -80,6 +80,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Variant variant;
   protected MVELExpressionLanguage mvel;
+  private FlowConstruct flowConstruct;
+
   final String largeExpression =
       "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
           + "if (fields.length > 4) {" + "    sb.append('  <Contact>\n');"
@@ -99,6 +101,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   public void setupMVEL() throws InitialisationException {
     mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
+
+    flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getName()).thenReturn("myFlow");
   }
 
   @Test
@@ -131,7 +136,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testEvaluateStringMuleEvent() {
+  public void testEvaluateStringMuleEvent() throws Exception {
     MuleEvent event = createMockEvent();
 
     // Literals
@@ -150,7 +155,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testEvaluateStringMuleEventMapOfStringObject() {
+  public void testEvaluateStringMuleEventMapOfStringObject() throws Exception {
     MuleEvent event = createMockEvent();
 
     // Literals
@@ -172,7 +177,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testEvaluateStringMuleMessage() {
+  public void testEvaluateStringMuleMessage() throws Exception {
     MuleEvent event = createMockEvent();
 
     // Literals
@@ -189,7 +194,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testEvaluateStringMuleMessageMapOfStringObject() {
+  public void testEvaluateStringMuleMessageMapOfStringObject() throws Exception {
     MuleEvent event = createMockEvent();
 
     // Literals
@@ -429,11 +434,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     }
   }
 
-  protected TypedValue evaluateTyped(String expression, MuleEvent event) {
+  protected TypedValue evaluateTyped(String expression, MuleEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateTyped("#[" + expression + "]", event);
+      return mvel.evaluateTyped("#[" + expression + "]", event, flowConstruct);
     } else {
-      return mvel.evaluateTyped(expression, event);
+      return mvel.evaluateTyped(expression, event, flowConstruct);
     }
   }
 
@@ -445,11 +450,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     }
   }
 
-  protected Object evaluate(String expression, MuleEvent event) {
+  protected Object evaluate(String expression, MuleEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[" + expression + "]", event);
+      return mvel.evaluate("#[" + expression + "]", event, flowConstruct);
     } else {
-      return mvel.evaluate(expression, event);
+      return mvel.evaluate(expression, event, flowConstruct);
     }
   }
 
@@ -467,11 +472,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected MuleEvent createMockEvent(String payload, DataType dataType) {
     MuleEvent event = mock(MuleEvent.class);
-    FlowConstruct flowConstruct = mock(FlowConstruct.class);
-    when(flowConstruct.getName()).thenReturn("myFlow");
     MuleMessage message = mock(MuleMessage.class);
     when(message.getPayload()).thenReturn(payload);
-    when(event.getFlowConstruct()).thenReturn(flowConstruct);
     when(event.getMessage()).thenReturn(message);
     when(message.getDataType()).thenReturn(dataType);
     return event;
@@ -555,9 +557,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
     MuleEvent event = getTestEvent(new String[] {"1", "2"});
-    assertEquals("1", mvel.evaluate("payload[0]", event));
+    assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));
     event.setMessage(MuleMessage.builder(event.getMessage()).payload(singletonList("1")).build());
-    assertEquals("1", mvel.evaluate("payload[0]", event));
+    assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));
   }
 
 }

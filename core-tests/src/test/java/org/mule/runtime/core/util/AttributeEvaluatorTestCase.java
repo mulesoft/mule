@@ -9,8 +9,12 @@ package org.mule.runtime.core.util;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -97,7 +101,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "hi";
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class)))
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenReturn(new StringBuilder(expectedValue));
     assertThat(attributeEvaluator.resolveStringValue(mockMuleEvent), is(expectedValue));
   }
@@ -107,7 +111,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "123";
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn(expectedValue);
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is(Integer.parseInt(expectedValue)));
   }
 
@@ -116,7 +120,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final long expectedValue = 1234l;
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn(expectedValue);
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is((int) expectedValue));
   }
 
@@ -125,7 +129,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "true";
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn(expectedValue);
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -134,7 +138,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final Boolean expectedValue = true;
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn(expectedValue);
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -143,7 +147,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String value = "abcd";
-    when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(value);
+    when(mockExpressionManager.evaluate(anyString(), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn(value);
     attributeEvaluator.resolveIntegerValue(mockMuleEvent);
   }
 

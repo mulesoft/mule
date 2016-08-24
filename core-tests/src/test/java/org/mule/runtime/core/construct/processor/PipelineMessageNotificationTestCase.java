@@ -22,19 +22,6 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessagingException;
@@ -68,6 +55,20 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
@@ -114,15 +115,16 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void requestResponseNonBlocking() throws Exception {
-    assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor());
+    assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor(), 1);
   }
 
   @Test
   public void requestResponseNonBlockingWithBlockingMessageProcessor() throws Exception {
-    assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""));
+    assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""), 0);
   }
 
-  private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor) throws Exception {
+  private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor, int extraCompletes)
+      throws Exception {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
@@ -141,9 +143,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
       verify(notificationManager, times(1))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
-      verify(notificationManager, times(1))
+      verify(notificationManager, times(1 + extraCompletes))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
-      verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+      verify(notificationManager, times(3 + extraCompletes)).fireNotification(any(PipelineMessageNotification.class));
       return true;
     }));
   }
@@ -252,10 +254,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
       verify(notificationManager, times(1))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
       verify(notificationManager, times(1))
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
+      verify(notificationManager, times(1))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
       verify(notificationManager, times(1))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
-      verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+      verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
       return true;
     }));
   }
@@ -342,7 +346,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
       // Event is not same, because it's copied
       verify(notificationManager, times(1))
-          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, false, null)));
+          .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, true, null)));
       verify(notificationManager, times(1))
           .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_START,
                                                                                     false, null)));
@@ -405,18 +409,18 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     @Override
     public boolean matches(Object argument) {
       ServerNotification notification = (ServerNotification) argument;
-      if (exceptionExpected) {
-        MessagingException exception = null;
-        if (notification instanceof PipelineMessageNotification) {
-          exception = ((PipelineMessageNotification) notification).getException();
-        } else if (notification instanceof AsyncMessageNotification) {
-          exception = ((AsyncMessageNotification) notification).getException();
+      MessagingException exception = null;
+      if (notification instanceof PipelineMessageNotification) {
+        exception = ((PipelineMessageNotification) notification).getException();
+      } else if (notification instanceof AsyncMessageNotification) {
+        exception = ((AsyncMessageNotification) notification).getException();
+      }
 
-        }
+      if (exceptionExpected) {
         return expectedAction == notification.getAction() && exception != null && notification.getSource() != null
             && (this.event == null || this.event == notification.getSource());
       } else {
-        return expectedAction == notification.getAction() && notification.getSource() != null
+        return expectedAction == notification.getAction() && exception == null && notification.getSource() != null
             && (this.event == null || this.event == notification.getSource());
       }
 

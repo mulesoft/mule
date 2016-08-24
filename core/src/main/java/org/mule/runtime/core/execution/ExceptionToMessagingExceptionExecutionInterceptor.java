@@ -9,6 +9,7 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
@@ -20,6 +21,7 @@ import java.util.Map.Entry;
 public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
   private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
 
   @Override
   public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException {
@@ -39,8 +41,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
   private MessagingException putContext(MessagingException messagingException, MessageProcessor failingMessageProcessor,
                                         MuleEvent event) {
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
-      for (Entry<String, Object> contextInfoEntry : exceptionContextProvider.getContextInfo(event, failingMessageProcessor)
-          .entrySet()) {
+      for (Entry<String, Object> contextInfoEntry : exceptionContextProvider
+          .getContextInfo(event, failingMessageProcessor, flowConstruct).entrySet()) {
         if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey())) {
           messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
         }
@@ -52,5 +54,10 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 }

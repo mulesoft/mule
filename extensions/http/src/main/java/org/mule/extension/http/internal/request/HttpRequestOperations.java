@@ -25,6 +25,7 @@ import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -117,8 +118,10 @@ public class HttpRequestOperations {
             .setAuthentication(config.getAuthentication()).setParseResponse(resolvedParseResponse)
             .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config).build();
 
-    return OperationResult
-        .<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true, muleContext))
+    // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
+    final Flow flowConstruct = new Flow("httpRequestOperation", muleContext);
+    return OperationResult.<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true,
+                                                                                       muleContext, flowConstruct))
         .build();
   }
 

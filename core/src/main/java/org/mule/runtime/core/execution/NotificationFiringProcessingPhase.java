@@ -7,10 +7,11 @@
 package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
@@ -33,7 +34,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   private MuleContext muleContext;
 
-  protected void fireNotification(Object source, MuleEvent event, int action) {
+  protected void fireNotification(Object source, MuleEvent event, FlowConstruct flow, int action) {
     try {
       if (event == null || VoidMuleEvent.getInstance().equals(event)) {
         // Null result only happens when there's a filter in the chain.
@@ -45,14 +46,9 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
           return;
         }
       }
-      getNotificationHelper(muleContext.getNotificationManager()).fireNotification(
-                                                                                   source,
-                                                                                   event,
-                                                                                   event.getMessageSourceURI() != null
-                                                                                       ? event.getMessageSourceURI().toString()
-                                                                                       : null,
-                                                                                   event.getFlowConstruct(),
-                                                                                   action);
+      getNotificationHelper(muleContext.getNotificationManager())
+          .fireNotification(source, event, event.getMessageSourceURI() != null ? event.getMessageSourceURI().toString() : null,
+                            flow, action);
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }

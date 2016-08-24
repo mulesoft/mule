@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.text.MessageFormat;
 
@@ -38,13 +38,11 @@ import org.slf4j.LoggerFactory;
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
-public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
-    implements FlowConstructAware, Initialisable, Disposable {
+public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdempotentMessageFilter.class);
 
   protected volatile ObjectStore<String> store;
-  protected FlowConstruct flowConstruct;
   protected String storePrefix;
 
   protected String idExpression = MessageFormat.format("{0}message:id{1}", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
@@ -60,8 +58,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
   @Override
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
-      storePrefix = String.format("%s.%s.%s", ThreadNameHelper.getPrefix(muleContext),
-                                  (flowConstruct == null ? "" : flowConstruct.getName()), this.getClass().getName());
+      storePrefix = format("%s.%s.%s", getPrefix(muleContext), flowConstruct.getName(), this.getClass().getName());
     }
     if (store == null) {
       this.store = createMessageIdStore();
@@ -86,11 +83,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
   }
 
   protected String getValueForEvent(MuleEvent event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, true);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, flowConstruct, true);
   }
 
   protected String getIdForEvent(MuleEvent event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, true);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, flowConstruct, true);
   }
 
   public String getIdExpression() {
@@ -111,7 +108,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
 
   @Override
   protected boolean accept(MuleEvent event) {
-    if (event != null && acceptMessageForFlowConstruct(event) && isNewMessage(event)) {
+    if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
         String value = getValueForEvent(event);
@@ -136,17 +133,6 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
     }
   }
 
-  protected boolean acceptMessageForFlowConstruct(MuleEvent event) {
-    if (flowConstruct.getName().equals(event.getFlowConstruct().getName())) {
-      return true;
-    } else {
-      logger.error("This IdempotentMessageFilter was configured on the service: " + storePrefix
-          + " but has received an event for service: " + flowConstruct.getName()
-          + ". Please check your config to make sure each service" + "has its own instance of IdempotentMessageFilter.");
-      return false;
-    }
-  }
-
   protected boolean isNewMessage(MuleEvent event) {
     try {
       String id = this.getIdForEvent(event);
@@ -157,15 +143,10 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor
       }
       return !store.contains(id);
     } catch (MuleException e) {
-      logger.error("Exception attempting to determine idempotency of incoming message for " + event.getFlowConstruct().getName()
+      logger.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
           + " from the endpoint " + event.getMessageSourceURI(), e);
       return false;
     }
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   public String getValueExpression() {

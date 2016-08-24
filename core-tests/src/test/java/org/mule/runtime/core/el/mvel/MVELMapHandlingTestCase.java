@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -32,7 +34,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void keyWithNonNullValue() throws Exception {
-    Map<String, String> payload = new HashMap<String, String>();
+    Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
 
     assertMapKey(payload, KEY, VALUE);
@@ -40,13 +42,13 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void keyWithNullValue() throws Exception {
-    Map<String, String> payload = new HashMap<String, String>();
+    Map<String, String> payload = new HashMap<>();
     assertMapKey(payload, KEY, null);
   }
 
   @Test
   public void keyWithNullableValue() throws Exception {
-    Map<String, String> payload = new HashMap<String, String>();
+    Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
 
     MuleEvent event = getTestEvent(payload);
@@ -58,7 +60,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void nullKeyWhichGetsValueLater() throws Exception {
-    Map<String, String> payload = new HashMap<String, String>();
+    Map<String, String> payload = new HashMap<>();
 
     MuleEvent event = getTestEvent(payload);
 
@@ -78,8 +80,8 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
   }
 
-  private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event) {
-    Object result = el.evaluate(expression, event);
-    assertThat(String.format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
+  private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event) throws Exception {
+    Object result = el.evaluate(expression, event, getTestFlow());
+    assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }
 }

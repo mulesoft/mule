@@ -30,7 +30,7 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
 
   @Override
   public Serializable generateKey(MuleEvent event) throws NotSerializableException {
-    Object key = muleContext.getExpressionManager().evaluate(expression, event);
+    Object key = muleContext.getExpressionManager().evaluate(expression, event, null);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Generated key for event: " + event + " key: " + key);

@@ -8,13 +8,14 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  * Intercepts a MessageProcessor execution.
  */
-public interface MessageProcessorExecutionInterceptor extends MuleContextAware {
+public interface MessageProcessorExecutionInterceptor extends MuleContextAware, FlowConstructAware {
 
   public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException;
 }

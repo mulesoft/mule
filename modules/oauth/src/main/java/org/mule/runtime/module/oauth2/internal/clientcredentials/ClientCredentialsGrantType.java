@@ -8,6 +8,7 @@ package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -22,7 +23,6 @@ import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
 import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Authorization element for client credentials oauth grant type
@@ -61,10 +61,12 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     tokenRequestHandler.refreshAccessToken();
   }
 
+  @Override
   public String getClientSecret() {
     return clientSecret;
   }
 
+  @Override
   public String getClientId() {
     return clientId;
   }
@@ -107,7 +109,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) {
-    final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent);
+    final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
     if (!(value instanceof Boolean)) {
       throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
                                                          getRefreshTokenWhen(), value));
