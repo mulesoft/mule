@@ -83,7 +83,7 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
-    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions);
+    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
     assertResponse(response);
   }
 

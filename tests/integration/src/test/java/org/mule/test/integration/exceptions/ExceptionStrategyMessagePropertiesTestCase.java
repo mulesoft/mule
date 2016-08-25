@@ -34,7 +34,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrat
     MuleClient client = muleContext.getClient();
     MuleMessage msg;
     for (int i = 0; i < numMessages; ++i) {
-      msg = client.request("test://out", 5000);
+      msg = client.request("test://out", 5000).getRight().get();
       assertNotNull(msg);
       assertEquals("bar", msg.getOutboundProperty("prop"));
     }

@@ -45,8 +45,6 @@ public class OracleSelectsLongTransactionTestCase extends AbstractDbIntegrationT
       sequence.add(i);
     }
     final MuleEvent responseEvent = flowRunner("longTransaction").withPayload(sequence).run();
-
-    final MuleMessage response = responseEvent.getMessage();
-    assertThat(response.getExceptionPayload(), nullValue());
+    assertThat(responseEvent.getError(), nullValue());
   }
 }

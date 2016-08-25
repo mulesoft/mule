@@ -46,7 +46,7 @@ public class PersistentRecoverMessageTestCase extends FunctionalTestCase {
     muleContext.start();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(getPayloadAsString(testEvent.getMessage()), result.getPayload());
   }

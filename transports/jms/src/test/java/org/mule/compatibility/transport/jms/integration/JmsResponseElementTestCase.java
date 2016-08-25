@@ -32,18 +32,16 @@ public class JmsResponseElementTestCase extends FunctionalTestCase {
   @Test
   public void testOutboundEndpointResponse() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("vm://vminbound", MuleMessage.builder().payload("some message").build());
+    MuleMessage response = client.send("vm://vminbound", MuleMessage.builder().payload("some message").build()).getRight();
     assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
     assertThat(response.getInboundProperty("test"), Is.is("test"));
-    assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
   }
 
   @Test
   public void testInboundEndpointResponse() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("vm://vminbound2", MuleMessage.builder().payload(MESSAGE).build());
+    MuleMessage response = client.send("vm://vminbound2", MuleMessage.builder().payload(MESSAGE).build()).getRight();
     assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
-    assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
   }
 
   @Test
@@ -54,18 +52,15 @@ public class JmsResponseElementTestCase extends FunctionalTestCase {
     client.dispatch("jms://out",
                     MuleMessage.builder().payload(MESSAGE).addOutboundProperty(MULE_REPLY_TO_PROPERTY, replyToUri).build());
 
-    MuleMessage response = client.request(replyToUri, TIMEOUT);
+    MuleMessage response = client.request(replyToUri, TIMEOUT).getRight().get();
     assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
-    assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
-    response = client.request(replyToUri, TINY_TIMEOUT);
-    assertThat(response, IsNull.<Object>nullValue());
+    assertThat(client.request(replyToUri, TINY_TIMEOUT).getRight().isPresent(), is(false));
   }
 
   @Test
   public void testInboundEndpointOneWay() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("jms://in3", MuleMessage.builder().payload(MESSAGE).build());
+    MuleMessage response = client.send("jms://in3", MuleMessage.builder().payload(MESSAGE).build()).getRight();
     assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
-    assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
   }
 }

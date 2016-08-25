@@ -57,7 +57,7 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase {
     props.put(HttpConnector.HTTP_PARAMS_PROPERTY, params);
 
     stopWatch.start();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props).getRight();
     stopWatch.stop();
 
     assertNotNull(result);

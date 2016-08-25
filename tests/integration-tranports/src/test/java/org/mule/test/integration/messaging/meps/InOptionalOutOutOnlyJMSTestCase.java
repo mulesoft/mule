@@ -58,13 +58,13 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null);
+    MuleMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
     assertThat(result.getPayload(), is(nullValue()));
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
-    result = client.send("inboundEndpoint", "some data", props, 20000);
+    result = client.send("inboundEndpoint", "some data", props, 20000).getRight();
 
     // Give JMS some time to dispatch
     Thread.sleep(200);

@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -30,8 +32,26 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
   }
 
   /**
+   * Check a given event against this filter.
+   *
+   * @param event a non null event to filter.
+   * @return <code>true</code> if the event matches the filter
+   */
+  @Override
+  public boolean accept(MuleEvent event) {
+    Error error = event.getError();
+    if (getExpectedType() == null) {
+      return error != null;
+    } else if (error != null) {
+      return getExpectedType().isAssignableFrom(error.getException().getClass());
+    } else {
+      return accept(event.getMessage());
+    }
+  }
+
+  /**
    * Check a given message against this filter.
-   * 
+   *
    * @param message a non null message to filter.
    * @return <code>true</code> if the message matches the filter
    */
@@ -46,5 +66,4 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
       return false;
     }
   }
-
 }

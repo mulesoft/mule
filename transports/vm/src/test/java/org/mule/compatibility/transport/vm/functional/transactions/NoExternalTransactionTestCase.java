@@ -6,10 +6,12 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -17,6 +19,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 
 import javax.transaction.Transaction;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -301,8 +304,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     // This will fail, since there will be no Mule transaction to join
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://entry?connector=vm-normal", "OK", null);
-    Object response = client.request("queue", WAIT);
-    assertNull(response);
+    assertThat(client.request("queue", WAIT).getRight().isPresent(), is(false));
 
     tm.commit();
   }

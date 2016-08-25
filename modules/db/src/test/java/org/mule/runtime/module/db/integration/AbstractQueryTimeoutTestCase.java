@@ -49,7 +49,7 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
     MuleEvent responseEvent = flowRunner(QUERY_TIMEOUT_FLOW).withPayload(0).run();
 
     MuleMessage response = responseEvent.getMessage();
-    assertThat(response.getExceptionPayload(), is(Matchers.nullValue()));
+    assertThat(responseEvent.getError(), is(Matchers.nullValue()));
     assertThat(response.getPayload(), is(notNullValue()));
 
     try {

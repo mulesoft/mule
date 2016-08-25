@@ -161,7 +161,8 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
     MuleMessage msg = MuleMessage.builder().payload(msgString).addOutboundProperty("soapAction", soapAction).build();
 
     return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg,
-                                        HTTP_REQUEST_OPTIONS);
+                                        HTTP_REQUEST_OPTIONS)
+        .getRight();
   }
 
   private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException {
@@ -169,6 +170,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
     MuleMessage msg = MuleMessage.builder().payload(msgString).mediaType(MediaType.parse(contentType)).build();
 
     return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg,
-                                        HTTP_REQUEST_OPTIONS);
+                                        HTTP_REQUEST_OPTIONS)
+        .getRight();
   }
 }

@@ -33,7 +33,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://pojo1", message, null);
-    MuleMessage result = client.request("jms://response", 10000);
+    MuleMessage result = client.request("jms://response", 10000).getRight().get();
     assertNotNull(result);
     assertEquals("Received: " + message, result.getPayload());
   }

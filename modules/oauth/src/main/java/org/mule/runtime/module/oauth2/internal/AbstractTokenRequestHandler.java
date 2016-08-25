@@ -61,7 +61,7 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware {
   }
 
   protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException, TokenUrlResponseException {
-    event.setMessage(muleContext.getClient().send(tokenUrl, event.getMessage(), httpRequestOptions));
+    event.setMessage(muleContext.getClient().send(tokenUrl, event.getMessage(), httpRequestOptions).getRight());
     if (event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY) >= BAD_REQUEST.getStatusCode()) {
       throw new TokenUrlResponseException(event);
     }

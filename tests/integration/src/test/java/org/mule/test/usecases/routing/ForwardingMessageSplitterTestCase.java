@@ -34,14 +34,14 @@ public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCa
     payload.add(new Integer(3));
     payload.add(new Exception());
     flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
-    MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT);
+    MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
     assertThat(m.getPayload(), instanceOf(String.class));
-    m = client.request("test://component.2", RECEIVE_TIMEOUT);
+    m = client.request("test://component.2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
     assertThat(m.getPayload(), instanceOf(Integer.class));
 
-    m = client.request("test://error.queue", RECEIVE_TIMEOUT);
+    m = client.request("test://error.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
     assertThat(m.getPayload(), instanceOf(Exception.class));
   }

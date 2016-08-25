@@ -26,10 +26,10 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("queueName", "test.out").build();
-    MuleMessage test = client.send("vm://input", message);
+    MuleMessage test = client.send("vm://input", message).getRight();
     assertNotNull(test);
 
-    MuleMessage response = client.request("jms://test.out", 5000);
+    MuleMessage response = client.request("jms://test.out", 5000).getRight().get();
     assertEquals(TEST_PAYLOAD, response.getPayload());
   }
 }

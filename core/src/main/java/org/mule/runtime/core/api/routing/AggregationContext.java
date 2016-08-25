@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
@@ -39,8 +40,8 @@ public final class AggregationContext {
       }
 
       MuleEvent event = (MuleEvent) object;
-      ExceptionPayload ep = event.getMessage().getExceptionPayload();
-      return ep != null && ep.getException() != null;
+      Error error = event.getError();
+      return error != null;
     }
   };
 
@@ -91,7 +92,7 @@ public final class AggregationContext {
     for (int i = 0; i < this.events.size(); i++) {
       MuleEvent event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
-        routes.put(i, event.getMessage().getExceptionPayload().getException());
+        routes.put(i, event.getError().getException());
       }
     }
 

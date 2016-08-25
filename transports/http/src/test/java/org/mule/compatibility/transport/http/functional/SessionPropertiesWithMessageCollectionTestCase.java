@@ -24,6 +24,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,8 +43,8 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
   @Test
   public void sessionPropertyAfterSplitterAndAggregator() throws MuleException {
     final MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null);
-    assertNotNullAndNotExceptionResponse(response);
+    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null).getRight();
+    assertNotNull(response);
   }
 
   @Test
@@ -58,11 +59,8 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
     assertThat(((List<String>) responseEvent.getSession().<List>getProperty("recordsToUpdate")).size(), is(numberOfElements));
   }
 
-  private void assertNotNullAndNotExceptionResponse(MuleMessage response) {
-    assertNotNull(response);
-    if (response.getExceptionPayload() != null) {
-      fail(response.getExceptionPayload().getException().getCause().toString());
-    }
+  private void assertNotNull(MuleMessage response) {
+    Assert.assertNotNull(response);
   }
 
   public static class TestSplitterComponent implements Callable {

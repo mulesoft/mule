@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.transaction;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -19,6 +20,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,10 +58,9 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase {
     }
     Flow flowWithTxConfigured = (Flow) getFlowConstruct("flowWithTxConfigured");
     flowWithTxConfigured.stop();
-    MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
+    MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT).getRight().get();
     assertThat(muleMessage, IsNull.<Object>notNullValue());
-    muleMessage = muleClient.request("jms://in", TIMEOUT);
-    assertThat(muleMessage, IsNull.<Object>nullValue());
+    assertThat(muleClient.request("jms://in", TIMEOUT).getRight().isPresent(), is(false));
   }
 
   public static class SuccessComponent implements Callable {

@@ -28,7 +28,7 @@ public class DynamicSubFlowTestCase extends AbstractIntegrationTestCase {
     final MuleEvent muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
     MuleMessage result = muleEvent.getMessage();
     assertThat(result, is(notNullValue()));
-    assertThat(result.getExceptionPayload(), is(nullValue()));
+    assertThat(muleEvent.getError(), is(nullValue()));
     assertThat(result.getPayload(), is(notNullValue()));
   }
 }

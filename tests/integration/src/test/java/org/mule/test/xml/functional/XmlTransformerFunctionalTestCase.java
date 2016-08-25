@@ -88,7 +88,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
   protected Object request(String endpoint, Class<?> clazz) throws MuleException {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request(endpoint, TIMEOUT);
+    MuleMessage message = client.request(endpoint, TIMEOUT).getRight().get();
     assertNotNull(message);
     assertNotNull(message.getPayload());
     assertThat(message.getPayload(), instanceOf(clazz));

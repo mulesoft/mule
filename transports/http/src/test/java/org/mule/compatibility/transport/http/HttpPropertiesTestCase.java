@@ -43,7 +43,7 @@ public class HttpPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", MuleMessage.builder()
-        .payload("name=John&lastname=Galt").mediaType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).build());
+        .payload("name=John&lastname=Galt").mediaType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).build()).getRight();
 
     assertNotNull(response);
     assertEquals("client", response.getInboundProperty("http.relative.path"));
@@ -56,7 +56,8 @@ public class HttpPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage response =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc",
-                    getTestMuleMessage(TEST_MESSAGE));
+                    getTestMuleMessage(TEST_MESSAGE))
+            .getRight();
     assertEquals("Successfully redirected: products?retrieve=all&order=desc", getPayloadAsString(response));
   }
 }

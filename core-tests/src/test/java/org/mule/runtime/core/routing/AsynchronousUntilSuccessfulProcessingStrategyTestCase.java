@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessagingException;
@@ -217,11 +218,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
+        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
+            assertThat(((Error) argument).getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }
@@ -250,11 +251,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         MuleEvent argEvent = (MuleEvent) argument;
         assertThat(argEvent, sameInstance(mockEvent));
 
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
+        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
+            assertThat(((Error) argument).getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }
@@ -282,11 +283,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
+        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
+            assertThat(((Error) argument).getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }

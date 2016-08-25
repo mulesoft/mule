@@ -31,7 +31,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     flowRunner("all").withPayload(bis).asynchronously().run();
 
-    MuleMessage error = client.request("test://errors", 2000);
+    MuleMessage error = client.request("test://errors", 2000).getRight().get();
     assertRoutingExceptionReceived(error);
   }
 
@@ -42,7 +42,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     flowRunner("first-successful").withPayload(bis).asynchronously().run();
 
-    MuleMessage error = client.request("test://errors2", 2000);
+    MuleMessage error = client.request("test://errors2", 2000).getRight().get();
     assertRoutingExceptionReceived(error);
   }
 

@@ -32,11 +32,11 @@ public class InOnlyOutOnlyTestCase extends AbstractIntegrationTestCase {
     baseRunner.reset();
     baseRunner.withInboundProperty("foo", "bar").run();
 
-    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header received"));
 
-    result = client.request("test://notReceived", RECEIVE_TIMEOUT);
+    result = client.request("test://notReceived", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header not received"));
   }

@@ -31,7 +31,7 @@ class CallAndExpectPayloadResult implements CallAndExpect {
   @Override
   public void callEndpointAndExecuteAsserts() throws MuleException {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send(outputEndpointName, payload, null);
+    MuleMessage result = client.send(outputEndpointName, payload, null).getRight();
 
     assertEquals(here(), expectedPayloadResult, result.getPayload());
   }

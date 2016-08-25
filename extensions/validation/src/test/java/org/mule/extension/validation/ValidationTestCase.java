@@ -41,7 +41,7 @@ abstract class ValidationTestCase extends ExtensionFunctionalTestCase {
   }
 
   protected void assertValid(FlowRunner runner) throws MuleException, Exception {
-    assertThat(runner.run().getMessage().getExceptionPayload(), is(nullValue()));
+    assertThat(runner.run().getError(), is(nullValue()));
     runner.reset();
   }
 

@@ -32,7 +32,7 @@ public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("Did not processed the file", response);
     assertEquals(TEST_MESSAGE, response.getPayload());

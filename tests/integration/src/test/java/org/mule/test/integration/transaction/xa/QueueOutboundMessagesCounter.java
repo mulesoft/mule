@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
+import java.util.Optional;
+
 public class QueueOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter, MuleContextAware {
 
   private int numberOfMessagesArrived;
@@ -18,10 +20,9 @@ public class QueueOutboundMessagesCounter implements TransactionScenarios.Outbou
 
   @Override
   public int numberOfMessagesThatArrived() throws Exception {
-    MuleMessage muleMessage;
     while (true) {
-      muleMessage = muleClient.request("outboundRequester", 100);
-      if (muleMessage != null) {
+      Optional<MuleMessage> messageOptional = muleClient.request("outboundRequester", 100).getRight();
+      if (messageOptional.isPresent()) {
         numberOfMessagesArrived++;
       } else {
         break;

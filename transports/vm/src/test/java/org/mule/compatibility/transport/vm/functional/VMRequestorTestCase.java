@@ -36,7 +36,7 @@ public class VMRequestorTestCase extends FunctionalTestCase {
     List<String> results = new ArrayList<String>();
     MuleMessage result = null;
     for (int i = 0; i < 10; i++) {
-      result = client.request("vm://out", 3000L);
+      result = client.request("vm://out", 3000L).getRight().get();
       assertNotNull(result);
       results.add(getPayloadAsString(result));
     }

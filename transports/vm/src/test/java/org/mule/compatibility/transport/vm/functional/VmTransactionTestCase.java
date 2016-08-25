@@ -32,7 +32,7 @@ public class VmTransactionTestCase extends FunctionalTestCase {
     serviceComponentAck = false;
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://dispatchIn", "TEST", null);
-    MuleMessage message = client.request("vm://out", 10000);
+    MuleMessage message = client.request("vm://out", 10000).getRight().get();
     assertNotNull("Message", message);
   }
 
@@ -40,7 +40,7 @@ public class VmTransactionTestCase extends FunctionalTestCase {
   public void testSend() throws Exception {
     serviceComponentAck = false;
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://sendRequestIn", "TEST", null);
+    MuleMessage message = client.send("vm://sendRequestIn", "TEST", null).getRight();
     assertNotNull("Message", message);
     assertTrue("Service component acknowledgement", serviceComponentAck);
   }

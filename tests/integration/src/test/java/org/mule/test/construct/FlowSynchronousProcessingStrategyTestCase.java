@@ -21,7 +21,7 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
   @Override
   public void oneWay() throws Exception {
     flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 }

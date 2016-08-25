@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.api.client;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.functional.Either;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Provides methods for performing send, dispatch and request operations programatically.
@@ -65,7 +68,7 @@ public interface MuleClient {
    * @throws org.mule.api.MuleException
    */
   @Deprecated
-  MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException;
+  Either<Error, MuleMessage> send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException;
 
   /**
    *
@@ -77,7 +80,7 @@ public interface MuleClient {
    *         <code>null</code>.
    * @throws org.mule.api.MuleException
    */
-  MuleMessage send(String url, MuleMessage message) throws MuleException;
+  Either<Error, MuleMessage> send(String url, MuleMessage message) throws MuleException;
 
   /**
    *
@@ -90,7 +93,7 @@ public interface MuleClient {
    *         <code>null</code>.
    * @throws org.mule.api.MuleException
    */
-  MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
+  Either<Error, MuleMessage> send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
   /**
    * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)}
@@ -107,7 +110,8 @@ public interface MuleClient {
    * @throws org.mule.api.MuleException
    */
   @Deprecated
-  MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout) throws MuleException;
+  Either<Error, MuleMessage> send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
+      throws MuleException;
 
   /**
    * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)} instead
@@ -122,7 +126,7 @@ public interface MuleClient {
    * @throws org.mule.api.MuleException
    */
   @Deprecated
-  MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException;
+  Either<Error, MuleMessage> send(String url, MuleMessage message, long timeout) throws MuleException;
 
   /**
    * Will receive an event from an endpointUri determined by the URL.
@@ -133,7 +137,7 @@ public interface MuleClient {
    * @return the message received or <code>null</code> if no message was received
    * @throws org.mule.api.MuleException
    */
-  MuleMessage request(String url, long timeout) throws MuleException;
+  Either<Error, Optional<MuleMessage>> request(String url, long timeout) throws MuleException;
 
   /**
    * Will register the specified process as a listener for the inbound endpoint. This may be implemented by subscription or

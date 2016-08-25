@@ -54,7 +54,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithInboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null);
+    MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
@@ -68,7 +68,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null);
+    MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null).getRight();
     // TODO PLG - ES - fix this, DLQ call fails since tx was resolved already
     /*
      * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
@@ -85,7 +85,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithComponentException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null);
+    MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
@@ -99,7 +99,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithOutboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null);
+    MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }

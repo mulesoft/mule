@@ -31,12 +31,12 @@ public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase 
   @Test
   public void testTransformersAreCorrectlyInvoked() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage test = client.send("jms://testQueue", "TEST1", null);
+    MuleMessage test = client.send("jms://testQueue", "TEST1", null).getRight();
     assertNotNull(test);
     assertEquals(1, counter1);
     assertEquals("TEST1 transformed", test.getPayload());
 
-    test = client.send("jms://testQueue", "TEST2", null);
+    test = client.send("jms://testQueue", "TEST2", null).getRight();
     assertNotNull(test);
     assertEquals(2, counter1);
     assertEquals("TEST2 transformed", test.getPayload());

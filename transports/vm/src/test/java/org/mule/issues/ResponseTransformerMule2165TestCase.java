@@ -57,7 +57,7 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase {
   }
 
   protected String request(MuleClient client, String endpoint) throws Exception {
-    MuleMessage message = client.request(endpoint, TIMEOUT);
+    MuleMessage message = client.request(endpoint, TIMEOUT).getRight().get();
     assertNotNull("no response from " + endpoint, message);
     assertNotNull(getPayloadAsString(message));
     return getPayloadAsString(message);

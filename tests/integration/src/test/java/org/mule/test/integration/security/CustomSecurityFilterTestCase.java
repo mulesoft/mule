@@ -9,6 +9,7 @@ package org.mule.test.integration.security;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,9 +38,9 @@ public class CustomSecurityFilterTestCase extends AbstractIntegrationTestCase {
     props.put("username", "ross");
     props.put("pass", "ross");
 
-    MuleMessage result = flowRunner("test").withPayload("hi").withInboundProperties(props).run().getMessage();
+    MuleEvent event = flowRunner("test").withPayload("hi").withInboundProperties(props).run();
 
-    assertNull(result.getExceptionPayload());
+    assertNull(event.getError());
 
     props.put("pass", "badpass");
 

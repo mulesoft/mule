@@ -6,13 +6,16 @@
  */
 package org.mule.compatibility.transport.jms.integration;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 /**
@@ -46,7 +49,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -57,7 +60,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-topic", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -71,7 +74,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -85,7 +88,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-optional-jndi", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -99,8 +102,8 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-force-jndi", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
-    assertNull("Attempt to look up a non-existant JNDI Destination should have failed", result);
+    assertThat("Attempt to look up a non-existant JNDI Destination should have failed",
+               client.request("vm://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -109,7 +112,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -120,7 +123,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-topic-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -134,7 +137,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -148,7 +151,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-optional-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -162,7 +165,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-force-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
-    assertNull("Attempt to look up a non-existant JNDI Destination should have failed", result);
+    assertThat("Attempt to look up a non-existant JNDI Destination should have failed",
+               client.request("vm://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 }

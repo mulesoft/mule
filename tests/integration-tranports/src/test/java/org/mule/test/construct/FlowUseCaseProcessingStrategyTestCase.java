@@ -43,7 +43,8 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
     MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(),
-                                        MuleMessage.builder().nullPayload().build(), httpRequestOptions);
+                                        MuleMessage.builder().nullPayload().build(), httpRequestOptions)
+        .getRight();
     assertThat(exception.getInboundProperty("http.status", 0), is(500));
   }
 

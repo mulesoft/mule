@@ -37,7 +37,8 @@ public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase {
 
     MuleMessage response = client
         .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("BounceTcpMMP")).getMessageSource()).getAddress(),
-              TEST_MESSAGE, null);
+              TEST_MESSAGE, null)
+        .getRight();
 
     assertNotNull(response);
     assertEquals(TEST_MESSAGE, response.getPayload());

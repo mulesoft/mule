@@ -56,7 +56,8 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   @Test
   public void callWithMethod() throws Exception {
     sendRequestAndAssertMethod(TEST_MESSAGE);
-    assertThat(getPayloadAsString(muleContext.getClient().request("test://out", RECEIVE_TIMEOUT)), equalTo(TEST_MESSAGE));
+    assertThat(getPayloadAsString(muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get()),
+               equalTo(TEST_MESSAGE));
   }
 
   @Test

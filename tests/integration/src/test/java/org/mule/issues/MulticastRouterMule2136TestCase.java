@@ -84,7 +84,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
   protected Object request(String endpoint, Class<?> clazz) throws MuleException {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage message = client.request(endpoint, TIMEOUT * 2);
+    MuleMessage message = client.request(endpoint, TIMEOUT * 2).getRight().get();
     assertNotNull(message);
     assertNotNull(message.getPayload());
 

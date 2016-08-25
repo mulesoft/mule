@@ -6,8 +6,10 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.exceptions.FunctionalTestException;
@@ -26,6 +28,7 @@ import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 
@@ -60,7 +63,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   }
 
   protected void assertMessageInDlq() throws MuleException {
-    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000);
+    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
     assertNotNull(dl);
     assertTrue(dl.getPayload() instanceof ExceptionMessage);
     ExceptionMessage em = (ExceptionMessage) dl.getPayload();
@@ -69,7 +72,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   }
 
   protected void assertMessageInDlqRollbackEs() throws Exception {
-    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000);
+    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
     assertNotNull(dl);
     assertTrue(getPayloadAsString(dl).equals(TEST_MESSAGE));
   }
@@ -77,7 +80,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   protected void purgeQueue() throws MuleException {
     // required if broker is not restarted with the test - it tries to deliver those messages to the client
     // purge the queue
-    while (client.request(JMS_INPUT_QUEUE, 1000) != null) {
+    while (client.request(JMS_INPUT_QUEUE, 1000).getRight().isPresent()) {
       logger.warn("Destination " + JMS_INPUT_QUEUE + " isn't empty, draining it");
     }
   }
@@ -113,7 +116,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   }
 
   protected void assertNoMessageInDlq(String location) throws MuleException {
-    assertNull(client.request(location, 1000));
+    assertThat(client.request(location, 1000).getRight().isPresent(), is(false));
   }
 
   @After

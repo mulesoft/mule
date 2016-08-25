@@ -37,7 +37,7 @@
         <test:component doInboundTransform="false" appendString=" Received"/>
     </flow>
 
-    <!-- next, the same flows but with adapted components that call getMessage() rather than getTransformedMessage() -->
+    <!-- next, the same flows but with adapted components that call getResult() rather than getTransformedMessage() -->
     <flow name="adaptedService1">
         <transports:inbound-endpoint ref="adapted"/>
         <component class="org.mule.compatibility.transport.http.issues.NoTransformPassThroughComponent"/>

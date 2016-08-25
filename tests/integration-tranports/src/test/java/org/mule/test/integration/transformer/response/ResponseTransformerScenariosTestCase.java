@@ -54,7 +54,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testVmSync() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://sync", "request", null);
+    MuleMessage message = client.send("vm://sync", "request", null).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUT_IN_RESP)));
   }
@@ -67,7 +67,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
     // This will disable the transformers configured in the VM connector's service-overrides.
     props.put(MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
 
-    MuleMessage message = client.send("vm://syncResponseTransformer", "request", props);
+    MuleMessage message = client.send("vm://syncResponseTransformer", "request", props).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(equalTo("request" + CUSTOM_RESPONSE)));
   }
@@ -75,7 +75,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testVmSyncOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null);
+    MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message),
                is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE)));
@@ -84,7 +84,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testJmsRemoteSync() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://jmsSync", "request", null);
+    MuleMessage message = client.send("vm://jmsSync", "request", null).getRight();
     assertThat(message, notNullValue());
 
     assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUT_IN_RESP)));
@@ -93,7 +93,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testJmsSyncOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null);
+    MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE)));
   }
@@ -101,7 +101,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testChainedRouterOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null);
+    MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + VM_OUT_IN_RESP
         + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
@@ -110,7 +110,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   @Test
   public void testNestedRouterOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null);
+    MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null).getRight();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE
         + CUSTOM_RESPONSE + VM_RESPONSE)));

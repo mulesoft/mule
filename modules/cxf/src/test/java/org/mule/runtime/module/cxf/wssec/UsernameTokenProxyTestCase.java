@@ -63,7 +63,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
     InputStream stream = getClass().getResourceAsStream(getMessageResource());
     assertNotNull(stream);
 
-    return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS);
+    return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS).getRight();
   }
 
   protected String getMessageResource() {

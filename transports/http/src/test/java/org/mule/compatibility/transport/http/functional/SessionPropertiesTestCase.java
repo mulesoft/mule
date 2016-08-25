@@ -53,7 +53,8 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     Map<String, Serializable> properties = Collections.emptyMap();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", properties);
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", properties).getRight();
     assertNotNullAndNotExceptionResponse(response);
   }
 
@@ -62,14 +63,12 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     Map<String, Serializable> properties = Collections.emptyMap();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", properties);
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", properties).getRight();
     assertNotNullAndNotExceptionResponse(response);
   }
 
   private void assertNotNullAndNotExceptionResponse(MuleMessage response) {
     assertNotNull(response);
-    if (response.getExceptionPayload() != null) {
-      fail(response.getExceptionPayload().getException().getCause().toString());
-    }
   }
 }

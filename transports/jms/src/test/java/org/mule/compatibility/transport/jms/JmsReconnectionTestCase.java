@@ -113,7 +113,7 @@ public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase {
 
   private void assertMessageRouted() throws Exception {
     flowRunner("put").withPayload(PAYLOAD).run();
-    MuleMessage message = muleContext.getClient().request("vm://out", TIMEOUT_MILLIS);
+    MuleMessage message = muleContext.getClient().request("vm://out", TIMEOUT_MILLIS).getRight().get();
     assertNotNull(message);
     assertEquals(PAYLOAD, message.getPayload());
   }

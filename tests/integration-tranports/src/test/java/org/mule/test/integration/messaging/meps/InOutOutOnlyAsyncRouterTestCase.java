@@ -30,7 +30,7 @@ public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null);
+    MuleMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
     assertEquals("got it!", getPayloadAsString(result));
 

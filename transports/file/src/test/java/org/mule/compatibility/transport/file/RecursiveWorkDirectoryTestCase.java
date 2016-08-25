@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -33,9 +34,6 @@ public class RecursiveWorkDirectoryTestCase extends FunctionalTestCase {
   @Test
   public void ignoresWorkDirectoryOnRequest() throws Exception {
     MuleClient client = muleContext.getClient();
-
-    MuleMessage response = client.request("file://" + temporaryFolder.getRoot(), RECEIVE_TIMEOUT);
-
-    assertThat(response, is(nullValue()));
+    assertThat(client.request("file://" + temporaryFolder.getRoot(), RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 }

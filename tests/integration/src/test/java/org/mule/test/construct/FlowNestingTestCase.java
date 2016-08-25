@@ -6,9 +6,11 @@
  */
 package org.mule.test.construct;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
@@ -21,6 +23,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,7 +46,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
   }
 
@@ -56,8 +59,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
-    assertNull(result);
+    assertThat(client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -68,7 +70,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("ABC", getPayloadAsString(result));
   }
@@ -81,7 +83,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("AB", getPayloadAsString(result));
   }

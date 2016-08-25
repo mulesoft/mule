@@ -51,7 +51,7 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase {
     flowRunner("defaultDeleteOneWay").withPayload(VENUS.getName()).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertThat(response.getPayload(), equalTo(1));
   }

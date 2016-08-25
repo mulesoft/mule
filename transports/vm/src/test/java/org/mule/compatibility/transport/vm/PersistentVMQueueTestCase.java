@@ -32,10 +32,9 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://receiver", input, null);
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
-    assertNull(result.getExceptionPayload());
     String[] payload = (String[]) result.getPayload();
     assertEquals(output.length, payload.length);
     for (int i = 0; i < output.length; i++) {
@@ -50,10 +49,9 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://flowReceiver", input, null);
-    MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
-    assertNull(result.getExceptionPayload());
     String[] payload = (String[]) result.getPayload();
     assertEquals(output.length, payload.length);
     for (int i = 0; i < output.length; i++) {

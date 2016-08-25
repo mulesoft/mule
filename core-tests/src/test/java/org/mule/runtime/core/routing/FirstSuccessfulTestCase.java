@@ -13,7 +13,9 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -23,6 +25,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -125,8 +128,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
       MuleEvent event =
           mp.process(new DefaultMuleEvent(create(flow), msg, REQUEST_RESPONSE, flow, session));
       MuleMessage returnedMessage = event.getMessage();
-      if (returnedMessage.getExceptionPayload() != null) {
-        System.out.println(returnedMessage.getExceptionPayload().getMessage());
+      if (event.getError() != null) {
         return EXCEPTION_SEEN;
       } else {
         return getPayloadAsString(returnedMessage);
@@ -148,15 +150,20 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
         MuleMessage msg;
+        Error error = null;
         String payload = event.getMessageAsString(muleContext);
         if (payload.indexOf(rejectIfMatches) >= 0) {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
-          msg = MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(new Exception())).build();
+          Exception exception = new Exception();
+          error = builder(exception).build();
+          msg = MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(exception)).build();
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        return new DefaultMuleEvent(create(getTestFlow()), msg, ONE_WAY, getTestFlow(), event.getSession());
+        DefaultMuleEvent muleEvent = new DefaultMuleEvent(create(getTestFlow()), msg, ONE_WAY, getTestFlow(), event.getSession());
+        muleEvent.setError(error);
+        return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

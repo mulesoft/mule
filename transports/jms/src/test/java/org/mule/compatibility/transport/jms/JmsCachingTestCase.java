@@ -37,15 +37,15 @@ public class JmsCachingTestCase extends FunctionalTestCase {
   public void worksWithCaching() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
+    MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null).getRight();
     assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
-    response = client.send("vm://testInput", TEST_MESSAGE_2, null);
+    response = client.send("vm://testInput", TEST_MESSAGE_2, null).getRight();
     assertThat(TEST_MESSAGE_2, equalTo(getPayloadAsString(response)));
 
     Set<String> responses = new HashSet<String>();
-    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     responses.add(getPayloadAsString(response));
-    response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     responses.add(getPayloadAsString(response));
 
     assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));

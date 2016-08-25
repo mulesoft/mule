@@ -41,7 +41,7 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase {
     DataHandler dataHandler =
         new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), MediaType.XML, "testAttachment.txt"));
     MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("testAttachment", dataHandler).build();
-    MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
+    MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg).getRight();
 
     assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
   }

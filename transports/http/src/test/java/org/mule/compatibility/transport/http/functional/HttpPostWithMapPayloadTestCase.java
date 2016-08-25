@@ -38,7 +38,7 @@ public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://testInput", mapPayload, null);
 
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals(mapPayload, response.getPayload());
   }
 

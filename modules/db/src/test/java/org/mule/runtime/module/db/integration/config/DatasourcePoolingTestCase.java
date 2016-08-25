@@ -7,19 +7,14 @@
 
 package org.mule.runtime.module.db.integration.config;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.module.db.integration.TestDbConfig;
-import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
-
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase {
 
@@ -43,10 +38,7 @@ public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase
     flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
-    assertThat(response.getExceptionPayload(), is(nullValue()));
-
-    response = client.request("test://testOut", RECEIVE_TIMEOUT);
-    assertThat(response.getExceptionPayload(), is(nullValue()));
+    client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+    client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
   }
 }

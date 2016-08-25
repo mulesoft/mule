@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.integration.transactions.local;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -19,6 +20,7 @@ import org.mule.runtime.core.construct.Flow;
 
 import javax.jms.JMSException;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,8 +43,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("transactional");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -55,10 +57,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -69,10 +69,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -83,8 +81,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -94,10 +92,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("transactionalFailInTheMiddleWithCatchExceptionStrategy");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
     assertThat(message1, notNullValue());
-    assertThat(message2, nullValue());
   }
 
   @Test
@@ -105,8 +102,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("transactionalFailAtEndWithCatchExceptionStrategy");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -120,10 +117,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       fail("DispatchException should be thrown");
     } catch (DispatchException e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -131,9 +126,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("transactionalDoesntFailWithAnotherResourceType");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    MuleMessage message3 = muleContext.getClient().request("out3", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
+    MuleMessage message3 = muleContext.getClient().request("out3", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
     assertThat(message3, notNullValue());
@@ -147,11 +142,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    MuleMessage message3 = muleContext.getClient().request("out3", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
+    MuleMessage message3 = muleContext.getClient().request("out3", 1000).getRight().get();
     assertThat(message3, notNullValue());
   }
 
@@ -160,8 +153,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("nestedTransactional");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -174,10 +167,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
     assertThat(message1, notNullValue());
-    assertThat(message2, nullValue());
   }
 
   @Test
@@ -185,8 +177,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalFailWithCatch");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -198,8 +190,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoin");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -212,10 +204,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
   }
 
   @Test
@@ -223,8 +213,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatch");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
+    MuleMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
+    MuleMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -234,10 +224,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatchAndRollback");
     MuleEvent event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("out1", 1000);
-    MuleMessage message2 = muleContext.getClient().request("out2", 1000);
-    assertThat(message1, nullValue());
-    assertThat(message2, nullValue());
+    assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
+    assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
   }
 
 }

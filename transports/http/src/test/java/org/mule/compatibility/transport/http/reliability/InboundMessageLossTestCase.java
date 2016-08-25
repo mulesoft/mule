@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.http.reliability;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -133,10 +135,13 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
     @Override
     public MuleEvent handleException(Exception ex, MuleEvent event) {
       doHandleException(ex, event);
+      MessagingException exception = new MessagingException(event, new RuntimeException("Bad news!"));
       MuleMessage message = MuleMessage.builder().nullPayload()
-          .exceptionPayload(new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))))
+          .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
-      return new DefaultMuleEvent(message, event);
+      DefaultMuleEvent resultEvent = new DefaultMuleEvent(message, event);
+      resultEvent.setError(builder(exception).build());
+      return resultEvent;
     }
   }
 }

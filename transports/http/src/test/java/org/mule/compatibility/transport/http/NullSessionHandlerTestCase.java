@@ -34,7 +34,7 @@ public class NullSessionHandlerTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     client.dispatch("vm://testInput", TEST_MESSAGE, null);
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("Message was filtered", response);
   }

@@ -25,7 +25,7 @@ public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      handled = event.getMessage().getExceptionPayload().getException();
+      handled = event.getError().getException();
       return event;
     }
   }
@@ -37,8 +37,9 @@ public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void testFlowRefHandlingException() throws Exception {
-    MuleMessage response = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run().getMessage();
+    MuleEvent event = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run();
+    MuleMessage response = event.getMessage();
     assertThat(ErrorProcessor.handled, not(nullValue()));
-    assertThat(response.getExceptionPayload(), nullValue());
+    assertThat(event.getError(), nullValue());
   }
 }

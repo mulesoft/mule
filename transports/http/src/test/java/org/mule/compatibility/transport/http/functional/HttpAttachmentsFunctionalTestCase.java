@@ -52,7 +52,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
     MuleMessage msg = MuleMessage.builder().payload("test")
         .addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1"))).build();
 
-    MuleMessage result = client.send("endpoint1", msg);
+    MuleMessage result = client.send("endpoint1", msg).getRight();
     assertEquals("We should have no attachments coming back", 0, result.getInboundAttachmentNames().size());
   }
 
@@ -66,7 +66,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
   // ftc.setEventCallback(new EventCallback(){
   // public void eventReceived(MuleEventContext context, Object component) throws Exception
   // {
-  // context.getMessage().addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
+  // context.getResult().addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
   // }
   // });
   //

@@ -27,7 +27,7 @@ public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJms
   @Test
   public void testObjectToMessageDoesntFail() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT);
+    MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT).getRight();
     assertThat(response, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(response), is("A message with something more"));
   }

@@ -38,13 +38,15 @@ public class SafeProtocolTestCase extends FunctionalTestCase {
   @Test
   public void testSafeToSafe() throws MuleException {
     MuleClient client = muleContext.getClient();
-    assertResponseOk(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe", TEST_MESSAGE, null));
+    assertResponseOk(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe", TEST_MESSAGE, null)
+        .getRight());
   }
 
   @Test
   public void testUnsafeToSafe() throws MuleException {
     MuleClient client = muleContext.getClient();
-    assertResponseBad(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=unsafe", TEST_MESSAGE, null));
+    assertResponseBad(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=unsafe", TEST_MESSAGE, null)
+        .getRight());
   }
 
   private void assertResponseOk(MuleMessage message) {

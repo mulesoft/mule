@@ -47,7 +47,7 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
                     MuleMessage.builder().payload(payload).outboundProperties(headers).build(),
                     newOptions().method(POST.name()).build());
 
-    MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertThat(getPayloadAsString(msg), is(payload));
     assertThat(msg.getInboundProperty(customHeader), is("value"));

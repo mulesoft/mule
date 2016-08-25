@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  *       thread.await();
  *       if (thread.getException() != null)
  *       {
- *           fail(thread.getException().getMessage());
+ *           fail(thread.getException().getResult());
  *       }
  *   }
  * </code> Both the TestingThread and the main thread will run in parallel, therefore assertions can be made on "somethingElse"

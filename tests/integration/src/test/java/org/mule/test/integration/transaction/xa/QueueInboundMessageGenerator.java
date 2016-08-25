@@ -16,7 +16,7 @@ public class QueueInboundMessageGenerator implements TransactionScenarios.Inboun
 
   @Override
   public Integer generateInboundMessages() throws Exception {
-    while (muleClient.request("inboundDispatcher", 100) != null);
+    while (muleClient.request("inboundDispatcher", 100).getRight().isPresent());
     for (int i = 0; i < NUMBER_OF_MESSAGES; i++) {
       muleClient.dispatch("inboundDispatcher", "test" + i, null);
     }

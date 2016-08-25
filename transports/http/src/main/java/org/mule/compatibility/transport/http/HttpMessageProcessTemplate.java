@@ -173,9 +173,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, MuleEvent response) {
     MessagingException e = messagingException;
     if (response != null &&
-        response.getMessage().getExceptionPayload() != null &&
-        response.getMessage().getExceptionPayload().getException() instanceof MessagingException) {
-      e = (MessagingException) response.getMessage().getExceptionPayload().getException();
+        response.getError() != null &&
+        response.getError().getException() instanceof MessagingException) {
+      e = (MessagingException) response.getError().getException();
     }
     return e;
   }

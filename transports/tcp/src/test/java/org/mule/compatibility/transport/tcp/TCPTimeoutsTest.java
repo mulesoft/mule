@@ -32,7 +32,7 @@ public class TCPTimeoutsTest extends FunctionalTestCase {
   public void testOutboundResponseTimeoutSet() throws Exception {
     final MuleClient client = new DefaultLocalMuleClient(muleContext);
 
-    final MuleMessage result = client.send("vm://testIn", TEST_MESSAGE, null);
+    final MuleMessage result = client.send("vm://testIn", TEST_MESSAGE, null).getRight();
 
     assertThat(result.getPayload(), is(nullValue()));
   }

@@ -75,7 +75,8 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   private String sendRequest(String url, String payload) throws Exception {
     MuleMessage response = muleContext.getClient()
-        .send(url, getTestMuleMessage(payload), newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build());
+        .send(url, getTestMuleMessage(payload), newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build())
+        .getRight();
     return getPayloadAsString(response);
   }
 

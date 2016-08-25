@@ -54,7 +54,7 @@ public class HttpStemTestCase extends FunctionalTestCase {
 
     testComponent.setEventCallback(callback);
 
-    MuleMessage result = client.send(url, "Hello World", null);
+    MuleMessage result = client.send(url, "Hello World", null).getRight();
     assertEquals("Hello World Received", getPayloadAsString(result));
     final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
     assertEquals(200, status);

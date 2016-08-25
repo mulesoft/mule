@@ -35,7 +35,7 @@ public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase {
   public void filtersFiles() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
   }

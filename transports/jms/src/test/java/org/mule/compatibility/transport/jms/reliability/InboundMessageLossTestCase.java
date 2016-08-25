@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.reliability;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
@@ -119,8 +121,9 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
       fail("Message should have been redelivered");
     }
     assertThat(muleContext.getClient().request("jms://rollbackOnException?connector=jmsConnectorNoRedelivery",
-                                               RECEIVE_TIMEOUT / 10),
-               IsNull.<Object>nullValue());
+                                               RECEIVE_TIMEOUT / 10)
+        .getRight().isPresent(),
+               is(false));
   }
 
   @Test

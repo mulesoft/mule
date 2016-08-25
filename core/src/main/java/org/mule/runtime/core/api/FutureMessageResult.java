@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api;
 
+import static org.mule.runtime.core.functional.Either.left;
+import static org.mule.runtime.core.functional.Either.right;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.util.List;
@@ -83,29 +87,33 @@ public class FutureMessageResult extends FutureTask {
     }
   }
 
-  public MuleMessage getMessage() throws InterruptedException, ExecutionException, MuleException {
-    return this.getMessage(this.get());
+  public Either<Error, MuleMessage> getResult() throws InterruptedException, ExecutionException, MuleException {
+    return this.getResult(this.get());
   }
 
-  public MuleMessage getMessage(long timeout) throws InterruptedException, ExecutionException, TimeoutException, MuleException {
-    return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
+  public Either<Error, MuleMessage> getResult(long timeout)
+      throws InterruptedException, ExecutionException, TimeoutException, MuleException {
+    return this.getResult(this.get(timeout, TimeUnit.MILLISECONDS));
   }
 
-  private MuleMessage getMessage(Object obj) throws MuleException {
-    MuleMessage result = null;
+  private Either<Error, MuleMessage> getResult(Object obj) throws MuleException {
+    Either<Error, MuleMessage> result = null;
     if (obj != null) {
-      if (obj instanceof MuleMessage) {
-        result = (MuleMessage) obj;
+      if (obj instanceof Error) {
+        result = left((Error) obj);
       } else {
-        result = MuleMessage.builder().payload(obj).build();
-      }
+        if (obj instanceof MuleMessage) {
+          result = right((MuleMessage) obj);
+        } else {
+          result = right(MuleMessage.builder().payload(obj).build());
+        }
 
-      synchronized (this) {
-        if (transformers != null) {
-          result = muleContext.getTransformationService().applyTransformers(result, null, transformers);
+        synchronized (this) {
+          if (transformers != null) {
+            result = right(muleContext.getTransformationService().applyTransformers(result.getRight(), null, transformers));
+          }
         }
       }
-
     }
     return result;
   }

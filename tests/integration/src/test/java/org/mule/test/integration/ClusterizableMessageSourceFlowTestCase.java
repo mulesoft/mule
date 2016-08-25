@@ -35,7 +35,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.start();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload());
   }
 
@@ -67,7 +67,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload());
   }
 

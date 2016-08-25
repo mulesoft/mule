@@ -45,12 +45,14 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase {
   public void bothServicesBindCorrectly() throws Exception {
     MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient()
         .send(format("%s://localhost:%d/service/helloWorld", endpointScheme.getValue(), dynamicPort.getNumber()),
-              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build());
+              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
+        .getRight();
     assertThat(getPayloadAsString(helloWorldServiceResponse, getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), is("hello world"));
 
     MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient()
         .send(format("%s://localhost:%d/service/helloMule", endpointScheme.getValue(), dynamicPort.getNumber()),
-              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build());
+              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
+        .getRight();
     assertThat(getPayloadAsString(helloMuleServiceResponse, getMuleContextForApp(HELLO_MULE_SERVICE_APP)), is("hello mule"));
   }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.construct;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -143,9 +144,11 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
 
   private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original) {
     if (result != null && !(result instanceof VoidMuleEvent)) {
+      Error error = result.getError();
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
       result = new DefaultMuleEvent(result, original.getFlowConstruct(), original.getReplyToHandler(),
                                     original.getReplyToDestination(), original.isSynchronous());
+      result.setError(error);
     }
     resetRequestContextEvent(result);
     return result;

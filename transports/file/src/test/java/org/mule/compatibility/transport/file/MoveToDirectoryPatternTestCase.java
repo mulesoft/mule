@@ -38,7 +38,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase {
   public void moveToPatternWithDirectory() throws Exception {
     MuleClient client = muleContext.getClient();
     writeTestMessageToInputDirectory();
-    MuleMessage msg = client.request("vm://file.outbox", 3000);
+    MuleMessage msg = client.request("vm://file.outbox", 3000).getRight().get();
     assertNotNull(msg);
     assertEquals(TEST_MESSAGE, msg.getPayload());
   }

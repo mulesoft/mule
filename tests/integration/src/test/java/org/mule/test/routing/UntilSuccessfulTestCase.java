@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.api.message.Error;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -94,14 +95,14 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
     ponderUntilMessageCountReceivedByCustomMP(1);
 
-    ExceptionPayload dlqExceptionPayload = CustomMP.getProcessedMessages().get(0).getExceptionPayload();
-    assertThat(dlqExceptionPayload, is(notNullValue()));
-    assertThat(dlqExceptionPayload.getException(), instanceOf(RetryPolicyExhaustedException.class));
-    assertThat(dlqExceptionPayload.getException().getMessage(),
+    Error error = CustomMP.getProcessedEvents().get(0).getError();
+    assertThat(error, is(notNullValue()));
+    assertThat(error.getException(), instanceOf(RetryPolicyExhaustedException.class));
+    assertThat(error.getException().getMessage(),
                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
 
-    assertThat(dlqExceptionPayload.getException().getCause(), instanceOf(MuleRuntimeException.class));
-    assertThat(dlqExceptionPayload.getException().getMessage(),
+    assertThat(error.getException().getCause(), instanceOf(MuleRuntimeException.class));
+    assertThat(error.getException().getMessage(),
                containsString("Failure expression positive when processing event"));
   }
 
@@ -209,23 +210,23 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   static class CustomMP implements MessageProcessor {
 
-    private static List<MuleMessage> processedMessages = new ArrayList<>();
+    private static List<MuleEvent> processedEvents = new ArrayList<>();
 
     public static void clearCount() {
-      processedMessages.clear();
+      processedEvents.clear();
     }
 
     public static int getCount() {
-      return processedMessages.size();
+      return processedEvents.size();
     }
 
-    public static List<MuleMessage> getProcessedMessages() {
-      return processedMessages;
+    public static List<MuleEvent> getProcessedEvents() {
+      return processedEvents;
     }
 
     @Override
     public MuleEvent process(final MuleEvent event) throws MuleException {
-      processedMessages.add(event.getMessage());
+      processedEvents.add(event);
       return null;
     }
   }

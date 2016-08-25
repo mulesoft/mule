@@ -35,7 +35,7 @@ public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTes
     flowRunner("SyncAsync").withPayload("testAsync").withInboundProperty("messageType", "async").run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(result.getPayload(), is("Response sent to asyncResponse"));
   }

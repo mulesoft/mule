@@ -9,6 +9,7 @@ package org.mule.shutdown;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -56,10 +57,11 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
       public void run() {
         try {
           MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-          MuleMessage result =
+          Error error =
               client.send(url, muleMessage,
-                          HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build());
-          results[0] = result.getExceptionPayload().getException() instanceof DispatchException;
+                          HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build())
+                  .getLeft();
+          results[0] = error.getException() instanceof DispatchException;
         } catch (Exception e) {
           // Ignore
         }

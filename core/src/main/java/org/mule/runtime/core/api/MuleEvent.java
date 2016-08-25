@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -269,6 +270,13 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param context the context for this session or null if the request is not secure.
    */
   void setSecurityContext(SecurityContext context);
+
+  /**
+   * Sets an error related to this event.
+   *
+   * @param error the error associated with this event
+   */
+  void setError(Error error);
 
   /**
    * Create new {@link Builder}.

@@ -40,7 +40,7 @@ public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
 
   private void sendMessageAndAssertResponse(String endpoint) throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage answer = client.send(endpoint, MuleMessage.builder().payload(TEST_MESSAGE).build());
+    MuleMessage answer = client.send(endpoint, MuleMessage.builder().payload(TEST_MESSAGE).build()).getRight();
     assertEquals(TEST_MESSAGE, getPayloadAsString(answer));
   }
 }

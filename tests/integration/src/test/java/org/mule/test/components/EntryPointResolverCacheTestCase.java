@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -28,9 +29,9 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void testCache() throws Exception {
-    MuleMessage response = null;
-
-    response = flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run()
+    MuleEvent responseEvent =
+        flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run();
+    MuleMessage response = responseEvent
         .getMessage();
     Object payload = response.getPayload();
 
@@ -40,12 +41,12 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
     response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData")
         .run().getMessage();
     payload = response.getPayload();
-    if ((payload == null) || (response.getExceptionPayload() != null)) {
-      DefaultExceptionPayload exPld = (DefaultExceptionPayload) response.getExceptionPayload();
-      if (exPld.getException() != null) {
-        fail(exPld.getException().getMessage());
+    if ((payload == null) || (responseEvent.getError() != null)) {
+      Throwable exception = responseEvent.getError().getException();
+      if (exception != null) {
+        fail(exception.getMessage());
       } else {
-        fail(exPld.toString());
+        fail(responseEvent.getError().toString());
       }
     }
     assertThat(payload, instanceOf(String.class));

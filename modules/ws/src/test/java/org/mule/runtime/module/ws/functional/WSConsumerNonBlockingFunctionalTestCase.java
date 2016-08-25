@@ -73,7 +73,8 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).build();
     MuleClient client = muleContext.getClient();
     MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build());
+                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+        .getRight();
     assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
   }
 
@@ -81,7 +82,8 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   protected void assertValidResponse(String address, Object payload, Map<String, Serializable> properties) throws Exception {
     MuleMessage request = MuleMessage.builder().payload(payload).inboundProperties(properties).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    MuleMessage response =
+        client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build()).getRight();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
   }
 
@@ -89,7 +91,8 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception {
     MuleMessage request = MuleMessage.builder().payload(message).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    MuleMessage response =
+        client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build()).getRight();
     String responsePayload = getPayloadAsString(response);
     assertThat(responsePayload, Matchers.containsString(expectedErrorMessage));
   }

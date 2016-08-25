@@ -45,7 +45,8 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   public void testContentTypesPlainXmlXml() throws Exception {
     EchoComponent.setExpectedMimeType("text/xml");
     MuleMessage response =
-        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build());
+        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
+            .getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
   }
@@ -53,7 +54,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testContentTypesAnyXmlXml() throws Exception {
     EchoComponent.setExpectedMimeType("text/xml");
-    MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build());
+    MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
   }
@@ -62,7 +63,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   public void testContentTypesXmlPlainPlain() throws Exception {
     EchoComponent.setExpectedMimeType("text/plain");
     MuleMessage response =
-        client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.XML).build());
+        client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.XML).build()).getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
   }
@@ -70,7 +71,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testContentTypesAnyPlainPlain() throws Exception {
     EchoComponent.setExpectedMimeType("text/plain");
-    MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").build());
+    MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
   }

@@ -36,7 +36,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint1", MuleMessage.builder().nullPayload().build());
+    MuleMessage result = client.send("clientEndpoint1", MuleMessage.builder().nullPayload().build()).getRight();
     assertEquals("boobar", getPayloadAsString(result));
   }
 
@@ -46,7 +46,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase {
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "noo");
     props.put("far", "nar");
-    MuleMessage result = client.send("clientEndpoint2", null, props);
+    MuleMessage result = client.send("clientEndpoint2", null, props).getRight();
     assertEquals("noonar", getPayloadAsString(result));
   }
 

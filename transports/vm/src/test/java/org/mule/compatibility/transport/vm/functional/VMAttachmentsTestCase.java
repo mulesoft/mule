@@ -35,13 +35,9 @@ public class VMAttachmentsTestCase extends FunctionalTestCase {
         .addOutboundAttachment("test-attachment", new DataHandler(ds)).build();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage reply = client.send("vm-in", msg);
+    MuleMessage reply = client.send("vm-in", msg).getRight();
 
     assertNotNull(reply);
-    if (reply.getExceptionPayload() != null) {
-      fail(reply.getExceptionPayload().getException().getCause().toString());
-    }
-
     assertEquals(1, reply.getInboundAttachmentNames().size());
     assertNotNull(reply.getInboundAttachment("mule"));
     assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));

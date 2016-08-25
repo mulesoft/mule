@@ -43,7 +43,7 @@ public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase {
     flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertMessageContains(response, getAllPlanetRecords());
   }

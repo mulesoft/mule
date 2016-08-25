@@ -25,7 +25,7 @@ import java.util.Set;
  * it. The entrypoint is discovered using the event payload type(s) as the argument using reflection. An entry point will try and
  * match for different argument types, so it's possible to have multiple entry points on a single service.
  * <p/>
- * For multiple parameters the payload of context.getMessage().getPayload() should be an Array of objects. If the message payload
+ * For multiple parameters the payload of context.getResult().getPayload() should be an Array of objects. If the message payload
  * is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to call that
  * doesn't match the set of ignoredMethods on the resolver.
  * <p/>
@@ -91,7 +91,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver {
 
   /**
    * Will discover the entrypoint on the service using the payload type to figure out the method to call. For multiple parameters
-   * the payload of context.getMessage().geTPayload() should be an Array of objects. If the message payload is of type
+   * the payload of context.getResult().geTPayload() should be an Array of objects. If the message payload is of type
    * {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to call that doesn't match
    * the set of ignoredMethods on the resover.
    *

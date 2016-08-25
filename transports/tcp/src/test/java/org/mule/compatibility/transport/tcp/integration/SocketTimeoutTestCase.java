@@ -9,16 +9,17 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.junit.Rule;
+import org.junit.Test;
+
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeoutException;
-
-import org.junit.Rule;
-import org.junit.Test;
 
 public class SocketTimeoutTestCase extends FunctionalTestCase {
 
@@ -36,7 +37,7 @@ public class SocketTimeoutTestCase extends FunctionalTestCase {
     FutureMessageResult result = client.sendAsync("vm://inboundTest1", "something", null);
     MuleMessage message = null;
     try {
-      message = result.getMessage(1000);
+      message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {
       fail("Response timeout not honored.");
     }
@@ -49,7 +50,7 @@ public class SocketTimeoutTestCase extends FunctionalTestCase {
     FutureMessageResult result = client.sendAsync("vm://inboundTest2", "something", null);
     MuleMessage message = null;
     try {
-      message = result.getMessage(1000);
+      message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {
       fail("Response timeout not honored.");
     }

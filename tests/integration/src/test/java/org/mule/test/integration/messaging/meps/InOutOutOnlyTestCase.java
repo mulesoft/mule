@@ -37,11 +37,11 @@ public class InOutOutOnlyTestCase extends AbstractIntegrationTestCase {
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header received"));
 
-    result = client.request("test://received", RECEIVE_TIMEOUT);
+    result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header received"));
 
-    result = client.request("test://notReceived", RECEIVE_TIMEOUT);
+    result = client.request("test://notReceived", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header not received"));
   }

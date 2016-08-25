@@ -50,7 +50,7 @@ public class XQueryFunctionalTestCase extends AbstractIntegrationTestCase {
 
     MuleMessage message = muleEvent.getMessage();
     assertNotNull(message);
-    assertNull(message.getExceptionPayload());
+    assertNull(muleEvent.getError());
     // Compare results
     assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
   }

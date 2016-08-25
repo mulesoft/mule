@@ -49,7 +49,7 @@ public class XSLTWikiDocsTestCase extends AbstractIntegrationTestCase {
     final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
     MuleMessage message = muleEvent.getMessage();
     assertNotNull(message);
-    assertNull(message.getExceptionPayload());
+    assertNull(muleEvent.getError());
     // Compare results
 
     String result = getPayloadAsString(message);

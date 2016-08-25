@@ -58,7 +58,7 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
       public void run() {
         try {
           MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
-          MuleMessage result = client.send(url, muleMessage);
+          MuleMessage result = client.send(url, muleMessage).getRight();
           results[0] = payload.equals(getPayloadAsString(result));
         } catch (Exception e) {
           // Ignore

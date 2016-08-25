@@ -58,7 +58,7 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     final String url = String.format("http://localhost:%s/test", port.getNumber());
     Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", Charset.forName(encoding)));
     request.execute();
-    MuleMessage result = muleContext.getClient().request("test://out", 2000);
+    MuleMessage result = muleContext.getClient().request("test://out", 2000).getRight().get();
     assertThat(getPayloadAsString(result), is(testMessage));
   }
 

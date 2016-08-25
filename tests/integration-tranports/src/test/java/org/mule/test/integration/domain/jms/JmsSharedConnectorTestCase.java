@@ -11,14 +11,17 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.functional.Either;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
@@ -79,9 +82,13 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase {
 
       @Override
       public boolean isSatisfied() {
-        MuleMessage responseMessage;
+        MuleMessage responseMessage = null;
         try {
-          responseMessage = getMuleContextForApp(CLIENT_APP).getClient().request(queueAddress(outQueue), 10);
+          Either<Error, Optional<MuleMessage>> result =
+              getMuleContextForApp(CLIENT_APP).getClient().request(queueAddress(outQueue), 10);
+          if (result.getRight().isPresent()) {
+            responseMessage = result.getRight().get();
+          }
         } catch (MuleException e) {
           throw new RuntimeException(e);
         }

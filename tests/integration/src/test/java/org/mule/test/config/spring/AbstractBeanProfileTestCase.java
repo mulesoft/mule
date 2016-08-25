@@ -22,7 +22,7 @@ public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTes
   public void profile(String appended) throws Exception {
     flowRunner("service").withPayload("Homero").run();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
     assertEquals("Homero" + appended, response.getPayload());
   }

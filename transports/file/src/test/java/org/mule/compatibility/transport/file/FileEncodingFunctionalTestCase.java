@@ -38,7 +38,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     createDataFile(tmpDir, TEST_MESSAGE_EUC_JP_ENCODED, ENCODING);
 
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT);
+    MuleMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT).getRight().get();
 
     assertThat(message, not(nullValue()));
     assertThat(message.getDataType().getMediaType().getCharset().get(), is(ENCODING));

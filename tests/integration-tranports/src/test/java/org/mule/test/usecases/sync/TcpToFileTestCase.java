@@ -29,7 +29,7 @@ public class TcpToFileTestCase extends FunctionalTestCase {
 
     client.send("tcp://localhost:4444", payload, null);
 
-    MuleMessage msg = client.request("file://temp/tests/mule", 10000);
+    MuleMessage msg = client.request("file://temp/tests/mule", 10000).getRight().get();
     assertNotNull(msg);
     assertEquals(payload, getPayloadAsString(msg));
   }

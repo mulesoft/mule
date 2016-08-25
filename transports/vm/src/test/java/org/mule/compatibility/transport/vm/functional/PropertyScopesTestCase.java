@@ -28,7 +28,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase {
   public void noPropagationOfInboundScopeSynchronous() throws Exception {
     MuleClient client = muleContext.getClient();
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addInboundProperty("foo", "bar").build();
-    MuleMessage response = client.send("vm://in-synch", message);
+    MuleMessage response = client.send("vm://in-synch", message).getRight();
     assertNotNull(response);
     assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
   }
@@ -37,7 +37,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase {
   public void noPropagationOfOutboundScopeSynchronous() throws Exception {
     MuleClient client = muleContext.getClient();
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-    MuleMessage response = client.send("vm://in-synch", message);
+    MuleMessage response = client.send("vm://in-synch", message).getRight();
     assertNotNull(response);
     assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
   }
@@ -47,7 +47,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
     client.dispatch("vm://in-asynch", message);
-    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertNull("Property should not have been propogated for this scope", response.getInboundProperty("foo"));
   }
@@ -57,7 +57,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
     client.dispatch("vm://in-asynch", message);
-    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertNull("Property should not have been propogated for this scope", response.getOutboundProperty("foo"));
   }

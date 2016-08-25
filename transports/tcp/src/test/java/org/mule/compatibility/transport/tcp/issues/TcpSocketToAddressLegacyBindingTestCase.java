@@ -44,7 +44,8 @@ public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketTo
        * Request not using loopback address to endpoint listening at all local addresses should get an appropriate response.
        */
       result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort2.getNumber(),
-                           TEST_MESSAGE, null);
+                           TEST_MESSAGE, null)
+          .getRight();
       assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
   }

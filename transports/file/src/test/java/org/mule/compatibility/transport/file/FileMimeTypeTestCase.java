@@ -31,7 +31,7 @@ public class FileMimeTypeTestCase extends AbstractFileFunctionalTestCase {
     createDataFile(getWorkingDirectory(), TEST_MESSAGE, null);
 
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://receive", TIMEOUT);
+    MuleMessage message = client.request("vm://receive", TIMEOUT).getRight().get();
 
     assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
     assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));

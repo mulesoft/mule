@@ -73,7 +73,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     // Uses default ciphers and protocols
     HttpRequestOptions requestOptions = optionsBuilder.tlsContextFactory(tlsContextFactory).build();
     MuleMessage response = muleContext.getClient().send(String.format("https://localhost:%s", port1.getValue()),
-                                                        getTestMuleMessage(TEST_PAYLOAD), requestOptions);
+                                                        getTestMuleMessage(TEST_PAYLOAD), requestOptions)
+        .getRight();
     assertThat(muleContext.getTransformationService().transform(response, DataType.STRING).getPayload(), is(TEST_PAYLOAD));
   }
 
@@ -83,7 +84,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     tlsContextFactory.setEnabledCipherSuites(cipherSuites.getValue());
     HttpRequestOptions requestOptions = optionsBuilder.tlsContextFactory(tlsContextFactory).build();
     MuleMessage response = muleContext.getClient().send(String.format("https://localhost:%s", port3.getValue()),
-                                                        getTestMuleMessage(TEST_PAYLOAD), requestOptions);
+                                                        getTestMuleMessage(TEST_PAYLOAD), requestOptions)
+        .getRight();
     assertThat(muleContext.getTransformationService().transform(response, DataType.STRING).getPayload(), is(TEST_PAYLOAD));
   }
 

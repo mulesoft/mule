@@ -39,7 +39,7 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase {
                                                                                .<String>getInboundProperty("Accept")));
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);
+    MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result.getPayload());
     assertEquals("foo", getPayloadAsString(result));
   }

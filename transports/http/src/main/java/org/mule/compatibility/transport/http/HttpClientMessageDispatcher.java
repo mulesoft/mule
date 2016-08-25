@@ -244,14 +244,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
       DefaultExceptionPayload ep = null;
 
       if (returnException(event, httpMethod)) {
-        ep = new DefaultExceptionPayload(new DispatchException(event, getEndpoint(),
-                                                               new HttpResponseException(httpMethod.getStatusText(),
-                                                                                         httpMethod.getStatusCode())));
+        DispatchException exception = new DispatchException(event, getEndpoint(),
+                                                            new HttpResponseException(httpMethod.getStatusText(),
+                                                                                      httpMethod.getStatusCode()));
+        ep = new DefaultExceptionPayload(exception);
       } else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START) {
         try {
           return handleRedirect(httpMethod, event);
         } catch (Exception e) {
-          ep = new DefaultExceptionPayload(new DispatchException(event, getEndpoint(), e));
+          DispatchException exception = new DispatchException(event, getEndpoint(), e);
+          ep = new DefaultExceptionPayload(exception);
           return getResponseFromMethod(httpMethod, ep);
         }
       }

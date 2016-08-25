@@ -44,7 +44,8 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   public void testTransform() throws Exception {
     MuleClient client = muleContext.getClient();
     MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()),
-                                      getTestMuleMessage("payload"), HTTP_REQUEST_OPTIONS);
+                                      getTestMuleMessage("payload"), HTTP_REQUEST_OPTIONS)
+        .getRight();
     assertNotNull(message);
     GZipUncompressTransformer gu = new GZipUncompressTransformer();
     gu.setMuleContext(muleContext);
@@ -61,7 +62,8 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     payload.add(42);
     MuleMessage message =
         client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                    getTestMuleMessage(muleContext.getObjectSerializer().serialize(payload)), HTTP_REQUEST_OPTIONS);
+                    getTestMuleMessage(muleContext.getObjectSerializer().serialize(payload)), HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(message);
     ByteArrayToSerializable bas = new ByteArrayToSerializable();
     bas.setMuleContext(muleContext);

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -77,8 +78,9 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
 
       while (--requestCount >= 0) {
         try {
-          final MuleMessage outbound = flowRunner("flowTestSync").withPayload(payload).run().getMessage();
-          assertNull(outbound.getExceptionPayload());
+          MuleEvent event = flowRunner("flowTestSync").withPayload(payload).run();
+          final MuleMessage outbound = event.getMessage();
+          assertNull(event.getError());
           assertNotNull(outbound.getPayload());
           byte[] bytes = null;
           if (outbound.getPayload() instanceof byte[]) {

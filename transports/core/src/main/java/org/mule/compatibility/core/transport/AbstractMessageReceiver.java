@@ -410,9 +410,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     MuleEvent resultEvent = listener.process(muleEvent);
     if (resultEvent != null
         && !VoidMuleEvent.getInstance().equals(resultEvent)
-        && resultEvent.getMessage() != null
-        && resultEvent.getMessage().getExceptionPayload() != null
-        && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException) {
+        && resultEvent.getError() != null
+        && resultEvent.getError().getException() instanceof FilterUnacceptedException) {
       handleUnacceptedFilter(muleEvent.getMessage());
       return muleEvent;
     }

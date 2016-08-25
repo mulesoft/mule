@@ -42,7 +42,8 @@ public class SerializationOnResponseAggregatorTestCase extends AbstractIntegrati
                                              new TestObjectStore(muleContext));
     MuleClient client = muleContext.getClient();
     MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage("request"),
-                                      newOptions().method(POST.name()).build());
+                                      newOptions().method(POST.name()).build())
+        .getRight();
     assertNotNull(message);
     assertThat(new String(getPayloadAsBytes(message)), is("request processed"));
   }

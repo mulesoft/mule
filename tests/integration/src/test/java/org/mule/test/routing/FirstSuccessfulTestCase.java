@@ -60,7 +60,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
     flowRunner("test-router4").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertThat(response.getPayload(), is(TEST_MESSAGE));
   }

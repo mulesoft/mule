@@ -8,6 +8,8 @@ package org.mule.compatibility.transport.vm.functional.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.client.DefaultLocalMuleClient.MESSAGE_FILTERED_ERROR_MESSAGE;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -16,7 +18,9 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.client.DefaultLocalMuleClient;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,20 +45,20 @@ public class MessageFilterTestCase extends FunctionalTestCase {
   public void testConfiguration() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("vm://order.validation", "OK", null);
-    assertNull(response);
+    assertThat(client.send("vm://order.validation", "OK", null).getLeft().getDescription(),
+               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK(rejected!-1)", rejectMesage);
 
-    response = client.send("vm://order.validation", "OK-ABC", null);
-    assertNull(response);
+    assertThat(client.send("vm://order.validation", "OK-ABC", null).getLeft().getDescription(),
+               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK-ABC(rejected!-2)", rejectMesage);
 
-    response = client.send("vm://order.validation", "OK-DEF", null);
-    assertNull(response);
+    assertThat(client.send("vm://order.validation", "OK-DEF", null).getLeft().getDescription(),
+               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK-DEF(rejected!-1)", rejectMesage);
     rejectMesage = null;
 
-    response = client.send("vm://order.validation", "OK-ABC-DEF", null);
+    MuleMessage response = client.send("vm://order.validation", "OK-ABC-DEF", null).getRight();
     assertEquals("OK-ABC-DEF(success)", getPayloadAsString(response));
     assertNull(rejectMesage);
   }

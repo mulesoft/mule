@@ -38,7 +38,7 @@ public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTes
     muleClient.send("vm://startBatch", TEST_MESSAGE, null);
 
     // Checks that the batch has processed the two messages without error
-    MuleMessage message = muleClient.request("jms://status.queue?connector=jmsConnector", 5000);
+    MuleMessage message = muleClient.request("jms://status.queue?connector=jmsConnector", 5000).getRight().get();
     assertNotNull(message);
     assertEquals("messagemessage", getPayloadAsString(message));
   }

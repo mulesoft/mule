@@ -48,7 +48,7 @@ public class KeepOriginalFilePropertiesTestCase extends FunctionalTestCase {
   }
 
   private MuleMessage waitUntilMessageIsProcessed() throws MuleException {
-    return muleContext.getClient().request(OUT_QUEUE, 3000);
+    return muleContext.getClient().request(OUT_QUEUE, 3000).getRight().get();
   }
 
   private String getProperty(MuleMessage msg, String propertyName) {

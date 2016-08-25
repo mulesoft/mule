@@ -36,7 +36,7 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
   public void testServer() throws Exception {
     MuleClient client = muleContext.getClient();
     safeProtocolSend("localhost", port.getNumber(), MuleMessage.builder().payload(TEST_MESSAGE).build());
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals(TEST_MESSAGE, response.getPayload());
   }
 
