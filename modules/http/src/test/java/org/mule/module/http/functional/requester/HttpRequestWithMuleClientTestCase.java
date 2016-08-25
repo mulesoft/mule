@@ -152,11 +152,22 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void customRequestConfig() throws Exception
     {
         final MuleMessage message = getTestMuleMessage(NullPayload.class);
-        final HttpRequesterConfig requestConfig = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
-        final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
-        final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
-        assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));
-        assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
+        HttpRequesterConfig requestConfig = null;
+        try
+        {
+            requestConfig  = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
+            final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
+            final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
+            assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));
+            assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
+        }
+        finally
+        {
+            if (requestConfig != null)
+            {
+                requestConfig.stop();
+            }
+        }
     }
 
     public static class LatchMessageProcessor implements MessageProcessor
