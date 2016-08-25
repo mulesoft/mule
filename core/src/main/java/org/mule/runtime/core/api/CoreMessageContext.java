@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 /**
@@ -20,4 +22,16 @@ public interface CoreMessageContext extends MessageContext {
    */
   ProcessingTime getProcessingTime();
 
+  /**
+   * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
+   * after it has executed.
+   * <p/>
+   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the list will
+   * always be empty.
+   * 
+   * @return the message processors trace associated to this event.
+   * 
+   * @since 3.8.0
+   */
+  ProcessorsTrace getProcessorsTrace();
 }

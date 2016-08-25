@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -58,6 +57,7 @@ public class VoidMuleEvent implements MuleEvent {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
     throw new UnsupportedOperationException();
   }
@@ -189,11 +189,6 @@ public class VoidMuleEvent implements MuleEvent {
 
   @Override
   public FlowCallStack getFlowCallStack() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ProcessorsTrace getProcessorsTrace() {
     throw new UnsupportedOperationException();
   }
 

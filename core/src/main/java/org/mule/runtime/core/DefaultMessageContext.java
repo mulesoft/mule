@@ -60,7 +60,7 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
 
   private final ProcessingTime processingTime;
 
-  private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
+  private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
   @Override
   public String getId() {
@@ -95,6 +95,11 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
   @Override
   public boolean isCorrelationIdFromSource() {
     return correlationId != null;
+  }
+
+  @Override
+  public ProcessorsTrace getProcessorsTrace() {
+    return processorsTrace;
   }
 
   /**

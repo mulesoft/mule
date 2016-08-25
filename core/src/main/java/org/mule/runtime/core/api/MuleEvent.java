@@ -12,7 +12,6 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -229,19 +228,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @since 3.8.0
    */
   FlowCallStack getFlowCallStack();
-
-  /**
-   * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
-   * after it has executed.
-   * <p/>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the list will
-   * always be empty.
-   * 
-   * @return the message processors trace associated to this event.
-   * 
-   * @since 3.8.0
-   */
-  ProcessorsTrace getProcessorsTrace();
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using

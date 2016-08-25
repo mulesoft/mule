@@ -10,14 +10,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PR
 import static org.mule.runtime.core.message.Correlation.NO_CORRELATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -31,14 +23,12 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -101,7 +91,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
-  private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
   protected boolean nonBlocking;
   private String legacyCorrelationId;
   private Error error;
@@ -315,9 +304,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.nonBlocking = rewriteEvent.isAllowNonBlocking() || isFlowConstructNonBlockingProcessingStrategy();
     this.flowCallStack =
         rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
-    // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we
-    // copy only the reference.
-    this.processorsTrace = rewriteEvent.getProcessorsTrace();
     this.error = rewriteEvent.getError();
   }
 
@@ -670,11 +656,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return flowCallStack;
   }
 
-  @Override
-  public ProcessorsTrace getProcessorsTrace() {
-    return processorsTrace;
-  }
-
   /**
    * @deprecated This should be used only by the compatibility module.
    * @param encoding
@@ -772,6 +753,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return value;
   }
 
+  @Override
   public void setError(Error error) {
     this.error = error;
   }
