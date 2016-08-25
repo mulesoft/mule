@@ -18,6 +18,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYP
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
@@ -25,10 +26,13 @@ import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.metadata.MetadataKeyProvider;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
+import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -95,7 +99,7 @@ public class MetadataMediator {
   }
 
   /**
-   * Resolves the list of types available for the Content or Output of the associated {@link MetadataAware} Component,
+   * Resolves the list of types available for the Content or Output of the associated {@link MetadataKeyProvider} Component,
    * representing them as a list of {@link MetadataKey}.
    * <p>
    * If no {@link MetadataKeyId} is present in the component's input parameters, then a {@link NullMetadataKey} is returned.
@@ -106,9 +110,11 @@ public class MetadataMediator {
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
    *         Dynamic keys are a available or the retrieval fails for any reason
    */
-  public MetadataResult<Set<MetadataKey>> getMetadataKeys(MetadataContext context) {
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
+    final String componentResolverName = getAliasName(componentModel.getMetadataResolverFactory().getClass());
+    final MetadataKeysContainerBuilder keyBuilder = new MetadataKeysContainerBuilder();
     if (metadataKeyParts.isEmpty()) {
-      return success(ImmutableSet.of(new NullMetadataKey()));
+      return success(keyBuilder.add(componentResolverName, ImmutableSet.of(new NullMetadataKey())).build());
     }
     try {
       final Set<MetadataKey> metadataKeys = resolverFactory.getKeyResolver().getMetadataKeys(context);
@@ -116,14 +122,16 @@ public class MetadataMediator {
       final Set<MetadataKey> enrichedMetadataKeys =
           metadataKeys.stream().map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
               .map(MetadataKeyBuilder::build).collect(toSet());
-      return success(enrichedMetadataKeys);
+
+      keyBuilder.add(componentResolverName, enrichedMetadataKeys);
+      return success(keyBuilder.build());
     } catch (Exception e) {
       return failure(e);
     }
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataAware} Component using only the static
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} Component using only the static
    * types of the Component parameters, attributes and output.
    *
    * @return a{@link MetadataResult} of {@link ComponentMetadataDescriptor} with the Static Metadata representation of the
@@ -142,8 +150,8 @@ public class MetadataMediator {
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataAware} Component using static and dynamic
-   * resolving of the Component parameters, attributes and output.
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} Component using static and
+   * dynamic resolving of the Component parameters, attributes and output.
    * <p>
    * If Component's {@link Content} parameter has a {@link MetadataContentResolver} associated or its Output has a
    * {@link MetadataOutputResolver} associated that can be used to resolve dynamic {@link MetadataType}, then the

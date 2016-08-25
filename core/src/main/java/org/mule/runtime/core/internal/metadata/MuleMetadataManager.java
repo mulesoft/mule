@@ -7,13 +7,15 @@
 package org.mule.runtime.core.internal.metadata;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.metadata.ComponentId;
-import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyProvider;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -33,7 +35,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -49,10 +50,15 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
 
   private static final String EXCEPTION_RESOLVING_COMPONENT_METADATA =
       "An exception occurred while resolving metadata for component '%s'";
-  private static final String COMPONENT_NOT_METADATA_AWARE = "Component is not MetadataAware, no information available";
+  private static final String COMPONENT_NOT_METADATA_PROVIDER =
+      "Component [%s] is not a MetadataProvider, no information available";
+  private static final String COMPONENT_NOT_METADATA_KEY_PROVIDER =
+      "Component [%s] is not a MetadataKeyProvider, no information available";
   private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Component MetadataKeys";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
+  private static final String CONFIG_NOT_FOUND = "Configuration named [%s] doesn't exist";
+
 
   @Inject
   private MuleContext muleContext;
@@ -96,8 +102,9 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<Set<MetadataKey>> getMetadataKeys(ComponentId componentId) {
-    return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadataKeys, EXCEPTION_RESOLVING_METADATA_KEYS);
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentId componentId) {
+    return exceptionHandledMetadataFetch(() -> findMetadataKeyProvider(componentId).getMetadataKeys(),
+                                         EXCEPTION_RESOLVING_METADATA_KEYS);
   }
 
   /**
@@ -105,7 +112,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
    */
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key) {
-    return exceptionHandledMetadataFetch(componentId, processor -> processor.getMetadata(key),
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(componentId).getMetadata(key),
                                          format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
   }
 
@@ -114,7 +121,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
    */
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId) {
-    return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadata,
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(componentId).getMetadata(),
                                          format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
   }
 
@@ -138,46 +145,68 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     return ImmutableMap.copyOf(caches.asMap());
   }
 
-  private <T> MetadataResult<T> exceptionHandledMetadataFetch(ComponentId componentId, MetadataDelegate<T> metadataSupplier,
-                                                              String failureMessage) {
+  private <T> MetadataResult<T> exceptionHandledMetadataFetch(MetadataDelegate<T> producer, String failureMessage) {
     try {
-      return metadataSupplier.get(findMetadataAwareComponent(componentId));
+      return producer.get();
     } catch (InvalidComponentIdException e) {
-      return MetadataResult.failure(e);
+      return failure(e);
     } catch (Exception e) {
-      return MetadataResult.failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
+      return failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
     }
   }
 
-  private MetadataAware findMetadataAwareComponent(ComponentId componentId) throws InvalidComponentIdException {
+  private MetadataKeyProvider findMetadataKeyProvider(ComponentId componentId) throws InvalidComponentIdException {
+    try {
+      return componentId.getFlowName().isPresent() ? (MetadataKeyProvider) lookupComponent(componentId)
+          : lookupConfig(componentId.getComponentPath());
+    } catch (ClassCastException e) {
+      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_KEY_PROVIDER, componentId)));
+    }
+  }
+
+  private MetadataProvider findMetadataProvider(ComponentId componentId) throws InvalidComponentIdException {
+    try {
+      return (MetadataProvider) lookupComponent(componentId);
+    } catch (ClassCastException e) {
+      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_PROVIDER, componentId)));
+    }
+  }
+
+  private Object lookupComponent(ComponentId componentId) throws InvalidComponentIdException {
+
     // FIXME MULE-9496 : Use flow paths to obtain Processors
-    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName());
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName().get());
     if (flow == null) {
       throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
     }
-    try {
-      if (!componentId.getComponentPath().equals("-1")) {
-        try {
-          return ((MetadataAware) flow.getMessageProcessors().get(Integer.parseInt(componentId.getComponentPath())));
-        } catch (IndexOutOfBoundsException | NumberFormatException e) {
-          throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())),
-                                                e);
-        }
-      } else {
-        final MessageSource messageSource = flow.getMessageSource();
-        if (messageSource == null) {
-          throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND));
-        }
-        return (MetadataAware) messageSource;
+    if (!componentId.getComponentPath().equals("-1")) {
+      try {
+        return flow.getMessageProcessors().get(Integer.parseInt(componentId.getComponentPath()));
+      } catch (IndexOutOfBoundsException | NumberFormatException e) {
+        throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())),
+                                              e);
       }
-    } catch (ClassCastException e) {
-      throw new InvalidComponentIdException(createStaticMessage(COMPONENT_NOT_METADATA_AWARE), e);
+    } else {
+      final MessageSource messageSource = flow.getMessageSource();
+      if (messageSource == null) {
+        throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND));
+      }
+      return messageSource;
+    }
+  }
+
+  private MetadataKeyProvider lookupConfig(String configName) throws InvalidComponentIdException {
+    MetadataKeyProvider configurationProvider = muleContext.getRegistry().lookupObject(configName);
+    if (configurationProvider != null) {
+      return configurationProvider;
+    } else {
+      throw new InvalidComponentIdException(createStaticMessage(format(CONFIG_NOT_FOUND, configName)));
     }
   }
 
   @FunctionalInterface
   private interface MetadataDelegate<T> {
 
-    MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
+    MetadataResult<T> get() throws MetadataResolvingException, InvalidComponentIdException;
   }
 }

@@ -38,6 +38,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -78,9 +79,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getMetadataKeysWithKeyId() throws Exception {
     componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(3));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
   }
@@ -88,19 +89,20 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getMetadataKeysWithoutKeyId() throws Exception {
     componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_ID, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeys = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeys.isSuccess(), is(true));
-    assertThat(metadataKeys.get().size(), is(1));
-    assertThat(metadataKeys.get().iterator().next(), instanceOf(NullMetadataKey.class));
+    final Set<MetadataKey> keys = getKeysFromContainer(metadataKeys.get());
+    assertThat(keys.size(), is(1));
+    assertThat(keys.iterator().next(), instanceOf(NullMetadataKey.class));
   }
 
   @Test
   public void getMultilevelKeys() throws Exception {
     componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
 
-    final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys, hasSize(2));
 
     assertThat(metadataKeys, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));

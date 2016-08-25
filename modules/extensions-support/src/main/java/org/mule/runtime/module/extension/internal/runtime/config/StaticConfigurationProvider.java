@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @param <T> the generic type of the instances provided
  * @since 3.7.0
  */
-public final class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T> {
+public class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T> {
 
   private final ConfigurationInstance<T> configuration;
 

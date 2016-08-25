@@ -14,9 +14,16 @@ import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.runtime.api.metadata.MetadataAware;
+
+import java.util.Optional;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyProvider;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
@@ -46,11 +53,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
-import java.util.Optional;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +64,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Lifecycle {
+public abstract class ExtensionComponent
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider, FlowConstructAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
@@ -202,7 +205,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<Set<MetadataKey>> getMetadataKeys() throws MetadataResolvingException {
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
     final MetadataContext metadataContext = getMetadataContext();
     return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
   }
