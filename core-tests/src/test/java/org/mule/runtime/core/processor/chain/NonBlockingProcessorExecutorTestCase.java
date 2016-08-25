@@ -44,8 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecutorTestCase {
 
-  private static final int LATCH_TIMEOUT = 50;
-  private static final String TEST_MESSAGE = "abc";
+  private static final int LATCH_TIMEOUT = 500;
 
   private SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
 
