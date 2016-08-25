@@ -7,8 +7,10 @@
 package org.mule.extension.db.internal.operation;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +27,7 @@ public class QuerySettings {
    */
   @Parameter
   @Optional(defaultValue = "0")
+  @Placement(group = ADVANCED)
   private int queryTimeout = 0;
 
   /**
@@ -32,6 +35,7 @@ public class QuerySettings {
    */
   @Parameter
   @Optional(defaultValue = "SECONDS")
+  @Placement(group = ADVANCED)
   private TimeUnit queryTimeoutUnit = SECONDS;
 
   public int getQueryTimeout() {

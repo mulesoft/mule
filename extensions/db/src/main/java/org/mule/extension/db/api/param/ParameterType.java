@@ -4,10 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.db.internal.resolver.query;
+package org.mule.extension.db.api.param;
 
-import org.mule.extension.db.api.param.QueryDefinition;
-
-public class DefaultQueryResolver extends AbstractQueryResolver<QueryDefinition> {
+/**
+ * Allows specifying the type of a given parameter
+ *
+ * @since 4.0
+ */
+public class ParameterType extends QueryParameter {
 
 }

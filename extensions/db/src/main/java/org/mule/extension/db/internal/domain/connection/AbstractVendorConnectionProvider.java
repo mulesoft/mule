@@ -7,8 +7,11 @@
 package org.mule.extension.db.internal.domain.connection;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,6 +43,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
+  @Placement(group = CONNECTION)
   private String host;
 
   /**
@@ -48,6 +52,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
+  @Placement(group = CONNECTION)
   private Integer port;
 
   /**
@@ -55,6 +60,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
+  @Placement(group = ADVANCED)
   private Map<String, String> connectionProperties;
 
   protected abstract String getUrlPrefix();

@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("query")
-public class QueryDefinition extends StatementDefinition<QueryDefinition> {
+public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefinition> {
 
   /**
    * A reference to a globally defined query
@@ -29,16 +29,16 @@ public class QueryDefinition extends StatementDefinition<QueryDefinition> {
   private QueryDefinition template;
 
   @Override
+  public QueryDefinition getTemplate() {
+    return template;
+  }
+
+  @Override
   protected QueryDefinition copy() {
     QueryDefinition copy = super.copy();
     copy.template = template;
 
     return copy;
-  }
-
-  @Override
-  public QueryDefinition getTemplate() {
-    return template;
   }
 
 }

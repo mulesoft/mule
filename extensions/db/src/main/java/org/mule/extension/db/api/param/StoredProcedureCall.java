@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall> {
+public class StoredProcedureCall extends ParameterizedStatementDefinition<StoredProcedureCall> {
 
   /**
    * A list of output parameters to be set on the JDBC prepared
@@ -48,6 +48,16 @@ public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall
   @Optional
   @XmlHints(allowInlineDefinition = false)
   private StoredProcedureCall template;
+
+  @Override
+  protected StoredProcedureCall copy() {
+    StoredProcedureCall copy = super.copy();
+    copy.template = template;
+    copy.outputParameters = new LinkedList<>(outputParameters);
+    copy.inOutParameters = new LinkedList<>(inOutParameters);
+
+    return copy;
+  }
 
   public java.util.Optional<QueryParameter> getOutputParameter(String name) {
     return findParameter(outputParameters, name);

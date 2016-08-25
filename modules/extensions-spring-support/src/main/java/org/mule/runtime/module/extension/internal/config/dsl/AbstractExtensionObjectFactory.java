@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
@@ -24,6 +25,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResol
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
@@ -135,10 +137,11 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
   private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys)
       throws ConfigurationException {
-    Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
-        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals());
-    if (parameterGroupModelProperty.isPresent()) {
-      checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
+    Optional<List<ParameterGroup>> exclusiveGroups =
+        model.getModelProperty(ParameterGroupModelProperty.class).map(mp -> mp.getExclusiveGroups());
+
+    if (exclusiveGroups.isPresent()) {
+      checkParameterGroupExclusiveness(model, exclusiveGroups.get(), resolverKeys);
     }
   }
 
@@ -151,14 +154,14 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
    * </ul>
    * 
    * @param model
-   * @param parameterGroupModelProperty
+   * @param exclusiveGroups
    * @param resolverKeys
    * @throws ConfigurationException if exclusiveness condition is not honored
    */
-  private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty,
+  private void checkParameterGroupExclusiveness(EnrichableModel model, List<ParameterGroup> exclusiveGroups,
                                                 Set<String> resolverKeys)
       throws ConfigurationException {
-    for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups()) {
+    for (ParameterGroup<?> group : exclusiveGroups) {
       Multimap<Class<?>, Field> parametersFromGroup = ArrayListMultimap.create();
       group.getOptionalParameters().stream()
           .filter(f -> resolverKeys.contains(f.getName()))
@@ -170,18 +173,13 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
           .forEach(f -> parametersFromGroup.put(f.getDeclaringClass(), f)));
 
       if (parametersFromGroup.keySet().size() > 1) {
-        throw new ConfigurationException(createStaticMessage(format("In %s '%s', exclusive parameters cannot be set in different classes: [%s]",
-                                                                    getComponentModelTypeName(model), getModelName(model),
-                                                                    Joiner.on(", ").join(parametersFromGroup.keySet()))));
+        throw buildExclusiveParametersException(model, parametersFromGroup);
       }
 
       for (Class<?> declaringParameterGroupClass : parametersFromGroup.keySet()) {
         if (parametersFromGroup.get(declaringParameterGroupClass).size() > 1
             && declaringParameterGroupClass.equals(group.getType())) {
-          throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
-                                                                      getComponentModelTypeName(model), getModelName(model),
-                                                                      Joiner.on(", ").join(parametersFromGroup
-                                                                          .get(declaringParameterGroupClass)))));
+          throw buildExclusiveParametersException(model, parametersFromGroup);
         }
       }
 
@@ -190,5 +188,17 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
                                                                      group.getType().getName()))));
       }
     }
+  }
+
+  private ConfigurationException buildExclusiveParametersException(EnrichableModel model,
+                                                                   Multimap<Class<?>, Field> parametersFromGroup) {
+    return new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                 getComponentModelTypeName(model), getModelName(model),
+                                                                 Joiner.on(", ")
+                                                                     .join(getOffendingParameterNames(parametersFromGroup)))));
+  }
+
+  private Set<String> getOffendingParameterNames(Multimap<Class<?>, Field> parametersFromGroup) {
+    return parametersFromGroup.values().stream().map(IntrospectionUtils::getAliasName).collect(toSet());
   }
 }

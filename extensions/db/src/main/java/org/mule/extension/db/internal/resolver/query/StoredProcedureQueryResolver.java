@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class StoredProcedureQueryResolver extends AbstractQueryResolver<StoredProcedureCall> {
+public class StoredProcedureQueryResolver extends ParameterizedQueryResolver<StoredProcedureCall> {
 
   @Override
   protected QueryTemplate createQueryTemplate(StoredProcedureCall call, DbConnector connector, DbConnection connection) {

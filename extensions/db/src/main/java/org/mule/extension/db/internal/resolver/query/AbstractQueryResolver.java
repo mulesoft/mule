@@ -6,13 +6,9 @@
  */
 package org.mule.extension.db.internal.resolver.query;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.extension.db.api.param.InputParameter;
-import org.mule.extension.db.api.param.QueryParameter;
 import org.mule.extension.db.api.param.StatementDefinition;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
@@ -46,17 +42,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-abstract class AbstractQueryResolver<T extends StatementDefinition<T>> implements QueryResolver<T> {
+abstract class AbstractQueryResolver<T extends StatementDefinition> implements QueryResolver<T> {
 
   protected Cache<String, QueryTemplate> queryTemplates = CacheBuilder.newBuilder().build();
   private QueryTemplateParser queryTemplateParser = new SimpleQueryTemplateParser();
 
   @Override
   public Query resolve(T statementDefinition, DbConnector connector, DbConnection connection) {
-    statementDefinition = statementDefinition.resolveFromTemplate();
+    statementDefinition = (T) statementDefinition.resolveFromTemplate();
 
     checkArgument(!isBlank(statementDefinition.getSql()), "sql query cannot be blank");
 
@@ -64,31 +59,7 @@ abstract class AbstractQueryResolver<T extends StatementDefinition<T>> implement
     return new Query(queryTemplate, resolveParams(statementDefinition, queryTemplate));
   }
 
-  private List<QueryParamValue> resolveParams(StatementDefinition statementDefinition, QueryTemplate template) {
-    return template.getInputParams().stream()
-        .map(p -> {
-          final String parameterName = p.getName();
-
-          Optional<QueryParameter> optionalParameter = statementDefinition.getInputParameter(parameterName);
-          if (!optionalParameter.isPresent()) {
-            throw new IllegalArgumentException(format("Parameter '%s' was not bound for query '%s'",
-                                                      parameterName,
-                                                      statementDefinition.getSql()));
-          }
-
-          QueryParameter parameter = optionalParameter.get();
-
-          if (!(parameter instanceof InputParameter)) {
-            throw new IllegalArgumentException(
-                                               format("Parameter '%s' should be bound to an input parameter on query '%s'",
-                                                      parameterName,
-                                                      statementDefinition.getSql()));
-          }
-
-          return new QueryParamValue(parameterName, ((InputParameter) parameter).getValue());
-        })
-        .collect(toList());
-  }
+  protected abstract List<QueryParamValue> resolveParams(T statementDefinition, QueryTemplate template);
 
   protected QueryTemplate createQueryTemplate(T statementDefinition, DbConnector connector, DbConnection connection) {
     QueryTemplate queryTemplate = queryTemplateParser.parse(statementDefinition.getSql());
