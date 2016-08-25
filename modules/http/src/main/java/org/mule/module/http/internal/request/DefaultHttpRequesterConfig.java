@@ -121,7 +121,6 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
             httpClient = httpClientFactory.create(configuration);
         }
 
-        httpClient.initialise();
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
@@ -324,6 +323,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     @Override
     public void start() throws MuleException
     {
+        httpClient.start();
         if (this.authentication instanceof Startable)
         {
             ((Startable) this.authentication).start();

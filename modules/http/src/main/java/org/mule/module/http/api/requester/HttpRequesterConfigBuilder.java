@@ -270,6 +270,7 @@ public class HttpRequesterConfigBuilder
                 defaultHttpRequesterConfig.setName(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-http-request"));
             }
             defaultHttpRequesterConfig.initialise();
+            defaultHttpRequesterConfig.start();
         }
         catch (InitialisationException e)
         {
