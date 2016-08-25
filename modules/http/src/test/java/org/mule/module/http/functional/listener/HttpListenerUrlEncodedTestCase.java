@@ -46,7 +46,6 @@ import org.junit.Test;
 
 public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
 {
-
     public static final String PARAM_1_NAME = "param1";
     public static final String PARAM_2_NAME = "param2";
     public static final String PARAM_1_VALUE = "param1Value";
@@ -60,7 +59,6 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty path = new SystemProperty("path", "path");
 
-
     @Override
     protected String getConfigFile()
     {
@@ -70,7 +68,6 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     @Test
     public void urlEncodedParamsGenerateAMapPayload() throws Exception
     {
-
         final Response response = Request.Post(getListenerUrl())
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE)).execute();
@@ -139,12 +136,17 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     public void serverClosesConnectionAfterSendingData() throws Exception
     {
         // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
+        com.ning.http.client.Response response;
         AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
-        ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
-                preparePost(getListenerUrl()).setBody("a=1&b=2").
-                addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED).execute();
-        com.ning.http.client.Response response = responseFuture.get();
+        GrizzlyAsyncHttpProvider grizzlyAsyncHttpProvider = new GrizzlyAsyncHttpProvider(asyncHttpClientConfig);
+
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient(grizzlyAsyncHttpProvider, asyncHttpClientConfig))
+        {
+            ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
+                    preparePost(getListenerUrl()).setBody("a=1&b=2").
+                    addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED).execute();
+            response = responseFuture.get();
+        }
 
         assertThat(response.getStatusCode(), is(200));
     }
