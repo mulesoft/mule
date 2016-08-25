@@ -7,6 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -108,7 +109,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run();
     assertNotNull(event);
     assertNotNull(event.getMessage());
-    assertTrue(getPayloadAsString(event.getMessage()).contains("TEST"));
+    assertThat(getPayloadAsString(event.getMessage()), containsString("TEST"));
     assertThat(event.getError(), is(nullValue()));
   }
 

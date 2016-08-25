@@ -18,8 +18,6 @@ import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
-import java.io.Serializable;
-import java.util.Map;
 import java.util.Optional;
 
 import org.mule.runtime.api.message.Error;
@@ -44,7 +42,9 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.message.ErrorBuilder;
+
+import java.io.Serializable;
+import java.util.Map;
 
 public class DefaultLocalMuleClient implements MuleClient {
 

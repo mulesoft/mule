@@ -72,31 +72,67 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Sets the description
+   * Sets the description of the error.
    *
-   * @param description
-   * @return
+   * The description if meant to be a short text that describes the error and should not contain any
+   * java specific detail.
+   *
+   * @param description the description
+   * @return {@code this} builder
      */
   public ErrorBuilder description(String description) {
     this.description = description;
     return this;
   }
 
+  /**
+   * Sets a detailed description of the error.
+   *
+   * This description should provide as much information as possible for recognize what the problem can be
+   * and, if possible, provide information on how to fix it.
+   *
+   * @param detailedDescription the detailed description
+   * @return {@code this} builder
+     */
   public ErrorBuilder detailedDescription(String detailedDescription) {
     this.detailedDescription = detailedDescription;
     return this;
   }
 
+  /**
+   * Sets the error type of this error. @see {@link ErrorType}.
+   *
+   * @param errorType the error type
+   * @return {@code this} builder
+     */
   public ErrorBuilder errorType(ErrorType errorType) {
     this.errorType = errorType;
     return this;
   }
 
+  /**
+   * Sets the error message for the error.
+   *
+   * An error message is a {@link MuleMessage} with information related to the error.
+   * For instance, a response from an http:request operation may return a 4XX status code.
+   * The content for the whole response can be set in the error message so the information
+   * is available during the error handler execution.
+   *
+   * @param errorMessage
+   * @return
+     */
   public ErrorBuilder errorMessage(MuleMessage errorMessage) {
     this.errorMessage = errorMessage;
     return this;
   }
 
+  /**
+   * Creates the instance of {@code Error} with the supplied configuration.
+   *
+   * All builder parameters are required except for the error message which may be null.
+   *
+   * @return the error instance
+   */
   public Error build() {
     checkState(exception != null, "error exception cannot be null");
     checkState(description != null, "description exception cannot be null");

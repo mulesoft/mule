@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Map;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -23,6 +19,10 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleEventBuilder;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * Legacy implementation of {@link MuleEvent}

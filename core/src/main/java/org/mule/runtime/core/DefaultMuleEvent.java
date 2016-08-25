@@ -340,6 +340,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we
     // copy only the reference.
     this.processorsTrace = rewriteEvent.getProcessorsTrace();
+    this.error = rewriteEvent.getError();
   }
 
   public DefaultMuleEvent(MessageContext context, MuleMessage message, URI messageSourceURI,
@@ -659,7 +660,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public static MuleEvent copy(MuleEvent event) {
     DefaultMuleEvent eventCopy = new DefaultMuleEvent(event.getMessage(), event, new DefaultMuleSession(event.getSession()));
     eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
-    eventCopy.error = event.getError();
     return eventCopy;
   }
 

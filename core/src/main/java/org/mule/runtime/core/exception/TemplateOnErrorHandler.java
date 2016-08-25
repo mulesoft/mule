@@ -70,7 +70,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       fireNotification(exception);
       logException(exception, request);
       processStatistics();
-      request.setError(builder(exception).build());
+      request
+          .setMessage(MuleMessage.builder(request.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build());
+      request.setError(ErrorBuilder.builder(exception).build());
       request.setMessage(MuleMessage.builder(request.getMessage()).build());
 
       markExceptionAsHandledIfRequired(exception);
