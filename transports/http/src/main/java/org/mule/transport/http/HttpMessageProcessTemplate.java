@@ -241,10 +241,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 {
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                    expected.setKeepAlive(true);
                     final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
                                                   getMuleContext()), getInboundEndpoint(), getFlowConstruct());
                     RequestContext.setEvent(event);
-                    httpServerConnection.writeResponse(transformResponse(expected));
+                    httpServerConnection.writeResponse(expected);
                 }
             }
         }
