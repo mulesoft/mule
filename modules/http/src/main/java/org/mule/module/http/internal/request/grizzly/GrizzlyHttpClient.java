@@ -7,15 +7,16 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.CompletionHandler;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -94,7 +95,7 @@ public class GrizzlyHttpClient implements HttpClient
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    public void start() throws MuleException
     {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnections(true);
@@ -112,7 +113,7 @@ public class GrizzlyHttpClient implements HttpClient
         asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
     }
 
-    private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws InitialisationException
+    private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws MuleException
     {
         if (tlsContextFactory != null)
         {
@@ -123,7 +124,7 @@ public class GrizzlyHttpClient implements HttpClient
             }
             catch (Exception e)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("Cannot initialize SSL context"), e, this);
+                throw new DefaultMuleException(createStaticMessage("Cannot initialize SSL context"), e);
             }
 
             // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.
