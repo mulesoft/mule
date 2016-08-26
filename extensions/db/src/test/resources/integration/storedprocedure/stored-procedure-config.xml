@@ -18,7 +18,7 @@
         <dbn:stored-procedure>
             <dbn:sql>{ CALL countTestRecords(:count) }</dbn:sql>
             <dbn:output-parameters>
-                <dbn:output-parameter paramName="count"/>
+                <dbn:output-parameter key="count"/>
             </dbn:output-parameters>
         </dbn:stored-procedure>
     </flow>
@@ -32,8 +32,8 @@
                 <dbn:input-parameter key="int3" value="5"/>
             </dbn:input-parameters>
             <dbn:output-parameters>
-                <dbn:output-parameter paramName="result1"/>
-                <dbn:output-parameter paramName="result2"/>
+                <dbn:output-parameter key="result1"/>
+                <dbn:output-parameter key="result2"/>
             </dbn:output-parameters>
         </dbn:stored-procedure>
     </flow>
@@ -46,7 +46,7 @@
                 <dbn:input-parameter key="s2" value="bar"/>
             </dbn:input-parameters>
             <dbn:output-parameters>
-                <dbn:output-parameter paramName="result"/>
+                <dbn:output-parameter key="result"/>
             </dbn:output-parameters>
         </dbn:stored-procedure>
     </flow>

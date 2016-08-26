@@ -33,13 +33,16 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @Parameter
   @Optional
   @DisplayName("Output Parameters")
-  private List<ParameterType> outputParameters = new LinkedList<>();
+  private List<OutputParameter> outputParameters = new LinkedList<>();
 
   /**
-   * A list of parameters to be set on the JDBC prepared
-   * statement which are both input and output. Each parameter
-   * should be referenced in the sql text using a semicolon
-   * prefix (E.g: {@code call increment(:value))
+   * A {@link Map} which keys are the name of a parameter to be set on
+   * the JDBC prepared statement which is both input and output.
+   * <p>
+   * Each parameter should be referenced in the sql
+   * text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
+   * <p>
+   * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
   @Optional
@@ -65,7 +68,7 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
     return copy;
   }
 
-  public java.util.Optional<ParameterType> getOutputParameter(String name) {
+  public java.util.Optional<OutputParameter> getOutputParameter(String name) {
     return outputParameters.stream().filter(p -> p.equals(name)).findFirst();
   }
 

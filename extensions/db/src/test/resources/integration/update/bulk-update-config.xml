@@ -15,7 +15,7 @@
         <dbn:bulk-update parameterValues="#[payload]">
             <dbn:sql>update PLANET set NAME='Mercury' where NAME= :name</dbn:sql>
             <dbn:parameter-types>
-                <dbn:parameter-type paramName="name" type="VARCHAR" />
+                <dbn:parameter-type key="name" type="VARCHAR" />
             </dbn:parameter-types>
         </dbn:bulk-update>
     </flow>
