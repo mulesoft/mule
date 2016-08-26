@@ -7,19 +7,19 @@
 package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
@@ -93,7 +93,7 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   @Override
-  public void initialise() throws InitialisationException {
+  public void start() throws MuleException {
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);
 
@@ -110,13 +110,13 @@ public class GrizzlyHttpClient implements HttpClient {
     asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
   }
 
-  private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws InitialisationException {
+  private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws MuleException {
     if (tlsContextFactory != null) {
       LifecycleUtils.initialiseIfNeeded(tlsContextFactory);
       try {
         sslContext = tlsContextFactory.createSslContext();
       } catch (Exception e) {
-        throw new InitialisationException(CoreMessages.createStaticMessage("Cannot initialize SSL context"), e, this);
+        throw new DefaultMuleException(createStaticMessage("Cannot initialize SSL context"), e);
       }
 
       // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.

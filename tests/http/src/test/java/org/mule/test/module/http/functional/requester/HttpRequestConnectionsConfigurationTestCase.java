@@ -54,6 +54,7 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
     httpRequesterConfig.setUsePersistentConnections(false);
     httpRequesterConfig.setConnectionIdleTimeout(-2);
     httpRequesterConfig.initialise();
+    httpRequesterConfig.start();
     httpRequesterConfig.stop();
   }
 

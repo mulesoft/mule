@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Object that sends an HTTP request, and returns the response.
  */
-public interface HttpClient extends Initialisable, Stoppable {
+public interface HttpClient extends Startable, Stoppable {
 
   /**
    * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
