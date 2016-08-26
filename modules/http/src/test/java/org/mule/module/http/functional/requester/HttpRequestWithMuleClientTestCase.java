@@ -155,7 +155,8 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         HttpRequesterConfig requestConfig = null;
         try
         {
-            requestConfig  = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
+            requestConfig = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
+            requestConfig.start();
             final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
             final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
             assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));

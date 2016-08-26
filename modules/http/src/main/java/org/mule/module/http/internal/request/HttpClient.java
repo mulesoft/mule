@@ -8,7 +8,7 @@ package org.mule.module.http.internal.request;
 
 import org.mule.api.CompletionHandler;
 import org.mule.api.context.WorkManager;
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Object that sends an HTTP request, and returns the response.
  */
-public interface HttpClient extends Initialisable, Stoppable
+public interface HttpClient extends Startable, Stoppable
 {
 
     /**

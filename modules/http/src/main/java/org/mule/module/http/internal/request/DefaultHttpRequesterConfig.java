@@ -101,7 +101,6 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
         httpClient = new GrizzlyHttpClient(configuration);
 
-        httpClient.initialise();
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
@@ -296,6 +295,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     @Override
     public void start() throws MuleException
     {
+        httpClient.start();
         if (this.authentication instanceof Startable)
         {
             ((Startable) this.authentication).start();
