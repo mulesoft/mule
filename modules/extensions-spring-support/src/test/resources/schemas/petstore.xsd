@@ -36,6 +36,13 @@
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="threadingProfile"></xs:attribute>
@@ -45,6 +52,7 @@
                     <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
                 </xs:extension>
@@ -89,6 +97,24 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="petstore:org.mule.test.petstore.extension.PetCage">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.petstore.extension.PhoneNumber">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="required" name="mobile"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="home"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-phone-number"></xs:element>
+    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-phone-number" name="phone-number">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="petstore:org.mule.test.petstore.extension.PhoneNumber">
                     <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -207,6 +233,15 @@
     <xs:complexType name="GetCashierType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -215,6 +250,7 @@
                 <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">

@@ -25,6 +25,10 @@ public class ExclusiveCashier {
   @Optional
   private String pensionPlan;
 
+  @Parameter
+  @Optional
+  private PhoneNumber phoneNumber;
+
   @ParameterGroup
   private BankAccount account;
 

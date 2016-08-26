@@ -30,6 +30,9 @@ import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
 
+import java.lang.reflect.Field;
+import java.util.Set;
+
 /**
  * This validator makes sure that all the {@link ParameterizedModel}s which contains any {@link ParameterGroup} using exclusion
  * complies the following conditions:
@@ -91,14 +94,20 @@ public final class ExclusiveParameterModelValidator implements ModelValidator {
                                                                pg.getType().getName(), ExclusiveOptionals.class.getName()));
             });
 
-        long optionalParametersCount = pg.getOptionalParameters().stream().count();
+        Set<Field> optionalParametersFromGroup = pg.getOptionalParameters();
+
+        pg.getModelProperty(ParameterGroupModelProperty.class).ifPresent(nestedParameterGroup -> nestedParameterGroup.getGroups()
+            .stream().forEach(g -> ((ParameterGroup<?>) g).getOptionalParameters().stream()
+                .forEach(p -> optionalParametersFromGroup.add(p))));
+
+        long optionalParametersCount = optionalParametersFromGroup.stream().count();
         if (optionalParametersCount <= 1) {
           throw new IllegalParameterModelDefinitionException(format("In %s '%s', parameter group '%s' should contain more than one field marked as optional inside but %d was/were found",
                                                                     getComponentModelTypeName(model), getModelName(model),
                                                                     pg.getType().getName(), optionalParametersCount));
         }
 
-        pg.getOptionalParameters().forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor() {
+        optionalParametersFromGroup.forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor() {
 
           @Override
           protected void defaultVisit(MetadataType metadataType) {
