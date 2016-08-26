@@ -43,8 +43,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   private MessageContext context;
 
   @Before
-  public void before() throws Exception
-  {
+  public void before() throws Exception {
     flow = getTestFlow();
     context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
   }
