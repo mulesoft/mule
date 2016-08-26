@@ -27,6 +27,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -235,17 +236,15 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       session = new DefaultMuleSession();
     }
     final Object replyToFromMessage = getReplyToDestination(message);
-    DefaultMuleEvent newEvent = null;
 
     final MessageContext executionContext = create(flowConstruct, getEndpoint().getAddress(), message.getCorrelationId());
 
+    final Builder builder = MuleEvent.builder(executionContext).message(message).flow(flowConstruct).session(session);
     if (replyToFromMessage != null) {
-      newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage);
-    } else {
-      newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null);
+      builder.replyToHandler(replyToHandler).replyToDestination(replyToFromMessage);
     }
+    DefaultMuleEvent newEvent = (DefaultMuleEvent) builder.build();
+
     if (message.getCorrelationId() != null) {
       newEvent.setLegacyCorrelationId(message.getCorrelationId());
     }

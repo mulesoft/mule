@@ -72,7 +72,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * @deprecated TODO MULE-9281 remove when the event becomes immutable
    */
   @Deprecated
-  private final String id;
+  private String id;
   private MessageContext context;
   private MuleMessage message;
   private final MuleSession session;
@@ -103,15 +103,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct) {
     this(context, message, exchangePattern, flowConstruct, new DefaultMuleSession());
-  }
-
-  /**
-   * Constructor used to create an event with no message source with minimal arguments and a
-   * {@link org.mule.runtime.core.api.connector.ReplyToHandler}
-   */
-  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
-                          ReplyToHandler replyToHandler, FlowConstruct flowConstruct) {
-    this(context, message, exchangePattern, flowConstruct, new DefaultMuleSession(), replyToHandler);
   }
 
   /**
@@ -181,11 +172,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    */
   public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent) {
     this(message, rewriteEvent, rewriteEvent.getSession());
-  }
-
-  public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct) {
-    this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
-         rewriteEvent.isSynchronous());
   }
 
   /**
@@ -307,12 +293,13 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.error = rewriteEvent.getError();
   }
 
+  // Use this constructor from the builder
   public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
-                          FlowConstruct flowConstruct, MuleSession session, boolean transacted, Object replyToDestination,
-                          ReplyToHandler replyToHandler) {
+                          FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
+                          Object replyToDestination, ReplyToHandler replyToHandler, FlowCallStack flowCallStack) {
     this.context = context;
     this.correlation = NO_CORRELATION;
-    this.id = generateEventId(flowConstruct.getMuleContext());
+    // this.id = generateEventId(flowConstruct.getMuleContext());
     this.flowConstruct = flowConstruct;
     this.session = session;
     setMessage(message);
@@ -321,8 +308,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.replyToHandler = replyToHandler;
     this.replyToDestination = replyToDestination;
     this.transacted = transacted;
-    this.synchronous = resolveEventSynchronicity() && replyToHandler == null;
+    this.synchronous = synchronous;
     this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
+
+    this.flowCallStack = flowCallStack;
   }
 
   protected boolean resolveEventSynchronicity() {

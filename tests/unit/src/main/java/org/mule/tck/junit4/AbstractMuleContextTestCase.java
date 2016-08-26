@@ -525,7 +525,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
       throws Exception {
-    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(MuleMessage.builder().payload(payload).build())
+    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload(payload).build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -66,16 +65,14 @@ public class MessageChunkAggregator extends AbstractAggregator {
 
           final Builder builder = MuleMessage.builder(firstEvent.getMessage());
 
-          // try to deserialize message, since ChunkingRouter might have
-          // serialized
-          // the object...
+          // try to deserialize message, since ChunkingRouter might have serialized the object...
           try {
             builder.payload(muleContext.getObjectSerializer().deserialize(baos.toByteArray()));
           } catch (SerializationException e) {
             builder.payload(baos.toByteArray());
           }
 
-          return new DefaultMuleEvent(builder.build(), firstEvent, getMergedSession(events.toArray()));
+          return MuleEvent.builder(firstEvent).message(builder.build()).session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         } finally {

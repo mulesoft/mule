@@ -7,15 +7,24 @@
 package org.mule.runtime.core.message;
 
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.util.HashMap;
@@ -29,7 +38,13 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
   private MessageExchangePattern exchangePattern;
   private FlowConstruct flow;
+  private Correlation correlation = new Correlation(null, null);
+  private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
+  private Object replyToDestination;
+  private boolean transacted;
+  private Boolean synchronous;
+  private MuleSession session = new DefaultMuleSession();
 
   public DefaultMuleEventBuilder(MessageContext messageContext) {
     this.context = messageContext;
@@ -38,6 +53,21 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   public DefaultMuleEventBuilder(MuleEvent event) {
     this.context = event.getContext();
     this.message = event.getMessage();
+    this.flow = event.getFlowConstruct();
+    this.correlation = event.getCorrelation();
+
+    this.flowCallStack = event.getFlowCallStack().clone();
+
+    this.exchangePattern = event.getExchangePattern();
+
+    this.replyToHandler = event.getReplyToHandler();
+    this.replyToDestination = event.getReplyToDestination();
+    this.message = event.getMessage();
+
+    this.transacted = event.isTransacted();
+
+    this.session = event.getSession();
+
     event.getFlowVariableNames().forEach(key -> this.flowVariables
         .put(key, new TypedValue<>(event.getFlowVariable(key), event.getFlowVariableDataType(key))));
   }
@@ -75,6 +105,12 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
+  public Builder synchronous(boolean synchronous) {
+    this.synchronous = synchronous;
+    return this;
+  }
+
+  @Override
   public MuleEvent.Builder exchangePattern(MessageExchangePattern exchangePattern) {
     this.exchangePattern = exchangePattern;
     return this;
@@ -93,11 +129,50 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
+  public Builder replyToDestination(Object replyToDestination) {
+    this.replyToDestination = replyToDestination;
+    return this;
+  }
+
+  @Override
+  public Builder transacted(boolean transacted) {
+    this.transacted = transacted;
+    return this;
+  }
+
+  @Override
+  public Builder session(MuleSession session) {
+    this.session = session;
+    return this;
+  }
+
+  @Override
   public MuleEvent build() {
-    MuleEvent event =
-        new DefaultMuleEvent(context, message, null, null, exchangePattern, flow, new DefaultMuleSession(), false, null,
-                             replyToHandler);
+    DefaultMuleEvent event =
+        new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
+                             synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
+                             replyToDestination, replyToHandler, flowCallStack);
     this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
+    event.setCorrelation(correlation);
     return event;
   }
+
+  protected boolean resolveEventSynchronicity() {
+    return transacted
+        || isFlowConstructSynchronous()
+        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
+        || message.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
+  }
+
+  private boolean isFlowConstructSynchronous() {
+    return (flow instanceof ProcessingDescriptor) && ((ProcessingDescriptor) flow)
+        .isSynchronous();
+  }
+
+  protected boolean isFlowConstructNonBlockingProcessingStrategy() {
+    return (flow instanceof Pipeline)
+        && ((Pipeline) flow).getProcessingStrategy() instanceof NonBlockingProcessingStrategy;
+  }
+
+
 }

@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -333,7 +332,8 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         List<MuleMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
         final CollectionBuilder builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
-        DefaultMuleEvent muleEvent = new DefaultMuleEvent(builder.build(), retrieveLastStoredEvent(), getMergedSession());
+        MuleEvent muleEvent =
+            MuleEvent.builder(retrieveLastStoredEvent()).message(builder.build()).session(getMergedSession()).build();
         return muleEvent;
       } else {
         return VoidMuleEvent.getInstance();

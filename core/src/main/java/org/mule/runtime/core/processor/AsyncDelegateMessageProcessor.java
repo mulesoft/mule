@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -121,7 +122,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     if (target != null) {
       // Clone event, make it async and remove ReplyToHandler
-      MuleEvent newEvent = new DefaultMuleEvent(message, event, false, false, MessageExchangePattern.ONE_WAY, null);
+      MuleEvent newEvent = MuleEvent.builder(event).message(message).flowVariables(emptyMap()).synchronous(false)
+          .exchangePattern(ONE_WAY).replyToHandler(null).build();
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(newEvent);
       target.process(newEvent);

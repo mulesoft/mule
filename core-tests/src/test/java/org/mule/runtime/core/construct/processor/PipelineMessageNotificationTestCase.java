@@ -136,7 +136,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
     source.trigger(event);
 
@@ -211,7 +211,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {
@@ -242,7 +242,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {

@@ -10,7 +10,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -108,10 +107,8 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     final MuleMessage coll = MuleMessage.builder()
         .collectionPayload(list, MuleMessage.class)
         .build();
-    MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
-    for (String name : previous.getFlowVariableNames()) {
-      resultEvent.setFlowVariable(name, previous.getFlowVariable(name), previous.getFlowVariableDataType(name));
-    }
+
+    MuleEvent resultEvent = MuleEvent.builder(previous).message(coll).build();
     setCurrentEvent(resultEvent);
     return resultEvent;
   }

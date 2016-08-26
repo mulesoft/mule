@@ -321,6 +321,14 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
     /**
      * 
+     * @param synchronous
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder synchronous(boolean synchronous);
+
+    /**
+     * 
      * @param exchangePattern
      * @return the builder instance
      */
@@ -337,6 +345,14 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
     /**
      * 
+     * @param replyToDestination
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder replyToDestination(Object replyToDestination);
+
+    /**
+     * 
      * @param flow
      * @return the builder instance
      */
@@ -344,7 +360,23 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder flow(FlowConstruct flow);
 
     /**
-     * Build a new {@link MuleEvent} based on the state confgured in the {@link Builder}.
+     * 
+     * @param transacted
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder transacted(boolean transacted);
+
+    /**
+     * 
+     * @param session
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder session(MuleSession session);
+
+    /**
+     * Build a new {@link MuleEvent} based on the state configured in the {@link Builder}.
      *
      * @return new {@link MuleEvent} instance.
      */
