@@ -20,8 +20,8 @@ public class ParameterType {
 
   public ParameterType() {}
 
-  public ParameterType(String paramName, JdbcType type) {
-    this.paramName = paramName;
+  public ParameterType(String key, JdbcType type) {
+    this.key = key;
     this.type = type;
   }
 
@@ -30,7 +30,7 @@ public class ParameterType {
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  private String paramName;
+  private String key;
 
   /**
    * Parameter type name.
@@ -40,8 +40,8 @@ public class ParameterType {
   @Expression(NOT_SUPPORTED)
   private JdbcType type;
 
-  public String getParamName() {
-    return paramName;
+  public String getKey() {
+    return key;
   }
 
   public JdbcType getType() {

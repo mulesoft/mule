@@ -10,7 +10,7 @@
             <dbn:stored-procedure>
                 <dbn:sql>{ CALL getZipCodes('Southwest', :out) }</dbn:sql>
                 <dbn:output-parameters>
-                    <dbn:output-parameter paramName="out" type="ZIPARRAY"/>
+                    <dbn:output-parameter key="out" type="ZIPARRAY"/>
                 </dbn:output-parameters>
             </dbn:stored-procedure>
 
@@ -24,7 +24,7 @@
             <dbn:stored-procedure>
                 <dbn:sql>{ CALL getContactDetails('Contact1', :out) }</dbn:sql>
                 <dbn:output-parameters>
-                    <dbn:output-parameter paramName="out" type="CONTACT_DETAILS_ARRAY"/>
+                    <dbn:output-parameter key="out" type="CONTACT_DETAILS_ARRAY"/>
                 </dbn:output-parameters>
             </dbn:stored-procedure>
 

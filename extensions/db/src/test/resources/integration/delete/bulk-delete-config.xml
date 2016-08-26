@@ -15,7 +15,7 @@
         <dbn:bulk-delete parameterValues="#[payload]">
             <dbn:sql>DELETE FROM PLANET WHERE name = :name</dbn:sql>
             <dbn:parameter-types>
-                <dbn:parameter-type paramName="name" type="VARCHAR" />
+                <dbn:parameter-type key="name" type="VARCHAR" />
             </dbn:parameter-types>
         </dbn:bulk-delete>
     </flow>

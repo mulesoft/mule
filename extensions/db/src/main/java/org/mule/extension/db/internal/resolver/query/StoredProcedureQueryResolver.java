@@ -8,6 +8,7 @@ package org.mule.extension.db.internal.resolver.query;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
+import org.mule.extension.db.api.param.OutputParameter;
 import org.mule.extension.db.api.param.ParameterType;
 import org.mule.extension.db.api.param.StoredProcedureCall;
 import org.mule.extension.db.internal.DbConnector;
@@ -44,7 +45,7 @@ public class StoredProcedureQueryResolver extends ParameterizedQueryResolver<Sto
         return new DefaultInputQueryParam(param.getIndex(), param.getType(), parameterValue.get(), paramName);
       }
 
-      Optional<ParameterType> outputParameter = call.getOutputParameter(paramName);
+      Optional<OutputParameter> outputParameter = call.getOutputParameter(paramName);
       if (outputParameter.isPresent()) {
         final ParameterType parameterType = outputParameter.get();
         DbType type = parameterType.getType() != null ? parameterType.getType().getDbType() : param.getType();

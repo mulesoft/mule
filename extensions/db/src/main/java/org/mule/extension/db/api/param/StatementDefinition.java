@@ -118,7 +118,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
    * @return an optional {@link ParameterType}
    */
   public java.util.Optional<ParameterType> getParameterType(String paramName) {
-    return parameterTypes.stream().filter(p -> p.getParamName().equals(paramName)).findFirst();
+    return parameterTypes.stream().filter(p -> p.getKey().equals(paramName)).findFirst();
   }
 
   public String getSql() {

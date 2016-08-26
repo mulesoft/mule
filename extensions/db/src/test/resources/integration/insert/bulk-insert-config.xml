@@ -15,7 +15,7 @@
         <dbn:bulk-insert parameterValues="#[payload]">
             <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</dbn:sql>
             <dbn:parameter-types>
-                <dbn:parameter-type paramName="name" type="VARCHAR" />
+                <dbn:parameter-type key="name" type="VARCHAR" />
             </dbn:parameter-types>
         </dbn:bulk-insert>
     </flow>
