@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 
 /**
@@ -103,13 +102,6 @@ public interface MuleEventContext {
   FlowConstruct getFlowConstruct();
 
   MessageExchangePattern getExchangePattern();
-
-  /**
-   * Returns a reference to the Endpoint Uri for this context This is the endpoint on which the event was received
-   * 
-   * @return the receive endpoint for this event context
-   */
-  URI getEndpointURI();
 
   /**
    * Returns the transaction for the current event or null if there is no transaction in progress

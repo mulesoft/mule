@@ -56,4 +56,9 @@ public interface MessageContext {
    */
   String getOriginatingFlowName();
 
+  /**
+   * @return the name of the connector that generated the message for the first event of this context.
+   */
+  String getOriginatingConnectorName();
+
 }

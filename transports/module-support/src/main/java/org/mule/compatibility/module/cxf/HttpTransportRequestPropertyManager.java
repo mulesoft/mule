@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.module.cxf;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.cxf.HttpRequestPropertyManager;
@@ -21,15 +20,6 @@ public class HttpTransportRequestPropertyManager extends HttpRequestPropertyMana
       requestPath = super.getRequestPath(message);
     }
     return requestPath;
-  }
-
-  @Override
-  public String getScheme(MuleEvent event) {
-    String scheme = event.getMessageSourceURI().getScheme();
-    if (scheme == null) {
-      scheme = super.getScheme(event);
-    }
-    return scheme;
   }
 
   @Override

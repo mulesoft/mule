@@ -23,15 +23,12 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.OffsetTime;
 import java.util.Collections;
@@ -126,6 +123,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         }
 
         @Override
+        public String getOriginatingConnectorName() {
+          return TEST_CONNECTOR;
+        }
+
+        @Override
         public boolean isCorrelationIdFromSource() {
           return false;
         }
@@ -142,6 +144,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
       return null;
     }
 
+    @Override
     public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
       return new byte[0];
     }
@@ -199,16 +202,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     @Override
     public boolean isTransacted() {
       return false;
-    }
-
-    @Override
-    public URI getMessageSourceURI() {
-      return URI.create("test://test");
-    }
-
-    @Override
-    public String getMessageSourceName() {
-      return "test";
     }
 
     @Override
@@ -273,11 +266,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
     @Override
     public FlowCallStack getFlowCallStack() {
-      return null;
-    }
-
-    @Override
-    public ProcessorsTrace getProcessorsTrace() {
       return null;
     }
 

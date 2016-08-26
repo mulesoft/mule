@@ -8,9 +8,6 @@ package org.mule.compatibility.core.agent;
 
 import static org.mule.runtime.core.DefaultMessageContext.create;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -33,6 +30,9 @@ import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications to a configurered endpoint uri.
@@ -149,7 +149,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           }
         };
 
-        MuleEvent event = new DefaultMuleEvent(create(flowConstruct), msg,
+        MuleEvent event = new DefaultMuleEvent(create(flowConstruct, "EndpointNotificationLoggerAgent"), msg,
                                                endpoint.getExchangePattern(), flowConstruct);
         event.setEnableNotifications(false);
         endpoint.process(event);

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -297,8 +298,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     + correlationId + ". Dropping event");
               }
               // Fire a notification to say we received this message
-              muleContext.fireNotification(new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
-                                                                   RoutingNotification.MISSED_ASYNC_REPLY));
+              muleContext
+                  .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingConnectorName(),
+                                                            MISSED_ASYNC_REPLY));
             } else {
               Latch l = locks.get(correlationId);
               if (l != null) {

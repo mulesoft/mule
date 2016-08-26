@@ -452,7 +452,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
       // Get the durable subscriber name if there is one
       durableName = (String) event.getFlowVariable(JmsConstants.DURABLE_NAME_PROPERTY);
       if (durableName == null && durable && topic) {
-        durableName = "mule." + connector.getName() + "." + event.getMessageSourceURI();
+        durableName = "mule." + connector.getName() + "." + event.getContext().getOriginatingConnectorName();
         if (logger.isDebugEnabled()) {
           logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
               + durableName);

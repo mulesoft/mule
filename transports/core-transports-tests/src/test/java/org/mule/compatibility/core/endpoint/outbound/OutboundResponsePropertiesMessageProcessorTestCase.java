@@ -9,13 +9,13 @@ package org.mule.compatibility.core.endpoint.outbound;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,7 +37,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
       // return event with same payload but no properties
       try {
         Flow flow = getTestFlow();
-        return new DefaultMuleEvent(create(flow),
+        return new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
                                     MuleMessage.builder().payload(event.getMessage().getPayload()).build(), REQUEST_RESPONSE,
                                     flow, getTestSession(null, muleContext));
       } catch (Exception e) {

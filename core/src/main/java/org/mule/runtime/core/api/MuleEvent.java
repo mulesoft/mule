@@ -12,7 +12,6 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -20,7 +19,6 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleEventBuilder;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -170,16 +168,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   boolean isTransacted();
 
   /**
-   * Returns the {@link URI} of the MessageSource that recieved or generated the message being processed.
-   */
-  URI getMessageSourceURI();
-
-  /**
-   * Returns the message source name if it has one, otherwise returns toString() of the URI returned be getMessageSourceURI()
-   */
-  String getMessageSourceName();
-
-  /**
    * Return the replyToHandler (if any) that will be used to perform async reply
    */
   ReplyToHandler getReplyToHandler();
@@ -240,19 +228,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @since 3.8.0
    */
   FlowCallStack getFlowCallStack();
-
-  /**
-   * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
-   * after it has executed.
-   * <p/>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the list will
-   * always be empty.
-   * 
-   * @return the message processors trace associated to this event.
-   * 
-   * @since 3.8.0
-   */
-  ProcessorsTrace getProcessorsTrace();
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using

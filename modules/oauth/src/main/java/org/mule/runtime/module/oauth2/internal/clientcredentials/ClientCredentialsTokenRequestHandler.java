@@ -86,7 +86,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     try {
       Flow flow = new Flow("test", getMuleContext());
       final DefaultMuleEvent accessTokenEvent =
-          new DefaultMuleEvent(create(flow), MuleMessage.builder().nullPayload().build(),
+          new DefaultMuleEvent(create(flow, "ClientCredentialsTokenRequestHandler"), MuleMessage.builder().nullPayload().build(),
                                REQUEST_RESPONSE, flow);
       setMapPayloadWithTokenRequestParameters(accessTokenEvent);
       final MuleEvent response;

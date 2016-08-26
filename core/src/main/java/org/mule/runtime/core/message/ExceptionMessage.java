@@ -13,10 +13,8 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -42,21 +40,21 @@ public class ExceptionMessage implements Serializable {
 
   protected Map<String, Object> properties;
   private String componentName;
-  private String endpointUri;
+  private String connectorName;
   private Date timeStamp;
 
-  public ExceptionMessage(MuleEvent event, Throwable exception, String componentName, URI endpointUri) {
+  public ExceptionMessage(MuleEvent event, Throwable exception, String componentName, String connectorName) {
     this.payload = event.getMessage().getPayload();
-    properties = new HashMap<String, Object>();
+    properties = new HashMap<>();
     this.exception = exception;
     timeStamp = new Date();
     this.componentName = componentName;
-    if (endpointUri != null) {
-      this.endpointUri = endpointUri.toString();
+    if (connectorName != null) {
+      this.connectorName = connectorName.toString();
     }
 
-    for (Iterator iterator = event.getMessage().getOutboundPropertyNames().iterator(); iterator.hasNext();) {
-      String propertyKey = (String) iterator.next();
+    for (Object element : event.getMessage().getOutboundPropertyNames()) {
+      String propertyKey = (String) element;
       setProperty(propertyKey, event.getMessage().getOutboundProperty(propertyKey));
     }
   }
@@ -140,8 +138,8 @@ public class ExceptionMessage implements Serializable {
     return componentName;
   }
 
-  public String getEndpoint() {
-    return endpointUri;
+  public String getConnectorName() {
+    return connectorName;
   }
 
   public Date getTimeStamp() {
@@ -155,6 +153,6 @@ public class ExceptionMessage implements Serializable {
   @Override
   public String toString() {
     return "ExceptionMessage{" + "payload=" + getPayload() + ", context=" + properties + "exception=" + exception
-        + ", componentName='" + componentName + "'" + ", endpointUri=" + endpointUri + ", timeStamp=" + timeStamp + "}";
+        + ", componentName='" + componentName + "'" + ", connectorName=" + connectorName + ", timeStamp=" + timeStamp + "}";
   }
 }

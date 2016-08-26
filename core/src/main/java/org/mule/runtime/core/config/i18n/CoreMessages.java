@@ -21,7 +21,6 @@ import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -379,8 +378,8 @@ public class CoreMessages extends MessageFactory {
     return factory.createMessage(BUNDLE_PATH, 133, name);
   }
 
-  public static Message authDeniedOnEndpoint(URI endpointURI) {
-    return factory.createMessage(BUNDLE_PATH, 134, endpointURI);
+  public static Message authDeniedOnEndpoint(String connectorName) {
+    return factory.createMessage(BUNDLE_PATH, 134, connectorName);
   }
 
   public static Message authFailedForUser(Object user) {
@@ -872,8 +871,8 @@ public class CoreMessages extends MessageFactory {
     return factory.createMessage(BUNDLE_PATH, 330, key);
   }
 
-  public static Message authorizationDeniedOnEndpoint(URI endpointURI) {
-    return factory.createMessage(BUNDLE_PATH, 331, endpointURI);
+  public static Message authorizationDeniedOnEndpoint(String originationgConnectorName) {
+    return factory.createMessage(BUNDLE_PATH, 331, originationgConnectorName);
   }
 
   public static Message objectStoreNotFound(String name) {

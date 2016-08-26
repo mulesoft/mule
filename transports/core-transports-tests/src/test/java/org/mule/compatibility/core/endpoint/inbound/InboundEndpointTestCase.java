@@ -21,7 +21,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -36,6 +35,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.InboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -46,7 +46,6 @@ import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
@@ -343,15 +342,17 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
   protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flow), inMessage, flow, getTestSession(null, muleContext));
+    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), inMessage, flow,
+                                                        getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
     return event;
   }
 
   protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flow), MuleMessage.builder().payload(RESPONSE_MESSAGE).build(),
-                                                        flow, getTestSession(null, muleContext));
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
+                             MuleMessage.builder().payload(RESPONSE_MESSAGE).build(), flow, getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
     return event;
   }

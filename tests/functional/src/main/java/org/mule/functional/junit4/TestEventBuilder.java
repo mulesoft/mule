@@ -7,12 +7,13 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -301,9 +301,9 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flow, sourceCorrelationId),
-                             (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern,
-                             flow, new DefaultMuleSession(), transacted, null, replyToHandler);
+        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId),
+                             (MuleMessage) spyTransformer.transform(muleMessage), exchangePattern, flow, new DefaultMuleSession(),
+                             transacted, null, replyToHandler);
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

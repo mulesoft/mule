@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
@@ -146,8 +147,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
                 + "this is probably because the async-reply timed out. Correlation Id is: " + groupId + ". Dropping event");
           }
           // Fire a notification to say we received this message
-          muleContext.fireNotification(new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
-                                                               RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
+          muleContext
+              .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingConnectorName(),
+                                                        MISSED_AGGREGATION_GROUP_EVENT));
           return null;
         }
       } catch (ObjectStoreException e) {

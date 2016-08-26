@@ -237,7 +237,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     final Object replyToFromMessage = getReplyToDestination(message);
     DefaultMuleEvent newEvent = null;
 
-    final MessageContext executionContext = create(flowConstruct, message.getCorrelationId());
+    final MessageContext executionContext = create(flowConstruct, getEndpoint().getAddress(), message.getCorrelationId());
 
     if (replyToFromMessage != null) {
       newEvent =

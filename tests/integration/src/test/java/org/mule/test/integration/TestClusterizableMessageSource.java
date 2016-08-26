@@ -6,43 +6,36 @@
  */
 package org.mule.test.integration;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 
 public class TestClusterizableMessageSource
-    implements ClusterizableMessageSource, Startable, MuleContextAware, FlowConstructAware {
+    implements ClusterizableMessageSource, Startable, FlowConstructAware {
 
   private MessageProcessor listener;
-  private MuleContext context;
   private FlowConstruct flowConstruct;
 
   @Override
   public void start() throws MuleException {
     MuleMessage muleMessage = MuleMessage.builder().payload("TEST").build();
     DefaultMuleEvent defaultMuleEvent =
-        new DefaultMuleEvent(create(flowConstruct), muleMessage, ONE_WAY, flowConstruct);
+        new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR), muleMessage, ONE_WAY, flowConstruct);
     listener.process(defaultMuleEvent);
   }
 
   @Override
   public void setListener(MessageProcessor listener) {
     this.listener = listener;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.context = context;
   }
 
   @Override

@@ -8,23 +8,26 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
-import org.junit.Test;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.ErrorBuilder;
+
+import org.junit.Test;
 
 public class ExceptionTestCase extends AbstractELTestCase {
 
   public ExceptionTestCase(Variant variant, String mvelOptimizer) {
     super(variant, mvelOptimizer);
+  }
+
+  @Override
+  public void setupFlowConstruct() throws Exception {
+    flowConstruct = getTestFlow();
   }
 
   @Test
@@ -48,10 +51,9 @@ public class ExceptionTestCase extends AbstractELTestCase {
   public void exceptionCausedBy() throws Exception {
     MuleEvent event = getTestEvent("");
     MuleMessage message = event.getMessage();
-    Flow flow = getTestFlow();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               new DefaultMuleEvent(create(flow), message, ONE_WAY, flow),
+                               new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct),
                                new IllegalAccessException());
     event.setError(ErrorBuilder.builder(me).build());
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));

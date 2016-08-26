@@ -70,7 +70,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
       assertEquals(UNAUTHORIZED.getStatusCode(), status);
       String expectedMessage = String.format(
                                              "Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter "
-                                                 + "but there was no security context on the session. Authentication denied on endpoint %s.",
+                                                 + "but there was no security context on the session. Authentication denied on connector %s.",
                                              get.getURI().getURI());
       assertThat(get.getResponseBodyAsString(), startsWith(expectedMessage));
     } finally {
@@ -95,7 +95,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
       assertThat(post.getResponseBodyAsString(),
                  startsWith(String.format(
                                           "Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter "
-                                              + "but there was no security context on the session. Authentication denied on endpoint %s.",
+                                              + "but there was no security context on the session. Authentication denied on connector %s.",
                                           post.getURI().getURI())));
     } finally {
       post.releaseConnection();

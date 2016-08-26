@@ -7,12 +7,12 @@
 package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authDeniedOnEndpoint;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 
-import java.net.URI;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
@@ -42,25 +42,22 @@ public class UnauthorisedException extends SecurityException {
   }
 
   public UnauthorisedException(MuleEvent event, SecurityContext context, SecurityFilter filter) {
-    super(constructMessage(context, event.getMessageSourceURI(), filter), event);
+    super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter), event);
   }
 
   @Deprecated
-  public UnauthorisedException(MuleEvent event, SecurityContext context,
-                               URI endpointURI, SecurityFilter filter) {
-    super(constructMessage(context, endpointURI, filter), event);
+  public UnauthorisedException(MuleEvent event, SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
+    super(constructMessage(context, originatingConnectorName, filter), event);
   }
 
-  private static Message constructMessage(SecurityContext context, URI endpointURI,
-                                          SecurityFilter filter) {
-
+  private static Message constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
     Message m;
     if (context == null) {
-      m = CoreMessages.authSetButNoContext(filter.getClass().getName());
+      m = authSetButNoContext(filter.getClass().getName());
     } else {
-      m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
+      m = authFailedForUser(context.getAuthentication().getPrincipal());
     }
-    m.setNextMessage(CoreMessages.authDeniedOnEndpoint(endpointURI));
+    m.setNextMessage(authDeniedOnEndpoint(originatingConnectorName));
     return m;
   }
 }

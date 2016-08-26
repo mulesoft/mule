@@ -9,6 +9,7 @@ package org.mule.runtime.core.source.polling;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
@@ -210,7 +211,7 @@ public class PollingMessageSource
 
         @Override
         public MuleEvent process() throws Exception {
-          MuleEvent event = new DefaultMuleEvent(create(flowConstruct), request, ONE_WAY, flowConstruct);
+          MuleEvent event = new DefaultMuleEvent(create(flowConstruct, getPollingUniqueName()), request, ONE_WAY, flowConstruct);
           event = interceptor.prepareSourceEvent(event);
 
           setCurrentEvent(event);
@@ -224,7 +225,7 @@ public class PollingMessageSource
             listener.process(event);
             interceptor.postProcessRouting(event);
           } else {
-            logger.info(CoreMessages.pollSourceReturnedNull(flowConstruct.getName()).getMessage());
+            logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
           }
           return null;
         }

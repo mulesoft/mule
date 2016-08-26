@@ -433,7 +433,7 @@ public class MuleClient implements Disposable {
           .addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
     }
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return new DefaultMuleEvent(create(flowConstruct), message, exchangePattern, flowConstruct);
+    return new DefaultMuleEvent(create(flowConstruct, "MuleClient"), message, exchangePattern, flowConstruct);
   }
 
   protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException {

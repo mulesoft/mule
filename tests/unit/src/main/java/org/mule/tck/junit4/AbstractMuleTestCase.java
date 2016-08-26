@@ -8,7 +8,7 @@ package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractMuleTestCase {
 
   public static final String TEST_PAYLOAD = "test";
+  public static final String TEST_CONNECTOR = "test";
 
   public static final String TESTING_MODE_PROPERTY_NAME = "mule.testingMode";
 
@@ -210,7 +211,7 @@ public abstract class AbstractMuleTestCase {
   }
 
   private static List<String> collectThreadNames() {
-    List<String> threadNames = new ArrayList<String>();
+    List<String> threadNames = new ArrayList<>();
     for (Thread t : Thread.getAllStackTraces().keySet()) {
       if (t.isAlive()) {
         threadNames.add(t.getName() + " - " + t.getId());

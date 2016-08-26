@@ -10,10 +10,10 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
-import org.mule.test.AbstractIntegrationTestCase;
+
+import org.mule.runtime.core.api.CoreMessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
 
   public static class ProcessorsTraceAsserter implements MessageProcessor {
@@ -45,7 +48,7 @@ public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      processorsTraceToAssert = event.getProcessorsTrace();
+      processorsTraceToAssert = ((CoreMessageContext) event.getContext()).getProcessorsTrace();
       return event;
     }
   }

@@ -9,7 +9,13 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+
+import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,11 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 /**
  * Test the syntax of the SimpleFilename parser
@@ -47,7 +48,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
     message =
         MuleMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(create(flow), message, flow);
+    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow);
   }
 
   @Test

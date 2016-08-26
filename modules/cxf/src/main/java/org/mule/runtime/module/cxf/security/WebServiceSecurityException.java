@@ -16,9 +16,9 @@ public class WebServiceSecurityException extends org.mule.runtime.core.api.secur
 
   public WebServiceSecurityException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor,
                                      SecurityManager securityManager) {
-    super(createStaticMessage("Security exception occurred invoking web service\nEndpoint = " + event.getMessageSourceURI()
-        + "\nSecurity provider(s) = " + securityManager.getProviders() + "\nEvent = " + event), event, cause,
-          failingMessageProcessor);
+    super(createStaticMessage("Security exception occurred invoking web service\nEndpoint = "
+        + event.getContext().getOriginatingConnectorName() + "\nSecurity provider(s) = " + securityManager.getProviders()
+        + "\nEvent = " + event), event, cause, failingMessageProcessor);
   }
 }
 

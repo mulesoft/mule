@@ -7,9 +7,10 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -167,7 +168,7 @@ public final class MuleTestUtils {
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), message, mep, flowConstruct, session);
+        new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR), message, mep, flowConstruct, session);
     return event;
   }
 
@@ -177,7 +178,7 @@ public final class MuleTestUtils {
                                        MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR),
                                                         MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
     return event;
   }
@@ -189,7 +190,7 @@ public final class MuleTestUtils {
   public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(create(flowConstruct),
+    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR),
                                                         MuleMessage.builder().payload(data).build(), flowConstruct, session);
     return event;
   }

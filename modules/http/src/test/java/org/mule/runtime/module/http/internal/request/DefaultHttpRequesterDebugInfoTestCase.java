@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Matchers.isNull;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
@@ -34,12 +33,7 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -51,6 +45,13 @@ import org.mule.runtime.module.http.internal.HttpParam;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Test;
 
 public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTestCase {
 
@@ -99,7 +100,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
 
     message = MuleMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(create(flow), message, REQUEST_RESPONSE, flow);
+    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, REQUEST_RESPONSE, flow);
   }
 
   @Test

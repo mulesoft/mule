@@ -11,8 +11,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -70,7 +70,7 @@ public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends 
 
     message = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(create(flow), message, flow, mockSession);
+    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow, mockSession);
   }
 
   @Test

@@ -9,7 +9,6 @@ package org.mule.runtime.core;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -40,6 +39,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Mock
   private FlowConstruct flow;
 
+  private MessageContext executionContext;
+  private MessageContext executionContextWithCorrelation;
 
   @Before
   public void before() {
@@ -47,12 +48,13 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     when(muleContext.getId()).thenReturn(CORRELATION_ID);
     when(muleContext.getUniqueIdString()).thenReturn(MSG_EXEC_CTX_ID);
     when(flow.getMuleContext()).thenReturn(muleContext);
+
+    executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    executionContextWithCorrelation = DefaultMessageContext.create(flow, TEST_CONNECTOR, CORRELATION_ID);
   }
 
   @Test
   public void noCorrelationIdInContext() {
-    final MessageContext executionContext = create(flow);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
 
@@ -61,8 +63,6 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void parentNoCorrelationIdInContext() {
-    final MessageContext executionContext = create(flow);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
@@ -75,23 +75,19 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void correlationIdInContext() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
 
     assertThat(event.getCorrelationId(), is(CORRELATION_ID));
   }
 
   @Test
   public void parentCorrelationIdInContext() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
+    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContextWithCorrelation, messageParent, flow);
     ((DefaultFlowCallStack) eventParent.getFlowCallStack()).push(new FlowStackElement(flow.getName(), "/0"));
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setParent(eventParent);
 
     assertThat(event.getCorrelationId(), is(CORRELATION_ID + ":" + "/0"));
@@ -99,10 +95,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void overrideCorrelationIdInContext() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setCorrelation(new Correlation(null, null));
 
     assertThat(event.getCorrelationId(), is(CORRELATION_ID));
@@ -110,13 +104,11 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void parentOverrideCorrelationIdInContext() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
+    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContextWithCorrelation, messageParent, flow);
     ((DefaultFlowCallStack) eventParent.getFlowCallStack()).push(new FlowStackElement(flow.getName(), "/0"));
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setLegacyCorrelationId(CORRELATION_ID);
     event.setParent(eventParent);
 
@@ -125,8 +117,6 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void noCorrelationIdInContextSequence() {
-    final MessageContext executionContext = create(flow);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
     event.setCorrelation(new Correlation(null, 6));
@@ -136,8 +126,6 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void parentNoCorrelationIdInContextSequence() {
-    final MessageContext executionContext = create(flow);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
@@ -151,10 +139,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void correlationIdInContextSequence() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setCorrelation(new Correlation(null, 6));
 
     assertThat(event.getCorrelationId(), is(CORRELATION_ID + ":" + "6"));
@@ -162,13 +148,11 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void parentCorrelationIdInContextSequence() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
+    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContextWithCorrelation, messageParent, flow);
     ((DefaultFlowCallStack) eventParent.getFlowCallStack()).push(new FlowStackElement(flow.getName(), "/0"));
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setCorrelation(new Correlation(null, 6));
     event.setParent(eventParent);
 
@@ -177,10 +161,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void overrideCorrelationIdInContextSequence() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setCorrelation(new Correlation(null, 6));
     event.setLegacyCorrelationId(CORRELATION_ID);
 
@@ -189,13 +171,11 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void parentOverrideCorrelationIdInContextSequence() {
-    final MessageContext executionContext = create(flow, CORRELATION_ID);
-
     final MuleMessage messageParent = MuleMessage.builder().payload(TEST_PAYLOAD).build();
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContext, messageParent, flow);
+    final DefaultMuleEvent eventParent = new DefaultMuleEvent(executionContextWithCorrelation, messageParent, flow);
     ((DefaultFlowCallStack) eventParent.getFlowCallStack()).push(new FlowStackElement(flow.getName(), "/0"));
-    final DefaultMuleEvent event = new DefaultMuleEvent(executionContext, message, flow);
+    final DefaultMuleEvent event = new DefaultMuleEvent(executionContextWithCorrelation, message, flow);
     event.setCorrelation(new Correlation(null, 6));
     event.setLegacyCorrelationId(CORRELATION_ID);
     event.setParent(eventParent);

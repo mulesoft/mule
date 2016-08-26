@@ -24,6 +24,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -198,11 +199,15 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(create(flowConstruct), message, REQUEST_RESPONSE, flowConstruct);
+    return new DefaultMuleEvent(createMuleClientMessageContext(), message, REQUEST_RESPONSE, flowConstruct);
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(create(flowConstruct), message, ONE_WAY, flowConstruct);
+    return new DefaultMuleEvent(createMuleClientMessageContext(), message, ONE_WAY, flowConstruct);
+  }
+
+  protected MessageContext createMuleClientMessageContext() {
+    return create(flowConstruct, "muleClient");
   }
 
   protected MuleEvent returnEvent(MuleEvent event) {

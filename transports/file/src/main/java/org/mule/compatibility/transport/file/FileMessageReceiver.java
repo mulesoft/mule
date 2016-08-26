@@ -15,23 +15,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
@@ -57,6 +40,24 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.lock.LockFactory;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+
+import org.apache.commons.collections.comparators.ReverseComparator;
 
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files from a directory.
@@ -254,7 +255,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
             .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct), fileParserMessasge, flowConstruct);
+        new DefaultMuleEvent(create(flowConstruct, endpoint.getAddress()), fileParserMessasge, flowConstruct);
 
     final File sourceFile;
     if (workDir != null) {

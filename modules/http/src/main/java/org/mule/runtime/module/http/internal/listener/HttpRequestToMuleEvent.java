@@ -18,15 +18,6 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,6 +35,15 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpRequestToMuleEvent {
 
@@ -111,8 +111,8 @@ public class HttpRequestToMuleEvent {
         .outboundProperties(outboundProperties).build();
     return new DefaultMuleEvent(
                                 // TODO does a correlation id come as a header that we may use?
-                                create(flowConstruct), message,
-                                resolveUri(requestContext), REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
+                                create(flowConstruct, resolveUri(requestContext).toString()), message,
+                                REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
   }
 
   private static URI resolveUri(final HttpRequestContext requestContext) {

@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -126,7 +125,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     try {
       Flow flow = getTestFlow();
       MuleEvent event =
-          mp.process(new DefaultMuleEvent(create(flow), msg, REQUEST_RESPONSE, flow, session));
+          mp.process(new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), msg, REQUEST_RESPONSE, flow,
+                                          session));
       MuleMessage returnedMessage = event.getMessage();
       if (event.getError() != null) {
         return EXCEPTION_SEEN;
@@ -161,7 +161,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        DefaultMuleEvent muleEvent = new DefaultMuleEvent(create(getTestFlow()), msg, ONE_WAY, getTestFlow(), event.getSession());
+        DefaultMuleEvent muleEvent =
+            new DefaultMuleEvent(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR), msg, ONE_WAY, getTestFlow(),
+                                 event.getSession());
         muleEvent.setError(error);
         return muleEvent;
       } catch (Exception e) {
