@@ -29,7 +29,7 @@ public abstract class BulkQueryFactory {
     BulkQuery bulkQuery = createBulkQuery();
 
     if (bulkQuery.getQueryTemplates().size() == 0) {
-      throw new QueryResolutionException("There are no queries on the resolved query script");
+      throw new QueryResolutionException("There are no queries on the resolved query script: " + toString());
     }
 
     return bulkQuery;

@@ -21,4 +21,9 @@ public class DefaultBulkQueryFactory extends BulkQueryFactory {
   protected String resolveBulkQueries() {
     return bulkQueryText.trim();
   }
+
+  @Override
+  public String toString() {
+    return bulkQueryText;
+  }
 }

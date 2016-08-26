@@ -34,4 +34,9 @@ public class FileBulkQueryFactory extends BulkQueryFactory {
       throw new QueryResolutionException("Unable to read script file: " + file);
     }
   }
+
+  @Override
+  public String toString() {
+    return file;
+  }
 }
