@@ -84,7 +84,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
      * @param expirationHandler a {@link BiConsumer} which acts as a expiration handler
      * @return {@code this} instance
      */
-    public Builder onExpired(BiConsumer<String, ConfigurationInstance<Object>> expirationHandler) {
+    public Builder onExpired(BiConsumer<String, ConfigurationInstance> expirationHandler) {
       manager.expirationHandler = expirationHandler;
       return this;
     }
@@ -109,7 +109,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   private MuleContext muleContext;
   private long frequency;
   private TimeUnit timeUnit;
-  private BiConsumer<String, ConfigurationInstance<Object>> expirationHandler;
+  private BiConsumer<String, ConfigurationInstance> expirationHandler;
 
   private ScheduledExecutorService executor;
 
@@ -135,7 +135,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
 
     LOGGER.debug("Running configuration expiration cycle");
     try {
-      Multimap<String, ConfigurationInstance<Object>> expired = extensionRegistry.getExpiredConfigs();
+      Multimap<String, ConfigurationInstance> expired = extensionRegistry.getExpiredConfigs();
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(expired.isEmpty() ? "No expired configuration instances were found" : "Found {} expired configurations",
                      expired.size());
@@ -148,7 +148,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
 
   }
 
-  private void handleExpiration(String key, ConfigurationInstance<Object> config) {
+  private void handleExpiration(String key, ConfigurationInstance config) {
     if (stopChecking()) {
       return;
     }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -15,7 +16,6 @@ import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 /**
  * Resolves and injects the values of a {@link Source} that has fields annotated with {@link Parameter} or
@@ -60,7 +60,7 @@ public final class SourceConfigurer {
         };
 
     try {
-      return builder.build(MuleExtensionUtils.getInitialiserEvent(muleContext));
+      return builder.build(getInitialiserEvent(muleContext));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
           + source.getClass().getName()), e);

@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.same;
@@ -38,10 +39,10 @@ import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -71,34 +72,48 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private static final String DUMMY_NAME = "dummyName";
   private static final String ERROR = "Error";
   private final Object result = new Object();
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-  @Mock
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationContextAdapter operationContext;
+
   @Mock(extraInterfaces = Interceptable.class)
-  private ConfigurationInstance<Object> configurationInstance;
+  private ConfigurationInstance configurationInstance;
   @Mock
   private MutableConfigurationStats configurationStats;
+
   @Mock(extraInterfaces = Interceptable.class)
   private OperationExecutor operationExecutor;
+
   @Mock
   private OperationExecutor operationExceptionExecutor;
+
   @Mock
   private Interceptor configurationInterceptor1;
+
   @Mock
   private Interceptor configurationInterceptor2;
+
   @Mock
   private Interceptor operationInterceptor1;
+
   @Mock
   private Interceptor operationInterceptor2;
+
   @Mock
   private ExceptionEnricher exceptionEnricher;
+
   @Mock
   private RuntimeConfigurationModel configurationModel;
+
   @Mock
   private RuntimeExtensionModel extensionModel;
+
   @Mock
   private RuntimeOperationModel operationModel;
+
   @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
   private ConnectionException connectionException = new ConnectionException("Connection failure");
@@ -118,8 +133,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationModel.getExceptionEnricherFactory()).thenReturn(empty());
     when(operationExecutor.execute(operationContext)).thenReturn(result);
     when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
-    when(operationContext.getConfiguration()).thenReturn(configurationInstance);
-    when(operationContext.getConfiguration().getModel().getExtensionModel().getName()).thenReturn(DUMMY_NAME);
+    when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
+    when(operationContext.getExtensionModel().getName()).thenReturn(DUMMY_NAME);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
     mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));

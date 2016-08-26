@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  * @since 4.0
  */
 @Configuration(name = "listener-config")
-@Providers({TcpListenerProvider.class, UdpListenerProvider.class})
+@ConnectionProviders({TcpListenerProvider.class, UdpListenerProvider.class})
 @Sources({SocketListener.class})
 public class ListenerConfig extends AbstractSocketConfig {
 

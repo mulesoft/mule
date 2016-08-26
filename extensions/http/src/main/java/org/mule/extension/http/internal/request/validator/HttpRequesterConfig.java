@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -44,7 +44,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Configuration(name = "request-config")
-@Providers(HttpRequesterProvider.class)
+@ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, Stoppable {
 

@@ -46,7 +46,7 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
       throw new MuleRuntimeException(MessageFactory.createStaticMessage(String
           .format("Error was found trying to obtain a connection to execute operation '%s' of extension '%s'",
                   operationContext.getOperationModel().getName(),
-                  operationContext.getConfiguration().getModel().getExtensionModel().getName())), e);
+                  operationContext.getExtensionModel().getName())), e);
     }
   }
 }

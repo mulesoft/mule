@@ -118,16 +118,17 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     delegate.setSourceContext(sourceContext);
   }
 
-  private <T> void setConfiguration(ConfigurationInstance<T> configuration) {
-    if (configurationSetter.isPresent()) {
-      configurationSetter.get().set(delegate, configuration.getValue());
+  private void setConfiguration(Optional<ConfigurationInstance> configuration) {
+    if (configurationSetter.isPresent() && configuration.isPresent()) {
+      configurationSetter.get().set(delegate, configuration.get().getValue());
     }
   }
 
   private void setConnection(SourceContext sourceContext) {
-    if (connectionSetter.isPresent() && !connectionSet) {
+    final Optional<ConfigurationInstance> configurationInstance = sourceContext.getConfigurationInstance();
+    if (connectionSetter.isPresent() && !connectionSet && configurationInstance.isPresent()) {
       try {
-        connectionHandler = connectionManager.getConnection(sourceContext.getConfigurationInstance().getValue());
+        connectionHandler = connectionManager.getConnection(configurationInstance.get().getValue());
         connectionSetter.get().set(delegate, connectionHandler.getConnection());
         connectionSet = true;
       } catch (ConnectionException e) {

@@ -6,9 +6,11 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+
 public class SpreadVeganismOperation {
 
-  public String spreadTheWord(String theWord) {
+  public String spreadTheWord(String theWord, @UseConfig Object config) {
     return theWord;
   }
 }

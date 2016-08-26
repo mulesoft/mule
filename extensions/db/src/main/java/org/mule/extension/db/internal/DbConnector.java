@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -51,7 +51,7 @@ import org.apache.commons.lang.StringUtils;
  */
 @Extension(name = "Database", description = "Connector for connecting to relation Databases through the JDBC API")
 @Operations({DmlOperations.class, DdlOperations.class, BulkOperations.class})
-@Providers({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
+@ConnectionProviders({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
 @Xml(namespace = "dbn")
 @Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class,
     BulkQueryDefinition.class},

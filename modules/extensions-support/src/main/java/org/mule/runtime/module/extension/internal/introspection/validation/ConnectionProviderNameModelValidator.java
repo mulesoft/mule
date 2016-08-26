@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;

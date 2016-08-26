@@ -7,17 +7,17 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
+import java.util.Optional;
 
 /**
  * {@link ModelValidator} which applies to {@link ExtensionModel}s which contains {@link ConfigurationModel}s and
@@ -32,37 +32,28 @@ public final class ConfigurationModelValidator implements ModelValidator {
 
   @Override
   public void validate(ExtensionModel model) throws IllegalModelDefinitionException {
-    ListMultimap<Class, String> configParams = getParameterConfigsFromOperations(model);
+    new ExtensionWalker() {
 
-    for (ConfigurationModel configurationModel : model.getConfigurationModels()) {
-      if (!(configurationModel instanceof RuntimeConfigurationModel)) {
-        continue;
-      }
+      @Override
+      public void onOperation(HasOperationModels owner, OperationModel operationModel) {
+        if (owner instanceof RuntimeConfigurationModel) {
 
-      for (Class clazz : configParams.keySet()) {
-        final ConfigurationFactory configurationFactory =
-            ((RuntimeConfigurationModel) configurationModel).getConfigurationFactory();
-        if (!clazz.isAssignableFrom(configurationFactory.getObjectType())) {
-          throw new IllegalConfigurationModelDefinitionException(String.format(
-                                                                               "Extension '%s' defines the '%s' configuration. However, the extension's operations %s expect configurations of type '%s'. "
-                                                                                   + "Please make sure that all configurations in the extension can be used with all its operations.",
-                                                                               model.getName(),
-                                                                               configurationFactory.getObjectType(), clazz,
-                                                                               configParams.get(clazz)));
+          Class<?> configType = ((RuntimeConfigurationModel) owner).getConfigurationFactory().getObjectType();
+          Optional<Class<?>> operationConfigParameterType = operationModel.getModelProperty(ConfigTypeModelProperty.class)
+              .map(modelProperty -> getType(modelProperty.getConfigType()));
+
+          if (operationConfigParameterType.isPresent() && !operationConfigParameterType.get().isAssignableFrom(configType)) {
+            throw new IllegalConfigurationModelDefinitionException(String.format(
+                                                                                 "Extension '%s' defines operation '%s' which requires a configuration of type '%s'. However, the operation is "
+                                                                                     + "reachable from configuration '%s' of incompatible type '%s'.",
+                                                                                 model.getName(),
+                                                                                 operationModel.getName(),
+                                                                                 operationConfigParameterType.get().getName(),
+                                                                                 ((RuntimeConfigurationModel) owner).getName(),
+                                                                                 configType.getName()));
+          }
         }
       }
-    }
+    }.walk(model);
   }
-
-  private ListMultimap<Class, String> getParameterConfigsFromOperations(ExtensionModel model) {
-    ListMultimap<Class, String> operationsByConfig = ArrayListMultimap.create();
-
-    for (OperationModel operationModel : model.getOperationModels()) {
-      operationModel.getModelProperty(ConfigTypeModelProperty.class)
-          .ifPresent(modelProperty -> operationsByConfig.put(getType(modelProperty.getConfigType()), operationModel.getName()));
-    }
-
-    return operationsByConfig;
-  }
-
 }

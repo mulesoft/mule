@@ -29,14 +29,14 @@ public interface ConfigurationProviderFactory {
    * @param resolverSet a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
    * @param dynamicConfigPolicy a {@link DynamicConfigPolicy} in case the configuration is dynamic
-   * @param <T> the generic type for the configuration instances to be returned
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */
-  <T> ConfigurationProvider<T> createDynamicConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
-                                                                  ResolverSet resolverSet,
-                                                                  ValueResolver<ConnectionProvider> connectionProviderResolver,
-                                                                  DynamicConfigPolicy dynamicConfigPolicy)
+  ConfigurationProvider createDynamicConfigurationProvider(String name,
+                                                           RuntimeConfigurationModel configurationModel,
+                                                           ResolverSet resolverSet,
+                                                           ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                           DynamicConfigPolicy dynamicConfigPolicy)
       throws Exception;
 
 
@@ -48,13 +48,12 @@ public interface ConfigurationProviderFactory {
    * @param resolverSet a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
    * @param muleContext the {@link MuleContext} that will own the configuration instances
-   * @param <T> the generic type for the configuration instances to be returned
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */
-  <T> ConfigurationProvider<T> createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
-                                                                 ResolverSet resolverSet,
-                                                                 ValueResolver<ConnectionProvider> connectionProviderResolver,
-                                                                 MuleContext muleContext)
+  ConfigurationProvider createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
+                                                          ResolverSet resolverSet,
+                                                          ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                          MuleContext muleContext)
       throws Exception;
 }

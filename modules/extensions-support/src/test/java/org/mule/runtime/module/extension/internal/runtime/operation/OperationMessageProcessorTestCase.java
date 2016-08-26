@@ -59,7 +59,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     OperationContextAdapter operationContextAdapter = (OperationContextAdapter) operationContext;
 
     assertThat(operationContextAdapter.getEvent(), is(sameInstance(event)));
-    assertThat(operationContextAdapter.getConfiguration().getValue(), is(sameInstance(configuration)));
+    assertThat(operationContextAdapter.getConfiguration().get().getValue(), is(sameInstance(configuration)));
   }
 
   @Test
@@ -239,6 +239,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     OperationContext operationContext = operationContextCaptor.getValue();
 
     assertThat(operationContext, is(instanceOf(OperationContextAdapter.class)));
-    assertThat(operationContext.getConfiguration().getValue(), is(sameInstance(defaultConfigInstance)));
+    assertThat(operationContext.getConfiguration().get().getValue(), is(sameInstance(defaultConfigInstance)));
   }
 }

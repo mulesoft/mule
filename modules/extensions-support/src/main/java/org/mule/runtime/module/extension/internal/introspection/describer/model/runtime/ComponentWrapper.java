@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
@@ -63,7 +63,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
   @Override
   public List<ConnectionProviderElement> getConnectionProviders() {
 
-    final Optional<Providers> optionalProviders = this.getAnnotation(Providers.class);
+    final Optional<ConnectionProviders> optionalProviders = this.getAnnotation(ConnectionProviders.class);
     if (optionalProviders.isPresent()) {
       return stream(optionalProviders.get().value()).map(ConnectionProviderTypeWrapper::new).collect(toList());
     }

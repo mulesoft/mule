@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -82,7 +83,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   private MuleContext muleContext;
 
   private ReflectiveMethodOperationExecutor executor;
-  private ConfigurationInstance<Object> configurationInstance;
+  private ConfigurationInstance configurationInstance;
   private OperationContextAdapter operationContext;
   private HeisenbergExtension config;
   private HeisenbergOperations operations;
@@ -93,10 +94,11 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   public void init() throws Exception {
     initHeisenberg();
     configurationInstance =
-        new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
+        new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
     when(muleEvent.getMessage().getDataType()).thenReturn(DATA_TYPE);
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent, muleContext);
+    operationContext = new DefaultOperationContext(extensionModel, of(configurationInstance), parameters, operationModel,
+                                                   muleEvent, muleContext);
     operationContext = spy(operationContext);
   }
 

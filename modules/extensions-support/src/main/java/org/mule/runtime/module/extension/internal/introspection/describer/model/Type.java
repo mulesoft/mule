@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface Type extends WithAnnotations, WithName, WithAlias {
+public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclaringClass {
 
   /**
    * @return A list of {@link FieldElement} that represent the list of {@link Field} that the {@link Type} declares
@@ -29,9 +29,4 @@ public interface Type extends WithAnnotations, WithName, WithAlias {
    */
   List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation);
 
-  /**
-   * @return the class that {@link Type} represents
-   */
-  // TODO MULE-10137 - Adapt logic to AST
-  Class getDeclaredClass();
 }

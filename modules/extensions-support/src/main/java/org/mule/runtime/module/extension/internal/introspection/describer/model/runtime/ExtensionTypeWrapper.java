@@ -8,11 +8,13 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,7 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   }
 
   /**
-   * @return A list {@link ConfigurationElement} of declared configurations
+   * {@inheritDoc}
    */
   public List<ConfigurationElement> getConfigurations() {
     final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
@@ -39,5 +41,18 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
       return Stream.of(configurations.value()).map(ConfigurationWrapper::new).collect(toList());
     }
     return emptyList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<MethodElement> getOperations() {
+    return getAnnotation(Operations.class)
+        .map(classes -> Stream.of(classes.value())
+            .flatMap(clazz -> IntrospectionUtils.getOperationMethods(clazz).stream())
+            .map(clazz -> (MethodElement) new MethodWrapper(clazz))
+            .collect(toList()))
+        .orElse(emptyList());
   }
 }

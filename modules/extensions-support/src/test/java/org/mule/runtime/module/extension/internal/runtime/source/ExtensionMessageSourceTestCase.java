@@ -29,9 +29,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
@@ -92,60 +92,42 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private static final String CONFIG_NAME = "myConfig";
   private static final String ERROR_MESSAGE = "ERROR";
   private static final String SOURCE_NAME = "source";
-
+  private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
   @Mock
   private RuntimeExtensionModel extensionModel;
-
   @Mock
   private RuntimeSourceModel sourceModel;
-
   @Mock
   private SourceFactory sourceFactory;
-
   @Mock
   private ThreadingProfile threadingProfile;
-
   @Mock
   private WorkManager workManager;
-
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MessageProcessor messageProcessor;
-
   @Mock
   private FlowConstruct flowConstruct;
-
   @Mock(extraInterfaces = Lifecycle.class)
   private Source source;
-
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionManagerAdapter extensionManager;
-
   @Mock
   private MessageProcessingManager messageProcessingManager;
-
   @Mock
   private ExceptionEnricherFactory enricherFactory;
-
   @Mock
   private MuleMessage muleMessage;
-
   @Mock
-  private ConfigurationProvider<Object> configurationProvider;
-
+  private ConfigurationProvider configurationProvider;
   @Mock(answer = RETURNS_DEEP_STUBS)
   private RuntimeConfigurationModel configurationModel;
-
   @Mock
-  private ConfigurationInstance<Object> configurationInstance;
-
+  private ConfigurationInstance configurationInstance;
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleEvent event;
-
   private ExtensionMessageSource messageSource;
-  private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
 
   @Before
   public void before() throws Exception {
@@ -155,6 +137,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(sourceFactory.createSource()).thenReturn(source);
     when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
+    setRequires(sourceModel, true, true);
     when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 

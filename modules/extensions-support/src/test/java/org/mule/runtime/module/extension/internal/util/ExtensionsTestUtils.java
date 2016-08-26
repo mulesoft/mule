@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -27,11 +28,14 @@ import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -163,6 +167,16 @@ public abstract class ExtensionsTestUtils {
 
   public static void mockClassLoaderModelProperty(ExtensionModel extensionModel, ClassLoader classLoader) {
     when(extensionModel.getModelProperty(ClassLoaderModelProperty.class))
-        .thenReturn(Optional.of(new ClassLoaderModelProperty(classLoader)));
+        .thenReturn(of(new ClassLoaderModelProperty(classLoader)));
+  }
+
+  public static void setRequires(EnrichableModel model, boolean requiresConfig, boolean requiresConnection) {
+    if (requiresConfig) {
+      when(model.getModelProperty(ConfigTypeModelProperty.class)).thenReturn(of(mock(ConfigTypeModelProperty.class)));
+    }
+
+    if (requiresConnection) {
+      when(model.getModelProperty(ConnectivityModelProperty.class)).thenReturn(of(mock(ConnectivityModelProperty.class)));
+    }
   }
 }

@@ -11,6 +11,8 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
@@ -27,6 +29,7 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
@@ -45,6 +48,7 @@ import org.mule.runtime.extension.api.introspection.connection.ConnectionManagem
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.Declarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
@@ -65,6 +69,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
@@ -82,6 +87,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithConnectionProviders;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithMessageSources;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithOperationContainers;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -91,14 +97,12 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingPar
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -107,6 +111,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by scanning annotations on a type provided in
@@ -133,7 +138,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   private final VersionResolver versionResolver;
   private final ClassTypeLoader typeLoader;
 
-  private final Multimap<Class<?>, OperationDeclarer> operationDeclarers = LinkedListMultimap.create();
+  private final Map<MethodElement, OperationDeclarer> operationDeclarers = new HashMap<>();
   private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
@@ -151,9 +156,9 @@ public final class AnnotationsBasedDescriber implements Describer {
    */
   @Override
   public final ExtensionDeclarer describe(DescribingContext context) {
-    final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(this.extensionType);
-    Extension extension = getExtension(this.extensionType);
-    ExtensionDeclarer declaration =
+    final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(extensionType);
+    Extension extension = getExtension(extensionType);
+    ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(extension.name())
             .onVersion(getVersion(extension))
@@ -162,14 +167,17 @@ public final class AnnotationsBasedDescriber implements Describer {
             .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
             .describedAs(extension.description())
             .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
-            .withModelProperty(new ImplementingTypeModelProperty(this.extensionType));
+            .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
-    declareConfigurations(declaration, extensionElement);
-    declareOperations(declaration, extensionElement);
-    declareConnectionProviders(declaration, extensionElement);
-    declareMessageSources(declaration, extensionElement);
+    declareConfigurations(declarer, extensionElement);
+    declareConnectionProviders(declarer, extensionElement);
 
-    return declaration;
+    if (!CollectionUtils.isEmpty(extensionElement.getConfigurations())) {
+      declareOperations(declarer, declarer, extensionElement.getOperations(), false);
+      extensionElement.getSources().forEach(source -> declareMessageSource(declarer, declarer, source, false));
+    }
+
+    return declarer;
   }
 
   private String getVersion(Extension extension) {
@@ -187,47 +195,63 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
   }
 
-  private void declareConfiguration(ExtensionDeclarer declaration, ExtensionElement extensionType,
+  private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType,
                                     ComponentElement configurationType) {
-    checkConfigurationIsNotAnOperation(configurationType.getDeclaredClass());
+    checkConfigurationIsNotAnOperation(configurationType.getDeclaringClass());
     ConfigurationDeclarer configurationDeclarer;
 
     Optional<Configuration> configurationAnnotation = configurationType.getAnnotation(Configuration.class);
     if (configurationAnnotation.isPresent()) {
       final Configuration configuration = configurationAnnotation.get();
-      configurationDeclarer = declaration.withConfig(configuration.name()).describedAs(configuration.description());
+      configurationDeclarer = declarer.withConfig(configuration.name()).describedAs(configuration.description());
     } else {
       configurationDeclarer =
-          declaration.withConfig(Extension.DEFAULT_CONFIG_NAME).describedAs(Extension.DEFAULT_CONFIG_DESCRIPTION);
+          declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);
     }
 
     configurationDeclarer
-        .createdWith(new TypeAwareConfigurationFactory(configurationType.getDeclaredClass(),
-                                                       extensionType.getDeclaredClass().getClassLoader()))
-        .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaredClass()));
+        .createdWith(new TypeAwareConfigurationFactory(configurationType.getDeclaringClass(),
+                                                       extensionType.getDeclaringClass().getClassLoader()))
+        .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaringClass()));
 
     declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters());
 
-    if (!extensionType.equals(configurationType)) {
-      declareOperations(configurationDeclarer, configurationType);
-      declareMessageSources(configurationDeclarer, configurationType);
-      declareConnectionProviders(configurationDeclarer, configurationType);
-    }
+    declareOperations(declarer, configurationDeclarer, configurationType);
+    declareMessageSources(declarer, configurationDeclarer, configurationType);
+    declareConnectionProviders(configurationDeclarer, configurationType);
   }
 
-  private void declareMessageSources(HasSourceDeclarer declarer, WithMessageSources typeComponent) {
+  private void declareMessageSources(ExtensionDeclarer extensionDeclarer, HasSourceDeclarer declarer,
+                                     WithMessageSources typeComponent) {
     // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-    typeComponent.getSources().forEach(source -> declareMessageSource(declarer, source));
+    typeComponent.getSources().forEach(source -> declareMessageSource(extensionDeclarer, declarer, source, true));
   }
 
-  private void declareMessageSource(HasSourceDeclarer declarer, SourceElement sourceType) {
-    SourceDeclarer source = sourceDeclarers.get(sourceType.getDeclaredClass());
+  private void declareMessageSource(ExtensionDeclarer extensionDeclarer,
+                                    HasSourceDeclarer declarer,
+                                    SourceElement sourceType,
+                                    boolean supportsConfig) {
+
+    final Optional<ExtensionParameter> configParameter = getConfigParameter(sourceType);
+    final Optional<ExtensionParameter> connectionParameter = getConnectionParameter(sourceType);
+
+    if (isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter)) {
+      throw new IllegalSourceModelDefinitionException(format("Source '%s' is defined at the extension level but it requires a config parameter. "
+          + "Remove such parameter or move the source to the proper config",
+                                                             sourceType.getName()));
+    }
+
+    HasSourceDeclarer actualDeclarer =
+        (HasSourceDeclarer) selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
+                                                        connectionParameter);
+
+    SourceDeclarer source = sourceDeclarers.get(sourceType.getDeclaringClass());
     if (source != null) {
-      declarer.withMessageSource(source);
+      actualDeclarer.withMessageSource(source);
       return;
     }
 
-    source = declarer.withMessageSource(sourceType.getAlias());
+    source = actualDeclarer.withMessageSource(sourceType.getAlias());
     List<java.lang.reflect.Type> sourceGenerics = sourceType.getSuperClassGenerics();
 
     if (sourceGenerics.size() != 2) {
@@ -238,19 +262,21 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                        sourceGenerics.size()));
     }
 
-    source.sourceCreatedBy(new DefaultSourceFactory(sourceType.getDeclaredClass()))
+    source.sourceCreatedBy(new DefaultSourceFactory(sourceType.getDeclaringClass()))
         .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
-        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaredClass()));
+        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
 
     source.withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
     source.withOutputAttributes().ofType(typeLoader.load(sourceGenerics.get(1)));
     declareFieldBasedParameters(source, sourceType.getParameters());
 
-    sourceDeclarers.put(sourceType.getDeclaredClass(), source);
+    sourceDeclarers.put(sourceType.getDeclaringClass(), source);
   }
 
-  private void declareOperations(HasOperationDeclarer declarer, WithOperationContainers operationContainers) {
-    operationContainers.getOperationContainers().forEach(operationContainer -> declareOperation(declarer, operationContainer));
+  private void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
+                                 WithOperationContainers operationContainers) {
+    operationContainers.getOperationContainers()
+        .forEach(operationContainer -> declareOperations(extensionDeclarer, declarer, operationContainer));
   }
 
   private Class<?>[] getOperationClasses(Class<?> extensionType) {
@@ -258,32 +284,77 @@ public final class AnnotationsBasedDescriber implements Describer {
     return operations == null ? ArrayUtils.EMPTY_CLASS_ARRAY : operations.value();
   }
 
-  private void declareOperation(HasOperationDeclarer declarer, OperationContainerElement operationsContainer) {
 
-    final Class<?> declaredClass = operationsContainer.getDeclaredClass();
+  private void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
+                                 OperationContainerElement operationsContainer) {
+    declareOperations(extensionDeclarer, declarer, operationsContainer.getOperations(), true);
+  }
 
-    if (operationDeclarers.containsKey(declaredClass)) {
-      operationDeclarers.get(declaredClass).forEach(declarer::withOperation);
-      return;
-    }
+  private void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
+                                 List<MethodElement> operations, boolean supportsConfig) {
 
-    checkOperationIsNotAnExtension(declaredClass);
+    for (MethodElement operationMethod : operations) {
+      final Class<?> declaringClass = operationMethod.getDeclaringClass();
+      checkOperationIsNotAnExtension(declaringClass);
 
-    for (MethodElement operationMethod : operationsContainer.getOperations()) {
-      Method method = operationMethod.getMethod();
-      final OperationDeclarer operation = declarer.withOperation(operationMethod.getAlias())
+      final Method method = operationMethod.getMethod();
+      final Optional<ExtensionParameter> configParameter = getConfigParameter(operationMethod);
+      final Optional<ExtensionParameter> connectionParameter = getConnectionParameter(operationMethod);
+
+      if (isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter)) {
+        throw new IllegalOperationModelDefinitionException(format(
+                                                                  "Operation '%s' is defined at the extension level but it requires a config. "
+                                                                      + "Remove such parameter or move the operation to the proper config",
+                                                                  method.getName()));
+      }
+
+      HasOperationDeclarer actualDeclarer =
+          (HasOperationDeclarer) selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
+                                                             connectionParameter);
+
+      if (operationDeclarers.containsKey(operationMethod)) {
+        actualDeclarer.withOperation(operationDeclarers.get(operationMethod));
+        continue;
+      }
+
+      final OperationDeclarer operation = actualDeclarer.withOperation(operationMethod.getAlias())
           .withModelProperty(new ImplementingMethodModelProperty(method))
-          .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaredClass, method))
+          .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaringClass, method))
           .withExceptionEnricherFactory(getExceptionEnricherFactory(operationMethod));
 
       operation.withOutput().ofType(getMethodReturnType(method, typeLoader));
       operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
       addInterceptingCallbackModelProperty(operationMethod, operation);
-      addPagedOperationModelProperty(operationMethod, operation);
+      addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
       declareMethodBasedParameters(operation, operationMethod.getParameters());
-      calculateExtendedTypes(declaredClass, method, operation);
-      operationDeclarers.put(declaredClass, operation);
+      calculateExtendedTypes(declaringClass, method, operation);
+      operationDeclarers.put(operationMethod, operation);
     }
+  }
+
+  private boolean isInvalidConfigSupport(boolean supportsConfig, Optional<ExtensionParameter>... parameters) {
+    return !supportsConfig && Stream.of(parameters).anyMatch(Optional::isPresent);
+  }
+
+  private Declarer selectDeclarerBasedOnConfig(ExtensionDeclarer extensionDeclarer,
+                                               Declarer declarer,
+                                               Optional<ExtensionParameter>... parameters) {
+
+    for (Optional<ExtensionParameter> parameter : parameters) {
+      if (parameter.isPresent()) {
+        return declarer;
+      }
+    }
+
+    return extensionDeclarer;
+  }
+
+  private Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
+    return element.getParametersAnnotatedWith(UseConfig.class).stream().findFirst();
+  }
+
+  private Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {
+    return element.getParametersAnnotatedWith(Connection.class).stream().findFirst();
   }
 
   private void declareConnectionProviders(HasConnectionProviderDeclarer declarer,
@@ -292,7 +363,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   }
 
   private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType) {
-    final Class<?> providerClass = providerType.getDeclaredClass();
+    final Class<?> providerClass = providerType.getDeclaringClass();
     ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
     if (providerDeclarer != null) {
       declarer.withConnectionProvider(providerDeclarer);
@@ -384,17 +455,19 @@ public final class AnnotationsBasedDescriber implements Describer {
 
         if (!annotatedParameters.isEmpty()) {
           if (extensionParameter.equals(parameterGroupOwner)) {
-            throw new IllegalParameterModelDefinitionException(String
-                .format("@%s cannot be applied recursively within the same class but field '%s' was found inside class '%s'",
-                        org.mule.runtime.extension.api.annotation.ParameterGroup.class.getSimpleName(),
-                        parameterGroupOwner.getName(),
-                        parameterGroupOwner.getType().getName()));
+            throw new IllegalParameterModelDefinitionException(
+                                                               format(
+                                                                      "@%s cannot be applied recursively within the same class but field '%s' was found inside class '%s'",
+                                                                      org.mule.runtime.extension.api.annotation.ParameterGroup.class
+                                                                          .getSimpleName(),
+                                                                      parameterGroupOwner.getName(),
+                                                                      parameterGroupOwner.getType().getName()));
           } else {
             declareParameters(component, annotatedParameters, contributors, extensionParameter);
           }
 
         } else {
-          declareParameters(component, getFieldsWithGetterAndSetters(type.getDeclaredClass()).stream().map(FieldWrapper::new)
+          declareParameters(component, getFieldsWithGetterAndSetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
               .collect(toList()), contributors, extensionParameter);
         }
       }
@@ -483,11 +556,19 @@ public final class AnnotationsBasedDescriber implements Describer {
   private void addImplementingTypeModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     parameter.withModelProperty(extensionParameter.isFieldBased()
         ? new DeclaringMemberModelProperty(((FieldElement) extensionParameter).getField())
-        : new ImplementingParameterModelProperty(((ParameterElement) extensionParameter).getParameter()));
+        : new ImplementingParameterModelProperty(
+                                                 ((ParameterElement) extensionParameter).getParameter()));
   }
 
-  private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation) {
+  private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation,
+                                              boolean supportsConfig) {
     if (PagingProvider.class.isAssignableFrom(operationMethod.getReturnType())) {
+      if (!supportsConfig) {
+        throw new IllegalOperationModelDefinitionException(format(
+                                                                  "Paged operation '%s' is defined at the extension level but it requires a config, since connections "
+                                                                      + "are required for paging",
+                                                                  operationMethod.getName()));
+      }
       operation.withModelProperty(new PagedOperationModelProperty());
     }
   }
@@ -503,11 +584,12 @@ public final class AnnotationsBasedDescriber implements Describer {
     void contribute(ExtensionParameter parameter, ParameterDeclarer declarer);
   }
 
+
   private static class InfrastructureFieldContributor implements ParameterDeclarerContributor {
 
     @Override
     public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
-      if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaredClass())) {
+      if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaringClass())) {
         declarer.withModelProperty(new InfrastructureParameterModelProperty());
         declarer.withExpressionSupport(ExpressionSupport.NOT_SUPPORTED);
       }

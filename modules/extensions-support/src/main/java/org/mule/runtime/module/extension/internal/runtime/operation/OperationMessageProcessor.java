@@ -36,6 +36,8 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +83,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     return (MuleEvent) withContextClassLoader(getExtensionClassLoader(), () -> {
-      ConfigurationInstance<Object> configuration = getConfiguration(event);
+      Optional<ConfigurationInstance> configuration = getConfiguration(event);
       OperationContextAdapter operationContext = createOperationContext(configuration, event);
       return doProcess(event, operationContext);
     }, MuleException.class, e -> {
@@ -112,9 +114,10 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
     return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
   }
 
-  private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event)
+  private OperationContextAdapter createOperationContext(Optional<ConfigurationInstance> configuration, MuleEvent event)
       throws MuleException {
-    return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event, muleContext);
+    return new DefaultOperationContext(extensionModel, configuration, resolverSet.resolve(event), operationModel, event,
+                                       muleContext);
   }
 
   @Override
@@ -158,7 +161,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
    * @throws IllegalSourceException If the validation fails
    */
   @Override
-  protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider) {
+  protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
     if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
         !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {

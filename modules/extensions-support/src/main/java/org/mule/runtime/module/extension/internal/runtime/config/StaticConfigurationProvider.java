@@ -14,14 +14,13 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 /**
  * {@link ConfigurationProvider} which provides always the same {@link #configuration}.
  *
- * @param <T> the generic type of the instances provided
  * @since 3.7.0
  */
-public class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T> {
+public class StaticConfigurationProvider extends LifecycleAwareConfigurationProvider {
 
-  private final ConfigurationInstance<T> configuration;
+  private final ConfigurationInstance configuration;
 
-  public StaticConfigurationProvider(String name, RuntimeConfigurationModel model, ConfigurationInstance<T> configuration) {
+  public StaticConfigurationProvider(String name, RuntimeConfigurationModel model, ConfigurationInstance configuration) {
     super(name, model);
     this.configuration = configuration;
     registerConfiguration(configuration);
@@ -34,7 +33,7 @@ public class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationP
    * @return {@link #configuration}
    */
   @Override
-  public ConfigurationInstance<T> get(Object muleEvent) {
+  public ConfigurationInstance get(Object muleEvent) {
     return configuration;
   }
 }

@@ -10,13 +10,13 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 @Extension(name = "secure", description = "Secure Test connector")
 @Operations(SecureOperations.class)
-@Providers(SecureConnectionProvider.class)
+@ConnectionProviders(SecureConnectionProvider.class)
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/secure", namespace = "secure")
 public class SecureConnector {
 

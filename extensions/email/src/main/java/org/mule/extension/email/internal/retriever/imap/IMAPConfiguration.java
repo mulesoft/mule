@@ -11,7 +11,7 @@ import org.mule.extension.email.internal.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
  * @since 4.0
  */
 @Operations({IMAPOperations.class, RetrieverOperations.class})
-@Providers({IMAPProvider.class, IMAPSProvider.class})
+@ConnectionProviders({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
 public class IMAPConfiguration implements RetrieverConfiguration {

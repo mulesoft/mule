@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -38,7 +39,8 @@ public class DefaultOperationContext implements OperationContextAdapter {
 
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
-  private final ConfigurationInstance<?> configuration;
+  private final ExtensionModel extensionModel;
+  private final Optional<ConfigurationInstance> configuration;
   private final Map<String, Object> parameters;
   private final Map<String, Object> variables = new HashMap<>();
   private final RuntimeOperationModel operationModel;
@@ -55,8 +57,14 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * @param operationModel a {@link RuntimeOperationModel} for the operation being executed
    * @param event the current {@link MuleEvent}
    */
-  public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters,
-                                 RuntimeOperationModel operationModel, MuleEvent event, MuleContext muleContext) {
+  public DefaultOperationContext(ExtensionModel extensionModel,
+                                 Optional<ConfigurationInstance> configuration,
+                                 ResolverSetResult parameters,
+                                 RuntimeOperationModel operationModel,
+                                 MuleEvent event,
+                                 MuleContext muleContext) {
+
+    this.extensionModel = extensionModel;
     this.configuration = configuration;
     this.event = event;
     this.operationModel = operationModel;
@@ -78,8 +86,8 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * {@inheritDoc}
    */
   @Override
-  public <C> ConfigurationInstance<C> getConfiguration() {
-    return (ConfigurationInstance<C>) configuration;
+  public Optional<ConfigurationInstance> getConfiguration() {
+    return configuration;
   }
 
   /**
@@ -160,6 +168,14 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * {@inheritDoc}
    */
   @Override
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public RuntimeOperationModel getOperationModel() {
     return operationModel;
   }
@@ -194,7 +210,7 @@ public class DefaultOperationContext implements OperationContextAdapter {
     if (action == null) {
       throw new IllegalArgumentException(format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
                                                 operationModel.getName(),
-                                                configuration.getModel().getExtensionModel().getName()));
+                                                extensionModel.getName()));
     }
 
     return action;

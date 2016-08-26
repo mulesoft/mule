@@ -9,10 +9,10 @@ package org.mule.test.transactional;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 
 @Extension(name = "transactional")
-@Providers(LocalTransactionProvider.class)
+@ConnectionProviders(LocalTransactionProvider.class)
 @Operations(TransactionalOperations.class)
 @Xml(namespace = "tx")
 public class TransactionalExtension {

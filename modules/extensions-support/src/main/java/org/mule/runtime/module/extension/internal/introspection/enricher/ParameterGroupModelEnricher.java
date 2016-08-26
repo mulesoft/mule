@@ -116,7 +116,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
   private ParameterGroup toParameterGroup(ParameterElement parameterElement) {
     final Type paramGroupType = parameterElement.getType();
     final ParameterGroup parameterGroup =
-        new ParameterGroup<>(paramGroupType.getDeclaredClass(), parameterElement.getParameter());
+        new ParameterGroup<>(paramGroupType.getDeclaringClass(), parameterElement.getParameter());
     populateParameterGroup(parameterGroup, paramGroupType);
 
     return parameterGroup;
@@ -133,7 +133,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     final Type paramGroupType = fieldElement.getType();
     final Field field = fieldElement.getField();
     field.setAccessible(true);
-    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaredClass(), field);
+    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaringClass(), field);
     populateParameterGroup(parameterGroup, paramGroupType);
 
     return parameterGroup;
@@ -160,7 +160,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     List<FieldElement> annotatedFields = paramGroupType.getAnnotatedFields(Parameter.class);
     if (annotatedFields.isEmpty()) {
       annotatedFields =
-          getFieldsWithGetterAndSetters(paramGroupType.getDeclaredClass()).stream().map(FieldWrapper::new).collect(toList());
+          getFieldsWithGetterAndSetters(paramGroupType.getDeclaringClass()).stream().map(FieldWrapper::new).collect(toList());
     }
 
     annotatedFields.forEach(field -> parameterGroup.addParameter(field.getField()));

@@ -10,8 +10,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
-
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -58,7 +57,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   }
 
   private void parseConnectionProvider(Builder definitionBuilder) {
-    if (!getConnectedComponents(configurationModel).isEmpty()) {
+    if (!getConnectedComponents(configurationModel.getExtensionModel(), configurationModel).isEmpty()) {
       definitionBuilder.withSetterParameterDefinition("requiresConnection", fromFixedValue(true).build());
       definitionBuilder.withSetterParameterDefinition("connectionProviderResolver",
                                                       fromChildConfiguration(ConnectionProviderResolver.class).build());

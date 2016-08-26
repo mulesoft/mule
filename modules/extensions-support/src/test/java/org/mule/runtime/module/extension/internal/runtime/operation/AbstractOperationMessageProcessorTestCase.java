@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -23,6 +24,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
@@ -64,7 +66,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -73,7 +74,6 @@ import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
@@ -89,13 +89,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected static final String OPERATION_NAME = "operation";
   protected static final String TARGET_VAR = "myFlowVar";
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   protected RuntimeExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected RuntimeConfigurationModel configurationModel;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   protected RuntimeOperationModel operationModel;
 
   @Mock
@@ -125,7 +125,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected MuleContext context;
 
   @Mock
-  protected ConfigurationInstance<Object> configurationInstance;
+  protected ConfigurationInstance configurationInstance;
 
   @Mock
   protected Object configuration;
@@ -152,7 +152,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected StringType stringType;
 
   @Mock
-  protected ConfigurationProvider<Object> configurationProvider;
+  protected ConfigurationProvider configurationProvider;
 
   protected OperationMessageProcessor messageProcessor;
 
@@ -169,13 +169,15 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
     when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
-    when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional
-        .of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class))));
-    when(operationModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(empty());
+    when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(
+                                                                                       of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory
+                                                                                           .getDefault().createTypeLoader()
+                                                                                           .load(String.class))));
+    setRequires(operationModel, true, true);
     when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
-    when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
+    when(operationModel.getExceptionEnricherFactory()).thenReturn(of(exceptionEnricherFactory));
 
     when(exceptionEnricherFactory.createEnricher()).thenReturn(new NullExceptionEnricher());
 
@@ -188,13 +190,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getName()).thenReturn("type");
     when(keyParamMock.getType()).thenReturn(stringType);
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyPartModelProperty(0)));
+        .thenReturn(of(new MetadataKeyPartModelProperty(0)));
     when(keyParamMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
     when(contentMock.getType()).thenReturn(stringType);
     when(contentMock.getModelProperty(MetadataContentModelProperty.class))
-        .thenReturn(Optional.of(new MetadataContentModelProperty()));
+        .thenReturn(of(new MetadataContentModelProperty()));
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
 
     when(operationModel.getParameterModels()).thenReturn(Arrays.asList(keyParamMock, contentMock));
@@ -211,12 +213,12 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationInstance.getName()).thenReturn(CONFIG_NAME);
     when(configurationInstance.getModel()).thenReturn(configurationModel);
     when(configurationInstance.getValue()).thenReturn(configuration);
-    when(configurationInstance.getConnectionProvider()).thenReturn(Optional.of(connectionProviderWrapper));
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(connectionProviderWrapper));
 
     when(configurationProvider.get(event)).thenReturn(configurationInstance);
     when(configurationProvider.getModel()).thenReturn(configurationModel);
 
-    when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(Optional.of(operationModel));
+    when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
     connectionManager = new DefaultConnectionManager(context);
     connectionManager.initialise();
@@ -227,8 +229,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
     when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
     when(configurationProvider.get(anyObject())).thenReturn(configurationInstance);
-    when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(Optional.of(configurationProvider));
-    when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
+    when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
+    when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
     messageProcessor = setUpOperationMessageProcessor();
   }

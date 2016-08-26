@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,17 +35,6 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>> {
   private final List<ValueResolver<V>> valueResolvers;
   private final List<ValueResolver<K>> keyResolvers;
 
-  public static <K, V> MapValueResolver<K, V> of(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
-                                                 List<ValueResolver<V>> valueResolvers) {
-    if (ConcurrentMap.class.equals(mapType)) {
-      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers);
-    } else if (Map.class.equals(mapType)) {
-      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers);
-    } else {
-      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers);
-    }
-  }
-
   /**
    * Creates a new instance
    *
@@ -62,6 +51,17 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>> {
     this.mapType = mapType;
     this.keyResolvers = keyResolvers;
     this.valueResolvers = valueResolvers;
+  }
+
+  public static <K, V> MapValueResolver<K, V> of(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
+                                                 List<ValueResolver<V>> valueResolvers) {
+    if (ConcurrentMap.class.equals(mapType)) {
+      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers);
+    } else if (Map.class.equals(mapType)) {
+      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers);
+    } else {
+      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers);
+    }
   }
 
   /**
@@ -94,7 +94,7 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>> {
   @Override
   public boolean isDynamic() {
     try {
-      return MuleExtensionUtils.hasAnyDynamic(keyResolvers) || MuleExtensionUtils.hasAnyDynamic(valueResolvers);
+      return hasAnyDynamic(keyResolvers) || hasAnyDynamic(valueResolvers);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

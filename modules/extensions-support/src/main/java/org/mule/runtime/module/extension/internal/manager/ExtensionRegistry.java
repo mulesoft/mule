@@ -133,10 +133,9 @@ final class ExtensionRegistry {
    * Returns the {@link ConfigurationProvider} registered under the given {@code key}
    *
    * @param key the key for the fetched {@link ConfigurationProvider}
-   * @param <T> the generic type for the returned value
    * @return a {@link ConfigurationProvider}
    */
-  <T> Optional<ConfigurationProvider<T>> getConfigurationProvider(String key) {
+  Optional<ConfigurationProvider> getConfigurationProvider(String key) {
     return Optional.ofNullable(registry.get(key));
   }
 
@@ -168,8 +167,8 @@ final class ExtensionRegistry {
    *
    * @return an immutable {@link Multimap}
    */
-  Multimap<String, ConfigurationInstance<Object>> getExpiredConfigs() {
-    ListMultimap<String, ConfigurationInstance<Object>> expired = ArrayListMultimap.create();
+  Multimap<String, ConfigurationInstance> getExpiredConfigs() {
+    ListMultimap<String, ConfigurationInstance> expired = ArrayListMultimap.create();
     for (ExtensionModel extensionModel : extensions.values()) {
       getConfigurationProviders(extensionModel).stream().filter(provider -> provider instanceof ExpirableConfigurationProvider)
           .forEach(provider -> expired.putAll(provider.getName(), ((ExpirableConfigurationProvider) provider).getExpired()));

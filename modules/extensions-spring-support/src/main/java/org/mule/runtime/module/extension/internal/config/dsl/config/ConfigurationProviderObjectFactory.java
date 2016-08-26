@@ -35,8 +35,8 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider<Object>>
-    implements ObjectFactory<ConfigurationProvider<Object>> {
+class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
+    implements ObjectFactory<ConfigurationProvider> {
 
   private final String name;
   private final RuntimeConfigurationModel configurationModel;
@@ -45,7 +45,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   private DynamicConfigPolicy dynamicConfigPolicy;
   private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
-  private ConfigurationProvider<Object> instance;
+  private ConfigurationProvider instance;
   private boolean requiresConnection = false;
 
   @Inject
@@ -59,18 +59,18 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   @Override
-  public ConfigurationProvider<Object> getObject() throws Exception {
+  public ConfigurationProvider getObject() throws Exception {
     if (instance == null) {
       instance = createInnerInstance();
     }
     return instance;
   }
 
-  private ConfigurationProvider<Object> createInnerInstance() throws ConfigurationException {
+  private ConfigurationProvider createInnerInstance() throws ConfigurationException {
     ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
     final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
-    ConfigurationProvider<Object> configurationProvider;
+    ConfigurationProvider configurationProvider;
     try {
       if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
         configurationProvider =

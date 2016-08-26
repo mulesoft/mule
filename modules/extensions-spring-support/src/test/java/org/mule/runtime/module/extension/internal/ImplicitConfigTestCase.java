@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -70,7 +70,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase {
   @Extension(name = "implicit")
   @Operations({ImplicitOperations.class})
   @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/implicit", namespace = "implicit")
-  @Providers(ImplicitConnectionProvider.class)
+  @ConnectionProviders(ImplicitConnectionProvider.class)
   public static class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware {
 
     private MuleContext muleContext;

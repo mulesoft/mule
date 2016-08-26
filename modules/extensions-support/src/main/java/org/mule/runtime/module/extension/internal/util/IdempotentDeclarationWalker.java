@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import org.mule.runtime.core.api.util.Reference;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;

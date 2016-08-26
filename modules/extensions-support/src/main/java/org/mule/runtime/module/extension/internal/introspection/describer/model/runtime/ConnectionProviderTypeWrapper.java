@@ -30,7 +30,7 @@ class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements Connection
    */
   @Override
   public List<Type> getSuperClassGenerics() {
-    return IntrospectionUtils.getSuperClassGenerics(getDeclaredClass(), ConnectionProvider.class);
+    return IntrospectionUtils.getSuperClassGenerics(getDeclaringClass(), ConnectionProvider.class);
   }
 
   /**
@@ -38,6 +38,6 @@ class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements Connection
    */
   @Override
   public List<Class<?>> getInterfaceGenerics(Class clazz) {
-    return IntrospectionUtils.getInterfaceGenerics(getDeclaredClass(), clazz);
+    return IntrospectionUtils.getInterfaceGenerics(getDeclaringClass(), clazz);
   }
 }

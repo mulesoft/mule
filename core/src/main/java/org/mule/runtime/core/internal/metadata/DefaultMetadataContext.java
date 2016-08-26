@@ -22,19 +22,20 @@ import java.util.Optional;
  */
 public class DefaultMetadataContext implements MetadataContext {
 
-  private final ConfigurationInstance<?> configInstance;
+  private final Optional<ConfigurationInstance> configInstance;
   private final ConnectionManager connectionManager;
   private final MetadataCache cache;
 
   /**
    * Retrieves the configuration for the related component
    *
-   * @param configInstance instance of the configuration of a component
+   * @param configInstance optional configuration of a component
    * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the
    *        {@param configInstance}
    * @param cache instance of the {@link MetadataCache} for this context
    */
-  public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager,
+  public DefaultMetadataContext(Optional<ConfigurationInstance> configInstance,
+                                ConnectionManager connectionManager,
                                 MetadataCache cache) {
     this.configInstance = configInstance;
     this.connectionManager = connectionManager;
@@ -43,11 +44,11 @@ public class DefaultMetadataContext implements MetadataContext {
 
   /**
    * @param <C> Configuration type
-   * @return The instance of the configuration of a component
+   * @return optional configuration of a component
    */
   @Override
-  public <C> C getConfig() {
-    return (C) configInstance.getValue();
+  public <C> Optional<C> getConfig() {
+    return (Optional<C>) configInstance.map(Optional::of);
   }
 
   /**
@@ -60,11 +61,12 @@ public class DefaultMetadataContext implements MetadataContext {
    */
   @Override
   public <C> Optional<C> getConnection() throws ConnectionException {
-    if (!configInstance.getConnectionProvider().isPresent()) {
+    ConfigurationInstance config = configInstance.orElse(null);
+    if (config == null || !config.getConnectionProvider().isPresent()) {
       return Optional.empty();
     }
 
-    return Optional.of((C) connectionManager.getConnection(configInstance.getValue()).getConnection());
+    return Optional.of((C) connectionManager.getConnection(config.getValue()).getConnection());
   }
 
   @Override

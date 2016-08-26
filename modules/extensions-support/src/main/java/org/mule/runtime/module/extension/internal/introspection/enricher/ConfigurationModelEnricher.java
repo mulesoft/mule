@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
@@ -20,13 +21,14 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated component
@@ -37,32 +39,36 @@ import java.util.List;
  */
 public class ConfigurationModelEnricher extends AbstractAnnotatedModelEnricher {
 
-  private ClassTypeLoader typeLoader;
-
   @Override
   public void enrich(DescribingContext describingContext) {
     final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
     if (extensionType != null) {
-      typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+
+      ClassTypeLoader typeLoader =
+          ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
       new IdempotentDeclarationWalker() {
 
         @Override
-        public void onOperation(OperationDeclaration declaration) {
-          declaration.getModelProperty(ImplementingMethodModelProperty.class)
-              .ifPresent(implementingProperty -> contribute(declaration, new MethodWrapper(implementingProperty.getMethod())));
+        protected void onOperation(OperationDeclaration declaration) {
+          enrich(declaration, ImplementingMethodModelProperty.class,
+                 (operation, property) -> enrich(operation, new MethodWrapper(property.getMethod()), typeLoader));
         }
 
         @Override
         public void onSource(SourceDeclaration declaration) {
-          declaration.getModelProperty(ImplementingTypeModelProperty.class)
-              .ifPresent(implementingProperty -> contribute(declaration,
-                                                            new ParameterizableTypeWrapper(implementingProperty.getType())));
+          enrich(declaration, ImplementingTypeModelProperty.class,
+                 (source, property) -> enrich(source, new ParameterizableTypeWrapper(property.getType()), typeLoader));
         }
       }.walk(describingContext.getExtensionDeclarer().getDeclaration());
     }
   }
 
-  private void contribute(BaseDeclaration declaration, WithParameters methodWrapper) {
+  private <P extends ModelProperty> void enrich(BaseDeclaration declaration, Class<P> propertyType,
+                                                BiConsumer<BaseDeclaration, P> consumer) {
+    declaration.getModelProperty(propertyType).ifPresent(p -> consumer.accept(declaration, (P) p));
+  }
+
+  private void enrich(BaseDeclaration declaration, WithParameters methodWrapper, ClassTypeLoader typeLoader) {
     final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(UseConfig.class);
     if (!configParameters.isEmpty()) {
       declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getMetadataType(typeLoader)));

@@ -7,10 +7,14 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Fruit;
 
 public class PaulMcCartneySource extends Source<Fruit, Attributes> {
+
+  @UseConfig
+  private Object config;
 
   @Override
   public void start() throws Exception {

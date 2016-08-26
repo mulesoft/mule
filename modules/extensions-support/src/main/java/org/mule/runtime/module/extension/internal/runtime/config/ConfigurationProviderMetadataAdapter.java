@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolve
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -40,7 +41,7 @@ import javax.inject.Inject;
  *
  * @since 1.0
  */
-public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigurationProvider<T>
+public final class ConfigurationProviderMetadataAdapter extends StaticConfigurationProvider
     implements MetadataKeyProvider {
 
   @Inject
@@ -49,8 +50,9 @@ public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigu
   @Inject
   protected ConnectionManagerAdapter connectionManager;
 
-  public ConfigurationProviderMetadataAdapter(String name, RuntimeConfigurationModel model,
-                                              ConfigurationInstance<T> configuration) {
+  public ConfigurationProviderMetadataAdapter(String name,
+                                              RuntimeConfigurationModel model,
+                                              ConfigurationInstance configuration) {
     super(name, model, configuration);
   }
 
@@ -84,7 +86,7 @@ public final class ConfigurationProviderMetadataAdapter<T> extends StaticConfigu
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException {
     MuleEvent fakeEvent = getInitialiserEvent(muleContext);
-    return new DefaultMetadataContext((ConfigurationInstance<Object>) get(fakeEvent),
+    return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,
                                       metadataManager.getMetadataCache(getName()));
   }

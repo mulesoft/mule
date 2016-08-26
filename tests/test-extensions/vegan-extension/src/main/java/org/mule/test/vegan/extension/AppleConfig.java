@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.Map;
@@ -22,7 +22,7 @@ import java.util.function.Function;
 @Configuration(name = APPLE)
 @Operations({EatAppleOperation.class, SpreadVeganismOperation.class})
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
-@Providers(VeganAppleConnectionProvider.class)
+@ConnectionProviders(VeganAppleConnectionProvider.class)
 public class AppleConfig {
 
   @Parameter

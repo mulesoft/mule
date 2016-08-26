@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public abstract class BaseObjectBuilder<T> implements ObjectBuilder<T> {
    */
   @Override
   public boolean isDynamic() {
-    return MuleExtensionUtils.hasAnyDynamic(resolvers.values());
+    return hasAnyDynamic(resolvers.values());
   }
 
   /**

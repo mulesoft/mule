@@ -56,7 +56,8 @@ public class DynamicMetadataModelEnricherTestCase {
 
   @Test
   public void parseMetadataAnnotationsOnParameter() {
-    final OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), CONTENT_METADATA_WITH_KEY_ID);
+    final OperationDeclaration operationDeclaration =
+        getDeclaration(declaration.getConfigurations().get(0).getOperations(), CONTENT_METADATA_WITH_KEY_ID);
     final List<ParameterDeclaration> parameters = operationDeclaration.getParameters();
 
     assertParameterIsMetadataKeyPart(getDeclaration(parameters, "type"));
@@ -66,7 +67,7 @@ public class DynamicMetadataModelEnricherTestCase {
   @Test
   public void declareStaticAndDynamicTypesInOperation() {
     List<ParameterDeclaration> params;
-    final List<OperationDeclaration> operations = declaration.getOperations();
+    List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
 
     OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
     assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
@@ -89,6 +90,7 @@ public class DynamicMetadataModelEnricherTestCase {
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
     assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
 
+    operations = declaration.getOperations();
     OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
     assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
@@ -107,7 +109,7 @@ public class DynamicMetadataModelEnricherTestCase {
   @Test
   public void declareStaticAndDynamicTypesInSource() {
 
-    final List<SourceDeclaration> messageSources = declaration.getMessageSources();
+    List<SourceDeclaration> messageSources = declaration.getConfigurations().get(0).getMessageSources();
     SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
     assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
@@ -117,6 +119,7 @@ public class DynamicMetadataModelEnricherTestCase {
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
     assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
 
+    messageSources = declaration.getMessageSources();
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
     assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())

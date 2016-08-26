@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -17,12 +18,12 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.core.work.SerialWorkManager;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -32,11 +33,11 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private Object executeWithRetryPolicy(OperationExecutor executor, OperationContextAdapter context,
                                         List<Interceptor> interceptors)
       throws Throwable {
-    RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration().getConnectionProvider());
+    RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration());
 
     ExecutionTemplate<RetryContext> executionTemplate = getExecutionTemplate(context);
 
@@ -215,9 +216,13 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
-  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConnectionProvider> optionalConnectionProvider) {
-    if (optionalConnectionProvider.isPresent()) {
-      final ConnectionProvider connectionProvider = optionalConnectionProvider.get();
+  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configurationInstance) {
+    Optional<ConnectionProvider> connectionProviderOptional = configurationInstance.map(
+                                                                                        ConfigurationInstance::getConnectionProvider)
+        .orElse(empty());
+
+    if (connectionProviderOptional.isPresent()) {
+      final ConnectionProvider connectionProvider = connectionProviderOptional.get();
       if (ConnectionProviderWrapper.class.isAssignableFrom(connectionProvider.getClass())) {
         return ((ConnectionProviderWrapper) connectionProvider).getRetryPolicyTemplate();
       }
@@ -226,14 +231,23 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   }
 
   private MutableConfigurationStats getMutableConfigurationStats(OperationContext context) {
-    ConfigurationStats stats = context.getConfiguration().getStatistics();
+    ConfigurationStats stats = context.getConfiguration().map(ConfigurationInstance::getStatistics).orElse(null);
     return stats instanceof MutableConfigurationStats ? (MutableConfigurationStats) stats : null;
   }
 
-  private List<Interceptor> collectInterceptors(Object... interceptableCandidates) {
-    return Stream.of(interceptableCandidates).filter(candidate -> candidate instanceof Interceptable)
-        .flatMap(interceptable -> ((Interceptable) interceptable).getInterceptors().stream())
-        .collect(new ImmutableListCollector<>());
+  private List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
+                                                OperationExecutor executor) {
+    List<Interceptor> accumulator = new LinkedList<>();
+    configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
+    collectInterceptors(accumulator, executor);
+
+    return accumulator;
+  }
+
+  private void collectInterceptors(List<Interceptor> accumulator, Object subject) {
+    if (subject instanceof Interceptable) {
+      accumulator.addAll(((Interceptable) subject).getInterceptors());
+    }
   }
 
   private class OperationRetryCallBack implements RetryCallback {
@@ -272,9 +286,10 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
 
     @Override
     public String getWorkDescription() {
-      return String.format("Extension [%s] with configuration [%s]",
-                           context.getConfiguration().getModel().getExtensionModel().getName(),
-                           context.getConfiguration().getName());
+      StringBuilder description = new StringBuilder(format("Extension '%s'", context.getExtensionModel().getName()));
+      context.getConfiguration().ifPresent(conf -> description.append(format(" with configuration '%s'", conf.getName())));
+
+      return description.toString();
     }
 
     @Override
@@ -286,6 +301,4 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       return operationExecutionResult;
     }
   }
-
-
 }

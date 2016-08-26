@@ -32,13 +32,14 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
 
   @Test
   public void getPets() throws Exception {
-    ConfigurationInstance<PetStoreConnector> config =
+    ConfigurationInstance config =
         muleContext.getExtensionManager().getConfiguration("petstore", getTestEvent(""));
     assertThat(config, is(notNullValue()));
 
     MuleEvent response = runFlow("getPets");
-    List<String> pets = (List<String>) response.getMessage().getPayload();
-    assertThat(pets, containsInAnyOrder(config.getValue().getPets().toArray()));
+    List<String> pets = response.getMessage().getPayload();
+    PetStoreConnector configValue = (PetStoreConnector) config.getValue();
+    assertThat(pets, containsInAnyOrder(configValue.getPets().toArray()));
   }
 
   @Test
