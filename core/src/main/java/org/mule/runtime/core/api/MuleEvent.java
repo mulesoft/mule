@@ -320,6 +320,30 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder removeFlowVariable(String key);
 
     /**
+     * 
+     * @param exchangePattern
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder exchangePattern(MessageExchangePattern exchangePattern);
+
+    /**
+     * 
+     * @param replyToHandler
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder replyToHandler(ReplyToHandler replyToHandler);
+
+    /**
+     * 
+     * @param flow
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder flow(FlowConstruct flow);
+
+    /**
      * Build a new {@link MuleEvent} based on the state confgured in the {@link Builder}.
      *
      * @return new {@link MuleEvent} instance.

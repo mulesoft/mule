@@ -11,7 +11,6 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingFo
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -526,7 +525,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
       throws Exception {
-    return new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), getTestMuleMessage(payload), REQUEST_RESPONSE,
-                                replyToHandler, flow);
+    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(MuleMessage.builder().payload(payload).build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }
 }

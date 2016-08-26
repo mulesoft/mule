@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMessageContext;
@@ -367,10 +368,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
-                                MuleMessage.builder().payload(TEST_MESSAGE).build(),
-                                MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
-                                flow);
+    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(MuleMessage.builder().payload(TEST_MESSAGE).build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(flow).build();
   }
 
   private MessageEnricher createNonBlockingEnricher(SensingNullMessageProcessor sensingNullMessageProcessor) {

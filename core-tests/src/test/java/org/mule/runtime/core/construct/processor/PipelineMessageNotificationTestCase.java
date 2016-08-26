@@ -136,9 +136,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = new DefaultMuleEvent(context, MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler,
-                                 pipeline);
-
+    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
     source.trigger(event);
 
     new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
@@ -212,8 +211,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = new DefaultMuleEvent(context, MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler,
-                                 pipeline);
+    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {
       source.trigger(event);
@@ -243,8 +242,8 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = new DefaultMuleEvent(context, MuleMessage.builder().payload("request").build(), REQUEST_RESPONSE, nullReplyToHandler,
-                                 pipeline);
+    event = MuleEvent.builder(payload).message(MuleMessage.builder().payload("request").build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {
       source.trigger(event);
