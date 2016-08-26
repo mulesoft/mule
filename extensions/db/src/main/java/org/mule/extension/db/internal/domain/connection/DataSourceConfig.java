@@ -9,6 +9,8 @@ package org.mule.extension.db.internal.domain.connection;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.param.TransactionIsolation;
@@ -16,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,13 +28,6 @@ import java.util.concurrent.TimeUnit;
 public class DataSourceConfig {
 
   /**
-   * URL used to connect to the database.
-   */
-  @Parameter
-  @Optional
-  private String url;
-
-  /**
    * Fully-qualified name of the database driver class.
    */
   @Parameter
@@ -39,6 +35,30 @@ public class DataSourceConfig {
   @Expression(NOT_SUPPORTED)
   private String driverClassName;
 
+  /**
+   * URL used to connect to the database.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION)
+  private String url;
+
+  /**
+   * The user that is used for authentication against the database
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION)
+  private String user;
+
+  /**
+   * The password that is used for authentication against the database.
+   */
+  @Parameter
+  @Optional
+  @Password
+  @Placement(group = CONNECTION)
+  private String password;
 
   /**
    * Maximum time that the data source will wait while attempting to connect to a
@@ -48,6 +68,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "0")
   @Expression(NOT_SUPPORTED)
+  @Placement(group = ADVANCED)
   private Integer connectionTimeout;
 
 
@@ -57,22 +78,8 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "SECONDS")
   @Expression(NOT_SUPPORTED)
+  @Placement(group = ADVANCED)
   private TimeUnit connectionTimeoutUnit = SECONDS;
-
-  /**
-   * The user that is used for authentication against the database
-   */
-  @Parameter
-  @Optional
-  private String user;
-
-  /**
-   * The password that is used for authentication against the database.
-   */
-  @Parameter
-  @Optional
-  @Password
-  private String password;
 
   /**
    * The transaction isolation level to set on the driver when connecting the database.
@@ -80,6 +87,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "NOT_CONFIGURED")
   @Expression(NOT_SUPPORTED)
+  @Placement(group = ADVANCED)
   private TransactionIsolation transactionIsolation = NOT_CONFIGURED;
 
   /**
@@ -88,6 +96,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "false")
   @Expression(NOT_SUPPORTED)
+  @Placement(group = ADVANCED)
   private boolean useXaTransactions = false;
 
   /**
@@ -96,6 +105,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
+  @Placement(group = ADVANCED)
   private DbPoolingProfile poolingProfile;
 
 

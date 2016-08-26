@@ -6,18 +6,16 @@
  */
 package org.mule.extension.db.api.param;
 
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
- * The definition for a DML query
+ * The definition of a bulk operations defined around one single SQL command
  *
  * @since 4.0
  */
-@Alias("query")
-public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefinition> {
+public class BulkQueryDefinition extends StatementDefinition<BulkQueryDefinition> {
 
   /**
    * A reference to a globally defined query
@@ -26,19 +24,19 @@ public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefin
   @Parameter
   @Optional
   @XmlHints(allowInlineDefinition = false)
-  private QueryDefinition template;
+  private BulkQueryDefinition template;
 
   @Override
-  public QueryDefinition getTemplate() {
+  public BulkQueryDefinition getTemplate() {
     return template;
   }
 
+
   @Override
-  protected QueryDefinition copy() {
-    QueryDefinition copy = super.copy();
+  protected BulkQueryDefinition copy() {
+    BulkQueryDefinition copy = super.copy();
     copy.template = template;
 
     return copy;
   }
-
 }

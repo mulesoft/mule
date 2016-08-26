@@ -6,30 +6,28 @@
  */
 package org.mule.extension.db.api.param;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extension.db.internal.operation.QuerySettings;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Base class containing common attributes for a statement.
  *
  * @param <T> the generic type of the implementing type
- *           @since 4.0
+ * @since 4.0
  */
-public abstract class StatementDefinition<T extends StatementDefinition<T>> {
+public abstract class StatementDefinition<T extends StatementDefinition> {
 
   /**
    * The text of the SQL query to be executed
@@ -40,21 +38,23 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
   @DisplayName("SQL Query Text")
   protected String sql;
 
-  /**
-   * A list of input parameters to be set on the JDBC prepared
-   * statement. Each parameter should be referenced in the sql
-   * text using a semicolon prefix (E.g: {@code where id = :myParamName)})
-   */
-  @Parameter
-  @Optional
-  @DisplayName("Input Parameters")
-  protected List<InputParameter> inputParameters = new LinkedList<>();
 
   /**
    * Parameters to configure the query
    */
   @ParameterGroup
   protected QuerySettings settings = new QuerySettings();
+
+  /**
+   * Allows to optionally specify the type of one or more of the parameters
+   * in the query. If provided, you're not even required to reference
+   * all of the parameters, but you cannot reference a parameter not
+   * present in the input values
+   */
+  @Parameter
+  @Optional
+  @Placement(group = ADVANCED)
+  private List<ParameterType> parameterTypes = new LinkedList<>();
 
   /**
    * Returns a globally defined definition this instance
@@ -80,7 +80,7 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
     if (template == null) {
       return (T) this;
     } else {
-      template = template.resolveFromTemplate();
+      template = (T) template.resolveFromTemplate();
     }
 
     T resolvedDefinition = copy();
@@ -89,18 +89,9 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
       resolvedDefinition.setSql(template.getSql());
     }
 
-    resolveTemplateParameters(template, resolvedDefinition);
-
     return resolvedDefinition;
   }
 
-  /**
-   * Returns a {@link Map} which keys are the names of the input
-   * parameters and the values are its values
-   */
-  public Map<String, Object> getParameterValues() {
-    return inputParameters.stream().collect(toMap(InputParameter::getParamName, InputParameter::getValue));
-  }
 
   /**
    * Returns a shallow copy of {@code this} instance.
@@ -115,65 +106,19 @@ public abstract class StatementDefinition<T extends StatementDefinition<T>> {
     }
 
     copy.sql = sql;
-    copy.inputParameters = new LinkedList<>(inputParameters);
-
+    copy.parameterTypes = new LinkedList<>(parameterTypes);
+    copy.setSettings(settings);
     return (T) copy;
   }
 
-  /**
-   * Optionally returns a parameter of the given {@code name}
-   * @param name the name of the searched parameter
-   * @return an {@link Optional} {@link QueryParameter}
-   */
-  public java.util.Optional<QueryParameter> getInputParameter(String name) {
-    return findParameter(inputParameters, name);
-  }
 
   /**
-   * @return an immutable list with the input parameters
+   * Returns the type for a given parameter
+   * @param paramName the parameter's name
+   * @return an optional {@link ParameterType}
    */
-  public List<QueryParameter> getInputParameters() {
-    return unmodifiableList(inputParameters);
-  }
-
-  private void resolveTemplateParameters(T template, T resolvedDefinition) {
-    Map<String, Object> templateParamValues = null;
-    if (template != null) {
-      templateParamValues = template.getParameterValues();
-    }
-
-    Map<String, Object> resolvedParameterValues = new HashMap<>();
-    if (templateParamValues != null) {
-      resolvedParameterValues.putAll(templateParamValues);
-    }
-
-    resolvedParameterValues.putAll(getParameterValues());
-    resolvedDefinition.getInputParameters().forEach(p -> {
-      InputParameter inputParameter = (InputParameter) p;
-      final String paramName = inputParameter.getParamName();
-      if (resolvedParameterValues.containsKey(paramName)) {
-        inputParameter.setValue(resolvedParameterValues.get(paramName));
-        resolvedParameterValues.remove(paramName);
-      }
-    });
-
-    resolvedParameterValues.entrySet().stream()
-        .map(entry -> {
-          InputParameter inputParameter = new InputParameter();
-          inputParameter.setParamName(entry.getKey());
-          inputParameter.setValue(entry.getValue());
-
-          return inputParameter;
-        }).forEach(p -> resolvedDefinition.inputParameters.add(p));
-  }
-
-
-
-  protected java.util.Optional<QueryParameter> findParameter(List<? extends QueryParameter> parameters, String name) {
-    return parameters.stream()
-        .filter(p -> p.getParamName().equals(name))
-        .map(p -> (QueryParameter) p)
-        .findFirst();
+  public java.util.Optional<ParameterType> getParameterType(String paramName) {
+    return parameterTypes.stream().filter(p -> p.getParamName().equals(paramName)).findFirst();
   }
 
   public String getSql() {

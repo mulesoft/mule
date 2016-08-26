@@ -7,19 +7,23 @@
 package org.mule.extension.db.api.param;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The definition of the invocation to a stored procedure
  *
  * @since 4.0
  */
-public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall> {
+public class StoredProcedureCall extends ParameterizedStatementDefinition<StoredProcedureCall> {
 
   /**
    * A list of output parameters to be set on the JDBC prepared
@@ -28,7 +32,8 @@ public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall
    */
   @Parameter
   @Optional
-  private List<OutputParameter> outputParameters = new LinkedList<>();
+  @DisplayName("Output Parameters")
+  private List<ParameterType> outputParameters = new LinkedList<>();
 
   /**
    * A list of parameters to be set on the JDBC prepared
@@ -38,7 +43,8 @@ public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall
    */
   @Parameter
   @Optional
-  private List<InputParameter> inOutParameters = new LinkedList<>();
+  @DisplayName("Input - Output Parameters")
+  protected LinkedHashMap<String, Object> inOutParameters = new LinkedHashMap<>();
 
   /**
    * A reference to a globally defined call
@@ -49,20 +55,30 @@ public class StoredProcedureCall extends StatementDefinition<StoredProcedureCall
   @XmlHints(allowInlineDefinition = false)
   private StoredProcedureCall template;
 
-  public java.util.Optional<QueryParameter> getOutputParameter(String name) {
-    return findParameter(outputParameters, name);
+  @Override
+  protected StoredProcedureCall copy() {
+    StoredProcedureCall copy = super.copy();
+    copy.template = template;
+    copy.outputParameters = new LinkedList<>(outputParameters);
+    copy.inOutParameters = new LinkedHashMap<>(inOutParameters);
+
+    return copy;
   }
 
-  public java.util.Optional<QueryParameter> getInOutParameter(String name) {
+  public java.util.Optional<ParameterType> getOutputParameter(String name) {
+    return outputParameters.stream().filter(p -> p.equals(name)).findFirst();
+  }
+
+  public java.util.Optional<Object> getInOutParameter(String name) {
     return findParameter(inOutParameters, name);
   }
 
-  public List<OutputParameter> getOutputParameters() {
+  public List<ParameterType> getOutputParameters() {
     return unmodifiableList(outputParameters);
   }
 
-  public List<InputParameter> getInOutParameters() {
-    return unmodifiableList(inOutParameters);
+  public Map<String, Object> getInOutParameters() {
+    return unmodifiableMap(inOutParameters);
   }
 
   @Override

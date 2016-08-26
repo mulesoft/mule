@@ -311,8 +311,9 @@ public abstract class ExtensionDefinitionParser {
       protected void defaultVisit(MetadataType metadataType) {
         addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueChildElementDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
-            .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true))
-            .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true)).build());
+            .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true, false))
+            .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true, false))
+            .build());
       }
 
       @Override

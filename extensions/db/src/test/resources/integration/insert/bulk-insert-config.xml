@@ -5,26 +5,18 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
 
-
-    <flow name="insert">
-        <dbn:insert>
-            <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')</dbn:sql>
-        </dbn:insert>
-    </flow>
-
-    <flow name="insertDynamic">
-        <dbn:insert>
-            <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, '#[payload]')</dbn:sql>
-        </dbn:insert>
-    </flow>
-
-    <flow name="insertParameterized">
-        <dbn:insert>
+    <flow name="bulkInsert">
+        <dbn:bulk-insert parameterValues="#[payload]">
             <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</dbn:sql>
-            <dbn:input-parameters>
-                <dbn:input-parameter key="name" value="#[payload]"/>
-            </dbn:input-parameters>
-        </dbn:insert>
+        </dbn:bulk-insert>
     </flow>
 
+    <flow name="bulkInsertWithOverriddenType">
+        <dbn:bulk-insert parameterValues="#[payload]">
+            <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</dbn:sql>
+            <dbn:parameter-types>
+                <dbn:parameter-type paramName="name" type="VARCHAR" />
+            </dbn:parameter-types>
+        </dbn:bulk-insert>
+    </flow>
 </mule>

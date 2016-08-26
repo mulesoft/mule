@@ -10,44 +10,35 @@ package org.mule.extension.db.internal.resolver.query;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
 import org.mule.extension.db.internal.parser.QueryTemplateParser;
-import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * Base class for {@link BulkQueryResolver} implementations
  */
-public abstract class AbstractBulkQueryResolver implements BulkQueryResolver {
+public abstract class BulkQueryFactory {
 
   private static final String BULK_QUERY_SEPARATOR = ";[\\r\\n]+";
 
-  protected final String bulkQueryText;
   private final QueryTemplateParser parser;
 
-  public AbstractBulkQueryResolver(String bulkQueryText, QueryTemplateParser queryTemplateParser) {
-    this.bulkQueryText = bulkQueryText;
+  public BulkQueryFactory(QueryTemplateParser queryTemplateParser) {
     this.parser = queryTemplateParser;
   }
 
-  @Override
-  public BulkQuery resolve(MuleEvent muleEvent) {
-    if (muleEvent == null) {
-      return null;
-    }
+  public BulkQuery resolve() {
 
-    BulkQuery bulkQuery = createBulkQuery(muleEvent);
+    BulkQuery bulkQuery = createBulkQuery();
 
     if (bulkQuery.getQueryTemplates().size() == 0) {
-      throw new QueryResolutionException("There are no queries on the resolved dynamic bulk query: " + this.bulkQueryText);
+      throw new QueryResolutionException("There are no queries on the resolved query script: " + toString());
     }
 
     return bulkQuery;
   }
 
-  protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
-    return bulkQuery.trim();
-  }
+  protected abstract String resolveBulkQueries();
 
-  protected BulkQuery createBulkQuery(MuleEvent muleEvent) {
-    String queries = resolveBulkQueries(muleEvent, this.bulkQueryText);
+  protected BulkQuery createBulkQuery() {
+    String queries = resolveBulkQueries();
 
     BulkQuery bulkQuery = new BulkQuery();
 

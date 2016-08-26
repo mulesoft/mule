@@ -8,8 +8,7 @@ package org.mule.extension.db.internal.resolver.query;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
-import org.mule.extension.db.api.param.InputParameter;
-import org.mule.extension.db.api.param.QueryParameter;
+import org.mule.extension.db.api.param.ParameterType;
 import org.mule.extension.db.api.param.StoredProcedureCall;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
@@ -18,12 +17,13 @@ import org.mule.extension.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.extension.db.internal.domain.param.DefaultOutputQueryParam;
 import org.mule.extension.db.internal.domain.param.QueryParam;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
+import org.mule.extension.db.internal.domain.type.DbType;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class StoredProcedureQueryResolver extends AbstractQueryResolver<StoredProcedureCall> {
+public class StoredProcedureQueryResolver extends ParameterizedQueryResolver<StoredProcedureCall> {
 
   @Override
   protected QueryTemplate createQueryTemplate(StoredProcedureCall call, DbConnector connector, DbConnection connection) {
@@ -39,21 +39,21 @@ public class StoredProcedureQueryResolver extends AbstractQueryResolver<StoredPr
     return queryTemplate.getParams().stream().map(param -> {
       String paramName = param.getName();
 
-      Optional<QueryParameter> parameter = call.getInputParameter(paramName);
-      if (parameter.isPresent()) {
-        InputParameter inputParameter = (InputParameter) parameter.get();
-        return new DefaultInputQueryParam(param.getIndex(), param.getType(), inputParameter.getValue(), paramName);
+      Optional<Object> parameterValue = call.getInputParameter(paramName);
+      if (parameterValue.isPresent()) {
+        return new DefaultInputQueryParam(param.getIndex(), param.getType(), parameterValue.get(), paramName);
       }
 
-      parameter = call.getOutputParameter(paramName);
-      if (parameter.isPresent()) {
-        return new DefaultOutputQueryParam(param.getIndex(), param.getType(), paramName);
+      Optional<ParameterType> outputParameter = call.getOutputParameter(paramName);
+      if (outputParameter.isPresent()) {
+        final ParameterType parameterType = outputParameter.get();
+        DbType type = parameterType.getType() != null ? parameterType.getType().getDbType() : param.getType();
+        return new DefaultOutputQueryParam(param.getIndex(), type, paramName);
       }
 
-      parameter = call.getInOutParameter(paramName);
-      if (parameter.isPresent()) {
-        InputParameter inputParameter = (InputParameter) parameter.get();
-        return new DefaultInOutQueryParam(param.getIndex(), param.getType(), paramName, inputParameter.getValue());
+      parameterValue = call.getInOutParameter(paramName);
+      if (parameterValue.isPresent()) {
+        return new DefaultInOutQueryParam(param.getIndex(), param.getType(), paramName, parameterValue.get());
       }
 
       throw new IllegalArgumentException(format("Parameter '%s' was not bound for query '%s'", paramName, call.getSql()));

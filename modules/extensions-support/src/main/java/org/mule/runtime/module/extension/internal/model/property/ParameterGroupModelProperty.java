@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
+import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
@@ -56,6 +57,10 @@ public final class ParameterGroupModelProperty implements ModelProperty {
   @Override
   public boolean isExternalizable() {
     return false;
+  }
+
+  public List<ParameterGroup> getExclusiveGroups() {
+    return groups.stream().filter(g -> g.hasExclusiveOptionals()).collect(toList());
   }
 
   public boolean hasExclusiveOptionals() {

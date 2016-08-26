@@ -12,11 +12,18 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
- * Base class for a query parameter
+ * Allows specifying the type of a given parameter
  *
  * @since 4.0
  */
-public abstract class QueryParameter {
+public class ParameterType {
+
+  public ParameterType() {}
+
+  public ParameterType(String paramName, JdbcType type) {
+    this.paramName = paramName;
+    this.type = type;
+  }
 
   /**
    * The name of the input parameter.
@@ -35,10 +42,6 @@ public abstract class QueryParameter {
 
   public String getParamName() {
     return paramName;
-  }
-
-  public void setParamName(String paramName) {
-    this.paramName = paramName;
   }
 
   public JdbcType getType() {

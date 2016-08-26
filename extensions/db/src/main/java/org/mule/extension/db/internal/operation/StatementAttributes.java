@@ -6,8 +6,11 @@
  */
 package org.mule.extension.db.internal.operation;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Parameters to configure the executed statements
@@ -23,6 +26,8 @@ public class StatementAttributes {
    */
   @Parameter
   @Optional
+  @Placement(group = ADVANCED)
+  @DisplayName("Fetch Size")
   private Integer fetchSize;
 
   /**
@@ -33,6 +38,8 @@ public class StatementAttributes {
    */
   @Parameter
   @Optional
+  @Placement(group = ADVANCED)
+  @DisplayName("Max Rows")
   private Integer maxRows;
 
   public Integer getFetchSize() {

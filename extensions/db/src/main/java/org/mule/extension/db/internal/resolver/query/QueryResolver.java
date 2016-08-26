@@ -15,7 +15,7 @@ import org.mule.extension.db.internal.domain.query.Query;
 /**
  * Resolves a {@link Query}
  */
-public interface QueryResolver<T extends StatementDefinition<T>> {
+public interface QueryResolver<T extends StatementDefinition> {
 
   /**
    * Resolves a query

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+
+    <flow name="bulkUpdate">
+        <dbn:bulk-update parameterValues="#[payload]">
+            <dbn:sql>update PLANET set NAME='Mercury' where NAME= :name</dbn:sql>
+        </dbn:bulk-update>
+    </flow>
+
+    <flow name="bulkUpdateWithOverriddenType">
+        <dbn:bulk-update parameterValues="#[payload]">
+            <dbn:sql>update PLANET set NAME='Mercury' where NAME= :name</dbn:sql>
+            <dbn:parameter-types>
+                <dbn:parameter-type paramName="name" type="VARCHAR" />
+            </dbn:parameter-types>
+        </dbn:bulk-update>
+    </flow>
+
+    <flow name="updateBulkAfterSelect">
+        <dbn:select>
+            <dbn:sql>select * from PLANET</dbn:sql>
+        </dbn:select>
+
+        <dbn:bulk-update parameterValues="#[payload]">
+            <dbn:sql>update PLANET set NAME='Mercury' where POSITION=:position</dbn:sql>
+        </dbn:bulk-update>
+    </flow>
+</mule>

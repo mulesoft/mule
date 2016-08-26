@@ -55,7 +55,7 @@
         <dbn:select>
             <dbn:sql>select * from Planet where name = :name</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="name" value="#[payload]"/>
+                <dbn:input-parameter key="name" value="#[payload]"/>
             </dbn:input-parameters>
         </dbn:select>
     </flow>

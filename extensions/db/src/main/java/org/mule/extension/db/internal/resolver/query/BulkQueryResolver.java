@@ -7,19 +7,56 @@
 
 package org.mule.extension.db.internal.resolver.query;
 
+import org.mule.extension.db.api.param.BulkQueryDefinition;
+import org.mule.extension.db.api.param.ParameterType;
+import org.mule.extension.db.internal.DbConnector;
+import org.mule.extension.db.internal.domain.connection.DbConnection;
+import org.mule.extension.db.internal.domain.param.DefaultInputQueryParam;
+import org.mule.extension.db.internal.domain.param.InputQueryParam;
+import org.mule.extension.db.internal.domain.param.QueryParam;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
+import org.mule.extension.db.internal.domain.query.Query;
+import org.mule.extension.db.internal.domain.query.QueryParamValue;
+import org.mule.extension.db.internal.domain.query.QueryTemplate;
 import org.mule.runtime.core.api.MuleEvent;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Resolves a {@link BulkQuery} for a given {@link MuleEvent}
  */
-public interface BulkQueryResolver {
+public class BulkQueryResolver extends AbstractQueryResolver<BulkQueryDefinition> {
 
-  /**
-   * Resolves a bulk query in the context of a given Mule event.
-   *
-   * @param muleEvent used to resolve any Mule expression
-   * @return bulk query resolved for the given event, null if event is null.
-   */
-  BulkQuery resolve(MuleEvent muleEvent);
+  @Override
+  public Query resolve(BulkQueryDefinition definition, DbConnector connector, DbConnection connection) {
+    Query query = super.resolve(definition, connector, connection);
+    List<QueryParam> queryParams = new LinkedList<>();
+
+    final QueryTemplate queryTemplate = query.getQueryTemplate();
+    queryTemplate.getParams().forEach(inputParam -> {
+      if (inputParam instanceof InputQueryParam) {
+        String paramName = inputParam.getName();
+        Optional<ParameterType> parameterType = definition.getParameterType(paramName);
+        if (parameterType.isPresent()) {
+          queryParams
+              .add(new DefaultInputQueryParam(inputParam.getIndex(), parameterType.get().getType().getDbType(), null, paramName));
+          return;
+        }
+      }
+
+      queryParams.add(inputParam);
+    });
+
+    return new Query(new QueryTemplate(queryTemplate.getSqlText(),
+                                       queryTemplate.getType(),
+                                       queryParams,
+                                       queryTemplate.isDynamic()));
+  }
+
+  @Override
+  protected List<QueryParamValue> resolveParams(BulkQueryDefinition statementDefinition, QueryTemplate template) {
+    return new LinkedList<>();
+  }
 }

@@ -9,30 +9,34 @@ package org.mule.extension.db.internal.resolver.query;
 
 import org.mule.extension.db.internal.parser.QueryTemplateParser;
 import org.mule.extension.db.internal.util.FileReader;
-import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.IOException;
 
 /**
  * Resolves a bulk query reading the queries from a file
  */
-public class FileBulkQueryResolver extends AbstractBulkQueryResolver {
+public class FileBulkQueryFactory extends BulkQueryFactory {
 
   private final String file;
   private final FileReader fileReader;
 
-  public FileBulkQueryResolver(String file, QueryTemplateParser queryTemplateParser, FileReader fileReader) {
-    super(null, queryTemplateParser);
+  public FileBulkQueryFactory(String file, QueryTemplateParser queryTemplateParser, FileReader fileReader) {
+    super(queryTemplateParser);
     this.file = file;
     this.fileReader = fileReader;
   }
 
   @Override
-  protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
+  protected String resolveBulkQueries() {
     try {
       return fileReader.getResourceAsString(file);
     } catch (IOException e) {
-      throw new QueryResolutionException("Unable to read bulk query file: " + file);
+      throw new QueryResolutionException("Unable to read script file: " + file);
     }
+  }
+
+  @Override
+  public String toString() {
+    return file;
   }
 }
