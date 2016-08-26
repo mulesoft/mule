@@ -22,7 +22,7 @@
         <dbn:insert>
             <dbn:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="name" value="#[payload]"/>
+                <dbn:input-parameter key="name" value="#[payload]"/>
             </dbn:input-parameters>
         </dbn:insert>
     </flow>

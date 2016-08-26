@@ -8,9 +8,7 @@ package org.mule.extension.db.internal.resolver.query;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import org.mule.extension.db.api.param.InputParameter;
 import org.mule.extension.db.api.param.ParameterizedStatementDefinition;
-import org.mule.extension.db.api.param.QueryParameter;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
 
@@ -25,24 +23,13 @@ public class ParameterizedQueryResolver<T extends ParameterizedStatementDefiniti
         .map(p -> {
           final String parameterName = p.getName();
 
-          Optional<QueryParameter> optionalParameter = statementDefinition.getInputParameter(parameterName);
-          if (!optionalParameter.isPresent()) {
+          Optional<Object> parameterValue = statementDefinition.getInputParameter(parameterName);
+          if (parameterValue.isPresent()) {
+            return new QueryParamValue(parameterName, parameterValue.get());
+          } else {
             throw new IllegalArgumentException(format("Parameter '%s' was not bound for query '%s'",
-                                                      parameterName,
-                                                      statementDefinition.getSql()));
+                                                      parameterName, statementDefinition.getSql()));
           }
-
-          QueryParameter parameter = optionalParameter.get();
-
-          if (!(parameter instanceof InputParameter)) {
-            throw new IllegalArgumentException(
-                                               format("Parameter '%s' should be bound to an input parameter on query '%s'",
-                                                      parameterName,
-                                                      statementDefinition.getSql()));
-          }
-
-          return new QueryParamValue(parameterName, ((InputParameter) parameter).getValue());
-        })
-        .collect(toList());
+        }).collect(toList());
   }
 }

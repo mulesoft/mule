@@ -8,13 +8,13 @@
     <dbn:query name="updateTemplate">
         <dbn:sql>update PLANET set NAME='Mercury' where POSITION= :position</dbn:sql>
         <dbn:input-parameters>
-            <dbn:input-parameter paramName="position" value="4"/>
+            <dbn:input-parameter key="position" value="4"/>
         </dbn:input-parameters>
     </dbn:query>
 
     <dbn:query name="overriddenUpdateParam" template="updateTemplate">
         <dbn:input-parameters>
-            <dbn:input-parameter paramName="position" value="2"/>
+            <dbn:input-parameter key="position" value="2"/>
         </dbn:input-parameters>
     </dbn:query>
 
@@ -29,7 +29,7 @@
     <flow name="inlineOverriddenParams">
         <dbn:update template="overriddenUpdateParam">
             <dbn:input-parameters>
-            <dbn:input-parameter paramName="position" value="3"/>
+            <dbn:input-parameter key="position" value="3"/>
             </dbn:input-parameters>
         </dbn:update>
     </flow>

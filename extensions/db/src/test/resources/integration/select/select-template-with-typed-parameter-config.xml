@@ -8,7 +8,7 @@
     <dbn:query name="selectQuery">
         <dbn:sql>select * from Planet where name = :name</dbn:sql>
         <dbn:input-parameters>
-            <dbn:input-parameter paramName="name" value="#[payload]" type="VARCHAR"/>
+            <dbn:input-parameter key="name" value="#[payload]" type="VARCHAR"/>
         </dbn:input-parameters>
     </dbn:query>
 

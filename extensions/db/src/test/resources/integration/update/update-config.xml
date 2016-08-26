@@ -24,7 +24,7 @@
         <dbn:update>
             <dbn:sql>update PLANET set NAME= :name where NAME='Mars'</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="name" value="#[payload]"/>
+                <dbn:input-parameter key="name" value="#[payload]"/>
             </dbn:input-parameters>
         </dbn:update>
     </flow>

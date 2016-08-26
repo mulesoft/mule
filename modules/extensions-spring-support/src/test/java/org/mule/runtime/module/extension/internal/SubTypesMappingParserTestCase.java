@@ -100,10 +100,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertRevolver(payload.getWeaponList().get(3), 0);
 
     assertThat(payload.getWeaponMap(), is(notNullValue()));
-    assertThat(payload.getWeaponMap().entrySet(), hasSize(4));
+    assertThat(payload.getWeaponMap().entrySet(), hasSize(3));
     assertRicin(payload.getWeaponMap().get("ricinChild"), 20L, "Lidia");
     assertRevolver(payload.getWeaponMap().get("revolverChild"), 1);
-    assertRevolver(payload.getWeaponMap().get("revolverRef"), 6);
     assertRevolver(payload.getWeaponMap().get("revolverMEL"), 0);
 
   }

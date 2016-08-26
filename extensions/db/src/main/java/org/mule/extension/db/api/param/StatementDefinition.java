@@ -8,13 +8,18 @@ package org.mule.extension.db.api.param;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extension.db.internal.operation.QuerySettings;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Base class containing common attributes for a statement.
@@ -39,6 +44,17 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
    */
   @ParameterGroup
   protected QuerySettings settings = new QuerySettings();
+
+  /**
+   * Allows to optionally specify the type of one or more of the parameters
+   * in the query. If provided, you're not even required to reference
+   * all of the parameters, but you cannot reference a parameter not
+   * present in the input values
+   */
+  @Parameter
+  @Optional
+  @Placement(group = ADVANCED)
+  private List<ParameterType> parameterTypes = new LinkedList<>();
 
   /**
    * Returns a globally defined definition this instance
@@ -90,10 +106,20 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
     }
 
     copy.sql = sql;
+    copy.parameterTypes = new LinkedList<>(parameterTypes);
     copy.setSettings(settings);
     return (T) copy;
   }
 
+
+  /**
+   * Returns the type for a given parameter
+   * @param paramName the parameter's name
+   * @return an optional {@link ParameterType}
+   */
+  public java.util.Optional<ParameterType> getParameterType(String paramName) {
+    return parameterTypes.stream().filter(p -> p.getParamName().equals(paramName)).findFirst();
+  }
 
   public String getSql() {
     return sql;

@@ -9,7 +9,7 @@
         <dbn:stored-procedure>
             <dbn:sql>call updateParamTestType1(:type)</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="type" value="#[payload]"/>
+                <dbn:input-parameter key="type" value="#[payload]"/>
             </dbn:input-parameters>
         </dbn:stored-procedure>
     </flow>

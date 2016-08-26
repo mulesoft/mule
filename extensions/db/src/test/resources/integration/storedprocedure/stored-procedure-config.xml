@@ -9,7 +9,7 @@
         <dbn:stored-procedure>
             <dbn:sql>{ call doubleMyInt(:myInt) }</dbn:sql>
             <dbn:in-out-parameters>
-                <dbn:input-parameter paramName="myInt" value="3"/>
+                <dbn:in-out-parameter key="myInt" value="3"/>
             </dbn:in-out-parameters>
         </dbn:stored-procedure>
     </flow>
@@ -18,7 +18,7 @@
         <dbn:stored-procedure>
             <dbn:sql>{ CALL countTestRecords(:count) }</dbn:sql>
             <dbn:output-parameters>
-                <dbn:outut-parameter paramName="count"/>
+                <dbn:output-parameter paramName="count"/>
             </dbn:output-parameters>
         </dbn:stored-procedure>
     </flow>
@@ -27,9 +27,9 @@
         <dbn:stored-procedure>
             <dbn:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="int1" value="3"/>
-                <dbn:input-parameter paramName="int2" value="4"/>
-                <dbn:input-parameter paramName="int3" value="5"/>
+                <dbn:input-parameter key="int1" value="3"/>
+                <dbn:input-parameter key="int2" value="4"/>
+                <dbn:input-parameter key="int3" value="5"/>
             </dbn:input-parameters>
             <dbn:output-parameters>
                 <dbn:output-parameter paramName="result1"/>
@@ -42,8 +42,8 @@
         <dbn:stored-procedure config-ref="dbConfig">
             <dbn:sql>{ call concatenateStrings(:s1, :s2, :result) }</dbn:sql>
             <dbn:input-parameters>
-                <dbn:input-parameter paramName="s1" value="foo"/>
-                <dbn:input-parameter paramName="s2" value="bar"/>
+                <dbn:input-parameter key="s1" value="foo"/>
+                <dbn:input-parameter key="s2" value="bar"/>
             </dbn:input-parameters>
             <dbn:output-parameters>
                 <dbn:output-parameter paramName="result"/>

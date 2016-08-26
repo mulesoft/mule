@@ -6,20 +6,25 @@
  */
 package org.mule.extension.db.api.param;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Base class for {@link StatementDefinition} implementations which have
  * a {@link List} of {@link InputParameter}
+ *
  * @param <T> the generic type of the implementing type
  * @since 4.0
  */
@@ -28,14 +33,16 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
 
 
   /**
-   * A list of input parameters to be set on the JDBC prepared
-   * statement. Each parameter should be referenced in the sql
-   * text using a semicolon prefix (E.g: {@code where id = :myParamName)})
+   * A {@link Map} which keys are the name of an input parameter to be set on
+   * the JDBC prepared statement. Each parameter should be referenced in the sql
+   * text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
+   * <p>
+   * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
   @Optional
   @DisplayName("Input Parameters")
-  protected List<InputParameter> inputParameters = new LinkedList<>();
+  protected LinkedHashMap<String, Object> inputParameters = new LinkedHashMap<>();
 
 
   /**
@@ -43,23 +50,38 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * parameters and the values are its values
    */
   public Map<String, Object> getParameterValues() {
-    return inputParameters.stream().collect(toMap(InputParameter::getParamName, InputParameter::getValue));
+    return unmodifiableMap(inputParameters);
   }
 
   /**
    * Optionally returns a parameter of the given {@code name}
+   *
    * @param name the name of the searched parameter
-   * @return an {@link Optional} {@link QueryParameter}
+   * @return an {@link Optional} {@link ParameterType}
    */
-  public java.util.Optional<QueryParameter> getInputParameter(String name) {
-    return findParameter(inputParameters, name);
+  public java.util.Optional<Object> getInputParameter(String name) {
+    return inputParameters.containsKey(name) ? of(inputParameters.get(name)) : empty();
+  }
+
+  protected java.util.Optional<Object> findParameter(Map<String, Object> parameters, String name) {
+    return parameters.containsKey(name) ? of(parameters.get(name)) : empty();
   }
 
   /**
-   * @return an immutable list with the input parameters
+   * @return an immutable {@link Map} with the input parameters
    */
-  public List<QueryParameter> getInputParameters() {
-    return unmodifiableList(inputParameters);
+  public Map<String, Object> getInputParameters() {
+    return unmodifiableMap(inputParameters);
+  }
+
+  /**
+   * Adds a new input parameter
+   *
+   * @param paramName the parameter name
+   * @param value     the parameter value
+   */
+  public void addInputParameter(String paramName, Object value) {
+    inputParameters.put(paramName, value);
   }
 
   private void resolveTemplateParameters(T template, T resolvedDefinition) {
@@ -75,36 +97,22 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
     }
 
     resolvedParameterValues.putAll(getParameterValues());
-    resolvedDefinition.getInputParameters().forEach(p -> {
-      InputParameter inputParameter = (InputParameter) p;
-      final String paramName = inputParameter.getParamName();
+
+    final Set<String> paramNames = new HashSet<>(resolvedDefinition.getInputParameters().keySet());
+    paramNames.forEach(paramName -> {
       if (resolvedParameterValues.containsKey(paramName)) {
-        inputParameter.setValue(resolvedParameterValues.get(paramName));
+        resolvedDefinition.addInputParameter(paramName, resolvedParameterValues.get(paramName));
         resolvedParameterValues.remove(paramName);
       }
     });
 
-    resolvedParameterValues.entrySet().stream()
-        .map(entry -> {
-          InputParameter inputParameter = new InputParameter();
-          inputParameter.setParamName(entry.getKey());
-          inputParameter.setValue(entry.getValue());
-
-          return inputParameter;
-        }).forEach(p -> resolvedDefinition.inputParameters.add(p));
-  }
-
-  protected java.util.Optional<QueryParameter> findParameter(List<? extends QueryParameter> parameters, String name) {
-    return parameters.stream()
-        .filter(p -> p.getParamName().equals(name))
-        .map(p -> (QueryParameter) p)
-        .findFirst();
+    resolvedParameterValues.forEach((key, value) -> resolvedDefinition.inputParameters.put(key, value));
   }
 
   @Override
   protected T copy() {
     T copy = super.copy();
-    copy.inputParameters = new LinkedList<>(inputParameters);
+    copy.inputParameters = new LinkedHashMap(inputParameters);
 
     return copy;
   }

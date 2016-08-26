@@ -61,7 +61,6 @@
             <subtypes:weapon-map key="revolverChild">
                 <subtypes:revolver bullets="1"/>
             </subtypes:weapon-map>
-            <subtypes:weapon-map key="revolverRef" value="remington"/>
             <subtypes:weapon-map key="revolverMEL" value="#[new org.mule.test.subtypes.extension.Revolver()]"/>
         </subtypes:weapon-maps>
     </subtypes:config>

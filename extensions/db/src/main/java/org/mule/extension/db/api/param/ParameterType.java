@@ -6,11 +6,45 @@
  */
 package org.mule.extension.db.api.param;
 
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+
 /**
  * Allows specifying the type of a given parameter
  *
  * @since 4.0
  */
-public class ParameterType extends QueryParameter {
+public class ParameterType {
 
+  public ParameterType() {}
+
+  public ParameterType(String paramName, JdbcType type) {
+    this.paramName = paramName;
+    this.type = type;
+  }
+
+  /**
+   * The name of the input parameter.
+   */
+  @Parameter
+  @Expression(NOT_SUPPORTED)
+  private String paramName;
+
+  /**
+   * Parameter type name.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  private JdbcType type;
+
+  public String getParamName() {
+    return paramName;
+  }
+
+  public JdbcType getType() {
+    return type;
+  }
 }

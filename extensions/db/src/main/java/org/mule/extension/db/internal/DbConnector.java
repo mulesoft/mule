@@ -7,6 +7,7 @@
 package org.mule.extension.db.internal;
 
 import org.mule.extension.db.api.StatementStreamingResultSetCloser;
+import org.mule.extension.db.api.param.BulkQueryDefinition;
 import org.mule.extension.db.api.param.CustomDataType;
 import org.mule.extension.db.api.param.JdbcType;
 import org.mule.extension.db.api.param.QueryDefinition;
@@ -52,7 +53,8 @@ import org.apache.commons.lang.StringUtils;
 @Operations({DmlOperations.class, DdlOperations.class, BulkOperations.class})
 @Providers({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
 @Xml(namespace = "dbn")
-@Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class},
+@Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class,
+    BulkQueryDefinition.class},
     resources = {"/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"})
 public class DbConnector implements Initialisable {
 

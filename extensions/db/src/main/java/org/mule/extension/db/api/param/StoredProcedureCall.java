@@ -7,12 +7,16 @@
 package org.mule.extension.db.api.param;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The definition of the invocation to a stored procedure
@@ -28,7 +32,8 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
    */
   @Parameter
   @Optional
-  private List<OutputParameter> outputParameters = new LinkedList<>();
+  @DisplayName("Output Parameters")
+  private List<ParameterType> outputParameters = new LinkedList<>();
 
   /**
    * A list of parameters to be set on the JDBC prepared
@@ -38,7 +43,8 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
    */
   @Parameter
   @Optional
-  private List<InputParameter> inOutParameters = new LinkedList<>();
+  @DisplayName("Input - Output Parameters")
+  protected LinkedHashMap<String, Object> inOutParameters = new LinkedHashMap<>();
 
   /**
    * A reference to a globally defined call
@@ -54,25 +60,25 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
     StoredProcedureCall copy = super.copy();
     copy.template = template;
     copy.outputParameters = new LinkedList<>(outputParameters);
-    copy.inOutParameters = new LinkedList<>(inOutParameters);
+    copy.inOutParameters = new LinkedHashMap<>(inOutParameters);
 
     return copy;
   }
 
-  public java.util.Optional<QueryParameter> getOutputParameter(String name) {
-    return findParameter(outputParameters, name);
+  public java.util.Optional<ParameterType> getOutputParameter(String name) {
+    return outputParameters.stream().filter(p -> p.equals(name)).findFirst();
   }
 
-  public java.util.Optional<QueryParameter> getInOutParameter(String name) {
+  public java.util.Optional<Object> getInOutParameter(String name) {
     return findParameter(inOutParameters, name);
   }
 
-  public List<OutputParameter> getOutputParameters() {
+  public List<ParameterType> getOutputParameters() {
     return unmodifiableList(outputParameters);
   }
 
-  public List<InputParameter> getInOutParameters() {
-    return unmodifiableList(inOutParameters);
+  public Map<String, Object> getInOutParameters() {
+    return unmodifiableMap(inOutParameters);
   }
 
   @Override

@@ -8,14 +8,14 @@
     <dbn:query name="namedParamsQueryTemplate">
         <dbn:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</dbn:sql>
         <dbn:input-parameters>
-            <dbn:input-parameter paramName="position" value="4"/>
-            <dbn:input-parameter paramName="name" value="Venus"/>
+            <dbn:input-parameter key="position" value="4"/>
+            <dbn:input-parameter key="name" value="Venus"/>
         </dbn:input-parameters>
     </dbn:query>
 
     <dbn:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
         <dbn:input-parameters>
-            <dbn:input-parameter paramName="name" value="Mars"/>
+            <dbn:input-parameter key="name" value="Mars"/>
         </dbn:input-parameters>
     </dbn:query>
 
@@ -27,8 +27,8 @@
         <dbn:select template="namedParamsQueryTemplate">
             <dbn:input-parameters>
                 <!-- Note that parameters are in different order-->
-                <dbn:input-parameter paramName="name" value="Venus"/>
-                <dbn:input-parameter paramName="position" value="2"/>
+                <dbn:input-parameter key="name" value="Venus"/>
+                <dbn:input-parameter key="position" value="2"/>
             </dbn:input-parameters>
         </dbn:select>
     </flow>
