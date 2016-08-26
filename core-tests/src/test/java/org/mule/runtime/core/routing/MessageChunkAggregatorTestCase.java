@@ -9,8 +9,8 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -44,7 +44,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     MuleMessage message2 = MuleMessage.of("test event B");
     MuleMessage message3 = MuleMessage.of("test event C");
 
-    MessageContext context = create(flow, "test", "foo");
+    MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
 
     DefaultMuleEvent event1 =
         new DefaultMuleEvent(context, message1, getTestFlow(), session);

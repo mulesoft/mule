@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.core.processor;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
@@ -20,6 +19,7 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -39,7 +39,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -119,7 +118,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
   protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
     Flow flow = getTestFlow();
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flow, "test"),
+        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
                              MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
@@ -187,7 +186,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
       flow.setExceptionListener(exceptionListener);
     }
     final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flow, "test"),
+        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
                              MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(), flow,
                              getTestSession(null, muleContext));
     DefaultMuleEventEndpointUtils

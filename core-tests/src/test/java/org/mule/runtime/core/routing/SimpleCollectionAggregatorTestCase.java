@@ -13,8 +13,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -50,7 +50,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = create(flow, "test", "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
@@ -99,7 +99,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = create(flow, "test", "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
     MuleMessage message1 = MuleMessage.of("test event A");
 
     DefaultMuleEvent event1 = new DefaultMuleEvent(executionContext, message1, flow);
@@ -128,7 +128,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = create(flow, "test", "foo");
+    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();

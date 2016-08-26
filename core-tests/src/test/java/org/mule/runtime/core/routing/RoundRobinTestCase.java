@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -78,11 +78,11 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     routes.add(route2);
     roundRobin.setRoutes(new ArrayList<>(routes));
 
-    MuleMessage message = MuleMessage.builder().payload(Collections.singletonList(TEST_MESSAGE)).build();
+    MuleMessage message = MuleMessage.builder().payload(singletonList(TEST_MESSAGE)).build();
 
     Flow flow = getTestFlow();
-    roundRobin
-        .process(new DefaultMuleEvent(create(flow, "test"), message, REQUEST_RESPONSE, flow, (MuleSession) null));
+    roundRobin.process(new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, REQUEST_RESPONSE, flow,
+                                            (MuleSession) null));
 
     verify(route1).process(any(MuleEvent.class));
     verify(route2, never()).process(any(MuleEvent.class));
@@ -106,8 +106,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     public void run() {
       for (int i = 0; i < numMessages; i++) {
         MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE + messageNumber.getAndIncrement()).build();
-        MuleEvent event =
-            new DefaultMuleEvent(create(flowConstruct, "test"), msg, REQUEST_RESPONSE, flowConstruct, session);
+        MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR), msg, REQUEST_RESPONSE,
+                                               flowConstruct, session);
         try {
           target.process(event);
         } catch (MuleException e) {

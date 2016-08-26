@@ -15,9 +15,9 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -112,8 +112,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Test
   public void enrichFlowVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
-    MuleEvent event =
-        new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
+                                           MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("flowVars['foo']", event, flowConstruct, "bar");
     assertThat(event.getFlowVariable("foo"), is("bar"));
     assertThat(event.getSession().getProperty("foo"), nullValue());
@@ -122,8 +122,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Test
   public void enrichSessionVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
-    MuleEvent event =
-        new DefaultMuleEvent(create(flow, "test"), MuleMessage.builder().payload("").build(), ONE_WAY, flow);
+    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
+                                           MuleMessage.builder().payload("").build(), ONE_WAY, flow);
     expressionManager.enrich("sessionVars['foo']", event, flowConstruct, "bar");
     assertThat(event.getSession().getProperty("foo"), equalTo("bar"));
     assertThat(event.getFlowVariableNames(), not(contains("foo")));

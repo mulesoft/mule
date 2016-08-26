@@ -11,11 +11,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -63,7 +63,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
   private MuleEvent createNonBlockingTestEvent() throws Exception {
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    return new DefaultMuleEvent(create(flow, "test"),
+    return new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
                                 MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                 MessageExchangePattern.REQUEST_RESPONSE,
                                 new SensingNullReplyToHandler(), flow);

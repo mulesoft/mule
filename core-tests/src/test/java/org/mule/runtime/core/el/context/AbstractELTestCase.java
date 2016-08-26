@@ -12,6 +12,8 @@ import static org.junit.Assert.fail;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -35,6 +37,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   protected Variant variant;
   protected ExpressionLanguage expressionLanguage;
   protected Flow flowConstruct;
+  protected MessageContext context;
 
   public AbstractELTestCase(Variant variant, String mvelOptimizer) {
     this.variant = variant;
@@ -44,6 +47,11 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setupFlowConstruct() throws Exception {
     flowConstruct = getTestFlow();
+  }
+
+  @Before
+  public void setupMessageContext() throws Exception {
+    context = DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR);
   }
 
   @Before

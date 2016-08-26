@@ -17,12 +17,13 @@ import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODE
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -49,40 +50,41 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
   private MuleContext muleContext;
   @Mock
   private TransformationService transformationService;
+  private Flow flow;
+  private MessageContext context;
 
   @Before
   public void setup() throws Exception {
     when(muleContext.getTransformationService()).thenReturn(transformationService);
     when(transformationService.transform(any(MuleMessage.class), any(DataType.class)))
         .thenAnswer(inv -> (MuleMessage) inv.getArguments()[0]);
+
+    flow = getTestFlow();
+    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
   }
 
   @Test
   public void validGet() throws Exception {
     MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-    Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(create(flow, "test"), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
   }
 
   @Test
   public void validPost() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-    Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(create(flow, "test"), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
   }
 
   @Test
   public void validPut() throws Exception {
     MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-    Flow flow = getTestFlow();
-    verifyTransformation(transform(new DefaultMuleEvent(create(flow, "test"), msg, flow)));
+    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
   }
 
   @Test(expected = TransformerException.class)
   public void invalidContentType() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, "application/json");
-    Flow flow = getTestFlow();
-    transform(new DefaultMuleEvent(create(flow, "test"), msg, flow));
+    transform(new DefaultMuleEvent(context, msg, flow));
   }
 
   private Object transform(MuleEvent event) throws TransformerException {

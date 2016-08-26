@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -90,7 +90,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
+    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     String string = "bar";
@@ -130,7 +130,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testNonSerializableSessionProperties() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
+    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     NotSerializableClass clazz = new NotSerializableClass();
@@ -153,7 +153,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSecurityContext() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("Test Message").build();
     Flow flow = MuleTestUtils.getTestFlow(muleContext);
-    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow);
+    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow);
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());

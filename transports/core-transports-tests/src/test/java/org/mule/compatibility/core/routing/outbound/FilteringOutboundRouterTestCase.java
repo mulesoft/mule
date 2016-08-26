@@ -13,11 +13,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -74,7 +75,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     when(mockEndpoint.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
     MuleSession session = mock(MuleSession.class);
     Flow flow = getTestFlow();
-    router.route(new DefaultMuleEvent(create(flow, "test"), message, flow, session));
+    router.route(new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow, session));
 
     // Test with transform
     message = MuleMessage.builder().payload(new Exception("test event")).build();
@@ -113,12 +114,13 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
 
     MuleMessage message = MuleMessage.builder().payload("test event").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow, null);
+    final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    MuleEvent event = new DefaultMuleEvent(context, message, flow, null);
     when(mockEndpoint.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
     MuleSession session = mock(MuleSession.class);
     MuleEvent result =
-        router.route(new DefaultMuleEvent(create(flow, "test"), message, flow, null));
+        router.route(new DefaultMuleEvent(context, message, flow, null));
     assertNotNull(result);
     assertEquals(message, result.getMessage());
   }
@@ -143,7 +145,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     m.put("barValue", "bar");
     MuleMessage message = MuleMessage.builder().payload("test event").outboundProperties(m).build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(create(flow, "test"), message, flow, null);
+    final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    MuleEvent event = new DefaultMuleEvent(context, message, flow, null);
 
     assertTrue(router.isMatch(getTestEvent(message)));
     OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, event);
