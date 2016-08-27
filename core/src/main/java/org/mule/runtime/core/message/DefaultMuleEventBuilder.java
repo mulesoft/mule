@@ -7,6 +7,7 @@
 package org.mule.runtime.core.message;
 
 
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -36,7 +37,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private MessageContext context;
   private MuleMessage message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
-  private MessageExchangePattern exchangePattern;
+  private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
   private FlowConstruct flow;
   private Correlation correlation = new Correlation(null, null);
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
