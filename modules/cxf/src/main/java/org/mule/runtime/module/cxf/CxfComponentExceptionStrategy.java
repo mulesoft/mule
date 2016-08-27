@@ -23,11 +23,11 @@ import org.apache.cxf.interceptor.Fault;
 public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy {
 
   @Override
-  protected void doHandleException(Exception e, MuleEvent event) {
+  protected MuleEvent doHandleException(Exception e, MuleEvent event) {
     if (e.getCause() instanceof Fault) {
-      super.doHandleException((Exception) e.getCause(), event);
+      return super.doHandleException((Exception) e.getCause(), event);
     } else {
-      super.doHandleException(e, event);
+      return super.doHandleException(e, event);
     }
   }
 }

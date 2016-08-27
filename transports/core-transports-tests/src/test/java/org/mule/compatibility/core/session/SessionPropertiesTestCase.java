@@ -240,7 +240,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
 
     // Event is copied, but session isn't
     assertNotSame(processedEvent, event);
-    assertEquals(processedEvent, event);
+    assertEquals(processedEvent.getMessage(), event.getMessage());
     assertSame(processedEvent.getSession(), event.getSession());
 
     // Session properties available before new flow are available after too

@@ -165,7 +165,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the exception thrown. This will be sent with the ExceptionMessage
    * @see ExceptionMessage
    */
-  protected void routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
+  protected MuleEvent routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
+    MuleEvent result = event;
+
     if (!messageProcessors.isEmpty()) {
       try {
         if (logger.isDebugEnabled()) {
@@ -183,13 +185,14 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         router.setMuleContext(muleContext);
 
         // Route the ExceptionMessage to the new router
-        router.route(MuleEvent.builder(event).message(exceptionMessage).build());
+        result = router.route(MuleEvent.builder(event).message(exceptionMessage).build());
       } catch (Exception e) {
         logFatal(event, e);
       }
     }
 
     processOutboundRouterStatistics();
+    return result;
   }
 
   protected MulticastingRouter buildRouter() {

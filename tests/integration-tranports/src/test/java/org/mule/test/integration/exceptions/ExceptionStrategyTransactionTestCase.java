@@ -7,7 +7,6 @@
 package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -19,7 +18,6 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 /**
@@ -66,8 +64,8 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase {
     private int visits = 0;
 
     @Override
-    protected void routeException(MuleEvent event, FlowConstruct flow, Throwable t) {
-      super.routeException(event, flow, t);
+    protected MuleEvent routeException(MuleEvent event, FlowConstruct flow, Throwable t) {
+      MuleEvent result = super.routeException(event, flow, t);
 
       if (visits++ > 1) {
         failure = "Exception strategy should only be called once";
@@ -83,6 +81,8 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase {
         failure = e.getMessage();
         fail(e.getMessage());
       }
+
+      return result;
     }
   }
 }

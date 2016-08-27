@@ -47,6 +47,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private Object replyToDestination;
   private boolean transacted;
   private Boolean synchronous;
+  private boolean nonBlocking;
   private MuleSession session = new DefaultMuleSession();
 
   public DefaultMuleEventBuilder(MessageContext messageContext) {
@@ -68,8 +69,10 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
     this.message = event.getMessage();
 
     this.transacted = event.isTransacted();
+    this.nonBlocking = event.isAllowNonBlocking();
 
     this.session = event.getSession();
+    this.error = event.getError();
 
     event.getFlowVariableNames().forEach(key -> this.flowVariables
         .put(key, new TypedValue<>(event.getFlowVariable(key), event.getFlowVariableDataType(key))));
@@ -160,6 +163,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
     DefaultMuleEvent event =
         new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
                              synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
+                             nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
                              replyToDestination, replyToHandler, flowCallStack);
     this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
     event.setCorrelation(correlation);
