@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -74,7 +74,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     if (copyOnVoidEvent
         && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
             || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
-      MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
+      MuleEvent copy = MuleEvent.builder(event).build();
       MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
       if (isUseEventCopy(result)) {
         setCurrentEvent(copy);

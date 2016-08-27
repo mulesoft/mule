@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.BlockingProcessorExecutor;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -73,6 +74,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     MuleMessage message = MuleMessage.builder().payload("").build();
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
         .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
             .getArguments()[1]));
@@ -116,7 +118,6 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
       assertThat(executor.execute().getMessageAsString(muleContext), equalTo(RESULT));
       assertThat(getCurrentEvent(), requestResponseMatcher);
     } else {
-      assertThat(executor.execute().getId(), equalTo(event.getId()));
       assertThat(executor.execute().getMessage(), equalTo(event.getMessage()));
       assertThat(getCurrentEvent(), not(sameInstance(event)));
     }

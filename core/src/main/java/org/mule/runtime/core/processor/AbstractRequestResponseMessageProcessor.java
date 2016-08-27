@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -58,7 +58,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   protected MuleEvent processNonBlocking(final MuleEvent request) throws MuleException {
     MessagingException exception = null;
-    MuleEvent eventToProcess = new DefaultMuleEvent(request, createReplyToHandler(request));
+    MuleEvent eventToProcess = MuleEvent.builder(request).replyToHandler(createReplyToHandler(request)).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(eventToProcess);
 
@@ -111,7 +111,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   private MuleEvent recreateEventWithOriginalReplyToHandler(MuleEvent event, ReplyToHandler originalReplyToHandler) {
     if (event != null) {
-      event = new DefaultMuleEvent(event, originalReplyToHandler);
+      event = MuleEvent.builder(event).replyToHandler(originalReplyToHandler).build();
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }

@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,7 +25,6 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerTemplate;
@@ -36,7 +36,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,17 +238,18 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   }
 
   protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException {
+    Builder eventBuilder = MuleEvent.builder(event);
     if (result instanceof MuleMessage) {
-      return new DefaultMuleEvent((MuleMessage) result, event);
+      eventBuilder.message((MuleMessage) result);
     } else if (result != null) {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      event.setMessage(muleContext.getTransformationService()
-          .applyTransformers(event.getMessage(), event, Collections.<Transformer>singletonList(template)));
-      return event;
+      eventBuilder
+          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
-      return new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), event);
+      eventBuilder.message(MuleMessage.builder().nullPayload().build());
     }
+    return eventBuilder.build();
   }
 
   public String getName() {

@@ -110,7 +110,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     Thread.sleep(50);
 
     // While a SedaService returns null, a Flow echos the request when there is async hand-off
-    assertEquals(event, response);
+    assertEquals(event.getMessage(), response.getMessage());
 
     assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
