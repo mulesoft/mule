@@ -19,8 +19,9 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy {
   }
 
   @Override
-  protected void doHandleException(Exception e, MuleEvent event) {
+  protected MuleEvent doHandleException(Exception e, MuleEvent event) {
     logger.debug("Ignoring", e);
+    return event;
   }
 
   @Override
