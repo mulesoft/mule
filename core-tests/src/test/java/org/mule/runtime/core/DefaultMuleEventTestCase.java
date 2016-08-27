@@ -17,12 +17,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
@@ -137,8 +137,8 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, REQUEST_RESPONSE, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow)
+        .synchronous(true).build();
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -148,8 +148,8 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, ONE_WAY, flow);
+    MuleEvent event =
+        MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).synchronous(true).build();
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }

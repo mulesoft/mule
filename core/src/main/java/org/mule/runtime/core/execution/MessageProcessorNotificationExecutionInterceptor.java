@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -63,7 +62,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
 
     if (nonBlocking && responseProcessing) {
       final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-      eventToProcess = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
+      eventToProcess = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
         @Override
         public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
@@ -84,7 +83,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
           }
           originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
         }
-      });
+      }).build();
     }
     // Update RequestContext ThreadLocal in case if previous processor modified it
     // also for backwards compatibility

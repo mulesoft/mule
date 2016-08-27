@@ -12,7 +12,6 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -72,16 +71,16 @@ public class AsyncResponseFlowProcessingPhase
               MuleEvent muleEvent = template.getMuleEvent();
               fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
               if (muleEvent.isAllowNonBlocking()) {
-                muleEvent =
-                    new DefaultMuleEvent(muleEvent,
-                                         new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template,
-                                                                                                                                  messageProcessContext
-                                                                                                                                      .getFlowConstruct(),
-                                                                                                                                  phaseResultNotifier,
-                                                                                                                                  exceptionHandler),
-                                                                                      messageProcessContext.getFlowConstruct()
-                                                                                          .getExceptionListener(),
-                                                                                      messageProcessContext.getFlowConstruct()));
+                muleEvent = MuleEvent.builder(muleEvent)
+                    .replyToHandler(new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template,
+                                                                                                                             messageProcessContext
+                                                                                                                                 .getFlowConstruct(),
+                                                                                                                             phaseResultNotifier,
+                                                                                                                             exceptionHandler),
+                                                                                 messageProcessContext.getFlowConstruct()
+                                                                                     .getExceptionListener(),
+                                                                                 messageProcessContext.getFlowConstruct()))
+                    .build();
                 // Update RequestContext ThreadLocal for backwards compatibility
                 setCurrentEvent(muleEvent);
               }

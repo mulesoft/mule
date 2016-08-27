@@ -8,7 +8,6 @@ package org.mule.runtime.core.message;
 
 
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
@@ -174,8 +173,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   protected boolean resolveEventSynchronicity() {
     return transacted
         || isFlowConstructSynchronous()
-        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
-        || message.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
+        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
   }
 
   private boolean isFlowConstructSynchronous() {

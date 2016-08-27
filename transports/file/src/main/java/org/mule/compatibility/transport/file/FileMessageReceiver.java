@@ -12,7 +12,6 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
 import static org.mule.runtime.core.DefaultMessageContext.create;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -25,6 +24,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -309,10 +309,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
     messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
-    if (forceSync) {
-      messageBuilder.addInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
-    }
-
     ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
     final MuleCompatibilityMessage finalMessage = messageBuilder.build();
     final Object originalPayload = finalMessage.getPayload();
@@ -323,6 +319,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     } else {
       processWithoutStreaming(originalSourceFilePath, originalSourceFileName, originalSourceDirectory, sourceFile,
                               destinationFile, executionTemplate, finalMessage);
+    }
+  }
+
+  @Override
+  protected void configureMuleEventBuilder(Builder builder) {
+    super.configureMuleEventBuilder(builder);
+    if (forceSync) {
+      builder.synchronous(true);
     }
   }
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.message.Correlation.NO_CORRELATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
@@ -319,8 +318,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   protected boolean resolveEventSynchronicity() {
     return transacted
         || isFlowConstructSynchronous()
-        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
-        || message.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
+        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
   }
 
   private boolean isFlowConstructSynchronous() {

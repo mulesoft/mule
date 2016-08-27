@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -185,7 +184,6 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), is(0));
 
-    assertThat(getCurrentEvent().getId(), equalTo(muleEventIdToProcess));
     assertThat(getCurrentEvent(), not(mockMuleEvent));
     assertThat(getCurrentEvent(), not(mockMuleEventPreviousExecution));
   }

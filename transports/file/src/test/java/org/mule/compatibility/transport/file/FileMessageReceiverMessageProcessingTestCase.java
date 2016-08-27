@@ -6,13 +6,11 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static java.lang.Boolean.FALSE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -209,7 +207,6 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockInboundEndpoint.getEncoding()).thenReturn(UTF_8);
     when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
     mockMessageFactory = new FileMuleMessageFactory();
-    when(mockMessage.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, FALSE)).thenReturn(true);
     when(mockMessage.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY)).thenReturn(UUID.getUUID());
     when(mockHandledMessagingException.getEvent()).thenReturn(mockMuleEvent);
     when(mockUnhandledMessagingException.getEvent()).thenReturn(mockMuleEvent);

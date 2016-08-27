@@ -243,6 +243,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     if (replyToFromMessage != null) {
       builder.replyToHandler(replyToHandler).replyToDestination(replyToFromMessage);
     }
+    configureMuleEventBuilder(builder);
     DefaultMuleEvent newEvent = (DefaultMuleEvent) builder.build();
 
     if (message.getCorrelationId() != null) {
@@ -256,6 +257,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       session.getSecurityContext().getAuthentication().setEvent(event);
     }
     return event;
+  }
+
+  protected void configureMuleEventBuilder(Builder builder) {
+    // Nothing to do, subclasses may override
   }
 
   protected Object getReplyToDestination(MuleMessage message) {
