@@ -320,6 +320,14 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder removeFlowVariable(String key);
 
     /**
+     * Sets an error related to the produced event.
+     *
+     * @param error the error associated with the produced event
+     * @return the builder instance
+     */
+    Builder error(Error error);
+
+    /**
      * 
      * @param synchronous
      * @return the builder instance

@@ -10,6 +10,7 @@ package org.mule.runtime.core.message;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -37,6 +38,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private MessageContext context;
   private MuleMessage message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
+  private Error error;
   private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
   private FlowConstruct flow;
   private Correlation correlation = new Correlation(null, null);
@@ -106,6 +108,12 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
+  public Builder error(Error error) {
+    this.error = error;
+    return this;
+  }
+
+  @Override
   public Builder synchronous(boolean synchronous) {
     this.synchronous = synchronous;
     return this;
@@ -155,6 +163,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
                              replyToDestination, replyToHandler, flowCallStack);
     this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
     event.setCorrelation(correlation);
+    event.setError(error);
     return event;
   }
 

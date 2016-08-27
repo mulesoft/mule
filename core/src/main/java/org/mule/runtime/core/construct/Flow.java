@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -111,7 +110,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
   }
 
   private MuleEvent createMuleEventForCurrentFlow(MuleEvent event, Object replyToDestination, ReplyToHandler replyToHandler) {
-    // Wrap and propagte reply to handler only if it's not a standard DefaultReplyToHandler.
+    // Wrap and propagate reply to handler only if it's not a standard DefaultReplyToHandler.
     if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler) {
       replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
     } else {
@@ -121,7 +120,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     }
 
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
-    event = new DefaultMuleEvent(event, this, replyToHandler, replyToDestination, event.isSynchronous() || isSynchronous());
+    event = MuleEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination)
+        .synchronous(event.isSynchronous() || isSynchronous()).build();
     resetRequestContextEvent(event);
     return event;
   }
@@ -146,9 +146,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     if (result != null && !(result instanceof VoidMuleEvent)) {
       Error error = result.getError();
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-      result = new DefaultMuleEvent(result, original.getFlowConstruct(), original.getReplyToHandler(),
-                                    original.getReplyToDestination(), original.isSynchronous());
-      result.setError(error);
+      result = MuleEvent.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
+          .replyToDestination(original.getReplyToDestination()).synchronous(original.isSynchronous()).error(error).build();
     }
     resetRequestContextEvent(result);
     return result;

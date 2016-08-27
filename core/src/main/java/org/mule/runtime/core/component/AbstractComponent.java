@@ -12,7 +12,6 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -135,7 +134,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
 
   protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException {
     if (result instanceof MuleMessage) {
-      return new DefaultMuleEvent((MuleMessage) result, event);
+      return MuleEvent.builder(event).message((MuleMessage) result).build();
     } else if (result instanceof VoidResult) {
       return event;
     } else {

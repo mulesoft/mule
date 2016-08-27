@@ -191,7 +191,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     @Override
     protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException {
       this.eventToEnrich = event;
-      MuleEvent result = processNext(copyEventForEnrichment(new DefaultMuleEvent(event, createReplyToHandler(event))));
+      MuleEvent result =
+          processNext(copyEventForEnrichment(MuleEvent.builder(event).replyToHandler(createReplyToHandler(event)).build()));
       if (!(result instanceof NonBlockingVoidMuleEvent)) {
         result = processResponse(result, event);
       }
