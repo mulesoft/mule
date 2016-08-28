@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -55,9 +54,9 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     // This is a bit of a hack since we return a collection of events on one
     // message
     for (int i = 0; i < results.length; i++) {
-      results[i] = new DefaultMuleEvent(results[i].getMessage(), results[i]);
+      results[i] = MuleEvent.builder(results[i]).build();
     }
-    return new DefaultMuleEvent(MuleMessage.builder().payload(results).build(), results[0]);
+    return MuleEvent.builder(results[0]).message(MuleMessage.builder().payload(results).build()).build();
   }
 
 }

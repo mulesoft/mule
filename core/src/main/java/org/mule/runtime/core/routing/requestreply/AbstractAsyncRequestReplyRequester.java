@@ -7,10 +7,10 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -89,10 +89,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       if (resultEvent != null) {
         // If result has MULE_SESSION property then merge session properties returned with existing
         // session properties. See MULE-5852
-        if (resultEvent.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null) {
+        if (resultEvent.getMessage().getInboundProperty(MULE_SESSION_PROPERTY) != null) {
           event.getSession().merge(resultEvent.getSession());
         }
-        resultEvent = new DefaultMuleEvent(resultEvent.getMessage(), event);
+        resultEvent = MuleEvent.builder(event).message(resultEvent.getMessage()).build();
         setCurrentEvent(resultEvent);
       }
       return resultEvent;

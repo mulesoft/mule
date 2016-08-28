@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -107,6 +106,12 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   }
 
   private DefaultMuleEvent createEvent(Object payload, MuleEvent originalEvent) {
+    /*
+     * TODO: These breaK:
+     * 
+     * org.mule.test.routing.ForeachTestCase, org.mule.test.routing.ForeachUntilSuccessfulTestCase,
+     * org.mule.test.integration.exceptions.ExceptionHandlingTestCase
+     */
     if (payload instanceof MuleEvent) {
       return new DefaultMuleEvent(((MuleEvent) payload).getMessage(), originalEvent);
     } else if (payload instanceof MuleMessage) {

@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.outbound;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -234,7 +233,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
    * Create a new event to be routed to the target MP
    */
   protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message) {
-    return new DefaultMuleEvent(message, routedEvent, true);
+    return MuleEvent.builder(routedEvent).message(message).synchronous(true).build();
   }
 
   /**
